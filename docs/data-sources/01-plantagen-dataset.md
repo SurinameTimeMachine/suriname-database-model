@@ -18,15 +18,21 @@
 | **File Format**         | CSV                                 |
 | **Geographic Coverage** | Suriname (all plantation districts) |
 
+### Description
+
+This dataset is derived from the "Suriname Slave and Emancipation Registers Dataset Version 1.1" dataset and contains all the plantations that appear in the Slave Registers as legal entities owning enslaved persons. In the original Slave Register dataset, plantations do not have a unique ID (although the plantation names are standardized). In this dataset, each plantation has its own unique ID (PSURxxxx). The Suriname Plantation Dataset provides background information on the plantations whose enslaved populations can be found in the Suriname slave registers and provides information on the completeness of the data present for each plantation in the Suriname Slave Registers database. Legally, plantations has a specific status with regards to owning enslaved, that was different from private owners -- e.g. there were more restrictions on the sale of enslaved persons by plantations.
+
 ### Purpose
 
-This dataset provides a **master list of Suriname plantations** with:
+This dataset provides a **master list of Suriname plantations as legal entities that owned enslaved persons between 1830-1863** with:
 
 - Unique identifiers (PSUR IDs)
-- plantages are not seen as locations but as organisations
-- Enslaved population counts across 4 time series
-- Product information at different years
-- District classification at different years
+- plantations are not seen as locations but as organisations (legal entities)
+- Enslaved population counts across 4 time series of the Slave registers
+- remarks about transfer of the slave forces to/from other plantations
+- Whether the part of the register series where the plantation was mentioned is missing or complete
+- Product information in 1846 and 1859
+- District classification at different years (1842, 1855)
 - General remarks and historical notes
 
 ---
@@ -39,8 +45,8 @@ Based on the source documentation, the dataset contains these columns:
 
 | Field             | Type        | Description                          | Example    | Crucial for Linking | Primary Information |
 | ----------------- | ----------- | ------------------------------------ | ---------- | ------------------- | ------------------- |
-| `ID_plantation`   | text/string | PSUR identifier (unique key)         | `PSUR0001` |                     |                     |
-| `Name_plantation` | text/string | Primary/standardized plantation name | `Aasvogel` |                     |                     |
+| `ID_plantation`   | text/string | PSUR identifier (unique key)         | `PSUR0001` |             Yes: to Almanakken dataset      |                     |
+| `Name_plantation` | text/string | Primary/standardized plantation name | `Aasvogel` |         Yes: to Slave registers           |          Yes although the name can differ from labels in other sources. So: nice to have           |
 
 ### Enslaved Population Series
 
@@ -48,10 +54,10 @@ The dataset tracks enslaved population across **4 temporal series**:
 
 | Field                    | Type    | Description                           | Notes      | Crucial for Linking | Primary Information |
 | ------------------------ | ------- | ------------------------------------- | ---------- | ------------------- | ------------------- |
-| `Serie1_number_enslaved` | integer | Number of enslaved people in Series 1 | ~1830–1840 |                     |                     |
-| `Serie2_number_enslaved` | integer | Number of enslaved people in Series 2 | ~1841–1850 |                     |                     |
-| `Serie3_number_enslaved` | integer | Number of enslaved people in Series 3 | ~1851–1860 |                     |                     |
-| `Serie4_number_enslaved` | integer | Number of enslaved people in Series 4 | ~1861–1863 |                     |                     |
+| `Serie1_number_enslaved` | integer | Number of enslaved people in Series 1 | ~1830–1840 |                     |          Yes, even though this amount can be derived directly from the Slave Registers, this would require extra calculations           |
+| `Serie2_number_enslaved` | integer | Number of enslaved people in Series 2 | ~1841–1850 |                     |           Y           |
+| `Serie3_number_enslaved` | integer | Number of enslaved people in Series 3 | ~1851–1860 |                     |          Y            |
+| `Serie4_number_enslaved` | integer | Number of enslaved people in Series 4 | ~1861–1863 |                     |          Y            |
 
 ### Series Status
 
@@ -59,20 +65,20 @@ Each series has a status indicating data completeness:
 
 | Field           | Type        | Description              | Values                                | Crucial for Linking | Primary Information |
 | --------------- | ----------- | ------------------------ | ------------------------------------- | ------------------- | ------------------- |
-| `Serie1_Status` | text/string | Completeness of Series 1 | `complete`, `missing`, `non existent` |                     |                     |
-| `Serie2_Status` | text/string | Completeness of Series 2 | `complete`, `missing`, `non existent` |                     |                     |
-| `Serie3_Status` | text/string | Completeness of Series 3 | `complete`, `missing`, `non existent` |                     |                     |
-| `Serie4_Status` | text/string | Completeness of Series 4 | `complete`, `missing`, `non existent` |                     |                     |
+| `Serie1_Status` | text/string | Completeness of Series 1 | `complete`, `missing`, `non existent` |                     |        Nice to have but not crucial. It explains the availability of the source Slave registers for a particular plantation             |
+| `Serie2_Status` | text/string | Completeness of Series 2 | `complete`, `missing`, `non existent` |                     |         Nice to have            |
+| `Serie3_Status` | text/string | Completeness of Series 3 | `complete`, `missing`, `non existent` |                     |         Nice to have            |
+| `Serie4_Status` | text/string | Completeness of Series 4 | `complete`, `missing`, `non existent` |                     |          Nice to have           |
 
 ### Temporal Information
 
 | Field           | Type        | Description                      | Notes | Crucial for Linking | Primary Information |
 | --------------- | ----------- | -------------------------------- | ----- | ------------------- | ------------------- |
-| `StartYear`     | integer     | Start year of plantation records |       |                     |                     |
-| `EndYear`       | integer     | End year of plantation records   |       |                     |                     |
-| `Start_remarks` | text/string | Notes about start/transfer       |       |                     |                     |
-| `Start_date`    | text/string | Specific start date if known     |       |                     |                     |
-| `End_remarks`   | text/string | Notes about end/closure          |       |                     |                     |
+| `StartYear`     | integer     | Start year of plantation records |       |                     |         Yes: useful information to include if we want a time slider etc. So this would indicate from which year the plantation occurs in the Slave registers           |
+| `EndYear`       | integer     | End year of plantation records   |       |                     |          Yes: until this year the plantation owned enslaved according to the SR           |
+| `Start_remarks` | text/string | Notes about start/transfer       |       |                     |        Yes: explains from which plantation enslaved were moved - perhaps needs Dutch translation?            |
+| `Start_date`    | text/string | Specific start date if known     |       |                     |                  |              |
+| `End_remarks`   | text/string | Notes about end/closure          |       |                     |         Yes: explains to which plantation enslaved were movedor other reason for end date (e.g. last enslaved died)- perhaps needs Dutch translation?             |
 | `End_date`      | text/string | Specific end date if known       |       |                     |                     |
 
 ### Geographic Information
