@@ -9,7 +9,7 @@
 
 ## Dataset Overview
 
-| Property                | Value                               |
+| Property                | Values                               |
 | ----------------------- | ----------------------------------- |
 | **Primary Entity**      | Plantations (organizations)         |
 | **Time Coverage**       | 1700–1863 (slavery period)          |
