@@ -4,7 +4,7 @@
 
 ---
 
-## What Is This About?
+## What is it about
 
 "Linked Open Data" (LOD) is a way of publishing data so that it can connect to other data on the web. The basic idea:
 
@@ -14,37 +14,26 @@
 
 So instead of my database having a field `birthplace = "Paramaribo"`, it would have `birthplace = https://www.wikidata.org/entity/Q3001`. Anyone who knows what Wikidata is can follow that link and get more information about Paramaribo.
 
-Tim Berners-Lee (inventor of the web) proposed a "five star" rating:
+Tim Berners-Lee (inventor of the web and linked data initiator) proposed a "five star" rating (https://5stardata.info/en/):
 
-| Stars | What It Means                    |
-| ----- | -------------------------------- |
-| 1     | Available on the web, any format |
-| 2     | Structured data (not just PDF)   |
-| 3     | Open format (not Excel)          |
-| 4     | Use URIs for things              |
-| 5     | Link to other data               |
+| Stars | What It Means                            |
+| ----- | ---------------------------------------- |
+| 1     | Available on the web, any format (PDF)   |
+| 2     | Structured data, but proprietary (Excel) |
+| 3     | Open format (CSV)                        |
+| 4     | Use URIs for things                      |
+| 5     | Link to other data or projects           |
 
-Right now our data is maybe 2-star (structured CSVs). Five-star would mean publishing it as linked data with connections to Wikidata, GeoNames, etc.
+Right now the Suriname Time Machine data is maybe 3-star (structured CSVs) with some having links to WikiMedia.
 
 ---
 
-## Do We Actually Need This?
+## Why do we need it
 
-**Arguments for linked data:**
-
-1. **Interoperability** - Other projects could use our data without custom parsing
-2. **Enrichment** - Following links to Wikidata gets us coordinates, alternate names, related entities
-3. **Standards** - Using CIDOC-CRM vocabulary means cultural heritage scholars understand our schema
-4. **Discoverability** - Linked data crawlers could find and index our project
-
-**Arguments against (or at least, reasons to wait):**
-
-1. **Complexity** - RDF is harder than SQL
-2. **Tooling** - Triple stores are less mature than PostgreSQL
-3. **Audience** - Most users won't query our SPARQL endpoint
-4. **Premature** - We don't know what our data looks like yet
-
-**My current thinking:** Build in PostgreSQL first. Design with LOD compatibility in mind (use URIs as identifiers, map to standard vocabularies). Export to linked data later.
+- Interoperability: other projects could use our data without custom parsing
+- Enrichment: following links to Wikidata gets us coordinates, alternate names, related entities
+- Standards: using CIDOC-CRM vocabulary means cultural heritage scholars understand our schema
+- Discoverability: linked data crawlers could find and index our project (which could also be problematic, so we probably also need to add a bit of a barrier for that)
 
 ---
 
@@ -53,9 +42,9 @@ Right now our data is maybe 2-star (structured CSVs). Five-star would mean publi
 Every entity should have a URI. Something like:
 
 ```
-https://suriname-time-machine.org/person/PERS_0001
-https://suriname-time-machine.org/place/LOC_0042
-https://suriname-time-machine.org/map/MAP_1763_001
+https://surinametijdmachine.org/person/PERS_0001
+https://surinametijdmachine.org/place/LOC_0042
+https://surinametijdmachine.org/map/MAP_1763_001
 ```
 
 If someone requests that URI, they should get information about the entity. In different formats depending on what they ask for:
@@ -63,15 +52,14 @@ If someone requests that URI, they should get information about the entity. In d
 - Web browser → HTML page
 - Machine → JSON-LD or RDF
 
-This is called "content negotiation" and it's fiddly to implement. But the important thing now is to design identifiers that could become URIs later.
-
-**Question:** What domain do we use? We don't have `suriname-time-machine.org`. Maybe we should think about this.
+Different URI types with examples and a pro and con list
+![Shortend identifier types in a table format with a pros and cons list](shortend-identifier-types-table.png)
 
 ---
 
-## RDF: The Data Model
+## RDF
 
-RDF (Resource Description Framework) represents everything as triples: subject - predicate - object.
+RDF (Resource Description Framework) represents everything as triples: subject - predicate - object, example:
 
 ```
 <PERS_0001> <hasName> "Jan Klaas"
@@ -79,13 +67,13 @@ RDF (Resource Description Framework) represents everything as triples: subject -
 <LOC_0042> <label> "Paramaribo"
 ```
 
-This is powerful because:
+Great to use, because:
 
 - You can merge data from different sources (if they use the same predicates)
 - Queries can follow chains of relationships
 - There's no fixed schema (both good and bad)
 
-But it's awkward because:
+BDifficult to use, because:
 
 - Simple things become verbose
 - Querying requires learning SPARQL
@@ -112,25 +100,18 @@ JSON-LD is RDF in JSON clothing. It looks like normal JSON:
 
 The `@context` says "interpret `name` as `schema.org/name`" and so on. Under the hood, it's RDF triples.
 
-This is probably the export format we'd use. It's readable by both humans and machines.
+This is probably the export format we should use. It is readable by both humans and machines, and also necessaryreunions.org is using it, and the HTR annotations of the maps are already structured in a JSON way, and AnnoRepo is using it, and it is easy to manipulate and track the changes.
 
 ---
 
-## Vocabularies I Keep Seeing
+## Vocabularies
 
 **Schema.org** - General purpose. Person, Place, Event. Used by Google for search results.
-
 **Dublin Core** - Metadata standard. Title, creator, date, description. Good for documents.
-
 **FOAF** (Friend of a Friend) - People and relationships. A bit dated but still used.
-
 **CIDOC-CRM** - Cultural heritage. Very comprehensive but complex. See [cidoc-crm.md](./cidoc-crm.md).
-
 **GeoSPARQL** - Geospatial data. Would be relevant for our maps.
-
 **PROV-O** - Provenance. Who created what, when, based on what. Important for us.
-
-The idea is: reuse existing vocabularies instead of inventing your own. If everyone uses `schema:name` for a person's name, data can be combined.
 
 ---
 
@@ -143,7 +124,7 @@ Wikidata is the most useful external dataset for us. It has:
 - Stable identifiers (Q-numbers)
 - Multilingual labels
 
-Example: Paramaribo is Q3001. I can query Wikidata for its coordinates, population, administrative divisions, etc.
+Example: Paramaribo is Q3001. Query Wikidata for its coordinates, population, administrative divisions, etc.
 
 **Practical approach:** Store Wikidata Q-IDs alongside our own identifiers. When we export to linked data, use `owl:sameAs` to say "our LOC_0042 is the same as Wikidata Q3001."
 
@@ -153,41 +134,6 @@ Example: Paramaribo is Q3001. I can query Wikidata for its coordinates, populati
   "owl:sameAs": "http://www.wikidata.org/entity/Q3001"
 }
 ```
-
-**To investigate:** Can we contribute back to Wikidata? Add plantation locations, historical figures from our data?
-
----
-
-## SPARQL
-
-SPARQL is the query language for RDF data. It looks like SQL but for triples.
-
-```sparql
-PREFIX schema: <https://schema.org/>
-
-SELECT ?name ?birthplace
-WHERE {
-  ?person a schema:Person .
-  ?person schema:name ?name .
-  ?person schema:birthPlace ?place .
-  ?place schema:name ?birthplace .
-}
-```
-
-You can query across federated endpoints:
-
-```sparql
-SELECT ?localPerson ?wikidataLabel
-WHERE {
-  ?localPerson owl:sameAs ?wikidata .
-  SERVICE <https://query.wikidata.org/sparql> {
-    ?wikidata rdfs:label ?wikidataLabel .
-    FILTER(LANG(?wikidataLabel) = "en")
-  }
-}
-```
-
-This is powerful but I've never actually built a SPARQL endpoint. The tooling seems more complicated than PostgreSQL.
 
 ---
 
@@ -210,62 +156,4 @@ One thing LOD standards do well: provenance. PROV-O lets you say:
 
 This is exactly what we need for tracking interpretations. The [ethical framework](./ethical-framework.md) says every interpretation should be attributed. PROV-O gives us a standard way to do that.
 
-Maybe I should model our interpretation table with PROV-O in mind?
-
----
-
-## Dead End: Going Full Linked Data Now
-
-I spent a while trying to design the database as a native RDF store. The idea was: use a triple store (like Apache Jena or Blazegraph), model everything in CIDOC-CRM, get linked data "for free."
-
-Problems I ran into:
-
-1. **Spatial queries** - RDF spatial support is weaker than PostGIS
-2. **Complex queries** - SPARQL is harder than SQL for ad-hoc analysis
-3. **Tooling** - No equivalent to psql, pgAdmin, DBeaver
-4. **Learning curve** - I kept making mistakes with RDF syntax
-
-I've shelved this approach. Maybe revisit later if there's demand for a SPARQL endpoint.
-
----
-
-## Practical Path Forward
-
-1. **Now:** Design PostgreSQL schema with LOD in mind
-
-   - Use stable identifiers that can become URIs
-   - Store external IDs (Wikidata, GeoNames) as columns
-   - Document mappings to CIDOC-CRM / Schema.org
-
-2. **Later:** Build export pipeline
-
-   - Generate JSON-LD from database
-   - Serve at URIs with content negotiation
-   - Maybe set up a SPARQL endpoint if people want it
-
-3. **Maybe never:** Full migration to triple store
-   - Only if there's a compelling use case
-   - Could run triple store alongside PostgreSQL
-
----
-
-## References
-
-**Heath, Tom, and Christian Bizer.** _Linked Data: Evolving the Web into a Global Data Space_. Morgan and Claypool, 2011.
-Free online: http://linkeddatabook.com/
-Good introduction, though a bit dated now.
-
-**W3C Linked Data** - https://www.w3.org/standards/semanticweb/data
-Official standards and specifications.
-
-**Wikidata Query Service** - https://query.wikidata.org/
-Try out SPARQL queries against Wikidata. Good for learning.
-
-**JSON-LD Playground** - https://json-ld.org/playground/
-Visualise how JSON-LD maps to RDF triples.
-
----
-
----
-
-7 January 2026
+> Maybe I should model our interpretation table with PROV-O in mind?
