@@ -23,6 +23,7 @@
 This dataset provides a **master list of Suriname plantations** with:
 
 - Unique identifiers (PSUR IDs)
+- plantages are not seen as locations but as organisations
 - Enslaved population counts across 4 time series
 - Product information at different years
 - District classification at different years
