@@ -45,7 +45,7 @@ Based on the source documentation, the dataset contains these columns:
 
 | Field             | Type        | Description                          | Example    | Crucial for Linking | Primary Information |
 | ----------------- | ----------- | ------------------------------------ | ---------- | ------------------- | ------------------- |
-| `ID_plantation`   | text/string | PSUR identifier (unique key)         | `PSUR0001` |             Yes: to Almanakken dataset      |                     |
+| `ID_plantation`   | text/string | PSUR identifier (unique key)         | `PSUR0001` |             Yes: to Almanakken dataset      |         NOTE: it would be useful to add a linking table that adds the wikidata Q-ids to this dataset (to which our own plantation permanent ids will be added). A TODO for Thunnis            |
 | `Name_plantation` | text/string | Primary/standardized plantation name | `Aasvogel` |         Yes: to Slave registers           |          Yes although the name can differ from labels in other sources. So: nice to have           |
 
 ### Enslaved Population Series
@@ -78,29 +78,29 @@ Each series has a status indicating data completeness:
 | `EndYear`       | integer     | End year of plantation records   |       |                     |          Yes: until this year the plantation owned enslaved according to the SR           |
 | `Start_remarks` | text/string | Notes about start/transfer       |       |                     |        Yes: explains from which plantation enslaved were moved - perhaps needs Dutch translation?            |
 | `Start_date`    | text/string | Specific start date if known     |       |                     |                  |              |
-| `End_remarks`   | text/string | Notes about end/closure          |       |                     |         Yes: explains to which plantation enslaved were movedor other reason for end date (e.g. last enslaved died)- perhaps needs Dutch translation?             |
+| `End_remarks`   | text/string | Notes about end/closure          |       |                     |         Yes: explains to which plantation enslaved were moved or other reason for end date (e.g. last enslaved died)- perhaps needs Dutch translation?  It would be a small effort to manually create links to the plantations that are referred to. A todo for Thunnis?           |
 | `End_date`      | text/string | Specific end date if known       |       |                     |                     |
 
 ### Geographic Information
 
 | Field           | Type        | Description      | Notes                              | Crucial for Linking | Primary Information |
 | --------------- | ----------- | ---------------- | ---------------------------------- | ------------------- | ------------------- |
-| `District_1842` | text/string | District in 1842 | Historical administrative division |                     |                     |
-| `District_1855` | text/string | District in 1855 | May differ from 1842               |                     |                     |
+| `District_1842` | text/string | District in 1842 | Historical administrative division |        not crucial but useful - but we still need a map/dataset that describes the historical districts that changed over time. To distinguish plantations with a similar name, either district or river/road on which it is located is needed             |                     |
+| `District_1855` | text/string | District in 1855 | May differ from 1842               |           idem          |                     |
 
 ### Production Information
 
 | Field          | Type        | Description           | Values                                       | Crucial for Linking | Primary Information |
 | -------------- | ----------- | --------------------- | -------------------------------------------- | ------------------- | ------------------- |
-| `Product_1846` | text/string | Product grown in 1846 | `sugar`, `coffee`, `cotton`, `cacao`, `food` |                     |                     |
-| `Product_1854` | text/string | Product grown in 1854 | Same as above                                |                     |                     |
-| `Product_1859` | text/string | Product grown in 1859 | Same as above                                |                     |                     |
+| `Product_1846` | text/string | Product grown in 1846 | `sugar`, `coffee`, `cotton`, `cacao`, `food` |         not crucial            |          better to get this information straight from the Almanakken database, where it is more precise          |
+| `Product_1854` | text/string | Product grown in 1854 | Same as above                                |       idem              |           idem          |
+| `Product_1859` | text/string | Product grown in 1859 | Same as above                                |            idem         |              idem       |
 
 ### Additional Information
 
 | Field             | Type        | Description                                 | Crucial for Linking | Primary Information |
 | ----------------- | ----------- | ------------------------------------------- | ------------------- | ------------------- |
-| `General_remarks` | text/string | Additional notes and historical information |                     |                     |
+| `General_remarks` | text/string | Additional notes and historical information |        not crucial             |       useful information to show because it often tells more about where the enslaved workforce is actually located or if it was abandoned. It would be a small effort to manually create links to the plantations that are referred to          |
 
 ---
 
@@ -188,7 +188,9 @@ flowchart TB
 
 ### Key Design Decisions in Source Data
 
-1. **Denormalized temporal data**: Products and districts at specific years are stored as separate columns (`Product_1846`, `Product_1854`) rather than in a normalized time-series table.
+1. **Denormalized temporal data**: Products and districts at specific years are stored as separate columns (`Product_1846`, `Product_1854`) rather than in a normalized time-series table. 
+
+TvO: I would leave out 'product' and instead get that data from the Almanak dataset. For district the same: we would preferably have a separate dataset on the historical districts of Suriname? For now I would use the district info perhaps as illustration so that users can easily distinguish between similarly named plantations
 
 2. **Series-based population tracking**: Enslaved population is organized into 4 temporal series rather than year-by-year counts.
 
@@ -198,15 +200,19 @@ flowchart TB
 
 1. **Normalization opportunity**: Convert `Product_YEAR` and `District_YEAR` columns into proper temporal tables for better querying.
 
-2. **Series interpretation needed**: The exact year ranges for Series 1-4 need to be documented (approximately 1830-1840, 1841-1850, 1851-1860, 1861-1863).
+2. **Series interpretation needed**: The exact year ranges for Series 1-4 need to be documented (approximately 1830-1840, 1841-1850, 1851-1860, 1861-1863). 
 
-3. **PSUR_ID as linking key**: The `ID_plantation` (PSUR ID) serves as the master key for connecting plantation data across datasets (Almanakken, Slave Registers, etc.).
+TvO: New series were started in 1830, 1838, 1848 and 1851, ending 1863. See for more background: https://doi.org/10.1080/1081602X.2018.1507917 and https://www.nationaalarchief.nl/onderzoeken/index/nt00461. So: series I: 1830-1838, II: 1838-1848; III: 1848-1851 and IV: 1851-1863. There could be some overlap between series in the transitional year.
+
+3. **PSUR_ID as linking key**: The `ID_plantation` (PSUR ID) serves as the master key for connecting plantation data across datasets (Almanakken, Slave Registers, etc.). 
+
+TvO: also: the standardized name is used to link to the slave registers, which unfortunately does not use the PSUR ids....
 
 ### Questions to Investigate
 
 - [ ] What are the exact date ranges for each series?
 - [ ] How do districts map between 1842 and 1855 classifications?
-- [ ] Are there plantations that changed products over time?
+- [ ] Are there plantations that changed products over time? TvO: yes but better to link to Almanakken dataset for this
 - [ ] How does this dataset relate to the Slave & Emancipation Registers?
 
 ---
