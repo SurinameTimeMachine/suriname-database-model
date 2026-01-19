@@ -210,10 +210,12 @@ TvO: also: the standardized name is used to link to the slave registers, which u
 
 ### Questions to Investigate
 
-- [ ] What are the exact date ranges for each series?
-- [ ] How do districts map between 1842 and 1855 classifications?
+- [ ] What are the exact date ranges for each series? -- TvO: solved
+- [ ] How do districts map between 1842 and 1855 classifications? Todo: create districting dataset
 - [ ] Are there plantations that changed products over time? TvO: yes but better to link to Almanakken dataset for this
-- [ ] How does this dataset relate to the Slave & Emancipation Registers?
+- [ ] How does this dataset relate to the Slave & Emancipation Registers? TvO: via standardized name
+
+Added TvO: todo: create linking table that links PSUR ids to wikidata ids (which is for now the main linking pin to other data until we have our own permanent ids for plantations)
 
 ---
 
