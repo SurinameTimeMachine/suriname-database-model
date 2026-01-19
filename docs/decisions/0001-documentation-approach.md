@@ -1,9 +1,3 @@
-# ADR-0001: Documentation-First Approach
-
-**Date:** 2026-01-06  
-**Status:** Accepted  
-**Deciders:** Project team
-
 ## Context
 
 We are building a database to integrate multiple historical datasets about Suriname (plantations, vital records, enslaved persons, maps). The project involves:
