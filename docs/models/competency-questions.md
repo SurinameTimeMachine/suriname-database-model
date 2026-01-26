@@ -91,58 +91,72 @@ A08. people per plantation over time
 ## Hard questions
 
 H01. did person X in source A equal person Y in source B
+
 - needs probabilistic answer, not yes/no
 - must explain reasoning
 
 H02. where exactly was plantation X
+
 - different maps show different locations
 - boundaries changed over time
 - must handle uncertainty
 
 H03. who were the ancestors of person X
+
 - often incomplete
 - different sources disagree
 - must show chain of evidence
 
 H04. what happened to people from plantation X after emancipation
+
 - requires cross-source linking
 - name changes common
 - many gaps
 
 H05. reconstruct family tree
+
 - combine evidence from multiple sources
 - handle contradictions
 - show confidence levels
 
 H06. what can we say about person X
+
 - aggregate everything we know
 - rank by confidence
 - show sources for each claim
 
 H07. trace location name through time
+
 - same place, many names
 - different languages (Dutch, Sranan)
 - formal vs informal names
 
 H08. what people share characteristics
+
 - clustering queries
 - fuzzy matching
 - demographic analysis
 
 H09. what's the provenance of claim X
+
 - who said this, when, in what source
 - chain of interpretation
 
+See [docs/models/provenance-chain-checklist.md](docs/models/provenance-chain-checklist.md) for the step-by-step metric and chain templates.
+
 H10. how did plantation workforce change
+
 - longitudinal analysis
 - requires linking people over time
 
 H11. uncertainty in dates
+
 - "about 1780" vs "1780-01-15"
 - ranges, approximations
 - must propagate through queries
 
 H12. same name, different people
+
 - disambiguation
 - contextual evidence
 - probabilistic
@@ -151,14 +165,14 @@ H12. same name, different people
 
 ## Query complexity
 
-| type | difficulty | why |
-|------|------------|-----|
-| P01-P17 | simple | single table or join |
-| L01-L14 | simple-medium | some need temporal joins |
-| S01-S11 | simple | metadata queries |
-| X01-X09 | hard | fuzzy matching, reasoning |
-| A01-A08 | medium | aggregation, grouping |
-| H01-H12 | very hard | uncertainty, inference |
+| type    | difficulty    | why                       |
+| ------- | ------------- | ------------------------- |
+| P01-P17 | simple        | single table or join      |
+| L01-L14 | simple-medium | some need temporal joins  |
+| S01-S11 | simple        | metadata queries          |
+| X01-X09 | hard          | fuzzy matching, reasoning |
+| A01-A08 | medium        | aggregation, grouping     |
+| H01-H12 | very hard     | uncertainty, inference    |
 
 Model must support simple queries efficiently. Hard queries may need special handling.
 
@@ -167,13 +181,10 @@ Model must support simple queries efficiently. Hard queries may need special han
 ## Testing plan
 
 For each query type:
+
 - write SQL equivalent
 - identify tables/joins needed
 - test with sample data
 - document edge cases
 
 Start with P01-P17 since most common. Then L queries. Leave H queries for later since may need special tools.
-
----
-
-7 January 2026

@@ -6,40 +6,41 @@ All datasets we are integrating and where they come from.
 
 ## The datasets
 
-| #   | name                     | records  | period      | what                      |
-| --- | ------------------------ | -------- | ----------- | ------------------------- |
-| 01  | Plantagen 1900           | ~40      | 1900        | plantation survey         |
-| 02  | Slavenregisters          | ~82,000  | 1830-1863   | slave registers           |
-| 03  | Emancipatieregisters     | ~34,000  | 1863        | emancipation records      |
-| 04  | Surinaamse manumissies   | ~9,000   | 1832-1863   | manumissions              |
-| 05  | PNV 18e-19e              | ~280,000 | 1700-1838   | vrijbrieven, contracts    |
-| 06  | Doodakten Suriname       | ~30,000  | 1828-1935   | death certificates        |
-| 07  | QGIS Maps                | varies   | 18th-19th c | georeferenced maps        |
-| 08  | HDSC Transcriptions      | large    | various     | transcription files       |
-| 09  | Heritage Guide 3D        | ~66      | various     | monuments                 |
-| 10  | Historic Map Annotations | TBD      | 17th-19th c | HTR place names from maps |
+| #   | name                                   | records | period      | what                             |
+| --- | -------------------------------------- | ------- | ----------- | -------------------------------- |
+| 01  | Plantagen dataset (v1.0)               | ~40     | 1900        | plantation survey                |
+| 02  | Doodakten Suriname                     | ~30,000 | 1845-1915   | death certificates               |
+| 03  | Geboorteakten Paramaribo               | TBD     | 1828-1921   | birth certificates               |
+| 04  | Wijkregisters Paramaribo               | TBD     | 1828-1847   | ward registers                   |
+| 05  | Slaven- en Emancipatieregisters (v1.1) | TBD     | 1830-1863   | slavery & emancipation registers |
+| 06  | Surinaamse Almanakken (Plantages)      | TBD     | 18th-19th c | plantation listings              |
+| 07  | QGIS Maps                              | varies  | 18th-20th c | georeferenced maps               |
+| 08  | Wikidata                               | varies  | various     | linked open data                 |
+| 09  | Heritage Guide 3D                      | ~66     | various     | monuments                        |
+| 10  | Historic Map Annotations               | TBD     | 17th-19th c | HTR place names from maps        |
 
 Some overlap. Manumissions appear in multiple places. Same persons appear across datasets at different life stages.
+
+We intentionally keep parallel records (duplicate or near-duplicate entries across sources) to preserve provenance, allow traceable comparisons, and support scientific review of changes and linkages over time.
 
 ---
 
 ## Temporal coverage
 
 ```
-Dataset          1700    1750    1800    1850    1900    1950
-                 |       |       |       |       |       |
-PNV 18e-19e     [===============================]
-Slavenregisters                         [=======]
-Manumissies                             [=======]
-Emancipatie                                   [=]
-Doodakten                               [================]
+Dataset               1700    1750    1800    1850    1900    1950
+                      |       |       |       |       |       |
+Almanakken           [==========================]
+Slaven/Emancipatie                     [=======]
+Wijkregisters                         [==]
+Geboorteakten                        [===============]
+Doodakten                                [===========]
 Plantagen 1900                                  [=]
-Heritage 3D     [==================================]
-QGIS Maps       [==================================]
+QGIS Maps       [====================================]
 Historic Maps   [==================================]
 ```
 
-PNV is the spine. Most records, longest timespan. But least structured (document images). Slavenregisters most structured. Death certificates bridge into 20th century.
+Registers provide the most structured person-level data. The plantation dataset and almanakken give place-level snapshots. Historic maps and QGIS layers add spatial context.
 
 ---
 
@@ -86,13 +87,16 @@ One person, multiple records across life. Key challenge is linking them.
 
 Each dataset has its own ID scheme as it seems:
 
-| dataset         | id field        | example    |
-| --------------- | --------------- | ---------- |
-| Slavenregisters | PSUR_ID         | PSUR_12345 |
-| Manumissies     | Id_person       | 5678       |
-| Doodakten       | original_scanid | scan_001   |
-| QGIS maps       | (none)          | -          |
-| Heritage 3D     | Wikidata Q-ID   | Q12345678  |
+| dataset            | id field      | example                   |
+| ------------------ | ------------- | ------------------------- |
+| Plantagen dataset  | ID_plantation | PSUR0001                  |
+| Doodakten          | id            | SR-NA_2.10.61_1000_0001-r |
+| Geboorteakten      | id            | SR-NA_2.10.61_1_0008-r    |
+| Wijkregisters      | Id            | 15601                     |
+| Slaven/Emancipatie | Id_person     | 12345                     |
+| Almanakken         | recordid      | 1818-28-1                 |
+| QGIS maps          | (none)        | -                         |
+| Heritage 3D        | Wikidata Q-ID | Q12345678                 |
 
 ---
 

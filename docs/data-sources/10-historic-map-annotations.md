@@ -2,7 +2,7 @@
 
 > **Source:** Historic maps of Suriname from various archives  
 > **Methodology:** [Necessary Reunions Project](https://necessaryreunions.org/)  
-> **License:** TBD (depends on source archives)  
+> **License:** Varies by source archive; see per-map metadata  
 > **GitHub Reference:** https://github.com/globalise-huygens/necessary-reunions
 
 ---
