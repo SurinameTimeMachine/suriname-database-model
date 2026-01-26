@@ -512,7 +512,3 @@ I should actually read these properly at some point:
 - [ ] Look up how Pelagios stores attestations (place mentions in texts)
 - [ ] Sketch what the query "all plantations mentioned in 1830 death certificates" would look like
 - [ ] Think about whether place_type should be a lookup table or enum
-
----
-
-7 January 2026

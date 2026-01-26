@@ -1,0 +1,155 @@
+id;unique streetname;standardized streetname
+1;Algemene Landsweg;Gemenelandsweg
+2;Burenstraat;Burenstraat
+3;Buurestraat;Burenstraat
+4;Crommelinstraat;Crommelinstraat
+5;Domineestraat;Domineestraat
+6;Dominestraat;Domineestraat
+7;Dominéstraat;Domineestraat
+8;Drambrandersgracht;Drambrandersgracht
+9;Dwarskerkhofstraat;Dwarskerkhofstraat
+10;Dwarskerkhofstraat over de Sommelsdijksekreekstraat;Dwarskerkhofstraat
+11;Dwarsstraat van de Wagenwegstraat naar de Keizerstraat;Maagdenstraat
+12;Eerste Dwarsstraat;Eerste Dwarsstraat
+13;Firdericisgracht;Fredericigracht
+14;Fredericigracht;Fredericigracht
+15;Fredericisstraat;Fredericistraat
+16;Fredericistraat;Fredericistraat
+17;Fredericusstraat;Fredericistraat
+18;Fridericisstraat;Fredericistraat
+19;Fridericistraat;Fredericistraat
+20;Gemeene Landsweg;Gemenelandsweg
+21;Gemeenelandsweg;Gemenelandsweg
+22;Gemene Landsweg;Gemenelandsweg
+23;Gemenelandsweg;Gemenelandsweg
+24;Generale Landsstraat;Gemenelandsweg
+25;Gouvernementsplein;Gouvernementsplein
+26;Gravenstraat;Gravenstraat
+27;grond Kwatta;Kwatta
+28;Groote Dwarsstraat;Grote Dwarsstraat
+29;Groote Rijweg;Grote Rijweg
+30;Groote Waterstraat;Grote Dwarsstraat
+31;Grote Dwarsstraat;Grote Dwarsstraat
+32;Grote Hofstraat;Grote Hofstraat
+33;Grote Kerkstraat;Grote Kerkstraat
+34;Grote Rijweg;Grote Rijweg
+35;Grote Waterstraat;Grote Waterstraat
+36;Grotestraat;Hogestraat
+37;Groteverfstraat;Groteverfstraat
+38;Heerenstraat;Herenstraat
+39;Heerestraat;Herenstraat
+40;Heiligenweg;Heiligenweg
+41;Heiligeweg;Heiligenweg
+42;Herenstraat;Herenstraat
+43;Het Plein;Gouvernementsplein
+44;Hoffstraat;Hofstraat
+45;Hofstraat;Hofstraat
+46;Hogestraat;Hogestraat
+47;Hoogestraat;Hogestraat
+48;Hoogstraat;Hogestraat
+49;Jodenbree;Jodenbreestraat
+50;Jodenbreestraat;Jodenbreestraat
+51;Kauknie;Kauknie
+52;Keijserstraat;Keizerstraat
+53;Keijzerstraaat;Keizerstraat
+54;Keizerstaat;Keizerstraat
+55;Keizerstraat;Keizerstraat
+56;Kerkhof of Malebatrumstraat;Malebatrumstraat
+57;Kerkhoff of Malebatrumstraat;Malebatrumstraat
+58;Kerkhofstraat;Malebatrumstraat
+59;Kerkplein;Kerkplein
+60;Kerkstraat;Kerkstraat
+61;Kerkzijdestraat;Kerkzijdestraat
+62;Klipstenen;Klipstenenstraat
+63;Klipstenenstraat;Klipstenenstraat
+64;Knuffelsgracht;Knuffelsgracht
+65;Korte Kerkstraat;Korte Kerkstraat
+66;Kortekerkstraat;Korte Kerkstraat
+67;Kromme Elleboogstraat;Kromme Elleboogstraat
+68;Kwatta;Kwatta
+69;Ladesmastraat;Ladesmastraat
+70;Ledesmastraat;Ladesmastraat
+71;Limesgracht;Limesgracht
+72;Limesstraat;Limesgracht
+73;Maagdenstraat;Maagdenstraat
+74;Mauriciusdwarsstraat;Mauriciusdwarsstraat
+75;Mauriciusgracht;Mauriciusgracht
+76;Mauriciusstraat;Mauriciusstraat
+77;Mauriciusstraatdwarsstraat;Mauriciusdwarsstraat
+78;Nepveu;Nepveu
+79;Nepveugracht;Nepveugracht
+80;Nepveusstraat;Nepveustraat
+81;Nepveustraat;Nepveustraat
+82;Nieuw Dominestraat;Nieuwe Domineestraat
+83;Nieuwe Domineestraat;Nieuwe Domineestraat
+84;Nieuwe Dominestraat;Nieuwe Domineestraat
+85;Nieuwe Dominéstraat;Nieuwe Domineestraat
+86;Nieuwemarkt;Nieuwmarkt
+87;Nieuwmarkt;Nieuwmarkt
+88;Noorderkerkstraat;Noorderkerkstraat
+89;noordhoek van de Oranjetuin;Kerkplein
+90;noordhoek van de Oude Oranje Tuin;Kerkplein
+91;noordhoek van de Oude Oranjetuin;Kerkplein
+92;Oranjestraat;Oranjestraat
+93;Oude Oranje Tuin;Kerkplein
+94;Oude Oranjetuin;Kerkplein
+95;Oude Oranjetuinstraat;Kerkplein
+96;Overzijde van de Princestraat;Prinsenstraat
+97;Pad van Wanica;Pad van Wanica
+98;Plein;Gouvernementsplein
+99;Ponte Werfstraat;Pontewerfstraat
+100;Pontewerfstraat;Pontewerfstraat
+101;Pontewerstraat;Pontewerfstraat
+102;Princenstraat;Prinsenstraat
+103;Princestraat;Prinsenstraat
+104;Prinsenstraat;Prinsenstraat
+105;Prinsestraat;Prinsenstraat
+106;Rijweg naar Kwatta;Rijweg naar Kwatta
+107;Rijweg van Kwatta;Rijweg naar Kwatta
+108;Rust en Vredestraat;Rust en Vredestraat
+109;Rustenvreedestraat;Rust en Vredestraat
+110;Saramaccastraat;Saramaccastraat
+111;Sommelsdijkstraat;Sommelsdijkstraat
+112;Steenbakkerijstraat;Steenbakkerijstraat
+113;Steenbakkersgracht;Steenbakkersgracht
+114;Steenbakkersgragt;Steenbakkersgracht
+115;Timmermansstraat;Timmermanstraat
+116;Timmermanstraat;Timmermanstraat
+117;Tweede Dwarsstraat;Tweede Dwarsstraat
+118;Viottebrug;Viottebrug
+119;Vrijmansgrond;Vrijmansgrond
+120;Vrijmansgrond of Generalelandsstraat;Gemenelandsweg
+121;Wagenwegstraat;Wagenwegstraat
+122;Wanica;Wanica
+123;Wanicastraat;Wanicastraat
+124;Wanicaweg;Wanicaweg
+125;Wanikastraat;Wanicastraat
+126;Waterkan;Waterkant
+127;Waterkant;Waterkant
+128;Watermolen;Watermolenstraat
+129;Watermolenstraat;Watermolenstraat
+130;Waterzijde;Waterkant
+131;Weidestraat;Weidestraat
+132;Wichersstraat;Wichersstraat
+133;Zwartehovenbrugstraat;Zwartenhovenbrugstaat
+134;Zwartenhogenbrugstraat;Zwartenhovenbrugstaat
+135;Zwartenhovenbrugstaat;Zwartenhovenbrugstaat
+136;Zwartenhovenbrugstraat;Zwartenhovenbrugstraat
+137;Zwartenhovenbugstraat;Zwartenhovenbrugstaat
+138;Zwartenhovenburgstraat;Zwartenhovenbrugstaat
+139;Zwarthovenbrugstraat;Zwartenhovenbrugstaat
+140;Gravenstraat of Soldatenstraat ;Gravenstraat
+141;geen adres vermeld;onbekend
+142;geen nummer;onbekend
+143;onbekend nummer;onbekend
+144;Buurenstraat;Burenstraat
+145;Dwarsstraat;Dwarsstraat
+148;Dwarsstraat van de Wagenwegstraat naar de naar de Keizerstraat;Maagdenstraat
+154;Kerkpleinstraat;Kerkpleinstraat
+155;Klipsteenenstraat;Klipstenenstraat
+156;noordhoek van de Oranje Tuin;Kerkplein
+157;Pontenwerfstraat;Pontewerfstraat
+158;Pontewerfstrat;Pontewerfstraat
+161;Sommelsdijksgracht;Sommelsdijksgracht
+163;Steenbakkersstraat;Steenbakkerijstraat
+164;Keijzerstraat;Keizerstraat

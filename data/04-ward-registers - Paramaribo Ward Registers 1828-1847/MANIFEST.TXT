@@ -1,0 +1,4 @@
+Standardization of street names/street standardization 20240328.csv (text/comma-separated-values) 5626 bytes.
+religion standardization.csv (text/csv) 4918 bytes.
+Documentation Wijkregister Paramaribo Dataset.pdf (application/pdf) 524640 bytes.
+WR28-47.csv (text/csv) 42829173 bytes.

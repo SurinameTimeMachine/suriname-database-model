@@ -18,7 +18,7 @@
 
 ---
 
-## What is a Historic Map? (My definiton)
+## What is a Historic Map? (My definition)
 
 A historic map is not a photograph of the past — it is a **schematic representation** of how a mapmaker understood and chose to depict a place at a particular moment in time. It reflects:
 
@@ -28,6 +28,8 @@ A historic map is not a photograph of the past — it is a **schematic represent
 - **Perspective**: Colonial viewpoints, ownership interests, aesthetic conventions
 
 ### The difference to a Historical Map
+
+A **historic map** is a primary source created in the past. A **historical map** is a modern reconstruction of the past (e.g., a 2024 map of 1763 boundaries). In this project, we treat historic maps as sources and any new reconstructions as derived research outputs.
 
 ### The Chain of Representation
 
