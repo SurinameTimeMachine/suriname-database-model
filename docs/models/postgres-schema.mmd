@@ -1,0 +1,203 @@
+---
+title: Suriname Time Machine - PostgreSQL/Supabase Database Schema
+---
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#e8f4ea'}}}%%
+erDiagram
+    %% =============================================================
+    %% LEGEND (same colors as conceptual model):
+    %% - Green: CIDOC-CRM Land/Physical tables
+    %% - Blue: Schema.org/Wikidata Organization tables
+    %% - Orange: Qualified Links tables
+    %% - Purple: Observations tables
+    %% - Gray: Lookup/vocabulary tables
+    %%
+    %% PostgreSQL/Supabase Implementation
+    %% Requires: CREATE EXTENSION IF NOT EXISTS postgis;
+    %% =============================================================
+
+    land_plots {
+        uuid id PK "gen_random_uuid()"
+        integer fid UK "QGIS feature ID"
+        integer map_year "1930, 1860, etc"
+        text observed_label "Label on map (nullable)"
+        text label_1860 "Historical label"
+        text pref_label "Derived readable name"
+        text label_status "labeled|unlabeled|illegible"
+        geometry geometry "PostGIS Polygon EPSG:4326"
+        uuid merged_from_id FK "Earlier plot merged into this"
+        uuid split_from_id FK "Plot this was split from"
+        text provenance "Source map reference"
+        timestamptz created_at "DEFAULT NOW()"
+        timestamptz updated_at
+    }
+
+    physical_sites {
+        uuid id PK "gen_random_uuid()"
+        text pref_label "Site name"
+        text status FK "built|planned|abandoned|unknown"
+        uuid land_plot_id FK "Current land plot occupied"
+        uuid formerly_occupied_id FK "Previous land plot"
+        timestamptz created_at "DEFAULT NOW()"
+    }
+
+    organizations {
+        text qid PK "Wikidata Q-ID e.g. Q4392658"
+        text pref_label "Standardized Dutch name"
+        text additional_type "wd:Q188913"
+        text absorbed_into_qid FK "Absorbed into org"
+        timestamptz created_at "DEFAULT NOW()"
+        timestamptz updated_at
+    }
+
+    organization_identifiers {
+        uuid id PK "gen_random_uuid()"
+        text organization_qid FK "Links to organizations.qid"
+        text identifier_type "psur_id|psur_id2|psur_id3"
+        text identifier_value "e.g. PSUR0118"
+        timestamptz created_at "DEFAULT NOW()"
+    }
+
+    organization_names {
+        uuid id PK "gen_random_uuid()"
+        text organization_qid FK "Links to organizations.qid"
+        text name "Historical name variant"
+        text source "map_1860|map_1930|almanakken"
+        integer source_year "Year of source"
+        boolean is_preferred "DEFAULT FALSE"
+        timestamptz created_at "DEFAULT NOW()"
+    }
+
+    land_organization_links {
+        uuid id PK "gen_random_uuid()"
+        uuid land_plot_id FK "Links to land_plots"
+        text organization_qid FK "Links to organizations"
+        text link_type FK "operated_by|owned_by|claimed_by"
+        text certainty FK "certain|probable|uncertain"
+        integer observed_in_year "Year of observation"
+        text evidence "Textual explanation"
+        text source "Provenance reference"
+        timestamptz created_at "DEFAULT NOW()"
+    }
+
+    organization_observations {
+        uuid id PK "gen_random_uuid()"
+        text record_id UK "Original almanac recordid"
+        text organization_qid FK "Links to organizations"
+        integer observation_year "Year of almanac"
+        text observed_name "Name as in source"
+        text owner "eigenaren"
+        text administrator "administrateurs"
+        text director "directeuren"
+        text product "Crop type"
+        integer enslaved_count "slaven"
+        text size "size_std"
+        boolean is_deserted "deserted flag"
+        text location "loc_std"
+        text owned_by_organization_qid FK "If owned by another"
+        integer source_page "Almanac page"
+        timestamptz created_at "DEFAULT NOW()"
+    }
+
+    organization_relations {
+        uuid id PK "gen_random_uuid()"
+        text from_organization_qid FK "Source organization"
+        text to_organization_qid FK "Target organization"
+        text relation_type "absorbed_into|has_parts|part_of"
+        integer approximate_year "When relation started"
+        timestamptz created_at "DEFAULT NOW()"
+    }
+
+    land_plot_relations {
+        uuid id PK "gen_random_uuid()"
+        uuid from_land_plot_id FK "Source land plot"
+        uuid to_land_plot_id FK "Target land plot"
+        text relation_type "merged_into|split_into"
+        integer approximate_year "When change occurred"
+        timestamptz created_at "DEFAULT NOW()"
+    }
+
+    lookup_status {
+        text code PK "built|planned|abandoned|unknown"
+        text label "Human readable"
+        text description "Explanation"
+    }
+
+    lookup_certainty {
+        text code PK "certain|probable|uncertain"
+        text label "Human readable"
+        text description "Explanation"
+    }
+
+    lookup_link_type {
+        text code PK "operated_by|owned_by|claimed_by"
+        text label "Human readable"
+        text description "Explanation"
+    }
+
+    %% =============================================================
+    %% RELATIONSHIPS
+    %% =============================================================
+
+    %% Physical Site → Land Plot
+    physical_sites ||--o| land_plots : "occupies"
+    physical_sites }o--o| land_plots : "formerly_occupied"
+
+    %% Land Plot ↔ Organization via Link table (many-to-many)
+    land_organization_links }o--|| land_plots : "land_plot_id"
+    land_organization_links }o--|| organizations : "organization_qid"
+
+    %% Organization → Observations (one-to-many)
+    organizations ||--o{ organization_observations : "has"
+
+    %% Organization → Names (one-to-many)
+    organizations ||--o{ organization_names : "has"
+
+    %% Organization → Identifiers (one-to-many)
+    organizations ||--o{ organization_identifiers : "has"
+
+    %% Organization → Organization Relations (self-referential)
+    organizations ||--o{ organization_relations : "from"
+    organization_relations }o--|| organizations : "to"
+
+    %% Land Plot → Land Plot Relations (self-referential)
+    land_plots ||--o{ land_plot_relations : "from"
+    land_plot_relations }o--|| land_plots : "to"
+
+    %% Observation → Organization (owned by another)
+    organization_observations }o--o| organizations : "owned_by"
+
+    %% Lookup tables
+    physical_sites }o--|| lookup_status : "status"
+    land_organization_links }o--|| lookup_certainty : "certainty"
+    land_organization_links }o--|| lookup_link_type : "link_type"
+
+    %% Self-referential on organizations (absorbed)
+    organizations }o--o| organizations : "absorbed_into"
+
+    %% =============================================================
+    %% STYLING
+    %% =============================================================
+
+    %% CIDOC-CRM tables (green)
+    classDef cidoc fill:#d4edda,stroke:#28a745,stroke-width:2px
+    class land_plots,physical_sites cidoc
+
+    %% Schema.org tables (blue)
+    classDef schemaorg fill:#cce5ff,stroke:#0066cc,stroke-width:2px
+    class organizations,organization_names,organization_identifiers schemaorg
+
+    %% Qualified link tables (orange)
+    classDef stmlink fill:#fff3cd,stroke:#ffc107,stroke-width:2px
+    class land_organization_links stmlink
+
+    %% Observation tables (purple)
+    classDef observation fill:#e2d5f1,stroke:#6f42c1,stroke-width:2px
+    class organization_observations observation
+
+    %% Relation tracking tables (teal)
+    classDef relations fill:#d1ecf1,stroke:#17a2b8,stroke-width:2px
+    class organization_relations,land_plot_relations relations
+
+    %% Lookup tables (gray)
+    classDef lookup fill:#f8f9fa,stroke:#6c757d,stroke-width:1px,stroke-dasharray: 5 5
+    class lookup_status,lookup_certainty,lookup_link_type lookup

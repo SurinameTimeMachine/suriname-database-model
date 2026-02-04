@@ -1,0 +1,137 @@
+---
+title: Suriname Time Machine - Three-Entity Conceptual Model
+---
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#e8f4ea', 'primaryBorderColor': '#2d6a4f', 'lineColor': '#333', 'tertiaryColor': '#fff5f5'}}}%%
+erDiagram
+    %% =============================================================
+    %% LEGEND:
+    %% - Green entities (Land/Physical): CIDOC-CRM Place/Thing
+    %% - Blue entities (Organization): Schema.org/Wikidata
+    %% - Orange entities (Qualified Links): Custom STM ontology
+    %% - Purple entities (Observations): Time-varying data
+    %% =============================================================
+
+    LAND_PLOT {
+        string fid PK "QGIS feature ID"
+        int mapYear PK "Year of source map"
+        string observedLabel "Label on map (nullable)"
+        string label1860 "Historical label"
+        string prefLabel "Derived readable name"
+        string labelStatus "labeled|unlabeled|illegible"
+        geometry hasGeometry "WKT Polygon"
+        string mergedFrom FK "Earlier plots merged into this"
+        string mergedInto FK "This merged into later"
+        string splitFrom FK "Plot split from"
+        string splitInto FK "Plot split into"
+        string wasDerivedFrom "Source map provenance"
+    }
+
+    PHYSICAL_SITE {
+        string id PK "stm:site/name-slug"
+        string prefLabel "Site name"
+        string status "built|planned|abandoned|unknown"
+        string occupiesLandPlot FK "Links to Land Plot"
+        string formerlyOccupied FK "Previous land"
+    }
+
+    ORGANIZATION {
+        string qid PK "Wikidata Q-ID (wd:Qxxxxx)"
+        string additionalType "wd:Q188913 plantation"
+        string prefLabel "Standardized Dutch name"
+        string altLabel "Historical spelling variants"
+        string psurId "Slave Register ID"
+        string absorbedInto FK "Absorbed into org"
+        string hasParts FK "Split parts"
+        string partOf FK "Part of larger org"
+    }
+
+    LAND_ORGANIZATION_LINK {
+        string id PK "Qualified link ID"
+        string landPlot FK "Links to Land Plot"
+        string organization FK "Links to Organization (Q-ID)"
+        string linkType "operated_by|owned_by|claimed_by"
+        string linkCertainty "certain|probable|uncertain"
+        int observedInYear "Year of observation"
+        string linkEvidence "Text explaining evidence"
+        string wasDerivedFrom "Source reference"
+    }
+
+    ORGANIZATION_OBSERVATION {
+        string recordId PK "obs:QID_year or recordid"
+        string observationOf FK "Links to Organization (Q-ID)"
+        int observationYear "Year of almanac"
+        string observedName "Name as in source"
+        string hasOwner "Owner(s)"
+        string hasAdministrator "Administrator(s)"
+        string hasDirector "Director(s)"
+        string hasProduct "Crop type"
+        int enslavedCount "Total enslaved"
+        string size "Size"
+        boolean isDeserted "Deserted flag"
+        string location "Location description"
+        string ownedByOrganization FK "If owned by another plantation"
+        string hadPrimarySource "Almanac page"
+    }
+
+    E55_TYPE_STATUS {
+        string id PK "Status vocabulary"
+        string label "built|planned|abandoned|unknown"
+    }
+
+    E55_TYPE_CERTAINTY {
+        string id PK "Certainty vocabulary"
+        string label "certain|probable|uncertain"
+    }
+
+    E55_TYPE_LINK {
+        string id PK "Link type vocabulary"
+        string label "operated_by|owned_by|claimed_by"
+    }
+
+    %% =============================================================
+    %% RELATIONSHIPS
+    %% =============================================================
+
+    %% Physical Site occupies Land Plot (one site per plot, but plot can have sites over time)
+    PHYSICAL_SITE ||--o| LAND_PLOT : "crm:P156_occupies"
+
+    %% Land Plot ↔ Organization via Qualified Link (many-to-many with metadata)
+    LAND_ORGANIZATION_LINK }o--|| LAND_PLOT : "stm:landPlot"
+    LAND_ORGANIZATION_LINK }o--|| ORGANIZATION : "stm:organization"
+
+    %% Organization has many Observations over time
+    ORGANIZATION ||--o{ ORGANIZATION_OBSERVATION : "stm:hasObservation"
+
+    %% Type vocabularies
+    PHYSICAL_SITE }o--|| E55_TYPE_STATUS : "crm:P2_has_type"
+    LAND_ORGANIZATION_LINK }o--|| E55_TYPE_CERTAINTY : "stm:linkCertainty"
+    LAND_ORGANIZATION_LINK }o--|| E55_TYPE_LINK : "stm:linkType"
+
+    %% Self-referential relationships
+    LAND_PLOT ||--o{ LAND_PLOT : "stm:mergedFrom/splitFrom"
+    ORGANIZATION ||--o{ ORGANIZATION : "stm:absorbedInto/partOf"
+    ORGANIZATION_OBSERVATION }o--o| ORGANIZATION : "stm:ownedByOrganization"
+
+    %% =============================================================
+    %% STYLING - Color by ontology source
+    %% =============================================================
+
+    %% CIDOC-CRM entities (green)
+    classDef cidoc fill:#d4edda,stroke:#28a745,stroke-width:2px
+    class LAND_PLOT,PHYSICAL_SITE cidoc
+
+    %% Schema.org/Wikidata entities (blue)
+    classDef schemaorg fill:#cce5ff,stroke:#0066cc,stroke-width:2px
+    class ORGANIZATION schemaorg
+
+    %% Custom STM ontology - qualified links (orange)
+    classDef stmlink fill:#fff3cd,stroke:#ffc107,stroke-width:2px
+    class LAND_ORGANIZATION_LINK stmlink
+
+    %% Time-varying observations (purple)
+    classDef observation fill:#e2d5f1,stroke:#6f42c1,stroke-width:2px
+    class ORGANIZATION_OBSERVATION observation
+
+    %% Type vocabularies (gray)
+    classDef vocabulary fill:#f8f9fa,stroke:#6c757d,stroke-width:1px,stroke-dasharray: 5 5
+    class E55_TYPE_STATUS,E55_TYPE_CERTAINTY,E55_TYPE_LINK vocabulary

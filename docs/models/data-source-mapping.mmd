@@ -1,0 +1,175 @@
+---
+title: Suriname Time Machine - Data Source Mapping
+---
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#e8f4ea'}}}%%
+flowchart TB
+    %% =============================================================
+    %% LEGEND (same colors as conceptual model):
+    %% - Green: CIDOC-CRM Land/Physical entities
+    %% - Blue: Schema.org/Wikidata Organization
+    %% - Orange: Qualified Links (STM ontology)
+    %% - Purple: Time-varying Observations
+    %% - Gray: Source data files (CSV)
+    %% =============================================================
+
+    subgraph SOURCES ["📁 SOURCE DATA FILES"]
+        direction TB
+
+        subgraph QGIS ["plantation_polygons_1930.csv (QGIS)"]
+            Q_fid["fid"]
+            Q_coords["coords"]
+            Q_label_1930["label_1930"]
+            Q_label_1860["label_1860-79"]
+            Q_plantation_label["plantation_label"]
+            Q_qid["qid ⭐"]
+            Q_qid_alt["qid_alt"]
+            Q_psur_id["psur_id"]
+            Q_psur_id2["psur_id2"]
+            Q_psur_id3["psur_id3"]
+        end
+
+        subgraph ALM ["Plantations Surinaamse Almanakken v1.0.csv"]
+            A_recordid["recordid"]
+            A_year["year"]
+            A_plantation_id["plantation_id ⭐"]
+            A_plantation_org["plantation_org"]
+            A_plantation_std["plantation_std"]
+            A_eigenaren["eigenaren"]
+            A_administrateurs["administrateurs"]
+            A_directeuren["directeuren"]
+            A_product_std["product_std"]
+            A_slaven["slaven"]
+            A_deserted["deserted"]
+            A_loc_std["loc_std"]
+            A_size_std["size_std"]
+            A_page["page"]
+            A_split_id["split1_id...split4_id"]
+            A_partof_id["partof_id"]
+            A_reference_id["reference_std_id"]
+            A_psur_id["psur_id"]
+        end
+    end
+
+    subgraph ENTITIES ["🎯 TARGET ENTITIES"]
+        direction TB
+
+        LAND_PLOT["🟢 LAND_PLOT
+        (crm:E53_Place)"]
+
+        PHYSICAL_SITE["🟢 PHYSICAL_SITE
+        (crm:E24)
+        ⏳ Future"]
+
+        ORGANIZATION["🔵 ORGANIZATION
+        (sdo:Organization)"]
+
+        LAND_ORG_LINK["🟠 LAND_ORGANIZATION_LINK
+        (stm:LandOrganizationLink)"]
+
+        ORG_OBSERVATION["🟣 ORGANIZATION_OBSERVATION
+        (stm:OrganizationObservation)"]
+    end
+
+    %% =============================================================
+    %% QGIS → LAND_PLOT mappings
+    %% =============================================================
+    Q_fid -->|"stm:fid"| LAND_PLOT
+    Q_coords -->|"geo:asWKT"| LAND_PLOT
+    Q_label_1930 -->|"stm:observedLabel"| LAND_PLOT
+    Q_label_1860 -->|"stm:label1860"| LAND_PLOT
+    Q_plantation_label -->|"skos:prefLabel"| LAND_PLOT
+
+    %% =============================================================
+    %% QGIS → ORGANIZATION mappings (creates org records)
+    %% =============================================================
+    Q_qid -->|"@id (URI)"| ORGANIZATION
+    Q_psur_id -->|"stm:psurId"| ORGANIZATION
+    Q_psur_id2 -->|"stm:psurId2"| ORGANIZATION
+    Q_psur_id3 -->|"stm:psurId3"| ORGANIZATION
+
+    %% =============================================================
+    %% QGIS → LAND_ORGANIZATION_LINK (implicit link creation)
+    %% =============================================================
+    Q_fid -.->|"stm:landPlot"| LAND_ORG_LINK
+    Q_qid -.->|"stm:organization"| LAND_ORG_LINK
+
+    %% =============================================================
+    %% Almanakken → ORGANIZATION enrichment
+    %% =============================================================
+    A_plantation_id -->|"@id match ⭐"| ORGANIZATION
+    A_plantation_std -->|"skos:prefLabel"| ORGANIZATION
+    A_split_id -->|"stm:hasParts"| ORGANIZATION
+    A_partof_id -->|"stm:partOf"| ORGANIZATION
+
+    %% =============================================================
+    %% Almanakken → ORGANIZATION_OBSERVATION mappings
+    %% =============================================================
+    A_recordid -->|"@id"| ORG_OBSERVATION
+    A_plantation_id -->|"stm:observationOf ⭐"| ORG_OBSERVATION
+    A_year -->|"stm:observationYear"| ORG_OBSERVATION
+    A_plantation_org -->|"stm:observedName"| ORG_OBSERVATION
+    A_eigenaren -->|"stm:hasOwner"| ORG_OBSERVATION
+    A_administrateurs -->|"stm:hasAdministrator"| ORG_OBSERVATION
+    A_directeuren -->|"stm:hasDirector"| ORG_OBSERVATION
+    A_product_std -->|"stm:hasProduct"| ORG_OBSERVATION
+    A_slaven -->|"stm:enslavedCount"| ORG_OBSERVATION
+    A_deserted -->|"stm:isDeserted"| ORG_OBSERVATION
+    A_loc_std -->|"stm:location"| ORG_OBSERVATION
+    A_size_std -->|"stm:size"| ORG_OBSERVATION
+    A_page -->|"prov:hadPrimarySource"| ORG_OBSERVATION
+    A_reference_id -->|"stm:ownedByOrganization"| ORG_OBSERVATION
+
+    %% =============================================================
+    %% CENTRAL LINKING KEY HIGHLIGHT
+    %% =============================================================
+    subgraph LINKING_KEY ["🔑 CENTRAL LINKING KEY"]
+        QID_KEY["Q-ID (Wikidata)
+        Links all entities via
+        plantation_id / qid columns"]
+    end
+
+    Q_qid ====>|"Primary Key"| QID_KEY
+    A_plantation_id ====>|"Foreign Key"| QID_KEY
+    QID_KEY ====> ORGANIZATION
+
+    %% =============================================================
+    %% Physical Site (future - derived)
+    %% =============================================================
+    LAND_PLOT -.->|"crm:P156_occupies
+    (derived)"| PHYSICAL_SITE
+
+    %% =============================================================
+    %% STYLING
+    %% =============================================================
+
+    %% Source files (gray)
+    classDef source fill:#f8f9fa,stroke:#6c757d,stroke-width:1px
+    class Q_fid,Q_coords,Q_label_1930,Q_label_1860,Q_plantation_label,Q_qid,Q_qid_alt,Q_psur_id,Q_psur_id2,Q_psur_id3 source
+    class A_recordid,A_year,A_plantation_id,A_plantation_org,A_plantation_std,A_eigenaren,A_administrateurs,A_directeuren,A_product_std,A_slaven,A_deserted,A_loc_std,A_size_std,A_page,A_split_id,A_partof_id,A_reference_id,A_psur_id source
+
+    %% CIDOC-CRM entities (green)
+    classDef cidoc fill:#d4edda,stroke:#28a745,stroke-width:2px
+    class LAND_PLOT,PHYSICAL_SITE cidoc
+
+    %% Schema.org entities (blue)
+    classDef schemaorg fill:#cce5ff,stroke:#0066cc,stroke-width:2px
+    class ORGANIZATION schemaorg
+
+    %% Qualified links (orange)
+    classDef stmlink fill:#fff3cd,stroke:#ffc107,stroke-width:2px
+    class LAND_ORG_LINK stmlink
+
+    %% Observations (purple)
+    classDef observation fill:#e2d5f1,stroke:#6f42c1,stroke-width:2px
+    class ORG_OBSERVATION observation
+
+    %% Linking key (red highlight)
+    classDef linkkey fill:#f8d7da,stroke:#dc3545,stroke-width:3px
+    class QID_KEY linkkey
+
+    %% Source file containers
+    style QGIS fill:#e9ecef,stroke:#495057,stroke-width:2px
+    style ALM fill:#e9ecef,stroke:#495057,stroke-width:2px
+    style SOURCES fill:#f8f9fa,stroke:#dee2e6,stroke-width:1px
+    style ENTITIES fill:#ffffff,stroke:#333,stroke-width:2px
+    style LINKING_KEY fill:#fff5f5,stroke:#dc3545,stroke-width:2px,stroke-dasharray: 5 5
