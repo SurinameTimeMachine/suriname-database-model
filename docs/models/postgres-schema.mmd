@@ -1,88 +1,81 @@
 ---
-title: Suriname Time Machine - PostgreSQL/Supabase Database Schema
+title: Suriname Time Machine - PostgreSQL Schema (CIDOC-CRM Aligned)
 ---
 %%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#e8f4ea'}}}%%
 erDiagram
     %% =============================================================
-    %% LEGEND (same colors as conceptual model):
-    %% - Green: CIDOC-CRM Land/Physical tables
-    %% - Blue: Schema.org/Wikidata Organization tables
-    %% - Orange: Qualified Links tables
-    %% - Purple: Observations tables
-    %% - Gray: Lookup/vocabulary tables
+    %% POSTGRESQL/SUPABASE SCHEMA - CIDOC-CRM ALIGNED
     %%
-    %% PostgreSQL/Supabase Implementation
+    %% LEGEND (matches conceptual model):
+    %% - Green: E24 Physical Human-Made Thing tables
+    %% - Teal: E26 Physical Feature tables (natural)
+    %% - Light Green: E53 Place tables (geometry)
+    %% - Blue: E74 Group / Organization tables
+    %% - Yellow: E55 Type lookup tables
+    %% - Purple: Observation tables
+    %% - Gray: E73 Information Object (documents/maps)
+    %%
     %% Requires: CREATE EXTENSION IF NOT EXISTS postgis;
     %% =============================================================
 
-    land_plots {
+    e24_human_made_things {
         uuid id PK "gen_random_uuid()"
-        integer fid UK "QGIS feature ID"
-        integer map_year "1930, 1860, etc"
-        text observed_label "Label on map (nullable)"
-        text label_1860 "Historical label"
-        text pref_label "Derived readable name"
-        text label_status "labeled|unlabeled|illegible"
-        geometry geometry "PostGIS Polygon EPSG:4326"
-        uuid merged_from_id FK "Earlier plot merged into this"
-        uuid split_from_id FK "Plot this was split from"
-        text provenance "Source map reference"
+        text uri UK "stm:plantation/{slug}"
+        text p1_label "Name (P1_is_identified_by)"
+        text p2_type_id FK "Links to e55_types"
+        text p52_owner_qid FK "Links to e74_groups"
         timestamptz created_at "DEFAULT NOW()"
         timestamptz updated_at
     }
 
-    physical_sites {
+    e26_physical_features {
         uuid id PK "gen_random_uuid()"
-        text pref_label "Site name"
-        text status FK "built|planned|abandoned|unknown"
-        uuid land_plot_id FK "Current land plot occupied"
-        uuid formerly_occupied_id FK "Previous land plot"
+        text uri UK "stm:feature/{slug}"
+        text p1_label "Name (Suriname River)"
+        text p2_type_id FK "Links to e55_types"
         timestamptz created_at "DEFAULT NOW()"
     }
 
-    organizations {
-        text qid PK "Wikidata Q-ID e.g. Q4392658"
-        text pref_label "Standardized Dutch name"
-        text additional_type "wd:Q188913"
-        text absorbed_into_qid FK "Absorbed into org"
+    e53_places {
+        uuid id PK "gen_random_uuid()"
+        text uri UK "stm:place/{fid}"
+        integer fid "QGIS feature ID"
+        geometry p168_geometry "PostGIS Polygon/Line"
+        integer observed_year "Year of map observation"
+        uuid p89_within_id FK "Parent place"
+        text p70i_documented_in FK "Source map/document"
+        timestamptz created_at "DEFAULT NOW()"
+    }
+
+    e74_groups {
+        text qid PK "Wikidata Q-ID (wd:Qxxxxx)"
+        text p1_label "Standardized Dutch name"
+        text p2_type_id FK "Links to e55_types"
+        text p107i_member_of_qid FK "Parent organization"
         timestamptz created_at "DEFAULT NOW()"
         timestamptz updated_at
     }
 
-    organization_identifiers {
-        uuid id PK "gen_random_uuid()"
-        text organization_qid FK "Links to organizations.qid"
-        text identifier_type "psur_id|psur_id2|psur_id3"
-        text identifier_value "e.g. PSUR0118"
+    e55_types {
+        text id PK "Type vocabulary ID"
+        text label "Human readable label"
+        text scope_note "Definition"
+        text category "feature|organization|document"
+    }
+
+    e73_information_objects {
+        text id PK "Document/map identifier"
+        text p1_label "Title"
+        text p2_type_id FK "map|almanac|register"
+        integer p4_year "Year of creation"
+        text source_url "External reference"
         timestamptz created_at "DEFAULT NOW()"
     }
 
-    organization_names {
-        uuid id PK "gen_random_uuid()"
-        text organization_qid FK "Links to organizations.qid"
-        text name "Historical name variant"
-        text source "map_1860|map_1930|almanakken"
-        integer source_year "Year of source"
-        boolean is_preferred "DEFAULT FALSE"
-        timestamptz created_at "DEFAULT NOW()"
-    }
-
-    land_organization_links {
-        uuid id PK "gen_random_uuid()"
-        uuid land_plot_id FK "Links to land_plots"
-        text organization_qid FK "Links to organizations"
-        text link_type FK "operated_by|owned_by|claimed_by"
-        text certainty FK "certain|probable|uncertain"
-        integer observed_in_year "Year of observation"
-        text evidence "Textual explanation"
-        text source "Provenance reference"
-        timestamptz created_at "DEFAULT NOW()"
-    }
-
-    organization_observations {
+    observations {
         uuid id PK "gen_random_uuid()"
         text record_id UK "Original almanac recordid"
-        text organization_qid FK "Links to organizations"
+        text organization_qid FK "Links to e74_groups"
         integer observation_year "Year of almanac"
         text observed_name "Name as in source"
         text owner "eigenaren"
@@ -90,114 +83,137 @@ erDiagram
         text director "directeuren"
         text product "Crop type"
         integer enslaved_count "slaven"
-        text size "size_std"
-        boolean is_deserted "deserted flag"
+        boolean is_deserted "verlaten flag"
         text location "loc_std"
-        text owned_by_organization_qid FK "If owned by another"
-        integer source_page "Almanac page"
+        text p70i_documented_in FK "Source document"
         timestamptz created_at "DEFAULT NOW()"
     }
 
-    organization_relations {
+    %% =============================================================
+    %% JUNCTION/LINK TABLES (for many-to-many)
+    %% =============================================================
+
+    e24_e53_locations {
         uuid id PK "gen_random_uuid()"
-        text from_organization_qid FK "Source organization"
-        text to_organization_qid FK "Target organization"
-        text relation_type "absorbed_into|has_parts|part_of"
-        integer approximate_year "When relation started"
+        uuid e24_id FK "Links to e24_human_made_things"
+        uuid e53_id FK "Links to e53_places"
+        text certainty "certain|probable|uncertain"
+        integer start_year "When location started"
+        integer end_year "When location ended"
+        text evidence "Supporting evidence"
         timestamptz created_at "DEFAULT NOW()"
     }
 
-    land_plot_relations {
+    e26_e53_locations {
         uuid id PK "gen_random_uuid()"
-        uuid from_land_plot_id FK "Source land plot"
-        uuid to_land_plot_id FK "Target land plot"
-        text relation_type "merged_into|split_into"
-        integer approximate_year "When change occurred"
+        uuid e26_id FK "Links to e26_physical_features"
+        uuid e53_id FK "Links to e53_places"
+        integer observed_year "Year observed on map"
+        text p70i_documented_in FK "Source map"
         timestamptz created_at "DEFAULT NOW()"
     }
 
-    lookup_status {
-        text code PK "built|planned|abandoned|unknown"
-        text label "Human readable"
-        text description "Explanation"
+    e24_e74_ownership {
+        uuid id PK "gen_random_uuid()"
+        uuid e24_id FK "Links to e24_human_made_things"
+        text e74_qid FK "Links to e74_groups"
+        text relationship_type "owner|operator|claimed_by"
+        integer start_year "When relationship started"
+        integer end_year "When relationship ended"
+        text certainty "certain|probable|uncertain"
+        text evidence "Supporting evidence"
+        timestamptz created_at "DEFAULT NOW()"
     }
 
-    lookup_certainty {
-        text code PK "certain|probable|uncertain"
-        text label "Human readable"
-        text description "Explanation"
+    e74_identifiers {
+        uuid id PK "gen_random_uuid()"
+        text organization_qid FK "Links to e74_groups"
+        text identifier_type "psur_id|alternate_qid"
+        text identifier_value "e.g. PSUR0118"
+        timestamptz created_at "DEFAULT NOW()"
     }
 
-    lookup_link_type {
-        text code PK "operated_by|owned_by|claimed_by"
-        text label "Human readable"
-        text description "Explanation"
+    e74_names {
+        uuid id PK "gen_random_uuid()"
+        text organization_qid FK "Links to e74_groups"
+        text name "Historical name variant"
+        text source "map_1860|map_1930|almanakken"
+        integer source_year "Year of source"
+        boolean is_preferred "DEFAULT FALSE"
+        timestamptz created_at "DEFAULT NOW()"
     }
 
     %% =============================================================
     %% RELATIONSHIPS
     %% =============================================================
 
-    %% Physical Site → Land Plot
-    physical_sites ||--o| land_plots : "occupies"
-    physical_sites }o--o| land_plots : "formerly_occupied"
+    %% E24 → E55 Type
+    e24_human_made_things }o--|| e55_types : "P2_has_type"
 
-    %% Land Plot ↔ Organization via Link table (many-to-many)
-    land_organization_links }o--|| land_plots : "land_plot_id"
-    land_organization_links }o--|| organizations : "organization_qid"
+    %% E26 → E55 Type
+    e26_physical_features }o--|| e55_types : "P2_has_type"
 
-    %% Organization → Observations (one-to-many)
-    organizations ||--o{ organization_observations : "has"
+    %% E74 → E55 Type
+    e74_groups }o--|| e55_types : "P2_has_type"
 
-    %% Organization → Names (one-to-many)
-    organizations ||--o{ organization_names : "has"
+    %% E73 → E55 Type
+    e73_information_objects }o--|| e55_types : "P2_has_type"
 
-    %% Organization → Identifiers (one-to-many)
-    organizations ||--o{ organization_identifiers : "has"
+    %% E24 ↔ E53 via junction (many-to-many with temporal)
+    e24_e53_locations }o--|| e24_human_made_things : "e24_id"
+    e24_e53_locations }o--|| e53_places : "e53_id"
 
-    %% Organization → Organization Relations (self-referential)
-    organizations ||--o{ organization_relations : "from"
-    organization_relations }o--|| organizations : "to"
+    %% E26 ↔ E53 via junction
+    e26_e53_locations }o--|| e26_physical_features : "e26_id"
+    e26_e53_locations }o--|| e53_places : "e53_id"
 
-    %% Land Plot → Land Plot Relations (self-referential)
-    land_plots ||--o{ land_plot_relations : "from"
-    land_plot_relations }o--|| land_plots : "to"
+    %% E24 ↔ E74 via junction (ownership with temporal)
+    e24_e74_ownership }o--|| e24_human_made_things : "e24_id"
+    e24_e74_ownership }o--|| e74_groups : "e74_qid"
 
-    %% Observation → Organization (owned by another)
-    organization_observations }o--o| organizations : "owned_by"
+    %% E53 nested (district contains plots)
+    e53_places }o--o| e53_places : "P89_falls_within"
 
-    %% Lookup tables
-    physical_sites }o--|| lookup_status : "status"
-    land_organization_links }o--|| lookup_certainty : "certainty"
-    land_organization_links }o--|| lookup_link_type : "link_type"
+    %% E74 nested (org membership)
+    e74_groups }o--o| e74_groups : "P107i_member_of"
 
-    %% Self-referential on organizations (absorbed)
-    organizations }o--o| organizations : "absorbed_into"
+    %% Observations → E74
+    observations }o--|| e74_groups : "organization_qid"
+
+    %% Observations → E73 (source document)
+    observations }o--|| e73_information_objects : "P70i_documented_in"
+
+    %% E53 → E73 (documented in map)
+    e53_places }o--o| e73_information_objects : "P70i_documented_in"
+
+    %% E74 identifiers and names
+    e74_groups ||--o{ e74_identifiers : "has"
+    e74_groups ||--o{ e74_names : "has"
 
     %% =============================================================
-    %% STYLING
+    %% STYLING - Color by CIDOC class
     %% =============================================================
 
-    %% CIDOC-CRM tables (green)
-    classDef cidoc fill:#d4edda,stroke:#28a745,stroke-width:2px
-    class land_plots,physical_sites cidoc
+    classDef e24 fill:#d4edda,stroke:#28a745,stroke-width:2px
+    class e24_human_made_things e24
 
-    %% Schema.org tables (blue)
-    classDef schemaorg fill:#cce5ff,stroke:#0066cc,stroke-width:2px
-    class organizations,organization_names,organization_identifiers schemaorg
+    classDef e26 fill:#d1ecf1,stroke:#17a2b8,stroke-width:2px
+    class e26_physical_features e26
 
-    %% Qualified link tables (orange)
-    classDef stmlink fill:#fff3cd,stroke:#ffc107,stroke-width:2px
-    class land_organization_links stmlink
+    classDef e53 fill:#e8f5e9,stroke:#4caf50,stroke-width:2px
+    class e53_places e53
 
-    %% Observation tables (purple)
+    classDef e74 fill:#cce5ff,stroke:#0066cc,stroke-width:2px
+    class e74_groups,e74_identifiers,e74_names e74
+
+    classDef e55 fill:#fff3cd,stroke:#ffc107,stroke-width:2px
+    class e55_types e55
+
+    classDef e73 fill:#f8f9fa,stroke:#6c757d,stroke-width:1px
+    class e73_information_objects e73
+
     classDef observation fill:#e2d5f1,stroke:#6f42c1,stroke-width:2px
-    class organization_observations observation
+    class observations observation
 
-    %% Relation tracking tables (teal)
-    classDef relations fill:#d1ecf1,stroke:#17a2b8,stroke-width:2px
-    class organization_relations,land_plot_relations relations
-
-    %% Lookup tables (gray)
-    classDef lookup fill:#f8f9fa,stroke:#6c757d,stroke-width:1px,stroke-dasharray: 5 5
-    class lookup_status,lookup_certainty,lookup_link_type lookup
+    classDef junction fill:#fce4ec,stroke:#e91e63,stroke-width:1px
+    class e24_e53_locations,e26_e53_locations,e24_e74_ownership junction

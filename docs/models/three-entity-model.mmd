@@ -1,137 +1,229 @@
 ---
-title: Suriname Time Machine - Three-Entity Conceptual Model
+title: Suriname Time Machine - CIDOC-CRM Conceptual Model
 ---
 %%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#e8f4ea', 'primaryBorderColor': '#2d6a4f', 'lineColor': '#333', 'tertiaryColor': '#fff5f5'}}}%%
 erDiagram
     %% =============================================================
+    %% CIDOC-CRM COMPLIANT MODEL
+    %%
     %% LEGEND:
-    %% - Green entities (Land/Physical): CIDOC-CRM Place/Thing
-    %% - Blue entities (Organization): Schema.org/Wikidata
-    %% - Orange entities (Qualified Links): Custom STM ontology
-    %% - Purple entities (Observations): Time-varying data
+    %% - Green: E24 Physical Human-Made Thing (plantation, house, canal)
+    %% - Teal: E26 Physical Feature (river, creek, lake - natural)
+    %% - Light Green: E53 Place (geometry/spatial extent)
+    %% - Blue: E74 Group / Organization (legal entities → people)
+    %% - Yellow: E55 Type (classification vocabulary)
+    %% - Red: E12 Production / E52 Time-Span (creation events)
+    %% - Purple: Observations (time-varying data from sources)
+    %% - Gray: E22/E36/E38 Source Pattern (artifacts and content)
     %% =============================================================
 
-    LAND_PLOT {
-        string fid PK "QGIS feature ID"
-        int mapYear PK "Year of source map"
-        string observedLabel "Label on map (nullable)"
-        string label1860 "Historical label"
-        string prefLabel "Derived readable name"
-        string labelStatus "labeled|unlabeled|illegible"
-        geometry hasGeometry "WKT Polygon"
-        string mergedFrom FK "Earlier plots merged into this"
-        string mergedInto FK "This merged into later"
-        string splitFrom FK "Plot split from"
-        string splitInto FK "Plot split into"
-        string wasDerivedFrom "Source map provenance"
+    E24_PHYSICAL_HUMAN_MADE_THING {
+        string id PK "stm:plantation/{slug} or stm:building/{id}"
+        string P1_is_identified_by "Name/label"
+        string P2_has_type FK "Links to E55 Type"
+        string P53_has_location FK "Links to E53 Place"
+        string P52_has_current_owner FK "Links to E74 Group"
     }
 
-    PHYSICAL_SITE {
-        string id PK "stm:site/name-slug"
-        string prefLabel "Site name"
-        string status "built|planned|abandoned|unknown"
-        string occupiesLandPlot FK "Links to Land Plot"
-        string formerlyOccupied FK "Previous land"
+    E26_PHYSICAL_FEATURE {
+        string id PK "stm:feature/{slug}"
+        string P1_is_identified_by "Name (Suriname River)"
+        string P2_has_type FK "Links to E55 Type"
+        string P53_has_location FK "Links to E53 Place"
     }
 
-    ORGANIZATION {
+    E53_PLACE {
+        string id PK "stm:place/{fid} or geometry-based"
+        int fid "QGIS feature ID (if from map)"
+        geometry P168_place_is_defined_by "WKT Polygon/Line"
+        int observed_year "Year of map observation"
+        string P89_falls_within FK "Parent place (district)"
+    }
+
+    E74_GROUP {
         string qid PK "Wikidata Q-ID (wd:Qxxxxx)"
-        string additionalType "wd:Q188913 plantation"
-        string prefLabel "Standardized Dutch name"
-        string altLabel "Historical spelling variants"
-        string psurId "Slave Register ID"
-        string absorbedInto FK "Absorbed into org"
-        string hasParts FK "Split parts"
-        string partOf FK "Part of larger org"
+        string P2_has_type FK "E55 Type: plantation-org"
+        string P1_is_identified_by "Standardized Dutch name"
+        string P107i_is_current_or_former_member_of FK "Parent org"
     }
 
-    LAND_ORGANIZATION_LINK {
-        string id PK "Qualified link ID"
-        string landPlot FK "Links to Land Plot"
-        string organization FK "Links to Organization (Q-ID)"
-        string linkType "operated_by|owned_by|claimed_by"
-        string linkCertainty "certain|probable|uncertain"
-        int observedInYear "Year of observation"
-        string linkEvidence "Text explaining evidence"
-        string wasDerivedFrom "Source reference"
-    }
-
-    ORGANIZATION_OBSERVATION {
-        string recordId PK "obs:QID_year or recordid"
-        string observationOf FK "Links to Organization (Q-ID)"
-        int observationYear "Year of almanac"
-        string observedName "Name as in source"
-        string hasOwner "Owner(s)"
-        string hasAdministrator "Administrator(s)"
-        string hasDirector "Director(s)"
-        string hasProduct "Crop type"
-        int enslavedCount "Total enslaved"
-        string size "Size"
-        boolean isDeserted "Deserted flag"
-        string location "Location description"
-        string ownedByOrganization FK "If owned by another plantation"
-        string hadPrimarySource "Almanac page"
-    }
-
-    E55_TYPE_STATUS {
-        string id PK "Status vocabulary"
-        string label "built|planned|abandoned|unknown"
-    }
-
-    E55_TYPE_CERTAINTY {
-        string id PK "Certainty vocabulary"
-        string label "certain|probable|uncertain"
-    }
-
-    E55_TYPE_LINK {
-        string id PK "Link type vocabulary"
-        string label "operated_by|owned_by|claimed_by"
+    E55_TYPE {
+        string id PK "Type vocabulary URI"
+        string P1_is_identified_by "Label"
+        string scope_note "Definition"
     }
 
     %% =============================================================
-    %% RELATIONSHIPS
+    %% E12 PRODUCTION + E52 TIME-SPAN (Creation Events)
     %% =============================================================
 
-    %% Physical Site occupies Land Plot (one site per plot, but plot can have sites over time)
-    PHYSICAL_SITE ||--o| LAND_PLOT : "crm:P156_occupies"
+    E12_PRODUCTION {
+        string id PK "Production event identifier"
+        string P108_has_produced FK "Links to E22 or E24"
+        string P14_carried_out_by FK "Links to E21 Person or E74 Group"
+        string P4_has_time_span FK "Links to E52 Time-Span"
+    }
 
-    %% Land Plot ↔ Organization via Qualified Link (many-to-many with metadata)
-    LAND_ORGANIZATION_LINK }o--|| LAND_PLOT : "stm:landPlot"
-    LAND_ORGANIZATION_LINK }o--|| ORGANIZATION : "stm:organization"
-
-    %% Organization has many Observations over time
-    ORGANIZATION ||--o{ ORGANIZATION_OBSERVATION : "stm:hasObservation"
-
-    %% Type vocabularies
-    PHYSICAL_SITE }o--|| E55_TYPE_STATUS : "crm:P2_has_type"
-    LAND_ORGANIZATION_LINK }o--|| E55_TYPE_CERTAINTY : "stm:linkCertainty"
-    LAND_ORGANIZATION_LINK }o--|| E55_TYPE_LINK : "stm:linkType"
-
-    %% Self-referential relationships
-    LAND_PLOT ||--o{ LAND_PLOT : "stm:mergedFrom/splitFrom"
-    ORGANIZATION ||--o{ ORGANIZATION : "stm:absorbedInto/partOf"
-    ORGANIZATION_OBSERVATION }o--o| ORGANIZATION : "stm:ownedByOrganization"
+    E52_TIME_SPAN {
+        string id PK "Time-span identifier"
+        date P82a_begin_of_the_begin "Start date (YYYY-01-01)"
+        date P82b_end_of_the_end "End date (YYYY-12-31)"
+    }
 
     %% =============================================================
-    %% STYLING - Color by ontology source
+    %% UNIVERSAL SOURCE PATTERN (E22 → E36 → E38)
+    %% See: universal-source-pattern.mmd for details
     %% =============================================================
 
-    %% CIDOC-CRM entities (green)
-    classDef cidoc fill:#d4edda,stroke:#28a745,stroke-width:2px
-    class LAND_PLOT,PHYSICAL_SITE cidoc
+    E22_HUMAN_MADE_OBJECT {
+        string id PK "Physical artifact (map, book, ledger)"
+        string P102_has_title "Title of the document"
+        string P50_has_current_keeper "Holding archive"
+        string P128_carries FK "Links to E36 Visual Item"
+    }
 
-    %% Schema.org/Wikidata entities (blue)
-    classDef schemaorg fill:#cce5ff,stroke:#0066cc,stroke-width:2px
-    class ORGANIZATION schemaorg
+    E36_VISUAL_ITEM {
+        string id PK "Visual content identifier"
+        string P138_represents FK "What it depicts (E24, E26, E74, E21)"
+    }
 
-    %% Custom STM ontology - qualified links (orange)
-    classDef stmlink fill:#fff3cd,stroke:#ffc107,stroke-width:2px
-    class LAND_ORGANIZATION_LINK stmlink
+    E38_IMAGE {
+        string id PK "Digital reproduction (IIIF scan)"
+        string iiif_url "IIIF Info URL"
+        string P138_represents FK "Links to E22 it reproduces"
+    }
 
-    %% Time-varying observations (purple)
+    OBSERVATION {
+        string id PK "obs:{qid}_{year} or recordid"
+        string observes FK "Links to E74 Group (org)"
+        int observation_year "Year of almanac"
+        string observed_name "Name as in source"
+        string has_owner "eigenaren"
+        string has_administrator "administrateurs"
+        string has_director "directeuren"
+        string has_product "Crop type"
+        int enslaved_count "slaven"
+        boolean is_deserted "verlaten flag"
+        string P70i_is_documented_in FK "Source document"
+    }
+
+    %% =============================================================
+    %% E55 TYPE VOCABULARY INSTANCES
+    %% =============================================================
+
+    E55_FEATURE_TYPE {
+        string id PK "Feature type vocabulary"
+        string label "plantation|house|street|canal|river|creek|lake"
+    }
+
+    E55_ORG_TYPE {
+        string id PK "Organization type vocabulary"
+        string label "plantation-organization|trading-company"
+    }
+
+    E55_DOC_TYPE {
+        string id PK "Document type vocabulary"
+        string label "historic-map|almanac|slave-register"
+    }
+
+    %% =============================================================
+    %% CIDOC-CRM RELATIONSHIPS
+    %% =============================================================
+
+    %% E24 Human-Made Things have types and locations
+    E24_PHYSICAL_HUMAN_MADE_THING }o--|| E55_TYPE : "P2_has_type"
+    E24_PHYSICAL_HUMAN_MADE_THING }o--o{ E53_PLACE : "P53_has_former_or_current_location"
+    E24_PHYSICAL_HUMAN_MADE_THING }o--o{ E74_GROUP : "P52_has_current_owner"
+
+    %% E26 Natural Features have types and locations
+    E26_PHYSICAL_FEATURE }o--|| E55_TYPE : "P2_has_type"
+    E26_PHYSICAL_FEATURE }o--o{ E53_PLACE : "P53_has_former_or_current_location"
+
+    %% E53 Places can nest (district contains plots)
+    E53_PLACE }o--o| E53_PLACE : "P89_falls_within"
+
+    %% E74 Groups (Organizations) have types
+    E74_GROUP }o--|| E55_TYPE : "P2_has_type"
+    E74_GROUP }o--o| E74_GROUP : "P107i_is_member_of"
+
+    %% =============================================================
+    %% PRODUCTION + TIME-SPAN RELATIONSHIPS
+    %% =============================================================
+
+    %% E24 was produced by E12 Production event
+    E24_PHYSICAL_HUMAN_MADE_THING }o--o| E12_PRODUCTION : "P108i_was_produced_by"
+
+    %% E22 was produced by E12 Production event
+    E22_HUMAN_MADE_OBJECT }o--o| E12_PRODUCTION : "P108i_was_produced_by"
+
+    %% E12 Production has time-span
+    E12_PRODUCTION }o--|| E52_TIME_SPAN : "P4_has_time_span"
+
+    %% =============================================================
+    %% UNIVERSAL SOURCE PATTERN RELATIONSHIPS
+    %% =============================================================
+
+    %% E22 Physical artifact carries E36 Visual content
+    E22_HUMAN_MADE_OBJECT ||--|| E36_VISUAL_ITEM : "P128_carries"
+
+    %% E38 Digital image represents E22 Physical artifact
+    E38_IMAGE }o--|| E22_HUMAN_MADE_OBJECT : "P138_represents"
+
+    %% E36 Visual Item represents things (E24, E26)
+    E36_VISUAL_ITEM }o--o{ E24_PHYSICAL_HUMAN_MADE_THING : "P138_represents"
+    E36_VISUAL_ITEM }o--o{ E26_PHYSICAL_FEATURE : "P138_represents"
+
+    %% =============================================================
+    %% OBSERVATION RELATIONSHIPS
+    %% =============================================================
+
+    %% Observations link to Organizations and Documents
+    OBSERVATION }o--|| E74_GROUP : "observes"
+    OBSERVATION }o--|| E22_HUMAN_MADE_OBJECT : "P70i_is_documented_in"
+
+    %% E22 Documents have types
+    E22_HUMAN_MADE_OBJECT }o--|| E55_TYPE : "P2_has_type"
+
+    %% =============================================================
+    %% TYPE VOCABULARY RELATIONSHIPS
+    %% =============================================================
+
+    E55_TYPE ||--o{ E55_FEATURE_TYPE : "includes"
+    E55_TYPE ||--o{ E55_ORG_TYPE : "includes"
+    E55_TYPE ||--o{ E55_DOC_TYPE : "includes"
+
+    %% =============================================================
+    %% STYLING - Color by CIDOC class
+    %% =============================================================
+
+    %% E24 Human-Made Things (green)
+    classDef e24 fill:#d4edda,stroke:#28a745,stroke-width:2px
+    class E24_PHYSICAL_HUMAN_MADE_THING e24
+
+    %% E26 Physical Features (teal)
+    classDef e26 fill:#d1ecf1,stroke:#17a2b8,stroke-width:2px
+    class E26_PHYSICAL_FEATURE e26
+
+    %% E53 Place (light green)
+    classDef e53 fill:#e8f5e9,stroke:#4caf50,stroke-width:2px
+    class E53_PLACE e53
+
+    %% E74 Group/Organization (blue)
+    classDef e74 fill:#cce5ff,stroke:#0066cc,stroke-width:2px
+    class E74_GROUP e74
+
+    %% E55 Type vocabularies (yellow)
+    classDef e55 fill:#fff3cd,stroke:#ffc107,stroke-width:2px
+    class E55_TYPE,E55_FEATURE_TYPE,E55_ORG_TYPE,E55_DOC_TYPE e55
+
+    %% E12 Production / E52 Time-Span (red/pink)
+    classDef production fill:#f8d7da,stroke:#dc3545,stroke-width:2px
+    class E12_PRODUCTION,E52_TIME_SPAN production
+
+    %% E22/E36/E38 Source Pattern (gray)
+    classDef source fill:#f8f9fa,stroke:#6c757d,stroke-width:1px
+    class E22_HUMAN_MADE_OBJECT,E36_VISUAL_ITEM,E38_IMAGE source
+
+    %% Observations (purple)
     classDef observation fill:#e2d5f1,stroke:#6f42c1,stroke-width:2px
-    class ORGANIZATION_OBSERVATION observation
-
-    %% Type vocabularies (gray)
-    classDef vocabulary fill:#f8f9fa,stroke:#6c757d,stroke-width:1px,stroke-dasharray: 5 5
-    class E55_TYPE_STATUS,E55_TYPE_CERTAINTY,E55_TYPE_LINK vocabulary
+    class OBSERVATION observation

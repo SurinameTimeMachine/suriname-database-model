@@ -1,0 +1,67 @@
+---
+title: Organization (E74) + PICO Connection Pattern
+---
+flowchart TB
+    subgraph CIDOC_CRM["CIDOC-CRM Domain"]
+        direction TB
+        E74["E74 Group<br/>(Organization)<br/>wd:Q-ID"]
+        E24["E24 Physical Human-Made Thing<br/>(Plantation)"]
+        E53["E53 Place<br/>stm:place/fid"]
+
+        E74 -->|"P52i is current owner of"| E24
+        E24 -->|"P53 has former or current location"| E53
+    end
+
+    subgraph PICO_Domain["PICO Domain"]
+        direction TB
+        PERSON_OBS["pico:PersonObservation<br/>(raw source data)"]
+        PERSON_REC["pico:PersonReconstruction<br/>(derived person)"]
+        SOURCE["sdo:ArchiveComponent<br/>(source document)"]
+
+        PERSON_OBS -->|"prov:hadPrimarySource"| SOURCE
+        PERSON_OBS -.->|"pico:derivesTo"| PERSON_REC
+    end
+
+    subgraph ROLES["Person Roles in Plantation Context"]
+        direction LR
+        OWNER["picot:owner"]
+        ADMIN["picot:administrator"]
+        ENSLAVED["hdsc:enslaved"]
+        DIRECTOR["picot:director"]
+    end
+
+    %% Cross-domain connections
+    E74 -->|"P107 has current or former member"| PERSON_REC
+    PERSON_OBS -->|"pico:hasRole"| ROLES
+
+    %% Enslaved relationship modeled explicitly
+    ENSLAVED -->|"hdsc:isEnslavedOf"| E74
+
+    %% Schema.org for organization properties
+    E74 -->|"sdo:name"| NAME["Plantation Organization Name"]
+    E74 -->|"sdo:foundingDate"| FOUNDED["Founding Date"]
+    E74 -->|"owl:sameAs"| WD["wikidata:Q-ID"]
+
+    subgraph OBSERVATION_LAYER["Temporal Observations"]
+        direction TB
+        OBS1["Almanakken Observation<br/>1823"]
+        OBS2["Almanakken Observation<br/>1847"]
+        OBS3["Slave Register Entry<br/>1863"]
+
+        OBS1 -->|"observes role of"| PERSON_OBS
+        OBS2 -->|"observes role of"| PERSON_OBS
+        OBS3 -->|"observes enslaved person"| PERSON_OBS
+    end
+
+    %% Style definitions - lighter colors for readability
+    classDef cidoc fill:#e8f4ea,stroke:#2d6a4f,color:#1b4332
+    classDef pico fill:#e3f2fd,stroke:#1976d2,color:#0d47a1
+    classDef role fill:#fff8e1,stroke:#f9a825,color:#5d4037
+    classDef obs fill:#f3e5f5,stroke:#9c27b0,color:#4a148c
+    classDef literal fill:#fafafa,stroke:#9e9e9e,color:#424242
+
+    class E74,E24,E53 cidoc
+    class PERSON_OBS,PERSON_REC,SOURCE pico
+    class OWNER,ADMIN,ENSLAVED,DIRECTOR role
+    class OBS1,OBS2,OBS3 obs
+    class NAME,FOUNDED,WD literal

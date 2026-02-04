@@ -1,0 +1,109 @@
+---
+title: Suriname Time Machine - Universal Source Pattern (CIDOC-CRM)
+---
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#e8f4ea'}}}%%
+flowchart TB
+    %% =============================================================
+    %% UNIVERSAL SOURCE PATTERN
+    %% Applies to: Maps, Almanacs, Slave Registers, Certificates
+    %% =============================================================
+
+    E22["E22 Human-Made Object
+    (Physical source artifact)
+    Map | Book | Ledger | Document"]
+
+    E38["E38 Image
+    (Digital reproduction)
+    IIIF scan"]
+
+    E36["E36 Visual Item
+    (What the artifact carries)
+    Cartography | Tables | Handwriting"]
+
+    E12["E12 Production"]
+
+    E52["E52 Time-Span
+    P82a begin: YYYY-01-01
+    P82b end: YYYY-12-31"]
+
+    E21["E21 Person
+    (Makers)"]
+
+    E74_PUB["E74 Group
+    (Publisher)"]
+
+    %% =============================================================
+    %% WHAT THE SOURCE REPRESENTS (varies by source type)
+    %% =============================================================
+
+    E24["E24 Physical Human-Made Thing
+    (Plantations, buildings)
+    ← Maps"]
+
+    E26["E26 Physical Feature
+    (Rivers, creeks)
+    ← Maps"]
+
+    E74_ORG["E74 Group
+    (Organizations)
+    ← Almanacs"]
+
+    E21_PERSON["E21 Person
+    (Historical persons)
+    ← Registers, Certificates"]
+
+    E53["E53 Place
+    (Spatial location)"]
+
+    %% =============================================================
+    %% RELATIONSHIPS
+    %% =============================================================
+
+    %% Physical artifact carries visual content
+    E22 -->|"P128 carries"| E36
+
+    %% Digital scan represents physical (FIXED: P138 not P183i)
+    E38 -->|"P138 represents"| E22
+
+    %% Production with time-span
+    E22 -->|"P108i was produced by"| E12
+    E12 -->|"P4 has time-span"| E52
+    E12 -->|"P14 carried out by"| E21
+    E12 -->|"P14 carried out by"| E74_PUB
+
+    %% Visual represents different things depending on source type
+    E36 -->|"P138 represents"| E24
+    E36 -->|"P138 represents"| E26
+    E36 -->|"P138 represents"| E74_ORG
+    E36 -->|"P138 represents"| E21_PERSON
+
+    %% Things/features have locations
+    E24 -->|"P53 has location"| E53
+    E26 -->|"P53 has location"| E53
+
+    %% =============================================================
+    %% STYLING
+    %% =============================================================
+
+    classDef e22 fill:#fff3cd,stroke:#ffc107,stroke-width:2px,color:#856404
+    classDef e38 fill:#cce5ff,stroke:#004085,stroke-width:2px,color:#004085
+    classDef e36 fill:#e2e3e5,stroke:#6c757d,stroke-width:2px,color:#383d41
+    classDef e24 fill:#d4edda,stroke:#28a745,stroke-width:2px,color:#155724
+    classDef e53 fill:#e8f5e9,stroke:#4caf50,stroke-width:2px,color:#1b5e20
+    classDef e26 fill:#b2dfdb,stroke:#00796b,stroke-width:2px,color:#004d40
+    classDef e74 fill:#e3f2fd,stroke:#1976d2,stroke-width:2px,color:#0d47a1
+    classDef e21 fill:#fce4ec,stroke:#c2185b,stroke-width:2px,color:#880e4f
+    classDef production fill:#f8d7da,stroke:#721c24,stroke-width:1px,color:#721c24
+    classDef timespan fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#4a148c
+
+    class E22 e22
+    class E38 e38
+    class E36 e36
+    class E24 e24
+    class E53 e53
+    class E26 e26
+    class E74_ORG e74
+    class E74_PUB production
+    class E21,E21_PERSON e21
+    class E12 production
+    class E52 timespan

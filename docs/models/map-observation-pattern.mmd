@@ -1,0 +1,134 @@
+---
+title: Suriname Time Machine - Map Observation Pattern (CIDOC-CRM)
+---
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#e8f4ea'}}}%%
+flowchart TB
+    %% =============================================================
+    %% CIDOC-CRM PATTERN FOR MAP OBSERVATIONS
+    %%
+    %% When we see a plantation on a historic map, we are observing:
+    %% 1. The map exists (E73 Information Object)
+    %% 2. The map depicts something (P138 represents)
+    %% 3. That something has a location (E53 Place)
+    %% 4. The location has geometry (P168 place is defined by)
+    %% 5. The depicted thing is identifiable (E24/E26)
+    %% =============================================================
+
+    subgraph MAP_LAYER ["E73 Information Object (Historic Map)"]
+        MAP["E73 Information Object
+        'Kaart van Suriname 1930'
+        P2 has type: historic-map
+        P4 has time-span: 1930"]
+    end
+
+    subgraph VISUAL_LAYER ["Visual Representation on Map"]
+        VISUAL["E36 Visual Item
+        (The polygon drawn on the map)
+        P138i has representation: E24/E26"]
+    end
+
+    subgraph THING_LAYER ["E24 Physical Human-Made Thing"]
+        E24["E24 Physical Human-Made Thing
+        'Geijersvlijt' (the plantation)
+        stm:plantation/geijersvlijt
+        P2 has type: plantation"]
+    end
+
+    subgraph PLACE_LAYER ["E53 Place (Location)"]
+        E53["E53 Place
+        stm:place/fid-1619
+        P168 place is defined by: WKT Polygon
+        P89 falls within: Suriname"]
+    end
+
+    subgraph APPELLATION_LAYER ["E41 Appellation (Name)"]
+        E41["E41 Appellation
+        'Geijersvlijt' (label on map)
+        P2 has type: observed-label"]
+    end
+
+    subgraph TIME_LAYER ["Temporal Qualification"]
+        TIME["The observation:
+        • Geometry observed in 1930
+        • Name observed in 1930
+        • Location valid ~1930"]
+    end
+
+    %% =============================================================
+    %% RELATIONSHIPS
+    %% =============================================================
+
+    %% Map contains visual item
+    MAP -->|"P65 shows visual item"| VISUAL
+
+    %% Visual item represents the plantation
+    VISUAL -->|"P138 represents"| E24
+
+    %% Map documents the place
+    MAP -->|"P70 documents"| E53
+
+    %% Plantation has location
+    E24 -->|"P53 has former or
+    current location"| E53
+
+    %% Plantation identified by name
+    E24 -->|"P1 is identified by"| E41
+
+    %% Appellation observed on map
+    MAP -->|"P67 refers to"| E41
+
+    %% Temporal context
+    MAP -.->|"temporal context"| TIME
+    E53 -.->|"observed at"| TIME
+    E41 -.->|"observed at"| TIME
+
+    %% =============================================================
+    %% THE KEY INSIGHT:
+    %% =============================================================
+    subgraph INSIGHT ["KEY CIDOC-CRM PATTERN"]
+        direction LR
+        KEY1["P70 documents:
+        Map → E53 Place
+        (geometry source)"]
+
+        KEY2["P138 represents:
+        Visual → E24 Thing
+        (what's depicted)"]
+
+        KEY3["P53 has location:
+        E24 → E53 Place
+        (spatial relation)"]
+    end
+
+    %% =============================================================
+    %% STYLING
+    %% =============================================================
+
+    classDef e73 fill:#f8f9fa,stroke:#6c757d,stroke-width:2px
+    class MAP e73
+
+    classDef e36 fill:#e9ecef,stroke:#adb5bd,stroke-width:1px
+    class VISUAL e36
+
+    classDef e24 fill:#d4edda,stroke:#28a745,stroke-width:2px
+    class E24 e24
+
+    classDef e53 fill:#e8f5e9,stroke:#4caf50,stroke-width:2px
+    class E53 e53
+
+    classDef e41 fill:#fff3cd,stroke:#ffc107,stroke-width:2px
+    class E41 e41
+
+    classDef temporal fill:#e2d5f1,stroke:#6f42c1,stroke-width:1px,stroke-dasharray: 5 5
+    class TIME temporal
+
+    classDef insight fill:#f8d7da,stroke:#dc3545,stroke-width:2px
+    class KEY1,KEY2,KEY3 insight
+
+    style MAP_LAYER fill:#f8f9fa,stroke:#6c757d
+    style VISUAL_LAYER fill:#e9ecef,stroke:#adb5bd
+    style THING_LAYER fill:#d4edda,stroke:#28a745
+    style PLACE_LAYER fill:#e8f5e9,stroke:#4caf50
+    style APPELLATION_LAYER fill:#fff3cd,stroke:#ffc107
+    style TIME_LAYER fill:#e2d5f1,stroke:#6f42c1,stroke-dasharray: 5 5
+    style INSIGHT fill:#fff5f5,stroke:#dc3545
