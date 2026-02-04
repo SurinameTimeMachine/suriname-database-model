@@ -1757,6 +1757,208 @@ stm:link/1860/suzannasdal_Q131349015
 | 18  | Custom `stm:hasParts`/`stm:partOf` for orgs        | Organizations are not E18 Physical Thing, so P46 inappropriate                 | P46 is_composed_of (rejected: wrong domain)                           |
 | 19  | Ownership-by-org in Observations                   | Ownership by another plantation can change over time                           | Direct property on Organization (rejected: loses temporal context)    |
 | 20  | Geometry on Land Plot, not Organization            | Organizations don't have geometry; Land Plots do                               | Geometry on Organization (rejected: wrong entity type)                |
+| 21  | **E22 Human-Made Object for physical sources**     | Maps, books, ledgers are physical artifacts that carry content                 | E73 Information Object (rejected: E73 is for abstract information)    |
+| 22  | E38 Image -> P138 represents -> E22                | Digital scans represent the physical artifact they reproduce                   | P183i (rejected: not standard CIDOC-CRM property for this purpose)    |
+| 23  | E12 Production + E52 Time-Span for creation        | Production events have time-spans; E22 doesn't directly have P4                | Direct P4 on E22 (rejected: wrong CIDOC-CRM domain)                   |
+| 24  | E36 Visual Item -> E24/E26 -> E53 (not E36 -> E53) | "Maps depict things; things have locations" - visual content represents things | E36 -> E53 directly (rejected: conflates content with spatial extent) |
+| 25  | **No emojis** in any files or diagrams             | Professional documentation; avoids encoding issues                             | Emojis for visual appeal (rejected: inconsistent rendering)           |
+| 26  | erDiagram doesn't support %% comments              | Mermaid parser limitation; use YAML frontmatter instead                        | Keep comments (rejected: causes syntax errors)                        |
+
+---
+
+# Part 8: Universal Source Pattern
+
+> **KEY INSIGHT:** All historical sources (maps, almanacs, slave registers, certificates) follow the same CIDOC-CRM pattern for connecting physical artifacts to the entities they document.
+
+## Step 8.1: The Problem — How Do Sources Connect to Data?
+
+When we extract data from a historical source, we need to model:
+
+1. **The physical artifact** (the map, the book, the ledger)
+2. **The content it carries** (cartography, tables, handwriting)
+3. **What that content represents** (plantations, persons, organizations)
+4. **Digital reproductions** (IIIF scans of the artifact)
+
+### The Universal Pattern
+
+```
+E22 Human-Made Object ─── P128 carries ───> E36 Visual Item ─── P138 represents ───> E24/E26/E74/E21
+(physical artifact)                         (content)                                (things depicted)
+        ^
+        |
+E38 Image ─── P138 represents
+(digital scan)
+        |
+        v
+E12 Production ─── P4 has time-span ───> E52 Time-Span
+(creation event)                         (when created)
+```
+
+See: [docs/models/universal-source-pattern.mmd](../../../docs/models/universal-source-pattern.mmd)
+
+## Step 8.2: Why E22 Human-Made Object (NOT E73 Information Object)?
+
+**Decision:** Use **E22 Human-Made Object** for maps, books, ledgers — NOT E73 Information Object.
+
+### CIDOC-CRM Class Definitions
+
+| Class                      | Definition                                           | Examples                                         |
+| -------------------------- | ---------------------------------------------------- | ------------------------------------------------ |
+| **E22 Human-Made Object**  | Physical objects purposely created by human activity | Maps, books, coins, paintings                    |
+| **E73 Information Object** | Identifiable immaterial items (abstract content)     | A poem, a musical composition, a database schema |
+
+### The Key Distinction
+
+- **E22** = The physical thing you can touch (the paper map in the archive)
+- **E73** = The abstract information (the idea/content independent of any carrier)
+
+A historical map is primarily a **physical artifact**:
+
+- It has a location (in an archive)
+- It was produced at a specific time
+- It can be damaged, restored, digitized
+- It carries visual content (E36)
+
+The **content** the map carries is modeled separately as E36 Visual Item.
+
+## Step 8.3: The Source Chain
+
+```turtle
+# The physical artifact (map, book, ledger)
+stm:source/map-1930
+    a crm:E22_Human-Made_Object ;
+    crm:P2_has_type stm:DocType_HistoricMap ;
+    crm:P102_has_title "Kaart van Suriname 1930" ;
+    crm:P50_has_current_keeper <archive:nationaal-archief> ;
+    crm:P128_carries stm:visual/map-1930-content .
+
+# The visual content the artifact carries
+stm:visual/map-1930-content
+    a crm:E36_Visual_Item ;
+    crm:P138_represents stm:plantation/geijersvlijt ;  # depicts this plantation
+    crm:P138_represents stm:feature/suriname-river .   # depicts this river
+
+# Digital reproduction (IIIF scan)
+stm:scan/map-1930-iiif
+    a crm:E38_Image ;
+    crm:P138_represents stm:source/map-1930 ;  # represents the physical map
+    stm:iiifInfoUrl "https://example.org/iiif/map-1930/info.json" .
+
+# Production event with time-span
+stm:production/map-1930
+    a crm:E12_Production ;
+    crm:P108_has_produced stm:source/map-1930 ;
+    crm:P14_carried_out_by stm:person/cartographer-xyz ;
+    crm:P4_has_time-span stm:timespan/1930 .
+
+stm:timespan/1930
+    a crm:E52_Time-Span ;
+    crm:P82a_begin_of_the_begin "1930-01-01"^^xsd:date ;
+    crm:P82b_end_of_the_end "1930-12-31"^^xsd:date .
+```
+
+## Step 8.4: Location Principle — "Maps Depict Things; Things Have Locations"
+
+**CRITICAL:** E36 Visual Item does NOT connect directly to E53 Place.
+
+### Wrong Pattern (DO NOT USE)
+
+```turtle
+# WRONG: E36 directly to E53
+stm:visual/map-1930-content
+    crm:P138_represents stm:place/geijersvlijt .  # NO!
+```
+
+### Correct Pattern
+
+```turtle
+# CORRECT: E36 -> E24/E26 -> E53
+stm:visual/map-1930-content
+    crm:P138_represents stm:plantation/geijersvlijt .  # depicts the plantation
+
+stm:plantation/geijersvlijt
+    a crm:E24_Physical_Human-Made_Thing ;
+    crm:P53_has_former_or_current_location stm:place/fid-1619 .  # plantation has location
+```
+
+### Why This Matters
+
+1. **Semantic accuracy:** The map depicts a plantation, not a location. The plantation has a location.
+2. **Query correctness:** "What plantations are depicted on this map?" vs "What locations?"
+3. **Provenance chain:** We can trace: Map -> depicts -> Plantation -> located at -> Place
+
+## Step 8.5: Applying to Different Source Types
+
+| Source Type           | E22 Instance          | E36 Content          | P138 represents                    |
+| --------------------- | --------------------- | -------------------- | ---------------------------------- |
+| **Historic Map**      | Physical map sheet    | Cartographic content | E24 (plantations), E26 (rivers)    |
+| **Almanac**           | Physical almanac book | Tabular data         | E74 (organizations)                |
+| **Slave Register**    | Physical ledger       | Handwritten entries  | E21 (persons), E74 (organizations) |
+| **Birth Certificate** | Physical document     | Handwritten text     | E21 (persons)                      |
+
+---
+
+# Part 9: Formatting and Technical Guidelines
+
+## Step 9.1: No Emojis
+
+**Rule:** Never use emojis in any files, diagrams, code, or documentation in this project.
+
+**Reasoning:**
+
+- Professional documentation standards
+- Avoids encoding issues across different systems
+- Consistent rendering in all environments
+- Some tools (PDF generators, terminal outputs) handle emojis poorly
+
+## Step 9.2: Mermaid Diagram Syntax
+
+### erDiagram Limitations
+
+**Issue:** Mermaid `erDiagram` does NOT support `%%` comments.
+
+```mermaid
+erDiagram
+    %% This will cause a syntax error!
+    ENTITY {
+        string id PK
+    }
+```
+
+**Solution:** Use YAML frontmatter for metadata, or remove comments entirely.
+
+```mermaid
+---
+title: My ER Diagram
+config:
+  theme: base
+---
+erDiagram
+    ENTITY {
+        string id PK
+    }
+```
+
+### flowchart Comments
+
+`flowchart` diagrams DO support `%%` comments:
+
+```mermaid
+flowchart TB
+    %% This comment is valid in flowcharts
+    A --> B
+```
+
+## Step 9.3: Diagram File Conventions
+
+| Diagram Type                    | File Location | Purpose                         |
+| ------------------------------- | ------------- | ------------------------------- |
+| `universal-source-pattern.mmd`  | docs/models/  | How sources connect to entities |
+| `three-entity-model.mmd`        | docs/models/  | Main conceptual ER diagram      |
+| `postgres-schema.mmd`           | docs/models/  | Database implementation         |
+| `map-observation-pattern.mmd`   | docs/models/  | Map-specific observation flow   |
+| `data-source-mapping.mmd`       | docs/models/  | CSV columns to entities         |
+| `organization-pico-pattern.mmd` | docs/models/  | Organization to PICO connection |
 
 ---
 

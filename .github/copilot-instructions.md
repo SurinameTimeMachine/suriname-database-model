@@ -39,3 +39,27 @@ Primary data lives in `/data/` with these key sources:
 - Processed CSVs → `/lod/csv/`
 - Transformation scripts → `/scripts/`
 - Documentation → `/docs/`
+
+## Formatting Rules
+
+- **No emojis** — Never use emojis in any files, diagrams, code, or documentation in this project
+- **Mermaid erDiagram** — Does NOT support `%%` comments; use YAML frontmatter for metadata instead
+- **Mermaid flowchart** — Supports `%%` comments normally
+
+## Key Modeling Decisions (Universal Source Pattern)
+
+Always use these patterns (see SKILL.md Part 8 for full details):
+
+- **Physical sources**: Use E22 Human-Made Object for maps, books, ledgers (NOT E73 Information Object)
+- **Source chain**: E22 Human-Made Object -> P128 carries -> E36 Visual Item -> P138 represents -> E24/E26/E74/E21
+- **Digital reproductions**: E38 Image -> P138 represents -> E22 (NOT P183i)
+- **Production events**: E22 -> P108i was produced by -> E12 Production -> P4 has time-span -> E52 Time-Span
+- **Location principle**: "Maps depict things; things have locations" — E36 does NOT connect directly to E53 Place
+
+## Diagram Files
+
+Key conceptual diagrams in `/docs/models/`:
+
+- `universal-source-pattern.mmd` — How all sources (maps, almanacs, registers) connect to entities
+- `three-entity-model.mmd` — Main ER diagram with all CIDOC-CRM entities
+- `postgres-schema.mmd` — Database implementation schema
