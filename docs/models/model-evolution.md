@@ -133,8 +133,10 @@ E41a --P139 has alternative form--> E41b
 
 ```
 E74 (split1_id) --stm:absorbedInto--> E74 (plantation_id)   [has parts]
-E74 (plantation_id) --stm:partOf--> E74 (part_of_id)        [part of]
+E74 (plantation_id) --P107i is member of--> E74 (part_of_id) [part of larger combination]
 ```
+
+Using `P107i is current or former member of` (CIDOC-CRM standard for group membership) rather than custom `stm:partOf`. When a plantation organization becomes part of a larger merged combination, it is organizational membership -- one E74 group belongs to a larger E74 group.
 
 **Enables:** Answering: plantation network reconstruction, understanding why PSUR IDs may link to a component plantation rather than the combined one.
 
@@ -304,3 +306,70 @@ stm:source/almanac-{year} --stm:pageReference--> "28"
 | 9        | 6.5  | Page provenance          | Future IIIF linking                               |
 | 10       | 6.6  | Function/additional info | Nice to have                                      |
 | 11       | 7.2  | Population breakdown     | Complex, defer until core is stable               |
+
+---
+
+## Diagram guide
+
+### How to read data-source-mapping.mmd
+
+The comprehensive flowchart in `data-source-mapping.mmd` shows how every CSV column from both primary datasets flows into the CIDOC-CRM entity model. It is structured in three vertical bands:
+
+| Band   | Location | Contents                                                                                                               |
+| ------ | -------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Left   | QGIS     | 8 columns from `plantation_polygons_1930.csv`                                                                          |
+| Right  | ALM      | 18 key columns from `Plantations Surinaamse Almanakken v1.0.csv`, grouped into core / people / enrichment / structural |
+| Center | CIDOC    | 13 CIDOC-CRM entity nodes                                                                                              |
+
+Every edge is annotated with:
+
+1. The **CIDOC-CRM property** (or custom stm:/skos: property) used
+2. A parenthetical **rationale** explaining why that property was chosen
+
+### Entity color key (CRITERIA / George Bruseker)
+
+Colors follow the standard CIDOC-CRM visualization scheme proposed by George Bruseker and implemented in [chin-rcip/CRITERIA](https://github.com/chin-rcip/CRITERIA). Each CRM class inherits the color of its parent class in the hierarchy. All strokes are black (#000000).
+
+| Fill       | CIDOC-CRM parent class | Our entities                    |
+| ---------- | ---------------------- | ------------------------------- |
+| #c78e66    | E18 Physical Thing     | E24 Plantation, E22 Source, E26 |
+| #94cc7d    | E53 Place              | E53 Place (location geometry)   |
+| #ffbdca    | E39 Actor              | E74 Group (organization)        |
+| #fef3ba    | E41 Appellation        | E41 MAP / ALM / STD (names)     |
+| #82ddff    | E2 Temporal Entity     | E12 Production, Observations    |
+| #86bcc8    | E52 Time-Span          | E52 Time-Span                   |
+| #fddc34    | E28 Conceptual Object  | E36 Visual Item, E38 Image      |
+| #fab565    | E55 Type               | E55 Type                        |
+| #ffe6eb    | E39 Actor (instance)   | PersonObservation (PICO)        |
+| #f8f9fa    | (non-CRM)              | CSV source columns              |
+| #ffffff    | Literal                | Roles, type literals            |
+| red border | (UI element)           | Q-ID bridge section             |
+
+### Q-ID bridge
+
+The red dashed box at the bottom shows how the two datasets connect. Both the QGIS `qid` column and the Almanakken `plantation_id` column contain Wikidata Q-IDs that resolve to the same E74 entity. This is the primary join key.
+
+Example -- Geijersvlijt:
+
+- QGIS: fid 1619, qid Q4392658, psur_id PSUR0118
+- Almanakken: plantation_id Q4392658, 116 annual observations (1787-1920)
+- Both point to: `wd:Q4392658` (the E74 organization)
+
+### CIDOC-CRM property reference
+
+| Property                           | Domain -> Range         | Why used                           |
+| ---------------------------------- | ----------------------- | ---------------------------------- |
+| P1 is identified by                | E1 -> E41               | Names assigned to entities         |
+| P52 has current owner              | E18 -> E39              | Plantation owned by organization   |
+| P51 has former or current owner    | E18 -> E39              | Historical ownership (qid_alt)     |
+| P53 has former or current location | E18 -> E53              | Plantation at a place              |
+| P107i is member of                 | E74 -> E74              | Sub-organization belongs to parent |
+| P128 carries                       | E18 -> E90              | Physical source carries a name     |
+| P138 represents                    | E36 -> E1               | Visual item depicts a thing        |
+| P139 has alternative form          | E41 -> E41              | Variant spellings linked           |
+| P190 has symbolic content          | E90 -> string           | Literal name string                |
+| P70i is documented in              | E1 -> E31               | Provenance link to source          |
+| geo:asWKT                          | geo:Geometry -> literal | GeoSPARQL spatial encoding         |
+| skos:closeMatch                    | concept -> concept      | PSUR ID approximate link           |
+| stm:observationOf                  | Observation -> E74      | Annual snapshot of org             |
+| stm:absorbedInto                   | E74 -> E74              | Plantation merger                  |

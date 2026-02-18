@@ -64,16 +64,22 @@ flowchart TB
     SOURCE -->|"P128 carries"| E41_ALM
 
     %% Style definitions
-    classDef cidoc fill:#e8f4ea,stroke:#2d6a4f,color:#1b4332
-    classDef pico fill:#e3f2fd,stroke:#1976d2,color:#0d47a1
-    classDef role fill:#fff8e1,stroke:#f9a825,color:#5d4037
-    classDef obs fill:#f3e5f5,stroke:#9c27b0,color:#4a148c
-    classDef literal fill:#fafafa,stroke:#9e9e9e,color:#424242
-    classDef appellation fill:#ffefd5,stroke:#e67e22,color:#7e4a00
+    %% CRITERIA / George Bruseker CIDOC-CRM colour scheme
+    %% See: https://github.com/chin-rcip/CRITERIA
 
-    class E74,E24,E53 cidoc
-    class E41_MAP,E41_ALM appellation
-    class PERSON_OBS,PERSON_REC,SOURCE pico
-    class OWNER,ADMIN,ENSLAVED,DIRECTOR role
-    class OBS1,OBS2,OBS3 obs
-    class TYPE,WD literal
+    classDef crm_E18_Physical_Thing fill:#c78e66,stroke:#000000,color:#000000
+    classDef crm_E53_Place fill:#94cc7d,stroke:#000000,color:#000000
+    classDef crm_E39_Actor fill:#ffbdca,stroke:#000000,color:#000000
+    classDef crm_E41_Appellation fill:#fef3ba,stroke:#000000,color:#000000
+    classDef crm_E2_Temporal_Entity fill:#82ddff,stroke:#000000,color:#000000
+    classDef crm_E39_Actor_URI fill:#ffe6eb,stroke:#000000,color:#000000
+    classDef Literal fill:#ffffff,stroke:#000000,color:#000000
+
+    class E74 crm_E39_Actor
+    class E24 crm_E18_Physical_Thing
+    class E53 crm_E53_Place
+    class E41_MAP,E41_ALM crm_E41_Appellation
+    class PERSON_OBS,PERSON_REC,SOURCE crm_E39_Actor_URI
+    class OWNER,ADMIN,ENSLAVED,DIRECTOR Literal
+    class OBS1,OBS2,OBS3 crm_E2_Temporal_Entity
+    class TYPE,WD Literal

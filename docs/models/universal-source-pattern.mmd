@@ -101,29 +101,27 @@ flowchart TB
     %% STYLING
     %% =============================================================
 
-    classDef e22 fill:#fff3cd,stroke:#ffc107,stroke-width:2px,color:#856404
-    classDef e38 fill:#cce5ff,stroke:#004085,stroke-width:2px,color:#004085
-    classDef e36 fill:#e2e3e5,stroke:#6c757d,stroke-width:2px,color:#383d41
-    classDef e41 fill:#ffefd5,stroke:#e67e22,stroke-width:2px,color:#7e4a00
-    classDef e41alm fill:#fff0e0,stroke:#d35400,stroke-width:2px,color:#7e4a00
-    classDef e24 fill:#d4edda,stroke:#28a745,stroke-width:2px,color:#155724
-    classDef e53 fill:#e8f5e9,stroke:#4caf50,stroke-width:2px,color:#1b5e20
-    classDef e26 fill:#b2dfdb,stroke:#00796b,stroke-width:2px,color:#004d40
-    classDef e74 fill:#e3f2fd,stroke:#1976d2,stroke-width:2px,color:#0d47a1
-    classDef e21 fill:#fce4ec,stroke:#c2185b,stroke-width:2px,color:#880e4f
-    classDef production fill:#f8d7da,stroke:#721c24,stroke-width:1px,color:#721c24
-    classDef timespan fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#4a148c
+    %% CRITERIA / George Bruseker CIDOC-CRM colour scheme
+    %% See: https://github.com/chin-rcip/CRITERIA
 
-    class E22 e22
-    class E38 e38
-    class E36 e36
-    class E41_MAP e41
-    class E41_ALM e41alm
-    class E24 e24
-    class E53 e53
-    class E26 e26
-    class E74_ORG e74
-    class E74_PUB production
-    class E21,E21_PERSON e21
-    class E12 production
-    class E52 timespan
+    classDef crm_E18_Physical_Thing fill:#c78e66,stroke:#000000,color:#000000
+    classDef crm_E28_Conceptual_Object fill:#fddc34,stroke:#000000,color:#000000
+    classDef crm_E41_Appellation fill:#fef3ba,stroke:#000000,color:#000000
+    classDef crm_E53_Place fill:#94cc7d,stroke:#000000,color:#000000
+    classDef crm_E39_Actor fill:#ffbdca,stroke:#000000,color:#000000
+    classDef crm_E2_Temporal_Entity fill:#82ddff,stroke:#000000,color:#000000
+    classDef crm_E52_Time_Span fill:#86bcc8,stroke:#000000,color:#000000
+
+    class E22 crm_E18_Physical_Thing
+    class E38 crm_E28_Conceptual_Object
+    class E36 crm_E28_Conceptual_Object
+    class E41_MAP crm_E41_Appellation
+    class E41_ALM crm_E41_Appellation
+    class E24 crm_E18_Physical_Thing
+    class E53 crm_E53_Place
+    class E26 crm_E18_Physical_Thing
+    class E74_ORG crm_E39_Actor
+    class E74_PUB crm_E39_Actor
+    class E21,E21_PERSON crm_E39_Actor
+    class E12 crm_E2_Temporal_Entity
+    class E52 crm_E52_Time_Span

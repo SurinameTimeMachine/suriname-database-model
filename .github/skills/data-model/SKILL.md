@@ -206,8 +206,8 @@ prov:hadPrimarySource  - almanac source
 | page              | stm:pageReference (provenance)      | useful   |
 | split1_id..5_id   | stm:absorbedInto (merger network)   | linking  |
 | split1_lab..5_lab | labels for merged plantations       | linking  |
-| partof_lab        | stm:partOf label                    | linking  |
-| part_of_id        | stm:partOf (Q-ID)                   | linking  |
+| partof_lab        | P107i label                         | linking  |
+| part_of_id        | P107i is member of (Q-ID)           | linking  |
 | reference_std_id  | stm:referencedBy (Q-ID)             | linking  |
 | reference_std_lab | label for reference plantation      | linking  |
 | function          | stm:function (free text)            | deferred |
