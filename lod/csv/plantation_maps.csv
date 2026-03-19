@@ -1,0 +1,2056 @@
+qid;map_id;label_on_map;has_polygon
+Q59132846;MAP_1930;Nieuw Java;true
+Q59132846;MAP_1860-79;Nieuw Java;false
+Q59115309;MAP_1930;Breedevoort;true
+Q59115309;MAP_1860-79;Breedevoort;false
+Q59132858;MAP_1930;Nieuw Roland;true
+Q59132858;MAP_1860-79;Nieuw Roland;false
+Q59119443;MAP_1930;Moederzorg;true
+Q59119443;MAP_1860-79;Moederzorg;false
+Q59133134;MAP_1930;Aan Reijnesburg;true
+Q59115222;MAP_1930;Aan Bergendaal;true
+Q59115222;MAP_1860-79;Aan Bergendaal;false
+Q59115248;MAP_1930;Bigrar;true
+Q59115248;MAP_1860-79;Bigrar;false
+Q59115347;MAP_1930;Cadix;true
+Q59115347;MAP_1860-79;Cadix;false
+Q59132922;MAP_1930;Non Panse;true
+Q59132922;MAP_1860-79;Non Panse;false
+Q59115172;MAP_1930;Auca;true
+Q59115172;MAP_1860-79;Auca;false
+Q59133982;MAP_1930;Venetie;true
+Q59133982;MAP_1860-79;Venetie;false
+Q59115185;MAP_1930;Baboenhol;true
+Q59115185;MAP_1860-79;Baboenhol;false
+Q59116891;MAP_1930;La Providence;true
+Q59116891;MAP_1860-79;La Providence;false
+Q59132801;MAP_1930;Morea;true
+Q59132801;MAP_1860-79;Morea;false
+Q4392658;MAP_1930;Geijersvlijt;true
+Q4392658;MAP_1860-79;Kl. Suzanna'sdal;false
+Q59115470;MAP_1930;Morgenstond;true
+Q59115470;MAP_1860-79;Morgenstond;false
+Q15873942;MAP_1930;Clevia;true
+Q15873942;MAP_1860-79;Clevia;false
+Q59116947;MAP_1930;Leonsberg;true
+Q59116947;MAP_1860-79;Leonsberg;false
+Q59133121;MAP_1930;Rainville;true
+Q59133121;MAP_1860-79;Rainville;false
+Q131413971;MAP_1930;Elisabethshof;true
+Q131413971;MAP_1860-79;Elisabethshof;false
+Q124831607;MAP_1930;Mon Plaisir;true
+Q124831607;MAP_1860-79;Mon Plaisir;false
+Q59115484;MAP_1930;De Twee Kinderen;true
+Q59116910;MAP_1930;Tourtonne;true
+Q59116910;MAP_1860-79;Tourtonne;false
+Q124831360;MAP_1930;Ma Retraite;true
+Q124831360;MAP_1860-79;Ma Retraite;false
+Q59115646;MAP_1930;Combe;true
+Q59115646;MAP_1860-79;Combe;false
+Q819296;MAP_1930;Bergendaal;true
+Q819296;MAP_1860-79;Bergendaal;false
+Q819296;MAP_1930;Bergendaal;true
+Q819296;MAP_1860-79;Bergendaal;false
+Q14514754;MAP_1930;Victoria;true
+Q14514754;MAP_1860-79;Victoria;false
+Q2280245;MAP_1930;A la bonne heure;true
+Q2280245;MAP_1860-79;A la bonne heure;false
+Q59132916;MAP_1930;Nijd en Spijt;true
+Q59132916;MAP_1860-79;Nijd en Spijt;false
+Q3255483;MAP_1930;Alkmaar;true
+Q3255483;MAP_1860-79;Alkmaar;false
+Q2608628;MAP_1930;Zorgvliet;true
+Q2608628;MAP_1860-79;Zorgvliet;false
+Q15873942;MAP_1930;Clevia;true
+Q15873942;MAP_1860-79;Clevia;false
+Q15882536;MAP_1930;Susanna'sdaal;true
+Q15882536;MAP_1860-79;Susanna'sdaal;false
+Q15883580;MAP_1930;Voorburg;true
+Q15883580;MAP_1860-79;Voorburg;false
+Q2183106;MAP_1930;Zoelen;true
+Q2183106;MAP_1860-79;Zoelen;false
+Q2121376;MAP_1930;Jagtlust;true
+Q2121376;MAP_1860-79;Jagtlust;false
+Q1827726;MAP_1930;Dordrecht;true
+Q1827726;MAP_1860-79;Dordrecht;false
+Q2689333;MAP_1930;Lust en Rust;true
+Q2689333;MAP_1860-79;Lust en Rust;false
+Q14917710;MAP_1930;Belwaarde;true
+Q14917710;MAP_1860-79;Belwaarde;false
+Q1018882;MAP_1930;Meerzorg;true
+Q1018882;MAP_1860-79;Meerzorg;false
+Q2381723;MAP_1930;Mopentibo;true
+Q2381723;MAP_1860-79;Mopentibo;false
+Q12013270;MAP_1930;Peperpot;true
+Q12013270;MAP_1860-79;Peperpot;false
+Q1891990;MAP_1930;Tyronne;true
+Q1891990;MAP_1860-79;Tyronne;false
+Q59133899;MAP_1930;Stalkertsvl en Buyslust;true
+Q59133899;MAP_1860-79;Stalkertsvl en Buyslust;false
+Q59134043;MAP_1930;Vrieshoop;true
+Q59134043;MAP_1860-79;Vrieshoop;false
+Q59115701;MAP_1930;Hoopwijk;true
+Q59115701;MAP_1860-79;Hoopwijk;false
+Q2182096;MAP_1930;Katwijk;true
+Q2182096;MAP_1860-79;Katwijk;false
+Q2600195;MAP_1930;Wederzorg;true
+Q2600195;MAP_1860-79;Wederzorg;false
+Q59134036;MAP_1930;Vriendsbeleid en Ouderzorg;true
+Q59134036;MAP_1860-79;Vriendsbeleid en Ouderzorg;false
+Q2313833;MAP_1930;Spieringshoek;true
+Q2313833;MAP_1860-79;Spieringshoek;false
+Q124808146;MAP_1930;Geertruidenberg;true
+Q124808146;MAP_1860-79;Geertruidenberg;false
+Q59132787;MAP_1930;Mon tr�sor;true
+Q59132787;MAP_1860-79;Mon tr�sor;false
+Q124805807;MAP_1930;Welgelegen;true
+Q124805807;MAP_1860-79;Welgelegen;false
+Q59115727;MAP_1930;Janslust;true
+Q59115727;MAP_1860-79;Janslust;false
+Q3307762;MAP_1930;Visserszorg;true
+Q3307762;MAP_1860-79;Visserszorg;false
+Q2467525;MAP_1930;Leliendaal;true
+Q2467525;MAP_1860-79;Leliendaal;false
+Q1817176;MAP_1930;Ellen;true
+Q1817176;MAP_1860-79;Ellen;false
+Q908006;MAP_1930;Marienburg;true
+Q908006;MAP_1860-79;Marienburg;false
+Q59116836;MAP_1930;Kortevreugd en Kleinshoven;true
+Q59116836;MAP_1860-79;Kortevreugd en Kleinshoven;false
+Q59115137;MAP_1930;Alderad;true
+Q59115137;MAP_1860-79;Alderad;false
+Q97306735;MAP_1930;Nieuw Mocha;true
+Q97306735;MAP_1860-79;Nieuw Mocha;false
+Q59116828;MAP_1930;Kleinhoop;true
+Q59116828;MAP_1860-79;Kleinhoop;false
+Q59115325;MAP_1930;Bruinendaal;true
+Q59115325;MAP_1860-79;Bruinendaal;false
+Q59115464;MAP_1930;De Jonge Beijenkorf;true
+Q59115464;MAP_1860-79;De Jonge Beijenkorf;false
+Q59133997;MAP_1930;Vlaardingen;true
+Q59133997;MAP_1860-79;Vlaardingen;false
+Q59115376;MAP_1930;Catarinenburg;true
+Q59115376;MAP_1860-79;Catarinenburg;false
+Q59116918;MAP_1930;Landlust;true
+Q59116918;MAP_1860-79;Landlust;false
+Q59115638;MAP_1930;Goosen;true
+Q59115638;MAP_1860-79;Goosen;false
+Q59115278;MAP_1930;Bodenburg;true
+Q59115278;MAP_1860-79;Bodenburg;false
+Q137472412;MAP_1930;Alliance;true
+Q137472412;MAP_1860-79;Alliance;false
+Q59116974;MAP_1930;Livonia;true
+Q59116974;MAP_1860-79;Livonia;false
+Q59115128;MAP_1930;Adrichem;true
+Q59115128;MAP_1860-79;Adrichem;false
+Q59116838;MAP_1930;Kulenkamp spruit;true
+Q59116838;MAP_1860-79;Kulenkamp spruit;false
+Q59116799;MAP_1930;Kerkshoven;true
+Q59116799;MAP_1860-79;Kerkshoven;false
+Q59115580;MAP_1930;Felix;true
+Q59115580;MAP_1860-79;Felix;false
+Q59115526;MAP_1930;Duringen;true
+Q59115526;MAP_1860-79;Duringen;false
+Q59116822;MAP_1930;Westphalenshoop;true
+Q59116822;MAP_1860-79;Westphalenshoop;false
+Q59115746;MAP_1930;Johanneszoon;true
+Q59115746;MAP_1860-79;Johanneszoon;false
+Q59115736;MAP_1930;Johanna Charlotte;true
+Q59115736;MAP_1860-79;Johanna Charlotte;false
+Q59117014;MAP_1930;Leidenshoop;true
+Q59117014;MAP_1860-79;Leidenshoop;false
+Q59133857;MAP_1930;Spieringszorg;true
+Q59133857;MAP_1860-79;Spieringszorg;false
+Q59115343;MAP_1930;Bijgeluk;true
+Q59115343;MAP_1860-79;Bijgeluk;false
+Q59115612;MAP_1930;George Hendrik;true
+Q59115612;MAP_1860-79;George Hendrik;false
+Q59116826;MAP_1930;Kleins Verwachting;true
+Q59116826;MAP_1860-79;Kleins Verwachting;false
+Q135395207;MAP_1930;Aan Korte vreugd;true
+Q135395207;MAP_1860-79;Aan Korte vreugd;false
+Q59116815;MAP_1930;Klein Gelderland;true
+Q59116815;MAP_1860-79;Klein Gelderland;false
+Q59116846;MAP_1930;l'Assistance;true
+Q59116846;MAP_1860-79;l'Assistance;false
+Q59134218;MAP_1930;Zonnebloem;true
+Q59134218;MAP_1860-79;Zonnebloem;false
+Q59132823;MAP_1930;Nieuw Acconoribo;true
+Q59132823;MAP_1860-79;Nieuw Acconoribo;false
+Q59115152;MAP_1930;Anna Catharina;true
+Q59115152;MAP_1860-79;Anna Catharina;false
+Q59116871;MAP_1930;La Jalousie;true
+Q59116871;MAP_1860-79;La Jalousie;false
+Q59134023;MAP_1930;Vossenburg;true
+Q59134023;MAP_1860-79;Vossenburg;false
+Q59115574;MAP_1930;Fairfield;true
+Q59115574;MAP_1860-79;Fairfield;false
+Q124831182;MAP_1930;La Libert�;true
+Q124831182;MAP_1860-79;La Libert�;false
+Q59133068;MAP_1930;Philipsdaal;true
+Q59133068;MAP_1860-79;Philipsdaal;false
+Q59115223;MAP_1930;Bergerac;true
+Q59115223;MAP_1860-79;Bergerac;false
+Q59115315;MAP_1930;Broedersgift;true
+Q59115315;MAP_1860-79;Broeders gift;false
+Q59115312;MAP_1930;Breukelerwaard;true
+Q59115312;MAP_1860-79;Breukelerwaard;false
+Q59119431;MAP_1930;Misluktbedrog;true
+Q59119431;MAP_1860-79;Misluktbedrog;false
+Q59133961;MAP_1930;Twijfelachtig;true
+Q59133961;MAP_1860-79;Twijfelachtig;false
+Q59116847;MAP_1930;L'Aventure;true
+Q59116847;MAP_1860-79;L'Aventure;false
+Q59132848;MAP_1930;Nieuw Levant;true
+Q59132848;MAP_1860-79;Nieuw Levant;false
+Q59115282;MAP_1930;Boksweide;true
+Q59115282;MAP_1860-79;Boksweide;false
+Q59116829;MAP_1930;Kleinslust;true
+Q59116829;MAP_1860-79;Kleinslust;false
+Q124806237;MAP_1930;Meerzorg;true
+Q124806237;MAP_1860-79;Meerzorg;false
+Q59134215;MAP_1930;Somerzorg;true
+Q59134215;MAP_1860-79;Somerzorg;false
+Q59118005;MAP_1930;De Merveille;true
+Q59118005;MAP_1860-79;De Merveille;false
+Q59115689;MAP_1930;Heijsvliet;true
+Q59115689;MAP_1860-79;Heijsvliet;false
+Q59115443;MAP_1930;De Eenzaamheid;true
+Q59115443;MAP_1860-79;De Eenzaamheid;false
+Q59115260;MAP_1930;Bleijendaal;true
+Q59115260;MAP_1860-79;Bleijendaal;false
+Q59134028;MAP_1930;Vreeland;true
+Q59134028;MAP_1860-79;Vreeland;false
+Q2445362;MAP_1930;Laarwijk;true
+Q2445362;MAP_1860-79;Laarwijk;false
+Q59117032;MAP_1930;Maagdenburg;true
+Q59117032;MAP_1860-79;Maagdenburg;false
+Q135395263;MAP_1930;Richelieu;true
+Q135395263;MAP_1860-79;Richelieu;false
+Q135395737;MAP_1930;Mon Repos;true
+Q135395737;MAP_1860-79;Mon Repos;false
+Q124827980;MAP_1930;De Hoop;true
+Q124827980;MAP_1860-79;De Hoop;false
+Q59133064;MAP_1930;Petersburg;true
+Q59133064;MAP_1860-79;Petersburg;false
+Q59133111;MAP_1930;Puttenzorg;true
+Q59133111;MAP_1860-79;Puttenzorg;false
+Q59115179;MAP_1930;Aurora;true
+Q59115179;MAP_1860-79;Aurora;false
+Q59115214;MAP_1930;Bel a Soir;true
+Q59115214;MAP_1860-79;Bel a Soir;false
+Q124831185;MAP_1930;La Paix;true
+Q124831185;MAP_1860-79;La Palix;false
+Q2743365;MAP_1930;Schaapstede;true
+Q2743365;MAP_1860-79;Schaapstede;false
+Q2700438;MAP_1930;De Goede Vriendschap;true
+Q2700438;MAP_1860-79;De Goede Vriendschap;false
+Q59133157;MAP_1930;Rijnberk;true
+Q59133157;MAP_1860-79;Rijnberk;false
+Q2183731;MAP_1930;Kroonenbrug;true
+Q2183731;MAP_1860-79;Kroonenbrug;false
+Q59115734;MAP_1930;Johan en Margaretha;true
+Q59115734;MAP_1860-79;Johan en Margaretha;false
+Q4968178;MAP_1930;Frederiksdorp;true
+Q4968178;MAP_1860-79;Frederiksdorp;false
+Q2238358;MAP_1930;Guadeloupe;true
+Q2238358;MAP_1860-79;Guadeloupe;false
+Q2042290;MAP_1930;Marienbosch;true
+Q2042290;MAP_1860-79;Marienbosch;false
+Q2386590;MAP_1930;Johannesburg;true
+Q2386590;MAP_1860-79;Johannesburg;false
+Q2055473;MAP_1930;Maasstroom;true
+Q2055473;MAP_1860-79;Maasstroom;false
+Q2413861;MAP_1930;Berlijn;true
+Q2413861;MAP_1860-79;Berlijn;false
+Q2439396;MAP_1930;Elisabethshoop;true
+Q2439396;MAP_1860-79;Elisabethshoop;false
+Q59116956;MAP_1930;Leyerdorp;true
+Q59116956;MAP_1860-79;Andreesgift;false
+Q59115149;MAP_1930;Andreesgift;true
+Q59115149;MAP_1860-79;Pieterszorg;false
+Q2321835;MAP_1930;Pieterszorg;true
+Q2321835;MAP_1860-79;Einde rust;false
+Q59115545;MAP_1930;Einde Rust;true
+Q59115545;MAP_1860-79;Lust tot Rust;false
+Q19974104;MAP_1930;Reijnsdorp;true
+Q19974104;MAP_1860-79;Reijnsdorp;false
+Q3964207;MAP_1930;Hecht en Sterk;true
+Q3964207;MAP_1860-79;Hecht en Sterk;false
+Q2520488;MAP_1930;La Singularit�;true
+Q2520488;MAP_1860-79;La Singularit�;false
+Q2113841;MAP_1930;Zorg en Hoop;true
+Q2113841;MAP_1860-79;Zorg en Hoop;false
+Q59115408;MAP_1930;Cornelia'sburg;true
+Q59115408;MAP_1860-79;Cornelia'sburg;false
+Q19818810;MAP_1930;Reijnsfort;true
+Q19818810;MAP_1860-79;Reijnsfort;false
+Q59115220;MAP_1930;Bent's hoop;true
+Q59115220;MAP_1860-79;Bent's hoop;false
+Q59115395;MAP_1930;Clifford Kocqshoven;true
+Q59115395;MAP_1860-79;Clifford Kocqshoven;false
+Q2804081;MAP_1930;Campenburg;true
+Q2804081;MAP_1860-79;Campenburg;false
+Q59116803;MAP_1930;Killenstein;true
+Q59116803;MAP_1860-79;Killenstein;false
+Q2747001;MAP_1930;Nut en Schadelijk;true
+Q2747001;MAP_1860-79;Nut en Schadelijk;false
+Q59133089;MAP_1930;Ponthieu;true
+Q59133089;MAP_1860-79;Ponthieu;false
+Q2638795;MAP_1930;Brouwerslust;true
+Q2638795;MAP_1860-79;Brouwerslust;false
+Q3143074;MAP_1930;Mon Souci;true
+Q3143074;MAP_1860-79;Mon Souci;false
+Q13427514;MAP_1930;t Vertrouwen;true
+Q13427514;MAP_1860-79;t Vertrouwen;false
+Q2356001;MAP_1930;Frederiksburg;true
+Q2356001;MAP_1860-79;Frederiksburg;false
+Q59116818;MAP_1930;Klein Lunenburg;true
+Q59116818;MAP_1860-79;Klein Lunenburg;false
+Q19787475;MAP_1930;Frederikslust;true
+Q19787475;MAP_1860-79;Frederikslust;false
+Q59115688;MAP_1930;De Herstelling;true
+Q59115688;MAP_1860-79;De Herstelling;false
+Q124823336;MAP_1930;Broedershoop;true
+Q124823336;MAP_1860-79;Broedershoop;false
+Q2649101;MAP_1930;Barbados;true
+Q2649101;MAP_1860-79;Barbados;false
+Q59115530;MAP_1930;Echtensrots;true
+Q59115530;MAP_1860-79;Echtensrots;false
+Q59115157;MAP_1930;Anna's zorg;true
+Q59115157;MAP_1860-79;Anna's zorg;false
+Q59115720;MAP_1930;Jacoba's daal;true
+Q59115720;MAP_1860-79;Jacoba's daal;false
+Q59132850;MAP_1930;Nieuw Meerzorg;true
+Q59132850;MAP_1860-79;Nieuw Meerzorg;false
+Q124825047;MAP_1930;Constantia;true
+Q124825047;MAP_1860-79;Constantia;false
+Q2646534;MAP_1930;Saphir;true
+Q2646534;MAP_1860-79;Saphir;false
+Q124831564;MAP_1930;Maria Petronella en Johanna Maria;true
+Q124831564;MAP_1860-79;Maria Petronella en Johanna Maria;false
+Q2643199;MAP_1930;Picardie;true
+Q2643199;MAP_1860-79;Picardie;false
+Q124808303;MAP_1930;Welgevallen;true
+Q124808303;MAP_1860-79;Welgevallen;false
+Q3262071;MAP_1930;Purmerend;true
+Q3262071;MAP_1860-79;Purmerend;false
+Q2408563;MAP_1930;Klein Bellevue;true
+Q2408563;MAP_1860-79;Klein Bellevue;false
+Q59115279;MAP_1930;Aan Bodenburg;true
+Q59115279;MAP_1860-79;Aan Bodemburg;false
+Q59133977;MAP_1930;Vaderszorg en Karelsdeel;true
+Q59133977;MAP_1860-79;Vaderszorg en Karelsdeel;false
+Q59115362;MAP_1930;Vaderszorg en Karelsdeel;true
+Q59115362;MAP_1860-79;Vaderszorg en Karelsdeel;false
+Q59115237;MAP_1930;Beudslust;true
+Q59115237;MAP_1860-79;Beudslust;false
+Q59116915;MAP_1930;Labadieshoop;true
+Q59116915;MAP_1860-79;Labadies hoop;false
+Q130359097;MAP_1930;Anna Elizabeth;true
+Q130359097;MAP_1860-79;Anna Elizabeth;false
+Q59115326;MAP_1930;Aan Bruinendaal;true
+Q59115326;MAP_1860-79;Aan Bruinendaal;false
+Q59115138;MAP_1930;Aan Alderat;true
+Q59115138;MAP_1860-79;Aan Alderat;false
+Q59119439;MAP_1930;Aan Moed en Kommer;true
+Q59119439;MAP_1860-79;Aan Moed en Kommer;false
+Q124812501;MAP_1930;Abigail's lust;true
+Q124812501;MAP_1860-79;Abigail's lust;false
+Q28150229;MAP_1930;Waterloo;true
+Q28150229;MAP_1860-79;Waterloo;false
+Q59115140;MAP_1930;Alsimo;true
+Q59115140;MAP_1860-79;Alsimo;false
+Q59115566;MAP_1930;Esther's rust;true
+Q59115566;MAP_1860-79;Esther's rust;false
+Q59119435;MAP_1930;Moed en Kommer;true
+Q59119435;MAP_1860-79;Moed en Kommer;false
+Q59115187;MAP_1930;Badenstein;true
+Q59115187;MAP_1860-79;Badenstein;false
+Q124815044;MAP_1930;Aan Anna's zorg;true
+Q124815044;MAP_1860-79;Aan Anna's zorg;false
+Q59115265;MAP_1930;Blijdenhoop;true
+Q59115265;MAP_1860-79;Blijden Hoop;false
+Q131286984;MAP_1930;Onverdacht;true
+Q131286984;MAP_1860-79;Onverdacht;false
+Q135395666;MAP_1930;Amsterdam;true
+Q135395666;MAP_1860-79;Amsterdam;false
+Q98012568;MAP_1930;Onverwacht;true
+Q98012568;MAP_1860-79;Onverwacht;false
+Q59115630;MAP_1930;De Goede Verwachting;true
+Q59115630;MAP_1860-79;De Goede Verwachting;false
+Q59132809;MAP_1930;Naccarikkibo;true
+Q59132809;MAP_1860-79;Naccarikkibo;false
+Q59115435;MAP_1930;Alida;true
+Q59115435;MAP_1860-79;Alida;false
+Q59133843;MAP_1930;La Solitude;true
+Q59133843;MAP_1860-79;La Solitude;false
+Q59115471;MAP_1930;De Nieuwe Eendragt;true
+Q59115471;MAP_1860-79;De Nieuwe Eendragt;false
+Q59133028;MAP_1930;Oud Bellevue;true
+Q59133028;MAP_1860-79;Oud Bellevue;false
+Q59132790;MAP_1930;Munnickendam;true
+Q59132790;MAP_1860-79;Munnickendam;false
+Q135395219;MAP_1930;Binsbergen;true
+Q135395219;MAP_1860-79;Binsbergen;false
+Q59116869;MAP_1930;La Felicite;true
+Q59116869;MAP_1860-79;La Felicite;false
+Q1834375;MAP_1930;Geertruidenberg;true
+Q1834375;MAP_1860-79;Geertruidenberg;false
+Q59115558;MAP_1930;Ephrata;true
+Q59115558;MAP_1860-79;Ephrata;false
+Q130535967;MAP_1930;Lemmertskamp;true
+Q130535967;MAP_1860-79;Lemmertskamp;false
+Q59133017;MAP_1930;Osembo;true
+Q59133017;MAP_1860-79;Osembo;false
+Q59115706;MAP_1930;Hulshof;true
+Q59115706;MAP_1860-79;Hulshof;false
+Q59115545;MAP_1930;Einde Rust;true
+Q59115545;MAP_1860-79;Rust en Werk;false
+Q59116976;MAP_1930;Lochaber;true
+Q59116976;MAP_1860-79;Rhijnie;false
+Q124832148;MAP_1860-79;Hern. Kerk en School;false
+Q124832148;MAP_1930;Waterloo;true
+Q124832148;MAP_1860-79;Waterloo;false
+Q2365469;MAP_1930;Buitenrust;true
+Q2365469;MAP_1860-79;Buitenrust;false
+Q59115355;MAP_1930;Cannawappibo;true
+Q59115355;MAP_1860-79;Cannawappibo;false
+Q59133831;MAP_1930;Siparipabo;true
+Q59133831;MAP_1860-79;Siparipabo;false
+Q59115115;MAP_1930;t IJland;true
+Q59115115;MAP_1860-79;t IJland;false
+Q124830844;MAP_1930;Hope;true
+Q124830844;MAP_1860-79;Hope;false
+Q49630506;MAP_1930;Van Drimmelenpolder;true
+Q20967226;MAP_1930;Crappa hoek;true
+Q20967226;MAP_1860-79;Crappa hoek;false
+Q59115453;MAP_1930;De Goudmijn;true
+Q59115453;MAP_1860-79;De Goudmijn;false
+Q59133962;MAP_1930;Twistrust;true
+Q59133962;MAP_1860-79;Twistrust;false
+Q124831922;MAP_1930;Staf Aarons;true
+Q124831922;MAP_1860-79;Staf Aarons;false
+Q59115505;MAP_1930;De Watering;true
+Q59115505;MAP_1860-79;De Watering;false
+Q59116832;MAP_1930;Kocqswoud;true
+Q59116832;MAP_1860-79;Kocqswoud;false
+Q59134148;MAP_1930;Capoerica;true
+Q59134148;MAP_1860-79;Capoerica;false
+Q59133966;MAP_1930;Mon plaisir;true
+Q59133966;MAP_1860-79;Uit en t'huis;false
+Q59133996;MAP_1930;Vissershaven;true
+Q59133996;MAP_1860-79;Visschershaven;false
+Q59132863;MAP_1930;Nieuw va comme je te pousse;true
+Q59132863;MAP_1860-79;Nieuw va comme je te pausse;false
+Q59116925;MAP_1930;Landzigt;true
+Q59116925;MAP_1860-79;Landzigt;false
+Q59134182;MAP_1930;Zeezigt;true
+Q59134182;MAP_1860-79;Zeezigt;false
+Q59119428;MAP_1930;Misgunst;true
+Q59119428;MAP_1860-79;Misgunst;false
+Q124832145;MAP_1930;Voorzorg;true
+Q124832145;MAP_1860-79;Voorzorg;false
+Q59115392;MAP_1930;Clemensburg;true
+Q59115392;MAP_1860-79;Clemensburg;false
+Q135395213;MAP_1930;Aan Vriesenburg;true
+Q135395213;MAP_1860-79;Aan Vriesenburg;false
+Q59115339;MAP_1930;Buijs en Vlijt;true
+Q59115339;MAP_1860-79;Buijs en Vlijt;false
+Q59133900;MAP_1930;Stolkwijk;true
+Q59133900;MAP_1860-79;Stolkwijk;false
+Q59133931;MAP_1930;Toevlugt;true
+Q59133931;MAP_1860-79;Toevlugt;false
+Q59133009;MAP_1930;Oostwaard;true
+Q59133009;MAP_1860-79;Oostwaard;false
+Q59115266;MAP_1930;Bleijenhoop en Bleijenrust;true
+Q59115266;MAP_1860-79;Bleijenhoop en Bleijenrust;false
+Q59117001;MAP_1930;Louisenburg;true
+Q59117001;MAP_1860-79;Louisenburg;false
+Q59116927;MAP_1930;Lankmoedigheid;true
+Q59116927;MAP_1860-79;Lankmoedigheid;false
+Q59115728;MAP_1930;Java;true
+Q59115728;MAP_1860-79;Java;false
+Q59132808;MAP_1930;Naaldwijk;true
+Q59132808;MAP_1860-79;Naaldwijk;false
+Q59133953;MAP_1930;De twee Gebroeders;true
+Q59133953;MAP_1860-79;De twee Gebroeders;false
+Q59116949;MAP_1930;Leijenhoop;true
+Q59116949;MAP_1860-79;Leijenhoop;false
+Q59115465;MAP_1930;De Lemmert;true
+Q59115465;MAP_1860-79;De Lemmert;false
+Q59115682;MAP_1930;Heijmslust;true
+Q59115682;MAP_1860-79;Heijmslust;false
+Q59115724;MAP_1930;Jagerswoud;true
+Q59115724;MAP_1860-79;Jagerswoud;false
+Q59116841;MAP_1930;Kweekhoven;true
+Q59116841;MAP_1860-79;Kweekhoven;false
+Q59133921;MAP_1930;Theodora Suzanna;true
+Q59133921;MAP_1860-79;Theodora Suzanna;false
+Q59133921;MAP_1860-79;Theodora Suzanna;false
+Q59134181;MAP_1930;Zeewijk;true
+Q59134181;MAP_1860-79;Zeewijk;false
+Q59133849;MAP_1930;Sophia's lust;true
+Q59133849;MAP_1860-79;Sophia's lust;false
+Q130359161;MAP_1930;Brandwacht;true
+Q130359161;MAP_1860-79;Brandwacht;false
+Q59115438;MAP_1930;De Dageraad;true
+Q59115438;MAP_1860-79;De Dageraad;false
+Q59134118;MAP_1930;Wilkenslust;true
+Q59134118;MAP_1860-79;Wilkenslust;false
+Q59115511;MAP_1930;Den Briel;true
+Q59115511;MAP_1860-79;Den Briel;false
+Q59132890;MAP_1930;Nieuw Onverwacht;true
+Q59132890;MAP_1860-79;Klein Onverwacht;false
+Q131414255;MAP_1930;Klein Onverwacht;true
+Q131414255;MAP_1860-79;Klein Onverwacht;false
+Q59133285;MAP_1930;Aan Saxen;true
+Q59133285;MAP_1860-79;Aan Saxen;false
+Q59116810;MAP_1930;Klein Charlottenburg;true
+Q59116810;MAP_1860-79;Klein Charlottenburg;false
+Q59117002;MAP_1930;Louisiana en Roux gift;true
+Q59117002;MAP_1860-79;Louisiana en Roux gift;false
+Q59115523;MAP_1930;Driesveld;true
+Q59115523;MAP_1860-79;Driesveld;false
+Q59134042;MAP_1930;Vriesenburg Nova en Dwingelo;true
+Q59134042;MAP_1860-79;Vriesenburg Nova en Dwingelo;false
+Q124832078;MAP_1930;Standvastigheid;true
+Q124832078;MAP_1860-79;Standvastigheid;false
+Q124830730;MAP_1930;Anna's rust en Haast u langzaam;true
+Q124830730;MAP_1860-79;Anna's rust en Haast u langzaam;false
+Q124815043;MAP_1930;Anna's rust en Haast u langzaam;true
+Q124815043;MAP_1860-79;Anna's rust en Haast u langzaam;false
+Q59115249;MAP_1930;Bijgelegen;true
+Q59115249;MAP_1860-79;Bijgelegen;false
+Q59133284;MAP_1930;Saxen;true
+Q59133284;MAP_1860-79;Saxen;false
+Q59116827;MAP_1930;Kleinhaassen;true
+Q59116827;MAP_1860-79;Kleinhaassen;false
+Q59116885;MAP_1930;La Perseverance;true
+Q59116885;MAP_1860-79;La Perseverance;false
+Q135395214;MAP_1930;Aan Vriesenburg Nova;true
+Q135395214;MAP_1860-79;Aan Vriesenburg Nova;false
+Q59115630;MAP_1930;De Goede verwachting;true
+Q59115630;MAP_1860-79;De Goede verwachting;false
+Q59116948;MAP_1930;Liverpool;true
+Q59116948;MAP_1860-79;Liverpool;false
+Q124825044;MAP_1930;Charlottenburg;true
+Q124825044;MAP_1860-79;Charlottenburg;false
+Q59115205;MAP_1930;Beekvliet;true
+Q59115205;MAP_1860-79;Beekvliet;false
+Q59133204;MAP_1930;Rotterdam;true
+Q59133204;MAP_1860-79;Rotterdam;false
+Q124825044;MAP_1930;Charlottenburg;true
+Q124825044;MAP_1860-79;Charlottenburg;false
+Q59115608;MAP_1930;De Gekroonde Paauw;true
+Q59115608;MAP_1860-79;De Gekroonde Paauw;false
+Q59119459;MAP_1930;Molhoop;true
+Q59119459;MAP_1860-79;Molhoop;false
+Q59115477;MAP_1930;De Oude Bijenkorf;true
+Q59115477;MAP_1860-79;De Oude Bijenkorft;false
+Q59115418;MAP_1930;Crommelin's gift;true
+Q59115418;MAP_1860-79;Crommelin's gift;false
+Q59115649;MAP_1930;Groningen;true
+Q59115649;MAP_1860-79;Groningen;false
+Q59117050;MAP_1930;Maria's lust;true
+Q59117050;MAP_1860-79;Maria's lust;false
+Q59133127;MAP_1930;Rees en Crop;true
+Q59133127;MAP_1860-79;Rees en Crop;false
+Q59134003;MAP_1930;Vlijt en Trouw;true
+Q59134003;MAP_1860-79;Vlijt en Trouw;false
+Q59115693;MAP_1930;Hofwijk;true
+Q59115693;MAP_1860-79;Hofwijk;false
+Q59115575;MAP_1930;Fackertshoop;true
+Q59115575;MAP_1860-79;Fackertshoop;false
+Q59115308;MAP_1930;Breda;true
+Q59115308;MAP_1860-79;Breda;false
+Q59115717;MAP_1930;Isaaks hoop;true
+Q59115717;MAP_1860-79;Isaaks hoop;false
+Q59115717;MAP_1930;Isaaks hoop;true
+Q59115717;MAP_1860-79;Isaaks hoop;false
+Q135395783;MAP_1930;Voorburg;true
+Q135395783;MAP_1860-79;Voorburg;false
+Q59133881;MAP_1930;Staf Aarons;true
+Q59133881;MAP_1860-79;Staf Aarons;false
+Q59133881;MAP_1930;Staf Aarons;true
+Q59133881;MAP_1860-79;Staf Aarons;false
+Q135395236;MAP_1930;Gerar;true
+Q135395236;MAP_1860-79;Gerar;false
+Q135395236;MAP_1930;Gerar;true
+Q135395236;MAP_1860-79;Gerar;false
+Q124831293;MAP_1930;Libanon;true
+Q124831293;MAP_1860-79;Libanon;false
+Q124831293;MAP_1930;Libanon;true
+Q124831293;MAP_1860-79;Libanon;false
+Q135395234;MAP_1930;Ernesborn;true
+Q135395234;MAP_1860-79;Ernesborn;false
+Q135395234;MAP_1930;Ernesborn;true
+Q135395234;MAP_1860-79;Ernesborn;false
+Q59115651;MAP_1930;Groningerland;true
+Q59115651;MAP_1860-79;Groningerland;false
+Q59134116;MAP_1930;Wilhelmina Catharina Frederica;true
+Q59134116;MAP_1860-79;Wilhelmina Catharina Frederica;false
+Q59134116;MAP_1930;Wilhelmina Catharina Frederica;true
+Q59134116;MAP_1860-79;Wilhelmina Catharina Frederica;false
+Q59134146;MAP_1930;Windsor forest;true
+Q59134146;MAP_1860-79;Windsor forest;false
+Q124808585;MAP_1930;Onverwacht;true
+Q135395727;MAP_1930;Duisburg;true
+Q135395727;MAP_1860-79;Duisburg;false
+Q135395727;MAP_1930;Duisburg;true
+Q124808585;MAP_1930;Onverwacht;true
+Q59116905;MAP_1930;La Solitude;true
+Q59116905;MAP_1860-79;La Solitude;false
+Q135395272;MAP_1860-79;Industrie;false
+Q124808585;MAP_1930;Onverwacht;true
+Q124808585;MAP_1860-79;Onverwacht;false
+Q59133845;MAP_1930;La Sonnette;true
+Q59133845;MAP_1860-79;La Sonnette;false
+Q59115497;MAP_1930;De Vier Hendrikken;true
+Q59115497;MAP_1860-79;De Vier Hendrikken;false
+Q59115136;MAP_1930;Albion;true
+Q59115136;MAP_1860-79;Albion;false
+Q59116900;MAP_1930;La Resource;true
+Q59116900;MAP_1860-79;La Ressource;false
+Q135395783;MAP_1930;Voorburg;true
+Q135395783;MAP_1860-79;Voorburg;false
+Q59115719;MAP_1930;Jacob's lust;true
+Q59115719;MAP_1860-79;Jacob's lust;false
+Q59115163;MAP_1930;Antigoa;true
+Q59115163;MAP_1860-79;Antigoa;false
+Q59133845;MAP_1930;La Sonnette;true
+Q59133845;MAP_1860-79;La Sonnette;false
+Q59115566;MAP_1930;Esther's rust;true
+Q59115566;MAP_1860-79;Esther's rust;false
+Q59115566;MAP_1930;Esther's rust;true
+Q59115566;MAP_1860-79;Esther's rust;false
+Q124831565;MAP_1930;Maria's lust en la Solitude;true
+Q124831565;MAP_1860-79;Maria's lust;false
+Q135395255;MAP_1930;Maton's hoop;true
+Q135395255;MAP_1860-79;Maton's hoop;false
+Q59133029;MAP_1930;Vriendsbeleid en Ouderzorg;true
+Q59133029;MAP_1860-79;Vriendsbeleid en Ouderzorg;false
+Q59115701;MAP_1930;Hoopwijk;true
+Q59115701;MAP_1860-79;Hoopwijk;false
+Q124831918;MAP_1930;Sinabo;true
+Q124831918;MAP_1860-79;Sinabo;false
+Q2042290;MAP_1930;Marienbosch;true
+Q2042290;MAP_1860-79;Marienbosch;false
+Q124830445;MAP_1930;De drie gebroeders;true
+Q124830445;MAP_1860-79;De drie gebroeders;false
+Q135395229;MAP_1930;De drie gebroeders;true
+Q135395229;MAP_1860-79;De drie gebroeders;false
+Q59115419;MAP_1930;Krommenie;true
+Q59115419;MAP_1860-79;Krommenie;false
+Q2121376;MAP_1930;Jagtlust;true
+Q2121376;MAP_1860-79;Jagtlust;false
+Q124832563;MAP_1930;Welgedacht;true
+Q124832563;MAP_1860-79;2;false
+Q2490145;MAP_1930;Flora;true
+Q2490145;MAP_1860-79;Flora;false
+Q124823173;MAP_1860-79;Bram's hoop;false
+Q59132806;MAP_1930;Munchenstein;true
+Q59132806;MAP_1860-79;Munchenstein;false
+Q59132806;MAP_1930;Munchenstein;true
+Q59132806;MAP_1860-79;Munchenstein;false
+Q59133010;MAP_1930;Oranje;true
+Q59133010;MAP_1860-79;Oranje;false
+Q59115246;MAP_1930;Bigrar;true
+Q59115246;MAP_1860-79;Bigrar;false
+Q59115231;MAP_1930;Aan Berlijn;true
+Q59115231;MAP_1860-79;Aan Berlijn;false
+Q59115231;MAP_1930;Aan Berlijn;true
+Q59115231;MAP_1860-79;Aan Berlijn;false
+Q59116858;MAP_1930;Aan Loefbeek;true
+Q59116858;MAP_1860-79;Aan Loefbeek;false
+Q59132806;MAP_1930;Munchenstein;true
+Q59132806;MAP_1860-79;Munchenstein;false
+Q124831607;MAP_1930;Monplaisir;true
+Q124831607;MAP_1860-79;4;false
+Q59115231;MAP_1930;Aan Berlijn;true
+Q59115231;MAP_1860-79;Aan Berlijn;false
+Q59115231;MAP_1930;Aan Berlijn;true
+Q59115231;MAP_1860-79;Aan Berlijn;false
+Q59115231;MAP_1930;Aan Berlijn;true
+Q59115231;MAP_1860-79;Aan Berlijn;false
+Q59119413;MAP_1930;Mijnzorg;true
+Q59119413;MAP_1860-79;7;false
+Q135395239;MAP_1930;Hanna's lust;true
+Q135395239;MAP_1930;Hanna's lust;true
+Q124832563;MAP_1930;Welgedacht;true
+Q124832563;MAP_1860-79;2;false
+Q59134180;MAP_1930;Sealand;true
+Q59134180;MAP_1860-79;Sealand;false
+Q59133968;MAP_1930;Union;true
+Q59133968;MAP_1860-79;Union;false
+Q59132857;MAP_1930;Nieuw Ribanica;true
+Q59132857;MAP_1860-79;Nieuw Ribanica;false
+Q59115340;MAP_1930;Burnside;true
+Q59115340;MAP_1860-79;Burnside;false
+Q59116979;MAP_1930;Londondery;true
+Q59116979;MAP_1860-79;Londondery;false
+Q59115708;MAP_1930;Huwelijkszorg;true
+Q59115708;MAP_1860-79;Huwelijkszorg;false
+Q59115440;MAP_1930;De Dankbaarheid;true
+Q59115440;MAP_1860-79;De Dankbaarheid;false
+Q59115675;MAP_1930;Hague;true
+Q59115675;MAP_1860-79;Hague;false
+Q125087711;MAP_1930;Welgelegen;true
+Q125087711;MAP_1860-79;Welgelegen;false
+Q125117414;MAP_1930;Inverness;true
+Q125117414;MAP_1860-79;Inverness;false
+Q59116940;MAP_1930;Leasowes;true
+Q59116940;MAP_1860-79;Leasowes;false
+Q59115396;MAP_1930;Clyde;true
+Q59115396;MAP_1860-79;Clyde;false
+Q59133938;MAP_1930;Todness;true
+Q59133938;MAP_1860-79;Todness;false
+Q59117998;MAP_1930;Mary's Hope;true
+Q59117998;MAP_1860-79;Mary's Hope;false
+Q59115338;MAP_1930;Bucklebury;true
+Q59115338;MAP_1860-79;Bucklebury;false
+Q59133100;MAP_1930;Pot;true
+Q59133100;MAP_1860-79;Pot;false
+Q59133279;MAP_1930;Sarah;true
+Q59133279;MAP_1860-79;Sarah;false
+Q59116940;MAP_1930;Leasowes;true
+Q59116940;MAP_1860-79;Leasowes;false
+Q59115352;MAP_1930;Caledonia;true
+Q59115352;MAP_1860-79;Caledonia;false
+Q59115352;MAP_1930;Caledonia;true
+Q59115352;MAP_1860-79;Caledonia;false
+Q59115352;MAP_1930;Caledonia;true
+Q59115352;MAP_1860-79;Caledonia;false
+Q59115359;MAP_1930;Carel Francois;true
+Q59115359;MAP_1860-79;Carel Francois;false
+Q59115735;MAP_1930;Johanna Catharina;true
+Q59115735;MAP_1860-79;Johanna Catharina;false
+Q59133965;MAP_1930;Tyrol;true
+Q59133965;MAP_1860-79;Tyrol;false
+Q59115596;MAP_1930;Fridericisgift;true
+Q59115596;MAP_1860-79;Fridericisgift;false
+Q59115757;MAP_1930;Kent;true
+Q59115757;MAP_1860-79;Kent;false
+Q59133267;MAP_1930;Sara Maria;true
+Q59133267;MAP_1860-79;Sara Maria;false
+Q124827875;MAP_1930;Eendracht;true
+Q124827875;MAP_1860-79;Eendracht;false
+Q59115469;MAP_1930;De Morgenster;true
+Q59115469;MAP_1860-79;De Morgenster;false
+Q59115735;MAP_1930;Johanna Catharina;true
+Q59115735;MAP_1860-79;Johanna Catharina;false
+Q59116888;MAP_1930;La Prevoyance;true
+Q59116888;MAP_1860-79;La Prevoyance;false
+Q59116888;MAP_1930;La Prevoyance;true
+Q59116888;MAP_1860-79;La Prevoyance;false
+Q59115314;MAP_1930;Broederschap;true
+Q59115314;MAP_1860-79;Broederschap;false
+Q59115549;MAP_1930;Elisabeth's hoop;true
+Q59115549;MAP_1860-79;Elisabeth's hoop;false
+Q59115131;MAP_1930;Aitnoch;true
+Q59115131;MAP_1860-79;Aitnoch;false
+Q124830731;MAP_1930;Hamburg;true
+Q124830731;MAP_1860-79;Hamburg;false
+Q124830243;MAP_1930;Nieuwe Hoop;true
+Q124830243;MAP_1860-79;De Nieuwe Hoop;false
+Q59116887;MAP_1930;La Poule;true
+Q59116887;MAP_1860-79;La Poule;false
+Q59133119;MAP_1930;Rachelshoop;true
+Q59133119;MAP_1860-79;Rachelshoop;false
+Q59115447;MAP_1930;De goede Intentie;true
+Q59115447;MAP_1860-79;De goede Intentie;false
+Q59134038;MAP_1930;Vriendslust;true
+Q59134038;MAP_1860-79;Vriendslust;false
+Q13457818;MAP_1930;Catharina Sophia;true
+Q13457818;MAP_1860-79;Catharina Sophia;false
+Q59115151;MAP_1930;Anna Maria;true
+Q59115151;MAP_1860-79;Anna Maria;false
+Q59133840;MAP_1930;Smithfield;true
+Q59133840;MAP_1860-79;Smithfield;false
+Q59133840;MAP_1930;Smithfield;true
+Q59133840;MAP_1860-79;Smithfield;false
+Q59115359;MAP_1930;Carel Francois;true
+Q59115359;MAP_1860-79;Carel Francois;false
+Q59115359;MAP_1930;Carel Francois;true
+Q59115359;MAP_1860-79;Carel Francois;false
+Q13457818;MAP_1930;Catharina Sophia;true
+Q13457818;MAP_1860-79;Catharina Sophia;false
+Q13457818;MAP_1930;Catharina Sophia;true
+Q13457818;MAP_1860-79;Catharina Sophia;false
+Q59115359;MAP_1930;Carel Francois;true
+Q59115359;MAP_1860-79;Carel Francois;false
+Q59115352;MAP_1930;Caledonia;true
+Q59115352;MAP_1860-79;Caledonia;false
+Q59115757;MAP_1930;Kent;true
+Q59115757;MAP_1860-79;Kent;false
+Q59115643;MAP_1930;Greenfield;true
+Q59115643;MAP_1860-79;Greenfield;false
+Q59115642;MAP_1930;Gratia's hoop;true
+Q59115642;MAP_1860-79;Gratia's hoop;false
+Q59133990;MAP_1930;Vier Azen;true
+Q59133990;MAP_1860-79;Vier Azen;false
+Q59133963;MAP_1930;Tijgerhol;true
+Q59133963;MAP_1860-79;Tijgerhol;false
+Q59132968;MAP_1930;Onobo;true
+Q59132968;MAP_1860-79;Onobo;false
+Q59115402;MAP_1930;Copie;true
+Q59115402;MAP_1860-79;Copie;false
+Q59117048;MAP_1930;Mapabo;true
+Q59117048;MAP_1860-79;Mapabo;false
+Q131414158;MAP_1930;Gouverneurslust;true
+Q131414158;MAP_1860-79;Gouverneurslust;false
+Q13457818;MAP_1930;Catharina Sophia;true
+Q13457818;MAP_1860-79;Catharina Sophia;false
+Q59115748;MAP_1930;Jukenombo;true
+Q59115748;MAP_1860-79;Jukenombo;false
+Q59115385;MAP_1930;Cipibo;true
+Q59115385;MAP_1860-79;Cipibo;false
+Q59115713;MAP_1930;Imo tappi;true
+Q59115713;MAP_1860-79;Imo tappi;false
+Q59133829;MAP_1930;Simirintibo;true
+Q59133829;MAP_1860-79;Simiritibo;false
+Q59115416;MAP_1930;Crawassibo;true
+Q59115416;MAP_1860-79;Crawassibo;false
+Q59115255;MAP_1930;Blakkreek;true
+Q59115255;MAP_1860-79;Blakkreek;false
+Q59116806;MAP_1930;Klarenbeek;true
+Q59116806;MAP_1860-79;Klarenbeek;false
+Q59115621;MAP_1930;Goed Accoord;true
+Q59115621;MAP_1860-79;Goed Accoord;false
+Q59117012;MAP_1930;Luxemburg;true
+Q59117012;MAP_1860-79;Luxemburg;false
+Q59133198;MAP_1930;Roseland;true
+Q59133198;MAP_1860-79;Roseland;false
+Q59134079;MAP_1930;Wayampibo;true
+Q59134079;MAP_1860-79;Wayampibo;false
+Q59132920;MAP_1930;Nimmerdor;true
+Q59132920;MAP_1860-79;Nimmerdor;false
+Q59133116;MAP_1930;Quapibo;true
+Q59133116;MAP_1860-79;Quapibo;false
+Q59115688;MAP_1930;Herstelling;true
+Q59115688;MAP_1860-79;Herstelling;false
+Q59116804;MAP_1930;Killenstein Nova;true
+Q59116804;MAP_1860-79;Killenstein Nova;false
+Q59115355;MAP_1930;Carmawippibo;true
+Q59115355;MAP_1860-79;Carmawippibo;false
+Q59115230;MAP_1930;Berkshoven;true
+Q59115230;MAP_1860-79;Berkshoven;false
+Q59115236;MAP_1930;Bethlehem;true
+Q59115236;MAP_1860-79;Bethlehem;false
+Q59115512;MAP_1930;Destombesburg;true
+Q59115512;MAP_1860-79;Destombesburg;false
+Q21000077;MAP_1930;Hazard;true
+Q21000077;MAP_1860-79;Hazard;false
+Q59116913;MAP_1930;La Volonte Divine;true
+Q59116913;MAP_1860-79;La Volonte Divine;false
+Q59132859;MAP_1930;Nieuw Rozenbeek;true
+Q59132859;MAP_1860-79;Nieuw Rozenbeek;false
+Q59133998;MAP_1930;Vlammenburg;true
+Q59133998;MAP_1860-79;Vlammenburg;false
+Q59116850;MAP_1930;l'Esperance;true
+Q59116850;MAP_1860-79;l'Esperance;false
+Q59132892;MAP_1930;Nieuw Wederhoop;true
+Q59132892;MAP_1860-79;Nieuw Wederhoop;false
+Q1977748;MAP_1930;Curacabo;true
+Q1977748;MAP_1860-79;Curacabo;false
+Q59115165;MAP_1930;Nieuw Appecappe;true
+Q59115165;MAP_1860-79;Nieuw Appecappe;false
+Q59115576;MAP_1930;Faugemburg;true
+Q59115576;MAP_1860-79;Fauqenburg;false
+Q59115429;MAP_1930;De Dageraad;true
+Q59115429;MAP_1860-79;De Dageraad;false
+Q59133840;MAP_1930;Smithfield;true
+Q59133840;MAP_1860-79;Smithfield;false
+Q59115151;MAP_1930;Anna Maria;true
+Q59115151;MAP_1860-79;Anna Maria;false
+Q59115191;MAP_1930;Barkley;true
+Q59115191;MAP_1860-79;Barkley;false
+Q59115130;MAP_1930;Agenoria;true
+Q59115130;MAP_1860-79;Agenoria;false
+Q59115399;MAP_1930;Concordia;true
+Q59115399;MAP_1860-79;Concordia;false
+Q59132843;MAP_1930;Klein Cullenburg;true
+Q59132843;MAP_1860-79;Klein Cullenburg;false
+Q59115555;MAP_1930;Elsenhagen;true
+Q59115555;MAP_1860-79;Elsenhagen;false
+Q59115154;MAP_1930;Annasburg;true
+Q59115154;MAP_1860-79;Annasburg;false
+Q59132765;MAP_1930;Klein Mon Desir;true
+Q59132765;MAP_1860-79;Klein Mon Desir;false
+Q59116928;MAP_1930;Le Contentement;true
+Q59116928;MAP_1860-79;Le Contentement;false
+Q59134207;MAP_1930;Zeldenrust;true
+Q59134207;MAP_1860-79;Zeldenrust;false
+Q124805743;MAP_1930;Zeldenrust en Welgelegen;true
+Q124805743;MAP_1860-79;Welgelegen;false
+Q59115653;MAP_1930;Groot Cuijlenburg;true
+Q59115653;MAP_1860-79;Groot Cuijlenburg;false
+Q124831787;MAP_1930;Patientie;true
+Q124831787;MAP_1860-79;Patientie;false
+Q59115623;MAP_1930;Goed Succes;true
+Q59115623;MAP_1860-79;Goed Succes;false
+Q59115169;MAP_1930;Arnhem;true
+Q59115169;MAP_1860-79;Arnhem;false
+Q59134005;MAP_1930;Vlugt en Trouw;true
+Q59134005;MAP_1860-79;Vlugt en Trouw;false
+Q59117003;MAP_1930;Lugtenburg;true
+Q59117003;MAP_1860-79;Lugtenburg;false
+Q59115670;MAP_1930;Halle in Saxen;true
+Q59115670;MAP_1860-79;Halle in Saxen;false
+Q59115321;MAP_1930;Brunswijk;true
+Q59115321;MAP_1860-79;Brunswijk;false
+Q59116819;MAP_1930;Klein Marseille;true
+Q59116819;MAP_1860-79;Klein Marseille;false
+Q59115664;MAP_1930;Gustaafsdaal;true
+Q59115664;MAP_1860-79;Gustaafsdaal;false
+Q59133976;MAP_1930;Va comme je te pousse;true
+Q59133976;MAP_1860-79;Va comme je te pousse;false
+Q59133054;MAP_1930;Perou;true
+Q59133054;MAP_1860-79;Perou;false
+Q59115506;MAP_1930;De Zuinigheid;true
+Q59115506;MAP_1860-79;De Zuinigheid;false
+Q59132783;MAP_1930;Mon Sort;true
+Q59132783;MAP_1860-79;Mon Sort;false
+Q59116876;MAP_1930;La Nouvelle Esperance;true
+Q59116876;MAP_1860-79;La Nouvelle Esperance;false
+Q59119433;MAP_1930;Mocha;true
+Q59119433;MAP_1860-79;Mocha;false
+Q95383870;MAP_1930;Marienburg;true
+Q95383870;MAP_1860-79;Marienburg;false
+Q59117047;MAP_1930;Manheim;true
+Q59117047;MAP_1860-79;Manheim;false
+Q59115551;MAP_1860-79;Elk 't Zijn;false
+Q59132759;MAP_1930;Aan Molhoop;true
+Q59132759;MAP_1860-79;Aan Molhoop;false
+Q59115499;MAP_1930;De Vrede;true
+Q59115499;MAP_1860-79;De Vrede;false
+Q59133856;MAP_1930;Souburg;true
+Q59133856;MAP_1860-79;Souburg;false
+Q59115654;MAP_1930;Groot Marseille;true
+Q59115654;MAP_1860-79;Groot Marseille;false
+Q59132765;MAP_1930;Mon desir;true
+Q59132765;MAP_1860-79;Mon desir;false
+Q59132765;MAP_1930;Mon desir;true
+Q59132765;MAP_1860-79;Mon desir;false
+Q59115668;MAP_1930;s Hagenbosch;true
+Q59115668;MAP_1860-79;s Hagenbosch;false
+Q124830526;MAP_1930;Genoodzaakt;true
+Q124830526;MAP_1860-79;Genoodzaakt;false
+Q59116883;MAP_1930;La Paix;true
+Q59116883;MAP_1860-79;La Paix;false
+Q59132761;MAP_1930;Mon Bijou;true
+Q59132761;MAP_1860-79;Mon Bijou;false
+Q59132846;MAP_1930;Nieuw Java;true
+Q59132846;MAP_1860-79;Nieuw Java;false
+Q135395231;MAP_1930;De Zes Kinderen;true
+Q135395231;MAP_1860-79;De Zes Kinderen;false
+Q135395230;MAP_1930;De Nieuwe Uitleg;true
+Q135395230;MAP_1860-79;De Nieuwe Uitleg;false
+Q135395210;MAP_1930;Aan Patientia;true
+Q135395210;MAP_1860-79;Aan Pateintia;false
+Q59132844;MAP_1930;Aan Klein Cuilenburg;true
+Q59132844;MAP_1860-79;Aan Klein Cuilenburg;false
+Q59115281;MAP_1930;Bokkenstein;true
+Q59115281;MAP_1860-79;Bokkenstein;false
+Q135395240;MAP_1930;Heerenveen;true
+Q135395240;MAP_1860-79;Heerenveen;false
+Q59115607;MAP_1930;Elisabeth;true
+Q59115607;MAP_1860-79;Elisabeth;false
+Q59117004;MAP_1930;Lunenburg;true
+Q59117004;MAP_1860-79;Lunenburg;false
+Q59115294;MAP_1930;Boomakker;true
+Q59115294;MAP_1860-79;Boomakker;false
+Q59133209;MAP_1930;Rustlust;true
+Q59133209;MAP_1860-79;Rustlust;false
+Q124831604;MAP_1930;Mijn Zorg;true
+Q124831604;MAP_1860-79;Mijn Zorg;false
+Q124827982;MAP_1930;De Hulp;true
+Q124827982;MAP_1860-79;De Hulp;false
+Q59115437;MAP_1930;De Beste;true
+Q59115437;MAP_1860-79;De Beste;false
+Q59115378;MAP_1930;Ceres;true
+Q59115378;MAP_1860-79;Ceres;false
+Q59115677;MAP_1930;De Harmonie;true
+Q59115677;MAP_1860-79;De Harmonie;false
+Q124832146;MAP_1930;Voorzorg;true
+Q124832146;MAP_1860-79;Voorzorg;false
+Q135395752;MAP_1930;Oranje;true
+Q135395752;MAP_1860-79;Oranje;false
+Q59117005;MAP_1930;Lunette;true
+Q59117005;MAP_1860-79;Lunette;false
+Q59115476;MAP_1930;De Onderneming;true
+Q59115476;MAP_1860-79;De Onderneming;false
+Q59115607;MAP_1930;Geertruida;true
+Q59115607;MAP_1860-79;Geertruida;false
+Q59134172;MAP_1930;Wolvenhorst;true
+Q59134172;MAP_1860-79;Wolvenhorst;false
+Q59115426;MAP_1930;De Zwarigheid;true
+Q59115426;MAP_1860-79;De Zwarigheid;false
+Q59117044;MAP_1930;Makreabo;true
+Q59117044;MAP_1860-79;Makreabo;false
+Q59133101;MAP_1930;Potribo;true
+Q59133101;MAP_1860-79;Potribo;false
+Q59133102;MAP_1930;Aan Potribo;true
+Q59133102;MAP_1860-79;Aan Potribo;false
+Q59115644;MAP_1930;Groenendal;true
+Q59115644;MAP_1860-79;Groenendal;false
+Q59115535;MAP_1930;Edinburg;true
+Q59115535;MAP_1860-79;Edinburg;false
+Q59115328;MAP_1930;Bruinsburg;true
+Q59115328;MAP_1860-79;Bruinsburg;false
+Q59132767;MAP_1930;Mon Plaisir;true
+Q59132767;MAP_1860-79;Mon Plaisir;false
+Q59115542;MAP_1930;Egmond;true
+Q59115542;MAP_1860-79;Egmond;false
+Q59133975;MAP_1930;Utrecht;true
+Q59133975;MAP_1860-79;Utrecht;false
+Q59117045;MAP_1930;Malebatrum;true
+Q59117045;MAP_1860-79;Malebatrum;false
+Q59133211;MAP_1930;Rustveld;true
+Q59133211;MAP_1860-79;Bustveld;false
+Q59115397;MAP_1930;Concordia;true
+Q59115397;MAP_1860-79;Concordia;false
+Q131413266;MAP_1930;Mijn Hoop;true
+Q131413266;MAP_1860-79;Mijn Hoop;false
+Q59133070;MAP_1930;Pietersburg;true
+Q59133070;MAP_1860-79;Pietersburg;false
+Q59132838;MAP_1930;Nieuw Clarenbeek;true
+Q59132838;MAP_1860-79;Nieuw Clarenbeek;false
+Q59115453;MAP_1930;De Goudmijn;true
+Q59115453;MAP_1860-79;De Goudmijn;false
+Q59133171;MAP_1930;Rozenburg;true
+Q59133171;MAP_1860-79;Rozenburg;false
+Q137787492;MAP_1930;Welbedacht;true
+Q137787492;MAP_1860-79;Welbedacht;false
+Q59133025;MAP_1930;Ostage;true
+Q59133025;MAP_1860-79;Ostage;false
+Q59133025;MAP_1930;Ostage;true
+Q59133025;MAP_1860-79;Ostage;false
+Q59134175;MAP_1930;Wriedijk;true
+Q59134175;MAP_1860-79;Wriedijk;false
+Q59132900;MAP_1930;De Nieuwhoop;true
+Q59132900;MAP_1860-79;De Nieuwhoop;false
+Q59133834;MAP_1930;Aan Siparipabo;true
+Q59133834;MAP_1860-79;Aan Siparipabo;false
+Q59133053;MAP_1930;Penoribo;true
+Q59133053;MAP_1860-79;Penoribo;false
+Q59133898;MAP_1930;Stolkertsijver;true
+Q59133898;MAP_1860-79;Stolkertsijver;false
+Q59115166;MAP_1930;Arendrust;true
+Q59115166;MAP_1860-79;Arendrust;false
+Q59133992;MAP_1930;De Vier Kinderen;true
+Q59133992;MAP_1860-79;De Vier Kinderen;false
+Q130535976;MAP_1930;Aan Stolkertsijver;true
+Q130535976;MAP_1860-79;Aan Stolkertsijver;false
+Q59133853;MAP_1930;Soribo;true
+Q59133853;MAP_1860-79;Soribo;false
+Q124830245;MAP_1930;Verwachting;true
+Q124830245;MAP_1860-79;Verwachting;false
+Q124816025;MAP_1930;Oud Belair;true
+Q124816025;MAP_1860-79;Oud Belair;false
+Q59132830;MAP_1930;Nieuw Belair;true
+Q59132830;MAP_1860-79;Nieuw Belair;false
+Q59116931;MAP_1930;Le Mat Rouge;true
+Q59116931;MAP_1860-79;Le Mat Rouge;false
+Q135395623;MAP_1930;Sappato;true
+Q135395623;MAP_1860-79;Sappato;false
+Q59132862;MAP_1930;Nieuw Timotibo;true
+Q59132862;MAP_1860-79;Nieuw Timotibo;false
+Q59115414;MAP_1930;Courtvlugt;true
+Q59115414;MAP_1860-79;Courtvlugt;false
+Q59134070;MAP_1930;Waterwijk;true
+Q59134070;MAP_1860-79;Waterwijk;false
+Q59116835;MAP_1930;Kort en Duur;true
+Q59116835;MAP_1860-79;Kort en Duur;false
+Q124830361;MAP_1930;De vrede;true
+Q124830361;MAP_1860-79;De vrede;false
+Q59115400;MAP_1930;Constantie;true
+Q59115400;MAP_1860-79;Constantie;false
+Q59133280;MAP_1930;Sardam;true
+Q59133280;MAP_1860-79;Sardam;false
+Q124831795;MAP_1930;Rustenburg;true
+Q124831795;MAP_1860-79;Rustenburg;false
+Q59115671;MAP_1930;Hamburg;true
+Q59115671;MAP_1860-79;Hamburg;false
+Q59115407;MAP_1930;Corisana;true
+Q59115407;MAP_1860-79;Corisana;false
+Q59133307;MAP_1930;Scheveningen;true
+Q59133307;MAP_1860-79;Scheveningen;false
+Q59132945;MAP_1930;Ongegund;true
+Q59132945;MAP_1860-79;Ongegund;false
+Q59116816;MAP_1930;Klein La Jalousie;true
+Q59116816;MAP_1860-79;Klein La Jalousie;false
+Q59115324;MAP_1930;Brouwershaven;true
+Q59115324;MAP_1860-79;Brouwershaven;false
+Q59115112;MAP_1930;s Gravenhage;true
+Q59115112;MAP_1860-79;s Gravenhage;false
+Q59115144;MAP_1930;Amsterdam;true
+Q59115144;MAP_1860-79;Amsterdam;false
+Q59134072;MAP_1930;Waijamoe;true
+Q59134072;MAP_1860-79;Waijamoe;false
+Q59115141;MAP_1930;Altona;true
+Q59115141;MAP_1860-79;Altona;false
+Q124831915;MAP_1930;Schoonhoven;true
+Q124831915;MAP_1860-79;Schoonhoven;false
+Q59132982;MAP_1930;Onvergenoegd;true
+Q59132982;MAP_1860-79;Onvergenoegd;false
+Q59134040;MAP_1930;Vriesenburg;true
+Q59134040;MAP_1860-79;Vriesenburg;false
+Q59133085;MAP_1930;Poelwijk;true
+Q59133085;MAP_1860-79;Poelwijk;false
+Q59118022;MAP_1930;Meulwijk;true
+Q59118022;MAP_1860-79;Meulwijk;false
+Q59115471;MAP_1930;De Eendragt;true
+Q59115471;MAP_1860-79;De Eendragt;false
+Q59133206;MAP_1930;Rustenburg;true
+Q59133206;MAP_1860-79;Rustenburg;false
+Q59132997;MAP_1930;Oostrust;true
+Q59132997;MAP_1860-79;Oostrust;false
+Q59132859;MAP_1930;Nieuw Rozenbeek;true
+Q59132859;MAP_1860-79;Nieuw Rozenbeek;false
+Q59115423;MAP_1930;Curacao;true
+Q59115423;MAP_1860-79;Curacao;false
+Q59115423;MAP_1930;Curacao;true
+Q59115423;MAP_1860-79;Curacao;false
+Q29533971;MAP_1860-79;Remoncourt;false
+Q59116911;MAP_1930;Berg Sinai;true
+Q59116911;MAP_1860-79;Berg Sinai;false
+Q124819566;MAP_1930;Aan Berg Sinai;true
+Q124819566;MAP_1860-79;Aan Berg Sinai;false
+Q130535969;MAP_1930;Maastricht;true
+Q130535969;MAP_1930;Maastricht;true
+Q130535969;MAP_1860-79;Maastricht;false
+Q59134009;MAP_1930;Voorgrond;true
+Q59134009;MAP_1860-79;Voorgrond;false
+Q59115670;MAP_1930;Halle in Saxen;true
+Q59115670;MAP_1860-79;Halle in Saxen;false
+Q59115670;MAP_1930;Halle in Saxen;true
+Q59115670;MAP_1860-79;Halle in Saxen;false
+Q59115670;MAP_1930;Halle in Saxen;true
+Q59115670;MAP_1860-79;Halle in Saxen;false
+Q59116876;MAP_1930;La Nouvelle Esperance;true
+Q59116876;MAP_1860-79;La Nouvelle Esperance;false
+Q59133025;MAP_1930;Ostage;true
+Q59133025;MAP_1860-79;Ostage;false
+Q59133025;MAP_1930;Ostage;true
+Q59133025;MAP_1860-79;Ostage;false
+Q124831795;MAP_1930;Rustenburg;true
+Q124831795;MAP_1860-79;Rustenburg;false
+Q59134081;MAP_1930;Waycoribo;true
+Q59134081;MAP_1860-79;Waycoribo;false
+Q59134081;MAP_1930;Waycoribo;true
+Q59134081;MAP_1860-79;Waycoribo;false
+Q59115166;MAP_1930;Arendrust;true
+Q59115166;MAP_1860-79;Arendrust;false
+Q59133834;MAP_1930;Aan Siparipabo;true
+Q59133834;MAP_1860-79;Aan Siparipabo;false
+Q59132920;MAP_1930;Nimmerdor;true
+Q59132920;MAP_1860-79;Nimmerdor;false
+Q59115416;MAP_1930;Crawassibo;true
+Q59115416;MAP_1860-79;Crawassibo;false
+Q59115165;MAP_1930;Nieuw Appecappe;true
+Q59115165;MAP_1860-79;Nieuw Appecappe;false
+Q59115355;MAP_1930;Cannawappibo;true
+Q59115355;MAP_1860-79;Cannawappibo;false
+Q59115439;MAP_1930;De Dankbaarheid;true
+Q59115439;MAP_1860-79;De Dankbaarheid;false
+Q59134182;MAP_1930;Zeezigt;true
+Q59134182;MAP_1860-79;Zeezigt;false
+Q59133849;MAP_1930;Sophia's lust;true
+Q59133849;MAP_1860-79;Sophia's lust;false
+Q59115654;MAP_1930;Groot Marseille;true
+Q59115654;MAP_1860-79;Groot Marseille;false
+Q59117004;MAP_1930;Lunenburg;true
+Q59117004;MAP_1860-79;Lunenburg;false
+Q59115360;MAP_1930;Karelsburg;true
+Q59115360;MAP_1860-79;Karelsburg;false
+Q59132790;MAP_1930;Munnickendam;true
+Q59132790;MAP_1860-79;Munnickendam;false
+Q59115476;MAP_1930;De Onderneming;true
+Q59115476;MAP_1860-79;De Onderneming;false
+Q59115476;MAP_1930;De Onderneming;true
+Q59115476;MAP_1860-79;De Onderneming;false
+Q59115654;MAP_1930;Groot Marseille;true
+Q59115654;MAP_1860-79;Groot Marseille;false
+Q59134072;MAP_1930;Waijamoe;true
+Q59134072;MAP_1860-79;Waijamoe;false
+Q59115471;MAP_1930;De Eendragt;true
+Q59115471;MAP_1860-79;De Eendragt;false
+Q135395231;MAP_1930;De Zes Kinderen;true
+Q135395231;MAP_1860-79;De Zes Kinderen;false
+Q59134081;MAP_1930;Waycoribo;true
+Q59134081;MAP_1860-79;Waycoribo;false
+Q59132968;MAP_1930;Onobo;true
+Q59132968;MAP_1860-79;Onobo;false
+Q59115718;MAP_1930;Jacobslust;true
+Q59115718;MAP_1860-79;Jacobslust;false
+Q59132783;MAP_1930;Mon Sort;true
+Q59132783;MAP_1860-79;Mon Sort;false
+Q59134081;MAP_1930;Waycoribo;true
+Q59134081;MAP_1860-79;Waycoribo;false
+Q59133136;MAP_1930;Reijnesberg;true
+Q59133136;MAP_1930;Reijnesberg;true
+Q59133136;MAP_1860-79;Reijnesberg;false
+Q59116847;MAP_1930;L'Aventure;true
+Q59116847;MAP_1860-79;L'Aventure;false
+Q935545;MAP_1930;Lelydorp;true
+Q935545;MAP_1860-79;20;false
+Q124823173;MAP_1930;Bram's hoop;true
+Q124823173;MAP_1860-79;Bram's hoop;false
+Q124831245;MAP_1930;L'Esperance;true
+Q124831245;MAP_1860-79;L'Esperance;false
+Q137732483;MAP_1930;Aan Bramshoop;true
+Q137732483;MAP_1860-79;Aan Bramshoop;false
+Q59134140;MAP_1930;Willemsburg;true
+Q59134140;MAP_1860-79;Willemsburg;false
+Q131413929;MAP_1930;La Discorde;true
+Q131413929;MAP_1860-79;La Discorde;false
+Q124825046;MAP_1930;Concordia;true
+Q124825046;MAP_1860-79;Concordia;false
+Q59119432;MAP_1930;Mocha;true
+Q59119432;MAP_1860-79;Mocha;false
+Q59132974;MAP_1930;Aan Onverdacht;true
+Q59132974;MAP_1860-79;Aan Onverdacht;false
+Q2273968;MAP_1930;Aan Onoribo;true
+Q2273968;MAP_1860-79;Aan Onoribo;false
+Q124831719;MAP_1930;Ongelegen;true
+Q124831719;MAP_1860-79;Ongelegen;false
+Q131414102;MAP_1930;Frederiksburg;true
+Q131414102;MAP_1860-79;Frederiksburg;false
+Q59134111;MAP_1930;Wijnbergslust;true
+Q59134111;MAP_1860-79;Wijnbergslust;false
+Q59133016;MAP_1930;Aan Osemibo;true
+Q59133016;MAP_1860-79;Aan Osemibo;false
+Q124831295;MAP_1930;Libanon;true
+Q124831295;MAP_1860-79;Libanon;false
+Q59115662;MAP_1930;Guldenvlies;true
+Q59115662;MAP_1860-79;Guldenvlies;false
+Q124831721;MAP_1930;Aan Onoribo;true
+Q124831721;MAP_1860-79;Aan Onoribo;false
+Q124830729;MAP_1930;Aan Guldenvlies;true
+Q124830729;MAP_1860-79;Aan Guldenvlies;false
+Q59133016;MAP_1930;Aan Osemibo;true
+Q59133016;MAP_1860-79;Aan Osemibo;false
+Q137429768;MAP_1930;Aan Onoribo;true
+Q137429768;MAP_1860-79;Aan Onoribo;false
+Q59132975;MAP_1930;Aan Onverdacht;true
+Q59132975;MAP_1860-79;Aan Onverdacht;false
+Q124831721;MAP_1930;Aan Onoribo;true
+Q124831721;MAP_1860-79;Aan Onoribo;false
+Q59132974;MAP_1930;Aan Onverdacht;true
+Q59132974;MAP_1860-79;Aan Onverdracht;false
+Q124832252;MAP_1930;Welgedacht;true
+Q124832252;MAP_1860-79;Welgedacht;false
+Q59115505;MAP_1930;De Watering;true
+Q59115505;MAP_1860-79;De Watering;false
+Q59132970;MAP_1930;Aan Onoribo;true
+Q59132970;MAP_1860-79;Aan Onoribo;false
+Q59133016;MAP_1930;Aan Osemibo;true
+Q59133016;MAP_1860-79;Aan Osemibo;false
+Q124831719;MAP_1930;Aan Ongelegen;true
+Q124831719;MAP_1860-79;Aan Ongelegen;false
+Q124831719;MAP_1930;Aan Ongelegen;true
+Q124831719;MAP_1860-79;Aan Ongelegen;false
+Q124831720;MAP_1930;Onoribo;true
+Q124831720;MAP_1860-79;Onoribo;false
+Q59132975;MAP_1930;Aan Onverdacht;true
+Q59132975;MAP_1860-79;Aan Onverdacht;false
+Q59116957;MAP_1930;Aan Libanon;true
+Q59116957;MAP_1860-79;Aan Libanon;false
+Q137429846;MAP_1930;Aan Onoribo;true
+Q137429846;MAP_1860-79;Aan Onoribo;false
+Q135395252;MAP_1930;Matille;true
+Q135395252;MAP_1860-79;Matille;false
+Q59118028;MAP_1930;Mijn Hulp;true
+Q59118028;MAP_1860-79;Mijn Hulp;false
+Q131415328;MAP_1930;Aan Frederiksburg;true
+Q131415328;MAP_1860-79;Aan Frederiksburg;false
+Q59132915;MAP_1930;De Nieuwe Star;true
+Q59132915;MAP_1860-79;De Nieuwe Star;false
+Q124832254;MAP_1930;Welbedacht;true
+Q124832254;MAP_1860-79;Welbedacht;false
+Q59115475;MAP_1930;Nieuwe Hoop;true
+Q59115475;MAP_1860-79;Nieuwe Hoop;false
+Q124832083;MAP_1930;Tulpenburg;true
+Q124832083;MAP_1860-79;Tulpenburg;false
+Q124830445;MAP_1930;De Drie Gebroeders;true
+Q124830445;MAP_1860-79;De Drie Gebroeders;false
+Q33181177;MAP_1930;De drie gebroeders;true
+Q33181177;MAP_1860-79;De Guinesche Vriendschap;false
+Q59134210;MAP_1930;Zeldenrust;true
+Q59134210;MAP_1860-79;Zeldenrust;false
+Q59133011;MAP_1930;Oranjestein;true
+Q59133011;MAP_1860-79;Oranjestein;false
+Q59116912;MAP_1930;La Vigilantie;true
+Q59116912;MAP_1860-79;La Vigilantie;false
+Q59116814;MAP_1860-79;Klein Cura�ao;false
+Q59133091;MAP_1860-79;Porto Bello;false
+Q25703530;MAP_1930;Accaribo;true
+Q25703530;MAP_1860-79;Accaribo;false
+Q59133839;MAP_1930;Smalkalden;true
+Q59133839;MAP_1860-79;Smalkalden;false
+Q1757289;MAP_1930;Kwatta;true
+Q1757289;MAP_1860-79;Kwatta;false
+Q59115596;MAP_1930;Fridericisgift;true
+Q59115596;MAP_1860-79;Fridericisgift;false
+Q59133267;MAP_1930;Sara Maria;true
+Q59133267;MAP_1860-79;Sara Maria;false
+Q124827875;MAP_1930;Eendracht;true
+Q124827875;MAP_1860-79;Eendracht;false
+Q59115469;MAP_1930;De Morgenster;true
+Q59115469;MAP_1860-79;De Morgenster;false
+Q59133965;MAP_1930;Tyrol;true
+Q59133965;MAP_1860-79;Tyrol;false
+Q59115684;MAP_1930;Hermitage;true
+Q59115684;MAP_1860-79;Hermitage;false
+Q124832259;MAP_1930;Zorg en Hoop;true
+Q124832259;MAP_1860-79;Zorg en Hoop;false
+Q2490145;MAP_1930;Flora;true
+Q2490145;MAP_1860-79;Flora;false
+Q135395727;MAP_1930;Duisburg;true
+Q135395250;MAP_1930;Maria's lust en toevlugt;true
+Q135395250;MAP_1860-79;Maria's lust en toevlugt;false
+Q59132944;MAP_1930;Oldenburg;true
+Q59132944;MAP_1860-79;Oldenburg;false
+Q124824456;MAP_1930;Cayenne Industrie;true
+Q124824456;MAP_1860-79;Cayenne;false
+Q59133200;MAP_1930;Rosina;true
+Q59133200;MAP_1860-79;Rosina;false
+Q59133979;MAP_1930;Vaderszorg;true
+Q59133979;MAP_1860-79;Vaderszorg;false
+Q59132805;MAP_1930;Mon Divertissement;true
+Q59132805;MAP_1860-79;Mon Divertissement;false
+Q135395255;MAP_1930;Maton's hoop;true
+Q135395255;MAP_1860-79;Maton's hoop;false
+Q124832258;MAP_1930;Wilhelmina's burg;true
+Q124832258;MAP_1860-79;v. Engel;false
+Q59133065;MAP_1930;Peu et Content;true
+Q59133065;MAP_1860-79;Peu et Content;false
+Q59115514;MAP_1930;Dijkveld;true
+Q59115514;MAP_1860-79;Dijkveld;false
+Q59133947;MAP_1930;Nieuwgrond;true
+Q59133947;MAP_1860-79;1;false
+Q124832563;MAP_1930;Welgedacht;true
+Q124832563;MAP_1860-79;3;false
+Q59115683;MAP_1930;Helena Christina;true
+Q59115683;MAP_1860-79;6;false
+Q59115117;MAP_1930;Abigael's lust;true
+Q59115117;MAP_1860-79;Abigael's lust;false
+Q135395239;MAP_1930;Hanna's lust;true
+Q59115202;MAP_1930;Beekhuizen;true
+Q59115202;MAP_1860-79;Beekhuizen;false
+Q59116975;MAP_1930;Livorno;true
+Q59116975;MAP_1860-79;Livorno;false
+Q59116805;MAP_1930;Kinderdeel;true
+Q59116805;MAP_1860-79;Kinderdeel;false
+Q59115594;MAP_1930;Frederikshoop;true
+Q59115594;MAP_1860-79;Frederikshoop;false
+Q59115498;MAP_1930;De Vier Kinderen;true
+Q59115498;MAP_1860-79;De Vier Kinderen;false
+Q106111222;MAP_1930;Magenta;true
+Q106111222;MAP_1860-79;Magenta;false
+Q59115489;MAP_1930;De Goede Verwachting;true
+Q59115489;MAP_1860-79;De Goede Verwachting;false
+Q59115556;MAP_1930;Ephraim's Zegen;true
+Q59115556;MAP_1860-79;Ephraim's Zegen;false
+Q59132894;MAP_1930;Nieuw weergevonden;true
+Q59132894;MAP_1860-79;Nieuw weergevonden;false
+Q59132896;MAP_1930;Nieuwzorg;true
+Q59132896;MAP_1860-79;Nieuwzorg;false
+Q59156173;MAP_1930;Altona;true
+Q59156173;MAP_1860-79;Altona;false
+Q2184109;MAP_1930;Boxel;true
+Q2184109;MAP_1860-79;Boxel;false
+Q59115517;MAP_1930;Domburg;true
+Q59115517;MAP_1860-79;Domburg;false
+Q59116859;MAP_1930;La bonne amitie;true
+Q59116859;MAP_1860-79;La bonne amitie;false
+Q59134025;MAP_1930;Vredenburg;true
+Q59134025;MAP_1860-79;Vredenburg;false
+Q59116901;MAP_1930;La Ressource;true
+Q59116901;MAP_1860-79;La Ressource;false
+Q59133012;MAP_1930;Ornamibo;true
+Q59133012;MAP_1860-79;Ornamibo;false
+Q59133948;MAP_1930;Tout lui faut;true
+Q59133948;MAP_1860-79;Tout lui faut;false
+Q59115705;MAP_1930;Houttuin;true
+Q59115705;MAP_1860-79;Houttuin;false
+Q59115229;MAP_1930;Bergershoop;true
+Q59115229;MAP_1860-79;12;false
+Q59119413;MAP_1930;Mijnzorg;true
+Q59119413;MAP_1860-79;10;false
+Q124823173;MAP_1930;Brams hoop;true
+Q124823173;MAP_1860-79;11;false
+Q124831607;MAP_1930;Monplaisir;true
+Q124831607;MAP_1860-79;1;false
+Q124832081;MAP_1930;Toevlugt;true
+Q124832081;MAP_1860-79;Toevlugt;false
+Q59115370;MAP_1930;Carracas;true
+Q59115370;MAP_1860-79;Carracat;false
+Q135395666;MAP_1930;Amsterdam;true
+Q135395666;MAP_1860-79;Amsterdam;false
+Q59134068;MAP_1930;Watervliet;true
+Q59134068;MAP_1860-79;Watervliet;false
+Q59132811;MAP_1930;Nahamoe;true
+Q59132811;MAP_1860-79;Nahamoe;false
+Q59116821;MAP_1930;Klein Perou;true
+Q59116821;MAP_1860-79;Klein Perou;false
+Q59115233;MAP_1930;Berceba;true
+Q59115233;MAP_1860-79;Berceba;false
+Q59133969;MAP_1930;Urbanica;true
+Q59133969;MAP_1860-79;Urbanica;false
+Q59116903;MAP_1930;La Simplicite;true
+Q59116903;MAP_1860-79;La Simplicite;false
+Q59133030;MAP_1930;Overbrug;true
+Q59133030;MAP_1860-79;Overbrug;false
+Q59115231;MAP_1930;Aan Berlijn;true
+Q59115231;MAP_1860-79;Aan Berlijn;false
+Q59116963;MAP_1930;Liefdenshoek;true
+Q59116963;MAP_1860-79;Liefdenshoek;false
+Q59134233;MAP_1930;Zorg en rust;true
+Q59134233;MAP_1860-79;Zorg en rust;false
+Q59115452;MAP_1930;De Goede Hoop;true
+Q59115452;MAP_1860-79;De Goede Hoop;false
+Q59133132;MAP_1930;Retiro;true
+Q59133132;MAP_1860-79;Retiro;false
+Q59115382;MAP_1930;Charprende;true
+Q59115382;MAP_1860-79;Charprende;false
+Q135395225;MAP_1930;Chocolat;true
+Q124831914;MAP_1930;Sara's lust;true
+Q124831914;MAP_1860-79;Sara's lust;false
+Q59115715;MAP_1930;Inveja;true
+Q59115703;MAP_1930;Horeb;true
+Q59115703;MAP_1860-79;Horeb;false
+Q124830989;MAP_1930;La Diligence;true
+Q124830989;MAP_1860-79;La Diligence;false
+Q59133113;MAP_1930;Quamabo;true
+Q59133113;MAP_1860-79;Quamabo;false
+Q59132821;MAP_1930;Namrek;true
+Q59132821;MAP_1860-79;Namrek;false
+Q135395223;MAP_1930;Carolina's hoop;true
+Q59115181;MAP_1930;Ayo;true
+Q59115181;MAP_1860-79;Ayo;false
+Q124831244;MAP_1930;L'Esperance;true
+Q124831244;MAP_1860-79;L'Esperance;false
+Q59115245;MAP_1930;Aan Bigrar;true
+Q59115245;MAP_1860-79;Aan Bigrar;false
+Q59133103;MAP_1930;Praag;true
+Q59133103;MAP_1860-79;Praag;false
+Q59115245;MAP_1930;Aan Bigrar;true
+Q59115245;MAP_1860-79;Aan Bigrar;false
+Q59115246;MAP_1930;Bigrar;true
+Q59115632;MAP_1930;De goede Vrede Cie;true
+Q59115632;MAP_1860-79;De goede Vrede Cie;false
+Q59133884;MAP_1930;Staf Arons;true
+Q59133884;MAP_1860-79;Staf Arons;false
+Q59115586;MAP_1930;Florentia;true
+Q59115586;MAP_1860-79;Florentia;false
+Q59133066;MAP_1930;Phedra;true
+Q59133066;MAP_1860-79;Phedra;false
+Q135395235;MAP_1930;Gehar;true
+Q135395235;MAP_1860-79;Gehar;false
+Q59115427;MAP_1930;Dothen;true
+Q59115427;MAP_1860-79;Dothen;false
+Q59133125;MAP_1930;Rama;true
+Q59133125;MAP_1860-79;Rama;false
+Q59115178;MAP_1930;Mirico;true
+Q59115178;MAP_1860-79;Aan Auca;false
+Q59134173;MAP_1930;Worsteling Jacobs;true
+Q59134173;MAP_1860-79;Worsteling Jacobs;false
+Q59132804;MAP_1930;Moria;true
+Q59132804;MAP_1860-79;Moria;false
+Q59134072;MAP_1930;Wayamoe;true
+Q59134072;MAP_1860-79;Wayamoe;false
+Q59115423;MAP_1930;Curacao;true
+Q59115423;MAP_1860-79;Curacao;false
+Q59115270;MAP_1930;Bloemendal;true
+Q59115270;MAP_1860-79;Bloemendal;false
+Q59115234;MAP_1930;Bethel;true
+Q59115234;MAP_1860-79;Bethel;false
+Q135395576;MAP_1930;Aan de Goede Toevlugt;true
+Q135395576;MAP_1860-79;Aan de Goede Toevlugt;false
+Q124831241;MAP_1930;La Revolution;true
+Q124831241;MAP_1860-79;La Revolution;false
+Q59133917;MAP_1930;Temeraire;true
+Q59133917;MAP_1860-79;Temeraire;false
+Q59116911;MAP_1930;Berg Sinai;true
+Q59116911;MAP_1860-79;Berg Sinai;false
+Q124819566;MAP_1930;Aan Berg Sinai;true
+Q124819566;MAP_1860-79;Aan Berg Sinai;false
+Q124831294;MAP_1930;Libanon;true
+Q124831294;MAP_1860-79;Libanon;false
+Q59132919;MAP_1930;Nijd en Spijt;true
+Q59132919;MAP_1860-79;Nijd en Spijt;false
+Q130535969;MAP_1930;Maastricht;true
+Q59133136;MAP_1930;Reijnesberg;true
+Q59134009;MAP_1930;Voorgrond;true
+Q59134009;MAP_1860-79;Voorgrond;false
+Q59116978;MAP_1930;Loefbeek;true
+Q59116978;MAP_1860-79;Loefbeek;false
+Q59115723;MAP_1930;Jagersburg;true
+Q59115723;MAP_1860-79;Jagersburg;false
+Q59115674;MAP_1930;Hanover;true
+Q59115674;MAP_1860-79;Hanover;false
+Q59118001;MAP_1930;Mawakkabo;true
+Q59118001;MAP_1860-79;Mawakkabo;false
+Q59115413;MAP_1930;Corpinabo;true
+Q59115413;MAP_1860-79;Corpinabo;false
+Q59115293;MAP_1930;La Bonne Aventure;true
+Q59115293;MAP_1860-79;La Bonne Aventure;false
+Q59115601;MAP_1930;Gage d'Amour;true
+Q59115601;MAP_1860-79;Gage d'Amour;false
+Q135395256;MAP_1930;Mattewaribo;true
+Q135395256;MAP_1860-79;Mattewaribo;false
+Q59133031;MAP_1930;Overtoom en Vreeland;true
+Q59133031;MAP_1860-79;Overtoom;false
+Q59116843;MAP_1930;Kweeklust;true
+Q59116843;MAP_1860-79;Kweeklust;false
+Q59116867;MAP_1930;La Diligence;true
+Q59116867;MAP_1860-79;La Diligence;false
+Q59133936;MAP_1930;Topibo;true
+Q59133936;MAP_1860-79;Topibo;false
+Q59115504;MAP_1930;De Vrijheid;true
+Q59115504;MAP_1860-79;De Vrijheid;false
+Q135395208;MAP_1930;Aan Loefbeek;true
+Q135395208;MAP_1860-79;Aan Loefbeek;false
+Q124832147;MAP_1930;Vreeland;true
+Q124832147;MAP_1860-79;Vreeland;false
+Q59133981;MAP_1930;Falkenburg;true
+Q59133981;MAP_1860-79;Falkenburg;false
+Q59118030;MAP_1930;Mijn Hoop;true
+Q59118030;MAP_1860-79;Mijn Hoop;false
+Q130535950;MAP_1930;Celle;true
+Q130535950;MAP_1860-79;Celle;false
+Q124832140;MAP_1930;De Vier Kinderen;true
+Q124832140;MAP_1860-79;De Vier Kinderen;false
+Q124799317;MAP_1930;Gloria;true
+Q124799317;MAP_1860-79;Gloria;false
+Q59116872;MAP_1930;La Liberte;true
+Q59116872;MAP_1860-79;La Liberte;false
+Q59133919;MAP_1930;Tampoea;true
+Q59133919;MAP_1860-79;Tampoea;false
+Q135395268;MAP_1930;Vellerskamp;true
+Q135395268;MAP_1860-79;Vellerskamp;false
+Q59116889;MAP_1930;La Prosperit�;true
+Q59116889;MAP_1860-79;La Prosperit�;false
+Q59115194;MAP_1930;Beaulieu;true
+Q59115194;MAP_1860-79;Beaulieu;false
+Q2711983;MAP_1930;Welgelegen;true
+Q2711983;MAP_1860-79;Welgelegen;false
+Q59115473;MAP_1930;De Nieuwe Hoop;true
+Q59115473;MAP_1860-79;De Nieuwe Hoop;false
+Q59133991;MAP_1930;Aan de Vier Kinderen;true
+Q59133991;MAP_1860-79;Aan de Vier Kinderen;false
+Q59133991;MAP_1930;Aan De Vier Kinderen;true
+Q59133991;MAP_1860-79;Aan De Vier Kinderen;false
+Q135395224;MAP_1930;Charlottenburg;true
+Q135395224;MAP_1860-79;Charlottenburg;false
+Q59115200;MAP_1930;Nieuw Door;true
+Q59115200;MAP_1860-79;Nieuw Door;false
+Q59134216;MAP_1930;Zonderzorg;true
+Q59134216;MAP_1860-79;Zonderzorg;false
+Q59115417;MAP_1930;Crevecoeur;true
+Q59115417;MAP_1860-79;Crevecoeur;false
+Q59133107;MAP_1930;Aan Prosperite;true
+Q59133107;MAP_1860-79;Aan Prosperite;false
+Q59133991;MAP_1930;Aan De Vier Kinderen;true
+Q59133991;MAP_1860-79;Aan De Vier Kinderen;false
+Q135395251;MAP_1930;Marinella;true
+Q135395251;MAP_1860-79;Marinella;false
+Q59115714;MAP_1930;Indigoveld;true
+Q59115714;MAP_1860-79;Indigoveld;false
+Q59134051;MAP_1930;De Waakzaamheid;true
+Q59134051;MAP_1860-79;De Waakzaamheid;false
+Q59132806;MAP_1930;Munchenstein;true
+Q59132806;MAP_1860-79;Munchenstein;false
+Q59133010;MAP_1930;Oranje;true
+Q59133010;MAP_1860-79;Oranje;false
+Q59133010;MAP_1930;Oranje;true
+Q59115536;MAP_1930;Aan de Eendragt;true
+Q59115536;MAP_1860-79;Aan de Eendragt;false
+Q59142787;MAP_1930;Berlijn;true
+Q59142787;MAP_1860-79;Berlijn;false
+Q59115231;MAP_1930;Aan Berlijn;true
+Q59115231;MAP_1860-79;Aan Berlijn;false
+Q135395232;MAP_1930;Drie Zwitsers grond;true
+Q135395232;MAP_1860-79;Drie Zwitsers grond;false
+Q59134249;MAP_1930;Zwitsersgrond;true
+Q59134249;MAP_1860-79;Zwitsersgrond;false
+Q59116942;MAP_1930;Leeuwenberg;true
+Q59116942;MAP_1860-79;Leeuwenberg;false
+Q59115538;MAP_1930;De Eendragt Kompas;true
+Q59115538;MAP_1860-79;De Eendragt Kompas;false
+Q124830360;MAP_1930;De Vrede;true
+Q124830360;MAP_1860-79;De Vrede;false
+Q135395697;MAP_1930;Bethel;true
+Q135395697;MAP_1860-79;Bethel;false
+Q111904390;MAP_1930;Palestina;true
+Q111904390;MAP_1860-79;Palestina;false
+Q125144386;MAP_1930;Bethanie;true
+Q125144386;MAP_1860-79;Bethanie;false
+Q59119458;MAP_1930;Moy;true
+Q59119458;MAP_1860-79;Moy;false
+Q59115675;MAP_1930;Hague;true
+Q59115675;MAP_1860-79;Hague;false
+Q125087711;MAP_1930;Welgelegen;true
+Q125087711;MAP_1860-79;Welgelegen;false
+Q59115673;MAP_1930;Hamilton;true
+Q59115673;MAP_1860-79;Hamilton;false
+Q59117998;MAP_1930;Mary's Hope;true
+Q59117998;MAP_1860-79;Mary's Hope;false
+Q59115217;MAP_1930;Bellevue;true
+Q59115217;MAP_1860-79;Bellevue;false
+Q59115358;MAP_1930;Cardross Park;true
+Q59115358;MAP_1860-79;Cardross Park;false
+Q59133062;MAP_1930;Perseverance;true
+Q59133062;MAP_1860-79;Perseverance;false
+Q59115692;MAP_1930;Hildesheim;true
+Q59115692;MAP_1860-79;Hildesheim;false
+Q135395621;MAP_1930;Rothershide;true
+Q135395621;MAP_1860-79;Rothershide;false
+Q59116979;MAP_1930;Londondery;true
+Q59116979;MAP_1860-79;Londondery;false
+Q59115620;MAP_1930;Glocester;true
+Q59115620;MAP_1860-79;Glocester;false
+Q59115702;MAP_1930;Hope;true
+Q59115702;MAP_1860-79;Hope;false
+Q59115588;MAP_1930;Forgue;true
+Q59115588;MAP_1860-79;Forgue;false
+Q59133158;MAP_1930;Rhijnie;true
+Q59133158;MAP_1860-79;Rhijnie;false
+Q59116932;MAP_1930;Leadshall;true
+Q59116932;MAP_1860-79;Leadshall;false
+Q59133108;MAP_1930;Providence;true
+Q59133108;MAP_1860-79;Providence;false
+Q59134180;MAP_1930;Sealand;true
+Q59134180;MAP_1860-79;Sealand;false
+Q28150537;MAP_1930;Diamond;true
+Q28150537;MAP_1860-79;Diamond;false
+Q135395273;MAP_1860-79;Pearl;false
+Q59133968;MAP_1930;Union;true
+Q59133968;MAP_1860-79;Union;false
+Q59134053;MAP_1930;Waldeck;true
+Q59134053;MAP_1860-79;Waldeck;false
+Q21000083;MAP_1930;Margarethenburg;true
+Q21000083;MAP_1860-79;Margarethenburg;false
+Q135395247;MAP_1930;Lot 11;true
+Q135395247;MAP_1860-79;Lot 11;false
+Q49630506;MAP_1930;Van Drimmelenpolder;true
+Q135395228;MAP_1930;Corantijnpolder;true
+Q28657049;MAP_1930;Botanybay;true
+Q28657049;MAP_1860-79;Botanyday;false
+Q59115617;MAP_1930;Glensander;true
+Q59115617;MAP_1860-79;Glensander;false
+Q28656929;MAP_1930;Huntley;true
+Q28656929;MAP_1860-79;Huntley;false
+Q20967226;MAP_1930;Crappa hoek;true
+Q20967226;MAP_1860-79;Crappa hoek;false
+Q59116999;MAP_1930;Gloria;true
+Q59116999;MAP_1860-79;Gloria;false
+Q59134054;MAP_1930;Waltonhall;true
+Q59134054;MAP_1860-79;Waltonhall;false
+Q59115338;MAP_1930;Bucklebury;true
+Q59115338;MAP_1860-79;Bucklebury;false
+Q135395624;MAP_1930;Sawmillkreekpolder;true
+Q135395624;MAP_1860-79;Sawmillkreekpolder;false
+Q135395221;MAP_1930;Boonackerpolder;true
+Q135395221;MAP_1860-79;Boonackerpolder;false
+Q5646176;MAP_1930;Hamptoncourtpolder;true
+Q5646176;MAP_1860-79;Hamptoncourtpolder;false
+Q20979831;MAP_1930;Longway;true
+Q20979831;MAP_1860-79;Longway;false
+Q21000095;MAP_1930;Plaisance;true
+Q21000095;MAP_1860-79;Plaisance;false
+Q21000089;MAP_1930;Paradise;true
+Q21000089;MAP_1860-79;Paradise;false
+Q135395770;MAP_1930;Phoenix;true
+Q135395770;MAP_1860-79;Phoenix;false
+Q124832148;MAP_1930;Waterloo;true
+Q124832148;MAP_1860-79;Waterloo;false
+Q28150367;MAP_1930;Nursery;true
+Q28150367;MAP_1860-79;Nursery;false
+Q124830732;MAP_1930;Hazard;true
+Q124830732;MAP_1860-79;Hazard;false
+Q59115747;MAP_1930;John;true
+Q59115747;MAP_1860-79;John;false
+Q59115189;MAP_1930;Bantaskine;true
+Q59115189;MAP_1860-79;Bantaskine;false
+Q59115600;MAP_1930;Friendship;true
+Q59115600;MAP_1860-79;Friendship;false
+Q59133938;MAP_1930;Todness;true
+Q59133938;MAP_1860-79;Todness;false
+Q59115396;MAP_1930;Clyde;true
+Q59115396;MAP_1860-79;Clyde;false
+Q59132942;MAP_1930;Novar;true
+Q59132942;MAP_1860-79;Novar;false
+Q1757548;MAP_1930;Johanna Maria;true
+Q1757548;MAP_1860-79;Johanna Maria;false
+Q59115216;MAP_1930;Belladrum;true
+Q59115216;MAP_1860-79;Belladrum;false
+Q124830844;MAP_1930;Hope;true
+Q124830844;MAP_1860-79;Hope;false
+Q59133034;MAP_1860-79;Oxford;false
+Q59133279;MAP_1930;Sarah;true
+Q59133279;MAP_1860-79;Sarah;false
+Q59116940;MAP_1930;Leasowes;true
+Q59116940;MAP_1860-79;Leasowes;false
+Q59133100;MAP_1930;Pot;true
+Q59133100;MAP_1860-79;Pot;false
+Q59133034;MAP_1930;Oxford;true
+Q59133034;MAP_1860-79;Oxford;false
+Q59115340;MAP_1930;Burnside;true
+Q59115340;MAP_1860-79;Burnside;false
+Q59115250;MAP_1860-79;Bijgeval;false
+Q59115250;MAP_1860-79;Bijgeval;false
+Q59115543;MAP_1860-79;Eigenrust;false
+Q59115735;MAP_1930;Johanna Catharina;true
+Q59115735;MAP_1860-79;Johanna Catharina;false
+Q104186199;MAP_1930;Curacao;true
+Q104186199;MAP_1860-79;Curacao;false
+Q59132849;MAP_1930;Nieuw Libanon;true
+Q59132849;MAP_1860-79;Nieuw Libanon;false
+Q59115163;MAP_1930;Antigoa;true
+Q59115163;MAP_1860-79;Antigoa;false
+Q135395246;MAP_1930;La Resolution;true
+Q135395246;MAP_1860-79;La Resolution;false
+Q59115369;MAP_1930;Carolina;true
+Q59115369;MAP_1860-79;Carolina;false
+Q59115431;MAP_1930;Dankbaarheid;true
+Q59115431;MAP_1860-79;Dankbaarheid;false
+Q135395783;MAP_1930;Voorburg;true
+Q135395783;MAP_1860-79;Voorburg;false
+Q59115719;MAP_1930;Jacob's lust;true
+Q59115719;MAP_1860-79;Jacob's lust;false
+Q124831565;MAP_1930;Maria's lust;true
+Q124831565;MAP_1860-79;Maria's lust;false
+Q124831608;MAP_1930;Mon Plaisir;true
+Q124831608;MAP_1860-79;Mon Plaisir;false
+Q59134217;MAP_1930;Zonhoop;true
+Q59134217;MAP_1860-79;Zonhoop;false
+Q59115433;MAP_1930;Daphina's zorg;true
+Q59115433;MAP_1860-79;Daphnina's zorg;false
+Q59115633;MAP_1930;Good Intent;true
+Q59115633;MAP_1860-79;Good Intent;false
+Q59115440;MAP_1930;De Dankbaarheid;true
+Q59115440;MAP_1860-79;De Dankbaarheid;false
+Q59116888;MAP_1930;La Prevoyance;true
+Q59116888;MAP_1860-79;La Prevayance;false
+Q59115314;MAP_1930;Broederschap;true
+Q59115314;MAP_1860-79;Broederschap;false
+Q59115665;MAP_1930;Haarlem;true
+Q59115665;MAP_1860-79;Haarlem;false
+Q59133269;MAP_1930;Sara's lust;true
+Q59133269;MAP_1860-79;Sara's lust;false
+Q59134146;MAP_1930;Windsor forest;true
+Q59134146;MAP_1860-79;Windsor forest;false
+Q124831293;MAP_1930;Libanon;true
+Q124831293;MAP_1860-79;Libanon;false
+Q124830243;MAP_1930;Nieuwe Hoop;true
+Q124830243;MAP_1860-79;De Nieuwe Hoop;false
+Q59134116;MAP_1930;Wilhelmina Catharina Frederica;true
+Q59134116;MAP_1860-79;Wilhelmina Catharina Frederica;false
+Q124831790;MAP_1930;Pietersburg;true
+Q124831790;MAP_1860-79;Pietersburg;false
+Q59115708;MAP_1930;Huwelijkszorg;true
+Q59115708;MAP_1860-79;Huwelijkszorg;false
+Q59115449;MAP_1930;De goede verwachting;true
+Q59115449;MAP_1860-79;De goede verwachting;false
+Q135395222;MAP_1930;Cabenda's hoop;true
+Q135395222;MAP_1860-79;Cabenda's hoop;false
+Q59116898;MAP_1930;La Rencontre;true
+Q59116898;MAP_1860-79;La Rencontre;false
+Q124812970;MAP_1930;Adrichem;true
+Q124812970;MAP_1860-79;Adrichem;false
+Q59134059;MAP_1930;Waterland;true
+Q59134059;MAP_1860-79;Waterland;false
+Q59133871;MAP_1930;St. Eustatius;true
+Q59133871;MAP_1860-79;St. Eustatius;false
+Q59115176;MAP_1930;Augustusberg;true
+Q59115176;MAP_1860-79;Augustusberg;false
+Q59132873;MAP_1930;Nieuw Weergevonden;true
+Q59132873;MAP_1860-79;Nieuw Weergevonden;false
+Q59133868;MAP_1930;St. Barbara;true
+Q59133868;MAP_1860-79;St. Barbara;false
+Q59133045;MAP_1930;Pancabo;true
+Q59133045;MAP_1860-79;Pancabo;false
+Q135395259;MAP_1930;Oud Kroonenburg;true
+Q135395259;MAP_1860-79;Oud Kroonenburg;false
+Q59115634;MAP_1930;Goosen;true
+Q59115634;MAP_1860-79;Goosen;false
+Q124824453;MAP_1930;Carthago;true
+Q124824453;MAP_1860-79;Carthago;false
+Q59133093;MAP_1930;Portorico;true
+Q59133093;MAP_1860-79;Portorico;false
+Q59115345;MAP_1930;Cabo Verde;true
+Q59115345;MAP_1860-79;Cabo Verde;false
+Q59115652;MAP_1930;Groot Chatillon;true
+Q59115652;MAP_1860-79;Groot Chatillon;false
+Q59133118;MAP_1930;Rac � Rac;true
+Q59133118;MAP_1860-79;Rac � Rac;false
+Q59115206;MAP_1930;Berendslust;true
+Q59115206;MAP_1860-79;Beerenrust;false
+Q124823337;MAP_1930;Kaap de Goede Hoop;true
+Q124823337;MAP_1860-79;Kaap de Goede Hoop;false
+Q59115391;MAP_1930;Klaverblad;true
+Q59115391;MAP_1860-79;Klaverblad;false
+Q59133195;MAP_1930;Rorac;true
+Q59133195;MAP_1860-79;Rorac;false
+Q59116811;MAP_1930;Klein Chatillon;true
+Q59116811;MAP_1860-79;Klein Chatillon;false
+Q59115609;MAP_1930;Gelderland;true
+Q59115609;MAP_1860-79;Gelderland;false
+Q124831294;MAP_1930;Libanon;true
+Q124831294;MAP_1860-79;Libanon;false
+Q59115565;MAP_1930;Esther's Lust;true
+Q59115565;MAP_1860-79;Esther's Lust;false
+Q124831789;MAP_1930;Petite versailles;true
+Q124831789;MAP_1860-79;Petite versailles;false
+Q59133870;MAP_1930;St. Domingo;true
+Q59133870;MAP_1860-79;St. Domingo;false
+Q59116816;MAP_1930;Kleine Jaloezie;true
+Q59116816;MAP_1860-79;Kleine Jaloezie;false
+Q59115290;MAP_1930;Bon Avontura;true
+Q59115290;MAP_1860-79;Bon Avontura;false
+Q59115277;MAP_1930;Boavista;true
+Q59115277;MAP_1860-79;Boavista;false
+Q59132877;MAP_1930;Nieuw Hazard;true
+Q59132877;MAP_1860-79;Nieuw Hazard;false
+Q59133934;MAP_1930;Toledo;true
+Q59133934;MAP_1860-79;Toledo;false
+Q59132891;MAP_1930;Nieuwe rust;true
+Q59132891;MAP_1860-79;Nieuwe rust;false
+Q59115631;MAP_1930;De Goede Vrede;true
+Q59115631;MAP_1860-79;De Goede Vrede;false
+Q59133989;MAP_1930;De Verwachting;true
+Q59133989;MAP_1860-79;De Verwachting;false
+Q59115513;MAP_1930;Des Canco;true
+Q59115513;MAP_1860-79;Des Canco;false
+Q59132832;MAP_1930;Bergen op Zoom;true
+Q59132832;MAP_1860-79;Bergen op Zoom;false
+Q59134109;MAP_1930;Wijklust;true
+Q59134109;MAP_1860-79;Wijklust;false
+Q124830793;MAP_1930;L'Hermitage;true
+Q124830793;MAP_1860-79;L'Hermitage;false
+Q59116834;MAP_1930;Koningsbergen;true
+Q59116834;MAP_1860-79;Koningsbergen;false
+Q59133991;MAP_1930;Aan de Vier Kinderen;true
+Q59133991;MAP_1860-79;Aan de Vier Kinderen;false
+Q59133905;MAP_1930;Surimombo;true
+Q59133905;MAP_1860-79;Surimombo;false
+Q59115609;MAP_1930;Gelderland;true
+Q59115609;MAP_1860-79;Gelderland;false
+Q135395260;MAP_1930;Paradijs;true
+Q135395260;MAP_1860-79;Paradijs;false
+Q124830246;MAP_1930;De Vier Gezusters;true
+Q124830246;MAP_1860-79;De Vier Gezusters;false
+Q59116862;MAP_1930;La Confiance;true
+Q59116862;MAP_1860-79;La Confiance;false
+Q59115125;MAP_1930;Abroea;true
+Q59115125;MAP_1860-79;Abroea;false
+Q59117037;MAP_1930;Mahanaim;true
+Q59117037;MAP_1860-79;Maltana�m;false
+Q59133036;MAP_1930;Palmeneribo;true
+Q59133036;MAP_1860-79;Palmeneribo;false
+Q59115297;MAP_1930;Boston;true
+Q59115297;MAP_1860-79;Boston;false
+Q111874789;MAP_1930;Maho;true
+Q111874789;MAP_1860-79;Maho;false
+Q59115627;MAP_1930;Goede moed;true
+Q59115627;MAP_1860-79;Goede moed;false
+Q124831565;MAP_1930;Maria's lust en la Solitude;true
+Q124831565;MAP_1860-79;Maria's lust;false
+Q130535970;MAP_1930;Nooit gedacht;true
+Q130535970;MAP_1860-79;Nooit gedacht;false
+Q59115751;MAP_1930;Karelsburg;true
+Q59115751;MAP_1860-79;Karelsburg;false
+Q59115448;MAP_1930;De Goede Onderneming;true
+Q59115448;MAP_1860-79;De Goede Onderneming;false
+Q124805910;MAP_1930;Weltevreden;true
+Q124805910;MAP_1860-79;Weltevreden;false
+Q59134038;MAP_1930;Vriendslust;true
+Q59134038;MAP_1860-79;Vriendslust;false
+Q59115447;MAP_1930;De goede Intentie;true
+Q59115447;MAP_1860-79;De goede Intentie;false
+Q59115131;MAP_1930;Aitnoch;true
+Q59115131;MAP_1860-79;Aitnoch;false
+Q59115549;MAP_1930;Elisabeth's hoop;true
+Q59115549;MAP_1860-79;Elisabeth's hoop;false
+Q124830731;MAP_1930;Hamburg;true
+Q124830731;MAP_1860-79;Hamburg;false
+Q59133119;MAP_1930;Rachelshoop;true
+Q59133119;MAP_1860-79;Rachelshoop;false
+Q59133827;MAP_1860-79;S�hlen;false
+Q59115651;MAP_1930;Groningerland;true
+Q59115651;MAP_1860-79;Groningerland;false
+Q124832087;MAP_1930;Vaderszorg;true
+Q124832087;MAP_1860-79;Vaderszorg;false
+Q124831605;MAP_1930;Misgunst;true
+Q124831605;MAP_1860-79;Misgunst;false
+Q59116845;MAP_1930;Kweeklust;true
+Q59116845;MAP_1860-79;Kweeklust;false
+Q59117049;MAP_1930;Margaretha's gift;true
+Q59117049;MAP_1860-79;Margaretha's gift;false
+Q104186352;MAP_1930;De Herstelling;true
+Q104186352;MAP_1860-79;De Herstelling;false
+Q59115515;MAP_1930;Dirkshoop;true
+Q59115515;MAP_1860-79;Dirkshoop;false
+Q135395226;MAP_1930;Columbia;true
+Q135395226;MAP_1860-79;Columbia;false
+Q59116887;MAP_1930;La Poule;true
+Q59116887;MAP_1860-79;La Poule;false
+Q59115744;MAP_1930;Johannishoop;true
+Q59115744;MAP_1860-79;Johanna's hoop;false
+Q59132789;MAP_1930;Monitor;true
+Q59132789;MAP_1860-79;Monitor;false
+Q59115446;MAP_1930;De Goede Hoop;true
+Q59115446;MAP_1860-79;De Goede Hoop;false
+Q137791004;MAP_1860-79;Gratti;false
+Q135395236;MAP_1930;Gerar;true
+Q135395236;MAP_1860-79;Gerar;false
+Q59115717;MAP_1930;Isaaks hoop;true
+Q59115717;MAP_1860-79;Isaaks hoop;false
+Q59133845;MAP_1930;La Sonnette;true
+Q59133845;MAP_1860-79;La Sonnette;false
+Q59115497;MAP_1930;De Vier Hendrikken;true
+Q59115497;MAP_1860-79;De Vier Hendrikken;false
+Q59116945;MAP_1930;Lemmershoop;true
+Q59116945;MAP_1860-79;Lemmershoop;false
+Q135395234;MAP_1930;Ernesborn;true
+Q135395234;MAP_1860-79;Ernesborn;false
+Q59133881;MAP_1930;Staf Aarons;true
+Q59133881;MAP_1860-79;Staf Aarons;false
+Q59116900;MAP_1930;La Resource;true
+Q59116900;MAP_1860-79;La Ressource;false
+Q59116875;MAP_1930;La Nouvelle Enterprise;true
+Q59116875;MAP_1860-79;La Nouvelle Enterprise;false
+Q59134141;MAP_1930;Willemshoop;true
+Q59134141;MAP_1860-79;Willemshoop;false
+Q59116905;MAP_1930;La Solitude;true
+Q59116905;MAP_1860-79;La Solitude;false
+Q59115136;MAP_1930;Albion;true
+Q59115136;MAP_1860-79;Albion;false
+Q59134143;MAP_1930;Willemstad;true
+Q59134143;MAP_1860-79;Willemstad;false
+Q59115740;MAP_1930;Petronella;true
+Q59115740;MAP_1860-79;Johanna Petronella;false
+Q59115592;MAP_1930;Frankfort;true
+Q59115592;MAP_1860-79;Frankfort;false
+Q59133104;MAP_1930;Practica;true
+Q59133104;MAP_1860-79;Practica;false
+Q59115274;MAP_1930;Blokkenbosch;true
+Q59115274;MAP_1860-79;Blokkenbosch;false
+Q59132760;MAP_1930;Mon Affaire;true
+Q59132760;MAP_1860-79;Mon Affaire;false
+Q124831359;MAP_1930;Ma Retraite;true
+Q124831359;MAP_1860-79;Ma Retraite;false
+Q2610103;MAP_1930;Beninenburg;true
+Q2610103;MAP_1860-79;Beninenburg;false
+Q59133983;MAP_1930;Venlo;true
+Q59133983;MAP_1860-79;Venlo;false
+Q59115406;MAP_1930;Coresburg;true
+Q59115406;MAP_1860-79;Coresburg;false
+Q59133872;MAP_1930;St. Germain;true
+Q59133872;MAP_1860-79;St. Germain;false
+Q59115691;MAP_1930;Hiesveld;true
+Q59115691;MAP_1860-79;Hiesveld;false
+Q124805954;MAP_1930;Weltevreden;true
+Q124805954;MAP_1860-79;Weltevreden;false
+Q3363363;MAP_1930;Akkerboom;true
+Q3363363;MAP_1860-79;Akkerboom;false
+Q59132908;MAP_1930;Nieuw Grond;true
+Q59132908;MAP_1860-79;Nieuw Grond;false
+Q3255570;MAP_1930;Beekenhorst;true
+Q3255570;MAP_1860-79;Beckenshorst;false
+Q59134046;MAP_1930;Vrouwenvlijt;true
+Q59134046;MAP_1860-79;Vrouwenvlijt;false
+Q59134105;MAP_1930;Welgemoed en Toevlugt;true
+Q59134105;MAP_1860-79;Welgemoed en Toevlugt;false
+Q59115487;MAP_1930;De Uitvlugt;true
+Q59115487;MAP_1860-79;De Uitvlugt;false
+Q59115492;MAP_1930;De Vier Gezusters;true
+Q59115492;MAP_1860-79;De Vier Gezusters;false
+Q59116860;MAP_1930;La Campagne;true
+Q59116860;MAP_1860-79;La Campagne;false
+Q59115409;MAP_1930;Cornelisvriendschap;true
+Q59115409;MAP_1860-79;Cornelisvriendschap;false
+Q124831652;MAP_1930;Montpellier;true
+Q124831652;MAP_1860-79;Montpellier;false
+Q1840866;MAP_1930;Nieuwzorg;true
+Q1840866;MAP_1860-79;Nieuwzorg;false
+Q59116902;MAP_1930;La Sangsue;true
+Q59116902;MAP_1860-79;La Sangsue;false
+Q59133051;MAP_1930;Patientie;true
+Q59133051;MAP_1860-79;Patientie;false
+Q59116964;MAP_1930;Liefdenshoop;true
+Q59116964;MAP_1860-79;Liefdenshoop;false
+Q59133950;MAP_1930;Tulpenburg;true
+Q59133950;MAP_1860-79;Tulpenburg;false
+Q13637207;MAP_1930;Fortuin;true
+Q13637207;MAP_1860-79;Fortuin;false
+Q137554028;MAP_1930;Dageraad;true
+Q137554028;MAP_1860-79;Dageraad;false
+Q124830525;MAP_1930;Gelre;true
+Q124830525;MAP_1860-79;Gelre;false
+Q59118025;MAP_1930;Mijn Geluk;true
+Q59118025;MAP_1860-79;Mijn Geluk;false
+Q59133261;MAP_1930;Sans Souci;true
+Q59133261;MAP_1860-79;Sans Souci;false
+Q59117993;MAP_1930;Mariendal;true
+Q59117993;MAP_1860-79;Mariendal;false
+Q2184790;MAP_1930;Saltzhalen;true
+Q2184790;MAP_1860-79;Saltzhalen;false
+Q2868386;MAP_1930;Welbedacht;true
+Q2868386;MAP_1860-79;Welbedacht;false
+Q124831242;MAP_1930;La Solitude;true
+Q124831242;MAP_1860-79;La Solitude;false
+Q124831724;MAP_1930;Oostenhuysen;true
+Q124831724;MAP_1860-79;Oostenhuysen;false
+Q2188906;MAP_1930;Hooijland;true
+Q2188906;MAP_1860-79;Hooijland;false
+Q59115462;MAP_1930;De Hulp;true
+Q59115462;MAP_1860-79;De Hulp;false
+Q59134050;MAP_1930;Vide Bouteille;true
+Q59134050;MAP_1860-79;Vide Bouteille;false
+Q59115168;MAP_1930;Argent Court;true
+Q59115168;MAP_1860-79;Argent Court;false
+Q124831918;MAP_1930;Sinabo;true
+Q135395212;MAP_1930;Aan Tulpenburg;true
+Q135395212;MAP_1860-79;Aan Tulpenburg;false
+Q28657104;MAP_1930;Nieuwe Aanleg;true
+Q28657104;MAP_1860-79;Nieuwe Aanleg;false
+Q59117036;MAP_1930;Magdalena's burg;true
+Q59117036;MAP_1860-79;Magdalena's burg;false
+Q59132800;MAP_1930;Montauban;true
+Q59132800;MAP_1860-79;Montaubon;false
+Q131413989;MAP_1930;Languedoc;true
+Q131413989;MAP_1860-79;Languedoc;false
+Q135395264;MAP_1930;Roepel;true
+Q135395264;MAP_1860-79;Roepel;false
+Q135395215;MAP_1930;Aan Welgemoed en Toevlugt;true
+Q135395215;MAP_1860-79;Aan Welgemoed en Toevlugt;false
+Q135395262;MAP_1930;Pottendorf;true
+Q135395262;MAP_1860-79;Pottendorf;false
+Q59116956;MAP_1860-79;Leyerdorp;false
+Q59115192;MAP_1930;Batavia;true
+Q59115192;MAP_1860-79;Batavia;false
+Q59133087;MAP_1930;Pomona;true
+Q59133087;MAP_1860-79;Pomona;false
+Q4465180;MAP_1930;Lustrijk;true
+Q4465180;MAP_1860-79;Lustrijk;false
+Q59116824;MAP_1930;Klein Polen;true
+Q59116824;MAP_1860-79;Klein Polen;false
+Q2777030;MAP_1930;Slootwijk;true
+Q2777030;MAP_1860-79;Slootwijk;false
+Q59133129;MAP_1930;De Resolutie;true
+Q59133129;MAP_1860-79;De Resolutie;false
+Q1831145;MAP_1930;Schoonoord;true
+Q1831145;MAP_1860-79;Schoonoord;false
+Q59116848;MAP_1930;l'Embarras;true
+Q59116848;MAP_1860-79;l'Embarras;false
+Q59118001;MAP_1930;Mawakkabo;true
+Q59118001;MAP_1860-79;Triangel;false
+Q124832082;MAP_1860-79;Toevlugt;false
+Q4392658;MAP_1930;Geijersvlijt;true
+Q4392658;MAP_1860-79;Geijersvlijt;false
+Q59133831;MAP_1930;Siparipabo;true
+Q59133831;MAP_1860-79;Siparipabo;false

@@ -1,0 +1,68 @@
+%%{ init: { 'theme': 'default' } }%%
+%% Plantation Data Model - Overview
+%% For detailed views, see:
+%% - plantages-conceptual.mmd  (Ontology: CIDOC-CRM, PICO, SKOS, GeoSPARQL)
+%% - plantages-datasources.mmd (Data mapping: CSV columns → model properties)
+
+graph TB
+    subgraph PLANTATION["stm:Plantation (wd:Qxxxxxx)"]
+        P["<b>Dual-Typed Entity</b><br/>crm:E24_Physical_Human-Made_Thing<br/>sdo:Organization<br/>stm:Plantation"]
+    end
+
+    subgraph IDENTITY["Identifiers"]
+        QID["<b>@id</b>: Wikidata Q-ID"]
+        PSUR["<b>stm:psurId</b>: PSUR####"]
+    end
+
+    subgraph NAMING["Names (SKOS)"]
+        PREF["<b>skos:prefLabel</b> @nl<br/>(latest known)"]
+        PREF_SRN["<b>skos:prefLabel</b> @srn<br/>(Sranantongo)"]
+        ALT["<b>skos:altLabel</b><br/>+ validFrom/Through + source"]
+    end
+
+    subgraph PHYSICAL["Physical (E24 + GeoSPARQL)"]
+        GEOM["<b>geo:hasGeometry</b><br/>polygon + source"]
+        STATUS["<b>stm:status</b><br/>built | planned | abandoned"]
+    end
+
+    subgraph RELATIONS["Relations (CIDOC-CRM)"]
+        HASPART["<b>crm:P46_is_composed_of</b><br/>→ split plantations"]
+        PARTOF["<b>crm:P46i_forms_part_of</b><br/>→ merged plantation"]
+        OWNED["<b>crm:P52_has_current_owner</b><br/>→ owning plantation"]
+    end
+
+    subgraph DEPICTIONS["Map Depictions (CIDOC-CRM)"]
+        MAP["<b>crm:P138i_has_representation</b><br/>→ stm:MapDepiction"]
+    end
+
+    subgraph ORG["Organization (PICO)"]
+        ADDTYPE["<b>sdo:additionalType</b><br/>→ wd:Q188913"]
+        AFF["<b>sdo:affiliation</b><br/>← PersonObservation (future)"]
+    end
+
+    subgraph OBS["Observations (Almanakken)"]
+        ALMANAK["<b>stm:hasObservation</b><br/>→ stm:PlantationObservation<br/>(year, product, enslaved count, etc.)"]
+    end
+
+    %% Connections
+    P --- QID
+    P --- PSUR
+    P --- PREF
+    P --- PREF_SRN
+    P --- ALT
+    P --- GEOM
+    P --- STATUS
+    P --- HASPART
+    P --- PARTOF
+    P --- OWNED
+    P --- MAP
+    P --- ADDTYPE
+    P -.-> AFF
+    P --- ALMANAK
+
+    %% Styling
+    classDef core fill:#e1f5fe,stroke:#01579b,stroke-width:3px,color:#000
+    classDef future fill:#eceff1,stroke:#607d8b,stroke-dasharray: 5 5,color:#000
+
+    class P core
+    class AFF future

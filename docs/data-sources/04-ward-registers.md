@@ -42,13 +42,13 @@ See [pico-model.md](../concepts/pico-model.md) for full analysis of this schema.
 
 ### Purpose & Description
 
-Since 1828, the colonial government of Suriname made an annual registration of the non-enslaved free inhabitants of the city. The registers have been partially preserved for 18 years. These "Ward Registers" are now available as a single CSV dataset. For more detailed information, consult the documentation.
+Since 1828, the colonial government of Suriname made an annual registration of the non-enslaved free inhabitants of the city. The registers have been partially preserved for 18 years. These "Ward Registers" are now available as a single CSV dataset. For more detailed information, consult the documentation or the datapaper (TSEG 2025): https://doi.org/10.52024/x5vgg810 
 
 The dataset includes:
 
-- Person demographics (name, age, sex, ethnicity, religion)
+- Person demographics (name, age, sex, ethnicity, religion, occupation)
 - Household information (free persons count by type)
-- Enslaved persons (count per household)
+- Enslaved persons (count per household) (from 1836 onwards)
 - Address information (detailed street-level)
 - Location codes (using historical numbering systems)
 - Administrative fields (register type, ward number)
@@ -64,101 +64,113 @@ Based on the source documentation screenshot:
 
 | Field     | Type        | Description                       | Example | Crucial for Linking | Primary Information |
 | --------- | ----------- | --------------------------------- | ------- | ------------------- | ------------------- |
-| `Id`      | integer     | Record identifier                 |         |                     |                     |
-| `Ark`     | text/string | Archive code (e.g., `1.04.08.01`) |         |                     |                     |
-| `Inv`     | integer     | Inventory number                  |         |                     |                     |
-| `Scan_Id` | text/string | Scan(image) identifier            |         |                     |                     |
-| `Scan`    | bool/string | URL to digitized original scan    |         |                     |                     |
-| `Year`    | integer     | Level (year)                      |         |                     |                     |
+| `Id`      | integer     | Record identifier                 |     60713    |         In the future: yes, if we start linking persons within this dataset and with external person data            |          No           |
+| `Arch`     | text/string | Archive code (e.g., `1.04.08.01`) |    1.05.08.01     |          No         |         Perhaps for provenance          |
+| `Inv`     | integer     | Inventory number                  |    669     |          No           |         No            |
+| `Kaart Id` | text/string | Scan(image) identifier            |   1840f73      |         Only if we want to be able to refer to all entries on one card (meaning all free inhabitants on a certain address in a certain year)             |          No           |
+| `Scan`    | bool/string | URL to digitized original scan    |   https://www.nationaalarchief.nl/onderzoeken/archief/1.05.08.01/invnr/669/file/NL-HaNA_1.05.08.01_669_0079      |         Yes for linking to the orig source / provenance            |          Yes           |
+| `Jaar`    | integer     | Level (year)                      |     1840    |        Yes if you want to be able to limit linking to a certain year             |         Yes            |
 
 ### Person Information - Name
 
 | Field           | Type        | Description                         | Crucial for Linking | Primary Information |
 | --------------- | ----------- | ----------------------------------- | ------------------- | ------------------- |
-| `Voornaam`      | text/string | First name/given name(s)            |                     |                     |
-| `Tussenvoesel`  | text/string | Name prefix(es) (e.g., `van`, `de`) |                     |                     |
-| `Achternaam`    | text/string | Surname/family name                 |                     |                     |
-| `Patroon`       | text/string | Patron name (e.g., `van 't`)        |                     |                     |
-| `Naamtype`      | text/string | Unique name                         |                     |                     |
-| `Geboorteland`  | text/string | Origin (place)                      |                     |                     |
-| `Ov_Dec_Borrow` | text/string | First name of deceased spouse       |                     |                     |
-| `Suffix`        | text/string | Suffix (e.g., `Jr`)                 |                     |                     |
-
+| `Voornaam`      | text/string | First name/given name(s) .           |          Depends on how we will link to other person observations, I assume this will be done via person IDs and thse are not (yet) in this dataset           |         Yes            |
+| `Tussenvoegsel`  | text/string | Name prefix(es) (e.g., `van`, `de`). Note that prefixes have additional meaning in Suriname, 'van' can indicate a manumission name, referring to the previous owner |         Idem            |         Yes            |
+| `Achternaam`    | text/string | Surname/family name. Note that people in slavery were not allowed surnames                 |       Idem              |           Yes          |
+| `Meisjesnaam`       | text/string | Maiden name, the surname of a married woman before marriage        |          Idem           |          Yes           |
+| `Weduwe`      | text/string |           Field contains 'weduwe' if the person was widow                |            Idem         |           Nice to have           |
+| `Fn_Dec_Spouse` | text/string | First name of deceased (male) spouse       |        Idem             |         No  -- in the linked data modelling the deceased husband should lead to a new person observation            |
+| `Suffix`        | text/string | Suffix (e.g., `Jr`)                 |        Idem             |           Nice to have           |
+| `Prefix`        | text/string | Prefix (e.g., 'de vrije', 'mr.')                 |          Idem            |        Nice to have             |
 ### Person Information - Demographics
 
 | Field       | Type        | Description                                                | Notes                       | Crucial for Linking | Primary Information |
 | ----------- | ----------- | ---------------------------------------------------------- | --------------------------- | ------------------- | ------------------- |
-| `Religie`   | text/string | Religion - original                                        |                             |                     |                     |
-| `Rel_Std`   | text/string | Religion - standardized level DAIS                         | Standardized classification |                     |                     |
-| `Leeftijd`  | mixed/float | Age in years (can include fractions like `0.5` for months) |                             |                     |                     |
-| `Ethnicity` | text/string | Ethnicity                                                  |                             |                     |                     |
-| `Sex`       | text/string | Sex (`M` for male, `V` for female)                         |                             |                     |                     |
-| `Beroep`    | text/string | Occupation/profession                                      |                             |                     |                     |
-| `Burgerst`  | text/string | Civil/marital status                                       |                             |                     |                     |
+| `Religie`   | text/string | Religion - normalized                                       |            Normalized notation of religion                 |           No: assuming we link person observations outside in a separate operation          |          Yes           |
+| `Rel_Std`   | text/string | Religion - standardized level DAIS                         | Standardized classification, useful for research purposes but better use the normalized terms for presentation |           No          |          No           |
+| `Leeftijd`  | mixed/float | Normalized age in years (can include fractions like `0.5` for months) |                             |        No            |          Yes           |
+| `Ethnicity` | text/string | Ethnicity                                                  |       Normalized. Contemporary ethnic classification referring to skin color. The n-word is replaced by 'Zwarte'.                   |           No          |           Yes          |
+| `Sex`       | text/string | Sex (`M` for male, `V` for female)                         |                             |            No         |         Yes            |
+| `Beroep`    | text/string | Occupation/profession                                      |                            |           No          |           Yes          |
 
-### Household Composition - Free Persons
+| `Herkomst`  | text/string | Place of origin (place)                      |           No          |          Yes           |
+
+### Household Composition - Enslaved Persons (tabular data)
+
+These fields represent the tabular information that describes the number of enslaved persons present at a certain address, usually attached to a free person on the same row on the card. The following attributes are used: 
+
+- X = colored 
+- B = black 
+- m = male
+- f = female
+- a = adult
+- c = child
+
+In the rdf representation of the data, for each person mentioned this way there is a (nameless) person observation. In combination with the owner, we can potentially link this nameless person observation to a person observation in the Slave Registers.
 
 | Field | Type    | Description                                        | Crucial for Linking | Primary Information |
 | ----- | ------- | -------------------------------------------------- | ------------------- | ------------------- |
-| `Hwa` | integer | Number of free adult males - cross-referenced      |                     |                     |
-| `Vba` | integer | Number of free adult females - cross-referenced    |                     |                     |
-| `Hwb` | integer | Number of free male children - uncrossreferenced   |                     |                     |
-| `Vbb` | integer | Number of free female children - uncrossreferenced |                     |                     |
-| `Hwc` | integer | Number of free adult males - heathen               |                     |                     |
-| `Vbc` | integer | Number of free adult females - heathen             |                     |                     |
-| `Hwi` | integer | Number of free male children - (heathen)           |                     |                     |
-| `Vbi` | integer | Number of free female children - (heathen)         |                     |                     |
-| `ink` | integer | Number of persons with unknown demographics        |                     |                     |
+| `Xma` | integer | Number of enslaved adult males (mixed ethnicity) - cross-referenced      |          No           |           Yes          |
+| `Xfa` | integer | Number of enslaved adult females - cross-referenced    |          Idem, etc.           |        Idem, etc             |
+| `Xmc` | integer | Number of enslaved male children - uncrossreferenced   |                     |                     |
+| `Xfc` | integer | Number of enslaved female children - uncrossreferenced |                     |                     |
+| `Bma` | integer | Number of enslaved adult males (African origin) - heathen               |                     |                     |
+| `Bfa` | integer | Number of enslaved adult females - heathen             |                     |                     |
+| `Bmc` | integer | Number of enslaved male children - (heathen)           |                     |                     |
+| `Bfc` | integer | Number of enslaved female children - (heathen)         |                     |                     |
+| `Unk` | integer | Number of enslaved persons with unknown demographics        |                     |                     |
 
-### Enslaved Persons
+### Person attributes and comments
 
 | Field                   | Type        | Description                 | Crucial for Linking | Primary Information |
 | ----------------------- | ----------- | --------------------------- | ------------------- | ------------------- |
-| `Enslaved`              | text/string | Enslaved status indicator   |                     |                     |
-| `Aantal_Slaafgemaakten` | integer     | Count of enslaved persons   |                     |                     |
-| `Sloneman`              | text/string | Enslaved information detail |                     |                     |
-| `Medel_Members`         | text/string | Family members              |                     |                     |
-| `Response_Members`      | text/string | Additional members          |                     |                     |
-| `Eigenaar`              | text/string | Owner's name                |                     |                     |
+| `Enslaved`              | text/string | Enslaved status indicator: value '1' indicates that the person in this row in the dataset is enslaved   |           No          |        No             |
+| `Aantal_Slaafgemaakten` | integer     | Count of enslaved persons in this row of the dataset  |         No            |          No           |
+| `Diverse`              | text/string | Original comments (in Dutch) |        No             |           Yes - preferable show in presentation of data            |          |
+| `Enslaved_Remarks`         | text/string |  Remarks about the enslaved on this address              |            No         |        Yes - preferable show in presentation of data            |
+| `Freeperson_Remarks`      | text/string |  Remarks about the free person(s) on this address          |         No            |        Yes - preferable show in presentation of data            |             |
+| `Eigenaar`              | text/string |  Owner of the property (house and/or land parcel)                |                     |           Yes - preferable show in presentation of data            |          |
+| `Annotaties`              | text/string |  Annotations added by the transcribers about the person                |           No          |          Yes - preferable show in presentation of data  (with sufficient explanation)          |           |
 
 ### Address Information
 
 | Field                             | Type        | Description                                            | Notes | Crucial for Linking | Primary Information |
 | --------------------------------- | ----------- | ------------------------------------------------------ | ----- | ------------------- | ------------------- |
-| `Annotaties`                      | text/string | Annotations/notes                                      |       |                     |                     |
-| `Oiv`                             | text/string | District/ward                                          |       |                     |                     |
-| `wijkletter`                      | text/string | Ward/district letter code                              |       |                     |                     |
-| `Straatnaam`                      | text/string | Street name (old)                                      |       |                     |                     |
-| `Housnummer`                      | text/string | House number (in `M+` entry)                           |       |                     |                     |
-| `Adres_Huiding_anno`              | text/string | Address direction (suppression): e.g., `Prins`, `Oost` |       |                     |                     |
-| `Adres_Lat_code_het_a_oost_zijde` | text/string | Location on street: `a=oost zijde, zo=z oost zijde`    |       |                     |                     |
-| `Adres_Aanvulling`                | text/string | Address supplement                                     |       |                     |                     |
-| `source`                          | text/string | Source description (e.g., `N house`, `N1 house`)       |       |                     |                     |
-| `Buurt`                           | text/string | Neighborhood                                           |       |                     |                     |
+|                   
+| `Wijk`                             | text/string | District/ward                                          |       |           No          |           Yes - preferable show in presentation of data           |
+| `wijkletter`                      | text/string | Ward/district letter code                              |      |        Yes: a unique location code must be created from 1. wijkletter 2. Brt code (if available) 3. huisnummer           |          No           |
+| `Straatnaam`                      | text/string | Street name                                     |       |          No           |       Yes - preferable show in presentation of data               |
+| `Huisnummer`                      | text/string | House number (in `M+` entry)                           |       |           Yes          |          No           |
+| `Adres_Richting_Aanv`              | text/string | Address direction (supplement): e.g., `Prins`, `Oost` |       |         No            |          No           |
+| `Adres_Aanvulling` | text/string | Extra location info, e.g. `a=oost zijde, zo=z oost zijde`    |       |         No            |         No            |
+| `Kamer`                | text/string | Address supplement: indication of the room                                     |       |         No            |          Yes - preferable show in presentation of data           |
+| `Buurt`                          | text/string | Source description (e.g., `N house`, `N1 house`)       |       |             No        |          No           |
+| `Brt`                           | text/string | Neighborhood code. For pre-1836 addresses it is necessary to know the neighborhood code to establish the exact address                                           |       |           Yes          |          Yes           |
 
 ### Location Codes
 
 | Field                | Type        | Description                                           | Crucial for Linking | Primary Information |
 | -------------------- | ----------- | ----------------------------------------------------- | ------------------- | ------------------- |
-| `BN`                 | text/string | Location code                                         |                     |                     |
-| `Ov`                 | text/string | Old numbering system code                             |                     |                     |
-| `Nw`                 | text/string | New numbering system code                             |                     |                     |
-| `Locatie`            | text/string | Location description                                  |                     |                     |
-| `Adres_Master`       | text/string | Standardized address                                  |                     |                     |
-| `Generation_Maptype` | text/string | Generation/cross-reference to other numbering systems |                     |                     |
-| `Address_Ful`        | text/string | Formatted full address                                |                     |                     |
+| 
+| `Ow`                 | text/string | Reference to old numbering system in post 1836 data                              |            No         |       No              |
+| `Nw`                 | text/string | Reference to new numbering system (only in 1834)                             |           No          |       No              |
+| `Locatie`            | text/string | Remarks about the location,  e.g. if undeveloped land, etc.                                  |           No          |          Yes - preferable show in presentation of data           |
+| `Adres_Remarks`       | text/string | Remarks specifically about the address, often remarks by transcriptors about errors                                  |           No          |          No           |
+| `Concordans_Muntjw` | text/string | Cross-reference to Muntjewerff's Concordans |           No          |            No         |
+| `Address_Full`        | text/string | Formatted full address                                |          No           |        Yes: this is the main label for the address             |
 
 ### Administrative Fields
 
 | Field       | Type        | Description                              | Crucial for Linking | Primary Information |
 | ----------- | ----------- | ---------------------------------------- | ------------------- | ------------------- |
-| `G_Orden`   | integer     | Sort order                               |                     |                     |
-| `Register`  | text/string | Register type (`W=Registers Paramaribo`) |                     |                     |
-| `Onderdeel` | text/string | Living counts number                     |                     |                     |
+| `S_Order`   | integer     | Original sort order of the transcribed table                               |         No            |          No           |
+| `Register`  | text/string | Register type (`W=Registers Paramaribo`) |       No              |             No        |
+| `Archieftoegang` | text/string |        Full name of the archival source              |            No         |        No             |
 
 ### Original Data Fields
 
-These preserve the original values before standardization:
+These preserve the original values before standardization. These can all be ignored for our purposes.
 
 | Field               | Type        | Description                                                          | Crucial for Linking | Primary Information |
 | ------------------- | ----------- | -------------------------------------------------------------------- | ------------------- | ------------------- |
@@ -304,11 +316,17 @@ erDiagram
 
 1. **Person deduplication challenge**: Same person appears across multiple years (1828-1847).
 
+This will be done by the HDSC (Matthias Rosenbaum-Feldbrügge)
+
 2. **Address normalization needed**: Complex street standardization with multiple systems.
+
+To make the address data operable, we need Muntjewerff's concordans: https://www.concordansparamaribo.info/concordans/concordans-2022 (perhaps we should add this as yet another dataset...)
 
 3. **Temporal person tracking**: Track same individual across registration years.
 
 4. **Household vs Person**: Need to separate household-level (enslaved counts) from person-level data.
+
+We tried to solve this in the rdf version of the data.
 
 ### Questions to Investigate
 
@@ -316,7 +334,7 @@ erDiagram
 - [ ] How do ward letters map to modern Paramaribo neighborhoods?
 - [ ] What is the relationship between `Eigenaar` (owner) and person record?
 - [ ] How does this overlap with Birth/Death certificate addresses?
-
+- [ ] How can we link enslaved persons in the WR to the enslaved persons in the Slave registers (via the owner)?
 ---
 
 ## Related Datasets

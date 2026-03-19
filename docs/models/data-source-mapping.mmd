@@ -1,0 +1,293 @@
+---
+title: Suriname Time Machine - Comprehensive Data Model
+---
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#e8f4ea', 'fontSize': '13px'}}}%%
+flowchart TB
+    %% =============================================================
+    %% LEFT: QGIS CSV COLUMNS
+    %% =============================================================
+
+    subgraph QGIS["plantation_polygons_1930.csv"]
+        direction TB
+        Q_fid["fid"]
+        Q_coords["coords (WKT)"]
+        Q_label_1930["label_1930"]
+        Q_label_1860["label_1860-79"]
+        Q_plantation_label["plantation_label"]
+        Q_qid["qid (Wikidata Q-ID)"]
+        Q_qid_alt["qid_alt"]
+        Q_psur["psur_id / psur_id2 / psur_id3"]
+    end
+
+    %% =============================================================
+    %% RIGHT: ALMANAKKEN CSV COLUMNS
+    %% =============================================================
+
+    subgraph ALM["Plantations Surinaamse Almanakken v1.0.csv"]
+        direction TB
+
+        subgraph ALM_CORE["Core columns"]
+            A_recordid["recordid"]
+            A_year["year"]
+            A_plantation_id["plantation_id (Q-ID)"]
+            A_plantation_org["plantation_org"]
+            A_plantation_std["plantation_std"]
+        end
+
+        subgraph ALM_PEOPLE["Person columns"]
+            A_eigenaren["eigenaren"]
+            A_administrateurs["administrateurs"]
+            A_directeuren["directeuren"]
+        end
+
+        subgraph ALM_ENRICH["Enrichment columns"]
+            A_slaven["slaven"]
+            A_product["product_std"]
+            A_deserted["deserted"]
+            A_loc_std["loc_std"]
+            A_size["size_std"]
+            A_page["page"]
+        end
+
+        subgraph ALM_STRUCT["Structural columns"]
+            A_psur["psur_id"]
+            A_split["split1_id .. split5_id"]
+            A_partof["part_of_id"]
+            A_ref["reference_std_id"]
+        end
+    end
+
+    %% =============================================================
+    %% CENTER: CIDOC-CRM ENTITIES
+    %% =============================================================
+
+    subgraph CIDOC["CIDOC-CRM Entities"]
+        direction TB
+
+        E24["E24 Physical Human-Made Thing
+        THE PLANTATION
+        URI: stm:plantation/slug"]
+
+        E53["E53 Place
+        Location / geometry
+        URI: stm:place/year/fid-N"]
+
+        E74["E74 Group / sdo:Organization
+        Legal entity operating plantation
+        URI: wd:Q-ID"]
+
+        E74_ALT["E74 Group
+        Absorbed / former org
+        URI: wd:qid_alt"]
+
+        E74_PARENT["E74 Group
+        Parent combined plantation
+        URI: wd:part_of_id"]
+
+        E74_REF["E74 Group
+        Reference plantation
+        URI: wd:reference_std_id"]
+
+        E41_MAP["E41 Appellation
+        Map label identifies E24
+        Carried by E22 Map"]
+
+        E41_ALM["E41 Appellation
+        Almanac name identifies E74
+        Carried by E22 Almanac"]
+
+        E41_STD["E41 Appellation
+        Standardized name
+        Modern normalization"]
+
+        OBS["OrganizationObservation
+        Annual snapshot from Almanakken
+        URI: stm:obs/recordid"]
+
+        POBS["PersonObservation
+        Raw name from source
+        PICO model"]
+
+        E22_MAP["E22 Human-Made Object
+        Physical map artifact"]
+
+        E22_ALM["E22 Human-Made Object
+        Physical almanac volume"]
+    end
+
+    %% =============================================================
+    %% QGIS -> ENTITIES
+    %% Geometry and physical plantation from map digitization
+    %% =============================================================
+
+    Q_fid -->|"stm:fid"| E53
+    Q_coords -->|"geo:hasGeometry / geo:asWKT
+    (GeoSPARQL for spatial data)"| E53
+
+    Q_label_1930 -->|"P190 has symbolic content
+    (creates E41 carried by 1930 map)"| E41_MAP
+    Q_label_1860 -->|"P190 has symbolic content
+    (creates alt E41 via P139)"| E41_MAP
+
+    Q_plantation_label -->|"skos:prefLabel
+    (display convenience only)"| E24
+
+    Q_qid -->|"P52 has current owner
+    (E18 Physical Thing -> E39 Actor)"| E74
+
+    Q_qid_alt -->|"P51 has former or current owner
+    (historical ownership before merger)"| E74_ALT
+
+    Q_psur -->|"skos:closeMatch
+    (researcher-assigned, flawed)"| E74
+
+    %% =============================================================
+    %% ALMANAKKEN -> ENTITIES
+    %% Annual observations from historical almanac publications
+    %% =============================================================
+
+    A_recordid -->|"URI identifier"| OBS
+    A_year -->|"stm:observationYear"| OBS
+    A_plantation_id -->|"stm:observationOf
+    (Q-ID links to same E74)"| E74
+
+    A_plantation_org -->|"P190 has symbolic content
+    (raw name as written in source)"| E41_ALM
+    A_plantation_std -->|"P190 has symbolic content
+    (modern standardized form)"| E41_STD
+
+    A_slaven -->|"stm:enslavedCount"| OBS
+    A_product -->|"stm:hasProduct"| OBS
+    A_deserted -->|"stm:isDeserted"| OBS
+    A_loc_std -->|"stm:locationStd
+    (string for now; future E53)"| OBS
+    A_size -->|"stm:sizeAkkers"| OBS
+    A_page -->|"stm:pageReference
+    (provenance; future IIIF link)"| OBS
+
+    A_eigenaren -->|"stm:hasOwner
+    (picot:owner role)"| POBS
+    A_administrateurs -->|"stm:hasAdministrator
+    (picot:administrator role)"| POBS
+    A_directeuren -->|"stm:hasDirector
+    (picot:director role)"| POBS
+
+    A_psur -->|"skos:closeMatch
+    (same caveats as QGIS psur)"| E74
+
+    A_split -->|"stm:absorbedInto
+    (split orgs merged into this one)"| E74
+
+    A_partof -->|"P107i is member of
+    (CIDOC-CRM: org belongs to
+    larger group)"| E74_PARENT
+
+    A_ref -->|"stm:referencedBy
+    (almanac cross-reference)"| E74_REF
+
+    %% =============================================================
+    %% CIDOC-CRM RELATIONSHIPS BETWEEN ENTITIES
+    %% =============================================================
+
+    E24 -->|"P53 has former or current location
+    (E24 -> E53: the plantation
+    is at this location)"| E53
+
+    E24 -->|"P52 has current owner
+    (E18 -> E39: physical thing
+    is owned by an actor)"| E74
+
+    E24 -->|"P1 is identified by
+    (map label names E24)"| E41_MAP
+
+    E74 -->|"P1 is identified by
+    (almanac name names E74)"| E41_ALM
+
+    E74 -->|"P1 is identified by"| E41_STD
+
+    E41_MAP ---|"P139 has alternative form
+    (links variant spellings across
+    sources without conflating
+    E24 and E74 identity)"| E41_ALM
+
+    E41_ALM ---|"P139 has alternative form"| E41_STD
+
+    E22_MAP -->|"P128 carries
+    (E18 -> E90: physical source
+    carries the name)"| E41_MAP
+
+    E22_ALM -->|"P128 carries"| E41_ALM
+
+    OBS -->|"stm:observationOf"| E74
+    OBS -->|"prov:hadPrimarySource"| E22_ALM
+
+    POBS -->|"pico:hasRole"| ROLES["picot:owner
+    picot:administrator
+    picot:director"]
+
+    OBS -->|"has PersonObservation"| POBS
+
+    E74_ALT -->|"stm:absorbedInto"| E74
+
+    %% =============================================================
+    %% Q-ID LINKING KEY
+    %% =============================================================
+
+    subgraph BRIDGE["Q-ID: The Bridge Between Datasets"]
+        QID_LINK["Wikidata Q-ID connects:
+        QGIS qid column +
+        Almanakken plantation_id column +
+        E24 -> P52 -> E74 ownership
+        All meet at the same E74 entity"]
+    end
+
+    Q_qid -.-> QID_LINK
+    A_plantation_id -.-> QID_LINK
+
+    %% =============================================================
+    %% STYLING
+    %% =============================================================
+
+    %% CRITERIA / George Bruseker CIDOC-CRM colour scheme
+    %% See: https://github.com/chin-rcip/CRITERIA
+
+    classDef csv fill:#f8f9fa,stroke:#000000,color:#000000
+    class Q_fid,Q_coords,Q_label_1930,Q_label_1860,Q_plantation_label,Q_qid,Q_qid_alt,Q_psur csv
+    class A_recordid,A_year,A_plantation_id,A_plantation_org,A_plantation_std csv
+    class A_eigenaren,A_administrateurs,A_directeuren csv
+    class A_slaven,A_product,A_deserted,A_loc_std,A_size,A_page csv
+    class A_psur,A_split,A_partof,A_ref csv
+
+    classDef crm_E18_Physical_Thing fill:#c78e66,stroke:#000000,color:#000000
+    class E24 crm_E18_Physical_Thing
+    class E22_MAP,E22_ALM crm_E18_Physical_Thing
+
+    classDef crm_E53_Place fill:#94cc7d,stroke:#000000,color:#000000
+    class E53 crm_E53_Place
+
+    classDef crm_E39_Actor fill:#ffbdca,stroke:#000000,color:#000000
+    class E74,E74_ALT,E74_PARENT,E74_REF crm_E39_Actor
+
+    classDef crm_E41_Appellation fill:#fef3ba,stroke:#000000,color:#000000
+    class E41_MAP,E41_ALM,E41_STD crm_E41_Appellation
+
+    classDef crm_E2_Temporal_Entity fill:#82ddff,stroke:#000000,color:#000000
+    class OBS crm_E2_Temporal_Entity
+
+    classDef crm_E39_Actor_URI fill:#ffe6eb,stroke:#000000,color:#000000
+    class POBS crm_E39_Actor_URI
+
+    classDef Literal fill:#ffffff,stroke:#000000,color:#000000
+    class ROLES Literal
+
+    classDef bridge fill:#ffffff,stroke:#dc3545,stroke-width:2px,color:#000000
+    class QID_LINK bridge
+
+    style QGIS fill:#f8f9fa,stroke:#000000,stroke-width:2px
+    style ALM fill:#f8f9fa,stroke:#000000,stroke-width:2px
+    style ALM_CORE fill:#ffffff,stroke:#000000,stroke-width:1px
+    style ALM_PEOPLE fill:#ffffff,stroke:#000000,stroke-width:1px
+    style ALM_ENRICH fill:#ffffff,stroke:#000000,stroke-width:1px
+    style ALM_STRUCT fill:#ffffff,stroke:#000000,stroke-width:1px
+    style CIDOC fill:#ffffff,stroke:#000000,stroke-width:2px
+    style BRIDGE fill:#ffffff,stroke:#dc3545,stroke-width:2px,stroke-dasharray: 5 5

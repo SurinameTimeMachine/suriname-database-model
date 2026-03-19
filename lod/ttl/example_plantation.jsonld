@@ -1,0 +1,29 @@
+{
+  "@context": "https://raw.githubusercontent.com/SurinameTimeMachine/suriname-database-model/main/lod/context.jsonld",
+  "@id": "http://www.wikidata.org/entity/Q59115309",
+  "@type": [
+    "crm:E24_Physical_Human-Made_Thing",
+    "sdo:Organization",
+    "stm:Plantation"
+  ],
+  "additionalType": "http://www.wikidata.org/entity/Q188913",
+  "prefLabel": "Breedevoort",
+  "status": "built",
+  "psurId": "PSUR0041",
+  "hasGeometry": {
+    "@type": "geo:Geometry",
+    "asWKT": "Polygon ((585326.14922244 648259.21601988, 585508.98534736 650186.95594791, 586796.74106242 650642.9...",
+    "geometrySource": "stm:MAP_1930"
+  },
+  "depictedOnMap": [
+    {
+      "mapId": "MAP_1930",
+      "labelOnMap": "Breedevoort"
+    },
+    {
+      "mapId": "MAP_1860-79",
+      "labelOnMap": "Breedevoort"
+    }
+  ],
+  "sameAs": "http://www.wikidata.org/entity/Q59115309"
+}

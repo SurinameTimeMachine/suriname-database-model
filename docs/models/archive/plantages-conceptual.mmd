@@ -1,0 +1,144 @@
+%% Plantation Conceptual Model - Ontology Layer
+%% Shows CIDOC-CRM, PICO/Schema.org, SKOS, GeoSPARQL relationships
+
+flowchart TB
+    %% ============================================
+    %% CORE ENTITY: Plantation with Dual-Typing
+    %% ============================================
+    subgraph CORE["PLANTATION ENTITY"]
+        direction TB
+        P["wd:Qxxxxxx<br/><b>@type:</b><br/>• crm:E24_Physical_Human-Made_Thing<br/>• sdo:Organization<br/>• stm:Plantation"]
+    end
+
+    %% ============================================
+    %% IDENTIFIERS
+    %% ============================================
+    subgraph IDS["IDENTIFIERS"]
+        QID["<b>@id</b><br/>Wikidata Q-ID<br/>(primary URI)"]
+        PSUR["<b>stm:psurId</b><br/>PSUR####<br/>(Slave Registers)"]
+    end
+
+    %% ============================================
+    %% NAMING (SKOS)
+    %% ============================================
+    subgraph NAMING["NAMING (SKOS)"]
+        PREF["<b>skos:prefLabel</b><br/>@nl: Latest known name"]
+        PREF_SRN["<b>skos:prefLabel</b><br/>@srn: Sranantongo name"]
+        ALT["<b>skos:altLabel</b><br/>Historical variants<br/>+ stm:validFrom/Through<br/>+ stm:source"]
+    end
+
+    %% ============================================
+    %% PHYSICAL ASPECT (CIDOC-CRM E24 + GeoSPARQL)
+    %% ============================================
+    subgraph PHYSICAL["PHYSICAL ASPECT (E24)"]
+        direction TB
+        GEOM["<b>geo:hasGeometry</b><br/>→ geo:Geometry<br/>  • geo:asWKT (polygon)<br/>  • stm:geometrySource"]
+        STATUS["<b>stm:status</b><br/>built | planned | abandoned | unknown"]
+
+        subgraph LIFECYCLE["CIDOC-CRM Lifecycle Events"]
+            BIRTH["<b>crm:P92i_was_brought_into_existence_by</b><br/>→ crm:E63_Beginning_of_Existence"]
+            DEATH["<b>crm:P93i_was_taken_out_of_existence_by</b><br/>→ crm:E64_End_of_Existence"]
+        end
+    end
+
+    %% ============================================
+    %% PLANTATION RELATIONSHIPS (CIDOC-CRM)
+    %% ============================================
+    subgraph RELATIONS["PLANTATION RELATIONSHIPS (CIDOC-CRM)"]
+        direction TB
+        HASPART["<b>crm:P46_is_composed_of</b><br/>→ Plantation (split parts)<br/>(has_parts / split)"]
+        PARTOF["<b>crm:P46i_forms_part_of</b><br/>→ Plantation (merged into)<br/>(partof)"]
+        OWNED["<b>crm:P52_has_current_owner</b><br/>→ Plantation (reference_std)<br/>(ownership relation)"]
+    end
+
+    %% ============================================
+    %% MAP DEPICTIONS (CIDOC-CRM)
+    %% ============================================
+    subgraph MAPS["MAP DEPICTIONS (CIDOC-CRM)"]
+        DEPICT["<b>crm:P138i_has_representation</b><br/>→ stm:MapDepiction"]
+        MAPDEP["stm:MapDepiction<br/>• stm:mapId<br/>• stm:labelOnMap<br/>• iiif:manifest (future)"]
+    end
+
+    %% ============================================
+    %% ORGANIZATION ASPECT (PICO / Schema.org)
+    %% ============================================
+    subgraph ORG["ORGANIZATION ASPECT (PICO)"]
+        direction TB
+        ADDTYPE["<b>sdo:additionalType</b><br/>→ wd:Q188913 (plantation)"]
+
+        subgraph FUTURE["Future: Person Links"]
+            direction LR
+            AFF["<b>sdo:affiliation</b><br/>← picom:PersonObservation<br/>(enslaved persons)"]
+            OWNER["<b>stm:hasOwner</b><br/>← Person (eigenaren)"]
+            ADMIN["<b>stm:hasAdministrator</b><br/>← Person (administrateurs)"]
+            DIRECT["<b>stm:hasDirector</b><br/>← Person (directeuren)"]
+        end
+    end
+
+    %% ============================================
+    %% OBSERVATIONS (Time-series from Almanakken)
+    %% ============================================
+    subgraph OBS["OBSERVATIONS (Almanakken)"]
+        direction TB
+        HASOBS["<b>stm:hasObservation</b><br/>→ stm:PlantationObservation"]
+
+        OBSENT["stm:PlantationObservation<br/>• stm:observationYear (xsd:gYear)<br/>• stm:product<br/>• stm:enslavedCount<br/>• stm:freeResidentsCount<br/>• stm:size<br/>• stm:deserted<br/>• stm:source (page ref)"]
+    end
+
+    %% ============================================
+    %% CONNECTIONS
+    %% ============================================
+
+    %% Core to Identifiers
+    P --- QID
+    P --- PSUR
+
+    %% Core to Naming
+    P --- PREF
+    P --- PREF_SRN
+    P --- ALT
+
+    %% Core to Physical
+    P --- GEOM
+    P --- STATUS
+    P -.- BIRTH
+    P -.- DEATH
+
+    %% Core to Relations
+    P --- HASPART
+    P --- PARTOF
+    P --- OWNED
+
+    %% Core to Maps
+    P --- DEPICT
+    DEPICT --> MAPDEP
+
+    %% Core to Organization
+    P --- ADDTYPE
+    P -.-> AFF
+    P -.-> OWNER
+    P -.-> ADMIN
+    P -.-> DIRECT
+
+    %% Core to Observations
+    P --- HASOBS
+    HASOBS --> OBSENT
+
+    %% ============================================
+    %% STYLING
+    %% ============================================
+    classDef core fill:#e1f5fe,stroke:#01579b,stroke-width:3px,color:#000
+    classDef cidoc fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#000
+    classDef skos fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px,color:#000
+    classDef geo fill:#fce4ec,stroke:#c2185b,stroke-width:2px,color:#000
+    classDef pico fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#000
+    classDef obs fill:#fff8e1,stroke:#f57f17,stroke-width:2px,color:#000
+    classDef future fill:#eceff1,stroke:#607d8b,stroke-width:1px,stroke-dasharray: 5 5,color:#000
+
+    class P,CORE core
+    class BIRTH,DEATH,HASPART,PARTOF,OWNED,DEPICT,MAPDEP cidoc
+    class PREF,PREF_SRN,ALT skos
+    class GEOM geo
+    class ADDTYPE,AFF,OWNER,ADMIN,DIRECT pico
+    class HASOBS,OBSENT obs
+    class AFF,OWNER,ADMIN,DIRECT,FUTURE future

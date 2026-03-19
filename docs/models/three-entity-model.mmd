@@ -1,0 +1,152 @@
+---
+title: Suriname Time Machine - CIDOC-CRM Conceptual Model
+config:
+  theme: base
+  themeVariables:
+    primaryColor: "#e8f4ea"
+    primaryBorderColor: "#2d6a4f"
+    lineColor: "#333"
+    tertiaryColor: "#fff5f5"
+---
+erDiagram
+    E24_PHYSICAL_HUMAN_MADE_THING {
+        string id PK "stm:plantation/slug"
+        string P1_is_identified_by FK "Links to E41 Appellation"
+        string P2_has_type FK "Links to E55 Type"
+        string P53_has_location FK "Links to E53 Place"
+        string P52_has_current_owner FK "Links to E74 Group"
+    }
+
+    E41_APPELLATION {
+        string id PK "stm:appellation/slug"
+        string P190_has_symbolic_content "The actual name string"
+        string P1i_identifies FK "E24 or E74 (not both)"
+        string P139_has_alternative_form FK "Variant spelling E41"
+        string P128i_is_carried_by FK "E22 source that records it"
+        string P72_has_language "nl sr en"
+    }
+
+    E26_PHYSICAL_FEATURE {
+        string id PK "stm:feature/slug"
+        string P1_is_identified_by "Name Suriname River"
+        string P2_has_type FK "Links to E55 Type"
+        string P53_has_location FK "Links to E53 Place"
+    }
+
+    E53_PLACE {
+        string id PK "stm:place/fid or geometry-based"
+        int fid "QGIS feature ID if from map"
+        string P168_place_is_defined_by "WKT Polygon Line"
+        int observed_year "Year of map observation"
+        string P89_falls_within FK "Parent place district"
+    }
+
+    E74_GROUP {
+        string qid PK "Wikidata Q-ID wd:Qxxxxx"
+        string P1_is_identified_by FK "Links to E41 Appellation"
+        string P2_has_type FK "E55 Type plantation-org"
+        string P107i_is_current_or_former_member_of FK "Parent org"
+    }
+
+    E55_TYPE {
+        string id PK "Type vocabulary URI"
+        string P1_is_identified_by "Label"
+        string scope_note "Definition"
+    }
+
+    E12_PRODUCTION {
+        string id PK "Production event identifier"
+        string P108_has_produced FK "Links to E22 or E24"
+        string P14_carried_out_by FK "Links to E21 Person or E74 Group"
+        string P4_has_time_span FK "Links to E52 Time-Span"
+    }
+
+    E52_TIME_SPAN {
+        string id PK "Time-span identifier"
+        date P82a_begin_of_the_begin "Start date YYYY-01-01"
+        date P82b_end_of_the_end "End date YYYY-12-31"
+    }
+
+    E22_HUMAN_MADE_OBJECT {
+        string id PK "Physical artifact map book ledger"
+        string P102_has_title "Title of the document"
+        string P50_has_current_keeper "Holding archive"
+        string P128_carries FK "Links to E36 Visual Item"
+    }
+
+    E36_VISUAL_ITEM {
+        string id PK "Visual content identifier"
+        string P138_represents FK "What it depicts E24 E26 E74 E21"
+    }
+
+    E38_IMAGE {
+        string id PK "Digital reproduction IIIF scan"
+        string iiif_url "IIIF Info URL"
+        string P138_represents FK "Links to E22 it reproduces"
+    }
+
+    OBSERVATION {
+        string id PK "obs:qid_year or recordid"
+        string observes FK "Links to E74 Group org"
+        int observation_year "Year of almanac"
+        string observed_name FK "E41 name as in source"
+        string has_owner "eigenaren -> PersonObservation"
+        string has_administrator "administrateurs -> PersonObservation"
+        string has_director "directeuren -> PersonObservation"
+        string has_product "Crop type"
+        int enslaved_count "slaven"
+        boolean is_deserted "verlaten flag"
+        string location_std "stm:locationStd string"
+        int size_akkers "stm:sizeAkkers"
+        string page_reference "stm:pageReference"
+        string P70i_is_documented_in FK "Source document"
+    }
+
+    E55_FEATURE_TYPE {
+        string id PK "Feature type vocabulary"
+        string label "plantation house street canal river creek lake"
+    }
+
+    E55_ORG_TYPE {
+        string id PK "Organization type vocabulary"
+        string label "plantation-organization trading-company"
+    }
+
+    E55_DOC_TYPE {
+        string id PK "Document type vocabulary"
+        string label "historic-map almanac slave-register"
+    }
+
+    E24_PHYSICAL_HUMAN_MADE_THING }o--|| E55_TYPE : "P2_has_type"
+    E24_PHYSICAL_HUMAN_MADE_THING }o--o{ E53_PLACE : "P53_has_former_or_current_location"
+    E24_PHYSICAL_HUMAN_MADE_THING }o--o{ E74_GROUP : "P52_has_current_owner"
+    E24_PHYSICAL_HUMAN_MADE_THING }o--o{ E41_APPELLATION : "P1_is_identified_by"
+
+    E26_PHYSICAL_FEATURE }o--|| E55_TYPE : "P2_has_type"
+    E26_PHYSICAL_FEATURE }o--o{ E53_PLACE : "P53_has_former_or_current_location"
+
+    E53_PLACE }o--o| E53_PLACE : "P89_falls_within"
+
+    E74_GROUP }o--|| E55_TYPE : "P2_has_type"
+    E74_GROUP }o--o| E74_GROUP : "P107i_is_member_of"
+    E74_GROUP }o--o{ E41_APPELLATION : "P1_is_identified_by"
+
+    E24_PHYSICAL_HUMAN_MADE_THING }o--o| E12_PRODUCTION : "P108i_was_produced_by"
+    E22_HUMAN_MADE_OBJECT }o--o| E12_PRODUCTION : "P108i_was_produced_by"
+    E12_PRODUCTION }o--|| E52_TIME_SPAN : "P4_has_time_span"
+
+    E22_HUMAN_MADE_OBJECT ||--|| E36_VISUAL_ITEM : "P128_carries"
+    E22_HUMAN_MADE_OBJECT ||--o{ E41_APPELLATION : "P128_carries"
+    E38_IMAGE }o--|| E22_HUMAN_MADE_OBJECT : "P138_represents"
+
+    E41_APPELLATION }o--o{ E41_APPELLATION : "P139_has_alternative_form"
+    E36_VISUAL_ITEM }o--o{ E24_PHYSICAL_HUMAN_MADE_THING : "P138_represents"
+    E36_VISUAL_ITEM }o--o{ E26_PHYSICAL_FEATURE : "P138_represents"
+
+    OBSERVATION }o--|| E74_GROUP : "observes"
+    OBSERVATION }o--|| E22_HUMAN_MADE_OBJECT : "P70i_is_documented_in"
+    E22_HUMAN_MADE_OBJECT }o--|| E55_TYPE : "P2_has_type"
+
+    E55_TYPE ||--o{ E55_FEATURE_TYPE : "includes"
+    E55_TYPE ||--o{ E55_ORG_TYPE : "includes"
+    E55_TYPE ||--o{ E55_DOC_TYPE : "includes"

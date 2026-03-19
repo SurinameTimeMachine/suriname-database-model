@@ -1,0 +1,152 @@
+%% Plantation Data Sources Mapping
+%% Shows which CSV columns map to which model properties
+%% Based on "Crucial for Linking" and "Primary Information" markers
+
+flowchart LR
+    %% ============================================
+    %% DATA SOURCES
+    %% ============================================
+
+    subgraph GIS["GIS Polygons 1930<br/>(plantation_polygons_1930.csv)"]
+        direction TB
+        G_QID["qid"]
+        G_QID_ALT["qid_alt"]
+        G_PSUR["psur_id, psur_id2, psur_id3"]
+        G_LABEL["label_1930"]
+        G_LABEL_OLD["label_1860-79"]
+        G_COORDS["coords"]
+    end
+
+    subgraph ALM["Almanakken<br/>(Plantations Surinaamse Almanakken)"]
+        direction TB
+
+        subgraph ALM_LINK["Crucial for Linking"]
+            A_YEAR["year"]
+            A_QID["plantation_id (Q-ID)"]
+            A_PSUR["psur_id"]
+            A_SPLIT["has_parts1_id...5_id"]
+            A_PARTOF["partof_id"]
+            A_REF["reference_std_id"]
+        end
+
+        subgraph ALM_PRIMARY["Primary Information"]
+            A_NAME["plantation_std"]
+            A_LOC["loc_std"]
+            A_PRODUCT["product_std"]
+            A_DESERTED["deserted"]
+            A_SRN["sranantongo_naam"]
+            A_ADMIN["administrateurs"]
+            A_DIRECT["directeuren"]
+            A_EIGEN["eigenaren"]
+            A_SLAVES["slaven / slaves_norm"]
+            A_POP["population columns"]
+            A_SIZE["size_std"]
+            A_PAGE["page (provenance)"]
+        end
+    end
+
+    %% ============================================
+    %% TARGET MODEL
+    %% ============================================
+
+    subgraph MODEL["Plantation Model"]
+        direction TB
+
+        subgraph M_IDS["Identifiers"]
+            M_ATID["@id (Wikidata QID)"]
+            M_PSUR_ID["stm:psurId"]
+        end
+
+        subgraph M_NAMES["Names (SKOS)"]
+            M_PREF["skos:prefLabel @nl"]
+            M_PREF_SRN["skos:prefLabel @srn"]
+            M_ALT["skos:altLabel"]
+        end
+
+        subgraph M_PHYS["Physical (E24)"]
+            M_GEOM["geo:hasGeometry"]
+            M_STATUS["stm:status"]
+        end
+
+        subgraph M_REL["Relations (CIDOC-CRM)"]
+            M_HASPART["crm:P46_is_composed_of"]
+            M_PARTOF["crm:P46i_forms_part_of"]
+            M_OWNER["crm:P52_has_current_owner"]
+        end
+
+        subgraph M_OBS["Observation"]
+            M_OBS_YEAR["stm:observationYear"]
+            M_PRODUCT["stm:product"]
+            M_ENSLAVED["stm:enslavedCount"]
+            M_FREE["stm:freeResidentsCount"]
+            M_SIZE["stm:size"]
+            M_SOURCE["stm:source"]
+            M_DESER["stm:deserted"]
+            M_LOC["stm:location"]
+        end
+
+        subgraph M_PERSON["Person Links (future)"]
+            M_P_ADMIN["stm:hasAdministrator"]
+            M_P_DIRECT["stm:hasDirector"]
+            M_P_EIGEN["stm:hasOwner"]
+        end
+    end
+
+    %% ============================================
+    %% MAPPINGS: GIS → Model
+    %% ============================================
+
+    G_QID ==>|"primary"| M_ATID
+    G_QID_ALT -->|"merged/split"| M_HASPART
+    G_PSUR ==> M_PSUR_ID
+    G_LABEL ==>|"latest name"| M_PREF
+    G_LABEL_OLD -->|"historical"| M_ALT
+    G_COORDS ==> M_GEOM
+
+    %% ============================================
+    %% MAPPINGS: Almanakken → Model
+    %% ============================================
+
+    %% Linking fields
+    A_QID ==>|"join key"| M_ATID
+    A_PSUR ==> M_PSUR_ID
+    A_SPLIT ==> M_HASPART
+    A_PARTOF ==> M_PARTOF
+    A_REF ==> M_OWNER
+
+    %% Primary information → Observation
+    A_YEAR ==> M_OBS_YEAR
+    A_NAME -->|"if different"| M_ALT
+    A_LOC ==> M_LOC
+    A_PRODUCT ==> M_PRODUCT
+    A_DESERTED ==> M_DESER
+    A_SIZE ==> M_SIZE
+    A_PAGE ==> M_SOURCE
+
+    %% Population
+    A_SLAVES ==> M_ENSLAVED
+    A_POP ==> M_FREE
+
+    %% Special: Sranantongo name
+    A_SRN ==>|"@srn language"| M_PREF_SRN
+
+    %% Person names (future - dashed)
+    A_ADMIN -.->|"future"| M_P_ADMIN
+    A_DIRECT -.->|"future"| M_P_DIRECT
+    A_EIGEN -.->|"future"| M_P_EIGEN
+
+    %% ============================================
+    %% STYLING
+    %% ============================================
+    classDef source fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,color:#000
+    classDef linking fill:#ffecb3,stroke:#ff8f00,stroke-width:2px,color:#000
+    classDef primary fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px,color:#000
+    classDef model fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#000
+    classDef future fill:#eceff1,stroke:#607d8b,stroke-width:1px,stroke-dasharray: 5 5,color:#000
+
+    class G_QID,G_QID_ALT,G_PSUR,G_LABEL,G_LABEL_OLD,G_COORDS source
+    class A_YEAR,A_QID,A_PSUR,A_SPLIT,A_PARTOF,A_REF linking
+    class A_NAME,A_LOC,A_PRODUCT,A_DESERTED,A_SRN,A_ADMIN,A_DIRECT,A_EIGEN,A_SLAVES,A_POP,A_SIZE,A_PAGE primary
+    class M_ATID,M_PSUR_ID,M_PREF,M_PREF_SRN,M_ALT,M_GEOM,M_STATUS,M_HASPART,M_PARTOF,M_OWNER model
+    class M_OBS_YEAR,M_PRODUCT,M_ENSLAVED,M_FREE,M_SIZE,M_SOURCE,M_DESER,M_LOC model
+    class M_P_ADMIN,M_P_DIRECT,M_P_EIGEN future

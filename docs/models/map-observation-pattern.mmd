@@ -1,0 +1,97 @@
+---
+title: Suriname Time Machine - Map Observation Pattern (CIDOC-CRM)
+---
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#e8f4ea'}}}%%
+flowchart TB
+    subgraph SOURCE_LAYER ["E22 Human-Made Object (Physical Map)"]
+        E22["E22 Human-Made Object
+        'Kaart van Suriname 1930'
+        P2 has type: historic-map"]
+    end
+
+    subgraph DIGITAL_LAYER ["E38 Image (Digital Scan)"]
+        E38["E38 Image
+        IIIF scan of the map
+        P138 represents: E22"]
+    end
+
+    subgraph VISUAL_LAYER ["E36 Visual Item (What Map Carries)"]
+        E36["E36 Visual Item
+        (The cartographic content)
+        P138 represents: E24/E26"]
+    end
+
+    subgraph PRODUCTION_LAYER ["E12 Production (Creation Event)"]
+        E12["E12 Production
+        P14 carried out by: cartographer"]
+        E52["E52 Time-Span
+        P82a: 1930-01-01
+        P82b: 1930-12-31"]
+    end
+
+    subgraph THING_LAYER ["E24 Physical Human-Made Thing"]
+        E24["E24 Physical Human-Made Thing
+        'Geijersvlijt' (the plantation)
+        stm:plantation/geijersvlijt
+        P2 has type: plantation"]
+    end
+
+    subgraph FEATURE_LAYER ["E26 Physical Feature"]
+        E26["E26 Physical Feature
+        'Suriname River'
+        P2 has type: river"]
+    end
+
+    subgraph PLACE_LAYER ["E53 Place (Spatial Extent)"]
+        E53["E53 Place
+        stm:place/fid-1619
+        P168 place is defined by: WKT Polygon"]
+    end
+
+    E22 -->|"P128 carries"| E36
+    E38 -->|"P138 represents"| E22
+    E22 -->|"P108i was produced by"| E12
+    E12 -->|"P4 has time-span"| E52
+
+    E36 -->|"P138 represents"| E24
+    E36 -->|"P138 represents"| E26
+
+    E24 -->|"P53 has location"| E53
+    E26 -->|"P53 has location"| E53
+
+    subgraph KEY_INSIGHT ["KEY INSIGHT: Universal Source Pattern"]
+        direction LR
+        KEY1["E22 → P128 → E36
+        Physical carries visual"]
+        KEY2["E36 → P138 → E24/E26
+        Visual represents things"]
+        KEY3["E24/E26 → P53 → E53
+        Things have locations"]
+    end
+
+    classDef e22 fill:#fff3cd,stroke:#ffc107,stroke-width:2px,color:#856404
+    classDef e38 fill:#cce5ff,stroke:#004085,stroke-width:2px,color:#004085
+    classDef e36 fill:#e2e3e5,stroke:#6c757d,stroke-width:2px,color:#383d41
+    classDef e24 fill:#d4edda,stroke:#28a745,stroke-width:2px,color:#155724
+    classDef e26 fill:#b2dfdb,stroke:#00796b,stroke-width:2px,color:#004d40
+    classDef e53 fill:#e8f5e9,stroke:#4caf50,stroke-width:2px,color:#1b5e20
+    classDef production fill:#f8d7da,stroke:#721c24,stroke-width:1px,color:#721c24
+    classDef insight fill:#fff5f5,stroke:#dc3545,stroke-width:2px
+
+    class E22 e22
+    class E38 e38
+    class E36 e36
+    class E24 e24
+    class E26 e26
+    class E53 e53
+    class E12,E52 production
+    class KEY1,KEY2,KEY3 insight
+
+    style SOURCE_LAYER fill:#fff8e1,stroke:#ffc107
+    style DIGITAL_LAYER fill:#e3f2fd,stroke:#1976d2
+    style VISUAL_LAYER fill:#eceff1,stroke:#607d8b
+    style PRODUCTION_LAYER fill:#ffebee,stroke:#c62828
+    style THING_LAYER fill:#e8f5e9,stroke:#2e7d32
+    style FEATURE_LAYER fill:#e0f2f1,stroke:#00796b
+    style PLACE_LAYER fill:#f1f8e9,stroke:#558b2f
+    style KEY_INSIGHT fill:#fff5f5,stroke:#dc3545,stroke-dasharray: 5 5

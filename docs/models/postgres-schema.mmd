@@ -1,0 +1,169 @@
+---
+title: Suriname Time Machine - PostgreSQL Schema (CIDOC-CRM Aligned)
+config:
+  theme: base
+  themeVariables:
+    primaryColor: "#e8f4ea"
+---
+erDiagram
+    e24_human_made_things {
+        uuid id PK "gen_random_uuid()"
+        text uri UK "stm:plantation/slug"
+        text p1_label "Name P1_is_identified_by"
+        text p2_type_id FK "Links to e55_types"
+        text p52_owner_qid FK "Links to e74_groups"
+        timestamptz created_at "DEFAULT NOW()"
+        timestamptz updated_at
+    }
+
+    e26_physical_features {
+        uuid id PK "gen_random_uuid()"
+        text uri UK "stm:feature/slug"
+        text p1_label "Name Suriname River"
+        text p2_type_id FK "Links to e55_types"
+        timestamptz created_at "DEFAULT NOW()"
+    }
+
+    e53_places {
+        uuid id PK "gen_random_uuid()"
+        text uri UK "stm:place/fid"
+        integer fid "QGIS feature ID"
+        text p168_geometry "PostGIS Polygon/Line"
+        integer observed_year "Year of map observation"
+        uuid p89_within_id FK "Parent place"
+        text p70i_documented_in FK "Source map/document"
+        timestamptz created_at "DEFAULT NOW()"
+    }
+
+    e74_groups {
+        text qid PK "Wikidata Q-ID wd:Qxxxxx"
+        text p1_label "Standardized Dutch name"
+        text p2_type_id FK "Links to e55_types"
+        text p107i_member_of_qid FK "Parent organization"
+        timestamptz created_at "DEFAULT NOW()"
+        timestamptz updated_at
+    }
+
+    e55_types {
+        text id PK "Type vocabulary ID"
+        text label "Human readable label"
+        text scope_note "Definition"
+        text category "feature organization document"
+    }
+
+    e41_appellations {
+        uuid id PK "gen_random_uuid()"
+        text uri UK "stm:appellation/slug"
+        text p190_symbolic_content "The actual name string"
+        text p72_language "nl sr en"
+        uuid p139_alt_form_id FK "Variant of another E41"
+        text p128i_carried_by FK "E22 source that records it"
+        integer source_year "Year inferred from E12"
+        timestamptz created_at "DEFAULT NOW()"
+    }
+
+    e22_human_made_objects {
+        text id PK "Document/map identifier"
+        text p1_label "Title"
+        text p2_type_id FK "map almanac register"
+        integer p4_year "Year of creation"
+        text source_url "External reference"
+        timestamptz created_at "DEFAULT NOW()"
+    }
+
+    observations {
+        uuid id PK "gen_random_uuid()"
+        text record_id UK "Original almanac recordid"
+        text organization_qid FK "Links to e74_groups"
+        integer observation_year "Year of almanac"
+        text observed_name "Name as in source"
+        text owner "eigenaren"
+        text administrator "administrateurs"
+        text director "directeuren"
+        text product "Crop type"
+        integer enslaved_count "slaven"
+        boolean is_deserted "verlaten flag"
+        text location "loc_std"
+        integer size_akkers "Size in akkers"
+        text page_reference "Almanac page number"
+        text p70i_documented_in FK "Source document"
+        timestamptz created_at "DEFAULT NOW()"
+    }
+
+    e24_e53_locations {
+        uuid id PK "gen_random_uuid()"
+        uuid e24_id FK "Links to e24_human_made_things"
+        uuid e53_id FK "Links to e53_places"
+        text certainty "certain probable uncertain"
+        integer start_year "When location started"
+        integer end_year "When location ended"
+        text evidence "Supporting evidence"
+        timestamptz created_at "DEFAULT NOW()"
+    }
+
+    e26_e53_locations {
+        uuid id PK "gen_random_uuid()"
+        uuid e26_id FK "Links to e26_physical_features"
+        uuid e53_id FK "Links to e53_places"
+        integer observed_year "Year observed on map"
+        text p70i_documented_in FK "Source map"
+        timestamptz created_at "DEFAULT NOW()"
+    }
+
+    e24_e74_ownership {
+        uuid id PK "gen_random_uuid()"
+        uuid e24_id FK "Links to e24_human_made_things"
+        text e74_qid FK "Links to e74_groups"
+        text relationship_type "owner operator claimed_by"
+        integer start_year "When relationship started"
+        integer end_year "When relationship ended"
+        text certainty "certain probable uncertain"
+        text evidence "Supporting evidence"
+        timestamptz created_at "DEFAULT NOW()"
+    }
+
+    e74_identifiers {
+        uuid id PK "gen_random_uuid()"
+        text organization_qid FK "Links to e74_groups"
+        text identifier_type "psur_id alternate_qid"
+        text identifier_value "e.g. PSUR0118"
+        timestamptz created_at "DEFAULT NOW()"
+    }
+
+    e1_e41_identified_by {
+        uuid id PK "gen_random_uuid()"
+        text entity_uri FK "E24 or E74 entity URI"
+        uuid e41_id FK "Links to e41_appellations"
+        boolean is_preferred "DEFAULT FALSE"
+        timestamptz created_at "DEFAULT NOW()"
+    }
+
+    e24_human_made_things }o--|| e55_types : "P2_has_type"
+    e26_physical_features }o--|| e55_types : "P2_has_type"
+    e74_groups }o--|| e55_types : "P2_has_type"
+    e22_human_made_objects }o--|| e55_types : "P2_has_type"
+
+    e24_e53_locations }o--|| e24_human_made_things : "e24_id"
+    e24_e53_locations }o--|| e53_places : "e53_id"
+
+    e26_e53_locations }o--|| e26_physical_features : "e26_id"
+    e26_e53_locations }o--|| e53_places : "e53_id"
+
+    e24_e74_ownership }o--|| e24_human_made_things : "e24_id"
+    e24_e74_ownership }o--|| e74_groups : "e74_qid"
+
+    e53_places }o--o| e53_places : "P89_falls_within"
+    e74_groups }o--o| e74_groups : "P107i_member_of"
+
+    observations }o--|| e74_groups : "organization_qid"
+    observations }o--|| e22_human_made_objects : "P70i_documented_in"
+
+    e53_places }o--o| e22_human_made_objects : "P70i_documented_in"
+
+    e74_groups ||--o{ e74_identifiers : "has"
+
+    e41_appellations }o--o| e41_appellations : "P139_has_alternative_form"
+    e41_appellations }o--o| e22_human_made_objects : "P128i_is_carried_by"
+    e1_e41_identified_by }o--|| e41_appellations : "e41_id"
+    e1_e41_identified_by }o--o| e24_human_made_things : "entity_uri"
+    e1_e41_identified_by }o--o| e74_groups : "entity_uri"
