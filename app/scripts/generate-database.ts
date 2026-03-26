@@ -44,22 +44,28 @@ function buildContext(): Record<string, unknown> {
     prov: 'http://www.w3.org/ns/prov#',
     sdo: 'https://schema.org/',
     xsd: 'http://www.w3.org/2001/XMLSchema#',
+    dcterms: 'http://purl.org/dc/terms/',
+    oa: 'http://www.w3.org/ns/oa#',
     picom: 'https://personsincontext.org/model#',
     picot: 'https://personsincontext.org/thesaurus#',
-    // Type aliases
+    // CIDOC-CRM type aliases
     Plantation: 'stm:Plantation',
     OrganizationObservation: 'stm:OrganizationObservation',
     ProvenanceRecord: 'stm:ProvenanceRecord',
-    E24_Physical_Human_Made_Thing: 'crm:E24_Physical_Human-Made_Thing',
-    E74_Group: 'crm:E74_Group',
-    E53_Place: 'crm:E53_Place',
-    E41_Appellation: 'crm:E41_Appellation',
+    E13_Attribute_Assignment: 'crm:E13_Attribute_Assignment',
     E22_Human_Made_Object: 'crm:E22_Human-Made_Object',
+    E24_Physical_Human_Made_Thing: 'crm:E24_Physical_Human-Made_Thing',
+    E36_Visual_Item: 'crm:E36_Visual_Item',
+    E41_Appellation: 'crm:E41_Appellation',
+    E52_Time_Span: 'crm:E52_Time-Span',
+    E53_Place: 'crm:E53_Place',
     E55_Type: 'crm:E55_Type',
+    E74_Group: 'crm:E74_Group',
     // CIDOC-CRM properties
     P1_is_identified_by: { '@id': 'crm:P1_is_identified_by', '@type': '@id' },
     P1i_identifies: { '@id': 'crm:P1i_identifies', '@type': '@id' },
     P2_has_type: { '@id': 'crm:P2_has_type', '@type': '@id' },
+    P4_has_time_span: { '@id': 'crm:P4_has_time-span', '@type': '@id' },
     P52_has_current_owner: {
       '@id': 'crm:P52_has_current_owner',
       '@type': '@id',
@@ -72,13 +78,30 @@ function buildContext(): Record<string, unknown> {
       '@id': 'crm:P53_has_former_or_current_location',
       '@type': '@id',
     },
+    P82a_begin_of_the_begin: {
+      '@id': 'crm:P82a_begin_of_the_begin',
+      '@type': 'xsd:date',
+    },
+    P82b_end_of_the_end: {
+      '@id': 'crm:P82b_end_of_the_end',
+      '@type': 'xsd:date',
+    },
     P128_carries: { '@id': 'crm:P128_carries', '@type': '@id' },
     P128i_is_carried_by: { '@id': 'crm:P128i_is_carried_by', '@type': '@id' },
     P138_represents: { '@id': 'crm:P138_represents', '@type': '@id' },
+    P138i_has_representation: {
+      '@id': 'crm:P138i_has_representation',
+      '@type': '@id',
+    },
     P139_has_alternative_form: {
       '@id': 'crm:P139_has_alternative_form',
       '@type': '@id',
     },
+    P140_assigned_attribute_to: {
+      '@id': 'crm:P140_assigned_attribute_to',
+      '@type': '@id',
+    },
+    P141_assigned: { '@id': 'crm:P141_assigned', '@type': '@id' },
     P190_has_symbolic_content: {
       '@id': 'crm:P190_has_symbolic_content',
       '@type': 'xsd:string',
@@ -99,6 +122,11 @@ function buildContext(): Record<string, unknown> {
     additionalType: { '@id': 'sdo:additionalType', '@type': '@id' },
     sameAs: { '@id': 'sdo:sameAs', '@type': '@id' },
     parentOrganization: { '@id': 'sdo:parentOrganization', '@type': '@id' },
+    // Dublin Core
+    'dcterms:description': {
+      '@id': 'dcterms:description',
+      '@type': 'xsd:string',
+    },
     // STM ontology
     status: { '@id': 'stm:status', '@type': 'xsd:string' },
     psurId: { '@id': 'stm:psurId', '@type': 'xsd:string' },
@@ -144,15 +172,28 @@ function buildContext(): Record<string, unknown> {
 
 // --- Entity builders ---
 
-function buildE22Sources(sources: SourceRow[]): Record<string, unknown>[] {
+function buildE22Sources(
+  sources: SourceRow[],
+  e36BySource: Map<string, string[]>,
+  appellationsBySource: Map<string, string[]>,
+): Record<string, unknown>[] {
   return sources.map((s) => {
     const entity: Record<string, unknown> = {
       '@id': s.uri,
       '@type': ['E22_Human_Made_Object'],
       prefLabel: s.label,
-      P2_has_type: `${STM}type/${s.type}`,
+      P2_has_type: `${STM}type/source-type/${s.type}`,
       mapId: s.id,
     };
+
+    // P128 carries: visual items (E36) and appellations (E41)
+    const carries: string[] = [
+      ...(e36BySource.get(s.uri) ?? []),
+      ...(appellationsBySource.get(s.uri) ?? []),
+    ];
+    if (carries.length > 0) {
+      entity.P128_carries = carries.length === 1 ? carries[0] : carries;
+    }
     if (s.year) entity.mapYear = s.year;
     if (s.source_url) entity.sameAs = s.source_url;
     return entity;
@@ -177,6 +218,11 @@ function buildE24Plantations(
       status: p.status,
     };
 
+    // CRM alignment: P2 has type -> E55 Type (plantation status)
+    if (p.status) {
+      entity.P2_has_type = `${STM}type/plantation-status/${p.status.toLowerCase()}`;
+    }
+
     if (p.prefLabel) entity.prefLabel = p.prefLabel;
     if (p.p52_owner_qid)
       entity.P52_has_current_owner = `${WD}${p.p52_owner_qid}`;
@@ -191,12 +237,24 @@ function buildE24Plantations(
 
     const maps = mapLinkIndex.get(p.uri) ?? [];
     if (maps.length > 0) {
+      // Keep stm:depictedOnMap for frontend compatibility
       entity['stm:depictedOnMap'] = maps.map((m) => ({
         mapId: m.map_id,
         labelOnMap: m.label_on_map,
         hasPolygon: m.has_polygon === 'true',
         P70i_is_documented_in: m.map_uri,
       }));
+      // CRM alignment: P138i has representation -> E36 Visual Items
+      const e36Uris = [
+        ...new Set(
+          maps.map((m) => {
+            const slug = p.uri.split('/').pop() ?? 'unknown';
+            return `${STM}visual-item/${m.map_id}-${slug}`;
+          }),
+        ),
+      ];
+      entity.P138i_has_representation =
+        e36Uris.length === 1 ? e36Uris[0] : e36Uris;
     }
 
     const provId = `${STM}provenance/e24-${p.slug}`;
@@ -342,22 +400,118 @@ function buildE41Appellations(
   });
 }
 
+// --- Structural entity builders ---
+
+function buildE36VisualItems(mapLinks: MapLink[]): Record<string, unknown>[] {
+  const seen = new Set<string>();
+  const entities: Record<string, unknown>[] = [];
+  for (const m of mapLinks) {
+    const slug = m.plantation_uri.split('/').pop() ?? 'unknown';
+    const id = `${STM}visual-item/${m.map_id}-${slug}`;
+    if (seen.has(id)) continue;
+    seen.add(id);
+    entities.push({
+      '@id': id,
+      '@type': ['E36_Visual_Item'],
+      P138_represents: m.plantation_uri,
+      P128i_is_carried_by: m.map_uri,
+      labelOnMap: m.label_on_map,
+      hasPolygon: m.has_polygon === 'true',
+    });
+  }
+  return entities;
+}
+
+function buildE55Types(): Record<string, unknown>[] {
+  const types: { id: string; label: string; broader?: string }[] = [
+    // Plantation status vocabulary
+    {
+      id: 'plantation-status/built',
+      label: 'Built',
+      broader: 'plantation-status',
+    },
+    {
+      id: 'plantation-status/planned',
+      label: 'Planned',
+      broader: 'plantation-status',
+    },
+    {
+      id: 'plantation-status/abandoned',
+      label: 'Abandoned',
+      broader: 'plantation-status',
+    },
+    {
+      id: 'plantation-status/unknown',
+      label: 'Unknown',
+      broader: 'plantation-status',
+    },
+    // Source type vocabulary
+    { id: 'source-type/map', label: 'Map' },
+    { id: 'source-type/almanac', label: 'Almanac' },
+    { id: 'source-type/register', label: 'Register' },
+    // Product types
+    { id: 'product/sugar', label: 'Sugar' },
+    { id: 'product/coffee', label: 'Coffee' },
+    { id: 'product/cacao', label: 'Cacao' },
+    { id: 'product/cotton', label: 'Cotton' },
+    { id: 'product/wood', label: 'Wood' },
+  ];
+
+  return types.map((t) => {
+    const entity: Record<string, unknown> = {
+      '@id': `${STM}type/${t.id}`,
+      '@type': ['E55_Type'],
+      prefLabel: t.label,
+    };
+    if (t.broader) {
+      entity['skos:broader'] = `${STM}type/${t.broader}`;
+    }
+    return entity;
+  });
+}
+
+function buildE52TimeSpans(years: Set<string>): Record<string, unknown>[] {
+  return Array.from(years)
+    .filter(Boolean)
+    .sort()
+    .map((year) => ({
+      '@id': `${STM}timespan/${year}`,
+      '@type': ['E52_Time_Span'],
+      prefLabel: year,
+      P82a_begin_of_the_begin: `${year}-01-01`,
+      P82b_end_of_the_end: `${year}-12-31`,
+    }));
+}
+
 function buildObservations(obs: ObservationRow[]): {
   entities: Record<string, unknown>[];
   provenance: Record<string, unknown>[];
+  observationYears: Set<string>;
 } {
   const entities: Record<string, unknown>[] = [];
   const provenance: Record<string, unknown>[] = [];
   const seenYears = new Set<string>();
+  const observationYears = new Set<string>();
 
   for (const o of obs) {
+    // Dual-type: stm:OrganizationObservation + crm:E13_Attribute_Assignment
     const entity: Record<string, unknown> = {
       '@id': o.uri,
-      '@type': ['OrganizationObservation'],
+      '@type': ['OrganizationObservation', 'E13_Attribute_Assignment'],
     };
 
-    if (o.organization_uri) entity.observationOf = o.organization_uri;
-    if (o.observation_year) entity.observationYear = o.observation_year;
+    // Original stm: properties (backward compat)
+    if (o.organization_uri) {
+      entity.observationOf = o.organization_uri;
+      // CRM alignment: P140 assigned attribute to
+      entity.P140_assigned_attribute_to = o.organization_uri;
+    }
+    if (o.observation_year) {
+      entity.observationYear = o.observation_year;
+      observationYears.add(o.observation_year);
+      // CRM alignment: P4 has time-span -> E52
+      entity.P4_has_time_span = `${STM}timespan/${o.observation_year}`;
+    }
     if (o.observed_name) entity.observedName = o.observed_name;
     if (o.owner) entity.hasOwner = o.owner;
     if (o.administrator) entity.hasAdministrator = o.administrator;
@@ -397,16 +551,16 @@ function buildObservations(obs: ObservationRow[]): {
           'recordid, plantation_id, year, eigenaren, slaven, product_std',
         sourceRow: `year=${year}`,
         transformedBy: 'scripts/transform-almanakken.ts',
-        modelEntity: 'OrganizationObservation',
+        modelEntity: 'E13_Attribute_Assignment / OrganizationObservation',
         schemaTable: 'observations',
-        linkedVia: 'plantation_id -> observationOf -> wd:{Q-ID}',
+        linkedVia: 'plantation_id -> P140/observationOf -> wd:{Q-ID}',
       });
     }
 
     entities.push(entity);
   }
 
-  return { entities, provenance };
+  return { entities, provenance, observationYears };
 }
 
 // --- WKT to GeoJSON ---
@@ -505,9 +659,35 @@ function main() {
     plantationMap.set(p.uri, p);
   }
 
+  // Build indexes for E22 P128 carries
+  const e36BySource = new Map<string, string[]>();
+  const appellationsBySource = new Map<string, string[]>();
+
+  // Build E36 visual items from map links
+  const allMapLinks = plantResult.mapLinks;
+  const e36Entities = buildE36VisualItems(allMapLinks);
+
+  // Index E36 by source URI
+  for (const m of allMapLinks) {
+    const slug = m.plantation_uri.split('/').pop() ?? 'unknown';
+    const e36Uri = `${STM}visual-item/${m.map_id}-${slug}`;
+    const list = e36BySource.get(m.map_uri) ?? [];
+    list.push(e36Uri);
+    e36BySource.set(m.map_uri, list);
+  }
+
+  // Index appellations by source URI (for P128 carries)
+  for (const a of [...plantResult.e41, ...almResult.appellations]) {
+    if (a.carried_by) {
+      const list = appellationsBySource.get(a.carried_by) ?? [];
+      list.push(a.uri);
+      appellationsBySource.set(a.carried_by, list);
+    }
+  }
+
   // Build entities
   console.log('\n--- Building JSON-LD entities ---');
-  const e22 = buildE22Sources(allSources);
+  const e22 = buildE22Sources(allSources, e36BySource, appellationsBySource);
   console.log(`  E22 Sources:        ${e22.length}`);
 
   const e24Result = buildE24Plantations(
@@ -530,7 +710,18 @@ function main() {
   console.log(`  E41 Appellations:   ${e41All.length}`);
 
   const obsResult = buildObservations(almResult.observations);
-  console.log(`  Observations:       ${obsResult.entities.length}`);
+  console.log(
+    `  Observations:       ${obsResult.entities.length} (dual-typed E13)`,
+  );
+
+  // Structural entities
+  console.log(`  E36 Visual Items:   ${e36Entities.length}`);
+
+  const e55Types = buildE55Types();
+  console.log(`  E55 Types:          ${e55Types.length}`);
+
+  const e52TimeSpans = buildE52TimeSpans(obsResult.observationYears);
+  console.log(`  E52 Time-Spans:     ${e52TimeSpans.length}`);
 
   const allProv = [
     ...e24Result.provenance,
@@ -546,6 +737,9 @@ function main() {
     ...e74Result.entities,
     ...e53Result.entities,
     ...e41All,
+    ...e36Entities,
+    ...e55Types,
+    ...e52TimeSpans,
     ...obsResult.entities,
     ...allProv,
   ];
@@ -609,6 +803,35 @@ function main() {
   const obsLinked = obsResult.entities.filter((e) => e.observationOf).length;
   console.log(
     `  Observations with org link: ${obsLinked}/${obsResult.entities.length}`,
+  );
+
+  const obsWithE13 = obsResult.entities.filter(
+    (e) =>
+      Array.isArray(e['@type']) &&
+      (e['@type'] as string[]).includes('E13_Attribute_Assignment'),
+  ).length;
+  console.log(
+    `  Observations dual-typed E13: ${obsWithE13}/${obsResult.entities.length}`,
+  );
+
+  const obsWithP4 = obsResult.entities.filter((e) => e.P4_has_time_span).length;
+  console.log(
+    `  Observations with P4 time-span: ${obsWithP4}/${obsResult.entities.length}`,
+  );
+
+  const e22WithP128 = e22.filter((e) => e.P128_carries).length;
+  console.log(`  E22 with P128 carries: ${e22WithP128}/${e22.length}`);
+
+  const e24WithP138i = e24Result.entities.filter(
+    (e) => e.P138i_has_representation,
+  ).length;
+  console.log(
+    `  E24 with P138i representation: ${e24WithP138i}/${e24Result.entities.length}`,
+  );
+
+  const e24WithP2 = e24Result.entities.filter((e) => e.P2_has_type).length;
+  console.log(
+    `  E24 with P2 type (E55): ${e24WithP2}/${e24Result.entities.length}`,
   );
 
   const features = geojson.features as {
