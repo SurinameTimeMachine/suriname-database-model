@@ -398,6 +398,30 @@ const RELATIONS: RelDef[] = [
     label: 'P4 has time-span',
     desc: 'When the source was produced (publication year)',
   },
+  {
+    from: 'e12',
+    to: 'e39',
+    label: 'P14 carried out by',
+    desc: 'Who made the source: Dutch colonial cartographers (maps) or Koloniaal Bestuur (almanacs)',
+  },
+  {
+    from: 'e12',
+    to: 'e53',
+    label: 'P7 took place at',
+    desc: 'Where the source was produced: Den Haag (maps) or Paramaribo (almanacs)',
+  },
+  {
+    from: 'e24',
+    to: 'e55',
+    label: 'P2 has type',
+    desc: 'Plantation status classification: Built, Planned, Abandoned, Unknown',
+  },
+  {
+    from: 'e22',
+    to: 'e55',
+    label: 'P2 has type',
+    desc: 'Source type classification: map, almanac, register',
+  },
 ];
 
 /* ─── Data fetching ────────────────────────────────────────────── */
@@ -483,7 +507,7 @@ function SchemaGraph({
         textAnchor="middle"
         className="text-sm font-bold fill-stm-warm-700"
       >
-        Suriname Time Machine -- CIDOC-CRM Entity Model (13 classes, 17
+        Suriname Time Machine -- CIDOC-CRM Entity Model (13 classes, 21
         relations)
       </text>
 
