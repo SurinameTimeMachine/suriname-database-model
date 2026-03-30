@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 /* ─── Helpers ──────────────────────────────────────────────────── */
 
@@ -80,9 +80,18 @@ const ENTITIES: EntityDef[] = [
       { name: 'P1 is identified by', range: 'E41 Appellation' },
       { name: 'skos:prefLabel', range: 'string (@nl)' },
       { name: 'sdo:additionalType', range: 'wd:Q188913' },
-      { name: 'skos:closeMatch', range: 'psur:{ID} (cross-reference)' },
-      { name: 'stm:absorbedInto', range: 'E74 Organization' },
-      { name: 'stm:psurId', range: 'string' },
+      {
+        name: 'P48 has preferred identifier',
+        range: 'E42 Identifier (Wikidata Q-ID)',
+      },
+      {
+        name: 'P1 is identified by',
+        range: 'E42 Identifier (PSUR register ID)',
+      },
+      {
+        name: 'P99i was dissolved by',
+        range: 'E68 Dissolution (-> successor E74)',
+      },
     ],
   },
   {
@@ -1255,7 +1264,7 @@ export default function ModelPage() {
               {
                 status: 'amber' as const,
                 question: 'Which organizations merged or were absorbed?',
-                path: 'E74 -> stm:absorbedInto -> E74 (partial data; needs more historical sources)',
+                path: 'E74 -> P99i was dissolved by -> E68 Dissolution (partial data; needs more historical sources)',
               },
               {
                 status: 'amber' as const,

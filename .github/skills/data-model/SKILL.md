@@ -139,10 +139,12 @@ geo:hasGeometry      - polygon (geo:asWKT)
 ### Organization (E74 Group / sdo:Organization)
 
 ```
-crm:P1_is_identified_by - E41 Appellation (formal name)
-skos:prefLabel           - canonical display label (@nl)
-sdo:additionalType       - wd:Q188913 (plantation type)
-stm:absorbedInto         - if absorbed by another org
+crm:P1_is_identified_by          - E41 Appellation (formal name)
+crm:P48_has_preferred_identifier - E42 Identifier (Wikidata Q-ID)
+crm:P1_is_identified_by          - E42 Identifier (PSUR register ID)
+skos:prefLabel                   - canonical display label (@nl)
+sdo:additionalType               - wd:Q188913 (plantation type)
+crm:P99i_was_dissolved_by        - E68 Dissolution (-> successor E74)
 ```
 
 ### Appellation (E41 Appellation)
@@ -172,18 +174,18 @@ prov:hadPrimarySource  - almanac source
 
 ### QGIS CSV -> Plantation + Location + Appellation
 
-| CSV Column       | Entity             | Property                                     |
-| ---------------- | ------------------ | -------------------------------------------- |
-| fid              | Location (E53)     | stm:fid                                      |
-| coords           | Location (E53)     | geo:hasGeometry                              |
-| label_1930       | Appellation (E41)  | P190 (creates E41, P1 on E24)                |
-| label_1860-79    | Appellation (E41)  | P190 (alt E41, P139 variant)                 |
-| plantation_label | Plantation (E24)   | skos:prefLabel (display)                     |
-| qid              | Plantation (E24)   | P52 has current owner -> wd:Q-ID             |
-| qid_alt          | Organization (E74) | P51 former owner, stm:absorbedInto qid       |
-| psur_id          | Organization (E74) | skos:closeMatch psur:{ID} (flawed, see note) |
-| psur_id2         | Organization (E74) | skos:closeMatch (2nd, from merger)           |
-| psur_id3         | Organization (E74) | skos:closeMatch (3rd, from merger)           |
+| CSV Column       | Entity             | Property                                      |
+| ---------------- | ------------------ | --------------------------------------------- |
+| fid              | Location (E53)     | stm:fid                                       |
+| coords           | Location (E53)     | geo:hasGeometry                               |
+| label_1930       | Appellation (E41)  | P190 (creates E41, P1 on E24)                 |
+| label_1860-79    | Appellation (E41)  | P190 (alt E41, P139 variant)                  |
+| plantation_label | Plantation (E24)   | skos:prefLabel (display)                      |
+| qid              | Plantation (E24)   | P52 has current owner -> wd:Q-ID              |
+| qid_alt          | Organization (E74) | P51 former owner, P99i dissolved by E68       |
+| psur_id          | Organization (E74) | P1 is identified by -> E42 Identifier (PSUR)  |
+| psur_id2         | Organization (E74) | P1 is identified by -> E42 (2nd, from merger) |
+| psur_id3         | Organization (E74) | P1 is identified by -> E42 (3rd, from merger) |
 
 ### Almanakken CSV -> Observation + Appellation
 
@@ -198,13 +200,13 @@ prov:hadPrimarySource  - almanac source
 | administrateurs   | stm:hasAdministrator (-> PersonObs) | core     |
 | directeuren       | stm:hasDirector (-> PersonObs)      | core     |
 | slaven            | stm:enslavedCount                   | core     |
-| psur_id           | skos:closeMatch psur:{ID} (flawed)  | linking  |
+| psur_id           | P1 -> E42 Identifier (PSUR)         | linking  |
 | product_std       | stm:hasProduct                      | primary  |
 | deserted          | stm:isDeserted (boolean)            | primary  |
 | loc_std           | stm:locationStd (string for now)    | primary  |
 | size_std          | stm:sizeAkkers                      | primary  |
 | page              | stm:pageReference (provenance)      | useful   |
-| split1_id..5_id   | stm:absorbedInto (merger network)   | linking  |
+| split1_id..5_id   | P99i -> E68 Dissolution (merger)    | linking  |
 | split1_lab..5_lab | labels for merged plantations       | linking  |
 | partof_lab        | P107i label                         | linking  |
 | part_of_id        | P107i is member of (Q-ID)           | linking  |
@@ -279,7 +281,8 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    S[wd:Q131349015] -->|stm:absorbedInto| G[wd:Q4392658]
+    S[E74 wd:Q131349015] -->|P99i was dissolved by| D[E68 Dissolution]
+    D -->|P151i formed from| G[E74 wd:Q4392658]
 ```
 
 ## People Connection (PICO-compatible)
