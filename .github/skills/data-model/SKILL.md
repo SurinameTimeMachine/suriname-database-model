@@ -117,19 +117,6 @@ E24 ──P52 has current owner──> E74
 
 Key insight: **Maps depict plantations (E24); plantations have locations (E53)**. The map does NOT depict the location directly. Each source type carries names (E41) that identify its own entity type: map labels identify E24, almanac names identify E74.
 
-## URI Patterns
-
-Base URI: `https://data.suriname-timemachine.org/`
-
-```
-Plantation:     {base}plantation/{name-slug}
-Location:       {base}place/{year}/fid-{fid}     (from QGIS polygon)
-Organization:   wd:{Q-ID}                       (Wikidata URI)
-Appellation:    {base}appellation/{slug}          (name entity)
-Source:         {base}source/{type}-{id}
-Observation:    {base}obs/{recordid}              (from Almanakken)
-```
-
 ## Entity Properties
 
 ### Plantation (E24 Physical Human-Made Thing)

@@ -1463,54 +1463,6 @@ export default function ModelPage() {
             </span>
           </div>
         </div>
-
-        {/* URI patterns */}
-        <div className="bg-white border border-stm-warm-200 p-6 mb-10">
-          <h3 className="font-serif text-xl font-bold text-stm-warm-800 mb-3">
-            URI Patterns
-          </h3>
-          <p className="text-xs text-stm-warm-400 mb-3">
-            Base URI: https://data.suriname-timemachine.org/
-          </p>
-          <div className="bg-stm-warm-50 p-4 font-mono text-xs text-stm-warm-600 space-y-1.5">
-            <div>
-              <span className="text-stm-warm-400 inline-block w-28">
-                Plantation:
-              </span>{' '}
-              &#123;base&#125;plantation/&#123;name-slug&#125;
-            </div>
-            <div>
-              <span className="text-stm-warm-400 inline-block w-28">
-                Location:
-              </span>{' '}
-              &#123;base&#125;place/&#123;year&#125;/fid-&#123;fid&#125;
-            </div>
-            <div>
-              <span className="text-stm-warm-400 inline-block w-28">
-                Organization:
-              </span>{' '}
-              wd:&#123;Q-ID&#125;
-            </div>
-            <div>
-              <span className="text-stm-warm-400 inline-block w-28">
-                Appellation:
-              </span>{' '}
-              &#123;base&#125;appellation/&#123;slug&#125;
-            </div>
-            <div>
-              <span className="text-stm-warm-400 inline-block w-28">
-                Source:
-              </span>{' '}
-              &#123;base&#125;source/&#123;type&#125;-&#123;id&#125;
-            </div>
-            <div>
-              <span className="text-stm-warm-400 inline-block w-28">
-                Attribution:
-              </span>{' '}
-              &#123;base&#125;obs/&#123;recordid&#125;
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );
