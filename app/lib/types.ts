@@ -130,6 +130,31 @@ export interface GeoJSONCollection {
   features: GeoJSONFeature[];
 }
 
+/** Place gazetteer entry — authority record for a named place */
+export interface GazetteerPlace {
+  id: string;
+  type: 'plantation' | 'district' | 'river' | 'settlement';
+  prefLabel: string;
+  altLabels: string[];
+  broader: string | null;
+  description: string;
+  location: {
+    lat: number | null;
+    lng: number | null;
+    wkt: string | null;
+    crs: string;
+  };
+  sources: string[];
+  wikidataQid: string | null;
+  fid: number | null;
+  psurIds: string[];
+  district: string | null;
+  locationDescription: string | null;
+  placeType: string | null;
+  modifiedBy: string | null;
+  modifiedAt: string | null;
+}
+
 // Union type for entity lookups
 export type Entity =
   | E24Plantation

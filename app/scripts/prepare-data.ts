@@ -146,4 +146,11 @@ if (existsSync(geojsonSrc)) {
   console.log('  Copied map-features.geojson');
 }
 
+// Copy places gazetteer (if it exists in data root)
+const gazetteerSrc = join(__dirname, '../../data/places-gazetteer.json');
+if (existsSync(gazetteerSrc)) {
+  copyFileSync(gazetteerSrc, join(OUT_DIR, 'places-gazetteer.json'));
+  console.log('  Copied places-gazetteer.json');
+}
+
 console.log('\nDone! Data files ready in public/data/');
