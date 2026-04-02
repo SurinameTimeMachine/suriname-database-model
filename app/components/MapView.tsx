@@ -27,9 +27,17 @@ const OVERLAY_CONFIGS: OverlayConfig[] = [
   {
     id: '1930-plantation',
     label: '1930 Plantation Map',
+    annotationUrl: 'https://annotations.allmaps.org/manifests/5178b46e14dc211e',
+    defaultEnabled: true,
+    transformation: 'thinPlateSpline',
+    gcpCount: 'unknown',
+  },
+  {
+    id: '1930-plantation-neat',
+    label: '1930 Plantation Map (Neat)',
     annotationUrl:
       'https://surinametijdmachine.org/iiif/mapathon/kaart-van-suriname-1930.json',
-    defaultEnabled: true,
+    defaultEnabled: false,
     transformation: 'thinPlateSpline',
     gcpCount: '2-4/sheet',
   },
