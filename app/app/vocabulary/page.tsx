@@ -2,7 +2,12 @@
 
 import ThesaurusEditor from '@/components/ThesaurusEditor';
 import { langEn, parseThesaurus } from '@/lib/thesaurus';
-import type { LangArrayMap, LangMap, PlaceTypeConcept, ThesaurusScheme } from '@/lib/thesaurus';
+import type {
+  LangArrayMap,
+  LangMap,
+  PlaceTypeConcept,
+  ThesaurusScheme,
+} from '@/lib/thesaurus';
 import { useEffect, useState } from 'react';
 
 interface AuthState {
@@ -67,9 +72,21 @@ export default function VocabularyPage() {
 
   // Build tree from thesaurus broader relationships
   const hierarchyGroups = [
-    { label: 'Human-Made Features', broader: 'stm:vocabulary/place-type/human-made', crmClass: 'E25' },
-    { label: 'Natural Features', broader: 'stm:vocabulary/place-type/natural', crmClass: 'E26' },
-    { label: 'Administrative Divisions', broader: 'stm:vocabulary/place-type/administrative', crmClass: 'E53' },
+    {
+      label: 'Human-Made Features',
+      broader: 'stm:vocabulary/place-type/human-made',
+      crmClass: 'E25',
+    },
+    {
+      label: 'Natural Features',
+      broader: 'stm:vocabulary/place-type/natural',
+      crmClass: 'E26',
+    },
+    {
+      label: 'Administrative Divisions',
+      broader: 'stm:vocabulary/place-type/administrative',
+      crmClass: 'E53',
+    },
   ];
 
   /** Get direct children of a broader URI, excluding concepts that have their own children (they are rendered as sub-groups) */
@@ -252,14 +269,22 @@ export default function VocabularyPage() {
 
                     {/* Multilingual labels */}
                     <div className="mb-4">
-                      <LangLabels label="Preferred Label" map={selected.prefLabel} />
-                      <LangArrayLabels label="Alternative Labels" map={selected.altLabels} />
+                      <LangLabels
+                        label="Preferred Label"
+                        map={selected.prefLabel}
+                      />
+                      <LangArrayLabels
+                        label="Alternative Labels"
+                        map={selected.altLabels}
+                      />
                     </div>
 
                     {/* Definition */}
                     {langEn(selected.definition) && (
                       <div className="bg-stm-warm-50 border border-stm-warm-200 rounded px-3 py-2 mb-4">
-                        <span className="text-xs font-medium text-stm-warm-600 uppercase tracking-wide">Definition</span>
+                        <span className="text-xs font-medium text-stm-warm-600 uppercase tracking-wide">
+                          Definition
+                        </span>
                         <LangText map={selected.definition} />
                       </div>
                     )}
@@ -270,33 +295,28 @@ export default function VocabularyPage() {
                         <span className="text-xs font-medium text-amber-700 uppercase tracking-wide">
                           Editorial Note (Colonial Bias)
                         </span>
-                        <LangText map={selected.editorialNote} className="text-amber-800" />
+                        <LangText
+                          map={selected.editorialNote}
+                          className="text-amber-800"
+                        />
                       </div>
                     )}
 
                     <dl className="space-y-3 text-sm">
                       <div>
-                        <dt className="text-stm-warm-500 font-medium">Type ID</dt>
+                        <dt className="text-stm-warm-500 font-medium">
+                          Type ID
+                        </dt>
                         <dd className="text-stm-warm-700 font-mono text-xs">
                           {selected.typeId}
                         </dd>
                       </div>
 
-                      <div>
-                        <dt className="text-stm-warm-500 font-medium">CRM Class</dt>
-                        <dd className="text-stm-warm-700">
-                          <span className="inline-block px-1.5 py-0.5 text-xs font-mono bg-stm-warm-100 text-stm-warm-600 rounded">
-                            {selected.crmBadge}
-                          </span>
-                          <span className="ml-2 text-xs text-stm-warm-500">
-                            {selected.crmClass.replace(/_/g, ' ')}
-                          </span>
-                        </dd>
-                      </div>
-
                       {selected.broader && (
                         <div>
-                          <dt className="text-stm-warm-500 font-medium">Broader</dt>
+                          <dt className="text-stm-warm-500 font-medium">
+                            Broader
+                          </dt>
                           <dd className="text-stm-warm-700 font-mono text-xs">
                             {shortUri(selected.broader)}
                           </dd>
@@ -306,7 +326,9 @@ export default function VocabularyPage() {
                       {/* External links */}
                       {selected.exactMatch.length > 0 && (
                         <div>
-                          <dt className="text-stm-warm-500 font-medium">Exact Match</dt>
+                          <dt className="text-stm-warm-500 font-medium">
+                            Exact Match
+                          </dt>
                           <dd className="space-y-0.5">
                             {selected.exactMatch.map((uri) => (
                               <ExternalLink key={uri} uri={uri} />
@@ -317,7 +339,9 @@ export default function VocabularyPage() {
 
                       {selected.closeMatch.length > 0 && (
                         <div>
-                          <dt className="text-stm-warm-500 font-medium">Close Match</dt>
+                          <dt className="text-stm-warm-500 font-medium">
+                            Close Match
+                          </dt>
                           <dd className="space-y-0.5">
                             {selected.closeMatch.map((uri) => (
                               <ExternalLink key={uri} uri={uri} />
@@ -329,18 +353,29 @@ export default function VocabularyPage() {
                       {/* Related concepts */}
                       {selected.related.length > 0 && (
                         <div>
-                          <dt className="text-stm-warm-500 font-medium">Related</dt>
+                          <dt className="text-stm-warm-500 font-medium">
+                            Related
+                          </dt>
                           <dd className="flex gap-1 flex-wrap">
                             {selected.related.map((uri) => {
                               const relId = uri.replace(/.*\//, '');
-                              const rel = concepts.find((c) => c.typeId === relId);
+                              const rel = concepts.find(
+                                (c) => c.typeId === relId,
+                              );
                               return (
                                 <button
                                   key={uri}
-                                  onClick={() => rel && setSelectedConcept(rel.typeId)}
+                                  onClick={() =>
+                                    rel && setSelectedConcept(rel.typeId)
+                                  }
                                   className="inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-stm-warm-100 text-stm-warm-600 rounded hover:bg-stm-warm-200 transition-colors"
                                 >
-                                  {rel && <span className="w-2 h-2 rounded-sm" style={{ backgroundColor: rel.color }} />}
+                                  {rel && (
+                                    <span
+                                      className="w-2 h-2 rounded-sm"
+                                      style={{ backgroundColor: rel.color }}
+                                    />
+                                  )}
                                   {rel ? langEn(rel.prefLabel) : shortUri(uri)}
                                 </button>
                               );
@@ -349,40 +384,34 @@ export default function VocabularyPage() {
                         </div>
                       )}
 
-                      <div>
-                        <dt className="text-stm-warm-500 font-medium">Sort Order</dt>
-                        <dd className="text-stm-warm-700 text-xs">{selected.sortOrder}</dd>
-                      </div>
-
-                      <div>
-                        <dt className="text-stm-warm-500 font-medium">Color</dt>
-                        <dd className="flex items-center gap-2">
-                          <span
-                            className="inline-block w-5 h-5 rounded border border-stm-warm-200"
-                            style={{ backgroundColor: selected.color }}
-                          />
-                          <span className="text-stm-warm-700 font-mono text-xs">
-                            {selected.color}
-                          </span>
-                        </dd>
-                      </div>
-
                       {/* Timestamps */}
                       {(selected.created || selected.modified) && (
                         <div>
-                          <dt className="text-stm-warm-500 font-medium">Dates</dt>
+                          <dt className="text-stm-warm-500 font-medium">
+                            Dates
+                          </dt>
                           <dd className="text-stm-warm-400 text-xs">
-                            {selected.created && <span>Created: {selected.created}</span>}
-                            {selected.created && selected.modified && <span className="mx-2">|</span>}
-                            {selected.modified && <span>Modified: {selected.modified}</span>}
+                            {selected.created && (
+                              <span>Created: {selected.created}</span>
+                            )}
+                            {selected.created && selected.modified && (
+                              <span className="mx-2">|</span>
+                            )}
+                            {selected.modified && (
+                              <span>Modified: {selected.modified}</span>
+                            )}
                           </dd>
                         </div>
                       )}
 
                       {selected.historyNote && (
                         <div>
-                          <dt className="text-stm-warm-500 font-medium">History Note</dt>
-                          <dd className="text-stm-warm-500 text-xs italic">{selected.historyNote}</dd>
+                          <dt className="text-stm-warm-500 font-medium">
+                            History Note
+                          </dt>
+                          <dd className="text-stm-warm-500 text-xs italic">
+                            {selected.historyNote}
+                          </dd>
                         </div>
                       )}
                     </dl>
@@ -405,18 +434,26 @@ export default function VocabularyPage() {
 
 /* --- Helper components for multilingual display --- */
 
-const LANG_NAMES: Record<string, string> = { en: 'English', nl: 'Nederlands', srn: 'Sranan Tongo' };
+const LANG_NAMES: Record<string, string> = {
+  en: 'English',
+  nl: 'Nederlands',
+  srn: 'Sranan Tongo',
+};
 
 function LangLabels({ label, map }: { label: string; map: LangMap }) {
   const entries = Object.entries(map).filter(([, v]) => v);
   if (entries.length === 0) return null;
   return (
     <div className="mb-1">
-      <span className="text-[10px] text-stm-warm-400 uppercase tracking-wide">{label}</span>
+      <span className="text-[10px] text-stm-warm-400 uppercase tracking-wide">
+        {label}
+      </span>
       <div className="flex flex-wrap gap-x-4 gap-y-0.5">
         {entries.map(([lang, val]) => (
           <span key={lang} className="text-sm text-stm-warm-700">
-            <span className="text-[10px] font-mono text-stm-warm-300 mr-1">{lang}</span>
+            <span className="text-[10px] font-mono text-stm-warm-300 mr-1">
+              {lang}
+            </span>
             {val}
           </span>
         ))}
@@ -430,28 +467,43 @@ function LangArrayLabels({ label, map }: { label: string; map: LangArrayMap }) {
   if (entries.length === 0) return null;
   return (
     <div className="mb-1">
-      <span className="text-[10px] text-stm-warm-400 uppercase tracking-wide">{label}</span>
+      <span className="text-[10px] text-stm-warm-400 uppercase tracking-wide">
+        {label}
+      </span>
       <div className="flex flex-wrap gap-1 mt-0.5">
         {entries.flatMap(([lang, vals]) =>
           (vals || []).map((v) => (
-            <span key={`${lang}-${v}`} className="inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-stm-warm-100 text-stm-warm-600 rounded">
-              <span className="text-[9px] font-mono text-stm-warm-300">{lang}</span>
+            <span
+              key={`${lang}-${v}`}
+              className="inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-stm-warm-100 text-stm-warm-600 rounded"
+            >
+              <span className="text-[9px] font-mono text-stm-warm-300">
+                {lang}
+              </span>
               {v}
             </span>
-          ))
+          )),
         )}
       </div>
     </div>
   );
 }
 
-function LangText({ map, className = 'text-stm-warm-700' }: { map: LangMap; className?: string }) {
+function LangText({
+  map,
+  className = 'text-stm-warm-700',
+}: {
+  map: LangMap;
+  className?: string;
+}) {
   const entries = Object.entries(map).filter(([, v]) => v);
   return (
     <div className="mt-1 space-y-0.5">
       {entries.map(([lang, val]) => (
         <p key={lang} className={`text-sm ${className}`}>
-          <span className="text-[10px] font-mono text-stm-warm-300 mr-1">{LANG_NAMES[lang] || lang}</span>
+          <span className="text-[10px] font-mono text-stm-warm-300 mr-1">
+            {LANG_NAMES[lang] || lang}
+          </span>
           {val}
         </p>
       ))}
