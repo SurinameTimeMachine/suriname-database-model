@@ -8,14 +8,8 @@ import {
   getSourcesByCategory,
   useSourceRegistry,
 } from '@/lib/sources';
-import { useEffect, useState } from 'react';
-
-const CATEGORY_ORDER = ['map', 'register', 'almanac', 'dataset', 'external'];
-
-interface AuthState {
-  user: { login: string; avatar_url: string; name: string | null } | null;
-  canEdit: boolean;
-}
+import { useState } from 'react';
+import { useAuth } from '@/lib/auth';
 
 function sortedCategories(categories: SourceCategory[]): SourceCategory[] {
   return [...categories].sort((a, b) => {
@@ -25,21 +19,16 @@ function sortedCategories(categories: SourceCategory[]): SourceCategory[] {
   });
 }
 
+const CATEGORY_ORDER = ['map', 'register', 'almanac', 'dataset', 'external'];
+
 export default function SourcesPage() {
   const { categories, sources, loading, prefLabel, description } =
     useSourceRegistry();
   const [expandedSource, setExpandedSource] = useState<string | null>(null);
   const [showFuture, setShowFuture] = useState(false);
-  const [auth, setAuth] = useState<AuthState>({ user: null, canEdit: false });
+  const { canEdit } = useAuth();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
-
-  useEffect(() => {
-    fetch('/api/auth/session')
-      .then((r) => r.json())
-      .then(setAuth)
-      .catch(() => {});
-  }, []);
 
   if (loading) {
     return (
@@ -78,7 +67,7 @@ export default function SourcesPage() {
             </p>
           </div>
           <div className="flex items-center gap-3 shrink-0">
-            {auth.canEdit && (
+            {canEdit && (
               <button
                 onClick={() => {
                   setShowAddForm(true);
@@ -88,30 +77,6 @@ export default function SourcesPage() {
               >
                 + Add Source
               </button>
-            )}
-            {auth.user ? (
-              <div className="flex items-center gap-2">
-                <img
-                  src={auth.user.avatar_url}
-                  alt={auth.user.login}
-                  className="w-7 h-7 rounded-full"
-                />
-                <span className="text-sm text-stm-warm-600">
-                  {auth.user.name || auth.user.login}
-                </span>
-                {auth.canEdit && (
-                  <span className="text-xs bg-stm-teal-100 text-stm-teal-700 px-1.5 py-0.5 rounded">
-                    Editor
-                  </span>
-                )}
-              </div>
-            ) : (
-              <a
-                href="/api/auth/github"
-                className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium bg-stm-warm-800 text-white rounded hover:bg-stm-warm-700 transition-colors"
-              >
-                Sign in
-              </a>
             )}
           </div>
         </div>
@@ -186,7 +151,7 @@ export default function SourcesPage() {
                   expandedSource={expandedSource}
                   onToggle={setExpandedSource}
                   variant="active"
-                  canEdit={auth.canEdit}
+                  canEdit={canEdit}
                   editingId={editingId}
                   onEdit={setEditingId}
                   categories={orderedCategories}
@@ -231,7 +196,7 @@ export default function SourcesPage() {
                     expandedSource={expandedSource}
                     onToggle={setExpandedSource}
                     variant="future"
-                    canEdit={auth.canEdit}
+                    canEdit={canEdit}
                     editingId={editingId}
                     onEdit={setEditingId}
                     categories={orderedCategories}

@@ -46,13 +46,19 @@ const GAZETTEER_PATH = 'data/places-gazetteer.jsonld';
 export async function POST(request: NextRequest) {
   const token = await getSessionToken();
   if (!token) {
-    return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+    return NextResponse.json(
+      { error: 'You are not signed in. Please sign in with GitHub first.' },
+      { status: 401 },
+    );
   }
 
   const canEdit = await hasRepoAccess(token);
   if (!canEdit) {
     return NextResponse.json(
-      { error: 'No push access to repo' },
+      {
+        error:
+          'You do not have edit permissions on this repository. Contact the repository owner for access.',
+      },
       { status: 403 },
     );
   }

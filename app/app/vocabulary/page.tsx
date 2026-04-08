@@ -9,26 +9,16 @@ import type {
   ThesaurusScheme,
 } from '@/lib/thesaurus';
 import { useEffect, useState } from 'react';
-
-interface AuthState {
-  user: { login: string; avatar_url: string; name: string | null } | null;
-  canEdit: boolean;
-}
+import { useAuth } from '@/lib/auth';
 
 export default function VocabularyPage() {
-  const [auth, setAuth] = useState<AuthState>({ user: null, canEdit: false });
+  const { canEdit } = useAuth();
   const [scheme, setScheme] = useState<ThesaurusScheme | null>(null);
   const [concepts, setConcepts] = useState<PlaceTypeConcept[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedConcept, setSelectedConcept] = useState<string | null>(null);
   const [activeView, setActiveView] = useState<'browser' | 'editor'>('browser');
 
-  useEffect(() => {
-    fetch('/api/auth/session')
-      .then((r) => r.json())
-      .then(setAuth)
-      .catch(() => {});
-  }, []);
 
   useEffect(() => {
     fetch('/data/place-types-thesaurus.jsonld')
@@ -146,7 +136,7 @@ export default function VocabularyPage() {
         </div>
 
         {activeView === 'editor' ? (
-          <ThesaurusEditor canEdit={auth.canEdit} />
+          <ThesaurusEditor canEdit={canEdit} />
         ) : (
           <>
             {/* Concept Scheme */}

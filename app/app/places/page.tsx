@@ -9,11 +9,7 @@ import { useSourceRegistry, getActiveSources } from '@/lib/sources';
 import { usePlaceTypes } from '@/lib/thesaurus';
 import type { GazetteerPlace } from '@/lib/types';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-
-interface AuthState {
-  user: { login: string; avatar_url: string; name: string | null } | null;
-  canEdit: boolean;
-}
+import { useAuth } from '@/lib/auth';
 
 type SortKey =
   | 'prefLabel'
@@ -72,7 +68,7 @@ export default function PlacesPage() {
   );
   const [places, setPlaces] = useState<GazetteerPlace[]>([]);
   const [loading, setLoading] = useState(true);
-  const [auth, setAuth] = useState<AuthState>({ user: null, canEdit: false });
+  const { canEdit } = useAuth();
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -100,14 +96,6 @@ export default function PlacesPage() {
         setPlaces(Array.isArray(entries) ? entries : []);
       })
       .finally(() => setLoading(false));
-  }, []);
-
-  // Check auth session
-  useEffect(() => {
-    fetch('/api/auth/session')
-      .then((r) => r.json())
-      .then(setAuth)
-      .catch(() => {});
   }, []);
 
   const toggleSort = useCallback((key: SortKey) => {
@@ -276,48 +264,6 @@ export default function PlacesPage() {
                 Suriname Gazetteer
               </h1>
             </div>
-
-            {/* Auth */}
-            <div className="flex items-center gap-3 shrink-0">
-              {auth.user ? (
-                <div className="flex items-center gap-2">
-                  <img
-                    src={auth.user.avatar_url}
-                    alt={auth.user.login}
-                    className="w-7 h-7 rounded-full"
-                  />
-                  <span className="text-sm text-stm-warm-600">
-                    {auth.user.name || auth.user.login}
-                  </span>
-                  {auth.canEdit && (
-                    <span className="text-xs bg-stm-teal-100 text-stm-teal-700 px-1.5 py-0.5 rounded">
-                      Editor
-                    </span>
-                  )}
-                  <a
-                    href="/api/auth/logout"
-                    className="text-xs text-stm-warm-400 hover:text-stm-warm-600 underline"
-                  >
-                    Sign out
-                  </a>
-                </div>
-              ) : (
-                <a
-                  href="/api/auth/github"
-                  className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium bg-stm-warm-800 text-white rounded hover:bg-stm-warm-700 transition-colors"
-                >
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 16 16"
-                    fill="currentColor"
-                  >
-                    <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
-                  </svg>
-                  Sign in with GitHub
-                </a>
-              )}
-            </div>
           </div>
         </div>
       </div>
@@ -378,7 +324,7 @@ export default function PlacesPage() {
               )}
 
               {/* Add button */}
-              {auth.canEdit && (
+              {canEdit && (
                 <button
                   onClick={() => {
                     setIsCreating(true);
@@ -582,7 +528,7 @@ export default function PlacesPage() {
                 key={selectedPlace.id}
                 place={selectedPlace}
                 districts={districts}
-                canEdit={auth.canEdit}
+                canEdit={canEdit}
                 onSave={handleSave}
                 onCancel={handleCancel}
               />
