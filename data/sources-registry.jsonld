@@ -174,19 +174,6 @@
       "description": "Master plantation list with approximately 375 plantations including PSUR IDs, names, enslaved population series, districts, and product types."
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/wikidata",
-      "@type": [
-        "crm:E22_Human-Made_Object"
-      ],
-      "sourceId": "wikidata",
-      "prefLabel": "Wikidata",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/external",
-      "publisher": "Wikimedia Foundation",
-      "sameAs": "https://www.wikidata.org",
-      "linkedToGazetteer": false,
-      "description": "Wikidata Q-IDs used as persistent identifiers for reconciling organizations, persons, and places across datasets."
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/source/historic-map-1",
       "@type": [
         "crm:E22_Human-Made_Object"

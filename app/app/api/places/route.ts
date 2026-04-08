@@ -5,7 +5,12 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { NextRequest, NextResponse } from 'next/server';
 
-const THESAURUS_FILE = join(process.cwd(), '..', 'data', 'place-types-thesaurus.jsonld');
+const THESAURUS_FILE = join(
+  process.cwd(),
+  '..',
+  'data',
+  'place-types-thesaurus.jsonld',
+);
 
 /** Read thesaurus JSON-LD from disk */
 function readThesaurusGraph(): Record<string, unknown>[] {
@@ -79,6 +84,15 @@ export async function POST(request: NextRequest) {
 
     place.modifiedBy = login;
     place.modifiedAt = now;
+
+    // Ensure externalLinks exists
+    if (!place.externalLinks) place.externalLinks = [];
+
+    // Derive wikidataQid from externalLinks for backward compatibility
+    const wdLink = place.externalLinks.find(
+      (l: { authority: string }) => l.authority === 'wikidata',
+    );
+    place.wikidataQid = wdLink ? wdLink.identifier : null;
 
     // Set JSON-LD properties from thesaurus
     const crmMap = loadCrmMapping();

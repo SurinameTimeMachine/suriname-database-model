@@ -1,6 +1,6 @@
 'use client';
 
-import type { GazetteerPlace } from '@/lib/types';
+import type { GazetteerPlace, ExternalLink, SkosMatchType } from '@/lib/types';
 import { useSourceRegistry, getSourcesByCategory } from '@/lib/sources';
 import { usePlaceTypes } from '@/lib/thesaurus';
 import dynamic from 'next/dynamic';
@@ -17,6 +17,187 @@ interface PlaceEditorProps {
 }
 
 const CATEGORY_ORDER = ['map', 'register', 'almanac', 'dataset', 'external'];
+
+const AUTHORITIES: {
+  id: string;
+  label: string;
+  uriTemplate: string;
+  placeholder: string;
+}[] = [
+  {
+    id: 'wikidata',
+    label: 'Wikidata',
+    uriTemplate: 'https://www.wikidata.org/entity/{id}',
+    placeholder: 'e.g. Q59132846',
+  },
+  {
+    id: 'tgn',
+    label: 'Getty TGN',
+    uriTemplate: 'http://vocab.getty.edu/tgn/{id}',
+    placeholder: 'e.g. 7005564',
+  },
+  {
+    id: 'geonames',
+    label: 'GeoNames',
+    uriTemplate: 'https://sws.geonames.org/{id}/',
+    placeholder: 'e.g. 3383330',
+  },
+];
+
+const MATCH_TYPES: {
+  value: SkosMatchType;
+  label: string;
+  description: string;
+}[] = [
+  {
+    value: 'exactMatch',
+    label: 'Exact',
+    description: 'Same place, interchangeable',
+  },
+  {
+    value: 'closeMatch',
+    label: 'Close',
+    description: 'Very similar, not identical',
+  },
+  {
+    value: 'broadMatch',
+    label: 'Broad',
+    description: 'External concept is broader',
+  },
+  {
+    value: 'narrowMatch',
+    label: 'Narrow',
+    description: 'External concept is more specific',
+  },
+  {
+    value: 'relatedMatch',
+    label: 'Related',
+    description: 'Associated but different concept',
+  },
+];
+
+const MATCH_COLORS: Record<SkosMatchType, string> = {
+  exactMatch: 'bg-emerald-100 text-emerald-700 border-emerald-300',
+  closeMatch: 'bg-sky-100 text-sky-700 border-sky-300',
+  broadMatch: 'bg-amber-100 text-amber-700 border-amber-300',
+  narrowMatch: 'bg-violet-100 text-violet-700 border-violet-300',
+  relatedMatch: 'bg-stone-100 text-stone-600 border-stone-300',
+};
+
+function resolveUri(authority: string, identifier: string): string {
+  const auth = AUTHORITIES.find((a) => a.id === authority);
+  if (auth) return auth.uriTemplate.replace('{id}', identifier);
+  // Custom URI: identifier is the full URI
+  return identifier;
+}
+
+function authorityLabel(authority: string): string {
+  const auth = AUTHORITIES.find((a) => a.id === authority);
+  return auth ? auth.label : authority;
+}
+
+function ExternalLinkAdder({
+  existingLinks,
+  onAdd,
+}: {
+  existingLinks: ExternalLink[];
+  onAdd: (link: ExternalLink) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [authority, setAuthority] = useState('wikidata');
+  const [identifier, setIdentifier] = useState('');
+  const [matchType, setMatchType] = useState<SkosMatchType>('closeMatch');
+  const isCustom = !AUTHORITIES.find((a) => a.id === authority);
+  const placeholder =
+    AUTHORITIES.find((a) => a.id === authority)?.placeholder || 'Full URI';
+  const isDuplicate = existingLinks.some(
+    (l) => l.authority === authority && l.identifier === identifier,
+  );
+
+  const handleAdd = () => {
+    if (!identifier.trim() || isDuplicate) return;
+    onAdd({ authority, identifier: identifier.trim(), matchType });
+    setIdentifier('');
+    setOpen(false);
+  };
+
+  if (!open) {
+    return (
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="text-xs text-stm-teal-600 hover:text-stm-teal-700 font-medium"
+      >
+        + Add link
+      </button>
+    );
+  }
+
+  return (
+    <div className="border border-stm-warm-200 rounded p-2.5 bg-stm-warm-50 space-y-2">
+      <div className="flex gap-2">
+        <select
+          value={authority}
+          onChange={(e) => setAuthority(e.target.value)}
+          className="px-2 py-1.5 text-xs border border-stm-warm-200 rounded bg-white focus:ring-1 focus:ring-stm-sepia-400 outline-none"
+        >
+          {AUTHORITIES.map((a) => (
+            <option key={a.id} value={a.id}>
+              {a.label}
+            </option>
+          ))}
+          <option value="_custom">Custom URI</option>
+        </select>
+        <input
+          type="text"
+          value={identifier}
+          onChange={(e) => setIdentifier(e.target.value)}
+          placeholder={authority === '_custom' ? 'https://...' : placeholder}
+          className={`flex-1 px-2 py-1.5 text-xs border border-stm-warm-200 rounded bg-white font-mono focus:ring-1 focus:ring-stm-sepia-400 outline-none ${isDuplicate ? 'border-red-300' : ''}`}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') handleAdd();
+          }}
+        />
+      </div>
+      <div className="flex items-center gap-2">
+        <span className="text-[10px] text-stm-warm-500 shrink-0">Match:</span>
+        <select
+          value={matchType}
+          onChange={(e) => setMatchType(e.target.value as SkosMatchType)}
+          className="px-2 py-1 text-[10px] border border-stm-warm-200 rounded bg-white focus:ring-1 focus:ring-stm-sepia-400 outline-none"
+        >
+          {MATCH_TYPES.map((mt) => (
+            <option key={mt.value} value={mt.value}>
+              {mt.label} -- {mt.description}
+            </option>
+          ))}
+        </select>
+        <div className="flex-1" />
+        <button
+          type="button"
+          onClick={handleAdd}
+          disabled={!identifier.trim() || isDuplicate}
+          className="px-2.5 py-1 text-xs font-medium bg-stm-teal-600 text-white rounded hover:bg-stm-teal-700 disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          Add
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setOpen(false);
+            setIdentifier('');
+          }}
+          className="px-2.5 py-1 text-xs text-stm-warm-500 hover:text-stm-warm-700"
+        >
+          Cancel
+        </button>
+      </div>
+      {isDuplicate && (
+        <p className="text-[10px] text-red-500">This link already exists.</p>
+      )}
+    </div>
+  );
+}
 
 export default function PlaceEditor({
   place,
@@ -283,31 +464,127 @@ export default function PlaceEditor({
           />
         </div>
 
-        {/* Wikidata Q-ID */}
+        {/* External Links */}
         <div>
           <label className="block text-sm font-medium text-stm-warm-700 mb-1">
-            Wikidata Q-ID
+            External Links
+            <span className="text-stm-warm-400 font-normal text-xs ml-1">
+              (LOD authority links with match closeness)
+            </span>
           </label>
-          <div className="flex items-center gap-2">
-            <input
-              type="text"
-              value={draft.wikidataQid || ''}
-              onChange={(e) => update('wikidataQid', e.target.value || null)}
-              disabled={!canEdit}
-              placeholder="e.g. Q59132846"
-              className="flex-1 px-3 py-2 border border-stm-warm-200 rounded text-sm font-mono bg-white focus:ring-2 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50"
+
+          {/* Existing links */}
+          {(draft.externalLinks || []).length > 0 && (
+            <div className="space-y-1.5 mb-2">
+              {(draft.externalLinks || []).map((link, i) => (
+                <div
+                  key={`${link.authority}-${link.identifier}`}
+                  className="flex items-center gap-2 px-2.5 py-1.5 border border-stm-warm-200 rounded bg-white text-sm"
+                >
+                  <span className="text-stm-warm-500 font-medium text-xs w-16 shrink-0">
+                    {authorityLabel(link.authority)}
+                  </span>
+                  <span className="font-mono text-stm-warm-700 text-xs flex-1 truncate">
+                    {link.identifier}
+                  </span>
+                  {canEdit ? (
+                    <select
+                      value={link.matchType}
+                      onChange={(e) => {
+                        const links = [...(draft.externalLinks || [])];
+                        links[i] = {
+                          ...links[i],
+                          matchType: e.target.value as SkosMatchType,
+                        };
+                        update('externalLinks', links);
+                      }}
+                      className="text-[10px] px-1.5 py-0.5 rounded border font-medium bg-white focus:ring-1 focus:ring-stm-sepia-400 outline-none"
+                    >
+                      {MATCH_TYPES.map((mt) => (
+                        <option key={mt.value} value={mt.value}>
+                          {mt.label}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <span
+                      className={`text-[10px] px-1.5 py-0.5 rounded border font-medium ${MATCH_COLORS[link.matchType]}`}
+                      title={
+                        MATCH_TYPES.find((m) => m.value === link.matchType)
+                          ?.description
+                      }
+                    >
+                      {
+                        MATCH_TYPES.find((m) => m.value === link.matchType)
+                          ?.label
+                      }
+                    </span>
+                  )}
+                  <a
+                    href={resolveUri(link.authority, link.identifier)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-stm-teal-600 hover:text-stm-teal-700 text-xs shrink-0"
+                    title="Open in new tab"
+                  >
+                    View
+                  </a>
+                  {canEdit && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const links = (draft.externalLinks || []).filter(
+                          (_, j) => j !== i,
+                        );
+                        update('externalLinks', links);
+                      }}
+                      className="text-stm-warm-400 hover:text-red-500 text-xs shrink-0"
+                    >
+                      x
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Add new link form */}
+          {canEdit && (
+            <ExternalLinkAdder
+              existingLinks={draft.externalLinks || []}
+              onAdd={(link) =>
+                update('externalLinks', [...(draft.externalLinks || []), link])
+              }
             />
-            {draft.wikidataQid && (
-              <a
-                href={`https://www.wikidata.org/wiki/${draft.wikidataQid}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-stm-teal-600 hover:text-stm-teal-700 text-sm underline shrink-0"
-              >
-                View on Wikidata
-              </a>
-            )}
-          </div>
+          )}
+
+          {!canEdit && (draft.externalLinks || []).length === 0 && (
+            <p className="text-xs text-stm-warm-400 italic">
+              No external links
+            </p>
+          )}
+
+          {/* Match type legend */}
+          <details className="mt-2">
+            <summary className="text-[10px] text-stm-warm-400 cursor-pointer hover:text-stm-warm-500">
+              Match type definitions
+            </summary>
+            <div className="mt-1 space-y-0.5">
+              {MATCH_TYPES.map((mt) => (
+                <div
+                  key={mt.value}
+                  className="flex items-center gap-2 text-[10px]"
+                >
+                  <span
+                    className={`px-1.5 py-0.5 rounded border font-medium ${MATCH_COLORS[mt.value]}`}
+                  >
+                    {mt.label}
+                  </span>
+                  <span className="text-stm-warm-500">{mt.description}</span>
+                </div>
+              ))}
+            </div>
+          </details>
         </div>
 
         {/* Sources */}

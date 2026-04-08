@@ -146,6 +146,21 @@ export interface GeoJSONCollection {
   features: GeoJSONFeature[];
 }
 
+/** SKOS match types for external authority links */
+export type SkosMatchType =
+  | 'exactMatch'
+  | 'closeMatch'
+  | 'broadMatch'
+  | 'narrowMatch'
+  | 'relatedMatch';
+
+/** External authority link with match closeness */
+export interface ExternalLink {
+  authority: string; // "wikidata" | "tgn" | "geonames" | custom prefix
+  identifier: string; // e.g. "Q59132846", "7005564"
+  matchType: SkosMatchType;
+}
+
 /** All valid gazetteer place types */
 export type PlaceType =
   | 'plantation'
@@ -181,7 +196,8 @@ export interface GazetteerPlace {
     crs: string;
   };
   sources: string[];
-  wikidataQid: string | null;
+  wikidataQid: string | null; // backward compat — derived from externalLinks
+  externalLinks: ExternalLink[];
   fid: number | null;
   psurIds: string[];
   district: string | null;

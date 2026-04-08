@@ -20,7 +20,7 @@ type SortKey =
   | 'type'
   | 'district'
   | 'psurIds'
-  | 'wikidataQid'
+  | 'externalLinks'
   | 'placeType'
   | 'lat'
   | 'modifiedAt';
@@ -37,6 +37,7 @@ function emptyPlace(): GazetteerPlace {
     location: { lat: null, lng: null, wkt: null, crs: 'EPSG:4326' },
     sources: [],
     wikidataQid: null,
+    externalLinks: [],
     fid: null,
     psurIds: [],
     district: null,
@@ -130,8 +131,7 @@ export default function PlacesPage() {
     if (sourceFilter.selected.size > 0) {
       const selected = [...sourceFilter.selected];
       const matchFn = (p: GazetteerPlace) => {
-        const check = (key: string) =>
-          key === 'wikidata' ? !!p.wikidataQid : p.sources.includes(key);
+        const check = (key: string) => p.sources.includes(key);
         return sourceFilter.mode === 'and'
           ? selected.every(check)
           : selected.some(check);
@@ -149,7 +149,11 @@ export default function PlacesPage() {
           p.prefLabel.toLowerCase().includes(q) ||
           p.altLabels.some((a) => a.toLowerCase().includes(q)) ||
           p.id.toLowerCase().includes(q) ||
-          (p.wikidataQid && p.wikidataQid.toLowerCase().includes(q)) ||
+          (p.externalLinks || []).some(
+            (l) =>
+              l.identifier.toLowerCase().includes(q) ||
+              l.authority.toLowerCase().includes(q),
+          ) ||
           (p.district && p.district.toLowerCase().includes(q)) ||
           p.psurIds.some((id) => id.toLowerCase().includes(q)) ||
           (p.locationDescription &&
@@ -177,8 +181,11 @@ export default function PlacesPage() {
           return cmp(a.district, b.district);
         case 'psurIds':
           return cmp(a.psurIds[0] ?? null, b.psurIds[0] ?? null);
-        case 'wikidataQid':
-          return cmp(a.wikidataQid, b.wikidataQid);
+        case 'externalLinks':
+          return cmp(
+            (a.externalLinks || []).length || null,
+            (b.externalLinks || []).length || null,
+          );
         case 'placeType':
           return cmp(a.placeType, b.placeType);
         case 'lat':
@@ -405,7 +412,7 @@ export default function PlacesPage() {
                         ['district', 'District'],
                         ['placeType', 'Product / Type'],
                         ['psurIds', 'PSUR'],
-                        ['wikidataQid', 'Wikidata'],
+                        ['externalLinks', 'Links'],
                         ['lat', 'Coords'],
                         ['modifiedAt', 'Modified'],
                       ] as [SortKey, string][]
@@ -424,9 +431,6 @@ export default function PlacesPage() {
                     </th>
                     <th className="py-2 px-2 font-medium whitespace-nowrap text-center">
                       Alm.
-                    </th>
-                    <th className="py-2 px-2 font-medium whitespace-nowrap text-center">
-                      WD
                     </th>
                   </tr>
                 </thead>
@@ -491,18 +495,20 @@ export default function PlacesPage() {
                         )}
                       </td>
 
-                      {/* Wikidata */}
-                      <td className="py-1.5 px-2 text-stm-warm-500 font-mono text-xs">
-                        {place.wikidataQid ? (
-                          <a
-                            href={`https://www.wikidata.org/wiki/${place.wikidataQid}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-stm-teal-600 hover:underline"
-                            onClick={(e) => e.stopPropagation()}
+                      {/* External Links */}
+                      <td className="py-1.5 px-2 text-center">
+                        {(place.externalLinks || []).length > 0 ? (
+                          <span
+                            className="inline-block min-w-5 px-1 py-0.5 text-[10px] font-medium rounded bg-stm-teal-100 text-stm-teal-700"
+                            title={(place.externalLinks || [])
+                              .map(
+                                (l) =>
+                                  `${l.authority}: ${l.identifier} (${l.matchType.replace('Match', '')})`,
+                              )
+                              .join('\n')}
                           >
-                            {place.wikidataQid}
-                          </a>
+                            {(place.externalLinks || []).length}
+                          </span>
                         ) : (
                           <span className="text-stm-warm-200">--</span>
                         )}
@@ -549,20 +555,6 @@ export default function PlacesPage() {
                           <span
                             className="text-stm-teal-600"
                             title="In Almanakken"
-                          >
-                            &#10003;
-                          </span>
-                        ) : (
-                          <span className="text-stm-warm-200">-</span>
-                        )}
-                      </td>
-
-                      {/* Wikidata */}
-                      <td className="py-1.5 px-2 text-center">
-                        {place.wikidataQid ? (
-                          <span
-                            className="text-blue-600"
-                            title="Has Wikidata Q-ID"
                           >
                             &#10003;
                           </span>
