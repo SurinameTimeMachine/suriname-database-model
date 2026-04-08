@@ -24,7 +24,8 @@
     "iiifManifest": "stm:iiifManifest",
     "iiifInfoUrl": "stm:iiifInfoUrl",
     "linkedToGazetteer": "stm:linkedToGazetteer",
-    "description": "dct:description"
+    "description": "dct:description",
+    "collectionUrl": "stm:collectionUrl"
   },
   "@id": "https://data.suriname-timemachine.org/registry/sources",
   "@type": "dct:Dataset",
@@ -71,6 +72,14 @@
       ],
       "prefLabel": "External References",
       "description": "External linked data sources used for reconciliation and enrichment."
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/type/source-type/research-collection",
+      "@type": [
+        "crm:E55_Type"
+      ],
+      "prefLabel": "Research Collections",
+      "description": "Community and researcher-compiled document collections containing historical descriptions of Surinamese plantations, places, and persons."
     },
     {
       "@id": "https://data.suriname-timemachine.org/source/map-1930",
@@ -2115,6 +2124,20 @@
       "iiifManifest": "https://digitalcollections.universiteitleiden.nl/iiif_manifest/item%3A2017249/manifest",
       "iiifInfoUrl": "https://iiif.universiteitleiden.nl/iiif/2/hdl:1887.1%252Fitem:2016722/info.json",
       "linkedToGazetteer": false
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/source/dikland-collection",
+      "@type": [
+        "crm:E22_Human-Made_Object"
+      ],
+      "sourceId": "dikland-collection",
+      "prefLabel": "Suriname Heritage Guide -- Dikland Collection",
+      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/research-collection",
+      "maker": "Philip Dikland",
+      "sameAs": "https://www.suriname-heritage-guide.com/",
+      "collectionUrl": "https://drive.google.com/drive/u/0/folders/0B88mZFitv8embmZaYWFQNnZacDQ?tid=0B88mZFitv8emcjVfcG5hWFJOdWs&resourcekey=0-sImlF_DkEFu3ebWbDQ58Kg",
+      "linkedToGazetteer": true,
+      "description": "Collection of historically documented plantation descriptions compiled by Philip Dikland and published via the Suriname Heritage Guide. Each PDF covers a single plantation and includes chronology, alternative names, and transcribed historical sources."
     }
   ]
 }

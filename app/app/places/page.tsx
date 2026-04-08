@@ -40,6 +40,7 @@ function emptyPlace(): GazetteerPlace {
     locationDescription: null,
     locationDescriptionOriginal: null,
     placeType: null,
+    diklandRefs: [],
     modifiedBy: null,
     modifiedAt: null,
   };

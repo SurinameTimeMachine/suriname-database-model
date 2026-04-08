@@ -10,7 +10,8 @@
     "E25_Human_Made_Feature": "crm:E25_Human-Made_Feature",
     "E25_Human-Made_Feature": "crm:E25_Human-Made_Feature",
     "E26_Physical_Feature": "crm:E26_Physical_Feature",
-    "E53_Place": "crm:E53_Place"
+    "E53_Place": "crm:E53_Place",
+    "diklandRefs": "stm:hasDiklandRef"
   },
   "@id": "https://data.suriname-timemachine.org/gazetteer",
   "@type": "dct:Dataset",

@@ -161,6 +161,15 @@ export interface ExternalLink {
   matchType: SkosMatchType;
 }
 
+/** Reference to a plantation description PDF in the Dikland (Suriname Heritage Guide) collection */
+export interface DiklandRef {
+  folderPath: string; // path within the Drive collection, e.g. "erfgoed - geschiedenis/.../Voorburg 2004-01 geschiedenis.pdf"
+  driveUrl: string; // direct link (Drive folder or PDF URL)
+  author: string | null;
+  year: string | null;
+  notes: string | null;
+}
+
 /** All valid gazetteer place types */
 export type PlaceType =
   | 'plantation'
@@ -204,6 +213,7 @@ export interface GazetteerPlace {
   locationDescription: string | null;
   locationDescriptionOriginal: string | null;
   placeType: string | null;
+  diklandRefs: DiklandRef[];
   modifiedBy: string | null;
   modifiedAt: string | null;
 }

@@ -1,8 +1,13 @@
 'use client';
 
-import type { GazetteerPlace, ExternalLink, SkosMatchType } from '@/lib/types';
-import { useSourceRegistry, getSourcesByCategory } from '@/lib/sources';
+import { getSourcesByCategory, useSourceRegistry } from '@/lib/sources';
 import { usePlaceTypes } from '@/lib/thesaurus';
+import type {
+  DiklandRef,
+  ExternalLink,
+  GazetteerPlace,
+  SkosMatchType,
+} from '@/lib/types';
 import dynamic from 'next/dynamic';
 import { useCallback, useMemo, useState } from 'react';
 
@@ -16,7 +21,17 @@ interface PlaceEditorProps {
   onCancel: () => void;
 }
 
-const CATEGORY_ORDER = ['map', 'register', 'almanac', 'dataset', 'external'];
+const CATEGORY_ORDER = [
+  'map',
+  'register',
+  'almanac',
+  'dataset',
+  'external',
+  'research-collection',
+];
+
+const DIKLAND_COLLECTION_URL =
+  'https://drive.google.com/drive/u/0/folders/0B88mZFitv8embmZaYWFQNnZacDQ?tid=0B88mZFitv8emcjVfcG5hWFJOdWs&resourcekey=0-sImlF_DkEFu3ebWbDQ58Kg';
 
 const AUTHORITIES: {
   id: string;
@@ -199,6 +214,123 @@ function ExternalLinkAdder({
   );
 }
 
+function DiklandRefAdder({ onAdd }: { onAdd: (ref: DiklandRef) => void }) {
+  const [open, setOpen] = useState(false);
+  const [folderPath, setFolderPath] = useState('');
+  const [driveUrl, setDriveUrl] = useState(DIKLAND_COLLECTION_URL);
+  const [author, setAuthor] = useState('Philip Dikland');
+  const [year, setYear] = useState('');
+  const [notes, setNotes] = useState('');
+
+  const handleAdd = () => {
+    if (!folderPath.trim()) return;
+    onAdd({
+      folderPath: folderPath.trim(),
+      driveUrl: driveUrl.trim() || DIKLAND_COLLECTION_URL,
+      author: author.trim() || null,
+      year: year.trim() || null,
+      notes: notes.trim() || null,
+    });
+    setFolderPath('');
+    setDriveUrl(DIKLAND_COLLECTION_URL);
+    setAuthor('Philip Dikland');
+    setYear('');
+    setNotes('');
+    setOpen(false);
+  };
+
+  if (!open) {
+    return (
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="text-xs text-stm-teal-600 hover:text-stm-teal-700 font-medium"
+      >
+        + Add Dikland reference
+      </button>
+    );
+  }
+
+  return (
+    <div className="border border-stm-warm-200 rounded p-2.5 bg-stm-warm-50 space-y-2">
+      <div>
+        <span className="text-[10px] text-stm-warm-500">
+          Folder path (required)
+        </span>
+        <input
+          type="text"
+          value={folderPath}
+          onChange={(e) => setFolderPath(e.target.value)}
+          placeholder="e.g. erfgoed - geschiedenis/Suriname rivier/plantages/Voorburg 2004-01 geschiedenis.pdf"
+          className="w-full mt-0.5 px-2 py-1.5 text-xs border border-stm-warm-200 rounded bg-white font-mono focus:ring-1 focus:ring-stm-sepia-400 outline-none"
+        />
+      </div>
+      <div>
+        <span className="text-[10px] text-stm-warm-500">Drive URL</span>
+        <input
+          type="text"
+          value={driveUrl}
+          onChange={(e) => setDriveUrl(e.target.value)}
+          placeholder="https://drive.google.com/..."
+          className="w-full mt-0.5 px-2 py-1.5 text-xs border border-stm-warm-200 rounded bg-white font-mono focus:ring-1 focus:ring-stm-sepia-400 outline-none"
+        />
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        <div>
+          <span className="text-[10px] text-stm-warm-500">Author</span>
+          <input
+            type="text"
+            value={author}
+            onChange={(e) => setAuthor(e.target.value)}
+            placeholder="Philip Dikland"
+            className="w-full mt-0.5 px-2 py-1.5 text-xs border border-stm-warm-200 rounded bg-white focus:ring-1 focus:ring-stm-sepia-400 outline-none"
+          />
+        </div>
+        <div>
+          <span className="text-[10px] text-stm-warm-500">Year</span>
+          <input
+            type="text"
+            value={year}
+            onChange={(e) => setYear(e.target.value)}
+            placeholder="e.g. 2004"
+            className="w-full mt-0.5 px-2 py-1.5 text-xs border border-stm-warm-200 rounded bg-white font-mono focus:ring-1 focus:ring-stm-sepia-400 outline-none"
+          />
+        </div>
+      </div>
+      <div>
+        <span className="text-[10px] text-stm-warm-500">Notes (optional)</span>
+        <textarea
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          rows={2}
+          placeholder="Alt labels, chronology highlights, transcribed quotes…"
+          className="w-full mt-0.5 px-2 py-1.5 text-xs border border-stm-warm-200 rounded bg-white focus:ring-1 focus:ring-stm-sepia-400 outline-none resize-y"
+        />
+      </div>
+      <div className="flex items-center gap-2 justify-end">
+        <button
+          type="button"
+          onClick={handleAdd}
+          disabled={!folderPath.trim()}
+          className="px-2.5 py-1 text-xs font-medium bg-stm-teal-600 text-white rounded hover:bg-stm-teal-700 disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          Add
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setOpen(false);
+            setFolderPath('');
+          }}
+          className="px-2.5 py-1 text-xs text-stm-warm-500 hover:text-stm-warm-700"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function PlaceEditor({
   place,
   districts,
@@ -229,6 +361,7 @@ export default function PlaceEditor({
     place.altLabels.join(', '),
   );
   const [sourceDropdownOpen, setSourceDropdownOpen] = useState(false);
+  const diklandRefs: DiklandRef[] = draft.diklandRefs ?? [];
 
   const update = <K extends keyof GazetteerPlace>(
     key: K,
@@ -585,6 +718,91 @@ export default function PlaceEditor({
               ))}
             </div>
           </details>
+        </div>
+
+        {/* Dikland Collection */}
+        <div>
+          <label className="block text-sm font-medium text-stm-warm-700 mb-1">
+            Dikland Collection
+            <span className="text-stm-warm-400 font-normal text-xs ml-1">
+              (Suriname Heritage Guide plantation descriptions)
+            </span>
+          </label>
+
+          {diklandRefs.length > 0 && (
+            <div className="space-y-1.5 mb-2">
+              {diklandRefs.map((ref, i) => (
+                <details
+                  key={i}
+                  className="border border-stm-warm-200 rounded bg-white"
+                >
+                  <summary className="flex items-center gap-2 px-2.5 py-1.5 cursor-pointer list-none">
+                    {ref.year && (
+                      <span className="text-[10px] font-mono text-stm-warm-400 shrink-0">
+                        {ref.year}
+                      </span>
+                    )}
+                    <span className="text-xs text-stm-warm-700 flex-1 truncate font-mono">
+                      {ref.folderPath.split('/').pop()}
+                    </span>
+                    <a
+                      href={ref.driveUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-stm-teal-600 hover:text-stm-teal-700 text-xs shrink-0"
+                      title="Open in Google Drive"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      Open
+                    </a>
+                    {canEdit && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          update(
+                            'diklandRefs',
+                            diklandRefs.filter((_, j) => j !== i),
+                          );
+                        }}
+                        className="text-stm-warm-400 hover:text-red-500 text-xs shrink-0"
+                      >
+                        x
+                      </button>
+                    )}
+                  </summary>
+                  <div className="px-2.5 pb-2 pt-1 space-y-1 border-t border-stm-warm-100">
+                    <p className="text-[10px] text-stm-warm-500 font-mono break-all">
+                      {ref.folderPath}
+                    </p>
+                    {ref.author && (
+                      <p className="text-[10px] text-stm-warm-500">
+                        {ref.author}
+                        {ref.year ? `, ${ref.year}` : ''}
+                      </p>
+                    )}
+                    {ref.notes && (
+                      <p className="text-[10px] text-stm-warm-600 italic">
+                        {ref.notes}
+                      </p>
+                    )}
+                  </div>
+                </details>
+              ))}
+            </div>
+          )}
+
+          {canEdit && (
+            <DiklandRefAdder
+              onAdd={(ref) => update('diklandRefs', [...diklandRefs, ref])}
+            />
+          )}
+
+          {!canEdit && diklandRefs.length === 0 && (
+            <p className="text-xs text-stm-warm-400 italic">
+              No Dikland references
+            </p>
+          )}
         </div>
 
         {/* Sources */}
