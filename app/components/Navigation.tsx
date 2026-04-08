@@ -1,9 +1,9 @@
 'use client';
 
-import { useAuth } from '@/lib/auth';
+import { clearAuthCache, useAuth } from '@/lib/auth';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { usePathname, useSearchParams } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
 
 const NAV_ITEMS = [
   { href: '/explore', label: 'Explore Map' },
@@ -15,8 +15,32 @@ const NAV_ITEMS = [
 
 export default function Navigation() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [mobileOpen, setMobileOpen] = useState(false);
   const { user, canEdit, loading: authLoading } = useAuth();
+  const [authError, setAuthError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const err = searchParams.get('auth_error');
+    if (err) {
+      setAuthError(
+        err === 'missing_code'
+          ? 'GitHub login failed: no authorization code received.'
+          : 'GitHub login failed: could not exchange token. Please try again.',
+      );
+      // Clean URL without reloading
+      window.history.replaceState({}, '', pathname);
+    }
+  }, [searchParams, pathname]);
+
+  const signIn = useCallback(() => {
+    window.location.href = `/api/auth/github?returnTo=${encodeURIComponent(pathname)}`;
+  }, [pathname]);
+
+  const signOut = useCallback(() => {
+    clearAuthCache();
+    window.location.href = '/api/auth/logout';
+  }, []);
 
   return (
     <>
@@ -77,16 +101,16 @@ export default function Navigation() {
                         Editor
                       </span>
                     )}
-                    <a
-                      href="/api/auth/logout"
+                    <button
+                      onClick={signOut}
                       className="text-[10px] text-stm-warm-500 hover:text-stm-warm-300 underline"
                     >
                       Sign out
-                    </a>
+                    </button>
                   </>
                 ) : (
-                  <a
-                    href="/api/auth/github"
+                  <button
+                    onClick={signIn}
                     className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium bg-stm-warm-700/60 text-stm-warm-200 rounded hover:bg-stm-warm-700 transition-colors"
                   >
                     <svg
@@ -98,7 +122,7 @@ export default function Navigation() {
                       <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
                     </svg>
                     Sign in
-                  </a>
+                  </button>
                 )}
               </div>
             </div>
@@ -183,25 +207,38 @@ export default function Navigation() {
                       Editor
                     </span>
                   )}
-                  <a
-                    href="/api/auth/logout"
+                  <button
+                    onClick={signOut}
                     className="text-[10px] text-stm-warm-500 hover:text-stm-warm-300 underline"
                   >
                     Sign out
-                  </a>
+                  </button>
                 </div>
               ) : (
-                <a
-                  href="/api/auth/github"
-                  className="block px-3 py-2 text-sm text-stm-warm-300 hover:text-stm-sepia-100"
+                <button
+                  onClick={signIn}
+                  className="block px-3 py-2 text-sm text-stm-warm-300 hover:text-stm-sepia-100 w-full text-left"
                 >
                   Sign in with GitHub
-                </a>
+                </button>
               )}
             </div>
           </div>
         )}
       </nav>
+
+      {/* Auth error banner */}
+      {authError && (
+        <div className="bg-red-50 border-b border-red-200 px-4 py-1.5 text-center flex items-center justify-center gap-2">
+          <p className="text-xs text-red-700">{authError}</p>
+          <button
+            onClick={() => setAuthError(null)}
+            className="text-xs text-red-500 hover:text-red-700 underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Read-only banner for logged-in users without edit rights */}
       {user && !canEdit && (

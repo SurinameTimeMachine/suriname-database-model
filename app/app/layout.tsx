@@ -2,6 +2,7 @@ import './globals.css';
 import Navigation from '@/components/Navigation';
 import type { Metadata } from 'next';
 import { Inter, Libre_Baskerville } from 'next/font/google';
+import { Suspense } from 'react';
 
 const serif = Libre_Baskerville({
   subsets: ['latin'],
@@ -33,7 +34,9 @@ export default function RootLayout({
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>
-        <Navigation />
+        <Suspense>
+          <Navigation />
+        </Suspense>
         <main id="main-content" className="flex-1 overflow-hidden">
           {children}
         </main>

@@ -2,14 +2,14 @@
 
 import PlaceEditor from '@/components/PlaceEditor';
 import SourceFilter, {
-  type SourceFilterState,
   emptyFilterState,
+  type SourceFilterState,
 } from '@/components/SourceFilter';
-import { useSourceRegistry, getActiveSources } from '@/lib/sources';
+import { useAuth } from '@/lib/auth';
+import { getActiveSources, useSourceRegistry } from '@/lib/sources';
 import { usePlaceTypes } from '@/lib/thesaurus';
 import type { GazetteerPlace } from '@/lib/types';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useAuth } from '@/lib/auth';
 
 type SortKey =
   | 'prefLabel'
@@ -272,18 +272,18 @@ export default function PlacesPage() {
         {/* Search + filters */}
         <div className="border-b border-stm-warm-100 bg-white/50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-wrap">
               {/* Search */}
-              <div className="relative flex-1 max-w-md">
+              <div className="relative flex-1 min-w-48">
                 <input
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search places..."
-                  className="w-full pl-8 pr-3 py-1.5 text-sm border border-stm-warm-200 rounded bg-white focus:ring-2 focus:ring-stm-sepia-400 focus:border-stm-sepia-400 outline-none"
+                  placeholder="Search by name, district, PSUR ID..."
+                  className="w-full pl-8 pr-8 py-1.5 text-sm border border-stm-warm-200 rounded bg-white focus:ring-2 focus:ring-stm-sepia-400 focus:border-stm-sepia-400 outline-none"
                 />
                 <svg
-                  className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stm-warm-400"
+                  className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stm-warm-400 pointer-events-none"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -291,24 +291,44 @@ export default function PlacesPage() {
                   <circle cx="11" cy="11" r="8" strokeWidth="2" />
                   <path d="m21 21-4.35-4.35" strokeWidth="2" />
                 </svg>
+                {search && (
+                  <button
+                    onClick={() => setSearch('')}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-stm-warm-400 hover:text-stm-warm-600"
+                    aria-label="Clear search"
+                  >
+                    <svg
+                      className="w-3.5 h-3.5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        d="M18 6 6 18M6 6l12 12"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                  </button>
+                )}
               </div>
 
-              {/* Type filter buttons */}
-              <div className="flex gap-1">
-                {typeFilters.map(({ value, label }) => (
-                  <button
-                    key={value}
-                    onClick={() => setTypeFilter(value)}
-                    className={`px-2.5 py-1 text-xs font-medium rounded transition-colors ${
-                      typeFilter === value
-                        ? 'bg-stm-sepia-600 text-white'
-                        : 'bg-stm-warm-100 text-stm-warm-600 hover:bg-stm-warm-200'
-                    }`}
-                  >
-                    {label}
-                    <span className="ml-1 opacity-60">{typeCounts[value]}</span>
-                  </button>
-                ))}
+              {/* Type filter */}
+              <div className="flex items-center gap-1.5 shrink-0">
+                <label className="text-xs text-stm-warm-500 whitespace-nowrap">
+                  Place type
+                </label>
+                <select
+                  value={typeFilter}
+                  onChange={(e) => setTypeFilter(e.target.value)}
+                  className="text-sm border border-stm-warm-200 rounded bg-white pl-2.5 pr-7 py-1.5 text-stm-warm-700 focus:ring-2 focus:ring-stm-sepia-400 focus:border-stm-sepia-400 outline-none cursor-pointer"
+                >
+                  {typeFilters.map(({ value, label }) => (
+                    <option key={value} value={value}>
+                      {label} ({typeCounts[value] ?? 0})
+                    </option>
+                  ))}
+                </select>
               </div>
 
               {/* Source filter */}
