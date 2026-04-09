@@ -23,26 +23,41 @@ function slugify(text: string): string {
     .slice(0, 60);
 }
 
-/** Update or add a source in the registry via GitHub Contents API. */
-export async function POST(request: NextRequest) {
+/** Shared auth check */
+async function authorize(): Promise<
+  { token: string; error?: never } | { token?: never; error: NextResponse }
+> {
   const token = await getSessionToken();
   if (!token) {
-    return NextResponse.json(
-      { error: 'You are not signed in. Please sign in with GitHub first.' },
-      { status: 401 },
-    );
+    return {
+      error: NextResponse.json(
+        { error: 'You are not signed in. Please sign in with GitHub first.' },
+        { status: 401 },
+      ),
+    };
   }
 
   const canEdit = await hasRepoAccess(token);
   if (!canEdit) {
-    return NextResponse.json(
-      {
-        error:
-          'You do not have edit permissions on this repository. Contact the repository owner for access.',
-      },
-      { status: 403 },
-    );
+    return {
+      error: NextResponse.json(
+        {
+          error:
+            'You do not have edit permissions on this repository. Contact the repository owner for access.',
+        },
+        { status: 403 },
+      ),
+    };
   }
+
+  return { token };
+}
+
+/** Update or add a source in the registry via GitHub. */
+export async function POST(request: NextRequest) {
+  const auth = await authorize();
+  if (auth.error) return auth.error;
+  const { token } = auth;
 
   const payload: SourcePayload = await request.json();
 

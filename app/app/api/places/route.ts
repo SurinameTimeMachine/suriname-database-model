@@ -2,8 +2,8 @@ import { hasRepoAccess, readRepoFile, writeRepoFile } from '@/lib/github';
 import { getSessionToken } from '@/lib/session';
 import type { GazetteerPlace } from '@/lib/types';
 import { readFileSync } from 'fs';
-import { join } from 'path';
 import { NextRequest, NextResponse } from 'next/server';
+import { join } from 'path';
 
 const THESAURUS_FILE = join(
   process.cwd(),
@@ -42,26 +42,41 @@ function loadTypeOrder(): Record<string, number> {
 
 const GAZETTEER_PATH = 'data/places-gazetteer.jsonld';
 
-/** Save an updated place to the gazetteer via GitHub Contents API. */
-export async function POST(request: NextRequest) {
+/** Shared auth check — returns token or error response */
+async function authorize(): Promise<
+  { token: string; error?: never } | { token?: never; error: NextResponse }
+> {
   const token = await getSessionToken();
   if (!token) {
-    return NextResponse.json(
-      { error: 'You are not signed in. Please sign in with GitHub first.' },
-      { status: 401 },
-    );
+    return {
+      error: NextResponse.json(
+        { error: 'You are not signed in. Please sign in with GitHub first.' },
+        { status: 401 },
+      ),
+    };
   }
 
   const canEdit = await hasRepoAccess(token);
   if (!canEdit) {
-    return NextResponse.json(
-      {
-        error:
-          'You do not have edit permissions on this repository. Contact the repository owner for access.',
-      },
-      { status: 403 },
-    );
+    return {
+      error: NextResponse.json(
+        {
+          error:
+            'You do not have edit permissions on this repository. Contact the repository owner for access.',
+        },
+        { status: 403 },
+      ),
+    };
   }
+
+  return { token };
+}
+
+/** Save an updated place to the gazetteer via GitHub. */
+export async function POST(request: NextRequest) {
+  const auth = await authorize();
+  if (auth.error) return auth.error;
+  const { token } = auth;
 
   const place: GazetteerPlace = await request.json();
 
@@ -144,6 +159,137 @@ export async function POST(request: NextRequest) {
     console.error('Save place error:', err);
     return NextResponse.json(
       { error: err instanceof Error ? err.message : 'Failed to save' },
+      { status: 500 },
+    );
+  }
+}
+
+/** Partial merge update — only provided fields are changed. */
+export async function PUT(request: NextRequest) {
+  const auth = await authorize();
+  if (auth.error) return auth.error;
+  const { token } = auth;
+
+  const partial = await request.json();
+
+  if (!partial.id) {
+    return NextResponse.json(
+      { error: 'Missing required field: id' },
+      { status: 400 },
+    );
+  }
+
+  try {
+    const { content, sha } = await readRepoFile(token, GAZETTEER_PATH);
+    const jsonld = JSON.parse(content);
+    const gazetteer: GazetteerPlace[] = jsonld['@graph'] || [];
+
+    const idx = gazetteer.findIndex((p) => p.id === partial.id);
+    if (idx < 0) {
+      return NextResponse.json(
+        { error: `Place "${partial.id}" not found` },
+        { status: 404 },
+      );
+    }
+
+    const now = new Date().toISOString().split('T')[0];
+    const { login } = await (
+      await fetch('https://api.github.com/user', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+    ).json();
+
+    // Merge provided fields onto existing entry
+    const merged = { ...gazetteer[idx], ...partial };
+    merged.modifiedBy = login;
+    merged.modifiedAt = now;
+
+    // Recalculate derived fields
+    if (!merged.externalLinks) merged.externalLinks = [];
+    const wdLink = merged.externalLinks.find(
+      (l: { authority: string }) => l.authority === 'wikidata',
+    );
+    merged.wikidataQid = wdLink ? wdLink.identifier : null;
+
+    const crmMap = loadCrmMapping();
+    const crmClass = crmMap[merged.type] || 'E53_Place';
+    merged['@id'] = `stm:place/${merged.id}`;
+    merged['@type'] = crmClass;
+
+    gazetteer[idx] = merged;
+
+    // Sort
+    const typeOrder = loadTypeOrder();
+    gazetteer.sort((a, b) => {
+      const diff = (typeOrder[a.type] ?? 99) - (typeOrder[b.type] ?? 99);
+      return diff !== 0 ? diff : a.prefLabel.localeCompare(b.prefLabel);
+    });
+
+    jsonld['@graph'] = gazetteer;
+
+    await writeRepoFile(
+      token,
+      GAZETTEER_PATH,
+      JSON.stringify(jsonld, null, 2),
+      sha,
+      `Merge update place: ${merged.prefLabel}`,
+    );
+
+    return NextResponse.json({ ok: true, place: merged });
+  } catch (err) {
+    console.error('Merge place error:', err);
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : 'Failed to merge' },
+      { status: 500 },
+    );
+  }
+}
+
+/** Delete a place from the gazetteer. */
+export async function DELETE(request: NextRequest) {
+  const auth = await authorize();
+  if (auth.error) return auth.error;
+  const { token } = auth;
+
+  const { id } = await request.json();
+
+  if (!id) {
+    return NextResponse.json(
+      { error: 'Missing required field: id' },
+      { status: 400 },
+    );
+  }
+
+  try {
+    const { content, sha } = await readRepoFile(token, GAZETTEER_PATH);
+    const jsonld = JSON.parse(content);
+    const gazetteer: GazetteerPlace[] = jsonld['@graph'] || [];
+
+    const idx = gazetteer.findIndex((p) => p.id === id);
+    if (idx < 0) {
+      return NextResponse.json(
+        { error: `Place "${id}" not found` },
+        { status: 404 },
+      );
+    }
+
+    const label = gazetteer[idx].prefLabel;
+    gazetteer.splice(idx, 1);
+    jsonld['@graph'] = gazetteer;
+
+    await writeRepoFile(
+      token,
+      GAZETTEER_PATH,
+      JSON.stringify(jsonld, null, 2),
+      sha,
+      `Delete place: ${label}`,
+    );
+
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    console.error('Delete place error:', err);
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : 'Failed to delete' },
       { status: 500 },
     );
   }
