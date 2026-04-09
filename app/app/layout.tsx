@@ -3,6 +3,7 @@ import Navigation from '@/components/Navigation';
 import type { Metadata } from 'next';
 import { Inter, Libre_Baskerville } from 'next/font/google';
 import { Suspense } from 'react';
+import { Analytics } from '@vercel/analytics/next';
 
 const serif = Libre_Baskerville({
   subsets: ['latin'],
@@ -40,6 +41,7 @@ export default function RootLayout({
         <main id="main-content" className="flex-1 overflow-hidden">
           {children}
         </main>
+        <Analytics />
       </body>
     </html>
   );
