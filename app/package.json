@@ -17,6 +17,7 @@
   "packageManager": "pnpm@10.19.0",
   "dependencies": {
     "@allmaps/leaflet": "1.0.0-beta.53",
+    "@vercel/analytics": "^2.0.1",
     "csv-parse": "^6.2.1",
     "d3-force": "^3.0.0",
     "d3-selection": "^3.0.0",
