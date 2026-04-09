@@ -19,6 +19,7 @@ interface PlaceEditorProps {
   canEdit: boolean;
   onSave: (place: GazetteerPlace) => Promise<void>;
   onCancel: () => void;
+  onDelete?: (id: string) => Promise<void>;
 }
 
 const CATEGORY_ORDER = [
@@ -337,6 +338,7 @@ export default function PlaceEditor({
   canEdit,
   onSave,
   onCancel,
+  onDelete,
 }: PlaceEditorProps) {
   const { labels, crmBadges, biasTypes, allTypes } = usePlaceTypes();
   const { sources: registrySources, categories: registryCategories } =
@@ -1068,6 +1070,23 @@ export default function PlaceEditor({
             >
               Cancel
             </button>
+            {onDelete && !place.id.startsWith('stm-new-') && (
+              <button
+                onClick={() => {
+                  if (
+                    confirm(
+                      `Delete "${draft.prefLabel}"? This cannot be undone.`,
+                    )
+                  ) {
+                    onDelete(place.id);
+                  }
+                }}
+                disabled={saving}
+                className="px-4 py-2 text-red-600 text-sm border border-red-200 rounded hover:bg-red-50 transition-colors ml-auto"
+              >
+                Delete
+              </button>
+            )}
           </div>
         )}
       </div>

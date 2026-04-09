@@ -23,26 +23,41 @@ function slugify(text: string): string {
     .slice(0, 60);
 }
 
-/** Update or add a source in the registry via GitHub Contents API. */
-export async function POST(request: NextRequest) {
+/** Shared auth check */
+async function authorize(): Promise<
+  { token: string; error?: never } | { token?: never; error: NextResponse }
+> {
   const token = await getSessionToken();
   if (!token) {
-    return NextResponse.json(
-      { error: 'You are not signed in. Please sign in with GitHub first.' },
-      { status: 401 },
-    );
+    return {
+      error: NextResponse.json(
+        { error: 'You are not signed in. Please sign in with GitHub first.' },
+        { status: 401 },
+      ),
+    };
   }
 
   const canEdit = await hasRepoAccess(token);
   if (!canEdit) {
-    return NextResponse.json(
-      {
-        error:
-          'You do not have edit permissions on this repository. Contact the repository owner for access.',
-      },
-      { status: 403 },
-    );
+    return {
+      error: NextResponse.json(
+        {
+          error:
+            'You do not have edit permissions on this repository. Contact the repository owner for access.',
+        },
+        { status: 403 },
+      ),
+    };
   }
+
+  return { token };
+}
+
+/** Update or add a source in the registry via GitHub. */
+export async function POST(request: NextRequest) {
+  const auth = await authorize();
+  if (auth.error) return auth.error;
+  const { token } = auth;
 
   const payload: SourcePayload = await request.json();
 
@@ -139,6 +154,133 @@ export async function POST(request: NextRequest) {
     console.error('Failed to save source:', err);
     return NextResponse.json(
       { error: 'Failed to save source' },
+      { status: 500 },
+    );
+  }
+}
+
+/** Partial merge update — only provided fields are changed. */
+export async function PUT(request: NextRequest) {
+  const auth = await authorize();
+  if (auth.error) return auth.error;
+  const { token } = auth;
+
+  const partial: Partial<SourcePayload> & { sourceId: string } =
+    await request.json();
+
+  if (!partial.sourceId) {
+    return NextResponse.json(
+      { error: 'Missing required field: sourceId' },
+      { status: 400 },
+    );
+  }
+
+  try {
+    const { content, sha } = await readRepoFile(token, REGISTRY_PATH);
+    const jsonld = JSON.parse(content);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const graph: any[] = jsonld['@graph'] || [];
+
+    const idx = graph.findIndex(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (e: any) =>
+        e.sourceId === partial.sourceId &&
+        (Array.isArray(e['@type'])
+          ? e['@type'].includes('crm:E22_Human-Made_Object')
+          : e['@type'] === 'crm:E22_Human-Made_Object'),
+    );
+
+    if (idx < 0) {
+      return NextResponse.json(
+        { error: `Source "${partial.sourceId}" not found` },
+        { status: 404 },
+      );
+    }
+
+    // Merge only provided fields
+    if (partial.prefLabel !== undefined)
+      graph[idx].prefLabel = partial.prefLabel.trim();
+    if (partial.description !== undefined)
+      graph[idx].description = partial.description?.trim() || undefined;
+    if (partial.categoryId !== undefined)
+      graph[idx].P2_has_type = `${TYPE_BASE}${partial.categoryId}`;
+    if (partial.linkedToGazetteer !== undefined)
+      graph[idx].linkedToGazetteer = partial.linkedToGazetteer;
+
+    jsonld['@graph'] = graph;
+
+    await writeRepoFile(
+      token,
+      REGISTRY_PATH,
+      JSON.stringify(jsonld, null, 2),
+      sha,
+      `Merge update source: ${graph[idx].prefLabel}`,
+    );
+
+    return NextResponse.json({ ok: true, sourceId: partial.sourceId });
+  } catch (err) {
+    console.error('Failed to merge source:', err);
+    return NextResponse.json(
+      { error: 'Failed to merge source' },
+      { status: 500 },
+    );
+  }
+}
+
+/** Delete a source from the registry. */
+export async function DELETE(request: NextRequest) {
+  const auth = await authorize();
+  if (auth.error) return auth.error;
+  const { token } = auth;
+
+  const { sourceId } = await request.json();
+
+  if (!sourceId) {
+    return NextResponse.json(
+      { error: 'Missing required field: sourceId' },
+      { status: 400 },
+    );
+  }
+
+  try {
+    const { content, sha } = await readRepoFile(token, REGISTRY_PATH);
+    const jsonld = JSON.parse(content);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const graph: any[] = jsonld['@graph'] || [];
+
+    const idx = graph.findIndex(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (e: any) =>
+        e.sourceId === sourceId &&
+        (Array.isArray(e['@type'])
+          ? e['@type'].includes('crm:E22_Human-Made_Object')
+          : e['@type'] === 'crm:E22_Human-Made_Object'),
+    );
+
+    if (idx < 0) {
+      return NextResponse.json(
+        { error: `Source "${sourceId}" not found` },
+        { status: 404 },
+      );
+    }
+
+    const label = graph[idx].prefLabel;
+    graph.splice(idx, 1);
+    jsonld['@graph'] = graph;
+
+    await writeRepoFile(
+      token,
+      REGISTRY_PATH,
+      JSON.stringify(jsonld, null, 2),
+      sha,
+      `Delete source: ${label}`,
+    );
+
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    console.error('Failed to delete source:', err);
+    return NextResponse.json(
+      { error: 'Failed to delete source' },
       { status: 500 },
     );
   }

@@ -234,6 +234,21 @@ export default function PlacesPage() {
     setIsCreating(false);
   }, []);
 
+  const handleDelete = useCallback(async (id: string) => {
+    const res = await fetch('/api/places', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id }),
+    });
+    if (!res.ok) {
+      const data = await res.json();
+      throw new Error(data.error || 'Failed to delete');
+    }
+    setPlaces((prev) => prev.filter((p) => p.id !== id));
+    setSelectedId(null);
+    setIsCreating(false);
+  }, []);
+
   // Keyboard: Escape closes editor
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -552,6 +567,7 @@ export default function PlacesPage() {
                 canEdit={canEdit}
                 onSave={handleSave}
                 onCancel={handleCancel}
+                onDelete={canEdit ? handleDelete : undefined}
               />
             </div>
           )}

@@ -273,6 +273,18 @@ function CategoryGroup({
               onEdit(editingId === src.sourceId ? null : src.sourceId)
             }
             categories={categories}
+            onDelete={async (sourceId: string) => {
+              const res = await fetch('/api/sources', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sourceId }),
+              });
+              if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.error || 'Failed to delete');
+              }
+              window.location.reload();
+            }}
           />
         ))}
       </div>
@@ -289,6 +301,7 @@ function SourceCard({
   isEditing,
   onEdit,
   categories,
+  onDelete,
 }: {
   source: Source;
   isExpanded: boolean;
@@ -298,6 +311,7 @@ function SourceCard({
   isEditing: boolean;
   onEdit: () => void;
   categories: SourceCategory[];
+  onDelete?: (sourceId: string) => Promise<void>;
 }) {
   const isFuture = variant === 'future';
 
@@ -475,7 +489,7 @@ function SourceCard({
 
               {/* Edit button */}
               {canEdit && (
-                <div className="pt-2 border-t border-stm-warm-100">
+                <div className="pt-2 border-t border-stm-warm-100 flex gap-3">
                   <button
                     type="button"
                     onClick={onEdit}
@@ -483,6 +497,23 @@ function SourceCard({
                   >
                     Edit source
                   </button>
+                  {onDelete && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (
+                          confirm(
+                            `Delete "${source.prefLabel}"? This cannot be undone.`,
+                          )
+                        ) {
+                          onDelete(source.sourceId);
+                        }
+                      }}
+                      className="text-xs text-red-600 hover:text-red-800 font-medium ml-auto"
+                    >
+                      Delete
+                    </button>
+                  )}
                 </div>
               )}
             </div>
