@@ -41,7 +41,7 @@ flowchart LR
     CSV["QGIS CSV row
     fid=1572"]
 
-    E24["E24 Plantation
+    E25["E25 Plantation
     plantation/nieuw-java"]
     E53["E53 Place
     place/1930/fid-1572"]
@@ -52,15 +52,15 @@ flowchart LR
     E74["E74 Organization
     wd:Q59132846"]
 
-    CSV -.->|creates| E24
+    CSV -.->|creates| E25
     CSV -.->|creates| E53
     CSV -.->|creates| E41a
     CSV -.->|creates| E41b
     CSV -.->|links to| E74
 
-    E24 -->|"P53 has location"| E53
-    E24 -->|"P52 has current owner"| E74
-    E24 -->|"P1 identified by"| E41a
+    E25 -->|"P53 has location"| E53
+    E25 -->|"P52 has current owner"| E74
+    E25 -->|"P1 identified by"| E41a
     E41a -->|"P139 has alt form"| E41b
 
     classDef crm_E18_Physical_Thing fill:#c78e66,stroke:#000000,color:#000000
@@ -68,7 +68,7 @@ flowchart LR
     classDef crm_E41_Appellation fill:#fef3ba,stroke:#000000,color:#000000
     classDef crm_E39_Actor fill:#ffbdca,stroke:#000000,color:#000000
 
-    class E24 crm_E18_Physical_Thing
+    class E25 crm_E18_Physical_Thing
     class E53 crm_E53_Place
     class E41a,E41b crm_E41_Appellation
     class E74 crm_E39_Actor
@@ -99,13 +99,13 @@ flowchart LR
 ### `qid` --- Wikidata Q-Identifier
 
 > **Sample:** `Q59132846` (Nieuw Java), `Q59115512` (Destombesburg), empty (534 rows)
-> **Model target:** `E24 Plantation` --- `P52 has current owner` --> `wd:{Q-ID}` (E74 Organization)
+> **Model target:** `E25 Plantation` --- `P52 has current owner` --> `wd:{Q-ID}` (E74 Organization)
 > **Coverage:** 1,062 / 1,597 (66%)
 
-**Verdict: Works with caveat.** The Q-ID is the key that links the QGIS polygon (via E24) to the Wikidata organization (E74). The mapping is the cornerstone of the entire linking strategy:
+**Verdict: Works with caveat.** The Q-ID is the key that links the QGIS polygon (via E25) to the Wikidata organization (E74). The mapping is the cornerstone of the entire linking strategy:
 
 ```
-E24 plantation/{slug} --P52 has current owner--> E74 wd:{Q-ID}
+E25 plantation/{slug} --P52 has current owner--> E74 wd:{Q-ID}
 ```
 
 The caveat is significant: **536 polygons (34%) have no Q-ID**. These are polygons traced from the 1930 map that have not yet been matched to a Wikidata entity. For these, we can still create:
@@ -120,7 +120,7 @@ But we cannot create the P52 link to E74, and these polygons will not connect to
 ### `plantation_label` --- Display Label
 
 > **Sample:** `Nieuw Java`, `Destombesburg`, `Aan De Vier Kinderen`
-> **Model target:** `E24 Plantation` --- `rdfs:label` (display convenience)
+> **Model target:** `E25 Plantation` --- `rdfs:label` (display convenience)
 > **Coverage:** 1,063 / 1,597 (67%)
 
 **Verdict: Works.** This is the human-readable display label for the plantation. The model treats `rdfs:label` as a convenience alongside the formal E41 chain. Coverage is close to the Q-ID coverage (1,063 vs 1,062) --- almost exactly the rows that have been identified get a display label.
@@ -130,13 +130,13 @@ But we cannot create the P52 link to E74, and these polygons will not connect to
 ### `label_1930` --- Name on the 1930 Map
 
 > **Sample:** `Nieuw Java`, `Destombesburg`, empty (565 rows)
-> **Model target:** `E41 Appellation` --- `P190 has symbolic content` (text); `P1i identifies` E24; `P128i is carried by` E22 (1930 map source)
+> **Model target:** `E41 Appellation` --- `P190 has symbolic content` (text); `P1i identifies` E25; `P128i is carried by` E22 (1930 map source)
 > **Coverage:** 1,032 / 1,597 (65%)
 
-**Verdict: Works with caveat.** This is the name as it appears on the 1930 map --- the cartographic label. In CRM terms, the 1930 map (E22) _carries_ this appellation (E41), and the appellation _identifies_ the plantation (E24). The name provenance is clean:
+**Verdict: Works with caveat.** This is the name as it appears on the 1930 map --- the cartographic label. In CRM terms, the 1930 map (E22) _carries_ this appellation (E41), and the appellation _identifies_ the plantation (E25). The name provenance is clean:
 
 ```
-E22 Map1930 --P128 carries--> E41 "Nieuw Java" --P1i identifies--> E24 Plantation
+E22 Map1930 --P128 carries--> E41 "Nieuw Java" --P1i identifies--> E25 Plantation
 ```
 
 The caveat: 565 polygons (35%) have no label from the 1930 map. Some of these have labels from the 1860--79 map instead. Some have no label at all. For label-less polygons, the E41 instance is simply not created --- the E53 Place exists but the plantation has no name vouched by this source.
@@ -148,14 +148,14 @@ The caveat: 565 polygons (35%) have no label from the 1930 map. Some of these ha
 ### `label_1860-79` --- Name on the 1860--79 Map
 
 > **Sample:** `Nieuw Java`, `Destombesburg`, `Aan De Vier Kinderen`
-> **Model target:** `E41 Appellation` --- `P190 has symbolic content`; `P1i identifies` E24; `P128i is carried by` E22 (1860--79 map source); linked to `label_1930` via `P139 has alternative form`
+> **Model target:** `E41 Appellation` --- `P190 has symbolic content`; `P1i identifies` E25; `P128i is carried by` E22 (1860--79 map source); linked to `label_1930` via `P139 has alternative form`
 > **Coverage:** 1,040 / 1,597 (65%)
 
 **Verdict: Works.** This is the name from an earlier map. The model handles this elegantly --- it is simply another E41 Appellation carried by a different E22 source:
 
 ```
-E22 Map1860 --P128 carries--> E41 "Destombesburg" --P1i identifies--> E24 Plantation
-E22 Map1930 --P128 carries--> E41 "Destombesburg" --P1i identifies--> E24 Plantation
+E22 Map1860 --P128 carries--> E41 "Destombesburg" --P1i identifies--> E25 Plantation
+E22 Map1930 --P128 carries--> E41 "Destombesburg" --P1i identifies--> E25 Plantation
 E41(1860) --P139 has alternative form--> E41(1930)
 ```
 
@@ -201,7 +201,7 @@ As the SKILL.md notes: the PSUR link is _"flawed"_ because it conflates organiza
 | `fid`              | E53 Place                       | 100%     | Works                                       |
 | `coords`           | E53 Place (geo:asWKT)           | 100%     | Works (reproject to WGS84)                  |
 | `qid`              | E74 via P52                     | 66%      | Works (34% unlinked)                        |
-| `plantation_label` | E24 rdfs:label                  | 67%      | Works                                       |
+| `plantation_label` | E25 rdfs:label                  | 67%      | Works                                       |
 | `label_1930`       | E41 Appellation                 | 65%      | Works (check overlap with plantation_label) |
 | `label_1860-79`    | E41 Appellation                 | 65%      | Works                                       |
 | `qid_alt`          | E74 P99i was dissolved by (E68) | 14%      | Works (clarify P51 vs dissolution)          |
@@ -411,17 +411,17 @@ TvO notes that v2.0 adds a `slaves_norm` column (normalized integer) and a `slav
 ### `namen_totslaafgemaakten` --- Sranantongo Plantation Name
 
 > **Sample:** Sranantongo name strings (only in last 3 almanac years)
-> **Model target:** `E41 Appellation` --- `P190 has symbolic content`; `P72 has language` --> Sranantongo; `P1i identifies` E24 Plantation
+> **Model target:** `E41 Appellation` --- `P190 has symbolic content`; `P72 has language` --> Sranantongo; `P1i identifies` E25 Plantation
 > **Coverage:** 3,277 / 23,003 (14%)
 
 **Verdict: Works with caveat --- and this column deserves special attention.**
 
 The column name is misleading (and is being corrected to `sranantongo_naam` in v2.0). These are NOT names of enslaved people. They are the names by which enslaved people _called the plantation_ --- in Sranantongo, the creole language of Suriname. This is one of the few places in the entire dataset where the perspective of the enslaved community is preserved.
 
-In CRM terms, this is another E41 Appellation instance, but with a crucial difference: `P72 has language` points to Sranantongo (ISO 639-3: `srn`), not Dutch. It identifies the E24 Plantation (the physical place), not the E74 Organization (the colonial legal entity):
+In CRM terms, this is another E41 Appellation instance, but with a crucial difference: `P72 has language` points to Sranantongo (ISO 639-3: `srn`), not Dutch. It identifies the E25 Plantation (the physical place), not the E74 Organization (the colonial legal entity):
 
 ```
-E22 Almanac --P128 carries--> E41 "..." (srn) --P1i identifies--> E24 Plantation
+E22 Almanac --P128 carries--> E41 "..." (srn) --P1i identifies--> E25 Plantation
 ```
 
 TvO recommends this be placed _"somewhere prominent."_ The model supports this --- E41 entities can carry language tags, and the provenance chain documents which source recorded it. But the transformation script should ensure these E41 instances are tagged with `@srn` and visually prioritized in any display layer.
@@ -473,7 +473,7 @@ The caveat: these location strings could eventually link to a topology of Surina
 > **Model target:** `E13 Attribute Assignment` --- `P43 has dimension` (E54 Dimension: akkers)
 > **Coverage:** 4,264 / 23,003 (19%)
 
-**Verdict: Works.** Straightforward numeric property. TvO notes it can change over time (plantations grew or shrank), which is exactly why it belongs on the observation rather than on the E24 or E74 directly. The 19% coverage reflects that size information was not consistently recorded across all edition years.
+**Verdict: Works.** Straightforward numeric property. TvO notes it can change over time (plantations grew or shrank), which is exactly why it belongs on the observation rather than on the E25 or E74 directly. The 19% coverage reflects that size information was not consistently recorded across all edition years.
 
 ---
 
@@ -635,22 +635,22 @@ flowchart LR
     QGIS["QGIS polygon
     qid = Q59116947
     (66% have Q-IDs)"]
-    E24["E24 Plantation"]
+    E25["E25 Plantation"]
     E74["E74 Organization
     wd:Q59116947"]
     OBS["Observation
     plantation_id = Q59116947
     (99.97% have Q-IDs)"]
 
-    QGIS -->|"creates"| E24
-    E24 -->|"P52"| E74
+    QGIS -->|"creates"| E25
+    E25 -->|"P52"| E74
     OBS -->|"P140 assigned attribute to"| E74
 
     classDef crm_E18_Physical_Thing fill:#c78e66,stroke:#000000,color:#000000
     classDef crm_E39_Actor fill:#ffbdca,stroke:#000000,color:#000000
     classDef crm_E2_Temporal fill:#82ddff,stroke:#000000,color:#000000
 
-    class E24 crm_E18_Physical_Thing
+    class E25 crm_E18_Physical_Thing
     class E74 crm_E39_Actor
     class OBS crm_E2_Temporal
 ```

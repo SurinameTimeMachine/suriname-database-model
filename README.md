@@ -30,7 +30,7 @@ app/                             # Next.js application
 
 ## Data Pipeline
 
-1. **transform-plantations.ts** -- Reads 1,596 QGIS polygons (EPSG:31170 Suriname Old TM), reprojects to WGS84, produces E24/E74/E53/E41 entity arrays
+1. **transform-plantations.ts** -- Reads 1,596 QGIS polygons (EPSG:31170 Suriname Old TM), reprojects to WGS84, produces E25/E74/E53/E41 entity arrays
 2. **transform-almanakken.ts** -- Reads 22,999 almanac rows (1818-1861), produces organization observations and appellations
 3. **generate-database.ts** -- Merges both transforms into a single JSON-LD graph (38,371 entities) with provenance chains, plus a GeoJSON feature collection
 4. **prepare-data.ts** -- Splits the JSON-LD into indexed JSON files for the Next.js frontend

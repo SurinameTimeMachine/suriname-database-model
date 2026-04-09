@@ -1,25 +1,74 @@
 /**
- * Seed script: generate the initial places-gazetteer.json from existing project data.
+ * Seed script: generate the initial places-gazetteer.jsonld from existing project data.
  *
  * Reads:
  *   - public/data/places.json        (E53 Place entities with geometry)
- *   - public/data/plantations.json   (E24 Plantations for Q-ID + labels)
+ *   - public/data/plantations.json   (E25 Plantations for Q-ID + labels)
  *   - ../data/07-gis-plantation-map-1930/plantation_polygons_1930.csv (PSUR IDs)
+ *   - ../data/07-gis-plantation-map-1930/places.csv           (named places)
+ *   - ../data/07-gis-plantation-map-1930/military_posts_1882.csv (military posts)
+ *   - ../data/07-gis-plantation-map-1930/roads_1930.csv       (road segments)
+ *   - ../data/07-gis-plantation-map-1930/railroad_1930.csv    (railroad)
  *   - ../data/06-almanakken .../...  (CSV for districts, location refs, product)
  *
  * Writes:
- *   - ../data/places-gazetteer.json  (canonical gazetteer file)
- *   - public/data/places-gazetteer.json (app-accessible copy)
+ *   - ../data/places-gazetteer.jsonld  (canonical gazetteer file, JSON-LD)
+ *   - public/data/places-gazetteer.jsonld (app-accessible copy)
  *
  * Run with: pnpm seed-gazetteer
  */
 import { parse } from 'csv-parse/sync';
 import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
+import proj4 from 'proj4';
+
+import type { PlaceType } from '../lib/types';
+
+// Load CRM mapping from the thesaurus file
+const thesaurusPath = join(__dirname, '../../data/place-types-thesaurus.jsonld');
+const thesaurusData = JSON.parse(readFileSync(thesaurusPath, 'utf-8'));
+const PLACE_TYPE_CRM: Record<string, string> = Object.fromEntries(
+  (thesaurusData['@graph'] || [])
+    .filter((e: Record<string, unknown>) => e.typeId)
+    .map((e: Record<string, unknown>) => [e.typeId, e.crmClass]),
+);
+
+// Register EPSG:31170 (Suriname Old TM / Zanderij datum)
+proj4.defs(
+  'EPSG:31170',
+  '+proj=tmerc +lat_0=0 +lon_0=-55.68333333333 +k=0.9996 +x_0=500000 +y_0=0 +ellps=intl +towgs84=-265,120,-358,0,0,0,0 +units=m +no_defs',
+);
+
+/** Reproject a single X/Y point from EPSG:31170 to WGS84 */
+function reprojectPoint(x: number, y: number): { lat: number; lng: number } {
+  const [lng, lat] = proj4('EPSG:31170', 'EPSG:4326', [x, y]);
+  return { lat, lng };
+}
+
+/** Reproject a WKT geometry string from EPSG:31170 to WGS84 */
+function reprojectWkt(wktUtm: string): string {
+  if (!wktUtm) return wktUtm;
+  return wktUtm.replace(/\(([^()]+)\)/g, (_match, coordText: string) => {
+    const pairs = coordText.split(',');
+    const newPairs = pairs.map((pair: string) => {
+      const parts = pair.trim().split(/\s+/);
+      if (parts.length >= 2) {
+        const x = parseFloat(parts[0]);
+        const y = parseFloat(parts[1]);
+        if (!isNaN(x) && !isNaN(y)) {
+          const [lon, lat] = proj4('EPSG:31170', 'EPSG:4326', [x, y]);
+          return `${lon.toFixed(8)} ${lat.toFixed(8)}`;
+        }
+      }
+      return pair.trim();
+    });
+    return '(' + newPairs.join(', ') + ')';
+  });
+}
 
 interface GazetteerPlace {
   id: string;
-  type: 'plantation' | 'district' | 'river' | 'settlement';
+  type: PlaceType;
   prefLabel: string;
   altLabels: string[];
   broader: string | null;
@@ -56,6 +105,26 @@ const QGIS_CSV = join(
   '07-gis-plantation-map-1930',
   'plantation_polygons_1930.csv',
 );
+const PLACES_CSV = join(
+  DATA_DIR,
+  '07-gis-plantation-map-1930',
+  'places.csv',
+);
+const MILITARY_CSV = join(
+  DATA_DIR,
+  '07-gis-plantation-map-1930',
+  'military_posts_1882.csv',
+);
+const ROADS_CSV = join(
+  DATA_DIR,
+  '07-gis-plantation-map-1930',
+  'roads_1930.csv',
+);
+const RAILROAD_CSV = join(
+  DATA_DIR,
+  '07-gis-plantation-map-1930',
+  'railroad_1930.csv',
+);
 
 // ── Load existing processed data ───────────────────────────────────
 
@@ -67,6 +136,11 @@ const placesRaw: Record<string, Record<string, unknown>> = JSON.parse(
 console.log('Loading plantations.json...');
 const plantationsRaw: Record<string, Record<string, unknown>> = JSON.parse(
   readFileSync(join(PUBLIC_DIR, 'plantations.json'), 'utf-8'),
+);
+
+console.log('Loading physical-features.json...');
+const physicalFeaturesRaw: Record<string, Record<string, unknown>> = JSON.parse(
+  readFileSync(join(PUBLIC_DIR, 'physical-features.json'), 'utf-8'),
 );
 
 // Build plantation lookup: placeUri -> plantation data
@@ -192,16 +266,31 @@ function districtSlug(name: string): string {
 // ── Extract centroids from WKT polygons ────────────────────────────
 
 function centroidFromWKT(wkt: string): { lat: number; lng: number } | null {
-  const match = wkt.match(/\(\((.+)\)\)/);
-  if (!match) return null;
-  const coords = match[1].split(',').map((pair) => {
-    const [lng, lat] = pair.trim().split(/\s+/).map(Number);
-    return { lat, lng };
-  });
-  if (coords.length === 0) return null;
-  const sumLat = coords.reduce((s, c) => s + c.lat, 0);
-  const sumLng = coords.reduce((s, c) => s + c.lng, 0);
-  return { lat: sumLat / coords.length, lng: sumLng / coords.length };
+  // Handle Polygon: POLYGON((...))
+  const polyMatch = wkt.match(/\(\((.+)\)\)/);
+  if (polyMatch) {
+    const coords = polyMatch[1].split(',').map((pair) => {
+      const [lng, lat] = pair.trim().split(/\s+/).map(Number);
+      return { lat, lng };
+    });
+    if (coords.length === 0) return null;
+    const sumLat = coords.reduce((s, c) => s + c.lat, 0);
+    const sumLng = coords.reduce((s, c) => s + c.lng, 0);
+    return { lat: sumLat / coords.length, lng: sumLng / coords.length };
+  }
+  // Handle LineString: LineString (...)
+  const lineMatch = wkt.match(/\((.+)\)/);
+  if (lineMatch) {
+    const coords = lineMatch[1].split(',').map((pair) => {
+      const [lng, lat] = pair.trim().split(/\s+/).map(Number);
+      return { lat, lng };
+    });
+    if (coords.length === 0) return null;
+    const sumLat = coords.reduce((s, c) => s + c.lat, 0);
+    const sumLng = coords.reduce((s, c) => s + c.lng, 0);
+    return { lat: sumLat / coords.length, lng: sumLng / coords.length };
+  }
+  return null;
 }
 
 // ── Sequential ID counter ──────────────────────────────────────────
@@ -274,7 +363,62 @@ for (const name of Array.from(allLocations).sort()) {
 }
 console.log(`  ${allLocations.size} locations (rivers/creeks/roads)`);
 
-// ── 3. Plantation places (from E53 + E24 + QGIS + almanakken) ─────
+// ── 3. QGIS river/creek features (E26 Physical Features) ──────────
+
+console.log('Processing QGIS river/creek features...');
+let riverCount = 0;
+let creekCount = 0;
+const riverPlaceUris = new Set<string>();
+
+for (const feature of Object.values(physicalFeaturesRaw)) {
+  const featureUri = feature['@id'] as string;
+  const prefLabel = (feature['prefLabel'] as string) || 'Unknown';
+  const featureType = (feature['featureType'] as string) || 'river';
+  const mainBodyWater = (feature['mainBodyWater'] as string) || '';
+  const placeUri = feature['P53_has_location'] as string | undefined;
+  if (placeUri) riverPlaceUris.add(placeUri);
+
+  // Look up the E53 Place for geometry
+  const placeEntity = placeUri ? placesRaw[placeUri] : undefined;
+  const geom = placeEntity?.['hasGeometry'] as { asWKT?: string } | undefined;
+  const wkt = geom?.asWKT || null;
+  const centroid = wkt ? centroidFromWKT(wkt) : null;
+  const fid = placeEntity?.['fid'] as number | undefined;
+
+  const type: 'river' | 'creek' = featureType === 'creek' ? 'creek' : 'river';
+  if (type === 'creek') creekCount++;
+  else riverCount++;
+
+  gazetteer.push({
+    id: nextId('stm'),
+    type,
+    prefLabel,
+    altLabels: [],
+    broader: null,
+    description: mainBodyWater
+      ? `${type === 'creek' ? 'Creek' : 'River'} segment of ${mainBodyWater} (QGIS 1930 map)`
+      : `${type === 'creek' ? 'Creek' : 'River'} feature from QGIS 1930 map`,
+    location: {
+      lat: centroid?.lat ?? null,
+      lng: centroid?.lng ?? null,
+      wkt,
+      crs: 'EPSG:4326',
+    },
+    sources: ['map-1930'],
+    wikidataQid: null,
+    fid: fid ?? null,
+    psurIds: [],
+    district: null,
+    locationDescription: mainBodyWater || null,
+    locationDescriptionOriginal: null,
+    placeType: type,
+    modifiedBy: null,
+    modifiedAt: null,
+  });
+}
+console.log(`  ${riverCount} rivers, ${creekCount} creeks (from QGIS)`);
+
+// ── 4. Plantation places (from E53 + E25 + QGIS + almanakken) ─────
 
 console.log('Processing plantation places...');
 let linkedDistricts = 0;
@@ -284,6 +428,10 @@ let linkedPsur = 0;
 
 for (const place of Object.values(placesRaw)) {
   const placeId = place['@id'] as string;
+
+  // Skip river/creek places — already handled in section 3
+  if (riverPlaceUris.has(placeId)) continue;
+
   const fid = place['fid'] as number;
   const label = (place['observedLabel'] as string) || `Place ${fid}`;
   const geom = place['hasGeometry'] as { asWKT?: string } | undefined;
@@ -361,13 +509,15 @@ for (const place of Object.values(placesRaw)) {
   });
 }
 
-console.log(`  ${Object.keys(placesRaw).length} plantation places (from QGIS)`);
+console.log(
+  `  ${Object.keys(placesRaw).length - riverPlaceUris.size} plantation places (from QGIS)`,
+);
 console.log(`  ${linkedDistricts} linked to districts`);
 console.log(`  ${linkedLocDesc} with location descriptions`);
 console.log(`  ${linkedProduct} with product/place types`);
 console.log(`  ${linkedPsur} with PSUR IDs`);
 
-// ── 4. Almanakken-only plantations (Q-IDs not in QGIS) ─────────────
+// ── 5. Almanakken-only plantations (Q-IDs not in QGIS) ─────────────
 
 console.log('Processing almanakken-only plantations...');
 const qidsInQgis = new Set<string>();
@@ -424,25 +574,382 @@ for (const [qid, agg] of almByQid) {
 console.log(`  ${almOnlyCount} almanakken-only plantations added`);
 console.log(`  ${almOnlyWithPsur} with PSUR IDs`);
 
-// ── Sort and write ─────────────────────────────────────────────────
+// ── 6. Named places from places.csv ───────────────────────────────
+
+console.log('Processing places.csv...');
+const placesContent = readFileSync(PLACES_CSV, 'utf-8');
+const placesRows = parse(placesContent, {
+  columns: true,
+  skip_empty_lines: true,
+  trim: true,
+});
+
+/** Map type1930 code to PlaceType */
+function mapPlaceType(type1930: string): PlaceType {
+  switch (type1930) {
+    case 'Astronomisch station':
+    case 'Kabelstation':
+      return 'station';
+    case 'District Commissaris':
+      return 'town';
+    case 'B':
+      return 'maroon-village';
+    case 'I':
+      return 'indigenous-village';
+    case 'Jodensavanne':
+    default:
+      return 'settlement';
+  }
+}
+
+/** Build colonial-era description fragments from type1882/remark1882 */
+function colonial1882Note(
+  type1882: string,
+  remark1882: string,
+): string | null {
+  const parts: string[] = [];
+  if (type1882) parts.push(type1882);
+  if (remark1882) parts.push(remark1882);
+  return parts.length > 0 ? `1882: ${parts.join(' -- ')}` : null;
+}
+
+// Track existing plantation labels to avoid duplicating places.csv entries
+// that already exist from QGIS polygon plantations (stage 4)
+const existingPlantationLabels = new Set(
+  gazetteer
+    .filter((g) => g.type === 'plantation')
+    .map((g) => g.prefLabel.toLowerCase()),
+);
+
+let placesAdded = 0;
+let placesSkippedDup = 0;
+for (const row of placesRows as Record<string, string>[]) {
+  const fid = parseInt(row['fid'], 10);
+  const label1930 = (row['label1930'] || '').trim();
+  const type1930 = (row['type1930'] || '').trim();
+  const remark1930 = (row['remark1930'] || '').trim();
+  const label1882 = (row['label1882'] || '').trim();
+  const type1882 = (row['type1882'] || '').trim();
+  const remark1882 = (row['remark1882'] || '').trim();
+  const xCoord = parseFloat(row['X_coord']);
+  const yCoord = parseFloat(row['Y_coord']);
+
+  // Determine preferred label
+  let prefLabel = label1930 || label1882;
+  const placeType = mapPlaceType(type1930);
+
+  // For unlabeled I/B features, use a type-based label with fid
+  if (!prefLabel) {
+    if (placeType === 'indigenous-village') {
+      prefLabel = label1882 || `Indigenous village (fid-${fid})`;
+    } else if (placeType === 'maroon-village') {
+      prefLabel = `Maroon village (fid-${fid})`;
+    } else {
+      prefLabel = `Place (fid-${fid})`;
+    }
+  }
+
+  // Skip if this is a plantation remark and already exists from QGIS
+  if (
+    remark1930 === 'plantation' &&
+    existingPlantationLabels.has(prefLabel.toLowerCase())
+  ) {
+    placesSkippedDup++;
+    continue;
+  }
+
+  // Reproject coordinates
+  const coords =
+    !isNaN(xCoord) && !isNaN(yCoord)
+      ? reprojectPoint(xCoord, yCoord)
+      : null;
+
+  // Build alt labels
+  const altLabels: string[] = [];
+  if (label1882 && label1882 !== prefLabel) altLabels.push(label1882);
+  if (label1930 && label1930 !== prefLabel) altLabels.push(label1930);
+
+  // Build description
+  const descParts: string[] = [];
+  if (remark1930) descParts.push(remark1930);
+  const note1882 = colonial1882Note(type1882, remark1882);
+  if (note1882) descParts.push(note1882);
+
+  // Source attribution
+  const sources: string[] = [];
+  if (label1930 || type1930) sources.push('map-1930');
+  if (label1882 || type1882) sources.push('map-1882');
+  if (sources.length === 0) sources.push('map-1930');
+
+  gazetteer.push({
+    id: nextId('stm'),
+    type: placeType,
+    prefLabel,
+    altLabels,
+    broader: null,
+    description: descParts.join('; ') || '',
+    location: {
+      lat: coords?.lat ?? null,
+      lng: coords?.lng ?? null,
+      wkt: null,
+      crs: 'EPSG:4326',
+    },
+    sources,
+    wikidataQid: null,
+    fid,
+    psurIds: [],
+    district: null,
+    locationDescription: null,
+    locationDescriptionOriginal: null,
+    placeType: null,
+    modifiedBy: null,
+    modifiedAt: null,
+  });
+  placesAdded++;
+}
+
+console.log(
+  `  ${placesAdded} places added, ${placesSkippedDup} skipped (duplicate plantation)`,
+);
+
+// ── 7. Military posts from military_posts_1882.csv ─────────────────
+
+console.log('Processing military_posts_1882.csv...');
+const militaryContent = readFileSync(MILITARY_CSV, 'utf-8');
+const militaryRows = parse(militaryContent, {
+  columns: true,
+  skip_empty_lines: true,
+  trim: true,
+});
+
+let militaryAdded = 0;
+for (const row of militaryRows as Record<string, string>[]) {
+  const fid = parseInt(row['fid'], 10);
+  const label = (row['label1882'] || '').trim();
+  const xCoord = parseFloat(row['X_coord']);
+  const yCoord = parseFloat(row['Y_coord']);
+
+  if (!label) continue;
+
+  const coords =
+    !isNaN(xCoord) && !isNaN(yCoord)
+      ? reprojectPoint(xCoord, yCoord)
+      : null;
+
+  gazetteer.push({
+    id: nextId('stm'),
+    type: 'military-post',
+    prefLabel: label,
+    altLabels: [],
+    broader: null,
+    description: 'Military post from 1882 map',
+    location: {
+      lat: coords?.lat ?? null,
+      lng: coords?.lng ?? null,
+      wkt: null,
+      crs: 'EPSG:4326',
+    },
+    sources: ['map-1882'],
+    wikidataQid: null,
+    fid,
+    psurIds: [],
+    district: null,
+    locationDescription: null,
+    locationDescriptionOriginal: null,
+    placeType: null,
+    modifiedBy: null,
+    modifiedAt: null,
+  });
+  militaryAdded++;
+}
+
+console.log(`  ${militaryAdded} military posts added`);
+
+// ── 8. Roads from roads_1930.csv ───────────────────────────────────
+
+console.log('Processing roads_1930.csv...');
+const roadsContent = readFileSync(ROADS_CSV, 'utf-8');
+const roadsRows = parse(roadsContent, {
+  columns: true,
+  skip_empty_lines: true,
+  trim: true,
+});
+
+let roadsAdded = 0;
+for (const row of roadsRows as Record<string, string>[]) {
+  const fid = parseInt(row['fid'], 10);
+  // Handle both WKT_geometry (uppercase) and wkt_geometry (lowercase)
+  const wktRaw = (row['WKT_geometry'] || row['wkt_geometry'] || '').trim();
+  if (!wktRaw) continue;
+
+  const wktReprojected = reprojectWkt(wktRaw);
+  const centroid = centroidFromWKT(wktReprojected);
+
+  gazetteer.push({
+    id: nextId('stm'),
+    type: 'road',
+    prefLabel: `Road segment ${fid}`,
+    altLabels: [],
+    broader: null,
+    description: 'Road segment from 1930 plantation map',
+    location: {
+      lat: centroid?.lat ?? null,
+      lng: centroid?.lng ?? null,
+      wkt: wktReprojected,
+      crs: 'EPSG:4326',
+    },
+    sources: ['map-1930'],
+    wikidataQid: null,
+    fid,
+    psurIds: [],
+    district: null,
+    locationDescription: null,
+    locationDescriptionOriginal: null,
+    placeType: null,
+    modifiedBy: null,
+    modifiedAt: null,
+  });
+  roadsAdded++;
+}
+
+console.log(`  ${roadsAdded} road segments added`);
+
+// ── 9. Railroad from railroad_1930.csv ─────────────────────────────
+
+console.log('Processing railroad_1930.csv...');
+const railroadContent = readFileSync(RAILROAD_CSV, 'utf-8');
+const railroadRows = parse(railroadContent, {
+  columns: true,
+  skip_empty_lines: true,
+  trim: true,
+});
+
+let railroadAdded = 0;
+for (const row of railroadRows as Record<string, string>[]) {
+  const fid = parseInt(row['fid'], 10);
+  const wktRaw = (row['wkt_geometry'] || row['WKT_geometry'] || '').trim();
+  if (!wktRaw) continue;
+
+  const wktReprojected = reprojectWkt(wktRaw);
+  const centroid = centroidFromWKT(wktReprojected);
+
+  gazetteer.push({
+    id: nextId('stm'),
+    type: 'railroad',
+    prefLabel: `Lawa Railroad (segment ${fid})`,
+    altLabels: ['Lawaspoorweg'],
+    broader: null,
+    description:
+      'Railroad segment from 1930 plantation map (Lawa Railroad / Lawaspoorweg)',
+    location: {
+      lat: centroid?.lat ?? null,
+      lng: centroid?.lng ?? null,
+      wkt: wktReprojected,
+      crs: 'EPSG:4326',
+    },
+    sources: ['map-1930'],
+    wikidataQid: null,
+    fid,
+    psurIds: [],
+    district: null,
+    locationDescription: null,
+    locationDescriptionOriginal: null,
+    placeType: null,
+    modifiedBy: null,
+    modifiedAt: null,
+  });
+  railroadAdded++;
+}
+
+console.log(`  ${railroadAdded} railroad segments added`);
+
+// ── Sort and write as JSON-LD ──────────────────────────────────────
+
+// Derive sort order from thesaurus
+const typeOrder: Record<string, number> = Object.fromEntries(
+  (thesaurusData['@graph'] || [])
+    .filter((e: Record<string, unknown>) => e.typeId && typeof e.sortOrder === 'number')
+    .map((e: Record<string, unknown>) => [e.typeId, e.sortOrder as number]),
+);
 
 gazetteer.sort((a, b) => {
-  const typeOrder = { district: 0, river: 1, settlement: 2, plantation: 3 };
-  const diff = typeOrder[a.type] - typeOrder[b.type];
+  const diff = (typeOrder[a.type] ?? 99) - (typeOrder[b.type] ?? 99);
   if (diff !== 0) return diff;
   return a.prefLabel.localeCompare(b.prefLabel);
 });
 
 console.log(`\nTotal: ${gazetteer.length} gazetteer entries`);
 
-const json = JSON.stringify(gazetteer, null, 2);
+// Print per-type counts
+const typeCounts = new Map<string, number>();
+for (const entry of gazetteer) {
+  typeCounts.set(entry.type, (typeCounts.get(entry.type) || 0) + 1);
+}
+for (const [type, count] of Array.from(typeCounts).sort(
+  (a, b) => (typeOrder[a[0]] ?? 99) - (typeOrder[b[0]] ?? 99),
+)) {
+  console.log(`  ${type}: ${count}`);
+}
+
+const STM_BASE = 'https://data.suriname-timemachine.org/';
+
+// Build JSON-LD graph entries
+const graph = gazetteer.map((entry) => {
+  const crmClass = PLACE_TYPE_CRM[entry.type] || 'E53_Place';
+  const jsonldEntry: Record<string, unknown> = {
+    '@id': `${STM_BASE}place/${entry.id}`,
+    '@type': [crmClass],
+    id: entry.id,
+    type: entry.type,
+    prefLabel: entry.prefLabel,
+    altLabels: entry.altLabels,
+    broader: entry.broader,
+    description: entry.description,
+    location: entry.location,
+    sources: entry.sources,
+    wikidataQid: entry.wikidataQid,
+    fid: entry.fid,
+    psurIds: entry.psurIds,
+    district: entry.district,
+    locationDescription: entry.locationDescription,
+    locationDescriptionOriginal: entry.locationDescriptionOriginal,
+    placeType: entry.placeType,
+    modifiedBy: entry.modifiedBy,
+    modifiedAt: entry.modifiedAt,
+  };
+  return jsonldEntry;
+});
+
+const jsonld = {
+  '@context': {
+    crm: 'http://www.cidoc-crm.org/cidoc-crm/',
+    skos: 'http://www.w3.org/2004/02/skos/core#',
+    geo: 'http://www.opengis.net/ont/geosparql#',
+    dct: 'http://purl.org/dc/terms/',
+    stm: STM_BASE,
+    prefLabel: 'skos:prefLabel',
+    altLabels: 'skos:altLabel',
+    E25_Human_Made_Feature: 'crm:E25_Human-Made_Feature',
+    'E25_Human-Made_Feature': 'crm:E25_Human-Made_Feature',
+    E26_Physical_Feature: 'crm:E26_Physical_Feature',
+    E53_Place: 'crm:E53_Place',
+  },
+  '@id': `${STM_BASE}gazetteer`,
+  '@type': 'dct:Dataset',
+  'dct:title': 'Suriname Time Machine -- Places Gazetteer',
+  'dct:description':
+    'Authority records for named places in Suriname. Preferred labels use modern, non-colonial terminology. Alternative labels preserve original source terms for scholarly reference.',
+  '@graph': graph,
+};
+
+const json = JSON.stringify(jsonld, null, 2);
 
 // Write to data root (source of truth)
-const dataPath = join(DATA_DIR, 'places-gazetteer.json');
+const dataPath = join(DATA_DIR, 'places-gazetteer.jsonld');
 writeFileSync(dataPath, json, 'utf-8');
 console.log(`Wrote ${dataPath}`);
 
 // Write to public/data (app-accessible)
-const publicPath = join(PUBLIC_DIR, 'places-gazetteer.json');
+const publicPath = join(PUBLIC_DIR, 'places-gazetteer.jsonld');
 writeFileSync(publicPath, json, 'utf-8');
 console.log(`Wrote ${publicPath}`);

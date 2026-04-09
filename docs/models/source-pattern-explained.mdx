@@ -39,28 +39,28 @@ The distinction between vessel and content is fundamental to what comes next.
 
 ## Layer 2 --- The Digital Reproduction
 
-**Relationship:** `E38 Image --P138 represents--> E22 Human-Made Object`
+**Relationship:** `E36 Visual Item --P138 represents--> E22 Human-Made Object`
 
 ```mermaid
 %%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#e8f4ea'}}}%%
 flowchart LR
-    E38["E38 Image
+    E36_IMG["E36 Visual Item
     (Digital reproduction)
     IIIF scan"]
     E22["E22 Human-Made Object
     (Physical source)"]
 
-    E38 -->|"P138 represents"| E22
+    E36_IMG -->|"P138 represents"| E22
 
     classDef crm_E18_Physical_Thing fill:#c78e66,stroke:#000000,color:#000000
     classDef crm_E28_Conceptual_Object fill:#fddc34,stroke:#000000,color:#000000
     class E22 crm_E18_Physical_Thing
-    class E38 crm_E28_Conceptual_Object
+    class E36_IMG crm_E28_Conceptual_Object
 ```
 
 The IIIF scan that appears on your screen is not the map. It _represents_ the map.
 
-E38 Image is a subclass of E36 Visual Item, which itself is a subclass of E73 Information Object --- it lives in the conceptual realm. The scan is a pattern of pixels that was mechanically derived from the physical artifact by a scanner or camera, but it is an entirely different kind of entity.
+E36 Visual Item is a subclass of E73 Information Object --- it lives in the conceptual realm. The scan is a pattern of pixels that was mechanically derived from the physical artifact by a scanner or camera, but it is an entirely different kind of entity.
 
 P138 _represents_ is the CRM property that bridges these worlds.
 
@@ -69,9 +69,9 @@ P138 _represents_ is the CRM property that bridges these worlds.
 >
 > _"This property is also used for the relationship between an original and a digitisation of the original by the use of techniques such as digital photography, flatbed or infrared scanning. Digitisation is here seen as a process with a mechanical, causal component rendering the spatial distribution of structural and optical properties of the original."_
 
-The word _represents_ is deliberately weaker than "is identical to." Every digitization involves choices: resolution, color calibration, cropping, lighting angle. Two different scans of the same map will produce two different E38 instances, both representing the same E22. This asymmetry matters for scholarly work --- when a researcher zooms into a scan and reads a faded plantation name, they need to know that what they see already passed through a layer of mechanical interpretation.
+The word _represents_ is deliberately weaker than "is identical to." Every digitization involves choices: resolution, color calibration, cropping, lighting angle. Two different scans of the same map will produce two different E36 instances, both representing the same E22. This asymmetry matters for scholarly work --- when a researcher zooms into a scan and reads a faded plantation name, they need to know that what they see already passed through a layer of mechanical interpretation.
 
-The arrow points from E38 to E22, not the other way around. The map does not "have" a scan; the scan "represents" the map. This preserves the primacy of the physical source.
+The arrow points from E36 to E22, not the other way around. The map does not "have" a scan; the scan "represents" the map. This preserves the primacy of the physical source.
 
 ---
 
@@ -201,7 +201,7 @@ P14 _carried out by_ attributes agency. The cartographer who drew the map, the p
 > **CRM Scope Note (P14 carried out by):**
 > _"This property describes the active participation of an instance of E39 Actor in an instance of E7 Activity. It implies causal or legal responsibility."_
 
-That word "responsibility" is significant. When a cartographer labels a plantation on a map, they are taking responsibility for that identification. When we later link that label to a specific E24 Plantation entity, the production event tells us _who made that claim_ and _when_.
+That word "responsibility" is significant. When a cartographer labels a plantation on a map, they are taking responsibility for that identification. When we later link that label to a specific E25 Plantation entity, the production event tells us _who made that claim_ and _when_.
 
 ---
 
@@ -209,7 +209,7 @@ That word "responsibility" is significant. When a cartographer labels a plantati
 
 **Relationships:**
 
-- `E36 Visual Item --P138 represents--> E24 Physical Human-Made Thing (Plantation)`
+- `E36 Visual Item --P138 represents--> E25 Human-Made Feature (Plantation)`
 - `E36 Visual Item --P138 represents--> E26 Physical Feature (River)`
 - `E36 Visual Item --P138 represents--> E74 Group (Organization)`
 - `E36 Visual Item --P138 represents--> E21 Person`
@@ -220,7 +220,7 @@ flowchart TB
     E36["E36 Visual Item
     (Content of the source)"]
 
-    E24["E24 Physical Human-Made Thing
+    E25["E25 Human-Made Feature
     (Plantation)"]
     E26["E26 Physical Feature
     (River, creek)"]
@@ -229,7 +229,7 @@ flowchart TB
     E21_PERSON["E21 Person
     (Historical person)"]
 
-    E36 -->|"P138 represents"| E24
+    E36 -->|"P138 represents"| E25
     E36 -->|"P138 represents"| E26
     E36 -->|"P138 represents"| E74_ORG
     E36 -->|"P138 represents"| E21_PERSON
@@ -239,7 +239,7 @@ flowchart TB
     classDef crm_E39_Actor fill:#ffbdca,stroke:#000000,color:#000000
 
     class E36 crm_E28_Conceptual_Object
-    class E24,E26 crm_E18_Physical_Thing
+    class E25,E26 crm_E18_Physical_Thing
     class E74_ORG,E21_PERSON crm_E39_Actor
 ```
 
@@ -251,19 +251,19 @@ We already met P138 in Layer 2, where a scan represents a map. Here, the same pr
 
 It would be tempting to draw a line from E36 directly to E53 Place --- after all, a map literally shows a geographic area. But this would be a category error.
 
-The map's visual content (E36) represents the _plantation_ (E24). The plantation, being a physical thing in the real world, _has a location_ (E53). The map does not depict the location; it depicts the thing that is at the location. This is a subtle but crucial distinction:
+The map's visual content (E36) represents the _plantation_ (E25). The plantation, being a physical thing in the real world, _has a location_ (E53). The map does not depict the location; it depicts the thing that is at the location. This is a subtle but crucial distinction:
 
 - If E36 linked directly to E53, we would be saying "the map shows a piece of empty land."
-- By routing through E24, we say "the map shows a plantation, and that plantation is located somewhere."
+- By routing through E25, we say "the map shows a plantation, and that plantation is located somewhere."
 
 This correctly models the chain of inference: we look at the map, see a depiction of a plantation, and from the plantation's identity we can determine where it was located. The location is not something we read off the map directly --- it is a property of the real-world thing the map depicts.
 
-### Why E24 for plantations?
+### Why E25 for plantations?
 
-> **CRM Scope Note (E24 Physical Human-Made Thing):**
-> _"This class comprises all persistent physical items of any size that are purposely created by human activity. This class comprises, besides others, Human-Made objects, such as a sword, and Human-Made features, such as rock art."_
+> **CRM Scope Note (E25 Human-Made Feature):**
+> _"This class comprises physical features of any size that are purposely created by human activity. This class is a subclass of both E24 Physical Human-Made Thing and E26 Physical Feature."_
 
-A plantation is a physical transformation of the landscape --- forests cleared, fields laid out, buildings constructed, canals dug. It is not just a concept or a legal designation; it is a persistent physical thing that was created by human activity and that you could walk through, touch, and photograph. E24 captures this physical reality.
+A plantation is a physical transformation of the landscape --- forests cleared, fields laid out, buildings constructed, canals dug. It is not just a concept or a legal designation; it is a persistent physical thing that was created by human activity and that you could walk through, touch, and photograph. E25 captures this physical reality as both a human creation and a landscape feature.
 
 > **CRM Scope Note (E26 Physical Feature):**
 > _Rivers and creeks are natural features of the landscape that plantations sit alongside. E26 Physical Feature covers items that are "physically attached in an integral way to particular physical objects" --- in our case, the land itself._
@@ -274,7 +274,7 @@ A plantation is a physical transformation of the landscape --- forests cleared, 
 
 **Relationships:**
 
-- `E41 Appellation (map label) --P1i identifies--> E24 Physical Human-Made Thing`
+- `E41 Appellation (map label) --P1i identifies--> E25 Human-Made Feature`
 - `E41 Appellation (almanac name) --P1i identifies--> E74 Group (Organization)`
 - `E41 (map label) --P139 has alternative form--> E41 (almanac name)`
 
@@ -289,14 +289,14 @@ flowchart TB
     (Almanac name)
     'Geyers-Vlijt'"]
 
-    E24["E24 Physical Human-Made Thing
+    E25["E25 Human-Made Feature
     (The plantation)"]
 
     E74_ORG["E74 Group
     (The organization)
     wd:Q4392658"]
 
-    E41_MAP -->|"P1i identifies"| E24
+    E41_MAP -->|"P1i identifies"| E25
     E41_ALM -->|"P1i identifies"| E74_ORG
     E41_MAP ---|"P139 has alt form"| E41_ALM
 
@@ -305,7 +305,7 @@ flowchart TB
     classDef crm_E39_Actor fill:#ffbdca,stroke:#000000,color:#000000
 
     class E41_MAP,E41_ALM crm_E41_Appellation
-    class E24 crm_E18_Physical_Thing
+    class E25 crm_E18_Physical_Thing
     class E74_ORG crm_E39_Actor
 ```
 
@@ -327,7 +327,7 @@ The CRM deliberately makes P1 neutral about provenance --- it just says "this na
 > **CRM Scope Note (P139 has alternative form):**
 > _"This property associates an instance of E41 Appellation with another instance of E41 Appellation that constitutes a derivative or variant of the former and that may also be used for identifying items identified by the former, in suitable contexts, independent from the particular item to be identified."_
 
-P139 links "Geijersvlijt" (map label) to "Geyers-Vlijt" (almanac name) as alternative forms of each other. This does _not_ mean E24 and E74 are the same entity. It means: these two names, despite their different spellings and different referent types, ultimately trace back to the same real-world referent complex. The plantation (E24) and the organization (E74) are connected through ownership (P52, in the next layer), and their names are connected through P139.
+P139 links "Geijersvlijt" (map label) to "Geyers-Vlijt" (almanac name) as alternative forms of each other. This does _not_ mean E25 and E74 are the same entity. It means: these two names, despite their different spellings and different referent types, ultimately trace back to the same real-world referent complex. The plantation (E25) and the organization (E74) are connected through ownership (P52, in the next layer), and their names are connected through P139.
 
 This is the mechanism that makes cross-source reconciliation possible without conflating things that are ontologically distinct.
 
@@ -337,13 +337,13 @@ This is the mechanism that makes cross-source reconciliation possible without co
 
 **Relationships:**
 
-- `E24 Physical Human-Made Thing --P53 has former or current location--> E53 Place`
-- `E24 Physical Human-Made Thing --P52 has current owner--> E74 Group`
+- `E25 Human-Made Feature --P53 has former or current location--> E53 Place`
+- `E25 Human-Made Feature --P52 has current owner--> E74 Group`
 
 ```mermaid
 %%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#e8f4ea'}}}%%
 flowchart LR
-    E24["E24 Physical Human-Made Thing
+    E25["E25 Human-Made Feature
     (The plantation)"]
     E53["E53 Place
     (Spatial location /
@@ -352,14 +352,14 @@ flowchart LR
     (Organization)
     wd:Q4392658"]
 
-    E24 -->|"P53 has location"| E53
-    E24 -->|"P52 has current owner"| E74_ORG
+    E25 -->|"P53 has location"| E53
+    E25 -->|"P52 has current owner"| E74_ORG
 
     classDef crm_E18_Physical_Thing fill:#c78e66,stroke:#000000,color:#000000
     classDef crm_E53_Place fill:#94cc7d,stroke:#000000,color:#000000
     classDef crm_E39_Actor fill:#ffbdca,stroke:#000000,color:#000000
 
-    class E24 crm_E18_Physical_Thing
+    class E25 crm_E18_Physical_Thing
     class E53 crm_E53_Place
     class E74_ORG crm_E39_Actor
 ```
@@ -371,14 +371,14 @@ The final layer grounds the model in space and in social relations.
 > **CRM Scope Note (P53 has former or current location):**
 > _"This property identifies an instance of E53 Place as the former or current location of an instance of E18 Physical Thing. In the case of immobile objects, the Place would normally correspond to the Place of creation."_
 
-Plantations are, by nature, immobile. They were carved out of specific pieces of Surinamese land, and that land does not move. P53 connects the plantation (E24) to its location (E53), where E53 holds the actual geometry (a GeoSPARQL polygon derived from the 1930 QGIS map data).
+Plantations are, by nature, immobile. They were carved out of specific pieces of Surinamese land, and that land does not move. P53 connects the plantation (E25) to its location (E53), where E53 holds the actual geometry (a GeoSPARQL polygon derived from the 1930 QGIS map data).
 
 > **CRM Scope Note (E53 Place):**
 > _"This class comprises extents in the natural space we live in, in particular on the surface of the Earth, in the pure sense of physics: independent from temporal phenomena and matter."_
 
-E53 is purely spatial --- it is a piece of the Earth's surface, nothing more. It does not care who owned the land above it, or what was built on it, or what happened there. That information lives on E24 and E74. The separation is clean: **E53 = where**, **E24 = what**, **E74 = who**.
+E53 is purely spatial --- it is a piece of the Earth's surface, nothing more. It does not care who owned the land above it, or what was built on it, or what happened there. That information lives on E25 and E74. The separation is clean: **E53 = where**, **E25 = what**, **E74 = who**.
 
-This is why the model routes location through E24 rather than attaching it to E36 or E22 directly. The map (E22) depicts the plantation (E24), and the plantation occupies a location (E53). Remove the map from the picture, and the plantation is still there, still occupying that same piece of land. Location is a property of the real-world thing, not of the document that depicted it.
+This is why the model routes location through E25 rather than attaching it to E36 or E22 directly. The map (E22) depicts the plantation (E25), and the plantation occupies a location (E53). Remove the map from the picture, and the plantation is still there, still occupying that same piece of land. Location is a property of the real-world thing, not of the document that depicted it.
 
 ### P52: The plantation has an owner
 
@@ -387,13 +387,13 @@ This is why the model routes location through E24 rather than attaching it to E3
 >
 > _"This property is a shortcut for the more detailed path from E18 Physical Thing through P24i changed ownership through, E8 Acquisition, P22 transferred title to, to E39 Actor, if and only if this acquisition event is the most recent."_
 
-P52 connects the physical plantation to the organization that owns or operates it. This is the relationship that makes E24 and E74 separate entities rather than one dual-typed entity (a key modeling decision, number 2 in our decisions list).
+P52 connects the physical plantation to the organization that owns or operates it. This is the relationship that makes E25 and E74 separate entities rather than one dual-typed entity (a key modeling decision, number 2 in our decisions list).
 
 Why separate them? Because they change independently:
 
-- A plantation can change owners. The land, the buildings, the canals --- the E24 --- remain the same. But the E74 connected through P52 changes.
-- An organization can be dissolved when absorbed by another organization (`P99i was dissolved by` -> E68 Dissolution). The E74 entities merge, but the E24 might keep its physical boundaries.
-- A plantation can be abandoned. The E24 still exists (you can still see its remains), but no E74 currently operates it.
+- A plantation can change owners. The land, the buildings, the canals --- the E25 --- remain the same. But the E74 connected through P52 changes.
+- An organization can be dissolved when absorbed by another organization (`P99i was dissolved by` -> E68 Dissolution). The E74 entities merge, but the E25 might keep its physical boundaries.
+- A plantation can be abandoned. The E25 still exists (you can still see its remains), but no E74 currently operates it.
 
 The Q-ID (Wikidata identifier) lives on the E74, serving as the linking key between our different data sources --- the same `wd:Q4392658` appears in both the QGIS CSV and the Almanakken dataset, connecting them through the organization they both describe.
 
@@ -410,7 +410,7 @@ flowchart TB
     (Physical source artifact)
     Map | Book | Ledger | Document"]
 
-    E38["E38 Image
+    E36_IMG["E36 Visual Item
     (Digital reproduction)
     IIIF scan"]
 
@@ -419,7 +419,7 @@ flowchart TB
     Cartography | Tables | Handwriting"]
 
     E41_MAP["E41 Appellation
-    (Map label identifies E24)
+    (Map label identifies E25)
     P190: printed name"]
 
     E41_ALM["E41 Appellation
@@ -438,7 +438,7 @@ flowchart TB
     E74_PUB["E74 Group
     (Publisher)"]
 
-    E24["E24 Physical Human-Made Thing
+    E25["E25 Human-Made Feature
     (Plantations, buildings)
     plantation/slug"]
 
@@ -461,7 +461,7 @@ flowchart TB
     E22 -->|"P128 carries"| E41_ALM
 
     %% Layer 2: Digital scan represents physical
-    E38 -->|"P138 represents"| E22
+    E36_IMG -->|"P138 represents"| E22
 
     %% Layer 4: Production event
     E22 -->|"P108i was produced by"| E12
@@ -470,20 +470,20 @@ flowchart TB
     E12 -->|"P14 carried out by"| E74_PUB
 
     %% Layer 5: Content represents reality
-    E36 -->|"P138 represents"| E24
+    E36 -->|"P138 represents"| E25
     E36 -->|"P138 represents"| E26
     E36 -->|"P138 represents"| E74_ORG
     E36 -->|"P138 represents"| E21_PERSON
 
     %% Layer 6: Names identify entities
-    E41_MAP -->|"P1i identifies"| E24
+    E41_MAP -->|"P1i identifies"| E25
     E41_ALM -->|"P1i identifies"| E74_ORG
     E41_MAP ---|"P139 has alt form"| E41_ALM
 
     %% Layer 7: Location and ownership
-    E24 -->|"P53 has location"| E53
+    E25 -->|"P53 has location"| E53
     E26 -->|"P53 has location"| E53
-    E24 -->|"P52 has current owner"| E74_ORG
+    E25 -->|"P52 has current owner"| E74_ORG
 
     classDef crm_E18_Physical_Thing fill:#c78e66,stroke:#000000,color:#000000
     classDef crm_E28_Conceptual_Object fill:#fddc34,stroke:#000000,color:#000000
@@ -494,11 +494,11 @@ flowchart TB
     classDef crm_E52_Time_Span fill:#86bcc8,stroke:#000000,color:#000000
 
     class E22 crm_E18_Physical_Thing
-    class E38 crm_E28_Conceptual_Object
+    class E36_IMG crm_E28_Conceptual_Object
     class E36 crm_E28_Conceptual_Object
     class E41_MAP crm_E41_Appellation
     class E41_ALM crm_E41_Appellation
-    class E24 crm_E18_Physical_Thing
+    class E25 crm_E18_Physical_Thing
     class E53 crm_E53_Place
     class E26 crm_E18_Physical_Thing
     class E74_ORG crm_E39_Actor
@@ -510,7 +510,7 @@ flowchart TB
 
 Read the pattern as a sentence:
 
-> A **physical source** (E22), **produced** (E12) at a **time** (E52) by **someone** (E21/E74), **carries** (P128) **visual content** (E36) and **names** (E41). The content **represents** (P138) real-world **things** (E24, E26, E74, E21). The names **identify** (P1i) those things. And those things **have locations** (P53 to E53) and **owners** (P52 to E74). A **digital scan** (E38) **represents** (P138) the physical source, giving us access to everything it carries.
+> A **physical source** (E22), **produced** (E12) at a **time** (E52) by **someone** (E21/E74), **carries** (P128) **visual content** (E36) and **names** (E41). The content **represents** (P138) real-world **things** (E25, E26, E74, E21). The names **identify** (P1i) those things. And those things **have locations** (P53 to E53) and **owners** (P52 to E74). A **digital scan** (E36) **represents** (P138) the physical source, giving us access to everything it carries.
 
 Every link exists for a reason. Every separation between entities preserves a distinction that matters for the historical record of Suriname.
 
@@ -518,18 +518,18 @@ Every link exists for a reason. Every separation between entities preserves a di
 
 ## Quick Reference: Properties Used
 
-| Property                           | Domain              | Range                         | Why we use it                                    |
-| ---------------------------------- | ------------------- | ----------------------------- | ------------------------------------------------ |
-| P128 carries                       | E18 Physical Thing  | E90 Symbolic Object           | Source carries content and names                 |
-| P138 represents                    | E36 Visual Item     | E1 CRM Entity                 | Content depicts real things; scan depicts source |
-| P108 has produced                  | E12 Production      | E24 Physical Human-Made Thing | Source was made by someone at some time          |
-| P4 has time-span                   | E2 Temporal Entity  | E52 Time-Span                 | Dates the production (and indirectly the names)  |
-| P14 carried out by                 | E7 Activity         | E39 Actor                     | Who made the source                              |
-| P1 is identified by                | E1 CRM Entity       | E41 Appellation               | A name identifies a thing                        |
-| P139 has alternative form          | E41 Appellation     | E41 Appellation               | Links variant name spellings across sources      |
-| P190 has symbolic content          | E90 Symbolic Object | E62 String                    | The actual text of a name                        |
-| P53 has former or current location | E18 Physical Thing  | E53 Place                     | Where the plantation is                          |
-| P52 has current owner              | E18 Physical Thing  | E39 Actor                     | Who owns the plantation                          |
+| Property                           | Domain              | Range                  | Why we use it                                    |
+| ---------------------------------- | ------------------- | ---------------------- | ------------------------------------------------ |
+| P128 carries                       | E18 Physical Thing  | E90 Symbolic Object    | Source carries content and names                 |
+| P138 represents                    | E36 Visual Item     | E1 CRM Entity          | Content depicts real things; scan depicts source |
+| P108 has produced                  | E12 Production      | E25 Human-Made Feature | Source was made by someone at some time          |
+| P4 has time-span                   | E2 Temporal Entity  | E52 Time-Span          | Dates the production (and indirectly the names)  |
+| P14 carried out by                 | E7 Activity         | E39 Actor              | Who made the source                              |
+| P1 is identified by                | E1 CRM Entity       | E41 Appellation        | A name identifies a thing                        |
+| P139 has alternative form          | E41 Appellation     | E41 Appellation        | Links variant name spellings across sources      |
+| P190 has symbolic content          | E90 Symbolic Object | E62 String             | The actual text of a name                        |
+| P53 has former or current location | E18 Physical Thing  | E53 Place              | Where the plantation is                          |
+| P52 has current owner              | E18 Physical Thing  | E39 Actor              | Who owns the plantation                          |
 
 ---
 
@@ -539,8 +539,8 @@ The diagrams use the [CRITERIA](https://github.com/chin-rcip/CRITERIA) color sch
 
 | Color                  | CRM Superclass        | Examples in our model                   |
 | ---------------------- | --------------------- | --------------------------------------- |
-| Brown (#c78e66)        | E18 Physical Thing    | E22 Source, E24 Plantation, E26 Feature |
-| Yellow (#fddc34)       | E28 Conceptual Object | E36 Visual Item, E38 Image              |
+| Brown (#c78e66)        | E18 Physical Thing    | E22 Source, E25 Plantation, E26 Feature |
+| Yellow (#fddc34)       | E28 Conceptual Object | E36 Visual Item                         |
 | Light yellow (#fef3ba) | E41 Appellation       | Map labels, almanac names               |
 | Green (#94cc7d)        | E53 Place             | Spatial locations                       |
 | Pink (#ffbdca)         | E39 Actor             | Persons, organizations, publishers      |

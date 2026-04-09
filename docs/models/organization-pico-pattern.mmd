@@ -5,14 +5,14 @@ flowchart TB
     subgraph CIDOC_CRM["CIDOC-CRM Domain"]
         direction TB
         E74["E74 Group<br/>(Organization)<br/>wd:Q-ID"]
-        E24["E24 Physical Human-Made Thing<br/>(Plantation)<br/>plantation/slug"]
+        E25["E25 Human-Made Feature<br/>(Plantation)<br/>plantation/slug"]
         E53["E53 Place<br/>place/fid"]
-        E41_MAP["E41 Appellation<br/>Map label (identifies E24)"]
+        E41_MAP["E41 Appellation<br/>Map label (identifies E25)"]
         E41_ALM["E41 Appellation<br/>Almanac name (identifies E74)"]
 
-        E24 -->|"P52 has current owner"| E74
-        E24 -->|"P53 has former or current location"| E53
-        E24 -->|"P1 is identified by"| E41_MAP
+        E25 -->|"P52 has current owner"| E74
+        E25 -->|"P53 has former or current location"| E53
+        E25 -->|"P1 is identified by"| E41_MAP
         E74 -->|"P1 is identified by"| E41_ALM
         E41_MAP ---|"P139 has alt form"| E41_ALM
     end
@@ -76,7 +76,7 @@ flowchart TB
     classDef Literal fill:#ffffff,stroke:#000000,color:#000000
 
     class E74 crm_E39_Actor
-    class E24 crm_E18_Physical_Thing
+    class E25 crm_E18_Physical_Thing
     class E53 crm_E53_Place
     class E41_MAP,E41_ALM crm_E41_Appellation
     class PERSON_OBS,PERSON_REC,SOURCE crm_E39_Actor_URI

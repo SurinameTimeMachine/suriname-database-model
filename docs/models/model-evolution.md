@@ -6,17 +6,17 @@ Step-by-step record of every modeling decision, change, and planned extension. E
 
 ## Phase 1: Foundation (completed)
 
-### Step 1.1 -- E24 Plantation as central entity
+### Step 1.1 -- E25 Plantation as central entity
 
-**What:** E24 Physical Human-Made Thing is the main entity. All sources ultimately depict plantations.
+**What:** E25 Human-Made Feature is the main entity. All sources ultimately depict plantations.
 
-**Why:** A plantation is a physical thing in the world -- it has a location, it appears on maps, it has a name. This is the anchor that connects all datasets. CIDOC-CRM E24 is the correct class because plantations are human-made physical things.
+**Why:** A plantation is a physical thing in the world -- it has a location, it appears on maps, it has a name. This is the anchor that connects all datasets. CIDOC-CRM E25 is the correct class because plantations are human-made landscape features (subclass of both E24 and E26).
 
-**Enables:** Every source (map, almanac, register) can connect to the same E24 instance.
+**Enables:** Every source (map, almanac, register) can connect to the same E25 instance.
 
 ### Step 1.2 -- E53 Place for location/geometry
 
-**What:** E24 has location via `P53 has former or current location` to E53 Place, which carries GeoSPARQL geometry.
+**What:** E25 has location via `P53 has former or current location` to E53 Place, which carries GeoSPARQL geometry.
 
 **Why:** "Maps depict things; things have locations." The map does NOT depict the location directly -- it depicts the plantation, and the plantation has a location. This prevents treating the map polygon as the "real" location.
 
@@ -24,9 +24,9 @@ Step-by-step record of every modeling decision, change, and planned extension. E
 
 ### Step 1.3 -- E22 Human-Made Object for sources
 
-**What:** Physical sources (maps, books, ledgers) are E22 Human-Made Object. They carry content via `P128 carries` E36 Visual Item. Digital scans are E38 Image that `P138 represents` the E22.
+**What:** Physical sources (maps, books, ledgers) are E22 Human-Made Object. They carry content via `P128 carries` E36 Visual Item. Digital scans are also E36 Visual Item that `P138 represents` the E22.
 
-**Why:** A colonial map is a physical artifact, not just "information." Modeling it as E22 preserves its materiality (who made it, where it is kept, when it was produced). E36 is what the map _shows_ (the cartographic content), and that content represents E24 plantations.
+**Why:** A colonial map is a physical artifact, not just "information." Modeling it as E22 preserves its materiality (who made it, where it is kept, when it was produced). E36 is what the map _shows_ (the cartographic content), and that content represents E25 plantations.
 
 **Enables:** Full provenance chain. Answering: _who created source X?_ (S02), _where is source X held?_ (S04), _what maps show place X?_ (L06).
 
@@ -34,19 +34,19 @@ Step-by-step record of every modeling decision, change, and planned extension. E
 
 ## Phase 2: Entity separation (completed)
 
-### Step 2.1 -- E74 Organization as separate entity from E24
+### Step 2.1 -- E74 Organization as separate entity from E25
 
-**What:** The legal/social entity operating a plantation (E74 Group) is a separate entity from the physical plantation (E24). They are linked by `P52 has current owner` (E24 -> E74).
+**What:** The legal/social entity operating a plantation (E74 Group) is a separate entity from the physical plantation (E25). They are linked by `P52 has current owner` (E25 -> E74).
 
 **Why:** "Geijersvlijt" the coffee plantation (physical thing with soil and buildings) is not the same as "Geijersvlijt" the organization (legal entity with owners, administrators, enslaved people). Organizations can be absorbed, merged, or transferred independently of the physical land. Keeping them separate allows tracking organizational changes (ownership transfers, mergers) independently of physical changes (boundary shifts, building construction).
 
-**Alternative rejected:** Dual-typing a single entity as both E24 and E74. This conflates two distinct things and makes it impossible to say "the organization changed owners but the plantation stayed the same."
+**Alternative rejected:** Dual-typing a single entity as both E25 and E74. This conflates two distinct things and makes it impossible to say "the organization changed owners but the plantation stayed the same."
 
 **Enables:** Tracking ownership transfers over time. Answering: _who owned plantation X in year Y?_ (L03), _trace organizational mergers_ (temporal changes section).
 
 ### Step 2.2 -- P52 has current owner (not custom operatedBy)
 
-**What:** Use standard CIDOC-CRM `P52 has current owner` and `P51 has former or current owner` to connect E24 to E74, instead of a custom `operatedBy` property.
+**What:** Use standard CIDOC-CRM `P52 has current owner` and `P51 has former or current owner` to connect E25 to E74, instead of a custom `operatedBy` property.
 
 **Why:** P52 is the correct CIDOC-CRM property for this relationship (E18 Physical Thing -> E39 Actor). Using standard properties means interoperability with other CIDOC-CRM datasets and no need to maintain custom vocabulary documentation.
 
@@ -74,23 +74,23 @@ Step-by-step record of every modeling decision, change, and planned extension. E
 
 ### Step 3.2 -- Each source creates its own E41 (distinct per entity type)
 
-**What:** A map label creates an E41 that identifies the plantation (E24). An almanac entry creates a different E41 that identifies the organization (E74). These are distinct E41 instances linked by `P139 has alternative form`.
+**What:** A map label creates an E41 that identifies the plantation (E25). An almanac entry creates a different E41 that identifies the organization (E74). These are distinct E41 instances linked by `P139 has alternative form`.
 
 ```
-E22 Map 1930 --P128 carries--> E41a "Geijersvlijt" --P1i identifies--> E24 Plantation
+E22 Map 1930 --P128 carries--> E41a "Geijersvlijt" --P1i identifies--> E25 Plantation
 E22 Almanac 1818 --P128 carries--> E41b "Geyers-Vlijt" --P1i identifies--> E74 Organization
 E41a --P139 has alternative form--> E41b
 ```
 
 **Why:** A map label (printed cartography) and an almanac entry (handwritten table) are fundamentally different source contexts. The map label names the physical thing visible on the map. The almanac names the organization listed in an administrative record. They happen to refer to "the same plantation" in everyday language, but in CIDOC-CRM they identify different entity types. The P139 link makes the connection explicit without conflating the two.
 
-**Alternative rejected:** Shared E41 instance with P1 pointing to both E24 and E74. This would lose the distinction between what the map names vs what the almanac names.
+**Alternative rejected:** Shared E41 instance with P1 pointing to both E25 and E74. This would lose the distinction between what the map names vs what the almanac names.
 
 **Enables:** Precise provenance: you can ask _where did this name come from?_ and get "the 1930 map" vs "the 1818 almanac." Answering: name variant tracking across sources.
 
 ### Step 3.3 -- skos:prefLabel kept as display convenience
 
-**What:** `skos:prefLabel` is retained on E24 and E74 as a simple display label alongside the formal E41 chain.
+**What:** `skos:prefLabel` is retained on E25 and E74 as a simple display label alongside the formal E41 chain.
 
 **Why:** Not every query needs to traverse E41 -> P190 just to show a name. For UI display, SPARQL result labels, and quick lookups, a simple `skos:prefLabel` is practical. The formal E41 chain is for provenance and name history; prefLabel is for convenience.
 
@@ -120,7 +120,7 @@ E41a --P139 has alternative form--> E41b
 
 ### Step 5.1 -- Plantation mergers and splits (has_parts / part_of)
 
-**What:** Map Almanakken `split1_id`..`split5_id` and `part_of_id` columns to structural relationships between E74 organizations and/or E24 plantations.
+**What:** Map Almanakken `split1_id`..`split5_id` and `part_of_id` columns to structural relationships between E74 organizations and/or E25 plantations.
 
 **CSV columns involved:**
 
@@ -178,7 +178,7 @@ E74 (plantation_id) --crm:P67_refers_to--> E74 (reference_std_id)
 - PSUR IDs alone are **not sufficient for reliable linking**. They should always be cross-checked against standardized plantation/organization names (`plantation_std` in Almanakken, `plantation_label` in QGIS) to validate the match.
 - Think of PSUR as a **hint**, not a ground truth. The combination of PSUR ID + name matching + Q-ID provides a more robust link.
 
-**Decision (resolved):** PSUR ID identifies the **E74 organization**, not E24. The slave registers list enslaved people under organizations (the legal entity that "owned" them). The fact that QGIS CSV also carries PSUR IDs on polygons is a convenience shortcut -- the PSUR conceptually points through E24 -> P52 -> E74.
+**Decision (resolved):** PSUR ID identifies the **E74 organization**, not E25. The slave registers list enslaved people under organizations (the legal entity that "owned" them). The fact that QGIS CSV also carries PSUR IDs on polygons is a convenience shortcut -- the PSUR conceptually points through E25 -> P52 -> E74.
 
 **Modeling approach:**
 
@@ -203,8 +203,8 @@ Using `skos:closeMatch` (not `owl:sameAs` or `skos:exactMatch`) because the matc
 **Modeling approach (proposed):**
 
 ```
-E24 polygon --P52--> E74 (qid, primary org)
-E24 polygon --P51--> E74 (qid_alt, former org, now absorbed)
+E25 polygon --P52--> E74 (qid, primary org)
+E25 polygon --P51--> E74 (qid_alt, former org, now absorbed)
 E74 (qid_alt) --P99i was dissolved by--> E68 Dissolution --P14 carried out by--> E74 (qid)
 ```
 
@@ -332,13 +332,13 @@ Colors follow the standard CIDOC-CRM visualization scheme proposed by George Bru
 
 | Fill       | CIDOC-CRM parent class | Our entities                    |
 | ---------- | ---------------------- | ------------------------------- |
-| #c78e66    | E18 Physical Thing     | E24 Plantation, E22 Source, E26 |
+| #c78e66    | E18 Physical Thing     | E25 Plantation, E22 Source, E26 |
 | #94cc7d    | E53 Place              | E53 Place (location geometry)   |
 | #ffbdca    | E39 Actor              | E74 Group (organization)        |
 | #fef3ba    | E41 Appellation        | E41 MAP / ALM / STD (names)     |
 | #82ddff    | E2 Temporal Entity     | E12 Production, Observations    |
 | #86bcc8    | E52 Time-Span          | E52 Time-Span                   |
-| #fddc34    | E28 Conceptual Object  | E36 Visual Item, E38 Image      |
+| #fddc34    | E28 Conceptual Object  | E36 Visual Item                 |
 | #fab565    | E55 Type               | E55 Type                        |
 | #ffe6eb    | E39 Actor (instance)   | PersonObservation (PICO)        |
 | #f8f9fa    | (non-CRM)              | CSV source columns              |

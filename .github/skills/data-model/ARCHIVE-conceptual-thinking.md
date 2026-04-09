@@ -1,8 +1,8 @@
 # Archive: Conceptual Thinking and Design Rationale
 
-> This document preserves the detailed reasoning and philosophical discussions from earlier iterations of the data model. Some concepts here (like the "three-entity model") have been superseded by the current E24-centric model. For the active reference, see [SKILL.md](SKILL.md).
+> This document preserves the detailed reasoning and philosophical discussions from earlier iterations of the data model. Some concepts here (like the "three-entity model") have been superseded by the current E25-centric model. For the active reference, see [SKILL.md](SKILL.md).
 
-> **SUPERSEDED**: The "three-entity model" (Land Plot, Physical Site, Organization) described in Parts A-E has been replaced. The current model uses **E24 Plantation as the main entity**, with E53 Place as its location property and E74/sdo:Organization as operator. See [universal-source-pattern.mmd](../../../docs/models/universal-source-pattern.mmd).
+> **SUPERSEDED**: The "three-entity model" (Land Plot, Physical Site, Organization) described in Parts A-E has been replaced. The current model uses **E25 Plantation as the main entity**, with E53 Place as its location property and E74/sdo:Organization as operator. See [universal-source-pattern.mmd](../../../docs/models/universal-source-pattern.mmd).
 
 ---
 
@@ -211,7 +211,7 @@ E36 Visual Item -> P138 represents -> E53 Place  (NO!)
 ### Correct Pattern
 
 ```
-E36 Visual Item -> P138 represents -> E24 Physical Thing -> P53 has location -> E53 Place
+E36 Visual Item -> P138 represents -> E25 Physical Thing -> P53 has location -> E53 Place
 ```
 
 ---

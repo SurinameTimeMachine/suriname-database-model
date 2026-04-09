@@ -11513,7 +11513,7 @@ Table 6: Deprecated Class Migration Instructions
 
 | **Deprecated Class**              | **Migration Instruction**                                                                   |
 | --------------------------------- | ------------------------------------------------------------------------------------------- |
-| E38 Image                         | use [E36](#_toc7971) Visual Item                                                            |
+| E36 Image                         | use [E36](#_toc7971) Visual Item                                                            |
 | E40 Legal Body                    | use [E74](#_toc8492) Group                                                                  |
 | E44 Place Appellation             | use [E41](#_toc8039) Appellation                                                            |
 | E45 Address                       | use [E41](#_toc8039) Appellation, [_P2_](#_toc8844) _has type_: "Address"                   |

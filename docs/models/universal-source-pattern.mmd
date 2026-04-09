@@ -12,7 +12,7 @@ flowchart TB
     (Physical source artifact)
     Map | Book | Ledger | Document"]
 
-    E38["E38 Image
+    E36_IMG["E36 Visual Item
     (Digital reproduction)
     IIIF scan"]
 
@@ -21,7 +21,7 @@ flowchart TB
     Cartography | Tables | Handwriting"]
 
     E41_MAP["E41 Appellation
-    (Map label identifies E24)
+    (Map label identifies E25)
     P190: printed name"]
 
     E41_ALM["E41 Appellation
@@ -44,7 +44,7 @@ flowchart TB
     %% WHAT THE SOURCE REPRESENTS (varies by source type)
     %% =============================================================
 
-    E24["E24 Physical Human-Made Thing
+    E25["E25 Human-Made Feature
     (Plantations, buildings)
     plantation/slug"]
 
@@ -71,7 +71,7 @@ flowchart TB
     E22 -->|"P128 carries"| E41_ALM
 
     %% Digital scan represents physical (P138)
-    E38 -->|"P138 represents"| E22
+    E36_IMG -->|"P138 represents"| E22
 
     %% Production with time-span (gives temporal scope to names)
     E22 -->|"P108i was produced by"| E12
@@ -80,22 +80,22 @@ flowchart TB
     E12 -->|"P14 carried out by"| E74_PUB
 
     %% Visual represents different things depending on source type
-    E36 -->|"P138 represents"| E24
+    E36 -->|"P138 represents"| E25
     E36 -->|"P138 represents"| E26
     E36 -->|"P138 represents"| E74_ORG
     E36 -->|"P138 represents"| E21_PERSON
 
     %% Names identify DIFFERENT entity types depending on source
-    E41_MAP -->|"P1i identifies"| E24
+    E41_MAP -->|"P1i identifies"| E25
     E41_ALM -->|"P1i identifies"| E74_ORG
     E41_MAP ---|"P139 has alt form"| E41_ALM
 
     %% Things/features have locations
-    E24 -->|"P53 has location"| E53
+    E25 -->|"P53 has location"| E53
     E26 -->|"P53 has location"| E53
 
     %% Plantation owned by organization (separate entities)
-    E24 -->|"P52 has current owner"| E74_ORG
+    E25 -->|"P52 has current owner"| E74_ORG
 
     %% =============================================================
     %% STYLING
@@ -113,11 +113,11 @@ flowchart TB
     classDef crm_E52_Time_Span fill:#86bcc8,stroke:#000000,color:#000000
 
     class E22 crm_E18_Physical_Thing
-    class E38 crm_E28_Conceptual_Object
+    class E36_IMG crm_E28_Conceptual_Object
     class E36 crm_E28_Conceptual_Object
     class E41_MAP crm_E41_Appellation
     class E41_ALM crm_E41_Appellation
-    class E24 crm_E18_Physical_Thing
+    class E25 crm_E18_Physical_Thing
     class E53 crm_E53_Place
     class E26 crm_E18_Physical_Thing
     class E74_ORG crm_E39_Actor

@@ -9,8 +9,8 @@ flowchart TB
         P2 has type: historic-map"]
     end
 
-    subgraph DIGITAL_LAYER ["E38 Image (Digital Scan)"]
-        E38["E38 Image
+    subgraph DIGITAL_LAYER ["E36 Visual Item (Digital Scan)"]
+        E36_IMG["E36 Visual Item
         IIIF scan of the map
         P138 represents: E22"]
     end
@@ -18,7 +18,7 @@ flowchart TB
     subgraph VISUAL_LAYER ["E36 Visual Item (What Map Carries)"]
         E36["E36 Visual Item
         (The cartographic content)
-        P138 represents: E24/E26"]
+        P138 represents: E25/E26"]
     end
 
     subgraph PRODUCTION_LAYER ["E12 Production (Creation Event)"]
@@ -29,8 +29,8 @@ flowchart TB
         P82b: 1930-12-31"]
     end
 
-    subgraph THING_LAYER ["E24 Physical Human-Made Thing"]
-        E24["E24 Physical Human-Made Thing
+    subgraph THING_LAYER ["E25 Human-Made Feature"]
+        E25["E25 Human-Made Feature
         'Geijersvlijt' (the plantation)
         plantation/geijersvlijt
         P2 has type: plantation"]
@@ -49,39 +49,39 @@ flowchart TB
     end
 
     E22 -->|"P128 carries"| E36
-    E38 -->|"P138 represents"| E22
+    E36_IMG -->|"P138 represents"| E22
     E22 -->|"P108i was produced by"| E12
     E12 -->|"P4 has time-span"| E52
 
-    E36 -->|"P138 represents"| E24
+    E36 -->|"P138 represents"| E25
     E36 -->|"P138 represents"| E26
 
-    E24 -->|"P53 has location"| E53
+    E25 -->|"P53 has location"| E53
     E26 -->|"P53 has location"| E53
 
     subgraph KEY_INSIGHT ["KEY INSIGHT: Universal Source Pattern"]
         direction LR
         KEY1["E22 → P128 → E36
         Physical carries visual"]
-        KEY2["E36 → P138 → E24/E26
+        KEY2["E36 → P138 → E25/E26
         Visual represents things"]
-        KEY3["E24/E26 → P53 → E53
+        KEY3["E25/E26 → P53 → E53
         Things have locations"]
     end
 
     classDef e22 fill:#fff3cd,stroke:#ffc107,stroke-width:2px,color:#856404
-    classDef e38 fill:#cce5ff,stroke:#004085,stroke-width:2px,color:#004085
+    classDef e36img fill:#cce5ff,stroke:#004085,stroke-width:2px,color:#004085
     classDef e36 fill:#e2e3e5,stroke:#6c757d,stroke-width:2px,color:#383d41
-    classDef e24 fill:#d4edda,stroke:#28a745,stroke-width:2px,color:#155724
+    classDef e25 fill:#d4edda,stroke:#28a745,stroke-width:2px,color:#155724
     classDef e26 fill:#b2dfdb,stroke:#00796b,stroke-width:2px,color:#004d40
     classDef e53 fill:#e8f5e9,stroke:#4caf50,stroke-width:2px,color:#1b5e20
     classDef production fill:#f8d7da,stroke:#721c24,stroke-width:1px,color:#721c24
     classDef insight fill:#fff5f5,stroke:#dc3545,stroke-width:2px
 
     class E22 e22
-    class E38 e38
+    class E36_IMG e36img
     class E36 e36
-    class E24 e24
+    class E25 e25
     class E26 e26
     class E53 e53
     class E12,E52 production

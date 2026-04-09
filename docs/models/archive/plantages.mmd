@@ -6,7 +6,7 @@
 
 graph TB
     subgraph PLANTATION["stm:Plantation (wd:Qxxxxxx)"]
-        P["<b>Dual-Typed Entity</b><br/>crm:E24_Physical_Human-Made_Thing<br/>sdo:Organization<br/>stm:Plantation"]
+        P["<b>Dual-Typed Entity</b><br/>crm:E25_Human-Made_Feature<br/>sdo:Organization<br/>stm:Plantation"]
     end
 
     subgraph IDENTITY["Identifiers"]
@@ -20,7 +20,7 @@ graph TB
         ALT["<b>skos:altLabel</b><br/>+ validFrom/Through + source"]
     end
 
-    subgraph PHYSICAL["Physical (E24 + GeoSPARQL)"]
+    subgraph PHYSICAL["Physical (E25 + GeoSPARQL)"]
         GEOM["<b>geo:hasGeometry</b><br/>polygon + source"]
         STATUS["<b>stm:status</b><br/>built | planned | abandoned"]
     end

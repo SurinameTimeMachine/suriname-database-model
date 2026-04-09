@@ -2,9 +2,9 @@
 
 Quick reference for validating plantation data entities.
 
-## Plantation (E24 Physical Human-Made Thing) - MAIN ENTITY
+## Plantation (E25 Human-Made Feature) - MAIN ENTITY
 
-- [ ] Type: `crm:E24_Physical_Human-Made_Thing`
+- [ ] Type: `crm:E25_Human-Made_Feature`
 - [ ] URI = `{base}plantation/{name-slug}`
 - [ ] `crm:P1_is_identified_by` E41 Appellation (formal name)
 - [ ] `rdfs:label` with `@nl` tag
@@ -35,7 +35,7 @@ Quick reference for validating plantation data entities.
 
 ## Qualified Links (for uncertain matches)
 
-- [ ] `crm:P140_assigned_attribute_to` linking to E24
+- [ ] `crm:P140_assigned_attribute_to` linking to E25
 - [ ] `crm:P141_assigned` linking to Q-ID
 - [ ] `crm:P2_has_type` (Certain / Probable / Uncertain)
 - [ ] `crm:P3_has_note` explanation
@@ -56,7 +56,7 @@ Quick reference for validating plantation data entities.
 ## Classification (E17 Type Assignment)
 
 - [ ] Type: `crm:E17_Type_Assignment` (subclass of E13)
-- [ ] `crm:P41_classified` linking to E24 Plantation (the physical thing)
+- [ ] `crm:P41_classified` linking to E25 Plantation (the physical thing)
 - [ ] `crm:P42_assigned` linking to E55 Type (`type/plantation-status/abandoned`)
 - [ ] `crm:P4_has_time-span` E52 Time-Span (year from almanac)
 - [ ] `prov:hadPrimarySource` linking to E22 (almanac)
@@ -66,5 +66,5 @@ Quick reference for validating plantation data entities.
 - [ ] Type: `crm:E22_Human-Made_Object`
 - [ ] `crm:P128_carries` linking to E36 Visual Item
 - [ ] `crm:P128_carries` linking to E41 Appellation
-- [ ] E36 uses `crm:P138_represents` to E24 Plantation (NOT to E53 directly)
-- [ ] Digital scans: E38 Image `crm:P138_represents` the E22
+- [ ] E36 uses `crm:P138_represents` to E25 Plantation (NOT to E53 directly)
+- [ ] Digital scans: E36 Visual Item `crm:P138_represents` the E22

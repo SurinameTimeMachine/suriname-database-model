@@ -7,7 +7,7 @@ flowchart TB
     %% ============================================
     subgraph CORE["PLANTATION ENTITY"]
         direction TB
-        P["wd:Qxxxxxx<br/><b>@type:</b><br/>• crm:E24_Physical_Human-Made_Thing<br/>• sdo:Organization<br/>• stm:Plantation"]
+        P["wd:Qxxxxxx<br/><b>@type:</b><br/>• crm:E25_Human-Made_Feature<br/>• sdo:Organization<br/>• stm:Plantation"]
     end
 
     %% ============================================
@@ -28,9 +28,9 @@ flowchart TB
     end
 
     %% ============================================
-    %% PHYSICAL ASPECT (CIDOC-CRM E24 + GeoSPARQL)
+    %% PHYSICAL ASPECT (CIDOC-CRM E25 + GeoSPARQL)
     %% ============================================
-    subgraph PHYSICAL["PHYSICAL ASPECT (E24)"]
+    subgraph PHYSICAL["PHYSICAL ASPECT (E25)"]
         direction TB
         GEOM["<b>geo:hasGeometry</b><br/>→ geo:Geometry<br/>  • geo:asWKT (polygon)<br/>  • stm:geometrySource"]
         STATUS["<b>stm:status</b><br/>built | planned | abandoned | unknown"]

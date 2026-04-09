@@ -92,9 +92,9 @@ person → E21 Person https://cidoc-crm.org/html/cidoc_crm_v7.1.3.html#E21
 
 place → E53 Place https://cidoc-crm.org/html/cidoc_crm_v7.1.3.html#E53
 
-map_feature → E22 Human-Made Object https://cidoc-crm.org/html/cidoc_crm_v7.1.3.html#E22 (maybe? Or rather E24 Physical Human-Made Thing?)
+map_feature → E25 Human-Made Feature https://cidoc-crm.org/html/cidoc_crm_v7.1.3.html#E25
 
-- polygon traced is feature (digital, or analog on the actual map?) on physical map, so a E25: Hamn-Made Feature https://cidoc-crm.org/html/cidoc_crm_v7.1.3.html#E25
+- polygon traced is feature (digital, or analog on the actual map?) on physical map, so a E25: Human-Made Feature https://cidoc-crm.org/html/cidoc_crm_v7.1.3.html#E25
 - physical map is E22 Human-Made Object https://cidoc-crm.org/html/cidoc_crm_v7.1.3.html#E22
 
 interpretation → E13 Attribute Assignment https://cidoc-crm.org/html/cidoc_crm_v7.1.3.html#E13

@@ -9,7 +9,7 @@ config:
     tertiaryColor: "#fff5f5"
 ---
 erDiagram
-    E24_PHYSICAL_HUMAN_MADE_THING {
+    E25_HUMAN_MADE_FEATURE {
         string id PK "plantation/slug"
         string P1_is_identified_by FK "Links to E41 Appellation"
         string P2_has_type FK "Links to E55 Type"
@@ -20,7 +20,7 @@ erDiagram
     E41_APPELLATION {
         string id PK "appellation/slug"
         string P190_has_symbolic_content "The actual name string"
-        string P1i_identifies FK "E24 or E74 (not both)"
+        string P1i_identifies FK "E25 or E74 (not both)"
         string P139_has_alternative_form FK "Variant spelling E41"
         string P128i_is_carried_by FK "E22 source that records it"
         string P72_has_language "nl sr en"
@@ -56,7 +56,7 @@ erDiagram
 
     E12_PRODUCTION {
         string id PK "Production event identifier"
-        string P108_has_produced FK "Links to E22 or E24"
+        string P108_has_produced FK "Links to E22 or E25"
         string P14_carried_out_by FK "Links to E21 Person or E74 Group"
         string P4_has_time_span FK "Links to E52 Time-Span"
     }
@@ -76,10 +76,10 @@ erDiagram
 
     E36_VISUAL_ITEM {
         string id PK "Visual content identifier"
-        string P138_represents FK "What it depicts E24 E26 E74 E21"
+        string P138_represents FK "What it depicts E25 E26 E74 E21"
     }
 
-    E38_IMAGE {
+    E36_IMAGE {
         string id PK "Digital reproduction IIIF scan"
         string iiif_url "IIIF Info URL"
         string P138_represents FK "Links to E22 it reproduces"
@@ -117,10 +117,10 @@ erDiagram
         string label "historic-map almanac slave-register"
     }
 
-    E24_PHYSICAL_HUMAN_MADE_THING }o--|| E55_TYPE : "P2_has_type"
-    E24_PHYSICAL_HUMAN_MADE_THING }o--o{ E53_PLACE : "P53_has_former_or_current_location"
-    E24_PHYSICAL_HUMAN_MADE_THING }o--o{ E74_GROUP : "P52_has_current_owner"
-    E24_PHYSICAL_HUMAN_MADE_THING }o--o{ E41_APPELLATION : "P1_is_identified_by"
+    E25_HUMAN_MADE_FEATURE }o--|| E55_TYPE : "P2_has_type"
+    E25_HUMAN_MADE_FEATURE }o--o{ E53_PLACE : "P53_has_former_or_current_location"
+    E25_HUMAN_MADE_FEATURE }o--o{ E74_GROUP : "P52_has_current_owner"
+    E25_HUMAN_MADE_FEATURE }o--o{ E41_APPELLATION : "P1_is_identified_by"
 
     E26_PHYSICAL_FEATURE }o--|| E55_TYPE : "P2_has_type"
     E26_PHYSICAL_FEATURE }o--o{ E53_PLACE : "P53_has_former_or_current_location"
@@ -131,16 +131,16 @@ erDiagram
     E74_GROUP }o--o| E74_GROUP : "P107i_is_member_of"
     E74_GROUP }o--o{ E41_APPELLATION : "P1_is_identified_by"
 
-    E24_PHYSICAL_HUMAN_MADE_THING }o--o| E12_PRODUCTION : "P108i_was_produced_by"
+    E25_HUMAN_MADE_FEATURE }o--o| E12_PRODUCTION : "P108i_was_produced_by"
     E22_HUMAN_MADE_OBJECT }o--o| E12_PRODUCTION : "P108i_was_produced_by"
     E12_PRODUCTION }o--|| E52_TIME_SPAN : "P4_has_time_span"
 
     E22_HUMAN_MADE_OBJECT ||--|| E36_VISUAL_ITEM : "P128_carries"
     E22_HUMAN_MADE_OBJECT ||--o{ E41_APPELLATION : "P128_carries"
-    E38_IMAGE }o--|| E22_HUMAN_MADE_OBJECT : "P138_represents"
+    E36_IMAGE }o--|| E22_HUMAN_MADE_OBJECT : "P138_represents"
 
     E41_APPELLATION }o--o{ E41_APPELLATION : "P139_has_alternative_form"
-    E36_VISUAL_ITEM }o--o{ E24_PHYSICAL_HUMAN_MADE_THING : "P138_represents"
+    E36_VISUAL_ITEM }o--o{ E25_HUMAN_MADE_FEATURE : "P138_represents"
     E36_VISUAL_ITEM }o--o{ E26_PHYSICAL_FEATURE : "P138_represents"
 
     OBSERVATION }o--|| E74_GROUP : "observes"

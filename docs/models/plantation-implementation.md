@@ -12,38 +12,38 @@ A **plantation** is modeled with multiple types on the same entity:
 
 ```
 wd:Q59115309
-    a crm:E24_Physical_Human-Made_Thing,  # Physical built thing
+    a crm:E25_Human-Made_Feature,  # Physical landscape feature
       sdo:Organization,                     # Legal/economic entity (PICO alignment)
-      crm:E24_Physical_Human-Made_Thing ;    # Physical built thing (domain type)
+      crm:E25_Human-Made_Feature ;    # Physical landscape feature (domain type)
 ```
 
 This approach:
 
-- Uses **CIDOC-CRM E24** for the physical/geographical aspect
+- Uses **CIDOC-CRM E25** for the physical/geographical aspect
 - Uses **Schema.org Organization** for PICO model compatibility (person affiliation)
-- Uses **crm:E24_Physical_Human-Made_Thing** as the primary physical type for domain queries
+- Uses **crm:E25_Human-Made_Feature** as the primary physical type for domain queries
 
-### Why E24_Physical_Human-Made_Thing?
+### Why E25_Human-Made_Feature?
 
-We chose [E24_Physical_Human-Made_Thing](https://cidoc-crm.org/Entity/e24-physical-human-made-thing/version-7.1.3) over other CIDOC-CRM classes for the following reasons:
+We chose [E25_Human-Made_Feature](https://cidoc-crm.org/Entity/e25-human-made-feature/version-7.1.3) over other CIDOC-CRM classes for the following reasons:
 
 | Class                         | Definition                                       | Why not?                                                  |
 | ----------------------------- | ------------------------------------------------ | --------------------------------------------------------- |
 | E22_Human-Made_Object         | Movable physical items                           | Plantations are **immovable** (attached to land)          |
-| E24_Physical_Human-Made_Thing | Persistent physical items (movable OR immovable) | ✓ **Correct choice**                                      |
-| E25_Human-Made_Feature        | Features dependent on a larger structure         | Plantations are **self-contained**                        |
+| E24_Physical_Human-Made_Thing | Persistent physical items (movable OR immovable) | Too broad; includes movable objects                       |
+| E25_Human-Made_Feature        | Human-made features of larger structures or land | **Correct choice** -- plantations are landscape features  |
 | E27_Site                      | Defined by archaeological convention             | Too arbitrary; plantations have clear physical boundaries |
 
-A plantation qualifies as E24 because it is:
+A plantation qualifies as E25 because it is:
 
 1. **Immovable** — Attached to the land
 2. **Human-made** — Cleared forest, constructed buildings, irrigation, planted crops
-3. **Persistent** — Has a lifespan (built → modified → abandoned)
-4. **Self-contained** — Not dependent on a larger structure
+3. **Persistent** — Has a lifespan (built -> modified -> abandoned)
+4. **A landscape feature** — A purposely created modification of the physical landscape
 
-The CIDOC-CRM specification states that E24 covers "all instances of E19 Physical Object" plus "instances of E26 Physical Feature that are purposely created by human activity" — including **buildings and land modifications**.
+The CIDOC-CRM specification states that E25 "comprises physical features of any size that are purposely created by human activity" and is a subclass of both E24 Physical Human-Made Thing and E26 Physical Feature — covering **buildings, gardens, and land modifications**.
 
-Using E24 gives us access to useful properties:
+Using E25 gives us access to useful properties:
 
 - `crm:P53_has_former_or_current_location` — geographical placement
 - `crm:P92i_was_brought_into_existence_by` — construction events
@@ -122,7 +122,7 @@ The PICO model represents plantations as `sdo:Organization` with:
 
 We extend PICO by adding:
 
-- `crm:E24_Physical_Human-Made_Thing` for spatial/physical properties
+- `crm:E25_Human-Made_Feature` for spatial/physical properties
 - `geo:hasGeometry` for GIS integration
 - `crm:E13_Attribute_Assignment` for time-series data (Almanakken)
 
@@ -132,7 +132,7 @@ We extend PICO by adding:
 
 ```turtle
 plantation/breedevoort
-    a crm:E24_Physical_Human-Made_Thing ;
+    a crm:E25_Human-Made_Feature ;
     crm:P2_has_type type/plantation-status/built ;
     skos:prefLabel "Breedevoort"@nl ;
     crm:P52_has_current_owner wd:Q59115309 ;
@@ -159,7 +159,7 @@ wd:Q59115309
 {
   "@context": "https://raw.githubusercontent.com/.../context.jsonld",
   "@id": "plantation/breedevoort",
-  "@type": "crm:E24_Physical_Human-Made_Thing",
+  "@type": "crm:E25_Human-Made_Feature",
   "P2_has_type": "type/plantation-status/built",
   "prefLabel": "Breedevoort",
   "P52_has_current_owner": {

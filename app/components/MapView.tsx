@@ -2,6 +2,7 @@
 
 import 'leaflet/dist/leaflet.css';
 import type { GeoJSONCollection, GeoJSONFeature } from '@/lib/types';
+import { usePlaceTypes } from '@/lib/thesaurus';
 import L from 'leaflet';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -200,6 +201,15 @@ export default function MapView({
   const selectedUriRef = useRef(selectedPlantationUri);
   const highlightedNameRef = useRef(highlightedName);
   const onSelectRef = useRef(onSelectPlantation);
+  const {
+    colors: PLACE_TYPE_COLORS,
+    labels: PLACE_TYPE_LABELS,
+    allTypes,
+  } = usePlaceTypes();
+  const placeTypeColorsRef = useRef(PLACE_TYPE_COLORS);
+  placeTypeColorsRef.current = PLACE_TYPE_COLORS;
+  const placeTypeLabelsRef = useRef(PLACE_TYPE_LABELS);
+  placeTypeLabelsRef.current = PLACE_TYPE_LABELS;
   const [opacity, setOpacity] = useState(0.7);
   const opacityRef = useRef(opacity);
   opacityRef.current = opacity;
@@ -209,6 +219,13 @@ export default function MapView({
   const [layersOpen, setLayersOpen] = useState(false);
   const [toolbarOpen, setToolbarOpen] = useState(true);
   const layersDropdownRef = useRef<HTMLDivElement>(null);
+  const [enabledFeatures, setEnabledFeatures] = useState<Set<string>>(
+    () => new Set(allTypes),
+  );
+  const enabledFeaturesRef = useRef(enabledFeatures);
+  enabledFeaturesRef.current = enabledFeatures;
+  const [featuresOpen, setFeaturesOpen] = useState(false);
+  const featuresDropdownRef = useRef<HTMLDivElement>(null);
 
   // Keep callback ref in sync
   useEffect(() => {
@@ -352,15 +369,117 @@ export default function MapView({
     }
 
     const layer = L.geoJSON(geojson as unknown as GeoJSON.GeoJsonObject, {
+      filter: (feature) => {
+        const ft = feature?.properties?.featureType;
+        return !ft || enabledFeaturesRef.current.has(ft);
+      },
+      pointToLayer: (_feature, latlng) => {
+        return L.circleMarker(latlng, { radius: 6 });
+      },
       style: (feature) => {
         const props = feature?.properties;
-        const isSelected = props?.plantationUri === selectedUriRef.current;
+        const geomType = feature?.geometry?.type;
+        const ft = props?.featureType || 'plantation';
+        const featureIdentifier =
+          props?.plantationUri ?? props?.featureUri ?? props?.placeUri;
+        const isSelected = featureIdentifier === selectedUriRef.current;
         const isHighlighted =
           !isSelected &&
           !!highlightedNameRef.current &&
           props?.name
             ?.toLowerCase()
             .includes(highlightedNameRef.current.toLowerCase());
+
+        // Point features (settlements, military posts, stations, villages, towns)
+        if (geomType === 'Point') {
+          const color = placeTypeColorsRef.current[ft] || '#888';
+          if (isSelected) {
+            return {
+              fillColor: color,
+              fillOpacity: 0.9,
+              color: '#333',
+              weight: 2.5,
+            };
+          }
+          if (isHighlighted) {
+            return {
+              fillColor: '#e07850',
+              fillOpacity: 0.8,
+              color: '#a04020',
+              weight: 2,
+            };
+          }
+          return {
+            fillColor: color,
+            fillOpacity: 0.7,
+            color: '#fff',
+            weight: 1.5,
+          };
+        }
+
+        // LineString features
+        if (geomType === 'LineString') {
+          // Roads
+          if (ft === 'road') {
+            if (isSelected)
+              return { color: '#8B4513', weight: 3, opacity: 0.9 };
+            if (isHighlighted)
+              return {
+                color: '#e07850',
+                weight: 2.5,
+                opacity: 0.8,
+                dashArray: '6 3',
+              };
+            return {
+              color: '#a0522d',
+              weight: 2,
+              opacity: 0.6,
+              dashArray: '5 4',
+            };
+          }
+          // Railroad
+          if (ft === 'railroad') {
+            if (isSelected)
+              return { color: '#1a1a1a', weight: 4, opacity: 0.9 };
+            if (isHighlighted)
+              return {
+                color: '#e07850',
+                weight: 3.5,
+                opacity: 0.8,
+                dashArray: '6 3',
+              };
+            return {
+              color: '#2c2c2c',
+              weight: 3,
+              opacity: 0.7,
+              dashArray: '8 4 2 4',
+            };
+          }
+          // Rivers and creeks
+          const isCreek = ft === 'creek';
+          if (isSelected) {
+            return {
+              color: '#1a6fa0',
+              weight: isCreek ? 3 : 4,
+              opacity: 0.9,
+            };
+          }
+          if (isHighlighted) {
+            return {
+              color: '#e07850',
+              weight: isCreek ? 2.5 : 3.5,
+              opacity: 0.8,
+              dashArray: '6 3',
+            };
+          }
+          return {
+            color: isCreek ? '#6baed6' : '#3182bd',
+            weight: isCreek ? 1.5 : 2.5,
+            opacity: 0.7,
+          };
+        }
+
+        // Polygon features (plantations)
         const isBuilt = props?.status === 'built';
         if (isSelected) {
           return {
@@ -388,7 +507,10 @@ export default function MapView({
       },
       onEachFeature: (feature, featureLayer) => {
         const props = feature.properties;
-        featureLayer.bindTooltip(props.name || 'Unknown', {
+        const ft = props?.featureType || 'plantation';
+        const label = placeTypeLabelsRef.current[ft];
+        const tooltip = `${props.name || 'Unknown'}${label ? ` (${label})` : ''}`;
+        featureLayer.bindTooltip(tooltip, {
           sticky: true,
           className: 'plantation-tooltip',
         });
@@ -397,16 +519,24 @@ export default function MapView({
           onSelectRef.current(feature as unknown as GeoJSONFeature);
         });
 
+        const featureIdentifier =
+          props?.plantationUri ?? props?.featureUri ?? props?.placeUri;
         featureLayer.on('mouseover', (e) => {
           const target = e.target as L.Path;
-          if (props.plantationUri !== selectedUriRef.current) {
-            target.setStyle({ fillOpacity: 0.5, weight: 2 });
+          if (featureIdentifier !== selectedUriRef.current) {
+            if (feature.geometry?.type === 'Point') {
+              target.setStyle({ fillOpacity: 0.9, weight: 2.5 });
+            } else if (feature.geometry?.type === 'LineString') {
+              target.setStyle({ opacity: 0.9, weight: 3.5 });
+            } else {
+              target.setStyle({ fillOpacity: 0.5, weight: 2 });
+            }
           }
         });
 
         featureLayer.on('mouseout', (e) => {
           const target = e.target as L.Path;
-          if (props.plantationUri !== selectedUriRef.current) {
+          if (featureIdentifier !== selectedUriRef.current) {
             layer.resetStyle(target);
           }
         });
@@ -415,7 +545,7 @@ export default function MapView({
 
     layer.addTo(mapRef.current);
     layerRef.current = layer;
-  }, [geojson]);
+  }, [geojson, enabledFeatures]);
 
   // Restyle features when selection or highlight changes (no layer recreation)
   useEffect(() => {
@@ -442,20 +572,30 @@ export default function MapView({
     });
   }, [opacity, enabledOverlays]);
 
-  // Fly to selected plantation — pad right side when panel is open
+  // Fly to selected feature — pad right side when panel is open
   useEffect(() => {
     if (!mapRef.current || !layerRef.current || !selectedPlantationUri) return;
 
     layerRef.current.eachLayer((layer) => {
-      const feature = (layer as L.GeoJSON & { feature?: GeoJSONFeature })
+      const feature = (layer as unknown as { feature?: GeoJSONFeature })
         .feature;
-      if (feature?.properties?.plantationUri === selectedPlantationUri) {
-        const bounds = (layer as L.Polygon).getBounds();
-        mapRef.current!.flyToBounds(bounds, {
-          padding: [50, 50],
-          paddingBottomRight: panelOpen ? [420, 50] : [50, 50],
-          maxZoom: 13,
-        });
+      const featureIdentifier =
+        feature?.properties?.plantationUri ??
+        feature?.properties?.featureUri ??
+        feature?.properties?.placeUri;
+      if (featureIdentifier === selectedPlantationUri) {
+        const geomType = feature?.geometry?.type;
+        if (geomType === 'Point') {
+          const latlng = (layer as L.CircleMarker).getLatLng();
+          mapRef.current!.flyTo(latlng, 13);
+        } else {
+          const bounds = (layer as L.Polygon).getBounds();
+          mapRef.current!.flyToBounds(bounds, {
+            padding: [50, 50],
+            paddingBottomRight: panelOpen ? [420, 50] : [50, 50],
+            maxZoom: 13,
+          });
+        }
       }
     });
   }, [selectedPlantationUri, panelOpen]);
@@ -472,14 +612,21 @@ export default function MapView({
 
     let combinedBounds: L.LatLngBounds | null = null;
     layerRef.current.eachLayer((layer) => {
-      const feature = (layer as L.GeoJSON & { feature?: GeoJSONFeature })
+      const feature = (layer as unknown as { feature?: GeoJSONFeature })
         .feature;
       if (
         feature?.properties?.name
           ?.toLowerCase()
           .includes(highlightedName.toLowerCase())
       ) {
-        const bounds = (layer as L.Polygon).getBounds();
+        let bounds: L.LatLngBounds;
+        const geomType = feature.geometry?.type;
+        if (geomType === 'Point') {
+          const latlng = (layer as L.CircleMarker).getLatLng();
+          bounds = L.latLngBounds(latlng, latlng);
+        } else {
+          bounds = (layer as L.Polygon).getBounds();
+        }
         combinedBounds = combinedBounds
           ? combinedBounds.extend(bounds)
           : bounds;
@@ -502,18 +649,26 @@ export default function MapView({
 
   // Close layers dropdown on click outside
   useEffect(() => {
-    if (!layersOpen) return;
+    if (!layersOpen && !featuresOpen) return;
     function handleClick(e: MouseEvent) {
       if (
+        layersOpen &&
         layersDropdownRef.current &&
         !layersDropdownRef.current.contains(e.target as Node)
       ) {
         setLayersOpen(false);
       }
+      if (
+        featuresOpen &&
+        featuresDropdownRef.current &&
+        !featuresDropdownRef.current.contains(e.target as Node)
+      ) {
+        setFeaturesOpen(false);
+      }
     }
     document.addEventListener('mousedown', handleClick);
     return () => document.removeEventListener('mousedown', handleClick);
-  }, [layersOpen]);
+  }, [layersOpen, featuresOpen]);
 
   return (
     <div className="relative w-full h-full">
@@ -593,16 +748,8 @@ export default function MapView({
             {/* Divider */}
             <div className="w-px h-6 bg-stm-warm-200" />
 
-            {/* Legend */}
+            {/* Legend (compact) */}
             <div className="flex items-center gap-3 text-xs">
-              <div className="flex items-center gap-1.5">
-                <span className="w-3.5 h-2.5 bg-stm-sepia-500 opacity-60 inline-block" />
-                <span className="text-stm-warm-600">Built</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="w-3.5 h-2.5 bg-stm-warm-400 opacity-60 inline-block" />
-                <span className="text-stm-warm-600">Unknown</span>
-              </div>
               <div className="flex items-center gap-1.5">
                 <span className="w-3.5 h-2.5 border-2 border-stm-sepia-600 bg-stm-sepia-300 opacity-80 inline-block" />
                 <span className="text-stm-warm-600">Selected</span>
@@ -613,6 +760,116 @@ export default function MapView({
               </div>
             </div>
 
+            {/* Divider */}
+            <div className="w-px h-6 bg-stm-warm-200" />
+
+            {/* Feature layers dropdown */}
+            <div className="relative" ref={featuresDropdownRef}>
+              <button
+                onClick={() => setFeaturesOpen((v) => !v)}
+                className={`flex items-center gap-1.5 text-xs font-medium px-2 py-1 transition-colors ${
+                  featuresOpen
+                    ? 'bg-stm-sepia-100 text-stm-sepia-800'
+                    : 'text-stm-warm-700 hover:bg-stm-warm-100'
+                }`}
+                aria-label="Toggle feature layers"
+                aria-expanded={featuresOpen}
+              >
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 14 14"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                >
+                  <circle cx="7" cy="7" r="3" />
+                  <path
+                    d="M1 7h2.5M10.5 7H13M7 1v2.5M7 10.5V13"
+                    strokeLinecap="round"
+                  />
+                </svg>
+                Features
+                <span className="ml-0.5 bg-stm-sepia-600 text-white text-[10px] leading-none px-1 py-0.5 rounded-full">
+                  {enabledFeatures.size}
+                </span>
+              </button>
+
+              {featuresOpen && (
+                <div className="absolute top-full left-0 mt-1 w-56 bg-white border border-stm-warm-200 shadow-lg z-10">
+                  <div className="px-3 py-1.5 border-b border-stm-warm-100 flex items-center justify-between">
+                    <span className="text-[10px] font-medium text-stm-warm-500 uppercase tracking-wide">
+                      Feature Layers
+                    </span>
+                    <button
+                      onClick={() => {
+                        setEnabledFeatures((prev) =>
+                          prev.size === allTypes.length
+                            ? new Set<string>()
+                            : new Set(allTypes),
+                        );
+                      }}
+                      className="text-[10px] text-stm-sepia-600 hover:text-stm-sepia-800"
+                    >
+                      {enabledFeatures.size === allTypes.length
+                        ? 'None'
+                        : 'All'}
+                    </button>
+                  </div>
+                  <ul className="max-h-72 overflow-y-auto py-1">
+                    {allTypes.map((ft) => {
+                      const isOn = enabledFeatures.has(ft);
+                      const color = PLACE_TYPE_COLORS[ft];
+                      const label = PLACE_TYPE_LABELS[ft] || ft;
+                      const isLine =
+                        ft === 'river' ||
+                        ft === 'creek' ||
+                        ft === 'road' ||
+                        ft === 'railroad';
+                      const isPoly = ft === 'plantation';
+                      return (
+                        <li key={ft}>
+                          <label className="flex items-center gap-2 px-3 py-1 hover:bg-stm-warm-50 cursor-pointer text-xs">
+                            <input
+                              type="checkbox"
+                              checked={isOn}
+                              onChange={() => {
+                                setEnabledFeatures((prev) => {
+                                  const next = new Set(prev);
+                                  if (next.has(ft)) next.delete(ft);
+                                  else next.add(ft);
+                                  return next;
+                                });
+                              }}
+                              className="accent-stm-sepia-600"
+                            />
+                            {isPoly ? (
+                              <span
+                                className="w-3.5 h-2.5 inline-block opacity-60"
+                                style={{ backgroundColor: color }}
+                              />
+                            ) : isLine ? (
+                              <span
+                                className="w-3.5 h-0.5 inline-block"
+                                style={{ backgroundColor: color }}
+                              />
+                            ) : (
+                              <span
+                                className="w-2.5 h-2.5 rounded-full inline-block"
+                                style={{ backgroundColor: color, opacity: 0.7 }}
+                              />
+                            )}
+                            <span className="text-stm-warm-800 flex-1">
+                              {label}
+                            </span>
+                          </label>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              )}
+            </div>
             {/* Divider */}
             <div className="w-px h-6 bg-stm-warm-200" />
 
@@ -758,7 +1015,7 @@ function SearchInput({
     <div className="relative">
       <input
         type="text"
-        placeholder="Search plantations..."
+        placeholder="Search features..."
         value={query}
         onChange={(e) => {
           setQuery(e.target.value);
@@ -772,7 +1029,7 @@ function SearchInput({
         }}
         onFocus={() => setOpen(true)}
         onBlur={() => setTimeout(() => setOpen(false), 200)}
-        aria-label="Search plantations by name"
+        aria-label="Search features by name"
         aria-autocomplete="list"
         role="combobox"
         aria-expanded={open && results.length > 0}

@@ -48,11 +48,11 @@ interface RelDef {
 const ENTITIES: EntityDef[] = [
   /* ── Data-backed entities ────────────────────────────────────── */
   {
-    id: 'e24',
-    type: 'E24',
+    id: 'e25',
+    type: 'E25',
     label: 'Plantation',
-    crmClass: 'E24 Physical Human-Made Thing',
-    desc: 'The central entity -- the physical plantation depicted by sources. A subclass of E22. Connected to locations via P53 and to operating organizations via P52. Can also model houses and other physical structures.',
+    crmClass: 'E25 Human-Made Feature',
+    desc: 'The central entity -- the physical plantation as a human-made landscape feature. A subclass of both E24 Physical Human-Made Thing and E26 Physical Feature. Connected to locations via P53 and to operating organizations via P52. Classified via SKOS thesaurus concepts.',
     color: '#e6956b',
     cx: 380,
     cy: 330,
@@ -60,7 +60,7 @@ const ENTITIES: EntityDef[] = [
     properties: [
       { name: 'P1 is identified by', range: 'E41 Appellation' },
       { name: 'rdfs:label', range: 'string (@nl)' },
-      { name: 'P2 has type', range: 'E55 Type (plantation, house, ...)' },
+      { name: 'P2 has type', range: 'E55 Type (via SKOS thesaurus)' },
       { name: 'P53 has location', range: 'E53 Place (polygon geometry)' },
       { name: 'P52 has current owner', range: 'E74 Organization (via Q-ID)' },
       { name: 'P51 has former or current owner', range: 'E74 Organization' },
@@ -75,11 +75,28 @@ const ENTITIES: EntityDef[] = [
     ],
   },
   {
+    id: 'e26',
+    type: 'E26',
+    label: 'Physical Feature',
+    crmClass: 'E26 Physical Feature',
+    desc: 'Natural geographical features such as rivers and creeks. E26 is the superclass of E25 (human-made features). Connected to locations via P53. Classified via SKOS thesaurus concepts (river, creek). No ownership relationship (rivers have no owners).',
+    color: '#5b9bd5',
+    cx: 150,
+    cy: 330,
+    dataKey: 'physical-features',
+    properties: [
+      { name: 'P1 is identified by', range: 'E41 Appellation' },
+      { name: 'rdfs:label', range: 'string (@nl)' },
+      { name: 'P2 has type', range: 'E55 Type (river / creek via thesaurus)' },
+      { name: 'P53 has location', range: 'E53 Place (LineString geometry)' },
+    ],
+  },
+  {
     id: 'e74',
     type: 'E74',
     label: 'Organization',
     crmClass: 'E74 Group / sdo:Organization',
-    desc: 'The legal entity that owns or operates the plantation. Identified by Wikidata Q-IDs. Separated from E24 to model the distinction between the physical place and its legal operator. Annual observations (E13) record time-varying properties.',
+    desc: 'The legal entity that owns or operates the plantation. Identified by Wikidata Q-IDs. Separated from E25 to model the distinction between the physical place and its legal operator. Annual observations (E13) record time-varying properties.',
     color: '#ffbdca',
     cx: 720,
     cy: 290,
@@ -130,7 +147,7 @@ const ENTITIES: EntityDef[] = [
     type: 'E41',
     label: 'Appellation',
     crmClass: 'E41 Appellation',
-    desc: 'Names as first-class entities. Each source creates its own E41 instance. Map labels identify E24; almanac names identify E74. Temporal scope is inferred from the E22 source production date. Linked via P139 has alternative form.',
+    desc: 'Names as first-class entities. Each source creates its own E41 instance. Map labels identify E25; almanac names identify E74. Temporal scope is inferred from the E22 source production date. Linked via P139 has alternative form.',
     color: '#fef3ba',
     cx: 620,
     cy: 100,
@@ -138,7 +155,7 @@ const ENTITIES: EntityDef[] = [
     properties: [
       { name: 'P190 has symbolic content', range: 'string' },
       { name: 'P139 has alternative form', range: 'E41 Appellation' },
-      { name: 'P1i identifies', range: 'E24 Plantation or E74 Organization' },
+      { name: 'P1i identifies', range: 'E25 Plantation or E74 Organization' },
       { name: 'P128i is carried by', range: 'E22 Source' },
       { name: 'P72 has language', range: 'E56 Language' },
     ],
@@ -148,7 +165,7 @@ const ENTITIES: EntityDef[] = [
     type: 'E22',
     label: 'Source',
     crmClass: 'E22 Human-Made Object',
-    desc: 'Physical sources: maps, almanacs, registers. The source carries visual items (E36) and appellations (E41) that represent or identify entities. Each source has an E12 Production event recording who made it, where, and when. Digital reproductions are modeled as E38 Image. The Almanakken (Surinaamse Almanakken) is modeled as a single E22 for the entire series.',
+    desc: 'Physical sources: maps, almanacs, registers. The source carries visual items (E36) and appellations (E41) that represent or identify entities. Each source has an E12 Production event recording who made it, where, and when. Digital reproductions (IIIF scans) are also modeled as E36 Visual Item, linked via P138 represents. The Almanakken (Surinaamse Almanakken) is modeled as a single E22 for the entire series.',
     color: '#c78e66',
     cx: 200,
     cy: 100,
@@ -195,14 +212,14 @@ const ENTITIES: EntityDef[] = [
     type: 'E17',
     label: 'Type Assignment',
     crmClass: 'E17 Type Assignment',
-    desc: 'Classifies a plantation as abandoned (verlaten) when an almanac row marks it as deserted. A subclass of E13 Attribute Assignment with specific properties P41 classified (targeting E24 Plantation) and P42 assigned (targeting E55 Type). Inherits P4 has time-span and prov:hadPrimarySource from E13.',
+    desc: 'Classifies a plantation as abandoned (verlaten) when an almanac row marks it as deserted. A subclass of E13 Attribute Assignment with specific properties P41 classified (targeting E25 Plantation) and P42 assigned (targeting E55 Type). Inherits P4 has time-span and prov:hadPrimarySource from E13.',
     color: '#f0a0a0',
     cx: 400,
     cy: 490,
     dataKey: '',
     structural: true,
     properties: [
-      { name: 'P41 classified', range: 'E24 Plantation' },
+      { name: 'P41 classified', range: 'E25 Plantation' },
       { name: 'P42 assigned', range: 'E55 Type (plantation-status/abandoned)' },
       { name: 'P4 has time-span', range: 'E52 Time-Span (year)' },
       { name: 'prov:hadPrimarySource', range: 'E22 Source (almanac)' },
@@ -213,34 +230,18 @@ const ENTITIES: EntityDef[] = [
     type: 'E36',
     label: 'Visual Item',
     crmClass: 'E36 Visual Item',
-    desc: 'The visual content carried by a source. A map (E22) carries a visual item (E36) that represents the physical plantation (E24). This intermediary class enables the principle: "maps depict things; things have locations."',
+    desc: 'The visual content carried by a source. A map (E22) carries a visual item (E36) that represents the physical plantation (E25). This intermediary class enables the principle: "maps depict things; things have locations." Digital reproductions (IIIF scans) are also E36 Visual Items that represent the physical source (E22) via P138.',
     color: '#d4a574',
     cx: 380,
     cy: 160,
     dataKey: '',
     structural: true,
     properties: [
-      { name: 'P138 represents', range: 'E24 Physical Human-Made Thing' },
+      { name: 'P138 represents', range: 'E25 Human-Made Feature' },
+      { name: 'P138 represents', range: 'E22 Human-Made Object (digital scan)' },
       { name: 'P128i is carried by', range: 'E22 Human-Made Object' },
-    ],
-  },
-  {
-    id: 'e38',
-    type: 'E38',
-    label: 'Image',
-    crmClass: 'E38 Image',
-    desc: 'Digital reproduction (IIIF scan) of a physical source. Links scanned map sheets and almanac pages to their physical originals via P138 represents. The holding archive (P50) and IIIF content URL track where the digital object is kept and accessible.',
-    color: '#b89470',
-    cx: 60,
-    cy: 260,
-    dataKey: '',
-    structural: true,
-    properties: [
-      { name: 'P138 represents', range: 'E22 Human-Made Object' },
       { name: 'P50 has current keeper', range: 'string (archive name)' },
       { name: 'sdo:contentUrl', range: 'IIIF info.json URL' },
-      { name: 'sdo:sameAs', range: 'IIIF manifest URL' },
-      { name: 'dcterms:identifier', range: 'Handle URL' },
     ],
   },
   {
@@ -291,7 +292,7 @@ const ENTITIES: EntityDef[] = [
     properties: [
       { name: 'rdfs:label', range: 'string' },
       { name: 'P127 has broader term', range: 'E55 Type (hierarchy)' },
-      { name: 'P2i is type of', range: 'E24 / E74 / E22 (typed entity)' },
+      { name: 'P2i is type of', range: 'E25 / E74 / E22 (typed entity)' },
     ],
   },
   {
@@ -351,7 +352,7 @@ const ENTITIES: EntityDef[] = [
     type: 'E81',
     label: 'Transformation',
     crmClass: 'E81 Transformation',
-    desc: "Models plantation mergers. When plantations merge, E81 simultaneously ends old E24 entities and produces the merged E24. For example, Suzanna'sdal and Geijersvlijt merging into one plantation by 1930.",
+    desc: "Models plantation mergers. When plantations merge, E81 simultaneously ends old E25 entities and produces the merged E25. For example, Suzanna'sdal and Geijersvlijt merging into one plantation by 1930.",
     color: '#f0a0a0',
     cx: 180,
     cy: 380,
@@ -360,11 +361,11 @@ const ENTITIES: EntityDef[] = [
     properties: [
       {
         name: 'P124 transformed',
-        range: 'E24 Physical Human-Made Thing (old)',
+        range: 'E25 Human-Made Feature (old)',
       },
       {
         name: 'P123 resulted in',
-        range: 'E24 Physical Human-Made Thing (merged)',
+        range: 'E25 Human-Made Feature (merged)',
       },
       { name: 'P4 has time-span', range: 'E52 Time-Span' },
     ],
@@ -390,22 +391,40 @@ const ENTITIES: EntityDef[] = [
 
 const RELATIONS: RelDef[] = [
   {
-    from: 'e24',
+    from: 'e25',
     to: 'e74',
     label: 'P52 has current owner',
     desc: 'The plantation is owned by this organization',
   },
   {
-    from: 'e24',
+    from: 'e25',
     to: 'e53',
     label: 'P53 has location',
     desc: 'The plantation is located at this place (polygon geometry from 1930 map)',
   },
   {
-    from: 'e24',
+    from: 'e25',
     to: 'e41',
     label: 'P1 is identified by',
     desc: 'The plantation is identified by this name (from map label)',
+  },
+  {
+    from: 'e26',
+    to: 'e53',
+    label: 'P53 has location',
+    desc: 'The natural feature is located at this place (LineString geometry from 1930 map)',
+  },
+  {
+    from: 'e26',
+    to: 'e41',
+    label: 'P1 is identified by',
+    desc: 'The natural feature is identified by this name (from map label)',
+  },
+  {
+    from: 'e26',
+    to: 'e55',
+    label: 'P2 has type',
+    desc: 'Feature type classification: river or creek (via SKOS thesaurus)',
   },
   {
     from: 'e74',
@@ -427,12 +446,12 @@ const RELATIONS: RelDef[] = [
   },
   {
     from: 'e36',
-    to: 'e24',
+    to: 'e25',
     label: 'P138 represents',
     desc: 'The visual item represents the physical plantation -- the key link in the universal source pattern',
   },
   {
-    from: 'e38',
+    from: 'e36',
     to: 'e22',
     label: 'P138 represents',
     desc: 'The digital scan (IIIF image) represents the physical source object',
@@ -504,7 +523,7 @@ const RELATIONS: RelDef[] = [
     desc: 'Where the source was produced: Den Haag (maps) or Paramaribo (almanacs)',
   },
   {
-    from: 'e24',
+    from: 'e25',
     to: 'e55',
     label: 'P2 has type',
     desc: 'Plantation status classification: Built, Planned, Abandoned, Unknown',
@@ -535,7 +554,7 @@ const RELATIONS: RelDef[] = [
   },
   {
     from: 'e81',
-    to: 'e24',
+    to: 'e25',
     label: 'P124/P123',
     desc: 'E81 Transformation: old plantations (P124 transformed) merge into a new plantation (P123 resulted in)',
   },
@@ -553,9 +572,9 @@ const RELATIONS: RelDef[] = [
   },
   {
     from: 'e17',
-    to: 'e24',
+    to: 'e25',
     label: 'P41 classified',
-    desc: 'E17 Type Assignment classifies the physical plantation (E24) as abandoned when marked verlaten',
+    desc: 'E17 Type Assignment classifies the physical plantation (E25) as abandoned when marked verlaten',
   },
   {
     from: 'e17',
@@ -580,6 +599,7 @@ const RELATIONS: RelDef[] = [
 /* ─── Data fetching ────────────────────────────────────────────── */
 interface EntityCounts {
   plantations: number;
+  'physical-features': number;
   organizations: number;
   places: number;
   sources: number;
@@ -592,6 +612,7 @@ async function fetchCounts(): Promise<EntityCounts> {
 
   const [
     plantations,
+    physicalFeatures,
     organizations,
     places,
     sources,
@@ -599,6 +620,9 @@ async function fetchCounts(): Promise<EntityCounts> {
     observations,
   ] = await Promise.all([
     fetch(`${DATA_BASE}/plantations.json`).then((r) => r.json()),
+    fetch(`${DATA_BASE}/physical-features.json`)
+      .then((r) => r.json())
+      .catch(() => ({})),
     fetch(`${DATA_BASE}/organizations.json`).then((r) => r.json()),
     fetch(`${DATA_BASE}/places.json`).then((r) => r.json()),
     fetch(`${DATA_BASE}/sources.json`).then((r) => r.json()),
@@ -608,6 +632,7 @@ async function fetchCounts(): Promise<EntityCounts> {
 
   return {
     plantations: Object.keys(plantations).length,
+    'physical-features': Object.keys(physicalFeatures).length,
     organizations: Object.keys(organizations).length,
     places: Object.keys(places).length,
     sources: Object.keys(sources).length,
@@ -977,7 +1002,7 @@ function SourcePatternSection() {
         All information flows through sources. Maps, almanacs, and registers are
         modeled as E22 Human-Made Objects. Each source carries appellations
         (E41) that identify entities, and visual items (E36) that represent
-        physical plantations (E24). The key principle:{' '}
+        physical plantations (E25). The key principle:{' '}
         <strong>maps depict things; things have locations</strong>.
       </p>
       <div className="bg-stm-warm-50 p-4 font-mono text-xs text-stm-warm-600 space-y-2.5">
@@ -987,7 +1012,7 @@ function SourcePatternSection() {
           {' -> P128 -> '}
           <span style={{ color: '#d4a574' }}>E36 Visual Item</span>
           {' -> P138 -> '}
-          <span style={{ color: '#e6956b' }}>E24 Plantation</span>
+          <span style={{ color: '#e6956b' }}>E25 Plantation</span>
         </div>
         <div>
           <span className="text-stm-warm-400">Name:</span>{' '}
@@ -999,14 +1024,14 @@ function SourcePatternSection() {
         </div>
         <div>
           <span className="text-stm-warm-400">Location:</span>{' '}
-          <span style={{ color: '#e6956b' }}>E24 Plantation</span>
+          <span style={{ color: '#e6956b' }}>E25 Plantation</span>
           {' -> P53 -> '}
           <span style={{ color: '#6aad55' }}>E53 Place</span>
           {' -> geo:hasGeometry -> geo:asWKT -> POLYGON(...)'}
         </div>
         <div>
           <span className="text-stm-warm-400">Ownership:</span>{' '}
-          <span style={{ color: '#e6956b' }}>E24 Plantation</span>
+          <span style={{ color: '#e6956b' }}>E25 Plantation</span>
           {' -> P52 -> '}
           <span style={{ color: '#d4829a' }}>E74 Organization</span>
           {' (wd:Q-ID)'}
@@ -1043,18 +1068,18 @@ function SourcePatternSection() {
         </div>
         <div>
           <span className="text-stm-warm-400">Digital:</span>{' '}
-          <span style={{ color: '#b89470' }}>E38 Image</span>
+          <span style={{ color: '#d4a574' }}>E36 Visual Item</span>
           {' -> P138 -> '}
           <span style={{ color: '#c78e66' }}>E22 Source</span>
           {' (IIIF scan of physical source)'}
         </div>
         <div>
           <span className="text-stm-warm-400">Merger:</span>{' '}
-          <span style={{ color: '#e6956b' }}>E24 Plantation</span>
+          <span style={{ color: '#e6956b' }}>E25 Plantation</span>
           {' -> P124 -> '}
           <span style={{ color: '#cc7070' }}>E81 Transformation</span>
           {' -> P123 -> '}
-          <span style={{ color: '#e6956b' }}>E24 Plantation</span>
+          <span style={{ color: '#e6956b' }}>E25 Plantation</span>
           {' (merged)'}
         </div>
         <div>
@@ -1129,7 +1154,7 @@ function SpatialModelSection() {
           </h4>
           <div className="bg-stm-warm-50 p-4 font-mono text-xs text-stm-warm-600 space-y-1.5">
             <div className="mb-2">
-              <span style={{ color: '#e6956b' }}>E24</span>
+              <span style={{ color: '#e6956b' }}>E25</span>
               {' -> P53 -> '}
               <span style={{ color: '#6aad55' }}>E53 Place</span>
             </div>
@@ -1226,8 +1251,8 @@ function TemporalModelSection() {
             </h4>
             <p className="text-xs text-stm-warm-500">
               When plantations merge, <strong>E81 Transformation</strong>{' '}
-              simultaneously ends old E24 entities (P124 transformed) and
-              produces the merged E24 (P123 resulted in). For example,
+              simultaneously ends old E25 entities (P124 transformed) and
+              produces the merged E25 (P123 resulted in). For example,
               Suzanna&apos;sdal and Geijersvlijt merging into one plantation.
             </p>
           </div>
@@ -1250,7 +1275,7 @@ function TemporalModelSection() {
 /* ─── Main Page ────────────────────────────────────────────────── */
 export default function ModelPage() {
   const [counts, setCounts] = useState<EntityCounts | null>(null);
-  const [selectedEntity, setSelectedEntity] = useState<string | null>('e24');
+  const [selectedEntity, setSelectedEntity] = useState<string | null>('e25');
   const [hoveredRelation, setHoveredRelation] = useState<number | null>(null);
 
   useEffect(() => {
@@ -1425,12 +1450,12 @@ export default function ModelPage() {
                 status: 'green' as const,
                 question:
                   'Which plantations were marked as deserted (verlaten)?',
-                path: 'E17 Type Assignment -> P41 classified -> E24 + P42 assigned -> E55 (abandoned)',
+                path: 'E17 Type Assignment -> P41 classified -> E25 + P42 assigned -> E55 (abandoned)',
               },
               {
                 status: 'green' as const,
                 question: 'Where was a plantation located on the 1930 map?',
-                path: 'E24 -> P53 -> E53 Place -> geo:hasGeometry -> geo:asWKT',
+                path: 'E25 -> P53 -> E53 Place -> geo:hasGeometry -> geo:asWKT',
               },
               {
                 status: 'green' as const,

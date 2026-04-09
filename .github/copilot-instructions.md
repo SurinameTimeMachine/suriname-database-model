@@ -19,7 +19,7 @@ Before performing ANY task related to the following topics, you MUST read the co
 
 This is the Suriname Time Machine project — a Linked Open Data initiative for historical records from Suriname's colonial archives. Key concepts:
 
-- **E24 Plantation is the main entity** - the physical thing depicted by sources
+- **E25 Plantation is the main entity** - the physical thing depicted by sources
 - E53 Place = location/geometry of the plantation (via P53)
 - E74/sdo:Organization = who operates the plantation
 - **CIDOC-CRM** for cultural heritage modeling
@@ -52,11 +52,11 @@ Primary data lives in `/data/` with these key sources:
 
 Always use these patterns (see SKILL.md for full details):
 
-- **E24 Plantation is central**: Sources depict plantations; plantations have locations
+- **E25 Plantation is central**: Sources depict plantations; plantations have locations
 - **Physical sources**: Use E22 Human-Made Object for maps, books, ledgers (NOT E73)
-- **Source chain**: E22 -> P128 carries -> E36 Visual Item -> P138 represents -> E24 Plantation
-- **Location chain**: E24 Plantation -> P53 has location -> E53 Place (geometry)
-- **Digital reproductions**: E38 Image -> P138 represents -> E22
+- **Source chain**: E22 -> P128 carries -> E36 Visual Item -> P138 represents -> E25 Plantation
+- **Location chain**: E25 Plantation -> P53 has location -> E53 Place (geometry)
+- **Digital reproductions**: E36 Visual Item -> P138 represents -> E22
 - **Location principle**: "Maps depict things; things have locations" — E36 does NOT connect to E53 directly
 
 ## Diagram Files

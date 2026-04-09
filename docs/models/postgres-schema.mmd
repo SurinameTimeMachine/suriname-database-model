@@ -6,7 +6,7 @@ config:
     primaryColor: "#e8f4ea"
 ---
 erDiagram
-    e24_human_made_things {
+    e25_human_made_features {
         uuid id PK "gen_random_uuid()"
         text uri UK "plantation/slug"
         text p1_label "Name P1_is_identified_by"
@@ -90,9 +90,9 @@ erDiagram
         timestamptz created_at "DEFAULT NOW()"
     }
 
-    e24_e53_locations {
+    e25_e53_locations {
         uuid id PK "gen_random_uuid()"
-        uuid e24_id FK "Links to e24_human_made_things"
+        uuid e25_id FK "Links to e25_human_made_features"
         uuid e53_id FK "Links to e53_places"
         text certainty "certain probable uncertain"
         integer start_year "When location started"
@@ -110,9 +110,9 @@ erDiagram
         timestamptz created_at "DEFAULT NOW()"
     }
 
-    e24_e74_ownership {
+    e25_e74_ownership {
         uuid id PK "gen_random_uuid()"
-        uuid e24_id FK "Links to e24_human_made_things"
+        uuid e25_id FK "Links to e25_human_made_features"
         text e74_qid FK "Links to e74_groups"
         text relationship_type "owner operator claimed_by"
         integer start_year "When relationship started"
@@ -132,25 +132,25 @@ erDiagram
 
     e1_e41_identified_by {
         uuid id PK "gen_random_uuid()"
-        text entity_uri FK "E24 or E74 entity URI"
+        text entity_uri FK "E25 or E74 entity URI"
         uuid e41_id FK "Links to e41_appellations"
         boolean is_preferred "DEFAULT FALSE"
         timestamptz created_at "DEFAULT NOW()"
     }
 
-    e24_human_made_things }o--|| e55_types : "P2_has_type"
+    e25_human_made_features }o--|| e55_types : "P2_has_type"
     e26_physical_features }o--|| e55_types : "P2_has_type"
     e74_groups }o--|| e55_types : "P2_has_type"
     e22_human_made_objects }o--|| e55_types : "P2_has_type"
 
-    e24_e53_locations }o--|| e24_human_made_things : "e24_id"
-    e24_e53_locations }o--|| e53_places : "e53_id"
+    e25_e53_locations }o--|| e25_human_made_features : "e25_id"
+    e25_e53_locations }o--|| e53_places : "e53_id"
 
     e26_e53_locations }o--|| e26_physical_features : "e26_id"
     e26_e53_locations }o--|| e53_places : "e53_id"
 
-    e24_e74_ownership }o--|| e24_human_made_things : "e24_id"
-    e24_e74_ownership }o--|| e74_groups : "e74_qid"
+    e25_e74_ownership }o--|| e25_human_made_features : "e25_id"
+    e25_e74_ownership }o--|| e74_groups : "e74_qid"
 
     e53_places }o--o| e53_places : "P89_falls_within"
     e74_groups }o--o| e74_groups : "P107i_member_of"
@@ -165,5 +165,5 @@ erDiagram
     e41_appellations }o--o| e41_appellations : "P139_has_alternative_form"
     e41_appellations }o--o| e22_human_made_objects : "P128i_is_carried_by"
     e1_e41_identified_by }o--|| e41_appellations : "e41_id"
-    e1_e41_identified_by }o--o| e24_human_made_things : "entity_uri"
+    e1_e41_identified_by }o--o| e25_human_made_features : "entity_uri"
     e1_e41_identified_by }o--o| e74_groups : "entity_uri"

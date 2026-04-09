@@ -204,7 +204,7 @@ A single `eigenaren` field may contain: `"J.H. Franke, E.G. Veldwijk en de Curat
 **Relationships:**
 
 - `E74 --P99i was dissolved by--> E68 Dissolution` (organization dissolved by successor)
-- `E24 --P124i was transformed by--> E81 Transformation` (physical plantation merged)
+- `E25 --P124i was transformed by--> E81 Transformation` (physical plantation merged)
 - `E74 --P107i is member of--> E74` (part-of relationship)
 - `E74 --crm:P67_refers_to--> E74` (inter-plantation reference)
 
@@ -260,8 +260,8 @@ The dissolved organization's Q-ID still exists in Wikidata but is marked as havi
 On the QGIS side, the `qid_alt` column captures the same phenomenon: a polygon has a primary Q-ID (`qid`) and an alternative Q-ID (`qid_alt`) for the dissolved entity:
 
 ```
-E24 polygon --P52 has current owner--> E74 (qid, surviving org)
-E24 polygon --P51 has former or current owner--> E74 (qid_alt, dissolved org)
+E25 polygon --P52 has current owner--> E74 (qid, surviving org)
+E25 polygon --P51 has former or current owner--> E74 (qid_alt, dissolved org)
 E74 (qid_alt) --P99i was dissolved by--> E68 Dissolution --P14 carried out by--> E74 (qid)
 ```
 
@@ -292,13 +292,13 @@ This is a weaker link than absorption or membership --- it indicates a reference
 **Entities:** E55 Type
 **Relationships:**
 
-- `E24 --P2 has type--> E55 PlantationStatus`
+- `E25 --P2 has type--> E55 PlantationStatus`
 - `E13 Attribute Assignment --crm:P2_has_type--> E55 Certainty`
 
 ```mermaid
 %%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#e8f4ea'}}}%%
 flowchart LR
-    E24["E24 Plantation"]
+    E25["E25 Plantation"]
     STATUS["E55 Type
     type/plantation-status/built"]
 
@@ -306,14 +306,14 @@ flowchart LR
     CERT["E55 Type
     type/certainty/certain"]
 
-    E24 -->|"P2 has type"| STATUS
+    E25 -->|"P2 has type"| STATUS
     LINK -->|"crm:P2_has_type"| CERT
 
     classDef crm_E18_Physical_Thing fill:#c78e66,stroke:#000000,color:#000000
     classDef crm_E55_Type fill:#fab565,stroke:#000000,color:#000000
     classDef link fill:#ffffff,stroke:#ff0000,stroke-dasharray:5,color:#000000
 
-    class E24 crm_E18_Physical_Thing
+    class E25 crm_E18_Physical_Thing
     class STATUS,CERT crm_E55_Type
     class LINK link
 ```
@@ -329,11 +329,11 @@ Not every polygon on the 1930 map was an active plantation. Some were planned bu
 | `type/plantation-status/abandoned` | Ceased operations                   | Almanac says "verlaten" (deserted), or no entries after a date |
 | `type/plantation-status/unknown`   | Cannot determine                    | Insufficient evidence                                          |
 
-The `deserted` column in the Almanakken (2,294 rows with values) provides direct evidence for abandonment. But a plantation can be abandoned and then reactivated --- so the status is also time-dependent and ideally lives on the observation, not just on E24.
+The `deserted` column in the Almanakken (2,294 rows with values) provides direct evidence for abandonment. But a plantation can be abandoned and then reactivated --- so the status is also time-dependent and ideally lives on the observation, not just on E25.
 
 ### Link Certainty
 
-When connecting an E24 Plantation (from QGIS) to an E74 Organization (via Q-ID), the match may be uncertain. Qualified links capture this:
+When connecting an E25 Plantation (from QGIS) to an E74 Organization (via Q-ID), the match may be uncertain. Qualified links capture this:
 
 ```
 link/geijersvlijt_Q4392658
@@ -367,7 +367,7 @@ flowchart LR
     PSUR["psur:PSUR0197
     (Slave registers)"]
 
-    E24["E24 Plantation
+    E25["E25 Plantation
     (QGIS polygon
     fid 1572)"]
 
@@ -375,7 +375,7 @@ flowchart LR
     (Almanakken row)"]
 
     E74_ORG ---|"skos:closeMatch"| PSUR
-    E24 -->|"P52 has current owner"| E74_ORG
+    E25 -->|"P52 has current owner"| E74_ORG
     ALM -->|"P140 assigned attribute to"| E74_ORG
 
     classDef crm_E39_Actor fill:#ffbdca,stroke:#000000,color:#000000
@@ -384,7 +384,7 @@ flowchart LR
     classDef external fill:#e8e8e8,stroke:#000000,color:#000000
 
     class E74_ORG crm_E39_Actor
-    class E24 crm_E18_Physical_Thing
+    class E25 crm_E18_Physical_Thing
     class ALM crm_E2_Temporal_Entity
     class PSUR external
 ```
@@ -428,15 +428,15 @@ flowchart TB
     subgraph "Universal Source Pattern (static)"
         E22["E22 Source"]
         E36["E36 Visual Item"]
-        E24["E24 Plantation"]
+        E25["E25 Plantation"]
         E53["E53 Place"]
         E74_ORG["E74 Organization
         wd:Q-ID"]
 
         E22 -->|"P128 carries"| E36
-        E36 -->|"P138 represents"| E24
-        E24 -->|"P53 has location"| E53
-        E24 -->|"P52 has current owner"| E74_ORG
+        E36 -->|"P138 represents"| E25
+        E25 -->|"P53 has location"| E53
+        E25 -->|"P52 has current owner"| E74_ORG
     end
 
     subgraph "Observation Pattern (temporal)"
@@ -467,7 +467,7 @@ flowchart TB
 
     class E22 crm_E18_Physical_Thing
     class E36 crm_E28_Conceptual_Object
-    class E24 crm_E18_Physical_Thing
+    class E25 crm_E18_Physical_Thing
     class E53 crm_E53_Place
     class E74_ORG,SPLIT crm_E39_Actor
     class OBS crm_E2_Temporal_Entity
@@ -477,7 +477,7 @@ flowchart TB
 
 The E74 Organization is the meeting point. Everything connects through it:
 
-- The plantation (E24) is owned by it (P52)
+- The plantation (E25) is owned by it (P52)
 - The observations describe it (P140 assigned attribute to)
 - The people relate to it (via P14 carried out by, with role qualifiers)
 - The PSUR links identify it (skos:closeMatch)

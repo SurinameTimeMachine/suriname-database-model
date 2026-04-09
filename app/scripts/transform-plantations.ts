@@ -6,7 +6,7 @@ import { parse } from 'csv-parse/sync';
  * CRS: EPSG:31170 (Suriname Old TM / Zanderij datum) -> EPSG:4326 (WGS84) via proj4
  *
  * Produces in-memory entity arrays (no intermediate CSVs):
- *   E24 plantations, E74 organizations, E53 places,
+ *   E25 plantations (human-made features), E74 organizations, E53 places,
  *   E41 appellations, E22 sources, plantation-map links
  */
 import { readFileSync } from 'fs';
@@ -31,12 +31,13 @@ const WD = 'http://www.wikidata.org/entity/';
 
 // --- Types ---
 
-export interface E24Row {
+export interface E25Row {
   uri: string;
   slug: string;
   fid: string;
   prefLabel: string;
   status: string;
+  featureType: string;
   p52_owner_qid: string;
   p51_former_owner_qid: string;
   p53_place_uri: string;
@@ -100,7 +101,7 @@ export interface SourceRow {
 }
 
 export interface PlantationTransformResult {
-  e24: E24Row[];
+  e25: E25Row[];
   e74: E74Row[];
   e53: E53Row[];
   e41: E41Row[];
@@ -153,7 +154,7 @@ export function transformPlantations(): PlantationTransformResult {
     `Loaded ${rows.length} polygons from plantation_polygons_1930.csv`,
   );
 
-  const e24: E24Row[] = [];
+  const e25: E25Row[] = [];
   const e74: E74Row[] = [];
   const e53: E53Row[] = [];
   const e41: E41Row[] = [];
@@ -185,13 +186,14 @@ export function transformPlantations(): PlantationTransformResult {
 
     const plantationUri = `${STM}plantation/${slug}`;
 
-    // E24 Plantation
-    e24.push({
+    // E25 Human-Made Feature (plantation)
+    e25.push({
       uri: plantationUri,
       slug,
       fid,
       prefLabel: label,
       status,
+      featureType: 'plantation',
       p52_owner_qid: qid,
       p51_former_owner_qid: qidAlt,
       p53_place_uri: coordsUtm ? `${STM}place/1930/fid-${fid}` : '',
@@ -248,7 +250,7 @@ export function transformPlantations(): PlantationTransformResult {
         language: 'nl',
         carried_by: `${STM}source/map-1930`,
         identifies_uri: plantationUri,
-        identifies_type: 'E24',
+        identifies_type: 'E25',
         source_year: '1930',
       });
     }
@@ -261,7 +263,7 @@ export function transformPlantations(): PlantationTransformResult {
         language: 'nl',
         carried_by: `${STM}source/map-1860-79`,
         identifies_uri: plantationUri,
-        identifies_type: 'E24',
+        identifies_type: 'E25',
         source_year: '1870',
         alt_form_of: e41_1930_uri,
       });
@@ -274,7 +276,7 @@ export function transformPlantations(): PlantationTransformResult {
         language: 'nl',
         carried_by: '',
         identifies_uri: plantationUri,
-        identifies_type: 'E24',
+        identifies_type: 'E25',
         source_year: '',
         alt_form_of: e41_1930_uri,
       });
@@ -341,7 +343,7 @@ export function transformPlantations(): PlantationTransformResult {
     },
   ];
 
-  console.log(`  E24 Plantations:  ${e24.length}`);
+  console.log(`  E25 Plantations:  ${e25.length}`);
   console.log(`  E74 Organizations: ${e74.length}`);
   console.log(`  E53 Places:       ${e53.length}`);
   console.log(`  E41 Appellations: ${e41.length}`);
@@ -362,7 +364,7 @@ export function transformPlantations(): PlantationTransformResult {
     }
   }
 
-  return { e24, e74, e53, e41, mapLinks, sources };
+  return { e25, e74, e53, e41, mapLinks, sources };
 }
 
 // Run standalone

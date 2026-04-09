@@ -17,21 +17,21 @@ The data model is defined in **three places** that must stay consistent. When ch
 | `app/app/model/page.tsx`               | `ENTITIES` array (properties, descriptions), `RELATIONS` array, documentation sections                              |
 | `app/components/` + `app/lib/types.ts` | `PlantationPanel.tsx` CrmField labels/badges, `EntityGraph.tsx` nodes/links, `types.ts` interfaces and CRM comments |
 
-## Core Model: E24 Plantation as Central Entity
+## Core Model: E25 Plantation as Central Entity
 
-The **plantation** (E24 Physical Human-Made Thing) is the main entity. E24 and E74 are **separate entities** linked via `P52 has current owner`. Names are modeled as **E41 Appellation** entities carried by sources (E22).
+The **plantation** (E25 Human-Made Feature) is the main entity. E25 and E74 are **separate entities** linked via `P52 has current owner`. Names are modeled as **E41 Appellation** entities carried by sources (E22).
 
 ```mermaid
 flowchart TB
     subgraph Sources
         E22[E22 Human-Made Object<br/>map, almanac, register]
         E36[E36 Visual Item<br/>content]
-        E38[E38 Image<br/>IIIF scan]
+        E36_IMG[E36 Visual Item<br/>IIIF scan]
         E41_MAP[E41 Appellation<br/>map label]
     E41_ALM[E41 Appellation<br/>almanac name]
     end
 
-    E24[E24 Physical Human-Made Thing<br/>THE PLANTATION]
+    E25[E25 Human-Made Feature<br/>THE PLANTATION]
     E53[E53 Place<br/>location/geometry]
     ORG[E74 Group / sdo:Organization<br/>legal entity]
     E13_OBS[E13 Attribute Assignment<br/>time-varying data]
@@ -40,41 +40,41 @@ flowchart TB
     E22 -->|P128 carries| E36
     E22 -->|P128 carries| E41_MAP
     E22 -->|P128 carries| E41_ALM
-    E36 -->|P138 represents| E24
-    E38 -->|P138 represents| E22
+    E36 -->|P138 represents| E25
+    E36_IMG -->|P138 represents| E22
 
-    E24 -->|P1 is identified by| E41_MAP
+    E25 -->|P1 is identified by| E41_MAP
     ORG -->|P1 is identified by| E41_ALM
     E41_MAP ---|P139 has alt form| E41_ALM
-    E24 -->|P53 has location| E53
-    E24 -->|P52 has current owner| ORG
+    E25 -->|P53 has location| E53
+    E25 -->|P52 has current owner| ORG
     E13_OBS -->|P140 assigned attr. to| ORG
-    E17 -->|P41 classified| E24
+    E17 -->|P41 classified| E25
 ```
 
-| Entity         | Class                         | Role                                               |
-| -------------- | ----------------------------- | -------------------------------------------------- |
-| Plantation     | E24 Physical Human-Made Thing | Main entity - the physical plantation              |
-| Location       | E53 Place                     | Where the plantation is (geometry)                 |
-| Organization   | E74 Group / sdo:Organization  | Who owns/operates it (separate entity)             |
-| Appellation    | E41 Appellation               | Name of plantation/organization                    |
-| Source         | E22 Human-Made Object         | Map, book, ledger depicting the plantation         |
-| Observation    | E13 Attribute Assignment      | Annual snapshot from Almanakken                    |
-| Classification | E17 Type Assignment           | Classifies E24 plantation status (subclass of E13) |
+| Entity         | Class                        | Role                                               |
+| -------------- | ---------------------------- | -------------------------------------------------- |
+| Plantation     | E25 Human-Made Feature       | Main entity - the physical plantation              |
+| Location       | E53 Place                    | Where the plantation is (geometry)                 |
+| Organization   | E74 Group / sdo:Organization | Who owns/operates it (separate entity)             |
+| Appellation    | E41 Appellation              | Name of plantation/organization                    |
+| Source         | E22 Human-Made Object        | Map, book, ledger depicting the plantation         |
+| Observation    | E13 Attribute Assignment     | Annual snapshot from Almanakken                    |
+| Classification | E17 Type Assignment          | Classifies E25 plantation status (subclass of E13) |
 
-## E24 and E74: Separate Entities
+## E25 and E74: Separate Entities
 
-The physical plantation (E24) is NOT the same thing as the legal organization (E74). They are linked:
+The physical plantation (E25) is NOT the same thing as the legal organization (E74). They are linked:
 
 ```
-E24 Plantation ──P52 has current owner──> E74 Organization (wd:Q-ID)
-E24 Plantation ──P51 has former or current owner──> E74 Organization (wd:Q-ID)
+E25 Plantation ──P52 has current owner──> E74 Organization (wd:Q-ID)
+E25 Plantation ──P51 has former or current owner──> E74 Organization (wd:Q-ID)
 ```
 
 - `P52 has current owner` (E18 Physical Thing -> E39 Actor): legal owner at time of record
 - `P51 has former or current owner` (E18 Physical Thing -> E39 Actor): ownership at any time
 
-The postgres schema junction table `e24_e74_ownership` carries `relationship_type` (owner | operator | administrator) and `certainty` for nuance that RDF handles via PICO roles.
+The postgres schema junction table `e25_e74_ownership` carries `relationship_type` (owner | operator | administrator) and `certainty` for nuance that RDF handles via PICO roles.
 
 ## E41 Appellation: Names as First-Class Entities
 
@@ -85,16 +85,16 @@ Names are modeled as **E41 Appellation** (subclass of E90 Symbolic Object), conn
 - `P139 has alternative form` (E41 -> E41): links variant spellings
 - `P190 has symbolic content` (E90 -> string): the actual text of the name
 
-Each source creates its own E41 instance that identifies the entity type it refers to. A map label (printed cartography) identifies the physical plantation (E24). An almanac entry (handwritten table) identifies the organization (E74). These are **distinct E41 instances**, linked to each other by P139 has alternative form.
+Each source creates its own E41 instance that identifies the entity type it refers to. A map label (printed cartography) identifies the physical plantation (E25). An almanac entry (handwritten table) identifies the organization (E74). These are **distinct E41 instances**, linked to each other by P139 has alternative form.
 
 Name provenance flows through the source chain:
 
 ```
-E22 Map 1930 ──P128 carries──> E41a "Geijersvlijt" ──P1i identifies──> E24 Plantation
+E22 Map 1930 ──P128 carries──> E41a "Geijersvlijt" ──P1i identifies──> E25 Plantation
 E22 Almanac 1818 ──P128 carries──> E41b "Geyers-Vlijt" ──P1i identifies──> E74 Organization
 
 E41a ──P139 has alternative form──> E41b
-E24 ──P52 has current owner──> E74 (linked via Q-ID)
+E25 ──P52 has current owner──> E74 (linked via Q-ID)
 ```
 
 The P139 link between E41a and E41b makes the name equivalence explicit without conflating the physical thing with the legal entity. Temporal scope of a name is inferred from the E12 Production event of the E22 source that carries it. No separate E15 Identifier Assignment needed.
@@ -106,23 +106,23 @@ The P139 link between E41a and E41b makes the name equivalence explicit without 
 All sources follow this chain (including appellations):
 
 ```
-E22 Map ──P128 carries──> E36 Visual Item ──P138 represents──> E24 Plantation
-        ──P128 carries──> E41a (map label) ──P1i identifies──> E24
+E22 Map ──P128 carries──> E36 Visual Item ──P138 represents──> E25 Plantation
+        ──P128 carries──> E41a (map label) ──P1i identifies──> E25
 
 E22 Almanac ──P128 carries──> E41b (almanac name) ──P1i identifies──> E74 Organization
 
 E41a ──P139 has alternative form──> E41b
 
-E38 Image (scan) ──P138 represents──> E22
-E24 ──P53 has location──> E53 Place
-E24 ──P52 has current owner──> E74
+E36 Visual Item (scan) ──P138 represents──> E22
+E25 ──P53 has location──> E53 Place
+E25 ──P52 has current owner──> E74
 ```
 
-Key insight: **Maps depict plantations (E24); plantations have locations (E53)**. The map does NOT depict the location directly. Each source type carries names (E41) that identify its own entity type: map labels identify E24, almanac names identify E74.
+Key insight: **Maps depict plantations (E25); plantations have locations (E53)**. The map does NOT depict the location directly. Each source type carries names (E41) that identify its own entity type: map labels identify E25, almanac names identify E74.
 
 ## Entity Properties
 
-### Plantation (E24 Physical Human-Made Thing)
+### Plantation (E25 Human-Made Feature)
 
 ```
 crm:P1_is_identified_by  - E41 Appellation (formal name)
@@ -196,11 +196,11 @@ prov:hadPrimarySource           - E22 Source (almanac)
 
 ### Classification (E17 Type Assignment)
 
-When an almanac row marks a plantation as "verlaten" (deserted), this is modeled as an **E17 Type Assignment** -- a CIDOC-CRM subclass of E13 specifically for classifying entities. E17 targets the **E24 Plantation** (the physical thing), not the E74 Organization.
+When an almanac row marks a plantation as "verlaten" (deserted), this is modeled as an **E17 Type Assignment** -- a CIDOC-CRM subclass of E13 specifically for classifying entities. E17 targets the **E25 Plantation** (the physical thing), not the E74 Organization.
 
 ```
 E17 Type Assignment
-    crm:P41_classified             - E24 Plantation (the physical thing)
+    crm:P41_classified             - E25 Plantation (the physical thing)
     crm:P42_assigned               - E55 Type (type/plantation-status/abandoned)
     crm:P4_has_time-span           - E52 Time-Span (year from almanac)
     prov:hadPrimarySource           - E22 Source (almanac)
@@ -216,10 +216,10 @@ E17 inherits P4 (time-span) and prov:hadPrimarySource from E13. The target type 
 | ---------------- | ------------------ | --------------------------------------------- |
 | fid              | Location (E53)     | P48 has preferred identifier -> E42 (QGIS ID) |
 | coords           | Location (E53)     | geo:hasGeometry                               |
-| label_1930       | Appellation (E41)  | P190 (creates E41, P1 on E24)                 |
+| label_1930       | Appellation (E41)  | P190 (creates E41, P1 on E25)                 |
 | label_1860-79    | Appellation (E41)  | P190 (alt E41, P139 variant)                  |
-| plantation_label | Plantation (E24)   | rdfs:label (display)                          |
-| qid              | Plantation (E24)   | P52 has current owner -> wd:Q-ID              |
+| plantation_label | Plantation (E25)   | rdfs:label (display)                          |
+| qid              | Plantation (E25)   | P52 has current owner -> wd:Q-ID              |
 | qid_alt          | Organization (E74) | P51 former owner, P99i dissolved by E68       |
 | psur_id          | Organization (E74) | P1 is identified by -> E42 Identifier (PSUR)  |
 | psur_id2         | Organization (E74) | P1 is identified by -> E42 (2nd, from merger) |
@@ -240,7 +240,7 @@ E17 inherits P4 (time-span) and prov:hadPrimarySource from E13. The target type 
 | slaven            | _(deferred -- requires PICO integration)_                   | deferred |
 | psur_id           | P1 -> E42 Identifier (PSUR)                                 | linking  |
 | product_std       | P141 assigned -> E55 Type                                   | primary  |
-| deserted          | E17: P41 classified -> E24, P42 assigned -> E55 (abandoned) | primary  |
+| deserted          | E17: P41 classified -> E25, P42 assigned -> E55 (abandoned) | primary  |
 | loc_std           | P7 took place at -> E53 (text)                              | primary  |
 | size_std          | P43 has dimension -> E54 (akkers)                           | primary  |
 | page              | P3 has note (page reference)                                | useful   |
@@ -259,7 +259,7 @@ E17 inherits P4 (time-span) and prov:hadPrimarySource from E13. The target type 
 The Q-ID connects everything:
 
 ```
-QGIS CSV (qid) ──> E24 ──P52 has current owner──> E74 (wd:Q-ID)
+QGIS CSV (qid) ──> E25 ──P52 has current owner──> E74 (wd:Q-ID)
                                                        ^
 Almanakken CSV (plantation_id) ──> Observation ──> E74 (wd:Q-ID)
 ```
@@ -267,7 +267,7 @@ Almanakken CSV (plantation_id) ──> Observation ──> E74 (wd:Q-ID)
 Each source creates distinct E41 instances identifying different entity types:
 
 ```
-E22 Map 1930 ──P128 carries──> E41a "Geijersvlijt" ──P1i identifies──> E24 (plantation/geijersvlijt)
+E22 Map 1930 ──P128 carries──> E41a "Geijersvlijt" ──P1i identifies──> E25 (plantation/geijersvlijt)
 E22 Almanac  ──P128 carries──> E41b "Geyers-Vlijt" ──P1i identifies──> E74 (wd:Q4392658)
 E41a ──P139 has alternative form──> E41b
 ```
@@ -276,7 +276,7 @@ For uncertain links, use qualified link entity:
 
 ```
 {base}link/{plantation}_{Q-ID}
-    crm:P140_assigned_attribute_to  - E24
+    crm:P140_assigned_attribute_to  - E25
     crm:P141_assigned               - wd:Q-ID
     crm:P2_has_type                 - Certain / Probable / Uncertain
     crm:P3_has_note                 - explanation
@@ -314,17 +314,17 @@ All non-CRM vocabularies used in this model are published standards. Links provi
 
 ### Plantation Mergers
 
-When plantations merge, E81 Transformation simultaneously ends old E24 entities and produces the merged E24:
+When plantations merge, E81 Transformation simultaneously ends old E25 entities and produces the merged E25:
 
 ```mermaid
 flowchart LR
     subgraph "1860"
-        A[E24 Suzanna'sdal]
-        B[E24 Geijersvlijt]
+        A[E25 Suzanna'sdal]
+        B[E25 Geijersvlijt]
     end
     T[E81 Transformation]
     subgraph "1930"
-        C[E24 Geijersvlijt<br/>merged]
+        C[E25 Geijersvlijt<br/>merged]
     end
     A -->|P124 transformed| T
     B -->|P124 transformed| T
@@ -347,7 +347,7 @@ Almanac columns map to PICO PersonObservation roles:
 
 | Almanac Column  | PICO Role           | Connection to E74    |
 | --------------- | ------------------- | -------------------- |
-| eigenaren       | picot:owner         | P52i person owns E24 |
+| eigenaren       | picot:owner         | P52i person owns E25 |
 | administrateurs | picot:administrator | P107 member of E74   |
 | directeuren     | picot:director      | P107 member of E74   |
 
@@ -364,18 +364,18 @@ PersonObservations can be linked to PersonReconstructions (derived identities).
 
 ## Key Decisions
 
-1. **E24 is the main plantation entity** - physical thing depicted by sources
-2. **E24 and E74 are separate entities** - linked via P52/P51 (not dual-typed)
+1. **E25 is the main plantation entity** - physical thing depicted by sources
+2. **E25 and E74 are separate entities** - linked via P52/P51 (not dual-typed)
 3. **E41 Appellation for names** - first-class entities, not just SKOS labels
-4. **Each source creates distinct E41** - map labels identify E24, almanac names identify E74, linked by P139
-5. **P52 has current owner** connects E24 to E74 (standard CIDOC-CRM, not custom operatedBy)
+4. **Each source creates distinct E41** - map labels identify E25, almanac names identify E74, linked by P139
+5. **P52 has current owner** connects E25 to E74 (standard CIDOC-CRM, not custom operatedBy)
 6. **Name provenance via source chain** - E22 P128 carries E41 (name came from this source)
 7. **skos:prefLabel kept as display convenience** alongside formal E41 chain
-8. E53 Place = location property of E24 (not separate "land plot" entity)
+8. E53 Place = location property of E25 (not separate "land plot" entity)
 9. E22 Human-Made Object for sources - maps are physical artifacts
 10. E36 Visual Item carries what source depicts
-11. P138 represents connects content to E24 (not to E53 directly)
-12. P53 has location connects E24 to E53
+11. P138 represents connects content to E25 (not to E53 directly)
+12. P53 has location connects E25 to E53
 13. sdo:Organization for PICO compatibility
 14. Q-ID as linking key between QGIS and Almanakken
 15. E13 Attribute Assignment for time-varying observations (not custom OrganizationObservation)

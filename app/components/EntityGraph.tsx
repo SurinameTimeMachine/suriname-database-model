@@ -3,7 +3,7 @@
 import { CRM_CLASS_NAMES, CRM_COLORS, entityTypeColor } from '@/lib/data';
 import type {
   E22Source,
-  E24Plantation,
+  E25Plantation,
   E41Appellation,
   E53Place,
   E74Organization,
@@ -20,7 +20,7 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 interface EntityGraphProps {
-  plantation: E24Plantation | null;
+  plantation: E25Plantation | null;
   organization: E74Organization | null;
   place: E53Place | null;
   appellations: E41Appellation[];
@@ -50,7 +50,7 @@ const CX = WIDTH / 2;
 const CY = HEIGHT / 2;
 
 function buildGraph(
-  plantation: E24Plantation,
+  plantation: E25Plantation,
   organization: E74Organization | null,
   place: E53Place | null,
   appellations: E41Appellation[],
@@ -60,13 +60,13 @@ function buildGraph(
   const nodes: GraphNode[] = [];
   const links: GraphLink[] = [];
 
-  // E24 center (plantation) -- fixed
+  // E25 center (plantation) -- fixed
   nodes.push({
-    id: 'e24',
+    id: 'e25',
     label: plantation.prefLabel,
-    type: 'E24',
+    type: 'E25',
     section: 'plantation',
-    color: CRM_COLORS.E24,
+    color: CRM_COLORS.E25,
     radius: 28,
     x: CX,
     y: CY,
@@ -88,7 +88,7 @@ function buildGraph(
       y: CY,
     });
     links.push({
-      source: 'e24',
+      source: 'e25',
       target: 'e74',
       label: 'P52 has current owner',
     });
@@ -107,7 +107,7 @@ function buildGraph(
       y: CY + 100,
     });
     links.push({
-      source: 'e24',
+      source: 'e25',
       target: 'e53',
       label: 'P53 has location',
     });
@@ -133,7 +133,7 @@ function buildGraph(
     });
     const identifiesOrg = app.P1i_identifies?.includes('wikidata');
     links.push({
-      source: identifiesOrg ? 'e74' : 'e24',
+      source: identifiesOrg ? 'e74' : 'e25',
       target: `e41-${i}`,
       label: 'P1 is identified by',
     });
@@ -153,10 +153,10 @@ function buildGraph(
       x: CX + 120 + i * 30,
       y: CY - 90 + i * 40,
     });
-    // Sources carry appellations -- link to E24 plantation via P128/P138 chain
+    // Sources carry appellations -- link to E25 plantation via P128/P138 chain
     links.push({
       source: `e22-src-${i}`,
-      target: 'e24',
+      target: 'e25',
       label: 'P128/P138',
     });
   }

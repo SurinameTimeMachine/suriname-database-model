@@ -19,11 +19,12 @@
     "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
     "hdsc": "https://data.colonialheritage.nl/ontology/",
     "ed": "https://lod.enslaved.org/wiki/",
-    "Plantation": "crm:E24_Physical_Human-Made_Thing",
+    "Plantation": "crm:E25_Human-Made_Feature",
     "OrganizationObservation": "crm:E13_Attribute_Assignment",
     "ProvenanceRecord": "prov:Entity",
     "E13_Attribute_Assignment": "crm:E13_Attribute_Assignment",
     "E22_Human-Made_Object": "crm:E22_Human-Made_Object",
+    "E25_Human_Made_Feature": "crm:E25_Human-Made_Feature",
     "E24_Physical_Human-Made_Thing": "crm:E24_Physical_Human-Made_Thing",
     "E26_Physical_Feature": "crm:E26_Physical_Feature",
     "E36_Visual_Item": "crm:E36_Visual_Item",
@@ -33,7 +34,6 @@
     "E55_Type": "crm:E55_Type",
     "E74_Group": "crm:E74_Group",
     "E12_Production": "crm:E12_Production",
-    "E38_Image": "crm:E38_Image",
     "P1_is_identified_by": {
       "@id": "crm:P1_is_identified_by",
       "@type": "@id"
@@ -331,6 +331,14 @@
     },
     "linkedVia": {
       "@id": "rdfs:comment",
+      "@type": "xsd:string"
+    },
+    "featureType": {
+      "@id": "crm:P2_has_type",
+      "@type": "xsd:string"
+    },
+    "mainBodyWater": {
+      "@id": "crm:P3_has_note",
       "@type": "xsd:string"
     }
   }

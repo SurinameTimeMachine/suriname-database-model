@@ -64,7 +64,7 @@ flowchart TB
     subgraph CIDOC["CIDOC-CRM Entities"]
         direction TB
 
-        E24["E24 Physical Human-Made Thing
+        E25["E25 Human-Made Feature
         THE PLANTATION
         URI: plantation/slug"]
 
@@ -89,7 +89,7 @@ flowchart TB
         URI: wd:reference_std_id"]
 
         E41_MAP["E41 Appellation
-        Map label identifies E24
+        Map label identifies E25
         Carried by E22 Map"]
 
         E41_ALM["E41 Appellation
@@ -131,7 +131,7 @@ flowchart TB
     (creates alt E41 via P139)"| E41_MAP
 
     Q_plantation_label -->|"skos:prefLabel
-    (display convenience only)"| E24
+    (display convenience only)"| E25
 
     Q_qid -->|"P52 has current owner
     (E18 Physical Thing -> E39 Actor)"| E74
@@ -196,16 +196,16 @@ flowchart TB
     %% CIDOC-CRM RELATIONSHIPS BETWEEN ENTITIES
     %% =============================================================
 
-    E24 -->|"P53 has former or current location
-    (E24 -> E53: the plantation
+    E25 -->|"P53 has former or current location
+    (E25 -> E53: the plantation
     is at this location)"| E53
 
-    E24 -->|"P52 has current owner
+    E25 -->|"P52 has current owner
     (E18 -> E39: physical thing
     is owned by an actor)"| E74
 
-    E24 -->|"P1 is identified by
-    (map label names E24)"| E41_MAP
+    E25 -->|"P1 is identified by
+    (map label names E25)"| E41_MAP
 
     E74 -->|"P1 is identified by
     (almanac name names E74)"| E41_ALM
@@ -215,7 +215,7 @@ flowchart TB
     E41_MAP ---|"P139 has alternative form
     (links variant spellings across
     sources without conflating
-    E24 and E74 identity)"| E41_ALM
+    E25 and E74 identity)"| E41_ALM
 
     E41_ALM ---|"P139 has alternative form"| E41_STD
 
@@ -245,7 +245,7 @@ flowchart TB
         QID_LINK["Wikidata Q-ID connects:
         QGIS qid column +
         Almanakken plantation_id column +
-        E24 -> P52 -> E74 ownership
+        E25 -> P52 -> E74 ownership
         All meet at the same E74 entity"]
     end
 
@@ -267,7 +267,7 @@ flowchart TB
     class A_psur,A_split,A_partof,A_ref csv
 
     classDef crm_E18_Physical_Thing fill:#c78e66,stroke:#000000,color:#000000
-    class E24 crm_E18_Physical_Thing
+    class E25 crm_E18_Physical_Thing
     class E22_MAP,E22_ALM crm_E18_Physical_Thing
 
     classDef crm_E53_Place fill:#94cc7d,stroke:#000000,color:#000000

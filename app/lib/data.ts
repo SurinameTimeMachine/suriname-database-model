@@ -1,12 +1,13 @@
 import type {
-  E24Plantation,
-  E74Organization,
-  E53Place,
-  E41Appellation,
   E22Source,
+  E25Plantation,
+  E26PhysicalFeature,
+  E41Appellation,
+  E53Place,
+  E74Organization,
+  GeoJSONCollection,
   OrganizationObservation,
   ProvenanceRecord,
-  GeoJSONCollection,
 } from './types';
 
 const DATA_BASE = '/data';
@@ -16,7 +17,8 @@ async function fetchJSON<T>(path: string): Promise<T> {
   return res.json();
 }
 
-let _plantations: Record<string, E24Plantation> | null = null;
+let _plantations: Record<string, E25Plantation> | null = null;
+let _physicalFeatures: Record<string, E26PhysicalFeature> | null = null;
 let _organizations: Record<string, E74Organization> | null = null;
 let _places: Record<string, E53Place> | null = null;
 let _sources: Record<string, E22Source> | null = null;
@@ -28,6 +30,12 @@ let _geojson: GeoJSONCollection | null = null;
 export async function getPlantations() {
   if (!_plantations) _plantations = await fetchJSON('plantations.json');
   return _plantations!;
+}
+
+export async function getPhysicalFeatures() {
+  if (!_physicalFeatures)
+    _physicalFeatures = await fetchJSON('physical-features.json');
+  return _physicalFeatures!;
 }
 
 export async function getOrganizations() {
@@ -71,6 +79,7 @@ export async function getGeoJSON() {
 export async function loadAllData() {
   const [
     plantations,
+    physicalFeatures,
     organizations,
     places,
     sources,
@@ -80,6 +89,7 @@ export async function loadAllData() {
     geojson,
   ] = await Promise.all([
     getPlantations(),
+    getPhysicalFeatures(),
     getOrganizations(),
     getPlaces(),
     getSources(),
@@ -90,6 +100,7 @@ export async function loadAllData() {
   ]);
   return {
     plantations,
+    physicalFeatures,
     organizations,
     places,
     sources,
@@ -117,10 +128,11 @@ export function uriLabel(uri: string): string {
  * See: https://github.com/chin-rcip/CRITERIA
  */
 export const CRM_COLORS: Record<string, string> = {
-  E24: '#e6956b', // E24 Physical Human-Made Thing (warm brown) -- plantation
+  E25: '#e6956b', // E25 Human-Made Feature (warm brown) -- plantation
+  E26: '#5b9bd5', // E26 Physical Feature (blue) -- rivers/creeks
+  E24: '#e6956b', // E24 Physical Human-Made Thing (warm brown) -- legacy alias
   E22: '#c78e66', // E22 Human-Made Object (brown) -- sources
   E36: '#d4a574', // E36 Visual Item (tan)
-  E38: '#b89470', // E38 Image (dark tan)
   E53: '#94cc7d', // E53 Place (green)
   E74: '#ffbdca', // E74 Group (pink)
   E41: '#fef3ba', // E41 Appellation (yellow)
@@ -135,10 +147,11 @@ export const CRM_COLORS: Record<string, string> = {
 
 /** Full CIDOC-CRM class names for tooltips */
 export const CRM_CLASS_NAMES: Record<string, string> = {
+  E25: 'E25 Human-Made Feature',
+  E26: 'E26 Physical Feature',
   E24: 'E24 Physical Human-Made Thing',
   E22: 'E22 Human-Made Object',
   E36: 'E36 Visual Item',
-  E38: 'E38 Image',
   E53: 'E53 Place',
   E74: 'E74 Group / sdo:Organization',
   E41: 'E41 Appellation',
@@ -149,6 +162,11 @@ export const CRM_CLASS_NAMES: Record<string, string> = {
   E54: 'E54 Dimension',
   PROV: 'prov:ProvenanceRecord',
 };
+
+// Place-type metadata (colors, labels, CRM badges, colonial bias notes)
+// is now sourced from the Geographical Features Thesaurus:
+//   data/place-types-thesaurus.jsonld
+// Use usePlaceTypes() from lib/thesaurus.ts to access these values.
 
 /** Get entity type color using CRITERIA scheme */
 export function entityTypeColor(typeStr: string): string {
@@ -161,7 +179,9 @@ export function entityTypeColor(typeStr: string): string {
 /** Get short type badge label */
 export function typeBadge(types: string | string[]): string {
   const arr = Array.isArray(types) ? types : [types];
-  if (arr.some((t) => t.includes('Plantation'))) return 'E24';
+  if (arr.some((t) => t.includes('Plantation') || t.includes('E25')))
+    return 'E25';
+  if (arr.some((t) => t.includes('E26'))) return 'E26';
   if (arr.some((t) => t.includes('E74'))) return 'E74';
   if (arr.some((t) => t.includes('E53'))) return 'E53';
   if (arr.some((t) => t.includes('E41'))) return 'E41';

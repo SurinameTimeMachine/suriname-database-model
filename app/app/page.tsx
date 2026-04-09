@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 const STATS = [
-  { label: 'Plantations', value: '1,596', desc: 'E24 Physical Sites' },
+  { label: 'Plantations', value: '1,596', desc: 'E25 Human-Made Features' },
   { label: 'Organizations', value: '934', desc: 'E74 with Wikidata Q-IDs' },
   { label: 'Observations', value: '22,999', desc: 'Annual almanac records' },
   { label: 'Name Variants', value: '7,062', desc: 'E41 Appellations' },
@@ -106,7 +106,7 @@ export default function HomePage() {
           <div className="grid sm:grid-cols-3 gap-8">
             <div className="bg-white border border-stm-warm-200 p-6">
               <div className="w-10 h-10 bg-blue-50 flex items-center justify-center mb-4">
-                <span className="text-entity-e24 font-bold text-sm">E24</span>
+                <span className="text-entity-e25 font-bold text-sm">E25</span>
               </div>
               <h3 className="font-semibold text-stm-warm-800 mb-2">
                 Plantation (Physical Site)
@@ -139,7 +139,7 @@ export default function HomePage() {
               </h3>
               <p className="text-sm text-stm-warm-500 leading-relaxed">
                 Where the plantation is. Polygons from the 1930 QGIS map,
-                reprojected from EPSG:31170 to WGS84. Linked to E24 via P53.
+                reprojected from EPSG:31170 to WGS84. Linked to E25 via P53.
               </p>
             </div>
           </div>

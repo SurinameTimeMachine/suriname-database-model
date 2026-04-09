@@ -1,0 +1,481 @@
+{
+  "@context": {
+    "skos": "http://www.w3.org/2004/02/skos/core#",
+    "crm": "http://www.cidoc-crm.org/cidoc-crm/",
+    "dct": "http://purl.org/dc/terms/",
+    "stm": "https://data.suriname-timemachine.org/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "prefLabel": {
+      "@id": "skos:prefLabel",
+      "@container": "@language"
+    },
+    "altLabel": {
+      "@id": "skos:altLabel",
+      "@container": ["@language", "@set"]
+    },
+    "definition": {
+      "@id": "skos:definition",
+      "@container": "@language"
+    },
+    "editorialNote": {
+      "@id": "skos:editorialNote",
+      "@container": "@language"
+    },
+    "scopeNote": {
+      "@id": "skos:scopeNote",
+      "@container": "@language"
+    },
+    "historyNote": "skos:historyNote",
+    "related": {
+      "@id": "skos:related",
+      "@type": "@id"
+    },
+    "exactMatch": {
+      "@id": "skos:exactMatch",
+      "@type": "@id"
+    },
+    "closeMatch": {
+      "@id": "skos:closeMatch",
+      "@type": "@id"
+    },
+    "broader": {
+      "@id": "skos:broader",
+      "@type": "@id"
+    },
+    "narrower": {
+      "@id": "skos:narrower",
+      "@type": "@id"
+    },
+    "inScheme": {
+      "@id": "skos:inScheme",
+      "@type": "@id"
+    },
+    "topConceptOf": {
+      "@id": "skos:topConceptOf",
+      "@type": "@id"
+    },
+    "hasTopConcept": {
+      "@id": "skos:hasTopConcept",
+      "@type": "@id"
+    },
+    "typeId": "stm:typeId",
+    "color": "stm:color",
+    "crmClass": "stm:crmClass",
+    "crmBadge": "stm:crmBadge",
+    "sortOrder": {
+      "@id": "stm:sortOrder",
+      "@type": "xsd:integer"
+    },
+    "created": "dct:created",
+    "modified": "dct:modified"
+  },
+  "@graph": [
+    {
+      "@id": "stm:vocabulary/place-type",
+      "@type": "skos:ConceptScheme",
+      "prefLabel": {
+        "en": "Geographical Features Thesaurus",
+        "nl": "Thesaurus Geografische Kenmerken"
+      },
+      "scopeNote": {
+        "en": "This vocabulary describes place types found in colonial-era sources from Suriname. Preferred labels use modern, non-colonial terminology. Alternative labels preserve original source terms for scholarly reference, with editorial notes documenting colonial bias. See also: docs/concepts/ethical-framework.md",
+        "nl": "Dit vocabulaire beschrijft plaatstypen uit koloniale bronnen van Suriname. Voorkeurslabels gebruiken moderne, niet-koloniale terminologie. Alternatieve labels bewaren originele brontermen voor wetenschappelijke referentie, met redactionele notities over koloniaal vooroordeel."
+      },
+      "hasTopConcept": [
+        "stm:vocabulary/place-type/human-made",
+        "stm:vocabulary/place-type/natural",
+        "stm:vocabulary/place-type/administrative"
+      ],
+      "created": "2026-04-07",
+      "modified": "2026-04-07"
+    },
+    {
+      "@id": "stm:vocabulary/place-type/human-made",
+      "@type": ["skos:Concept", "crm:E55_Type"],
+      "prefLabel": {
+        "en": "Human-Made Feature",
+        "nl": "Menselijk Bouwwerk"
+      },
+      "definition": {
+        "en": "A physical feature created or substantially modified by human activity."
+      },
+      "topConceptOf": "stm:vocabulary/place-type",
+      "inScheme": "stm:vocabulary/place-type",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "narrower": [
+        "stm:vocabulary/place-type/plantation",
+        "stm:vocabulary/place-type/military-post",
+        "stm:vocabulary/place-type/road",
+        "stm:vocabulary/place-type/railroad",
+        "stm:vocabulary/place-type/station",
+        "stm:vocabulary/place-type/settlement"
+      ]
+    },
+    {
+      "@id": "stm:vocabulary/place-type/natural",
+      "@type": ["skos:Concept", "crm:E55_Type"],
+      "prefLabel": {
+        "en": "Natural Feature",
+        "nl": "Natuurlijk Kenmerk",
+        "srn": "Naturu sani"
+      },
+      "definition": {
+        "en": "A geographical feature formed by natural processes, not substantially modified by human activity."
+      },
+      "topConceptOf": "stm:vocabulary/place-type",
+      "inScheme": "stm:vocabulary/place-type",
+      "crmClass": "E26_Physical_Feature",
+      "crmBadge": "E26",
+      "narrower": [
+        "stm:vocabulary/place-type/river",
+        "stm:vocabulary/place-type/creek"
+      ]
+    },
+    {
+      "@id": "stm:vocabulary/place-type/administrative",
+      "@type": ["skos:Concept", "crm:E55_Type"],
+      "prefLabel": {
+        "en": "Administrative Division",
+        "nl": "Administratieve Indeling"
+      },
+      "definition": {
+        "en": "A formally defined area used for governance, census, or administrative purposes."
+      },
+      "topConceptOf": "stm:vocabulary/place-type",
+      "inScheme": "stm:vocabulary/place-type",
+      "crmClass": "E53_Place",
+      "crmBadge": "E53",
+      "narrower": [
+        "stm:vocabulary/place-type/district"
+      ]
+    },
+    {
+      "@id": "stm:vocabulary/place-type/plantation",
+      "@type": ["skos:Concept", "crm:E55_Type"],
+      "prefLabel": {
+        "en": "Plantation",
+        "nl": "Plantage",
+        "srn": "Plantasi"
+      },
+      "definition": {
+        "en": "A large agricultural estate, typically established during the colonial period for the production of export crops using enslaved labor.",
+        "nl": "Een groot landbouwbedrijf, doorgaans opgericht tijdens de koloniale periode voor de productie van exportgewassen met gebruik van tot slaaf gemaakte arbeid."
+      },
+      "editorialNote": {
+        "en": "Colonial data bias: Plantations were the primary sites of enslaved labor in Suriname. The term itself carries the weight of colonial exploitation."
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/human-made",
+      "related": ["stm:vocabulary/place-type/settlement"],
+      "exactMatch": ["http://www.wikidata.org/entity/Q188913"],
+      "typeId": "plantation",
+      "color": "#a67830",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "sortOrder": 1,
+      "created": "2026-04-07",
+      "modified": "2026-04-07"
+    },
+    {
+      "@id": "stm:vocabulary/place-type/military-post",
+      "@type": ["skos:Concept", "crm:E55_Type"],
+      "prefLabel": {
+        "en": "Military Post",
+        "nl": "Militaire Post"
+      },
+      "altLabel": {
+        "nl": ["voormalige militaire post (1882 map)"]
+      },
+      "definition": {
+        "en": "A fortified position or garrison established for military defense or territorial control.",
+        "nl": "Een versterkte positie of garnizoen opgericht voor militaire verdediging of territoriale controle."
+      },
+      "editorialNote": {
+        "en": "Colonial data bias: Military posts were instruments of colonial territorial control and surveillance of Maroon and Indigenous communities.",
+        "nl": "Koloniaal vooroordeel: Militaire posten waren instrumenten van koloniale territoriale controle en toezicht op Marron- en Inheemse gemeenschappen."
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/human-made",
+      "related": ["stm:vocabulary/place-type/settlement"],
+      "closeMatch": ["http://www.wikidata.org/entity/Q245016"],
+      "typeId": "military-post",
+      "color": "#c0392b",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "sortOrder": 2,
+      "created": "2026-04-07",
+      "modified": "2026-04-07"
+    },
+    {
+      "@id": "stm:vocabulary/place-type/road",
+      "@type": ["skos:Concept", "crm:E55_Type"],
+      "prefLabel": {
+        "en": "Road",
+        "nl": "Weg",
+        "srn": "Pasi"
+      },
+      "definition": {
+        "en": "A constructed path or route for transportation between settlements."
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/human-made",
+      "exactMatch": ["http://www.wikidata.org/entity/Q34442"],
+      "typeId": "road",
+      "color": "#a0522d",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "sortOrder": 3,
+      "created": "2026-04-07",
+      "modified": "2026-04-07"
+    },
+    {
+      "@id": "stm:vocabulary/place-type/railroad",
+      "@type": ["skos:Concept", "crm:E55_Type"],
+      "prefLabel": {
+        "en": "Railroad",
+        "nl": "Spoorweg"
+      },
+      "definition": {
+        "en": "A track or system of tracks for rail transport between locations."
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/human-made",
+      "related": ["stm:vocabulary/place-type/station"],
+      "closeMatch": ["http://www.wikidata.org/entity/Q22667"],
+      "typeId": "railroad",
+      "color": "#2c2c2c",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "sortOrder": 4,
+      "created": "2026-04-07",
+      "modified": "2026-04-07"
+    },
+    {
+      "@id": "stm:vocabulary/place-type/station",
+      "@type": ["skos:Concept", "crm:E55_Type"],
+      "prefLabel": {
+        "en": "Station",
+        "nl": "Station",
+        "srn": "Stasi"
+      },
+      "definition": {
+        "en": "A stopping place on a transportation route, particularly a railroad."
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/human-made",
+      "related": ["stm:vocabulary/place-type/railroad"],
+      "closeMatch": ["http://www.wikidata.org/entity/Q55488"],
+      "typeId": "station",
+      "color": "#2c3e50",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "sortOrder": 5,
+      "created": "2026-04-07",
+      "modified": "2026-04-07"
+    },
+    {
+      "@id": "stm:vocabulary/place-type/settlement",
+      "@type": ["skos:Concept", "crm:E55_Type"],
+      "prefLabel": {
+        "en": "Settlement",
+        "nl": "Nederzetting"
+      },
+      "altLabel": {
+        "nl": [
+          "Leprozen etablissement",
+          "strafetablissement",
+          "voormalige Gouvernements kostgrond",
+          "Posto (1882 map)"
+        ]
+      },
+      "definition": {
+        "en": "A place where people have established a community and live together.",
+        "nl": "Een plaats waar mensen een gemeenschap hebben gevestigd en samenleven."
+      },
+      "editorialNote": {
+        "en": "Colonial data bias: Several settlements have colonial institutional origins (leper colonies, penal establishments, government provisions grounds) reflecting colonial governance structures.",
+        "nl": "Koloniaal vooroordeel: Diverse nederzettingen hebben koloniale institutionele oorsprong (leprozenkolonies, strafgestichten, gouvernements kostgronden) die koloniale bestuursstructuren weerspiegelen."
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/human-made",
+      "related": ["stm:vocabulary/place-type/plantation"],
+      "exactMatch": ["http://www.wikidata.org/entity/Q486972"],
+      "narrower": [
+        "stm:vocabulary/place-type/town",
+        "stm:vocabulary/place-type/indigenous-village",
+        "stm:vocabulary/place-type/maroon-village"
+      ],
+      "typeId": "settlement",
+      "color": "#8b7355",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "sortOrder": 6,
+      "created": "2026-04-07",
+      "modified": "2026-04-07"
+    },
+    {
+      "@id": "stm:vocabulary/place-type/town",
+      "@type": ["skos:Concept", "crm:E55_Type"],
+      "prefLabel": {
+        "en": "Town",
+        "nl": "Stad",
+        "srn": "Foto"
+      },
+      "definition": {
+        "en": "A densely populated settlement with defined boundaries and local governance.",
+        "nl": "Een dichtbevolkte nederzetting met vaste grenzen en lokaal bestuur."
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/settlement",
+      "exactMatch": ["http://www.wikidata.org/entity/Q3957"],
+      "typeId": "town",
+      "color": "#d4a853",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "sortOrder": 7,
+      "created": "2026-04-07",
+      "modified": "2026-04-07"
+    },
+    {
+      "@id": "stm:vocabulary/place-type/indigenous-village",
+      "@type": ["skos:Concept", "crm:E55_Type"],
+      "prefLabel": {
+        "en": "Indigenous Village",
+        "nl": "Inheems Dorp"
+      },
+      "altLabel": {
+        "nl": [
+          "Indiaansch dorp",
+          "Indianen (1882 map)"
+        ],
+        "en": [
+          "I (1930 map code)"
+        ]
+      },
+      "definition": {
+        "en": "A settlement of Indigenous peoples of Suriname.",
+        "nl": "Een nederzetting van Inheemse volkeren van Suriname."
+      },
+      "editorialNote": {
+        "en": "Colonial data bias: \"I\" and \"Indiaansch dorp\" are colonial Dutch terms from the 1930 and 1882 plantation maps. Indigenous communities were reduced to single-letter codes. The preferred term recognizes the self-determination of these communities.",
+        "nl": "Koloniaal vooroordeel: \"I\" en \"Indiaansch dorp\" zijn koloniale Nederlandse termen uit de plantagekaarten van 1930 en 1882. Inheemse gemeenschappen werden gereduceerd tot codes van een enkele letter."
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/settlement",
+      "typeId": "indigenous-village",
+      "color": "#27ae60",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "sortOrder": 8,
+      "created": "2026-04-07",
+      "modified": "2026-04-07"
+    },
+    {
+      "@id": "stm:vocabulary/place-type/maroon-village",
+      "@type": ["skos:Concept", "crm:E55_Type"],
+      "prefLabel": {
+        "en": "Maroon Village",
+        "nl": "Marrondorp",
+        "srn": "Marunkondre"
+      },
+      "altLabel": {
+        "nl": [
+          "Boschdorp",
+          "Boschnegers dorp",
+          "Boschneger"
+        ],
+        "en": [
+          "B (1930 map code)"
+        ]
+      },
+      "definition": {
+        "en": "A settlement established by Maroon communities -- self-liberated formerly enslaved people and their descendants.",
+        "nl": "Een nederzetting opgericht door Marrongemeenschappen -- zelfbevrijde voorheen tot slaaf gemaakte mensen en hun nakomelingen."
+      },
+      "editorialNote": {
+        "en": "Colonial data bias: \"Boschnegers\" (lit. \"bush negroes\") was a derogatory Dutch colonial designation for Maroon communities. The preferred term \"Maroon\" respects their agency and self-identification.",
+        "nl": "Koloniaal vooroordeel: \"Boschnegers\" was een denigrerende Nederlandse koloniale aanduiding voor Marrongemeenschappen. De voorkeursterm \"Marron\" respecteert hun eigen identiteit en zelfbeschikking."
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/settlement",
+      "closeMatch": ["http://www.wikidata.org/entity/Q5765472"],
+      "typeId": "maroon-village",
+      "color": "#8e44ad",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "sortOrder": 9,
+      "created": "2026-04-07",
+      "modified": "2026-04-07"
+    },
+    {
+      "@id": "stm:vocabulary/place-type/river",
+      "@type": ["skos:Concept", "crm:E55_Type"],
+      "prefLabel": {
+        "en": "River",
+        "nl": "Rivier",
+        "srn": "Liba"
+      },
+      "definition": {
+        "en": "A large natural flowing watercourse, typically emptying into the sea or a larger body of water.",
+        "nl": "Een grote natuurlijke waterloop die doorgaans uitmondt in de zee of een groter waterlichaam."
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/natural",
+      "exactMatch": ["http://www.wikidata.org/entity/Q4022"],
+      "typeId": "river",
+      "color": "#3182bd",
+      "crmClass": "E26_Physical_Feature",
+      "crmBadge": "E26",
+      "sortOrder": 10,
+      "created": "2026-04-07",
+      "modified": "2026-04-07"
+    },
+    {
+      "@id": "stm:vocabulary/place-type/creek",
+      "@type": ["skos:Concept", "crm:E55_Type"],
+      "prefLabel": {
+        "en": "Creek",
+        "nl": "Kreek",
+        "srn": "Kriki"
+      },
+      "definition": {
+        "en": "A small to medium natural watercourse, often a tributary of a river.",
+        "nl": "Een kleine tot middelgrote natuurlijke waterloop, vaak een zijrivier."
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/natural",
+      "closeMatch": ["http://www.wikidata.org/entity/Q47521"],
+      "typeId": "creek",
+      "color": "#6baed6",
+      "crmClass": "E26_Physical_Feature",
+      "crmBadge": "E26",
+      "sortOrder": 11,
+      "created": "2026-04-07",
+      "modified": "2026-04-07"
+    },
+    {
+      "@id": "stm:vocabulary/place-type/district",
+      "@type": ["skos:Concept", "crm:E55_Type"],
+      "prefLabel": {
+        "en": "District",
+        "nl": "District",
+        "srn": "Distrikt"
+      },
+      "definition": {
+        "en": "An administrative subdivision of Suriname used for governance and census purposes.",
+        "nl": "Een bestuurlijke onderverdeling van Suriname voor bestuur en volkstelling."
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/administrative",
+      "exactMatch": ["http://www.wikidata.org/entity/Q149621"],
+      "typeId": "district",
+      "color": "#5a9e6f",
+      "crmClass": "E53_Place",
+      "crmBadge": "E53",
+      "sortOrder": 0,
+      "created": "2026-04-07",
+      "modified": "2026-04-07"
+    }
+  ]
+}

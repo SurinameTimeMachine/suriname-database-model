@@ -1,0 +1,55 @@
+{
+  "@context": {
+    "crm": "http://www.cidoc-crm.org/cidoc-crm/",
+    "dct": "http://purl.org/dc/terms/",
+    "sdo": "https://schema.org/",
+    "stm": "https://data.suriname-timemachine.org/",
+    "prefLabel": "crm:P1_is_identified_by",
+    "P2_has_type": {
+      "@id": "crm:P2_has_type",
+      "@type": "@id"
+    },
+    "formsPartOf": {
+      "@id": "crm:P46i_forms_part_of",
+      "@type": "@id"
+    },
+    "sameAs": {
+      "@id": "sdo:sameAs",
+      "@type": "@id"
+    },
+    "sourceId": "dct:identifier",
+    "folderPath": "stm:folderPath",
+    "collectionUrl": "stm:collectionUrl",
+    "author": "dct:creator",
+    "year": "dct:date",
+    "altLabels": "skos:altLabel",
+    "notes": "dct:description",
+    "skos": "http://www.w3.org/2004/02/skos/core#"
+  },
+  "@id": "https://data.suriname-timemachine.org/source/dikland-collection",
+  "@type": "crm:E22_Human-Made_Object",
+  "sourceId": "dikland-collection",
+  "prefLabel": "Suriname Heritage Guide -- Dikland Collection",
+  "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/research-collection",
+  "author": "Philip Dikland",
+  "sameAs": "https://www.suriname-heritage-guide.com/",
+  "collectionUrl": "https://drive.google.com/drive/u/0/folders/0B88mZFitv8embmZaYWFQNnZacDQ?tid=0B88mZFitv8emcjVfcG5hWFJOdWs&resourcekey=0-sImlF_DkEFu3ebWbDQ58Kg",
+  "dct:description": "Collection of historically documented plantation descriptions compiled by Philip Dikland and published via the Suriname Heritage Guide. Each PDF covers a single plantation and includes chronology, alternative names, and transcribed historical sources. Files are organised in theme folders on Google Drive.",
+  "@graph": [
+    {
+      "@id": "https://data.suriname-timemachine.org/source/dikland/voorburg",
+      "@type": "crm:E22_Human-Made_Object",
+      "sourceId": "dikland/voorburg",
+      "prefLabel": "Voorburg - suikerplantage aan de Surinamerivier (Dikland)",
+      "formsPartOf": "https://data.suriname-timemachine.org/source/dikland-collection",
+      "folderPath": "erfgoed - geschiedenis/Suriname rivier/plantages/Voorburg 2004-01 geschiedenis.pdf",
+      "collectionUrl": "https://drive.google.com/drive/u/0/folders/0B88mZFitv8embmZaYWFQNnZacDQ?tid=0B88mZFitv8emcjVfcG5hWFJOdWs&resourcekey=0-sImlF_DkEFu3ebWbDQ58Kg",
+      "author": "Philip Dikland",
+      "year": "2004",
+      "altLabels": [
+        "Voorburg"
+      ],
+      "notes": "Suikerplantage Voorburg aan de Surinamerivier, rechteroever bij het afvaren. Omstreeks 1750 aangelegd als gouvernementskostgrond; omstreeks 1770 gekregen de naam Voorburg. Auteur Philip Dikland, 2004; aangevuld 2007, 2010."
+    }
+  ]
+}

@@ -16,13 +16,19 @@ import {
   transformAlmanakken,
 } from './transform-almanakken';
 import {
-  type E24Row,
+  type E25Row,
   type E41Row,
   type E53Row,
   type MapLink,
   type SourceRow,
   transformPlantations,
 } from './transform-plantations';
+import {
+  type E26E41Row,
+  type E26E53Row,
+  type E26Row,
+  transformRivers,
+} from './transform-rivers';
 
 const LOD_DIR = join(__dirname, '../lod');
 const BASE = 'https://data.suriname-timemachine.org/';
@@ -49,21 +55,21 @@ function buildContext(): Record<string, unknown> {
     picom: 'https://personsincontext.org/model#',
     picot: 'https://personsincontext.org/thesaurus#',
     // CIDOC-CRM type aliases
-    Plantation: 'crm:E24_Physical_Human-Made_Thing',
+    Plantation: 'crm:E25_Human-Made_Feature',
     OrganizationObservation: 'crm:E13_Attribute_Assignment',
     ProvenanceRecord: 'prov:Entity',
     E13_Attribute_Assignment: 'crm:E13_Attribute_Assignment',
     E22_Human_Made_Object: 'crm:E22_Human-Made_Object',
-    E24_Physical_Human_Made_Thing: 'crm:E24_Physical_Human-Made_Thing',
+    E25_Human_Made_Feature: 'crm:E25_Human-Made_Feature',
+    E26_Physical_Feature: 'crm:E26_Physical_Feature',
     E36_Visual_Item: 'crm:E36_Visual_Item',
     E41_Appellation: 'crm:E41_Appellation',
     E52_Time_Span: 'crm:E52_Time-Span',
     E53_Place: 'crm:E53_Place',
     E55_Type: 'crm:E55_Type',
     E74_Group: 'crm:E74_Group',
-    // E12 Production + E38 Image
+    // E12 Production
     E12_Production: 'crm:E12_Production',
-    E38_Image: 'crm:E38_Image',
     // CIDOC-CRM properties
     P1_is_identified_by: { '@id': 'crm:P1_is_identified_by', '@type': '@id' },
     P1i_identifies: { '@id': 'crm:P1i_identifies', '@type': '@id' },
@@ -116,7 +122,7 @@ function buildContext(): Record<string, unknown> {
       '@id': 'crm:P108i_was_produced_by',
       '@type': '@id',
     },
-    // E38 Image properties
+    // E36 Visual Item (digital reproduction) properties
     P50_has_current_keeper: {
       '@id': 'crm:P50_has_current_keeper',
       '@type': 'xsd:string',
@@ -148,6 +154,8 @@ function buildContext(): Record<string, unknown> {
       '@type': 'xsd:string',
     },
     // Mapped properties (CRM/PROV/DC equivalents)
+    featureType: { '@id': 'crm:P2_has_type', '@type': 'xsd:string' },
+    mainBodyWater: { '@id': 'crm:P3_has_note', '@type': 'xsd:string' },
     status: { '@id': 'crm:P2_has_type', '@type': 'xsd:string' },
     psurId: { '@id': 'crm:P1_is_identified_by', '@type': 'xsd:string' },
     fid: { '@id': 'crm:P48_has_preferred_identifier', '@type': 'xsd:integer' },
@@ -223,8 +231,8 @@ function buildE22Sources(
   });
 }
 
-function buildE24Plantations(
-  plantations: E24Row[],
+function buildE25Plantations(
+  plantations: E25Row[],
   appellationIndex: Map<string, string[]>,
   mapLinkIndex: Map<string, MapLink[]>,
 ): {
@@ -237,8 +245,9 @@ function buildE24Plantations(
   for (const p of plantations) {
     const entity: Record<string, unknown> = {
       '@id': p.uri,
-      '@type': ['E24_Physical_Human_Made_Thing', 'Plantation'],
+      '@type': ['E25_Human_Made_Feature', 'Plantation'],
       status: p.status,
+      featureType: p.featureType,
     };
 
     // CRM alignment: P2 has type -> E55 Type (plantation status)
@@ -280,7 +289,7 @@ function buildE24Plantations(
         e36Uris.length === 1 ? e36Uris[0] : e36Uris;
     }
 
-    const provId = `${BASE}provenance/e24-${p.slug}`;
+    const provId = `${BASE}provenance/e25-${p.slug}`;
     entity.wasDerivedFrom = provId;
     provenance.push({
       '@id': provId,
@@ -290,9 +299,57 @@ function buildE24Plantations(
       sourceColumn: 'plantation_label, qid, coords',
       sourceRow: `fid=${p.fid}`,
       transformedBy: 'scripts/transform-plantations.ts',
-      modelEntity: 'E24_Physical_Human-Made_Thing',
-      schemaTable: 'e24_human_made_things',
+      modelEntity: 'E25_Human-Made_Feature',
+      schemaTable: 'e25_human_made_features',
       linkedVia: `qid -> P52_has_current_owner -> wd:${p.p52_owner_qid}`,
+    });
+
+    entities.push(entity);
+  }
+
+  return { entities, provenance };
+}
+
+function buildE26PhysicalFeatures(
+  features: E26Row[],
+  appellationIndex: Map<string, string[]>,
+): {
+  entities: Record<string, unknown>[];
+  provenance: Record<string, unknown>[];
+} {
+  const entities: Record<string, unknown>[] = [];
+  const provenance: Record<string, unknown>[] = [];
+  const VOCAB_BASE = `${BASE}vocabulary/geographical-feature/natural`;
+
+  for (const f of features) {
+    const entity: Record<string, unknown> = {
+      '@id': f.uri,
+      '@type': ['E26_Physical_Feature'],
+      featureType: f.featureType,
+      P2_has_type: `${VOCAB_BASE}/${f.featureType}`,
+    };
+
+    if (f.prefLabel) entity.prefLabel = f.prefLabel;
+    if (f.p53_place_uri) entity.P53_has_location = f.p53_place_uri;
+    if (f.mainBodyWater) entity.mainBodyWater = f.mainBodyWater;
+
+    const appUris = appellationIndex.get(f.uri) ?? [];
+    if (appUris.length > 0) {
+      entity.P1_is_identified_by = appUris.length === 1 ? appUris[0] : appUris;
+    }
+
+    const provId = `${BASE}provenance/e26-${f.slug}`;
+    entity.wasDerivedFrom = provId;
+    provenance.push({
+      '@id': provId,
+      '@type': ['ProvenanceRecord'],
+      sourceFile: 'data/07-gis-plantation-map-1930/rivers.csv',
+      sourceColumn: 'label1930, main_body_water, wkt_geometry',
+      sourceRow: `fid=${f.fid}`,
+      transformedBy: 'scripts/transform-rivers.ts',
+      modelEntity: 'E26_Physical_Feature',
+      schemaTable: 'e26_physical_features',
+      linkedVia: `P2_has_type -> ${VOCAB_BASE}/${f.featureType}`,
     });
 
     entities.push(entity);
@@ -395,6 +452,53 @@ function buildE53Places(places: E53Row[]): {
       modelEntity: 'E53_Place',
       schemaTable: 'e53_places',
       linkedVia: `P53i_is_location_of -> ${pl.plantation_uri}`,
+    });
+
+    entities.push(entity);
+  }
+
+  return { entities, provenance };
+}
+
+function buildE53RiverPlaces(places: E26E53Row[]): {
+  entities: Record<string, unknown>[];
+  provenance: Record<string, unknown>[];
+} {
+  const entities: Record<string, unknown>[] = [];
+  const provenance: Record<string, unknown>[] = [];
+
+  for (const pl of places) {
+    const entity: Record<string, unknown> = {
+      '@id': pl.uri,
+      '@type': ['E53_Place'],
+      fid: parseInt(pl.fid) || null,
+      mapYear: pl.map_year,
+    };
+
+    if (pl.observed_label) entity.observedLabel = pl.observed_label;
+
+    if (pl.coords_wgs84) {
+      entity.hasGeometry = {
+        '@type': 'geo:Geometry',
+        asWKT: pl.coords_wgs84,
+        geometrySource: pl.source_uri,
+      };
+    }
+
+    if (pl.source_uri) entity.P70i_is_documented_in = pl.source_uri;
+
+    const provId = `${BASE}provenance/e53-river-fid-${pl.fid}`;
+    entity.wasDerivedFrom = provId;
+    provenance.push({
+      '@id': provId,
+      '@type': ['ProvenanceRecord'],
+      sourceFile: 'data/07-gis-plantation-map-1930/rivers.csv',
+      sourceColumn: 'wkt_geometry (EPSG:31170 -> EPSG:4326)',
+      sourceRow: `fid=${pl.fid}`,
+      transformedBy: 'scripts/transform-rivers.ts (proj4 reprojection)',
+      modelEntity: 'E53_Place',
+      schemaTable: 'e53_places',
+      linkedVia: `P53i_is_location_of -> ${pl.feature_uri}`,
     });
 
     entities.push(entity);
@@ -521,13 +625,13 @@ function buildE12Productions(sources: SourceRow[]): Record<string, unknown>[] {
   });
 }
 
-function buildE38Images(sources: SourceRow[]): Record<string, unknown>[] {
+function buildE36Images(sources: SourceRow[]): Record<string, unknown>[] {
   const entities: Record<string, unknown>[] = [];
   for (const s of sources) {
     if (!s.iiif_info_url && !s.iiif_manifest) continue;
     const entity: Record<string, unknown> = {
       '@id': `${BASE}image/${s.id.toLowerCase()}`,
-      '@type': ['E38_Image'],
+      '@type': ['E36_Visual_Item'],
       prefLabel: `Digital scan of ${s.label}`,
       P138_represents: s.uri,
     };
@@ -631,12 +735,32 @@ function wktToGeoJsonCoords(wkt: string): number[][][] | null {
   return ring.length >= 4 ? [ring] : null;
 }
 
+function wktLineStringToCoords(wkt: string): number[][] | null {
+  const match = wkt.match(/LineString\s*\((.+?)\)/i);
+  if (!match) return null;
+
+  const coords: number[][] = [];
+  for (const pair of match[1].split(',')) {
+    const parts = pair.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      const lon = parseFloat(parts[0]);
+      const lat = parseFloat(parts[1]);
+      if (!isNaN(lon) && !isNaN(lat)) coords.push([lon, lat]);
+    }
+  }
+
+  return coords.length >= 2 ? coords : null;
+}
+
 function buildGeoJson(
   places: E53Row[],
-  plantationMap: Map<string, E24Row>,
+  plantationMap: Map<string, E25Row>,
+  riverPlaces: E26E53Row[],
+  riverMap: Map<string, E26Row>,
 ): Record<string, unknown> {
   const features: Record<string, unknown>[] = [];
 
+  // Plantation polygons
   for (const pl of places) {
     if (!pl.coords_wgs84) continue;
     const coords = wktToGeoJsonCoords(pl.coords_wgs84);
@@ -646,12 +770,13 @@ function buildGeoJson(
 
     features.push({
       type: 'Feature',
-      id: pl.fid,
+      id: `plantation-${pl.fid}`,
       geometry: { type: 'Polygon', coordinates: coords },
       properties: {
         fid: parseInt(pl.fid) || null,
         name: plantation?.prefLabel ?? pl.observed_label,
         status: plantation?.status ?? 'unknown',
+        featureType: 'plantation',
         mapYear: pl.map_year,
         plantationUri: pl.plantation_uri,
         organizationQid: plantation?.p52_owner_qid ?? '',
@@ -660,9 +785,34 @@ function buildGeoJson(
     });
   }
 
+  // River/creek LineStrings
+  for (const rp of riverPlaces) {
+    if (!rp.coords_wgs84) continue;
+    const coords = wktLineStringToCoords(rp.coords_wgs84);
+    if (!coords) continue;
+
+    const river = riverMap.get(rp.feature_uri);
+
+    features.push({
+      type: 'Feature',
+      id: `river-${rp.fid}`,
+      geometry: { type: 'LineString', coordinates: coords },
+      properties: {
+        fid: parseInt(rp.fid) || null,
+        name: river?.prefLabel ?? rp.observed_label,
+        status: 'natural',
+        featureType: river?.featureType ?? 'river',
+        mapYear: rp.map_year,
+        featureUri: rp.feature_uri,
+        mainBodyWater: river?.mainBodyWater ?? '',
+        placeUri: rp.uri,
+      },
+    });
+  }
+
   return {
     type: 'FeatureCollection',
-    name: 'Suriname Time Machine - Plantation Locations',
+    name: 'Suriname Time Machine - Geographical Features',
     crs: {
       type: 'name',
       properties: { name: 'urn:ogc:def:crs:EPSG::4326' },
@@ -679,6 +829,8 @@ function main() {
   // Run transforms
   console.log('--- Transform: Plantations ---');
   const plantResult = transformPlantations();
+  console.log('\n--- Transform: Rivers ---');
+  const riverResult = transformRivers();
   console.log('\n--- Transform: Almanakken ---');
   const almResult = transformAlmanakken();
 
@@ -687,7 +839,11 @@ function main() {
 
   // Build indexes
   const appellationIndex = new Map<string, string[]>();
-  for (const a of [...plantResult.e41, ...almResult.appellations]) {
+  for (const a of [
+    ...plantResult.e41,
+    ...almResult.appellations,
+    ...riverResult.e41,
+  ]) {
     const key = a.identifies_uri;
     if (key) {
       const list = appellationIndex.get(key) ?? [];
@@ -703,9 +859,14 @@ function main() {
     mapLinkIndex.set(m.plantation_uri, list);
   }
 
-  const plantationMap = new Map<string, E24Row>();
-  for (const p of plantResult.e24) {
+  const plantationMap = new Map<string, E25Row>();
+  for (const p of plantResult.e25) {
     plantationMap.set(p.uri, p);
+  }
+
+  const riverMap = new Map<string, E26Row>();
+  for (const r of riverResult.e26) {
+    riverMap.set(r.uri, r);
   }
 
   // Build indexes for E22 P128 carries
@@ -726,7 +887,11 @@ function main() {
   }
 
   // Index appellations by source URI (for P128 carries)
-  for (const a of [...plantResult.e41, ...almResult.appellations]) {
+  for (const a of [
+    ...plantResult.e41,
+    ...almResult.appellations,
+    ...riverResult.e41,
+  ]) {
     if (a.carried_by) {
       const list = appellationsBySource.get(a.carried_by) ?? [];
       list.push(a.uri);
@@ -739,22 +904,29 @@ function main() {
   const e22 = buildE22Sources(allSources, e36BySource, appellationsBySource);
   console.log(`  E22 Sources:        ${e22.length}`);
 
-  const e24Result = buildE24Plantations(
-    plantResult.e24,
+  const e25Result = buildE25Plantations(
+    plantResult.e25,
     appellationIndex,
     mapLinkIndex,
   );
-  console.log(`  E24 Plantations:    ${e24Result.entities.length}`);
+  console.log(`  E25 Plantations:    ${e25Result.entities.length}`);
+
+  const e26Result = buildE26PhysicalFeatures(riverResult.e26, appellationIndex);
+  console.log(`  E26 Rivers/Creeks:  ${e26Result.entities.length}`);
 
   const e74Result = buildE74Organizations(plantResult.e74);
   console.log(`  E74 Organizations:  ${e74Result.entities.length}`);
 
   const e53Result = buildE53Places(plantResult.e53);
-  console.log(`  E53 Places:         ${e53Result.entities.length}`);
+  const e53RiverResult = buildE53RiverPlaces(riverResult.e53);
+  console.log(
+    `  E53 Places:         ${e53Result.entities.length + e53RiverResult.entities.length} (${e53Result.entities.length} plantation, ${e53RiverResult.entities.length} river)`,
+  );
 
   const e41All = buildE41Appellations([
     ...plantResult.e41,
     ...almResult.appellations,
+    ...riverResult.e41,
   ]);
   console.log(`  E41 Appellations:   ${e41All.length}`);
 
@@ -776,29 +948,33 @@ function main() {
   const e12Productions = buildE12Productions(allSources);
   console.log(`  E12 Productions:    ${e12Productions.length}`);
 
-  // E38 Image entities: IIIF digital reproductions
-  const e38Images = buildE38Images(allSources);
-  console.log(`  E38 Images:         ${e38Images.length}`);
+  // E36 Visual Item entities: IIIF digital reproductions
+  const e36Images = buildE36Images(allSources);
+  console.log(`  E36 Images:         ${e36Images.length}`);
 
   const allProv = [
-    ...e24Result.provenance,
+    ...e25Result.provenance,
+    ...e26Result.provenance,
     ...e74Result.provenance,
     ...e53Result.provenance,
+    ...e53RiverResult.provenance,
     ...obsResult.provenance,
   ];
   console.log(`  Provenance records: ${allProv.length}`);
 
   const graph = [
     ...e22,
-    ...e24Result.entities,
+    ...e25Result.entities,
+    ...e26Result.entities,
     ...e74Result.entities,
     ...e53Result.entities,
+    ...e53RiverResult.entities,
     ...e41All,
     ...e36Entities,
     ...e55Types,
     ...e52TimeSpans,
     ...e12Productions,
-    ...e38Images,
+    ...e36Images,
     ...obsResult.entities,
     ...allProv,
   ];
@@ -811,7 +987,7 @@ function main() {
     '@type': 'sdo:Dataset',
     'sdo:name': 'Suriname Time Machine - Linked Open Data',
     'sdo:description':
-      'Comprehensive linked data graph of Surinamese plantation records, connecting CIDOC-CRM entities with full provenance chains.',
+      'Comprehensive linked data graph of Surinamese plantation records and geographical features, connecting CIDOC-CRM entities with full provenance chains.',
     'sdo:dateModified': new Date().toISOString(),
     'sdo:license': 'https://creativecommons.org/licenses/by/4.0/',
     '@graph': graph,
@@ -824,7 +1000,12 @@ function main() {
   console.log(`\nWrote ${jsonldPath} (${jsonldMB} MB)`);
 
   // Write GeoJSON
-  const geojson = buildGeoJson(plantResult.e53, plantationMap);
+  const geojson = buildGeoJson(
+    plantResult.e53,
+    plantationMap,
+    riverResult.e53,
+    riverMap,
+  );
   const geojsonPath = join(LOD_DIR, 'map-features.geojson');
   const geojsonStr = JSON.stringify(geojson, null, 2);
   writeFileSync(geojsonPath, geojsonStr, 'utf-8');
@@ -837,21 +1018,27 @@ function main() {
   // Validation
   console.log('\n=== Validation ===');
 
-  const dualTyped = graph.filter(
+  const noE24 = graph.filter(
     (e) =>
       Array.isArray(e['@type']) &&
-      (e['@type'] as string[]).includes('E24_Physical_Human_Made_Thing') &&
-      (e['@type'] as string[]).includes('E74_Group'),
+      (e['@type'] as string[]).includes('E24_Physical_Human_Made_Thing'),
   ).length;
   console.log(
-    `  Dual-typed E24+E74: ${dualTyped} ${dualTyped === 0 ? '(OK)' : '(PROBLEM)'}`,
+    `  Legacy E24 entities: ${noE24} ${noE24 === 0 ? '(OK - fully migrated to E25)' : '(PROBLEM - should be 0)'}`,
   );
 
-  const e24WithLoc = e24Result.entities.filter(
+  const e25WithLoc = e25Result.entities.filter(
     (e) => e.P53_has_location,
   ).length;
   console.log(
-    `  E24 with E53 location: ${e24WithLoc}/${e24Result.entities.length}`,
+    `  E25 with E53 location: ${e25WithLoc}/${e25Result.entities.length}`,
+  );
+
+  const e26WithLoc = e26Result.entities.filter(
+    (e) => e.P53_has_location,
+  ).length;
+  console.log(
+    `  E26 with E53 location: ${e26WithLoc}/${e26Result.entities.length}`,
   );
 
   const e41WithContent = e41All.filter(
@@ -881,16 +1068,16 @@ function main() {
   const e22WithP128 = e22.filter((e) => e.P128_carries).length;
   console.log(`  E22 with P128 carries: ${e22WithP128}/${e22.length}`);
 
-  const e24WithP138i = e24Result.entities.filter(
+  const e25WithP138i = e25Result.entities.filter(
     (e) => e.P138i_has_representation,
   ).length;
   console.log(
-    `  E24 with P138i representation: ${e24WithP138i}/${e24Result.entities.length}`,
+    `  E25 with P138i representation: ${e25WithP138i}/${e25Result.entities.length}`,
   );
 
-  const e24WithP2 = e24Result.entities.filter((e) => e.P2_has_type).length;
+  const e25WithP2 = e25Result.entities.filter((e) => e.P2_has_type).length;
   console.log(
-    `  E24 with P2 type (E55): ${e24WithP2}/${e24Result.entities.length}`,
+    `  E25 with P2 type (E55): ${e25WithP2}/${e25Result.entities.length}`,
   );
 
   const e22WithP108i = e22.filter((e) => e.P108i_was_produced_by).length;
@@ -911,24 +1098,45 @@ function main() {
     `  E12 with P7 (took place at): ${e12WithP7}/${e12Productions.length}`,
   );
 
-  const e38WithContent = e38Images.filter((e) => e.contentUrl).length;
+  const e36WithContent = e36Images.filter((e) => e.contentUrl).length;
   console.log(
-    `  E38 with IIIF contentUrl: ${e38WithContent}/${e38Images.length}`,
+    `  E36 with IIIF contentUrl: ${e36WithContent}/${e36Images.length}`,
   );
 
-  const e38WithP50 = e38Images.filter((e) => e.P50_has_current_keeper).length;
+  const e36WithP50 = e36Images.filter((e) => e.P50_has_current_keeper).length;
   console.log(
-    `  E38 with P50 (current keeper): ${e38WithP50}/${e38Images.length}`,
+    `  E36 with P50 (current keeper): ${e36WithP50}/${e36Images.length}`,
   );
 
-  const features = geojson.features as {
-    geometry: { coordinates: number[][][] };
-  }[];
-  if (features.length > 0) {
-    const [lon, lat] = features[0].geometry.coordinates[0][0];
+  const polygonFeatures = (
+    geojson.features as { geometry: { type: string } }[]
+  ).filter((f) => f.geometry.type === 'Polygon');
+  const lineFeatures = (
+    geojson.features as { geometry: { type: string } }[]
+  ).filter((f) => f.geometry.type === 'LineString');
+  console.log(
+    `  GeoJSON: ${polygonFeatures.length} Polygons, ${lineFeatures.length} LineStrings`,
+  );
+
+  if (polygonFeatures.length > 0) {
+    const feat = polygonFeatures[0] as unknown as {
+      geometry: { coordinates: number[][][] };
+    };
+    const [lon, lat] = feat.geometry.coordinates[0][0];
     const ok = lon > -58 && lon < -53 && lat > 1 && lat < 7;
     console.log(
-      `  GeoJSON CRS check: lon=${lon.toFixed(4)}, lat=${lat.toFixed(4)} -> ${ok ? 'OK' : 'OUTSIDE Suriname'}`,
+      `  GeoJSON CRS check (polygon): lon=${lon.toFixed(4)}, lat=${lat.toFixed(4)} -> ${ok ? 'OK' : 'OUTSIDE Suriname'}`,
+    );
+  }
+
+  if (lineFeatures.length > 0) {
+    const feat = lineFeatures[0] as unknown as {
+      geometry: { coordinates: number[][] };
+    };
+    const [lon, lat] = feat.geometry.coordinates[0];
+    const ok = lon > -58 && lon < -53 && lat > 1 && lat < 7;
+    console.log(
+      `  GeoJSON CRS check (line): lon=${lon.toFixed(4)}, lat=${lat.toFixed(4)} -> ${ok ? 'OK' : 'OUTSIDE Suriname'}`,
     );
   }
 
