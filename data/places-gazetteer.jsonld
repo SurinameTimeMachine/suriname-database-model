@@ -7779,10 +7779,8 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01922",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
+      "@id": "stm:place/stm-01922",
+      "@type": "E25_Human-Made_Feature",
       "id": "stm-01922",
       "type": "plantation",
       "prefLabel": "Boston",
@@ -7806,12 +7804,17 @@
       "locationDescription": "Boven-Saramacca",
       "locationDescriptionOriginal": "Rivier Saramacca, (boven) linkerhand in het afvaren",
       "placeType": "hout",
-      "modifiedBy": null,
-      "modifiedAt": null,
+      "modifiedBy": "Thunnisvanoort",
+      "modifiedAt": "2026-04-09",
       "externalLinks": [
         {
           "authority": "wikidata",
           "identifier": "Q59115297",
+          "matchType": "closeMatch"
+        },
+        {
+          "authority": "_custom",
+          "identifier": "http://www.surinameplantages.com/archief/b/boston",
           "matchType": "closeMatch"
         }
       ]
