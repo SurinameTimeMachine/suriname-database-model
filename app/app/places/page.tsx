@@ -10,7 +10,7 @@ import { getActiveSources, useSourceRegistry } from '@/lib/sources';
 import { usePlaceTypes } from '@/lib/thesaurus';
 import type { GazetteerPlace } from '@/lib/types';
 import { getPreferredName } from '@/lib/types';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 
 type SortKey =
   | 'name'
@@ -54,6 +54,145 @@ function SortArrow({ active, dir }: { active: boolean; dir: SortDir }) {
     </span>
   );
 }
+
+interface PlaceRowProps {
+  place: GazetteerPlace;
+  isSelected: boolean;
+  onSelect: (id: string) => void;
+  colors: Record<string, string>;
+  labels: Record<string, string>;
+}
+
+const PlaceRow = memo(function PlaceRow({
+  place,
+  isSelected,
+  onSelect,
+  colors,
+  labels,
+}: PlaceRowProps) {
+  const handleClick = useCallback(
+    () => onSelect(place.id),
+    [onSelect, place.id],
+  );
+  const altNames = place.names.filter((n) => !n.isPreferred);
+
+  return (
+    <tr
+      onClick={handleClick}
+      className={`cursor-pointer border-b border-stm-warm-50 transition-colors ${
+        isSelected ? 'bg-stm-sepia-50' : 'bg-white hover:bg-stm-warm-50'
+      }`}
+    >
+      {/* Name */}
+      <td className="py-1.5 px-2 font-medium text-stm-warm-800 max-w-55 truncate">
+        {getPreferredName(place)}
+        {altNames.length > 0 && (
+          <span className="text-[11px] text-stm-warm-400 ml-1 font-normal hidden xl:inline">
+            (
+            {altNames
+              .slice(0, 2)
+              .map((n) => n.text)
+              .join(', ')}
+            )
+          </span>
+        )}
+      </td>
+
+      {/* Type */}
+      <td className="py-1.5 px-2">
+        <span
+          className="inline-block px-1.5 py-0.5 text-[10px] font-medium rounded"
+          style={{
+            backgroundColor: (colors[place.type] || '#888') + '20',
+            color: colors[place.type] || '#888',
+          }}
+        >
+          {labels[place.type] || place.type}
+        </span>
+      </td>
+
+      {/* District */}
+      <td className="py-1.5 px-2 text-stm-warm-600 max-w-35 truncate">
+        {place.district ?? <span className="text-stm-warm-200">--</span>}
+      </td>
+
+      {/* Product / Type */}
+      <td className="py-1.5 px-2 text-stm-warm-500 text-xs max-w-30 truncate">
+        {place.placeType ?? <span className="text-stm-warm-200">--</span>}
+      </td>
+
+      {/* PSUR */}
+      <td className="py-1.5 px-2 text-stm-warm-500 font-mono text-xs">
+        {place.psurIds.length > 0 ? (
+          place.psurIds.join(', ')
+        ) : (
+          <span className="text-stm-warm-200">--</span>
+        )}
+      </td>
+
+      {/* External Links */}
+      <td className="py-1.5 px-2 text-center">
+        {(place.externalLinks || []).length > 0 ? (
+          <span
+            className="inline-block min-w-5 px-1 py-0.5 text-[10px] font-medium rounded bg-stm-teal-100 text-stm-teal-700"
+            title={(place.externalLinks || [])
+              .map(
+                (l) =>
+                  `${l.authority}: ${l.identifier} (${l.matchType.replace('Match', '')})`,
+              )
+              .join('\n')}
+          >
+            {(place.externalLinks || []).length}
+          </span>
+        ) : (
+          <span className="text-stm-warm-200">--</span>
+        )}
+      </td>
+
+      {/* Coords */}
+      <td className="py-1.5 px-2 text-stm-warm-400 font-mono text-xs whitespace-nowrap">
+        {place.location.lat != null ? (
+          <>
+            {place.location.lat.toFixed(2)}, {place.location.lng?.toFixed(2)}
+          </>
+        ) : (
+          <span className="text-stm-warm-200">--</span>
+        )}
+      </td>
+
+      {/* Modified */}
+      <td className="py-1.5 px-2 text-stm-warm-400 text-xs whitespace-nowrap">
+        {place.modifiedAt ? (
+          new Date(place.modifiedAt).toLocaleDateString()
+        ) : (
+          <span className="text-stm-warm-200">--</span>
+        )}
+      </td>
+
+      {/* Map 1930 */}
+      <td className="py-1.5 px-2 text-center">
+        {place.sources.includes('map-1930') ? (
+          <span className="text-stm-sepia-500" title="In Map 1930">
+            &#10003;
+          </span>
+        ) : (
+          <span className="text-stm-warm-200">-</span>
+        )}
+      </td>
+
+      {/* Almanakken */}
+      <td className="py-1.5 px-2 text-center">
+        {place.sources.includes('almanakken') ? (
+          <span className="text-stm-teal-600" title="In Almanakken">
+            &#10003;
+          </span>
+        ) : (
+          <span className="text-stm-warm-200">-</span>
+        )}
+      </td>
+    </tr>
+  );
+});
 
 export default function PlacesPage() {
   const { labels, colors, allTypes } = usePlaceTypes();
@@ -115,6 +254,11 @@ export default function PlacesPage() {
       setSortDir('asc');
       return key;
     });
+  }, []);
+
+  const handleRowSelect = useCallback((id: string) => {
+    setSelectedId(id);
+    setIsCreating(false);
   }, []);
 
   // Filter, search, and sort
@@ -424,140 +568,14 @@ export default function PlacesPage() {
                 </thead>
                 <tbody>
                   {filtered.map((place) => (
-                    <tr
+                    <PlaceRow
                       key={place.id}
-                      onClick={() => {
-                        setSelectedId(place.id);
-                        setIsCreating(false);
-                      }}
-                      className={`cursor-pointer border-b border-stm-warm-50 transition-colors ${
-                        selectedId === place.id
-                          ? 'bg-stm-sepia-50'
-                          : 'bg-white hover:bg-stm-warm-50'
-                      }`}
-                    >
-                      {/* Name */}
-                      <td className="py-1.5 px-2 font-medium text-stm-warm-800 max-w-55 truncate">
-                        {getPreferredName(place)}
-                        {place.names.filter((n) => !n.isPreferred).length >
-                          0 && (
-                          <span className="text-[11px] text-stm-warm-400 ml-1 font-normal hidden xl:inline">
-                            (
-                            {place.names
-                              .filter((n) => !n.isPreferred)
-                              .slice(0, 2)
-                              .map((n) => n.text)
-                              .join(', ')}
-                            )
-                          </span>
-                        )}
-                      </td>
-
-                      {/* Type */}
-                      <td className="py-1.5 px-2">
-                        <span
-                          className="inline-block px-1.5 py-0.5 text-[10px] font-medium rounded"
-                          style={{
-                            backgroundColor:
-                              (colors[place.type] || '#888') + '20',
-                            color: colors[place.type] || '#888',
-                          }}
-                        >
-                          {labels[place.type] || place.type}
-                        </span>
-                      </td>
-
-                      {/* District */}
-                      <td className="py-1.5 px-2 text-stm-warm-600 max-w-35 truncate">
-                        {place.district ?? (
-                          <span className="text-stm-warm-200">--</span>
-                        )}
-                      </td>
-
-                      {/* Product / Type */}
-                      <td className="py-1.5 px-2 text-stm-warm-500 text-xs max-w-30 truncate">
-                        {place.placeType ?? (
-                          <span className="text-stm-warm-200">--</span>
-                        )}
-                      </td>
-
-                      {/* PSUR */}
-                      <td className="py-1.5 px-2 text-stm-warm-500 font-mono text-xs">
-                        {place.psurIds.length > 0 ? (
-                          place.psurIds.join(', ')
-                        ) : (
-                          <span className="text-stm-warm-200">--</span>
-                        )}
-                      </td>
-
-                      {/* External Links */}
-                      <td className="py-1.5 px-2 text-center">
-                        {(place.externalLinks || []).length > 0 ? (
-                          <span
-                            className="inline-block min-w-5 px-1 py-0.5 text-[10px] font-medium rounded bg-stm-teal-100 text-stm-teal-700"
-                            title={(place.externalLinks || [])
-                              .map(
-                                (l) =>
-                                  `${l.authority}: ${l.identifier} (${l.matchType.replace('Match', '')})`,
-                              )
-                              .join('\n')}
-                          >
-                            {(place.externalLinks || []).length}
-                          </span>
-                        ) : (
-                          <span className="text-stm-warm-200">--</span>
-                        )}
-                      </td>
-
-                      {/* Coords */}
-                      <td className="py-1.5 px-2 text-stm-warm-400 font-mono text-xs whitespace-nowrap">
-                        {place.location.lat != null ? (
-                          <>
-                            {place.location.lat.toFixed(2)},{' '}
-                            {place.location.lng?.toFixed(2)}
-                          </>
-                        ) : (
-                          <span className="text-stm-warm-200">--</span>
-                        )}
-                      </td>
-
-                      {/* Modified */}
-                      <td className="py-1.5 px-2 text-stm-warm-400 text-xs whitespace-nowrap">
-                        {place.modifiedAt ? (
-                          new Date(place.modifiedAt).toLocaleDateString()
-                        ) : (
-                          <span className="text-stm-warm-200">--</span>
-                        )}
-                      </td>
-
-                      {/* Map 1930 */}
-                      <td className="py-1.5 px-2 text-center">
-                        {place.sources.includes('map-1930') ? (
-                          <span
-                            className="text-stm-sepia-500"
-                            title="In Map 1930"
-                          >
-                            &#10003;
-                          </span>
-                        ) : (
-                          <span className="text-stm-warm-200">-</span>
-                        )}
-                      </td>
-
-                      {/* Almanakken */}
-                      <td className="py-1.5 px-2 text-center">
-                        {place.sources.includes('almanakken') ? (
-                          <span
-                            className="text-stm-teal-600"
-                            title="In Almanakken"
-                          >
-                            &#10003;
-                          </span>
-                        ) : (
-                          <span className="text-stm-warm-200">-</span>
-                        )}
-                      </td>
-                    </tr>
+                      place={place}
+                      isSelected={selectedId === place.id}
+                      onSelect={handleRowSelect}
+                      colors={colors}
+                      labels={labels}
+                    />
                   ))}
                 </tbody>
               </table>
