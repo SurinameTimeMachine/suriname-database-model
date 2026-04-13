@@ -439,44 +439,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00711",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-00711",
-      "type": "plantation",
-      "prefLabel": "Aan Anna's zorg",
-      "altLabels": [],
-      "broader": "stm-00004",
-      "description": "",
-      "location": {
-        "lat": 5.982238188,
-        "lng": -54.899449238,
-        "wkt": "Polygon ((-54.88957898 5.97996126, -54.91452857 5.98173968, -54.91418942 5.98566077, -54.88937024 5.98386797, -54.88957898 5.97996126))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken"
-      ],
-      "wikidataQid": "Q124815044",
-      "fid": 1794,
-      "psurIds": [],
-      "district": "Divisie Beneden-Cottica",
-      "locationDescription": "Warappa Kreek",
-      "locationDescriptionOriginal": "Warrappa-kreek, regterhand in het opvaren",
-      "placeType": "katoen",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q124815044",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-01229",
       "@type": [
         "E25_Human-Made_Feature"
@@ -73606,6 +73568,48 @@
           "authority": "wikidata",
           "identifier": "Q59134249",
           "matchType": "closeMatch"
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-00711",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-00711",
+      "type": "plantation",
+      "broader": "stm-00004",
+      "description": "",
+      "location": {
+        "lat": 5.982238188,
+        "lng": -54.899449238,
+        "wkt": "Polygon ((-54.88957898 5.97996126, -54.91452857 5.98173968, -54.91418942 5.98566077, -54.88937024 5.98386797, -54.88957898 5.97996126))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken"
+      ],
+      "wikidataQid": "Q124815044",
+      "fid": 1794,
+      "psurIds": [],
+      "district": "Divisie Beneden-Cottica",
+      "locationDescription": "Warappa Kreek",
+      "locationDescriptionOriginal": "Warrappa-kreek, regterhand in het opvaren",
+      "placeType": "katoen",
+      "modifiedBy": "jonaschlegel",
+      "modifiedAt": "2026-04-13",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q124815044",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Aan Anna's zorg",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
         }
       ]
     },
