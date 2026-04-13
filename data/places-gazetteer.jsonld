@@ -360,37 +360,6 @@
       "externalLinks": []
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01683",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01683",
-      "type": "plantation",
-      "prefLabel": "249",
-      "altLabels": [],
-      "broader": null,
-      "description": "",
-      "location": {
-        "lat": 5.788764784285715,
-        "lng": -55.325787735714286,
-        "wkt": "Polygon ((-55.32560445 5.81574440, -55.32220757 5.81545068, -55.32455222 5.76728819, -55.32712987 5.76763779, -55.32785111 5.76843979, -55.32756448 5.77104824, -55.32560445 5.81574440))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930"
-      ],
-      "wikidataQid": null,
-      "fid": 2768,
-      "psurIds": [],
-      "district": null,
-      "locationDescription": null,
-      "locationDescriptionOriginal": null,
-      "placeType": null,
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": []
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-00552",
       "@type": [
         "E25_Human-Made_Feature"
@@ -60756,6 +60725,35 @@
       "placeType": null,
       "modifiedBy": null,
       "modifiedAt": null,
+      "externalLinks": []
+    },
+    {
+      "@id": "stm:place/stm-01683",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01683",
+      "type": "plantation",
+      "prefLabel": "Place2768",
+      "altLabels": [],
+      "broader": null,
+      "description": "Lot 249 (nameless)",
+      "location": {
+        "lat": 5.788764784285715,
+        "lng": -55.325787735714286,
+        "wkt": "Polygon ((-55.32560445 5.81574440, -55.32220757 5.81545068, -55.32455222 5.76728819, -55.32712987 5.76763779, -55.32785111 5.76843979, -55.32756448 5.77104824, -55.32560445 5.81574440))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930"
+      ],
+      "wikidataQid": null,
+      "fid": 2768,
+      "psurIds": [],
+      "district": null,
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": "Thunnisvanoort",
+      "modifiedAt": "2026-04-13",
       "externalLinks": []
     },
     {
