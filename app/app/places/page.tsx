@@ -93,8 +93,15 @@ export default function PlacesPage() {
     fetch('/data/places-gazetteer.jsonld')
       .then((r) => r.json())
       .then((data) => {
-        const entries = data['@graph'] || data;
-        setPlaces(Array.isArray(entries) ? entries : []);
+        const entries: GazetteerPlace[] = data['@graph'] || data;
+        if (!Array.isArray(entries)) return;
+        // Normalize: guard against legacy entries that lack names[]
+        setPlaces(
+          entries.map((p) => ({
+            ...p,
+            names: Array.isArray(p.names) ? p.names : [],
+          })),
+        );
       })
       .finally(() => setLoading(false));
   }, []);

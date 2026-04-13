@@ -243,10 +243,60 @@ if (existsSync(geojsonSrc)) {
 }
 
 // Copy places gazetteer (if it exists in data root)
+// Applies inline migration: entries still using prefLabel instead of names[] are converted.
 const gazetteerSrc = join(__dirname, '../../data/places-gazetteer.jsonld');
 if (existsSync(gazetteerSrc)) {
-  copyFileSync(gazetteerSrc, join(OUT_DIR, 'places-gazetteer.jsonld'));
-  console.log('  Copied places-gazetteer.jsonld');
+  const gazetteerRaw = JSON.parse(readFileSync(gazetteerSrc, 'utf-8'));
+  const gazetteerGraph: Record<string, unknown>[] =
+    gazetteerRaw['@graph'] || [];
+  let migrated = 0;
+  const migratedGraph = gazetteerGraph.map((entry) => {
+    if (Array.isArray(entry.names) && !entry.prefLabel) return entry;
+    const names: Record<string, unknown>[] = [];
+    const pref =
+      typeof entry.prefLabel === 'string' ? entry.prefLabel.trim() : '';
+    if (pref)
+      names.push({
+        text: pref,
+        language: 'nl',
+        type: 'official',
+        isPreferred: true,
+      });
+    const alts: string[] = Array.isArray(entry.altLabels)
+      ? (entry.altLabels as string[])
+      : [];
+    for (const alt of alts) {
+      const t = typeof alt === 'string' ? alt.trim() : '';
+      if (t)
+        names.push({
+          text: t,
+          language: 'nl',
+          type: 'historical',
+          isPreferred: false,
+        });
+    }
+    if (names.length > 0 && !names.some((n) => n.isPreferred))
+      names[0].isPreferred = true;
+    const {
+      prefLabel: _pl,
+      altLabels: _al,
+      ...rest
+    } = entry as Record<string, unknown> & {
+      prefLabel?: unknown;
+      altLabels?: unknown;
+    };
+    void _pl;
+    void _al;
+    migrated++;
+    return { ...rest, names };
+  });
+  if (migrated > 0)
+    console.log(`  Migrated ${migrated} gazetteer entries to names[] format`);
+  writeFileSync(
+    join(OUT_DIR, 'places-gazetteer.jsonld'),
+    JSON.stringify({ ...gazetteerRaw, '@graph': migratedGraph }),
+  );
+  console.log('  Wrote places-gazetteer.jsonld');
 } else {
   // Fallback: try old .json format
   const gazetteerSrcJson = join(__dirname, '../../data/places-gazetteer.json');
