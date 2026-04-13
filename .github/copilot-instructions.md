@@ -45,6 +45,7 @@ Primary data lives in `/data/` with these key sources:
 ## Formatting Rules
 
 - **No emojis** — Never use emojis in any files, diagrams, code, or documentation in this project
+- **No rounded corners** — All UI elements use sharp/square corners (border-radius: 0). The `--radius-*` theme tokens are globally set to `0px` in `globals.css`. Never add `rounded`, `rounded-sm`, `rounded-md`, `rounded-lg`, or `rounded-xl` to new elements. Exception: `rounded-full` is allowed only for circular avatars and small dot indicators.
 - **Mermaid erDiagram** — Does NOT support `%%` comments; use YAML frontmatter for metadata instead
 - **Mermaid flowchart** — Supports `%%` comments normally
 

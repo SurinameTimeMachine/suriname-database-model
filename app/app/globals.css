@@ -5,6 +5,17 @@
    Aligned with surinametijdmachine.org visual identity
    ────────────────────────────────────────────────────────── */
 @theme {
+  /* Sharp corners -- no border-radius anywhere (matches navbar aesthetic) */
+  --radius-xs: 0px;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+  --radius-3xl: 0px;
+  --radius-4xl: 0px;
+  --radius: 0px;
+
   --color-stm-sepia-50: #fdf8f0;
   --color-stm-sepia-100: #f5ead6;
   --color-stm-sepia-200: #e8d5b0;
