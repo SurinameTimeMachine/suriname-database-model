@@ -360,35 +360,6 @@
       "externalLinks": []
     },
     {
-      "@id": "stm:place/stm-01690",
-      "@type": "E25_Human-Made_Feature",
-      "id": "stm-01690",
-      "type": "plantation",
-      "prefLabel": "248",
-      "altLabels": [],
-      "broader": null,
-      "description": "",
-      "location": {
-        "lat": 5.786178632222222,
-        "lng": -55.32829225777777,
-        "wkt": "Polygon ((-55.33077827 5.77248930, -55.32860494 5.81705545, -55.32549090 5.81691140, -55.32560445 5.81574440, -55.32756448 5.77104824, -55.32785111 5.76843979, -55.32853179 5.77002671, -55.32942611 5.77140310, -55.33077827 5.77248930))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930"
-      ],
-      "wikidataQid": null,
-      "fid": 2775,
-      "psurIds": [],
-      "district": null,
-      "locationDescription": null,
-      "locationDescriptionOriginal": null,
-      "placeType": null,
-      "modifiedBy": "Thunnisvanoort",
-      "modifiedAt": "2026-04-09",
-      "externalLinks": []
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-01683",
       "@type": [
         "E25_Human-Made_Feature"
@@ -60785,6 +60756,35 @@
       "placeType": null,
       "modifiedBy": null,
       "modifiedAt": null,
+      "externalLinks": []
+    },
+    {
+      "@id": "stm:place/stm-01690",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01690",
+      "type": "plantation",
+      "prefLabel": "Place2775",
+      "altLabels": [],
+      "broader": null,
+      "description": "Lot 248 (nameless)",
+      "location": {
+        "lat": 5.786178632222222,
+        "lng": -55.32829225777777,
+        "wkt": "Polygon ((-55.33077827 5.77248930, -55.32860494 5.81705545, -55.32549090 5.81691140, -55.32560445 5.81574440, -55.32756448 5.77104824, -55.32785111 5.76843979, -55.32853179 5.77002671, -55.32942611 5.77140310, -55.33077827 5.77248930))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930"
+      ],
+      "wikidataQid": null,
+      "fid": 2775,
+      "psurIds": [],
+      "district": null,
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": "Thunnisvanoort",
+      "modifiedAt": "2026-04-13",
       "externalLinks": []
     },
     {
