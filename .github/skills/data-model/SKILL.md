@@ -161,7 +161,8 @@ crm:P99i_was_dissolved_by        - E68 Dissolution (-> successor E74)
 crm:P190_has_symbolic_content - the actual name string
 crm:P139_has_alternative_form - variant spelling (another E41)
 crm:P128i_is_carried_by       - E22 source that records this name
-crm:P72_has_language           - E56 Language (e.g. nl, sr)
+crm:P72_has_language           - E56 Language (nl, en, srn, und)
+crm:P2_has_type                - E55 Type (type/name-type/{type})
 ```
 
 ### Observation (E13 Attribute Assignment, from Almanakken)
@@ -290,6 +291,24 @@ For uncertain links, use qualified link entity:
 - `type/plantation-status/planned` - plan only, never built
 - `type/plantation-status/abandoned` - ceased operations
 - `type/plantation-status/unknown` - can't determine
+
+### Name Type
+
+Every E41 Appellation carries a `P2_has_type` pointing to one of these:
+
+- `type/name-type/official` - formal administrative or legal name (was: prefLabel)
+- `type/name-type/historical` - name recorded in a historical source (was: altLabel)
+- `type/name-type/vernacular` - informal/community name incl. volksname (often `P72_has_language = srn` or `nl`)
+- `type/name-type/variant` - alternative spelling or orthographic variant
+
+In `GazetteerPlace`, this is exposed as `PlaceName.type: NameType`. The preferred display name is the one with `isPreferred: true` (maps to `E1_E41_identified_by.is_preferred = true` in the schema).
+
+**Language codes** (`P72_has_language`, `PlaceName.language`):
+
+- `nl` - Dutch / Nederlands
+- `en` - English
+- `srn` - Sranan Tongo (ISO 639-3)
+- `und` - Undetermined
 
 ### Link Certainty
 

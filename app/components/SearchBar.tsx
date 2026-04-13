@@ -21,7 +21,13 @@ export default function SearchBar({
     if (!geojson || query.length < 2) return [];
     const q = query.toLowerCase();
     return geojson.features
-      .filter((f) => f.properties.name?.toLowerCase().includes(q))
+      .filter((f) => {
+        if (f.properties.name?.toLowerCase().includes(q)) return true;
+        // Also search all historical/vernacular name variants
+        return (f.properties.allNames ?? []).some((n: string) =>
+          n.toLowerCase().includes(q),
+        );
+      })
       .slice(0, 20);
   }, [geojson, query]);
 

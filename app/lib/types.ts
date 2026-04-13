@@ -118,7 +118,8 @@ export interface ProvenanceRecord {
 
 export interface GeoJSONFeatureProperties {
   fid: number; // CRM: P48 has preferred identifier -> E42 Identifier
-  name: string;
+  name: string; // preferred display name (E41 isPreferred)
+  allNames?: string[]; // all name texts for this feature (enables multi-name search)
   status: string;
   featureType: string; // PlaceType — granular place type
   mapYear: string; // Derivable from E22 source production date
@@ -154,6 +155,34 @@ export type SkosMatchType =
   | 'narrowMatch'
   | 'relatedMatch';
 
+/** CRM: P72 has language — ISO 639-1/3 codes used in this project */
+export type LanguageCode = 'nl' | 'en' | 'srn' | 'und';
+
+/**
+ * CRM: P2 has type — name-type vocabulary (type/name-type/*)
+ * - official:   formal administrative or legal name
+ * - historical: name used in a historical source or period
+ * - vernacular: informal, folk, or community name (including volksname)
+ * - variant:    alternative spelling or orthographic variant
+ */
+export type NameType = 'official' | 'historical' | 'vernacular' | 'variant';
+
+/**
+ * A named form of a place — corresponds to E41 Appellation in CIDOC-CRM.
+ * CRM chain: E53 Place -> P1 is identified by -> E41 Appellation
+ *   E41.P190 has symbolic content = text
+ *   E41.P72  has language          = language
+ *   E41.P2   has type              = type/name-type/{type}
+ */
+export interface PlaceName {
+  text: string; // CRM: P190 has symbolic content
+  language: LanguageCode; // CRM: P72 has language
+  type: NameType; // CRM: P2 has type -> type/name-type/{type}
+  isPreferred: boolean; // true for exactly one name per place (the display name)
+  source?: string; // optional: source ID from sources registry
+  sourceYear?: number; // optional: year of the source
+}
+
 /** External authority link with match closeness */
 export interface ExternalLink {
   authority: string; // "wikidata" | "tgn" | "geonames" | custom prefix
@@ -188,14 +217,21 @@ export type PlaceType =
 // PLACE_TYPE_CRM and COLONIAL_BIAS_TYPES are now sourced from the
 // Geographical Features Thesaurus: data/place-types-thesaurus.jsonld
 // Use usePlaceTypes() from lib/thesaurus.ts to access these values.
+
+/** Return the preferred display name for a place (the first PlaceName where isPreferred=true, or the first name text). */
+export function getPreferredName(place: GazetteerPlace): string {
+  const names = place.names;
+  if (!names || names.length === 0) return '';
+  return names.find((n) => n.isPreferred)?.text ?? names[0]?.text ?? '';
+}
 // For server-side / Node scripts, read the thesaurus file directly.
 
 /** Place gazetteer entry — authority record for a named place */
 export interface GazetteerPlace {
   id: string;
   type: PlaceType;
-  prefLabel: string;
-  altLabels: string[];
+  /** All named forms for this place — replaces flat prefLabel + altLabels. */
+  names: PlaceName[];
   broader: string | null;
   description: string;
   location: {

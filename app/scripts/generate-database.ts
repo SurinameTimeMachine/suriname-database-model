@@ -757,6 +757,8 @@ function buildGeoJson(
   plantationMap: Map<string, E25Row>,
   riverPlaces: E26E53Row[],
   riverMap: Map<string, E26Row>,
+  plantationNames: Map<string, string[]>,
+  riverNames: Map<string, string[]>,
 ): Record<string, unknown> {
   const features: Record<string, unknown>[] = [];
 
@@ -767,6 +769,13 @@ function buildGeoJson(
     if (!coords) continue;
 
     const plantation = plantationMap.get(pl.plantation_uri);
+    const preferredName = plantation?.prefLabel ?? pl.observed_label;
+    const allNames = [
+      ...new Set([
+        ...(preferredName ? [preferredName] : []),
+        ...(plantationNames.get(pl.plantation_uri) ?? []),
+      ]),
+    ];
 
     features.push({
       type: 'Feature',
@@ -774,7 +783,8 @@ function buildGeoJson(
       geometry: { type: 'Polygon', coordinates: coords },
       properties: {
         fid: parseInt(pl.fid) || null,
-        name: plantation?.prefLabel ?? pl.observed_label,
+        name: preferredName,
+        allNames,
         status: plantation?.status ?? 'unknown',
         featureType: 'plantation',
         mapYear: pl.map_year,
@@ -792,6 +802,13 @@ function buildGeoJson(
     if (!coords) continue;
 
     const river = riverMap.get(rp.feature_uri);
+    const preferredName = river?.prefLabel ?? rp.observed_label;
+    const allNames = [
+      ...new Set([
+        ...(preferredName ? [preferredName] : []),
+        ...(riverNames.get(rp.feature_uri) ?? []),
+      ]),
+    ];
 
     features.push({
       type: 'Feature',
@@ -799,7 +816,8 @@ function buildGeoJson(
       geometry: { type: 'LineString', coordinates: coords },
       properties: {
         fid: parseInt(rp.fid) || null,
-        name: river?.prefLabel ?? rp.observed_label,
+        name: preferredName,
+        allNames,
         status: 'natural',
         featureType: river?.featureType ?? 'river',
         mapYear: rp.map_year,
@@ -999,12 +1017,35 @@ function main() {
   const jsonldMB = (Buffer.byteLength(jsonldStr) / 1024 / 1024).toFixed(1);
   console.log(`\nWrote ${jsonldPath} (${jsonldMB} MB)`);
 
+  // Build name text indexes for GeoJSON allNames
+  // plantationNames: plantation URI -> all E41 name texts
+  const plantationNames = new Map<string, string[]>();
+  for (const a of plantResult.e41) {
+    if (a.identifies_uri && a.symbolic_content) {
+      const list = plantationNames.get(a.identifies_uri) ?? [];
+      list.push(a.symbolic_content);
+      plantationNames.set(a.identifies_uri, list);
+    }
+  }
+
+  // riverNames: river feature URI -> all E41 name texts
+  const riverNames = new Map<string, string[]>();
+  for (const a of riverResult.e41) {
+    if (a.identifies_uri && a.symbolic_content) {
+      const list = riverNames.get(a.identifies_uri) ?? [];
+      list.push(a.symbolic_content);
+      riverNames.set(a.identifies_uri, list);
+    }
+  }
+
   // Write GeoJSON
   const geojson = buildGeoJson(
     plantResult.e53,
     plantationMap,
     riverResult.e53,
     riverMap,
+    plantationNames,
+    riverNames,
   );
   const geojsonPath = join(LOD_DIR, 'map-features.geojson');
   const geojsonStr = JSON.stringify(geojson, null, 2);

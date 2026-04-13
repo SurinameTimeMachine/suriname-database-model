@@ -9,10 +9,11 @@ import { useAuth } from '@/lib/auth';
 import { getActiveSources, useSourceRegistry } from '@/lib/sources';
 import { usePlaceTypes } from '@/lib/thesaurus';
 import type { GazetteerPlace } from '@/lib/types';
+import { getPreferredName } from '@/lib/types';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 type SortKey =
-  | 'prefLabel'
+  | 'name'
   | 'type'
   | 'district'
   | 'psurIds'
@@ -26,8 +27,7 @@ function emptyPlace(): GazetteerPlace {
   return {
     id: `stm-new-${Date.now()}`,
     type: 'settlement',
-    prefLabel: '',
-    altLabels: [],
+    names: [],
     broader: null,
     description: '',
     location: { lat: null, lng: null, wkt: null, crs: 'EPSG:4326' },
@@ -74,7 +74,7 @@ export default function PlacesPage() {
   const [typeFilter, setTypeFilter] = useState('all');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
-  const [sortKey, setSortKey] = useState<SortKey>('prefLabel');
+  const [sortKey, setSortKey] = useState<SortKey>('name');
   const [sortDir, setSortDir] = useState<SortDir>('asc');
   const [sourceFilter, setSourceFilter] =
     useState<SourceFilterState>(emptyFilterState());
@@ -135,8 +135,7 @@ export default function PlacesPage() {
       const q = search.toLowerCase();
       list = list.filter(
         (p) =>
-          p.prefLabel.toLowerCase().includes(q) ||
-          p.altLabels.some((a) => a.toLowerCase().includes(q)) ||
+          p.names.some((n) => n.text.toLowerCase().includes(q)) ||
           p.id.toLowerCase().includes(q) ||
           (p.externalLinks || []).some(
             (l) =>
@@ -162,8 +161,8 @@ export default function PlacesPage() {
         return String(va).localeCompare(String(vb)) * dir;
       };
       switch (sortKey) {
-        case 'prefLabel':
-          return cmp(a.prefLabel, b.prefLabel);
+        case 'name':
+          return cmp(getPreferredName(a), getPreferredName(b));
         case 'type':
           return cmp(a.type, b.type);
         case 'district':
@@ -389,7 +388,7 @@ export default function PlacesPage() {
                   <tr className="text-left text-xs text-stm-warm-500 border-b border-stm-warm-200">
                     {(
                       [
-                        ['prefLabel', 'Name'],
+                        ['name', 'Name'],
                         ['type', 'Type'],
                         ['district', 'District'],
                         ['placeType', 'Product / Type'],
@@ -432,10 +431,17 @@ export default function PlacesPage() {
                     >
                       {/* Name */}
                       <td className="py-1.5 px-2 font-medium text-stm-warm-800 max-w-55 truncate">
-                        {place.prefLabel}
-                        {place.altLabels.length > 0 && (
+                        {getPreferredName(place)}
+                        {place.names.filter((n) => !n.isPreferred).length >
+                          0 && (
                           <span className="text-[11px] text-stm-warm-400 ml-1 font-normal hidden xl:inline">
-                            ({place.altLabels.slice(0, 2).join(', ')})
+                            (
+                            {place.names
+                              .filter((n) => !n.isPreferred)
+                              .slice(0, 2)
+                              .map((n) => n.text)
+                              .join(', ')}
+                            )
                           </span>
                         )}
                       </td>

@@ -1,6 +1,7 @@
 import { hasRepoAccess, readRepoFile, writeRepoFile } from '@/lib/github';
 import { getSessionToken } from '@/lib/session';
 import type { GazetteerPlace } from '@/lib/types';
+import { getPreferredName } from '@/lib/types';
 import { readFileSync } from 'fs';
 import { NextRequest, NextResponse } from 'next/server';
 import { join } from 'path';
@@ -81,9 +82,14 @@ export async function POST(request: NextRequest) {
   const place: GazetteerPlace = await request.json();
 
   // Validate required fields
-  if (!place.id || !place.prefLabel || !place.type) {
+  if (
+    !place.id ||
+    !Array.isArray(place.names) ||
+    place.names.length === 0 ||
+    !place.type
+  ) {
     return NextResponse.json(
-      { error: 'Missing required fields: id, prefLabel, type' },
+      { error: 'Missing required fields: id, names (non-empty), type' },
       { status: 400 },
     );
   }
@@ -130,11 +136,13 @@ export async function POST(request: NextRequest) {
       gazetteer.push(entryWithLd);
     }
 
-    // Sort by type order from thesaurus then name
+    // Sort by type order from thesaurus then preferred name
     const typeOrder = loadTypeOrder();
     gazetteer.sort((a, b) => {
       const diff = (typeOrder[a.type] ?? 99) - (typeOrder[b.type] ?? 99);
-      return diff !== 0 ? diff : a.prefLabel.localeCompare(b.prefLabel);
+      return diff !== 0
+        ? diff
+        : getPreferredName(a).localeCompare(getPreferredName(b));
     });
 
     // Update @graph in the JSON-LD envelope
@@ -143,8 +151,8 @@ export async function POST(request: NextRequest) {
     // Commit to GitHub
     const commitMsg =
       idx >= 0
-        ? `Update place: ${place.prefLabel}`
-        : `Add place: ${place.prefLabel}`;
+        ? `Update place: ${getPreferredName(place)}`
+        : `Add place: ${getPreferredName(place)}`;
 
     await writeRepoFile(
       token,
@@ -222,7 +230,9 @@ export async function PUT(request: NextRequest) {
     const typeOrder = loadTypeOrder();
     gazetteer.sort((a, b) => {
       const diff = (typeOrder[a.type] ?? 99) - (typeOrder[b.type] ?? 99);
-      return diff !== 0 ? diff : a.prefLabel.localeCompare(b.prefLabel);
+      return diff !== 0
+        ? diff
+        : getPreferredName(a).localeCompare(getPreferredName(b));
     });
 
     jsonld['@graph'] = gazetteer;
@@ -232,7 +242,7 @@ export async function PUT(request: NextRequest) {
       GAZETTEER_PATH,
       JSON.stringify(jsonld, null, 2),
       sha,
-      `Merge update place: ${merged.prefLabel}`,
+      `Merge update place: ${getPreferredName(merged)}`,
     );
 
     return NextResponse.json({ ok: true, place: merged });
@@ -273,7 +283,7 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    const label = gazetteer[idx].prefLabel;
+    const label = getPreferredName(gazetteer[idx]);
     gazetteer.splice(idx, 1);
     jsonld['@graph'] = gazetteer;
 

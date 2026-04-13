@@ -6,8 +6,12 @@ import type {
   DiklandRef,
   ExternalLink,
   GazetteerPlace,
+  LanguageCode,
+  NameType,
+  PlaceName,
   SkosMatchType,
 } from '@/lib/types';
+import { getPreferredName } from '@/lib/types';
 import dynamic from 'next/dynamic';
 import { useCallback, useMemo, useState } from 'react';
 
@@ -359,11 +363,46 @@ export default function PlaceEditor({
   const [draft, setDraft] = useState<GazetteerPlace>({ ...place });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [altLabelInput, setAltLabelInput] = useState(
-    place.altLabels.join(', '),
-  );
   const [sourceDropdownOpen, setSourceDropdownOpen] = useState(false);
   const diklandRefs: DiklandRef[] = draft.diklandRefs ?? [];
+
+  // --- Name helpers ---
+  const updateName = (index: number, patch: Partial<PlaceName>) => {
+    setDraft((d) => {
+      const next = d.names.map((n, i) =>
+        i === index ? { ...n, ...patch } : n,
+      );
+      return { ...d, names: next };
+    });
+  };
+
+  const setPreferred = (index: number) => {
+    setDraft((d) => ({
+      ...d,
+      names: d.names.map((n, i) => ({ ...n, isPreferred: i === index })),
+    }));
+  };
+
+  const addName = () => {
+    const newName: PlaceName = {
+      text: '',
+      language: 'nl',
+      type: 'official',
+      isPreferred: draft.names.length === 0,
+    };
+    setDraft((d) => ({ ...d, names: [...d.names, newName] }));
+  };
+
+  const removeName = (index: number) => {
+    setDraft((d) => {
+      const next = d.names.filter((_, i) => i !== index);
+      // Ensure at least one preferred if any remain
+      if (next.length > 0 && !next.some((n) => n.isPreferred)) {
+        next[0] = { ...next[0], isPreferred: true };
+      }
+      return { ...d, names: next };
+    });
+  };
 
   const update = <K extends keyof GazetteerPlace>(
     key: K,
@@ -393,12 +432,7 @@ export default function PlaceEditor({
     setSaving(true);
     setError(null);
     try {
-      // Parse alt labels from comma-separated input
-      const altLabels = altLabelInput
-        .split(',')
-        .map((s) => s.trim())
-        .filter(Boolean);
-      await onSave({ ...draft, altLabels });
+      await onSave({ ...draft });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save');
     } finally {
@@ -430,37 +464,119 @@ export default function PlaceEditor({
       </div>
 
       <div className="p-5 space-y-4 max-h-[70vh] overflow-y-auto">
-        {/* Preferred Label */}
+        {/* Names */}
         <div>
-          <label className="block text-sm font-medium text-stm-warm-700 mb-1">
-            Preferred Label
-          </label>
-          <input
-            type="text"
-            value={draft.prefLabel}
-            onChange={(e) => update('prefLabel', e.target.value)}
-            disabled={!canEdit}
-            className="w-full px-3 py-2 border border-stm-warm-200 rounded text-sm bg-white focus:ring-2 focus:ring-stm-sepia-400 focus:border-stm-sepia-400 outline-none disabled:bg-stm-warm-50 disabled:text-stm-warm-400"
-          />
-        </div>
+          <div className="flex items-center justify-between mb-1">
+            <label className="text-sm font-medium text-stm-warm-700">
+              Names
+            </label>
+            {canEdit && (
+              <button
+                type="button"
+                onClick={addName}
+                className="text-xs text-stm-teal-600 hover:text-stm-teal-700 font-medium"
+              >
+                + Add name
+              </button>
+            )}
+          </div>
 
-        {/* Alternative Labels */}
-        <div>
-          <label className="block text-sm font-medium text-stm-warm-700 mb-1">
-            Alternative Labels
-            <span className="text-stm-warm-400 font-normal">
-              {' '}
-              (comma-separated)
-            </span>
-          </label>
-          <input
-            type="text"
-            value={altLabelInput}
-            onChange={(e) => setAltLabelInput(e.target.value)}
-            disabled={!canEdit}
-            placeholder="e.g. Geyers-Vlijt, Geyersvlijt"
-            className="w-full px-3 py-2 border border-stm-warm-200 rounded text-sm bg-white focus:ring-2 focus:ring-stm-sepia-400 focus:border-stm-sepia-400 outline-none disabled:bg-stm-warm-50"
-          />
+          {draft.names.length === 0 && (
+            <p className="text-xs text-stm-warm-400 italic">
+              No names yet.{canEdit ? ' Click "+ Add name" to add one.' : ''}
+            </p>
+          )}
+
+          <div className="space-y-2">
+            {draft.names.map((nm, i) => (
+              <div
+                key={i}
+                className={`border rounded p-2.5 space-y-2 ${
+                  nm.isPreferred
+                    ? 'border-stm-sepia-300 bg-stm-sepia-50'
+                    : 'border-stm-warm-200 bg-white'
+                }`}
+              >
+                {/* Name text */}
+                <input
+                  type="text"
+                  value={nm.text}
+                  onChange={(e) => updateName(i, { text: e.target.value })}
+                  disabled={!canEdit}
+                  placeholder="Name text"
+                  className="w-full px-2 py-1.5 border border-stm-warm-200 rounded text-sm bg-white focus:ring-1 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50 disabled:text-stm-warm-400"
+                />
+
+                {/* Language + Type + actions row */}
+                <div className="flex items-center gap-2 flex-wrap">
+                  {/* Language */}
+                  <select
+                    value={nm.language}
+                    onChange={(e) =>
+                      updateName(i, {
+                        language: e.target.value as LanguageCode,
+                      })
+                    }
+                    disabled={!canEdit}
+                    className="px-2 py-1 text-xs border border-stm-warm-200 rounded bg-white focus:ring-1 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50"
+                  >
+                    <option value="nl">Dutch (nl)</option>
+                    <option value="en">English (en)</option>
+                    <option value="srn">Sranan Tongo (srn)</option>
+                    <option value="und">Unknown (und)</option>
+                  </select>
+
+                  {/* Type */}
+                  <select
+                    value={nm.type}
+                    onChange={(e) =>
+                      updateName(i, { type: e.target.value as NameType })
+                    }
+                    disabled={!canEdit}
+                    className="px-2 py-1 text-xs border border-stm-warm-200 rounded bg-white focus:ring-1 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50"
+                  >
+                    <option value="official">Official name</option>
+                    <option value="historical">Historical name</option>
+                    <option value="vernacular">Vernacular name</option>
+                    <option value="variant">Variant spelling</option>
+                  </select>
+
+                  {/* Preferred radio */}
+                  {canEdit && (
+                    <label className="flex items-center gap-1 text-xs text-stm-warm-600 cursor-pointer select-none">
+                      <input
+                        type="radio"
+                        name="preferred-name"
+                        checked={nm.isPreferred}
+                        onChange={() => setPreferred(i)}
+                        className="accent-stm-sepia-600"
+                      />
+                      Preferred
+                    </label>
+                  )}
+                  {!canEdit && nm.isPreferred && (
+                    <span className="text-[10px] font-medium text-stm-sepia-600 bg-stm-sepia-100 px-1.5 py-0.5 rounded">
+                      Preferred
+                    </span>
+                  )}
+
+                  <div className="flex-1" />
+
+                  {/* Remove */}
+                  {canEdit && draft.names.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeName(i)}
+                      className="text-stm-warm-400 hover:text-red-500 text-xs"
+                      title="Remove name"
+                    >
+                      x
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Type + District row */}
@@ -507,7 +623,7 @@ export default function PlaceEditor({
               <option value="">-- None --</option>
               {districts.map((d) => (
                 <option key={d.id} value={d.id}>
-                  {d.prefLabel}
+                  {getPreferredName(d)}
                 </option>
               ))}
             </select>
@@ -1058,7 +1174,11 @@ export default function PlaceEditor({
           <div className="flex gap-2 pt-2">
             <button
               onClick={handleSave}
-              disabled={saving || !draft.prefLabel.trim()}
+              disabled={
+                saving ||
+                draft.names.length === 0 ||
+                !draft.names.some((n) => n.isPreferred && n.text.trim())
+              }
               className="px-4 py-2 bg-stm-sepia-600 text-white text-sm font-medium rounded hover:bg-stm-sepia-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {saving ? 'Saving...' : 'Save to GitHub'}
@@ -1075,7 +1195,7 @@ export default function PlaceEditor({
                 onClick={() => {
                   if (
                     confirm(
-                      `Delete "${draft.prefLabel}"? This cannot be undone.`,
+                      `Delete "${getPreferredName(draft)}"? This cannot be undone.`,
                     )
                   ) {
                     onDelete(place.id);
