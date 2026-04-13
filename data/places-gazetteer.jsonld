@@ -2741,14 +2741,15 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00597",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
+      "@id": "stm:place/stm-00597",
+      "@type": "E25_Human-Made_Feature",
       "id": "stm-00597",
       "type": "plantation",
       "prefLabel": "Adrichem",
-      "altLabels": [],
+      "altLabels": [
+        "Heide",
+        "Fiscari"
+      ],
       "broader": "stm-00008",
       "description": "",
       "location": {
@@ -2771,13 +2772,22 @@
       "locationDescription": "Matappica Kreek",
       "locationDescriptionOriginal": "Matappica-kreek, linkerhand in het opvaren",
       "placeType": "koffie en katoen",
-      "modifiedBy": null,
-      "modifiedAt": null,
+      "modifiedBy": "Thunnisvanoort",
+      "modifiedAt": "2026-04-13",
       "externalLinks": [
         {
           "authority": "wikidata",
           "identifier": "Q59115128",
           "matchType": "closeMatch"
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Adrichem 2005-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/drive/folders/0B88mZFitv8emS1hQN2JjNjl2NmM?tid=0B88mZFitv8emcjVfcG5hWFJOdWs&resourcekey=0-3bVNO9yHN3AcEqwuUzUrAw",
+          "author": "Philip Dikland",
+          "year": "2005-2008",
+          "notes": null
         }
       ]
     },
