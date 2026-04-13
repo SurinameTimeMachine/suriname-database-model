@@ -729,15 +729,65 @@ export default function PlaceEditor({
             <div className="space-y-1.5 mb-2">
               {(draft.externalLinks || []).map((link, i) => (
                 <div
-                  key={`${link.authority}-${link.identifier}`}
+                  key={i}
                   className="flex items-center gap-2 px-2.5 py-1.5 border border-stm-warm-200 rounded bg-white text-sm"
                 >
-                  <span className="text-stm-warm-500 font-medium text-xs w-16 shrink-0">
-                    {authorityLabel(link.authority)}
-                  </span>
-                  <span className="font-mono text-stm-warm-700 text-xs flex-1 truncate">
-                    {link.identifier}
-                  </span>
+                  {canEdit ? (
+                    /* Editable authority select */
+                    <select
+                      value={
+                        AUTHORITIES.find((a) => a.id === link.authority)
+                          ? link.authority
+                          : '_custom'
+                      }
+                      onChange={(e) => {
+                        const links = [...(draft.externalLinks || [])];
+                        links[i] = {
+                          ...links[i],
+                          authority:
+                            e.target.value === '_custom'
+                              ? link.authority
+                              : e.target.value,
+                        };
+                        update('externalLinks', links);
+                      }}
+                      className="text-xs px-1.5 py-0.5 border border-stm-warm-200 rounded bg-white focus:ring-1 focus:ring-stm-sepia-400 outline-none w-20 shrink-0"
+                    >
+                      {AUTHORITIES.map((a) => (
+                        <option key={a.id} value={a.id}>
+                          {a.label}
+                        </option>
+                      ))}
+                      <option value="_custom">Custom</option>
+                    </select>
+                  ) : (
+                    <span className="text-stm-warm-500 font-medium text-xs w-16 shrink-0">
+                      {authorityLabel(link.authority)}
+                    </span>
+                  )}
+
+                  {canEdit ? (
+                    /* Editable identifier */
+                    <input
+                      type="text"
+                      value={link.identifier}
+                      onChange={(e) => {
+                        const links = [...(draft.externalLinks || [])];
+                        links[i] = { ...links[i], identifier: e.target.value };
+                        update('externalLinks', links);
+                      }}
+                      placeholder={
+                        AUTHORITIES.find((a) => a.id === link.authority)
+                          ?.placeholder || 'Identifier / URI'
+                      }
+                      className="font-mono text-xs flex-1 min-w-0 px-1.5 py-0.5 border border-stm-warm-200 rounded bg-white focus:ring-1 focus:ring-stm-sepia-400 outline-none"
+                    />
+                  ) : (
+                    <span className="font-mono text-stm-warm-700 text-xs flex-1 truncate">
+                      {link.identifier}
+                    </span>
+                  )}
+
                   {canEdit ? (
                     <select
                       value={link.matchType}
@@ -889,20 +939,121 @@ export default function PlaceEditor({
                       </button>
                     )}
                   </summary>
-                  <div className="px-2.5 pb-2 pt-1 space-y-1 border-t border-stm-warm-100">
-                    <p className="text-[10px] text-stm-warm-500 font-mono break-all">
-                      {ref.folderPath}
-                    </p>
-                    {ref.author && (
-                      <p className="text-[10px] text-stm-warm-500">
-                        {ref.author}
-                        {ref.year ? `, ${ref.year}` : ''}
-                      </p>
-                    )}
-                    {ref.notes && (
-                      <p className="text-[10px] text-stm-warm-600 italic">
-                        {ref.notes}
-                      </p>
+                  <div className="px-2.5 pb-2 pt-1.5 space-y-1.5 border-t border-stm-warm-100">
+                    {canEdit ? (
+                      /* Editable fields */
+                      <>
+                        <div>
+                          <span className="text-[10px] text-stm-warm-500">
+                            Folder path
+                          </span>
+                          <input
+                            type="text"
+                            value={ref.folderPath}
+                            onChange={(e) => {
+                              const next = [...diklandRefs];
+                              next[i] = {
+                                ...next[i],
+                                folderPath: e.target.value,
+                              };
+                              update('diklandRefs', next);
+                            }}
+                            className="w-full mt-0.5 px-2 py-1 text-xs border border-stm-warm-200 rounded bg-white font-mono focus:ring-1 focus:ring-stm-sepia-400 outline-none"
+                          />
+                        </div>
+                        <div>
+                          <span className="text-[10px] text-stm-warm-500">
+                            Drive URL
+                          </span>
+                          <input
+                            type="text"
+                            value={ref.driveUrl}
+                            onChange={(e) => {
+                              const next = [...diklandRefs];
+                              next[i] = {
+                                ...next[i],
+                                driveUrl: e.target.value,
+                              };
+                              update('diklandRefs', next);
+                            }}
+                            className="w-full mt-0.5 px-2 py-1 text-xs border border-stm-warm-200 rounded bg-white font-mono focus:ring-1 focus:ring-stm-sepia-400 outline-none"
+                          />
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <span className="text-[10px] text-stm-warm-500">
+                              Author
+                            </span>
+                            <input
+                              type="text"
+                              value={ref.author ?? ''}
+                              onChange={(e) => {
+                                const next = [...diklandRefs];
+                                next[i] = {
+                                  ...next[i],
+                                  author: e.target.value || null,
+                                };
+                                update('diklandRefs', next);
+                              }}
+                              className="w-full mt-0.5 px-2 py-1 text-xs border border-stm-warm-200 rounded bg-white focus:ring-1 focus:ring-stm-sepia-400 outline-none"
+                            />
+                          </div>
+                          <div>
+                            <span className="text-[10px] text-stm-warm-500">
+                              Year
+                            </span>
+                            <input
+                              type="text"
+                              value={ref.year ?? ''}
+                              onChange={(e) => {
+                                const next = [...diklandRefs];
+                                next[i] = {
+                                  ...next[i],
+                                  year: e.target.value || null,
+                                };
+                                update('diklandRefs', next);
+                              }}
+                              className="w-full mt-0.5 px-2 py-1 text-xs border border-stm-warm-200 rounded bg-white font-mono focus:ring-1 focus:ring-stm-sepia-400 outline-none"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <span className="text-[10px] text-stm-warm-500">
+                            Notes
+                          </span>
+                          <textarea
+                            value={ref.notes ?? ''}
+                            onChange={(e) => {
+                              const next = [...diklandRefs];
+                              next[i] = {
+                                ...next[i],
+                                notes: e.target.value || null,
+                              };
+                              update('diklandRefs', next);
+                            }}
+                            rows={2}
+                            className="w-full mt-0.5 px-2 py-1 text-xs border border-stm-warm-200 rounded bg-white focus:ring-1 focus:ring-stm-sepia-400 outline-none resize-y"
+                          />
+                        </div>
+                      </>
+                    ) : (
+                      /* Read-only view */
+                      <>
+                        <p className="text-[10px] text-stm-warm-500 font-mono break-all">
+                          {ref.folderPath}
+                        </p>
+                        {ref.author && (
+                          <p className="text-[10px] text-stm-warm-500">
+                            {ref.author}
+                            {ref.year ? `, ${ref.year}` : ''}
+                          </p>
+                        )}
+                        {ref.notes && (
+                          <p className="text-[10px] text-stm-warm-600 italic">
+                            {ref.notes}
+                          </p>
+                        )}
+                      </>
                     )}
                   </div>
                 </details>
