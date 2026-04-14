@@ -17762,44 +17762,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01942",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01942",
-      "type": "plantation",
-      "prefLabel": "Elisabeth's hoop",
-      "altLabels": [],
-      "broader": null,
-      "description": "",
-      "location": {
-        "lat": 5.753956271666667,
-        "lng": -55.37039495333334,
-        "wkt": "Polygon ((-55.36819864 5.77578402, -55.37016010 5.73422850, -55.37026230 5.73198080, -55.37382472 5.73214505, -55.37172532 5.77381524, -55.36819864 5.77578402))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken"
-      ],
-      "wikidataQid": "Q59115549",
-      "fid": 3027,
-      "psurIds": [],
-      "district": null,
-      "locationDescription": "Beneden-Saramacca",
-      "locationDescriptionOriginal": "Rivier Saramacca, (beneden) linkerhand in het afvaren",
-      "placeType": "kost",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59115549",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-00541",
       "@type": [
         "E25_Human-Made_Feature"
@@ -73607,6 +73569,48 @@
       "names": [
         {
           "text": "Aan Anna's zorg",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01942",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01942",
+      "type": "plantation",
+      "broader": "stm-00011",
+      "description": "",
+      "location": {
+        "lat": 5.753956271666667,
+        "lng": -55.37039495333334,
+        "wkt": "Polygon ((-55.36819864 5.77578402, -55.37016010 5.73422850, -55.37026230 5.73198080, -55.37382472 5.73214505, -55.37172532 5.77381524, -55.36819864 5.77578402))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken"
+      ],
+      "wikidataQid": "Q59115549",
+      "fid": 3027,
+      "psurIds": [],
+      "district": null,
+      "locationDescription": "Beneden-Saramacca",
+      "locationDescriptionOriginal": "Rivier Saramacca, (beneden) linkerhand in het afvaren",
+      "placeType": "kost",
+      "modifiedBy": "Thunnisvanoort",
+      "modifiedAt": "2026-04-14",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59115549",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Elisabeth's hoop",
           "language": "nl",
           "type": "official",
           "isPreferred": true
