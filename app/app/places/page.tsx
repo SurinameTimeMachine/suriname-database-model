@@ -425,23 +425,28 @@ function PlacesPageInner() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updated),
       });
+      const data = await res.json();
       if (!res.ok) {
-        const data = await res.json();
         throw new Error(data.error || 'Failed to save');
       }
+      // Use the server response which includes modifiedBy/modifiedAt set by the API
+      if (!data.place?.modifiedBy || !data.place?.modifiedAt) {
+        throw new Error('Server response missing modifiedBy/modifiedAt');
+      }
+      const saved: GazetteerPlace = data.place;
       // Update local state
       setPlaces((prev) => {
-        const idx = prev.findIndex((p) => p.id === updated.id);
+        const idx = prev.findIndex((p) => p.id === saved.id);
         if (idx >= 0) {
           const next = [...prev];
-          next[idx] = updated;
+          next[idx] = saved;
           return next;
         }
-        return [...prev, updated];
+        return [...prev, saved];
       });
-      setSelectedIds([updated.id]);
+      setSelectedIds([saved.id]);
       setIsCreating(false);
-      syncUrlToSelection([updated.id]);
+      syncUrlToSelection([saved.id]);
     },
     [syncUrlToSelection],
   );
