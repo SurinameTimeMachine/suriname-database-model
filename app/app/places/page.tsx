@@ -418,6 +418,7 @@ function PlacesPageInner() {
     return counts;
   }, [places]);
 
+<<<<<<< HEAD
   const handleSave = useCallback(
     async (updated: GazetteerPlace) => {
       const res = await fetch('/api/places', {
@@ -445,6 +446,33 @@ function PlacesPageInner() {
     },
     [syncUrlToSelection],
   );
+=======
+  const handleSave = useCallback(async (updated: GazetteerPlace) => {
+    const res = await fetch('/api/places', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updated),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error || 'Failed to save');
+    }
+    // Use the server response which includes modifiedBy/modifiedAt set by the API
+    const saved: GazetteerPlace = data.place ?? updated;
+    // Update local state
+    setPlaces((prev) => {
+      const idx = prev.findIndex((p) => p.id === saved.id);
+      if (idx >= 0) {
+        const next = [...prev];
+        next[idx] = saved;
+        return next;
+      }
+      return [...prev, saved];
+    });
+    setSelectedId(saved.id);
+    setIsCreating(false);
+  }, []);
+>>>>>>> 32c9449 (fix: show modifications from all collaborators in places table)
 
   const handleCancel = useCallback(() => {
     setSelectedIds([]);

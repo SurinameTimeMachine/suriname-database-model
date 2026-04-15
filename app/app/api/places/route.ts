@@ -2,9 +2,26 @@ import { hasRepoAccess, readRepoFile, writeRepoFile } from '@/lib/github';
 import { getSessionToken } from '@/lib/session';
 import type { GazetteerPlace } from '@/lib/types';
 import { getPreferredName } from '@/lib/types';
-import { readFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 import { NextRequest, NextResponse } from 'next/server';
 import { join } from 'path';
+
+const PUBLIC_GAZETTEER = join(
+  process.cwd(),
+  'public',
+  'data',
+  'places-gazetteer.jsonld',
+);
+
+/** Best-effort sync of the public static copy so subsequent page loads
+ *  reflect the latest data without needing a full rebuild. */
+function syncPublicCopy(jsonldStr: string) {
+  try {
+    writeFileSync(PUBLIC_GAZETTEER, jsonldStr, 'utf-8');
+  } catch {
+    // Non-fatal: the GitHub copy is the source of truth
+  }
+}
 
 const THESAURUS_FILE = join(
   process.cwd(),
@@ -154,13 +171,9 @@ export async function POST(request: NextRequest) {
         ? `Update place: ${getPreferredName(place)}`
         : `Add place: ${getPreferredName(place)}`;
 
-    await writeRepoFile(
-      token,
-      GAZETTEER_PATH,
-      JSON.stringify(jsonld, null, 2),
-      sha,
-      commitMsg,
-    );
+    const jsonStr = JSON.stringify(jsonld, null, 2);
+    await writeRepoFile(token, GAZETTEER_PATH, jsonStr, sha, commitMsg);
+    syncPublicCopy(jsonStr);
 
     return NextResponse.json({ ok: true, place });
   } catch (err) {
@@ -237,13 +250,15 @@ export async function PUT(request: NextRequest) {
 
     jsonld['@graph'] = gazetteer;
 
+    const jsonStr = JSON.stringify(jsonld, null, 2);
     await writeRepoFile(
       token,
       GAZETTEER_PATH,
-      JSON.stringify(jsonld, null, 2),
+      jsonStr,
       sha,
       `Merge update place: ${getPreferredName(merged)}`,
     );
+    syncPublicCopy(jsonStr);
 
     return NextResponse.json({ ok: true, place: merged });
   } catch (err) {
@@ -287,13 +302,9 @@ export async function DELETE(request: NextRequest) {
     gazetteer.splice(idx, 1);
     jsonld['@graph'] = gazetteer;
 
-    await writeRepoFile(
-      token,
-      GAZETTEER_PATH,
-      JSON.stringify(jsonld, null, 2),
-      sha,
-      `Delete place: ${label}`,
-    );
+    const jsonStr = JSON.stringify(jsonld, null, 2);
+    await writeRepoFile(token, GAZETTEER_PATH, jsonStr, sha, `Delete place: ${label}`);
+    syncPublicCopy(jsonStr);
 
     return NextResponse.json({ ok: true });
   } catch (err) {
