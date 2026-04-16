@@ -2946,47 +2946,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-02057",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-02057",
-      "type": "plantation",
-      "prefLabel": "Akkerboom",
-      "altLabels": [],
-      "broader": "stm-00003",
-      "description": "",
-      "location": {
-        "lat": 5.836357413636364,
-        "lng": -54.94309205727272,
-        "wkt": "Polygon ((-54.94690467 5.83063557, -54.94709758 5.82951572, -54.95020289 5.82958622, -54.95003718 5.83203053, -54.94994502 5.83338841, -54.94580676 5.86092479, -54.93984838 5.85882539, -54.94307967 5.83265922, -54.92700590 5.83201337, -54.92717991 5.82971676, -54.94690467 5.83063557))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q3363363",
-      "fid": 3142,
-      "psurIds": [
-        "PSUR0005"
-      ],
-      "district": "Divisie Beneden-Commewijne",
-      "locationDescription": "Beneden-Commewijne",
-      "locationDescriptionOriginal": "Rivier Commewijne, (beneden) linkerhand in het afvaren",
-      "placeType": "koffie",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q3363363",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-00862",
       "@type": [
         "E25_Human-Made_Feature"
@@ -73449,6 +73408,60 @@
           "language": "nl",
           "type": "official",
           "isPreferred": true
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-02057",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-02057",
+      "type": "plantation",
+      "broader": "stm-00003",
+      "description": "",
+      "location": {
+        "lat": 5.836357413636364,
+        "lng": -54.94309205727272,
+        "wkt": "Polygon ((-54.94690467 5.83063557, -54.94709758 5.82951572, -54.95020289 5.82958622, -54.95003718 5.83203053, -54.94994502 5.83338841, -54.94580676 5.86092479, -54.93984838 5.85882539, -54.94307967 5.83265922, -54.92700590 5.83201337, -54.92717991 5.82971676, -54.94690467 5.83063557))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q3363363",
+      "fid": 3142,
+      "psurIds": [
+        "PSUR0005"
+      ],
+      "district": "Divisie Beneden-Commewijne",
+      "locationDescription": "Beneden-Commewijne",
+      "locationDescriptionOriginal": "Rivier Commewijne, (beneden) linkerhand in het afvaren",
+      "placeType": "koffie",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-16",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q3363363",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Akkerboom",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne river\\plantages\\Akerboom 2011-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/drive/u/0/folders/0B88mZFitv8embmZaYWFQNnZacDQ?tid=0B88mZFitv8emcjVfcG5hWFJOdWs&resourcekey=0-sImlF_DkEFu3ebWbDQ58Kg",
+          "author": "Philip Dikland",
+          "year": "2011",
+          "notes": null
         }
       ]
     },
