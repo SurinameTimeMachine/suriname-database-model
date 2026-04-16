@@ -73482,6 +73482,21 @@
           "language": "nl",
           "type": "official",
           "isPreferred": true
+        },
+        {
+          "text": "Makniri",
+          "language": "srn",
+          "type": "historical",
+          "isPreferred": false
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Alliance 2004-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/drive/u/0/folders/0B88mZFitv8embmZaYWFQNnZacDQ?tid=0B88mZFitv8emcjVfcG5hWFJOdWs&resourcekey=0-sImlF_DkEFu3ebWbDQ58Kg",
+          "author": "Philip Dikland",
+          "year": "2003, aangevuld 2004, 2010, 2011, 2012",
+          "notes": null
         }
       ]
     },
