@@ -10,8 +10,7 @@ import { getActiveSources, useSourceRegistry } from '@/lib/sources';
 import { usePlaceTypes } from '@/lib/thesaurus';
 import type { GazetteerPlace } from '@/lib/types';
 import { getPreferredName } from '@/lib/types';
-import { buildPlaceUrl } from '@/lib/url';
-import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import {
   memo,
   Suspense,
@@ -274,13 +273,9 @@ function PlacesPageInner() {
   const [sourceFilter, setSourceFilter] =
     useState<SourceFilterState>(emptyFilterState());
 
-  // URL sync: read path param /places/{id} or legacy ?place= query param
-  const params = useParams<{ id?: string[] }>();
+  // URL sync: read ?place= query param
   const searchParams = useSearchParams();
-  const router = useRouter();
   const initializedFromUrl = useRef(false);
-  // Path param from [[...id]] catch-all (first segment only)
-  const pathPlaceId = params.id?.[0] ?? null;
   const {
     sources: registrySources,
     categories: registryCategories,
@@ -310,26 +305,26 @@ function PlacesPageInner() {
   }, []);
 
   // Initialize selection from URL (once data is loaded)
-  // Priority: path param /places/{id} > legacy ?place= query param
   useEffect(() => {
     if (initializedFromUrl.current || places.length === 0) return;
     initializedFromUrl.current = true;
-    const placeId = pathPlaceId || searchParams.get('place');
+    const placeId = searchParams.get('place');
     if (placeId && places.some((p) => p.id === placeId)) {
       setSelectedIds([placeId]);
-      // If loaded via legacy ?place= param, redirect to path-based URL
-      if (!pathPlaceId && searchParams.get('place')) {
-        router.replace(buildPlaceUrl(placeId), { scroll: false });
-      }
     }
-  }, [places, pathPlaceId, searchParams, router]);
+  }, [places, searchParams]);
 
-  // Sync selectedIds to URL as path route (skip transient stm-new-* IDs)
-  // Uses replaceState to avoid Next.js re-rendering the page on every click
+  // Sync selectedIds to URL as ?place= query param (skip transient stm-new-* IDs)
   const syncUrlToSelection = useCallback((ids: string[]) => {
     const persistIds = ids.filter((id) => !id.startsWith('stm-new-'));
-    const newUrl = persistIds[0] ? buildPlaceUrl(persistIds[0]) : '/places';
-    window.history.replaceState(null, '', newUrl);
+    const params = new URLSearchParams(window.location.search);
+    if (persistIds[0]) {
+      params.set('place', persistIds[0]);
+    } else {
+      params.delete('place');
+    }
+    const qs = params.toString();
+    window.history.replaceState(null, '', qs ? `/places?${qs}` : '/places');
   }, []);
 
   const toggleSort = useCallback(

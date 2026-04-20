@@ -17,7 +17,7 @@ export const DEFAULT_ZOOM = 8;
 
 /* ─── Path-based URL builders ──────────────────────────────────── */
 export function buildPlaceUrl(id: string): string {
-  return `/places/${encodeURIComponent(id)}`;
+  return `/places?place=${encodeURIComponent(id)}`;
 }
 
 export function buildSourceUrl(sourceId: string): string {
