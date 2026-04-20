@@ -82113,38 +82113,6 @@
       "externalLinks": []
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-02649",
-      "@type": [
-        "E53_Place"
-      ],
-      "id": "stm-02649",
-      "type": "settlement",
-      "prefLabel": "Moengo",
-      "altLabels": [],
-      "broader": null,
-      "description": "1882: Aucaner dorp",
-      "location": {
-        "lat": 5.625886610761272,
-        "lng": -54.403425893838275,
-        "wkt": null,
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "map-1882"
-      ],
-      "wikidataQid": null,
-      "fid": 181,
-      "psurIds": [],
-      "district": null,
-      "locationDescription": null,
-      "locationDescriptionOriginal": null,
-      "placeType": null,
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": []
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02576",
       "@type": [
         "E53_Place"
@@ -84135,6 +84103,48 @@
       "names": [
         {
           "text": "Kabel",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-02649",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-02649",
+      "type": "settlement",
+      "broader": null,
+      "description": "1882: Aucaner dorp",
+      "location": {
+        "lat": 5.625886610761272,
+        "lng": -54.403425893838275,
+        "wkt": null,
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "map-1882"
+      ],
+      "wikidataQid": "Q24226",
+      "fid": 181,
+      "psurIds": [],
+      "district": null,
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": "Thunnisvanoort",
+      "modifiedAt": "2026-04-20",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q24226",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Moengo",
           "language": "nl",
           "type": "official",
           "isPreferred": true
