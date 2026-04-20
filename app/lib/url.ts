@@ -52,22 +52,28 @@ export interface ExploreParams {
   lng: number | null;
 }
 
+function parseFiniteNumber(
+  raw: string | null,
+  min?: number,
+  max?: number,
+): number | null {
+  if (raw == null || raw === '') return null;
+  const n = Number(raw);
+  if (!Number.isFinite(n)) return null;
+  if (min != null && n < min) return null;
+  if (max != null && n > max) return null;
+  return n;
+}
+
 export function parseExploreParams(
   searchParams: URLSearchParams,
 ): ExploreParams {
   const place = searchParams.get('place');
-  const zRaw = searchParams.get('z');
-  const latRaw = searchParams.get('lat');
-  const lngRaw = searchParams.get('lng');
-
-  const z = zRaw ? Number(zRaw) : null;
-  const lat = latRaw ? Number(latRaw) : null;
-  const lng = lngRaw ? Number(lngRaw) : null;
 
   return {
     place: place || null,
-    z: Number.isFinite(z) ? z : null,
-    lat: Number.isFinite(lat) && lat! >= -90 && lat! <= 90 ? lat : null,
-    lng: Number.isFinite(lng) && lng! >= -180 && lng! <= 180 ? lng : null,
+    z: parseFiniteNumber(searchParams.get('z'), 0, 22),
+    lat: parseFiniteNumber(searchParams.get('lat'), -90, 90),
+    lng: parseFiniteNumber(searchParams.get('lng'), -180, 180),
   };
 }
