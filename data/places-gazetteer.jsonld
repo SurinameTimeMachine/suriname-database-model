@@ -80259,37 +80259,6 @@
       "externalLinks": []
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-02707",
-      "@type": [
-        "E53_Place"
-      ],
-      "id": "stm-02707",
-      "type": "settlement",
-      "prefLabel": "Brownsweg",
-      "altLabels": [],
-      "broader": null,
-      "description": "",
-      "location": {
-        "lat": 5.0167968458030066,
-        "lng": -55.16583664429913,
-        "wkt": null,
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930"
-      ],
-      "wikidataQid": null,
-      "fid": 243,
-      "psurIds": [],
-      "district": null,
-      "locationDescription": null,
-      "locationDescriptionOriginal": null,
-      "placeType": null,
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": []
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02752",
       "@type": [
         "E53_Place"
@@ -83776,6 +83745,47 @@
       "modifiedBy": null,
       "modifiedAt": null,
       "externalLinks": []
+    },
+    {
+      "@id": "stm:place/stm-02707",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-02707",
+      "type": "settlement",
+      "broader": null,
+      "description": "",
+      "location": {
+        "lat": 5.0167968458030066,
+        "lng": -55.16583664429913,
+        "wkt": null,
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930"
+      ],
+      "wikidataQid": "Q927447",
+      "fid": 243,
+      "psurIds": [],
+      "district": null,
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": "Thunnisvanoort",
+      "modifiedAt": "2026-04-20",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q927447",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Brownsweg",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        }
+      ]
     },
     {
       "id": "stm-new-1776183306173",
