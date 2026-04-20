@@ -5221,47 +5221,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00670",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-00670",
-      "type": "plantation",
-      "prefLabel": "Bent's hoop",
-      "altLabels": [],
-      "broader": "stm-00004",
-      "description": "",
-      "location": {
-        "lat": 5.943792454444445,
-        "lng": -54.92912961555555,
-        "wkt": "Polygon ((-54.96172765 5.94293630, -54.96355528 5.94305488, -54.96302474 5.94944496, -54.90651200 5.94666677, -54.90509306 5.94477662, -54.90396494 5.94239304, -54.90051259 5.94233006, -54.89604863 5.93959316, -54.96172765 5.94293630))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q59115220",
-      "fid": 1753,
-      "psurIds": [
-        "PSUR0026"
-      ],
-      "district": "Divisie Beneden-Cottica",
-      "locationDescription": "Warappa Kreek",
-      "locationDescriptionOriginal": "Warrappa-kreek, linkerhand in het opvaren",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59115220",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02173",
       "@type": [
         "E25_Human-Made_Feature"
@@ -73573,6 +73532,66 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emWHBSZ2JyczZTRHM/view?usp=sharing&resourcekey=0-no1LG3q3ytTGrwZRnRG6TA",
           "author": "Philip Dikland",
           "year": "2002",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-00670",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-00670",
+      "type": "plantation",
+      "broader": "stm-00004",
+      "description": "",
+      "location": {
+        "lat": 5.943792454444445,
+        "lng": -54.92912961555555,
+        "wkt": "Polygon ((-54.96172765 5.94293630, -54.96355528 5.94305488, -54.96302474 5.94944496, -54.90651200 5.94666677, -54.90509306 5.94477662, -54.90396494 5.94239304, -54.90051259 5.94233006, -54.89604863 5.93959316, -54.96172765 5.94293630))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q59115220",
+      "fid": 1753,
+      "psurIds": [
+        "PSUR0026"
+      ],
+      "district": "Divisie Beneden-Cottica",
+      "locationDescription": "Warappa Kreek",
+      "locationDescriptionOriginal": "Warrappa-kreek, linkerhand in het opvaren",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-20",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59115220",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Bent's hoop",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "Limeshoopoe",
+          "language": "srn",
+          "type": "historical",
+          "isPreferred": false
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Bentshoop 2008-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emZ1QyT0VaekxJN2s/view?usp=sharing&resourcekey=0-GwWdehBVkUbc9fAI7pYs2A",
+          "author": "Philip Dikland",
+          "year": null,
           "notes": null
         }
       ]
