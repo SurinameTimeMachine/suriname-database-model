@@ -1320,13 +1320,12 @@ function ModelPageInner() {
     }
   }, [searchParams]);
 
-  // Sync entity selection to URL
   const handleSelectEntity = useCallback((id: string) => {
     setSelectedEntity(id);
     const entity = ENTITIES.find((e) => e.id === id);
     if (entity) {
       const params = new URLSearchParams(window.location.search);
-      params.set('entity', entity.id);
+      params.set('entity', entity.type);
       window.history.replaceState(null, '', `/model?${params.toString()}`);
     }
   }, []);
