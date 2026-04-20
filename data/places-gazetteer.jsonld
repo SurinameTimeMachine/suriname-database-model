@@ -5946,44 +5946,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01014",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01014",
-      "type": "plantation",
-      "prefLabel": "Bethlehem",
-      "altLabels": [],
-      "broader": "stm-00005",
-      "description": "",
-      "location": {
-        "lat": 5.698280583809525,
-        "lng": -54.724788626666665,
-        "wkt": "Polygon ((-54.73492112 5.69890739, -54.73027843 5.70282682, -54.72386453 5.69514195, -54.71109025 5.70622571, -54.70198336 5.71350652, -54.70574579 5.71787003, -54.70808924 5.72109827, -54.70408143 5.72457711, -54.70143873 5.72678018, -54.69296063 5.71590194, -54.70254441 5.70758184, -54.72917355 5.68491153, -54.73224869 5.68405970, -54.73837995 5.67622693, -54.74211662 5.67505313, -54.74420772 5.67664309, -54.74533410 5.67943350, -54.74524080 5.68332573, -54.74546202 5.68600861, -54.74647867 5.68890489, -54.73492112 5.69890739))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken"
-      ],
-      "wikidataQid": "Q59115236",
-      "fid": 2098,
-      "psurIds": [],
-      "district": "Divisie Boven-Commewijne",
-      "locationDescription": "Boven-Commewijne",
-      "locationDescriptionOriginal": "Rivier Commewijne, (boven) regterhand in het afvaren",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59115236",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-00699",
       "@type": [
         "E25_Human-Made_Feature"
@@ -73649,6 +73611,57 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emcUNianFwU1lnZGs/view?usp=sharing&resourcekey=0-1zqdqc-xZq1Py2gJs0g1og",
           "author": "Philip Dikland",
           "year": "2001, aangevuld 2015",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01014",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01014",
+      "type": "plantation",
+      "broader": "stm-00005",
+      "description": "",
+      "location": {
+        "lat": 5.698280583809525,
+        "lng": -54.724788626666665,
+        "wkt": "Polygon ((-54.73492112 5.69890739, -54.73027843 5.70282682, -54.72386453 5.69514195, -54.71109025 5.70622571, -54.70198336 5.71350652, -54.70574579 5.71787003, -54.70808924 5.72109827, -54.70408143 5.72457711, -54.70143873 5.72678018, -54.69296063 5.71590194, -54.70254441 5.70758184, -54.72917355 5.68491153, -54.73224869 5.68405970, -54.73837995 5.67622693, -54.74211662 5.67505313, -54.74420772 5.67664309, -54.74533410 5.67943350, -54.74524080 5.68332573, -54.74546202 5.68600861, -54.74647867 5.68890489, -54.73492112 5.69890739))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken"
+      ],
+      "wikidataQid": "Q59115236",
+      "fid": 2098,
+      "psurIds": [],
+      "district": "Divisie Boven-Commewijne",
+      "locationDescription": "Boven-Commewijne",
+      "locationDescriptionOriginal": "Rivier Commewijne, (boven) regterhand in het afvaren",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-20",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59115236",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Bethlehem",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Bethlehem 2005-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emUEN6Q2hqakgzZFE/view?usp=sharing&resourcekey=0-uxVurzCL-xLLa-TXI6NSdg",
+          "author": "Philip Dikland",
+          "year": "2005",
           "notes": null
         }
       ]
