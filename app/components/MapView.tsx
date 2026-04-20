@@ -1,21 +1,10 @@
 'use client';
 
 import 'leaflet/dist/leaflet.css';
-
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
-
-import L from 'leaflet';
-
+import type { GeoJSONCollection, GeoJSONFeature } from '@/lib/types';
 import { usePlaceTypes } from '@/lib/thesaurus';
-import type {
-  GeoJSONCollection,
-  GeoJSONFeature,
-} from '@/lib/types';
+import L from 'leaflet';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 const TRANSFORMATION_LABELS: Record<string, string> = {
   helmert: 'Helmert',
@@ -159,22 +148,6 @@ const OVERLAY_CONFIGS: OverlayConfig[] = [
     defaultEnabled: false,
     transformation: 'thinPlateSpline',
     gcpCount: 5,
-  },
-  {
-    id: 'historic-map-32-main',
-    label: 'Paramaribo main map 1916-17',
-    annotationUrl: 'https://annotations.allmaps.org/maps/a8b80690c8e2e4cb',
-    defaultEnabled: false,
-    transformation: 'thinPlateSpline',
-    gcpCount: '1 mask',
-  },
-  {
-    id: 'historic-map-32-districts',
-    label: 'Paramaribo districts 1916',
-    annotationUrl: 'https://annotations.allmaps.org/maps/5f85ef4e29065511',
-    defaultEnabled: false,
-    transformation: 'thinPlateSpline',
-    gcpCount: '1 mask',
   },
   {
     id: 'leiden-overview',
@@ -446,24 +419,6 @@ export default function MapView({
 
         // LineString features
         if (geomType === 'LineString') {
-          // Streets
-          if (ft === 'street') {
-            if (isSelected)
-              return { color: '#8c5d2e', weight: 3, opacity: 0.9 };
-            if (isHighlighted)
-              return {
-                color: '#e07850',
-                weight: 2.5,
-                opacity: 0.85,
-                dashArray: '6 3',
-              };
-            return {
-              color: '#b17f47',
-              weight: 2,
-              opacity: 0.75,
-            };
-          }
-
           // Roads
           if (ft === 'road') {
             if (isSelected)
@@ -869,7 +824,6 @@ export default function MapView({
                       const isLine =
                         ft === 'river' ||
                         ft === 'creek' ||
-                        ft === 'street' ||
                         ft === 'road' ||
                         ft === 'railroad';
                       const isPoly = ft === 'plantation';

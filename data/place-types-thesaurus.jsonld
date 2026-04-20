@@ -112,7 +112,6 @@
       "narrower": [
         "stm:vocabulary/place-type/plantation",
         "stm:vocabulary/place-type/military-post",
-        "stm:vocabulary/place-type/street",
         "stm:vocabulary/place-type/road",
         "stm:vocabulary/place-type/railroad",
         "stm:vocabulary/place-type/station",
@@ -262,32 +261,6 @@
       "sortOrder": 3,
       "created": "2026-04-07",
       "modified": "2026-04-07"
-    },
-    {
-      "@id": "stm:vocabulary/place-type/street",
-      "@type": [
-        "skos:Concept",
-        "crm:E55_Type"
-      ],
-      "prefLabel": {
-        "en": "Street",
-        "nl": "Straat"
-      },
-      "definition": {
-        "en": "An urban or town thoroughfare intended for local circulation and access."
-      },
-      "inScheme": "stm:vocabulary/place-type",
-      "broader": "stm:vocabulary/place-type/human-made",
-      "closeMatch": [
-        "http://www.wikidata.org/entity/Q79007"
-      ],
-      "typeId": "street",
-      "color": "#b17f47",
-      "crmClass": "E25_Human-Made_Feature",
-      "crmBadge": "E25",
-      "sortOrder": 12,
-      "created": "2026-04-20",
-      "modified": "2026-04-20"
     },
     {
       "@id": "stm:vocabulary/place-type/railroad",

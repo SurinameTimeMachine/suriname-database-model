@@ -1,9 +1,6 @@
 'use client';
 
-import {
-  useEffect,
-  useState,
-} from 'react';
+import { useEffect, useState } from 'react';
 
 // ---------- Types ----------
 
@@ -216,7 +213,6 @@ const FALLBACK_DATA: ThesaurusData = {
     { id: '', typeId: 'military-post', prefLabel: { en: 'Military Post' }, altLabels: {}, definition: {}, editorialNote: {}, historyNote: null, color: '#c0392b', crmClass: 'E25_Human-Made_Feature', crmBadge: 'E25', sortOrder: 2, broader: 'stm:vocabulary/place-type/human-made', related: [], exactMatch: [], closeMatch: [], created: null, modified: null },
     { id: '', typeId: 'road', prefLabel: { en: 'Road' }, altLabels: {}, definition: {}, editorialNote: {}, historyNote: null, color: '#a0522d', crmClass: 'E25_Human-Made_Feature', crmBadge: 'E25', sortOrder: 3, broader: 'stm:vocabulary/place-type/human-made', related: [], exactMatch: [], closeMatch: [], created: null, modified: null },
     { id: '', typeId: 'railroad', prefLabel: { en: 'Railroad' }, altLabels: {}, definition: {}, editorialNote: {}, historyNote: null, color: '#2c2c2c', crmClass: 'E25_Human-Made_Feature', crmBadge: 'E25', sortOrder: 4, broader: 'stm:vocabulary/place-type/human-made', related: [], exactMatch: [], closeMatch: [], created: null, modified: null },
-    { id: '', typeId: 'street', prefLabel: { en: 'Street' }, altLabels: {}, definition: {}, editorialNote: {}, historyNote: null, color: '#b17f47', crmClass: 'E25_Human-Made_Feature', crmBadge: 'E25', sortOrder: 12, broader: 'stm:vocabulary/place-type/human-made', related: [], exactMatch: [], closeMatch: [], created: null, modified: null },
     { id: '', typeId: 'station', prefLabel: { en: 'Station' }, altLabels: {}, definition: {}, editorialNote: {}, historyNote: null, color: '#2c3e50', crmClass: 'E25_Human-Made_Feature', crmBadge: 'E25', sortOrder: 5, broader: 'stm:vocabulary/place-type/human-made', related: [], exactMatch: [], closeMatch: [], created: null, modified: null },
     { id: '', typeId: 'settlement', prefLabel: { en: 'Settlement' }, altLabels: {}, definition: {}, editorialNote: {}, historyNote: null, color: '#8b7355', crmClass: 'E25_Human-Made_Feature', crmBadge: 'E25', sortOrder: 6, broader: 'stm:vocabulary/place-type/human-made', related: [], exactMatch: [], closeMatch: [], created: null, modified: null },
     { id: '', typeId: 'town', prefLabel: { en: 'Town' }, altLabels: {}, definition: {}, editorialNote: {}, historyNote: null, color: '#d4a853', crmClass: 'E25_Human-Made_Feature', crmBadge: 'E25', sortOrder: 7, broader: 'stm:vocabulary/place-type/settlement', related: [], exactMatch: [], closeMatch: [], created: null, modified: null },

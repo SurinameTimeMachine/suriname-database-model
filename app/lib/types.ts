@@ -211,7 +211,6 @@ export type PlaceType =
   | 'indigenous-village'
   | 'maroon-village'
   | 'town'
-  | 'street'
   | 'road'
   | 'railroad';
 

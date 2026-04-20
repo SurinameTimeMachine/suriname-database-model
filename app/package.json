@@ -9,8 +9,7 @@
     "generate": "tsx scripts/generate-database.ts",
     "prepare-data": "tsx scripts/prepare-data.ts",
     "pipeline": "tsx scripts/generate-database.ts && tsx scripts/prepare-data.ts",
-    "seed-gazetteer": "tsx scripts/seed-gazetteer.ts",
-    "import-streets-1916": "tsx scripts/import-streets-paramaribo-1916.ts"
+    "seed-gazetteer": "tsx scripts/seed-gazetteer.ts"
   },
   "keywords": [],
   "author": "",
