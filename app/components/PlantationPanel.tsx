@@ -328,219 +328,41 @@ export default function PlantationPanel({
 
   if (!feature || !data) return null;
 
-  // E26 Physical Feature (river/creek) — simple detail view
-  if (feature.geometry.type === 'LineString') {
-    const props = feature.properties;
-    const ft = props.featureType || 'river';
-    const featureUri = props.featureUri ?? props.placeUri ?? '';
-    const physicalFeature = data.physicalFeatures?.[featureUri];
-    const crmBadge = PLACE_TYPE_CRM_BADGE[ft] || 'E26';
-    const typeLabel = PLACE_TYPE_LABELS[ft] || ft;
-    const biasInfo = biasTypes[ft];
-    return (
-      <div className="absolute top-0 right-0 w-105 h-full bg-stm-warm-50 shadow-xl z-1001 flex flex-col border-l border-stm-warm-300">
-        <div className="px-4 py-3 border-b border-stm-warm-300 bg-white">
-          <div className="flex items-start justify-between">
-            <div className="min-w-0 pr-2">
-              <h2 className="text-base font-bold text-stm-warm-900 font-serif leading-tight">
-                {props.name || 'Unknown'}
-              </h2>
-              <p className="text-[11px] text-stm-warm-400 font-mono mt-0.5">
-                <Badge type={crmBadge} /> {typeLabel}
-              </p>
-            </div>
-            <button
-              onClick={onClose}
-              className="w-7 h-7 flex items-center justify-center hover:bg-stm-warm-100 text-stm-warm-400 hover:text-stm-warm-600 transition-colors shrink-0"
-              aria-label="Close detail panel"
-            >
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 14 14"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-              >
-                <path d="M2 2l10 10M12 2L2 12" strokeLinecap="round" />
-              </svg>
-            </button>
-          </div>
-        </div>
-        <div className="flex-1 overflow-y-auto px-4 py-3 space-y-0">
-          {biasInfo && (
-            <div className="mb-2 px-2 py-1.5 bg-amber-50 border border-amber-200 text-xs text-amber-800">
-              <span className="font-medium">Colonial terminology note:</span>{' '}
-              {biasInfo.editorialNote}
-              {biasInfo.altTerms.length > 0 && (
-                <span className="block mt-0.5 text-amber-600 text-[10px]">
-                  Historical terms: {biasInfo.altTerms.join(', ')}
-                </span>
-              )}
-            </div>
-          )}
-          <CrmField
-            label="Type"
-            crmClass="E55"
-            property="P2 has type"
-            value={typeLabel}
-          />
-          {props.mainBodyWater && (
-            <CrmField
-              label="Main body"
-              crmClass="E26"
-              property="mainBodyWater"
-              value={props.mainBodyWater}
-            />
-          )}
-          {physicalFeature?.prefLabel && (
-            <CrmField
-              label="Preferred name"
-              crmClass="E41"
-              property="P1 is identified by"
-              value={physicalFeature.prefLabel}
-            />
-          )}
-          {props.mapYear && (
-            <CrmField
-              label="Map Year"
-              crmClass="E52"
-              property="P4 has time-span"
-              value={props.mapYear}
-            />
-          )}
-          <CrmField
-            label="Feature URI"
-            crmClass={crmBadge}
-            property="@id"
-            value={featureUri}
-            mono
-          />
-        </div>
-      </div>
-    );
-  }
-
-  // Point features (settlements, military posts, stations, villages, towns) — gazetteer detail view
-  if (feature.geometry.type === 'Point') {
-    const props = feature.properties;
-    const ft = props.featureType || 'settlement';
-    const crmBadge = PLACE_TYPE_CRM_BADGE[ft] || 'E53';
-    const typeLabel = PLACE_TYPE_LABELS[ft] || ft;
-    const color = PLACE_TYPE_COLORS[ft] || '#888';
-    const biasInfo = biasTypes[ft];
-    const coords = feature.geometry.coordinates as number[];
-    return (
-      <div className="absolute top-0 right-0 w-105 h-full bg-stm-warm-50 shadow-xl z-1001 flex flex-col border-l border-stm-warm-300">
-        <div className="px-4 py-3 border-b border-stm-warm-300 bg-white">
-          <div className="flex items-start justify-between">
-            <div className="min-w-0 pr-2">
-              <h2 className="text-base font-bold text-stm-warm-900 font-serif leading-tight flex items-center gap-2">
-                <span
-                  className="w-3 h-3 rounded-full inline-block shrink-0"
-                  style={{ backgroundColor: color }}
-                />
-                {props.name || 'Unknown'}
-              </h2>
-              <p className="text-[11px] text-stm-warm-400 font-mono mt-0.5">
-                <Badge type={crmBadge} /> {typeLabel}
-              </p>
-            </div>
-            <button
-              onClick={onClose}
-              className="w-7 h-7 flex items-center justify-center hover:bg-stm-warm-100 text-stm-warm-400 hover:text-stm-warm-600 transition-colors shrink-0"
-              aria-label="Close detail panel"
-            >
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 14 14"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-              >
-                <path d="M2 2l10 10M12 2L2 12" strokeLinecap="round" />
-              </svg>
-            </button>
-          </div>
-        </div>
-        <div className="flex-1 overflow-y-auto px-4 py-3 space-y-0">
-          {biasInfo && (
-            <div className="mb-2 px-2 py-1.5 bg-amber-50 border border-amber-200 text-xs text-amber-800">
-              <span className="font-medium">Colonial terminology note:</span>{' '}
-              {biasInfo.editorialNote}
-              {biasInfo.altTerms.length > 0 && (
-                <span className="block mt-0.5 text-amber-600 text-[10px]">
-                  Historical terms: {biasInfo.altTerms.join(', ')}
-                </span>
-              )}
-            </div>
-          )}
-          <CrmField
-            label="Type"
-            crmClass="E55"
-            property="P2 has type"
-            value={typeLabel}
-          />
-          <CrmField
-            label="Feature ID"
-            crmClass="E42"
-            property="P48 has preferred identifier"
-            value={props.fid}
-            mono
-          />
-          {props.mapYear && (
-            <CrmField
-              label="Map Year"
-              crmClass="E52"
-              property="P4 has time-span"
-              value={props.mapYear}
-            />
-          )}
-          {coords.length >= 2 && (
-            <CrmField
-              label="Coordinates"
-              crmClass="E53"
-              property="geo:asWKT"
-              value={`${coords[1].toFixed(5)}, ${coords[0].toFixed(5)}`}
-              mono
-            />
-          )}
-          {props.placeUri && (
-            <CrmField
-              label="Place URI"
-              crmClass={crmBadge}
-              property="@id"
-              value={props.placeUri}
-              mono
-            />
-          )}
-        </div>
-      </div>
-    );
-  }
-
   const toggle = (id: string) =>
     setOpenSections((s) => ({ ...s, [id]: !s[id] }));
 
   const props = feature.properties;
-  const plantationUri = props.plantationUri!;
-  const plantation = data.plantations[plantationUri] as
-    | E25Plantation
-    | undefined;
+  const ft = props.featureType || 'plantation';
+  const crmBadge = PLACE_TYPE_CRM_BADGE[ft] || 'E25';
+  const typeLabel = PLACE_TYPE_LABELS[ft] || ft;
+  const color = PLACE_TYPE_COLORS[ft] || '#888';
+  const biasInfo = biasTypes[ft];
+
+  // Resolve linked entities — works for all feature types
+  const plantationUri = props.plantationUri ?? null;
+  const plantation = plantationUri
+    ? (data.plantations[plantationUri] as E25Plantation | undefined)
+    : undefined;
+
+  const featureUri = props.featureUri ?? props.placeUri ?? '';
+  const physicalFeature = data.physicalFeatures?.[featureUri];
+
   const orgUri = props.organizationQid
     ? `http://www.wikidata.org/entity/${props.organizationQid}`
     : plantation?.P52_has_current_owner;
   const organization = orgUri
     ? (data.organizations[orgUri] as E74Organization | undefined)
     : undefined;
-  const place = props.placeUri
-    ? (data.places[props.placeUri] as E53Place | undefined)
+
+  const placeUri = props.placeUri ?? null;
+  const place = placeUri
+    ? (data.places[placeUri] as E53Place | undefined)
     : undefined;
 
   // Appellations for both E25 and E74
-  const plantationApps = (data.appellations[plantationUri] ||
-    []) as E41Appellation[];
+  const plantationApps = plantationUri
+    ? ((data.appellations[plantationUri] || []) as E41Appellation[])
+    : [];
   const orgApps = orgUri
     ? ((data.appellations[orgUri] || []) as E41Appellation[])
     : [];
@@ -590,9 +412,28 @@ export default function PlantationPanel({
     if (p) provRecords.push({ label: 'Location (E53)', record: p });
   }
 
+  // Coordinates (for display in the Location section)
+  const coords =
+    feature.geometry.type === 'Point'
+      ? (feature.geometry.coordinates as number[])
+      : feature.geometry.type === 'Polygon'
+        ? (feature.geometry.coordinates as number[][][]).flat().flat()
+        : [];
+
+  // URI label for the header subtitle
+  const headerUri = plantationUri || featureUri || placeUri || '';
+
   function scrollToSection(section: string) {
     const el = sectionRefs.current[section];
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function NoDataPlaceholder() {
+    return (
+      <p className="text-[11px] text-stm-warm-300 italic px-4 pb-3">
+        No data yet
+      </p>
+    );
   }
 
   return (
@@ -601,11 +442,20 @@ export default function PlantationPanel({
       <div className="px-4 py-3 border-b border-stm-warm-300 bg-white">
         <div className="flex items-start justify-between">
           <div className="min-w-0 pr-2">
-            <h2 className="text-base font-bold text-stm-warm-900 font-serif leading-tight">
+            <h2 className="text-base font-bold text-stm-warm-900 font-serif leading-tight flex items-center gap-2">
+              {feature.geometry.type === 'Point' && (
+                <span
+                  className="w-3 h-3 rounded-full inline-block shrink-0"
+                  style={{ backgroundColor: color }}
+                />
+              )}
               {props.name || 'Unknown'}
             </h2>
             <p className="text-[11px] text-stm-warm-400 font-mono mt-0.5">
-              {uriLabel(plantationUri)}
+              <Badge type={crmBadge} /> {typeLabel}
+              {headerUri && (
+                <span className="ml-1.5">{uriLabel(headerUri)}</span>
+              )}
             </p>
           </div>
           <button
@@ -629,6 +479,19 @@ export default function PlantationPanel({
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto">
+        {/* Colonial terminology note */}
+        {biasInfo && (
+          <div className="mx-4 mt-3 mb-1 px-2 py-1.5 bg-amber-50 border border-amber-200 text-xs text-amber-800">
+            <span className="font-medium">Colonial terminology note:</span>{' '}
+            {biasInfo.editorialNote}
+            {biasInfo.altTerms.length > 0 && (
+              <span className="block mt-0.5 text-amber-600 text-[10px]">
+                Historical terms: {biasInfo.altTerms.join(', ')}
+              </span>
+            )}
+          </div>
+        )}
+
         {/* Entity Graph */}
         <div className="px-4 py-3 bg-white border-b border-stm-warm-200">
           <p className="text-[10px] font-semibold text-stm-warm-400 uppercase tracking-wider mb-1.5">
@@ -642,84 +505,140 @@ export default function PlantationPanel({
             sources={sources}
             observationCount={observations.length}
             onNodeClick={scrollToSection}
+            centerNode={
+              !plantation
+                ? { label: props.name || 'Unknown', crmType: crmBadge }
+                : undefined
+            }
           />
         </div>
 
         <div className="divide-y divide-stm-warm-200">
-          {/* Plantation (E25 Human-Made Feature) */}
+          {/* Feature / Plantation (E25 or E26) */}
           <div>
             <SectionHeader
               id="plantation"
-              title="Plantation"
-              badge="E25"
+              title={
+                plantation
+                  ? 'Plantation'
+                  : physicalFeature
+                    ? 'Physical Feature'
+                    : 'Feature'
+              }
+              badge={crmBadge}
               open={openSections.plantation}
               onToggle={() => toggle('plantation')}
               refs={sectionRefs}
             />
-            {openSections.plantation && (
-              <div className="px-4 pb-3 space-y-0">
-                <p className="text-[9px] text-stm-warm-300 font-mono mb-1">
-                  E25 Human-Made Feature
-                </p>
-                <CrmField
-                  label="Name"
-                  crmClass="E41"
-                  property="P1 is identified by"
-                  value={plantation?.prefLabel}
-                />
-                <CrmField
-                  label="Status"
-                  crmClass="E55"
-                  property="P2 has type"
-                  value={plantation?.status}
-                />
-                <CrmField
-                  label="Owner"
-                  crmClass="E74"
-                  property="P52 has current owner"
-                  value={organization?.prefLabel}
-                />
-                <CrmField
-                  label="Location"
-                  crmClass="E53"
-                  property="P53 has location"
-                  value={
-                    place?.observedLabel || (place ? `fid-${place.fid}` : null)
-                  }
-                />
-                {plantation?.['depictedOnMap'] && (
-                  <div className="mt-1.5">
-                    <span className="text-[10px] text-stm-warm-400 uppercase tracking-wider">
-                      P138i has representation
-                    </span>
-                    <div className="flex gap-1 mt-1 flex-wrap">
-                      {plantation['depictedOnMap'].map((m, i) => (
-                        <span
-                          key={i}
-                          className="bg-white text-stm-sepia-700 border border-stm-sepia-200 px-1.5 py-0.5 text-[10px]"
-                        >
-                          {m.mapId} &mdash; &ldquo;{m.labelOnMap}&rdquo;
-                        </span>
-                      ))}
+            {openSections.plantation &&
+              (plantation ? (
+                <div className="px-4 pb-3 space-y-0">
+                  <p className="text-[9px] text-stm-warm-300 font-mono mb-1">
+                    E25 Human-Made Feature
+                  </p>
+                  <CrmField
+                    label="Name"
+                    crmClass="E41"
+                    property="P1 is identified by"
+                    value={plantation.prefLabel}
+                  />
+                  <CrmField
+                    label="Status"
+                    crmClass="E55"
+                    property="P2 has type"
+                    value={plantation.status}
+                  />
+                  <CrmField
+                    label="Owner"
+                    crmClass="E74"
+                    property="P52 has current owner"
+                    value={organization?.prefLabel}
+                  />
+                  <CrmField
+                    label="Location"
+                    crmClass="E53"
+                    property="P53 has location"
+                    value={
+                      place?.observedLabel ||
+                      (place ? `fid-${place.fid}` : null)
+                    }
+                  />
+                  {plantation['depictedOnMap'] && (
+                    <div className="mt-1.5">
+                      <span className="text-[10px] text-stm-warm-400 uppercase tracking-wider">
+                        P138i has representation
+                      </span>
+                      <div className="flex gap-1 mt-1 flex-wrap">
+                        {plantation['depictedOnMap'].map((m, i) => (
+                          <span
+                            key={i}
+                            className="bg-white text-stm-sepia-700 border border-stm-sepia-200 px-1.5 py-0.5 text-[10px]"
+                          >
+                            {m.mapId} &mdash; &ldquo;{m.labelOnMap}&rdquo;
+                          </span>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            )}
+                  )}
+                </div>
+              ) : (
+                <div className="px-4 pb-3 space-y-0">
+                  <p className="text-[9px] text-stm-warm-300 font-mono mb-1">
+                    {crmBadge === 'E26'
+                      ? 'E26 Physical Feature'
+                      : `${crmBadge} Feature`}
+                  </p>
+                  <CrmField
+                    label="Name"
+                    crmClass="E41"
+                    property="P1 is identified by"
+                    value={physicalFeature?.prefLabel || props.name}
+                  />
+                  <CrmField
+                    label="Type"
+                    crmClass="E55"
+                    property="P2 has type"
+                    value={typeLabel}
+                  />
+                  {props.mainBodyWater && (
+                    <CrmField
+                      label="Main body"
+                      crmClass="E26"
+                      property="mainBodyWater"
+                      value={props.mainBodyWater}
+                    />
+                  )}
+                  <CrmField
+                    label="Feature ID"
+                    crmClass="E42"
+                    property="P48 has preferred identifier"
+                    value={props.fid}
+                    mono
+                  />
+                  {props.mapYear && (
+                    <CrmField
+                      label="Map Year"
+                      crmClass="E52"
+                      property="P4 has time-span"
+                      value={props.mapYear}
+                    />
+                  )}
+                </div>
+              ))}
           </div>
 
           {/* Organization (E74) */}
-          {organization && (
-            <div>
-              <SectionHeader
-                id="organization"
-                title="Organization"
-                badge="E74"
-                open={openSections.organization}
-                onToggle={() => toggle('organization')}
-                refs={sectionRefs}
-              />
-              {openSections.organization && (
+          <div>
+            <SectionHeader
+              id="organization"
+              title="Organization"
+              badge="E74"
+              open={openSections.organization}
+              onToggle={() => toggle('organization')}
+              refs={sectionRefs}
+            />
+            {openSections.organization &&
+              (organization ? (
                 <div className="px-4 pb-3 space-y-0">
                   <p className="text-[9px] text-stm-warm-300 font-mono mb-1">
                     P52 has current owner
@@ -751,22 +670,23 @@ export default function PlantationPanel({
                     }
                   />
                 </div>
-              )}
-            </div>
-          )}
+              ) : (
+                <NoDataPlaceholder />
+              ))}
+          </div>
 
           {/* Location (E53) */}
-          {place && (
-            <div>
-              <SectionHeader
-                id="place"
-                title="Location"
-                badge="E53"
-                open={openSections.place}
-                onToggle={() => toggle('place')}
-                refs={sectionRefs}
-              />
-              {openSections.place && (
+          <div>
+            <SectionHeader
+              id="place"
+              title="Location"
+              badge="E53"
+              open={openSections.place}
+              onToggle={() => toggle('place')}
+              refs={sectionRefs}
+            />
+            {openSections.place &&
+              (place ? (
                 <div className="px-4 pb-3 space-y-0">
                   <p className="text-[9px] text-stm-warm-300 font-mono mb-1">
                     P53 has location
@@ -800,24 +720,46 @@ export default function PlantationPanel({
                         : null
                     }
                   />
+                  {feature.geometry.type === 'Point' && coords.length >= 2 && (
+                    <CrmField
+                      label="Coordinates"
+                      crmClass="E53"
+                      property="geo:asWKT"
+                      value={`${coords[1].toFixed(5)}, ${coords[0].toFixed(5)}`}
+                      mono
+                    />
+                  )}
                 </div>
-              )}
-            </div>
-          )}
+              ) : (
+                <div className="px-4 pb-3 space-y-0">
+                  {feature.geometry.type === 'Point' && coords.length >= 2 ? (
+                    <CrmField
+                      label="Coordinates"
+                      crmClass="E53"
+                      property="geo:asWKT"
+                      value={`${coords[1].toFixed(5)}, ${coords[0].toFixed(5)}`}
+                      mono
+                    />
+                  ) : (
+                    <NoDataPlaceholder />
+                  )}
+                </div>
+              ))}
+          </div>
 
           {/* Timeline — annual observations from the Almanakken */}
-          {sortedObservations.length > 0 && (
-            <div>
-              <SectionHeader
-                id="sources"
-                title="Timeline"
-                badge="E13"
-                open={openSections.sources}
-                onToggle={() => toggle('sources')}
-                refs={sectionRefs}
-                count={sortedObservations.length}
-              />
-              {openSections.sources && (
+          <div>
+            <SectionHeader
+              id="sources"
+              title="Timeline"
+              badge="E13"
+              open={openSections.sources}
+              onToggle={() => toggle('sources')}
+              refs={sectionRefs}
+              count={sortedObservations.length || undefined}
+            />
+            {openSections.sources &&
+              (sortedObservations.length > 0 ? (
                 <div className="px-3 pb-3">
                   <p className="text-[10px] text-stm-warm-400 mb-2">
                     Annual observations from Surinaamse Almanakken
@@ -828,23 +770,24 @@ export default function PlantationPanel({
                     ))}
                   </div>
                 </div>
-              )}
-            </div>
-          )}
+              ) : (
+                <NoDataPlaceholder />
+              ))}
+          </div>
 
           {/* Sources */}
-          {sources.length > 0 && (
-            <div>
-              <SectionHeader
-                id="sources-ref"
-                title="Sources"
-                badge="E22"
-                open={openSections['sources-ref'] ?? false}
-                onToggle={() => toggle('sources-ref')}
-                refs={sectionRefs}
-                count={sources.length}
-              />
-              {openSections['sources-ref'] && (
+          <div>
+            <SectionHeader
+              id="sources-ref"
+              title="Sources"
+              badge="E22"
+              open={openSections['sources-ref'] ?? false}
+              onToggle={() => toggle('sources-ref')}
+              refs={sectionRefs}
+              count={sources.length || undefined}
+            />
+            {openSections['sources-ref'] &&
+              (sources.length > 0 ? (
                 <div className="px-4 pb-3 space-y-1.5">
                   {sources.map((src) => (
                     <div
@@ -865,22 +808,23 @@ export default function PlantationPanel({
                     </div>
                   ))}
                 </div>
-              )}
-            </div>
-          )}
+              ) : (
+                <NoDataPlaceholder />
+              ))}
+          </div>
 
           {/* Provenance */}
-          {provRecords.length > 0 && (
-            <div>
-              <SectionHeader
-                id="provenance"
-                title="Provenance"
-                badge="PROV"
-                open={openSections.provenance ?? false}
-                onToggle={() => toggle('provenance')}
-                refs={sectionRefs}
-              />
-              {openSections.provenance && (
+          <div>
+            <SectionHeader
+              id="provenance"
+              title="Provenance"
+              badge="PROV"
+              open={openSections.provenance ?? false}
+              onToggle={() => toggle('provenance')}
+              refs={sectionRefs}
+            />
+            {openSections.provenance &&
+              (provRecords.length > 0 ? (
                 <div className="px-4 pb-3">
                   {provRecords.map(({ label, record }) => (
                     <div key={record['@id']} className="mb-2">
@@ -891,9 +835,10 @@ export default function PlantationPanel({
                     </div>
                   ))}
                 </div>
-              )}
-            </div>
-          )}
+              ) : (
+                <NoDataPlaceholder />
+              ))}
+          </div>
         </div>
       </div>
     </div>

@@ -19,6 +19,11 @@ import {
 } from 'd3-force';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+interface CenterNodeDescriptor {
+  label: string;
+  crmType: string; // "E25", "E26", "E53", etc.
+}
+
 interface EntityGraphProps {
   plantation: E25Plantation | null;
   organization: E74Organization | null;
@@ -27,6 +32,8 @@ interface EntityGraphProps {
   sources: E22Source[];
   observationCount: number;
   onNodeClick: (section: string) => void;
+  /** When plantation is null, use this to define the center node */
+  centerNode?: CenterNodeDescriptor;
 }
 
 interface GraphNode extends SimulationNodeDatum {
@@ -50,7 +57,8 @@ const CX = WIDTH / 2;
 const CY = HEIGHT / 2;
 
 function buildGraph(
-  plantation: E25Plantation,
+  center: { label: string; crmType: string },
+  plantation: E25Plantation | null,
   organization: E74Organization | null,
   place: E53Place | null,
   appellations: E41Appellation[],
@@ -60,13 +68,16 @@ function buildGraph(
   const nodes: GraphNode[] = [];
   const links: GraphLink[] = [];
 
-  // E25 center (plantation) -- fixed
+  const centerType = center.crmType;
+  const centerId = centerType.toLowerCase();
+
+  // Center node (plantation E25, physical feature E26, or place E53, etc.) -- fixed
   nodes.push({
-    id: 'e25',
-    label: plantation.prefLabel,
-    type: 'E25',
+    id: centerId,
+    label: center.label,
+    type: centerType,
     section: 'plantation',
-    color: CRM_COLORS.E25,
+    color: CRM_COLORS[centerType] || CRM_COLORS.E25,
     radius: 28,
     x: CX,
     y: CY,
@@ -88,14 +99,14 @@ function buildGraph(
       y: CY,
     });
     links.push({
-      source: 'e25',
+      source: centerId,
       target: 'e74',
       label: 'P52 has current owner',
     });
   }
 
-  // E53
-  if (place) {
+  // E53 — skip if center is already E53
+  if (place && centerType !== 'E53') {
     nodes.push({
       id: 'e53',
       label: `fid-${place.fid}`,
@@ -107,7 +118,7 @@ function buildGraph(
       y: CY + 100,
     });
     links.push({
-      source: 'e25',
+      source: centerId,
       target: 'e53',
       label: 'P53 has location',
     });
@@ -133,7 +144,7 @@ function buildGraph(
     });
     const identifiesOrg = app.P1i_identifies?.includes('wikidata');
     links.push({
-      source: identifiesOrg ? 'e74' : 'e25',
+      source: identifiesOrg ? 'e74' : centerId,
       target: `e41-${i}`,
       label: 'P1 is identified by',
     });
@@ -153,10 +164,10 @@ function buildGraph(
       x: CX + 120 + i * 30,
       y: CY - 90 + i * 40,
     });
-    // Sources carry appellations -- link to E25 plantation via P128/P138 chain
+    // Sources carry appellations -- link to center via P128/P138 chain
     links.push({
       source: `e22-src-${i}`,
-      target: 'e25',
+      target: centerId,
       label: 'P128/P138',
     });
   }
@@ -230,6 +241,7 @@ export default function EntityGraph({
   sources,
   observationCount,
   onNodeClick,
+  centerNode,
 }: EntityGraphProps) {
   const [simulatedNodes, setSimulatedNodes] = useState<GraphNode[]>([]);
   const [simulatedLinks, setSimulatedLinks] = useState<GraphLink[]>([]);
@@ -244,9 +256,17 @@ export default function EntityGraph({
   );
   const svgRef = useRef<SVGSVGElement>(null);
 
+  // Derive center descriptor: use plantation if available, otherwise fall back to explicit centerNode
+  const center = useMemo(() => {
+    if (plantation) return { label: plantation.prefLabel, crmType: 'E25' };
+    if (centerNode) return centerNode;
+    return null;
+  }, [plantation, centerNode]);
+
   const graph = useMemo(() => {
-    if (!plantation) return null;
+    if (!center) return null;
     return buildGraph(
+      center,
       plantation,
       organization,
       place,
@@ -255,6 +275,7 @@ export default function EntityGraph({
       observationCount,
     );
   }, [
+    center,
     plantation,
     organization,
     place,
@@ -350,7 +371,7 @@ export default function EntityGraph({
     simRef.current.alphaTarget(0);
   }, [dragNode]);
 
-  if (!plantation) return null;
+  if (!center) return null;
 
   return (
     <div className="relative">
