@@ -6823,47 +6823,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00594",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-00594",
-      "type": "plantation",
-      "prefLabel": "Bodenburg",
-      "altLabels": [],
-      "broader": "stm-00004",
-      "description": "",
-      "location": {
-        "lat": 5.921503679411764,
-        "lng": -54.88455042882352,
-        "wkt": "Polygon ((-54.89386060 5.92773825, -54.88956761 5.92726733, -54.86737640 5.92571004, -54.86790533 5.92112119, -54.86933022 5.91882846, -54.87374033 5.91848633, -54.87872529 5.91940723, -54.88189138 5.91913724, -54.88438876 5.91747292, -54.88766789 5.91677811, -54.88925805 5.91737469, -54.89153774 5.91893323, -54.89111529 5.92019624, -54.89120087 5.92121306, -54.89253058 5.92318200, -54.89340035 5.92497798, -54.89386060 5.92773825))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q59115278",
-      "fid": 1677,
-      "psurIds": [
-        "PSUR0037"
-      ],
-      "district": "Divisie Beneden-Cottica",
-      "locationDescription": "Matappica Kreek",
-      "locationDescriptionOriginal": "Matappica-kreek, linkerhand in het opvaren",
-      "placeType": "koffie",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59115278",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02362",
       "@type": [
         "E25_Human-Made_Feature"
@@ -73675,6 +73634,66 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emU0dkN0RudDRza3M/view?usp=sharing&resourcekey=0-iKmpotMi0QUwM7bx818o4w",
           "author": "Philip Dikland",
           "year": "2004",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-00594",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-00594",
+      "type": "plantation",
+      "broader": "stm-00004",
+      "description": "",
+      "location": {
+        "lat": 5.921503679411764,
+        "lng": -54.88455042882352,
+        "wkt": "Polygon ((-54.89386060 5.92773825, -54.88956761 5.92726733, -54.86737640 5.92571004, -54.86790533 5.92112119, -54.86933022 5.91882846, -54.87374033 5.91848633, -54.87872529 5.91940723, -54.88189138 5.91913724, -54.88438876 5.91747292, -54.88766789 5.91677811, -54.88925805 5.91737469, -54.89153774 5.91893323, -54.89111529 5.92019624, -54.89120087 5.92121306, -54.89253058 5.92318200, -54.89340035 5.92497798, -54.89386060 5.92773825))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q59115278",
+      "fid": 1677,
+      "psurIds": [
+        "PSUR0037"
+      ],
+      "district": "Divisie Beneden-Cottica",
+      "locationDescription": "Matappica Kreek",
+      "locationDescriptionOriginal": "Matappica-kreek, linkerhand in het opvaren",
+      "placeType": "koffie",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-20",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59115278",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Bodenburg",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "Saffyn",
+          "language": "srn",
+          "type": "historical",
+          "isPreferred": false
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Bodenburg 2005-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emV2NBY1JweVZUQWs/view?usp=sharing&resourcekey=0-xR2GcRFSY5HlfywHy8zqlA",
+          "author": "Philip Dikland",
+          "year": "2005",
           "notes": null
         }
       ]
