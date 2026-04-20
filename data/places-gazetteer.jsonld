@@ -73351,7 +73351,7 @@
       "locationDescriptionOriginal": "Rivier Commewijne, (beneden) linkerhand in het afvaren",
       "placeType": "suiker",
       "modifiedBy": "GerDijkstra",
-      "modifiedAt": "2026-04-16",
+      "modifiedAt": "2026-04-20",
       "externalLinks": [
         {
           "authority": "wikidata",
@@ -73377,6 +73377,15 @@
           "language": "nl",
           "type": "historical",
           "isPreferred": false
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Alkmaar 2001-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emalV0RUY2WkpvZWc/view?usp=drive_link&resourcekey=0-ePew4aZ_EWtKwcLGMfZDCA",
+          "author": "Philip Dikland",
+          "year": "2001, aangevuld 2004, 2008, 2017",
+          "notes": null
         }
       ]
     },
