@@ -18,6 +18,8 @@ import type {
   OrganizationObservation,
   ProvenanceRecord,
 } from '@/lib/types';
+import { extractPlaceId } from '@/lib/url';
+import Link from 'next/link';
 import { useRef, useState } from 'react';
 import EntityGraph from './EntityGraph';
 import ProvenanceChain from './ProvenanceChain';
@@ -457,6 +459,20 @@ export default function PlantationPanel({
                 <span className="ml-1.5">{uriLabel(headerUri)}</span>
               )}
             </p>
+            {(() => {
+              const pid = extractPlaceId(plantationUri || featureUri || placeUri || '');
+              return pid ? (
+                <Link
+                  href={`/places?place=${pid}`}
+                  className="inline-flex items-center gap-1 mt-1 text-[11px] text-stm-teal-600 hover:text-stm-teal-700 hover:underline"
+                >
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                  Edit in gazetteer
+                </Link>
+              ) : null;
+            })()}
           </div>
           <button
             onClick={onClose}
