@@ -83847,6 +83847,52 @@
       ]
     },
     {
+      "id": "stm-new-1776691745741",
+      "type": "settlement",
+      "names": [
+        {
+          "text": "Soekibaka",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "Soeki-baka",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": false
+        }
+      ],
+      "broader": null,
+      "description": "",
+      "location": {
+        "lat": 4.384054320462455,
+        "lng": -55.783415454574055,
+        "wkt": null,
+        "crs": "EPSG:4326"
+      },
+      "sources": [],
+      "wikidataQid": null,
+      "externalLinks": [
+        {
+          "authority": "geonames",
+          "identifier": "https://www.geonames.org/3383040/soekibaka.html",
+          "matchType": "closeMatch"
+        }
+      ],
+      "fid": null,
+      "psurIds": [],
+      "district": null,
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "diklandRefs": [],
+      "modifiedBy": "Thunnisvanoort",
+      "modifiedAt": "2026-04-20",
+      "@id": "stm:place/stm-new-1776691745741",
+      "@type": "E25_Human-Made_Feature"
+    },
+    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02530",
       "@type": [
         "E53_Place"
