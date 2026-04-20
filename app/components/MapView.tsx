@@ -274,9 +274,9 @@ export default function MapView({
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
-    let timer: ReturnType<typeof setTimeout>;
+    let timer: ReturnType<typeof setTimeout> | undefined;
     const handler = () => {
-      clearTimeout(timer);
+      if (timer) clearTimeout(timer);
       timer = setTimeout(() => {
         const c = map.getCenter();
         onViewportChangeRef.current?.([c.lat, c.lng], map.getZoom());
@@ -284,7 +284,7 @@ export default function MapView({
     };
     map.on('moveend', handler);
     return () => {
-      clearTimeout(timer);
+      if (timer) clearTimeout(timer);
       map.off('moveend', handler);
     };
   }, []);
