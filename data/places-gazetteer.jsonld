@@ -103062,37 +103062,6 @@
       "externalLinks": []
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00481",
-      "@type": [
-        "E26_Physical_Feature"
-      ],
-      "id": "stm-00481",
-      "type": "creek",
-      "prefLabel": "Wittiwatra Kreek",
-      "altLabels": [],
-      "broader": null,
-      "description": "Creek segment of Cottica (QGIS 1930 map)",
-      "location": {
-        "lat": 5.528495760799999,
-        "lng": -54.25642503280002,
-        "wkt": "LineString (-54.23867418 5.54285976, -54.24062270 5.54278670, -54.24131371 5.54229523, -54.24286521 5.54291331, -54.24506279 5.54101423, -54.24717438 5.54114279, -54.24856720 5.53991182, -54.25117314 5.53807945, -54.25283358 5.53820021, -54.25385749 5.53856380, -54.25489430 5.53784842, -54.25549230 5.53504040, -54.25716451 5.53207039, -54.25919893 5.52996960, -54.26009044 5.52733207, -54.26213097 5.52563936, -54.26303210 5.52364312, -54.26299588 5.51929936, -54.26394202 5.51642774, -54.26569773 5.51514750, -54.26581336 5.51316311, -54.26717070 5.51054768, -54.26920369 5.50835937, -54.27078845 5.50539061, -54.27086606 5.50474799)",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930"
-      ],
-      "wikidataQid": null,
-      "fid": 748,
-      "psurIds": [],
-      "district": null,
-      "locationDescription": "Cottica",
-      "locationDescriptionOriginal": null,
-      "placeType": "creek",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": []
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-00180",
       "@type": [
         "E26_Physical_Feature"
@@ -103272,6 +103241,47 @@
       "names": [
         {
           "text": "Sara Kreek",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-00481",
+      "@type": "E26_Physical_Feature",
+      "id": "stm-00481",
+      "type": "creek",
+      "broader": null,
+      "description": "Creek segment of Cottica (QGIS 1930 map)",
+      "location": {
+        "lat": 5.528495760799999,
+        "lng": -54.25642503280002,
+        "wkt": "LineString (-54.23867418 5.54285976, -54.24062270 5.54278670, -54.24131371 5.54229523, -54.24286521 5.54291331, -54.24506279 5.54101423, -54.24717438 5.54114279, -54.24856720 5.53991182, -54.25117314 5.53807945, -54.25283358 5.53820021, -54.25385749 5.53856380, -54.25489430 5.53784842, -54.25549230 5.53504040, -54.25716451 5.53207039, -54.25919893 5.52996960, -54.26009044 5.52733207, -54.26213097 5.52563936, -54.26303210 5.52364312, -54.26299588 5.51929936, -54.26394202 5.51642774, -54.26569773 5.51514750, -54.26581336 5.51316311, -54.26717070 5.51054768, -54.26920369 5.50835937, -54.27078845 5.50539061, -54.27086606 5.50474799)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930"
+      ],
+      "wikidataQid": "Q34924652",
+      "fid": 748,
+      "psurIds": [],
+      "district": null,
+      "locationDescription": "Cottica",
+      "locationDescriptionOriginal": null,
+      "placeType": "creek",
+      "modifiedBy": "Thunnisvanoort",
+      "modifiedAt": "2026-04-20",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q34924652",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Wittiwatra Kreek",
           "language": "nl",
           "type": "official",
           "isPreferred": true
