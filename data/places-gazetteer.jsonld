@@ -25568,44 +25568,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01001",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01001",
-      "type": "plantation",
-      "prefLabel": "Klarenbeek",
-      "altLabels": [],
-      "broader": null,
-      "description": "",
-      "location": {
-        "lat": 5.601425783846154,
-        "lng": -54.67210979076923,
-        "wkt": "Polygon ((-54.65388866 5.61408565, -54.65551547 5.58739437, -54.66224975 5.59108058, -54.66357194 5.58932553, -54.66654402 5.59127399, -54.67469464 5.59535751, -54.68144447 5.59856428, -54.68213872 5.59949497, -54.68656425 5.60561696, -54.68660402 5.60781009, -54.68572948 5.61059713, -54.68459320 5.61384848, -54.65388866 5.61408565))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken"
-      ],
-      "wikidataQid": "Q59116806",
-      "fid": 2085,
-      "psurIds": [],
-      "district": null,
-      "locationDescription": "Boven-Commewijne",
-      "locationDescriptionOriginal": "Rivier Commewijne (boven), regterhand",
-      "placeType": null,
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59116806",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02349",
       "@type": [
         "E25_Human-Made_Feature"
@@ -73947,6 +73909,57 @@
           "language": "nl",
           "type": "variant",
           "isPreferred": false
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01001",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01001",
+      "type": "plantation",
+      "broader": null,
+      "description": "",
+      "location": {
+        "lat": 5.601425783846154,
+        "lng": -54.67210979076923,
+        "wkt": "Polygon ((-54.65388866 5.61408565, -54.65551547 5.58739437, -54.66224975 5.59108058, -54.66357194 5.58932553, -54.66654402 5.59127399, -54.67469464 5.59535751, -54.68144447 5.59856428, -54.68213872 5.59949497, -54.68656425 5.60561696, -54.68660402 5.60781009, -54.68572948 5.61059713, -54.68459320 5.61384848, -54.65388866 5.61408565))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken"
+      ],
+      "wikidataQid": "Q59116806",
+      "fid": 2085,
+      "psurIds": [],
+      "district": null,
+      "locationDescription": "Boven-Commewijne",
+      "locationDescriptionOriginal": "Rivier Commewijne (boven), regterhand",
+      "placeType": null,
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-20",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59116806",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Klarenbeek",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Clarenbeek en Nimmerdorr 2005-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emOE1zN2pjRHQxcnc/view?usp=sharing&resourcekey=0-nfSrRIpI5inws9Q9kLXe_g",
+          "author": "Philip Dikland",
+          "year": "2005, aangevuld 2010",
+          "notes": null
         }
       ]
     },
