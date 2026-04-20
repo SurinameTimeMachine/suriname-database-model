@@ -184,6 +184,9 @@ interface MapViewProps {
   panelOpen: boolean;
   onSelectPlantation: (feature: GeoJSONFeature) => void;
   onHighlightName: (name: string) => void;
+  initialCenter?: [number, number];
+  initialZoom?: number;
+  onViewportChange?: (center: [number, number], zoom: number) => void;
 }
 
 export default function MapView({
@@ -193,6 +196,9 @@ export default function MapView({
   panelOpen,
   onSelectPlantation,
   onHighlightName,
+  initialCenter,
+  initialZoom,
+  onViewportChange,
 }: MapViewProps) {
   const mapRef = useRef<L.Map | null>(null);
   const layerRef = useRef<L.GeoJSON | null>(null);
@@ -237,8 +243,8 @@ export default function MapView({
     if (mapRef.current || !containerRef.current) return;
 
     const map = L.map(containerRef.current, {
-      center: [5.5, -55.2],
-      zoom: 8,
+      center: initialCenter ?? [5.5, -55.2],
+      zoom: initialZoom ?? 8,
       zoomControl: false,
       zoomAnimation: false,
     });
@@ -259,6 +265,27 @@ export default function MapView({
       warpedLayersRef.current.clear();
       map.remove();
       mapRef.current = null;
+    };
+  }, []);
+
+  // Notify parent of viewport changes (debounced to avoid flooding)
+  const onViewportChangeRef = useRef(onViewportChange);
+  onViewportChangeRef.current = onViewportChange;
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    let timer: ReturnType<typeof setTimeout>;
+    const handler = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        const c = map.getCenter();
+        onViewportChangeRef.current?.([c.lat, c.lng], map.getZoom());
+      }, 1500);
+    };
+    map.on('moveend', handler);
+    return () => {
+      clearTimeout(timer);
+      map.off('moveend', handler);
     };
   }, []);
 

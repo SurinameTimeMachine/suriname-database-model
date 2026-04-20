@@ -8,7 +8,9 @@ import type {
   PlaceTypeConcept,
   ThesaurusScheme,
 } from '@/lib/thesaurus';
-import { useEffect, useState } from 'react';
+import { buildVocabularyUrl } from '@/lib/url';
+import { useParams, useRouter } from 'next/navigation';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/lib/auth';
 
 export default function VocabularyPage() {
@@ -18,6 +20,12 @@ export default function VocabularyPage() {
   const [loading, setLoading] = useState(true);
   const [selectedConcept, setSelectedConcept] = useState<string | null>(null);
   const [activeView, setActiveView] = useState<'browser' | 'editor'>('browser');
+
+  // URL sync: read path param /vocabulary/{typeId}
+  const params = useParams<{ typeId?: string[] }>();
+  const router = useRouter();
+  const initializedFromUrl = useRef(false);
+  const pathTypeId = params.typeId?.[0] ?? null;
 
 
   useEffect(() => {
@@ -30,6 +38,25 @@ export default function VocabularyPage() {
       })
       .finally(() => setLoading(false));
   }, []);
+
+  // Initialize selected concept from URL path (once concepts are loaded)
+  useEffect(() => {
+    if (initializedFromUrl.current || concepts.length === 0) return;
+    initializedFromUrl.current = true;
+    if (pathTypeId && concepts.some((c) => c.typeId === pathTypeId)) {
+      setSelectedConcept(pathTypeId);
+    }
+  }, [concepts, pathTypeId]);
+
+  // Sync selected concept to URL
+  const handleSelectConcept = useCallback(
+    (typeId: string | null) => {
+      setSelectedConcept(typeId);
+      const newUrl = typeId ? buildVocabularyUrl(typeId) : '/vocabulary';
+      router.replace(newUrl, { scroll: false });
+    },
+    [router],
+  );
 
   if (loading) {
     return (
@@ -185,7 +212,7 @@ export default function VocabularyPage() {
                             <div key={child.typeId}>
                               <button
                                 type="button"
-                                onClick={() => setSelectedConcept(child.typeId)}
+                                onClick={() => handleSelectConcept(child.typeId)}
                                 className={`w-full text-left pl-8 pr-4 py-2 border-b border-stm-warm-100 hover:bg-stm-warm-50 transition-colors flex items-center gap-2 ${
                                   selectedConcept === child.typeId
                                     ? 'bg-stm-sepia-50 border-l-2 border-l-stm-sepia-500'
@@ -209,7 +236,7 @@ export default function VocabularyPage() {
                                 <button
                                   key={sub.typeId}
                                   type="button"
-                                  onClick={() => setSelectedConcept(sub.typeId)}
+                                  onClick={() => handleSelectConcept(sub.typeId)}
                                   className={`w-full text-left pl-14 pr-4 py-1.5 border-b border-stm-warm-100 hover:bg-stm-warm-50 transition-colors flex items-center gap-2 ${
                                     selectedConcept === sub.typeId
                                       ? 'bg-stm-sepia-50 border-l-2 border-l-stm-sepia-500'
@@ -356,7 +383,7 @@ export default function VocabularyPage() {
                                 <button
                                   key={uri}
                                   onClick={() =>
-                                    rel && setSelectedConcept(rel.typeId)
+                                    rel && handleSelectConcept(rel.typeId)
                                   }
                                   className="inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-stm-warm-100 text-stm-warm-600 rounded hover:bg-stm-warm-200 transition-colors"
                                 >

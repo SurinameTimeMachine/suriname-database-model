@@ -1,15 +1,17 @@
 'use client';
 
+import { useAuth } from '@/lib/auth';
 import {
-  type Source,
-  type SourceCategory,
   getActiveSources,
   getFutureSources,
   getSourcesByCategory,
+  type Source,
+  type SourceCategory,
   useSourceRegistry,
 } from '@/lib/sources';
-import { useState } from 'react';
-import { useAuth } from '@/lib/auth';
+import { buildSourceUrl } from '@/lib/url';
+import { useParams, useRouter } from 'next/navigation';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 function sortedCategories(categories: SourceCategory[]): SourceCategory[] {
   return [...categories].sort((a, b) => {
@@ -29,6 +31,36 @@ export default function SourcesPage() {
   const { canEdit } = useAuth();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
+
+  // URL sync: read path param /sources/{sourceId}
+  const params = useParams<{ sourceId?: string[] }>();
+  const router = useRouter();
+  const initializedFromUrl = useRef(false);
+  const pathSourceId = params.sourceId?.[0] ?? null;
+
+  // Initialize expanded source from URL path (once sources are loaded)
+  useEffect(() => {
+    if (initializedFromUrl.current || sources.length === 0) return;
+    initializedFromUrl.current = true;
+    if (pathSourceId && sources.some((s) => s.sourceId === pathSourceId)) {
+      setExpandedSource(pathSourceId);
+      // Scroll to the source after a brief delay for DOM render
+      requestAnimationFrame(() => {
+        const el = document.getElementById(`source-${pathSourceId}`);
+        el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+    }
+  }, [sources, pathSourceId]);
+
+  // Sync expandedSource to URL
+  const handleToggleSource = useCallback(
+    (sourceId: string | null) => {
+      setExpandedSource(sourceId);
+      const newUrl = sourceId ? buildSourceUrl(sourceId) : '/sources';
+      router.replace(newUrl, { scroll: false });
+    },
+    [router],
+  );
 
   if (loading) {
     return (
@@ -149,7 +181,7 @@ export default function SourcesPage() {
                   category={cat}
                   sources={catSources}
                   expandedSource={expandedSource}
-                  onToggle={setExpandedSource}
+                  onToggle={handleToggleSource}
                   variant="active"
                   canEdit={canEdit}
                   editingId={editingId}
@@ -194,7 +226,7 @@ export default function SourcesPage() {
                     category={cat}
                     sources={catSources}
                     expandedSource={expandedSource}
-                    onToggle={setExpandedSource}
+                    onToggle={handleToggleSource}
                     variant="future"
                     canEdit={canEdit}
                     editingId={editingId}
@@ -317,6 +349,7 @@ function SourceCard({
 
   return (
     <div
+      id={`source-${source.sourceId}`}
       className={`border rounded-lg transition-colors ${
         isFuture
           ? 'border-stm-warm-150 bg-stm-warm-50/50'

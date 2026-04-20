@@ -1,7 +1,8 @@
 'use client';
 
 import { CRM_COLORS } from '@/lib/data';
-import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 /* ─── Helpers ──────────────────────────────────────────────────── */
 
@@ -1280,12 +1281,47 @@ function TemporalModelSection() {
 
 /* ─── Main Page ────────────────────────────────────────────────── */
 export default function ModelPage() {
+  return (
+    <Suspense>
+      <ModelPageInner />
+    </Suspense>
+  );
+}
+
+function ModelPageInner() {
+  const searchParams = useSearchParams();
   const [counts, setCounts] = useState<EntityCounts | null>(null);
   const [selectedEntity, setSelectedEntity] = useState<string | null>('e25');
   const [hoveredRelation, setHoveredRelation] = useState<number | null>(null);
+  const initializedFromUrl = useRef(false);
 
   useEffect(() => {
     fetchCounts().then(setCounts);
+  }, []);
+
+  // Initialize from ?entity= param (once, after mount)
+  useEffect(() => {
+    if (initializedFromUrl.current) return;
+    initializedFromUrl.current = true;
+    const entityParam = searchParams.get('entity');
+    if (entityParam) {
+      // Accept both "E25" and "e25" formats
+      const id = entityParam.toLowerCase();
+      if (ENTITIES.some((e) => e.id === id)) {
+        setSelectedEntity(id);
+      }
+    }
+  }, [searchParams]);
+
+  // Sync entity selection to URL
+  const handleSelectEntity = useCallback((id: string) => {
+    setSelectedEntity(id);
+    const entity = ENTITIES.find((e) => e.id === id);
+    if (entity) {
+      const params = new URLSearchParams(window.location.search);
+      params.set('entity', entity.type);
+      window.history.replaceState(null, '', `/model?${params.toString()}`);
+    }
   }, []);
 
   const selectedDef = useMemo(
@@ -1326,7 +1362,7 @@ export default function ModelPage() {
           <SchemaGraph
             counts={counts}
             selectedEntity={selectedEntity}
-            onSelect={setSelectedEntity}
+            onSelect={handleSelectEntity}
             hoveredRelation={hoveredRelation}
             onHoverRelation={setHoveredRelation}
           />
@@ -1378,7 +1414,7 @@ export default function ModelPage() {
                 <button
                   key={ent.id}
                   onClick={() => {
-                    setSelectedEntity(ent.id);
+                    handleSelectEntity(ent.id);
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
                   className={`text-left bg-white border p-4 transition-all hover:shadow-md ${

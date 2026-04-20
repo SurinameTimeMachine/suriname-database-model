@@ -10,7 +10,8 @@ import { getActiveSources, useSourceRegistry } from '@/lib/sources';
 import { usePlaceTypes } from '@/lib/thesaurus';
 import type { GazetteerPlace } from '@/lib/types';
 import { getPreferredName } from '@/lib/types';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { buildPlaceUrl } from '@/lib/url';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import {
   memo,
   Suspense,
@@ -273,10 +274,13 @@ function PlacesPageInner() {
   const [sourceFilter, setSourceFilter] =
     useState<SourceFilterState>(emptyFilterState());
 
-  // URL sync: read ?place= (and future ?place2=) from search params
+  // URL sync: read path param /places/{id} or legacy ?place= query param
+  const params = useParams<{ id?: string[] }>();
   const searchParams = useSearchParams();
   const router = useRouter();
   const initializedFromUrl = useRef(false);
+  // Path param from [[...id]] catch-all (first segment only)
+  const pathPlaceId = params.id?.[0] ?? null;
   const {
     sources: registrySources,
     categories: registryCategories,
@@ -305,34 +309,26 @@ function PlacesPageInner() {
       .finally(() => setLoading(false));
   }, []);
 
-  // Initialize selection from URL params (once data is loaded)
+  // Initialize selection from URL (once data is loaded)
+  // Priority: path param /places/{id} > legacy ?place= query param
   useEffect(() => {
     if (initializedFromUrl.current || places.length === 0) return;
     initializedFromUrl.current = true;
-    const placeParam = searchParams.get('place');
-    // Future: const place2Param = searchParams.get('place2');
-    if (placeParam && places.some((p) => p.id === placeParam)) {
-      setSelectedIds([placeParam]);
+    const placeId = pathPlaceId || searchParams.get('place');
+    if (placeId && places.some((p) => p.id === placeId)) {
+      setSelectedIds([placeId]);
+      // If loaded via legacy ?place= param, redirect to path-based URL
+      if (!pathPlaceId && searchParams.get('place')) {
+        router.replace(buildPlaceUrl(placeId), { scroll: false });
+      }
     }
-  }, [places, searchParams]);
+  }, [places, pathPlaceId, searchParams, router]);
 
-  // Sync selectedIds to URL (skip transient stm-new-* IDs)
+  // Sync selectedIds to URL as path route (skip transient stm-new-* IDs)
   const syncUrlToSelection = useCallback(
     (ids: string[]) => {
       const persistIds = ids.filter((id) => !id.startsWith('stm-new-'));
-      const params = new URLSearchParams(window.location.search);
-      if (persistIds[0]) {
-        params.set('place', persistIds[0]);
-      } else {
-        params.delete('place');
-      }
-      // Future: place2 param for dual-panel
-      // if (persistIds[1]) params.set('place2', persistIds[1]);
-      // else params.delete('place2');
-      const qs = params.toString();
-      const newUrl = qs
-        ? `${window.location.pathname}?${qs}`
-        : window.location.pathname;
+      const newUrl = persistIds[0] ? buildPlaceUrl(persistIds[0]) : '/places';
       router.replace(newUrl, { scroll: false });
     },
     [router],
