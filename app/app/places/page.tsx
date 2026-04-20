@@ -275,7 +275,7 @@ function PlacesPageInner() {
 
   // URL sync: read ?place= query param
   const searchParams = useSearchParams();
-  const initializedFromUrl = useRef(false);
+  const lastAppliedPlace = useRef<string | null>(null);
   const {
     sources: registrySources,
     categories: registryCategories,
@@ -304,11 +304,12 @@ function PlacesPageInner() {
       .finally(() => setLoading(false));
   }, []);
 
-  // Initialize selection from URL (once data is loaded)
+  // Initialize/update selection from URL ?place= param
   useEffect(() => {
-    if (initializedFromUrl.current || places.length === 0) return;
-    initializedFromUrl.current = true;
+    if (places.length === 0) return;
     const placeId = searchParams.get('place');
+    if (placeId === lastAppliedPlace.current) return;
+    lastAppliedPlace.current = placeId;
     if (placeId && places.some((p) => p.id === placeId)) {
       setSelectedIds([placeId]);
     }

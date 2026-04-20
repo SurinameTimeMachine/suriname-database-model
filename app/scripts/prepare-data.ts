@@ -162,6 +162,30 @@ if (existsSync(geojsonSrc)) {
     const entries = gazetteerData['@graph'] || [];
     let added = 0;
 
+    // Build lookups: fid -> stmId, placeUri -> stmId
+    const fidToStmId = new Map<number, string>();
+    const uriToStmId = new Map<string, string>();
+    for (const entry of entries as Record<string, unknown>[]) {
+      const stmId = entry.id as string;
+      if (entry.fid != null) fidToStmId.set(entry.fid as number, stmId);
+      if (entry['@id']) uriToStmId.set(entry['@id'] as string, stmId);
+    }
+
+    // Inject stmId into existing features
+    let enriched = 0;
+    for (const feature of geojson.features) {
+      const props = feature.properties;
+      const stmId =
+        fidToStmId.get(props.fid) ??
+        uriToStmId.get(props.placeUri ?? '') ??
+        null;
+      if (stmId) {
+        props.stmId = stmId;
+        enriched++;
+      }
+    }
+    console.log(`  Enriched ${enriched} existing features with stmId`);
+
     // Existing feature types in geojson are 'plantation', 'river', 'creek'
     // Add features for types NOT already in the pipeline
     const pipelineTypes = new Set(['plantation', 'river', 'creek']);
@@ -198,6 +222,7 @@ if (existsSync(geojsonSrc)) {
               properties: {
                 fid: entry.fid ?? null,
                 name: entry.prefLabel || '',
+                stmId: entry.id as string,
                 placeUri: (entry['@id'] as string) || `stm:place/${entry.id}`,
                 status: 'infrastructure',
                 featureType: type,
@@ -222,6 +247,7 @@ if (existsSync(geojsonSrc)) {
           properties: {
             fid: entry.fid ?? null,
             name: entry.prefLabel || '',
+            stmId: entry.id as string,
             placeUri: (entry['@id'] as string) || `stm:place/${entry.id}`,
             status: 'named',
             featureType: type,

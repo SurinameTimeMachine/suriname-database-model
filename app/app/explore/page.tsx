@@ -34,7 +34,7 @@ function ExplorePageInner() {
   );
   const [highlightedName, setHighlightedName] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const initializedFromUrl = useRef(false);
+  const lastAppliedPlace = useRef<string | null>(null);
 
   // Compute initial viewport from URL params
   const initialCenter: [number, number] =
@@ -49,14 +49,16 @@ function ExplorePageInner() {
       .finally(() => setLoading(false));
   }, []);
 
-  // Initialize selected feature from ?place= param (once data is loaded)
+  // Initialize/update selected feature from ?place= param
   useEffect(() => {
-    if (initializedFromUrl.current || !data?.geojson) return;
-    initializedFromUrl.current = true;
-    if (urlParams.place) {
-      const placeParam = urlParams.place;
+    if (!data?.geojson) return;
+    const placeParam = urlParams.place;
+    if (placeParam === lastAppliedPlace.current) return;
+    lastAppliedPlace.current = placeParam;
+    if (placeParam) {
       const feature = data.geojson.features.find(
         (f) =>
+          f.properties.stmId === placeParam ||
           extractPlaceId(f.properties.placeUri) === placeParam ||
           extractPlaceId(f.properties.plantationUri) === placeParam ||
           extractPlaceId(f.properties.featureUri) === placeParam ||
@@ -94,12 +96,14 @@ function ExplorePageInner() {
     (feature: GeoJSONFeature) => {
       setSelectedFeature(feature);
       setHighlightedName(feature.properties.name);
-      const placeId = extractPlaceId(
-        feature.properties.placeUri ??
-          feature.properties.plantationUri ??
-          feature.properties.featureUri ??
-          feature.id,
-      );
+      const placeId =
+        feature.properties.stmId ??
+        extractPlaceId(
+          feature.properties.placeUri ??
+            feature.properties.plantationUri ??
+            feature.properties.featureUri ??
+            feature.id,
+        );
       syncUrl(placeId);
     },
     [syncUrl],
