@@ -8678,44 +8678,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00672",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-00672",
-      "type": "plantation",
-      "prefLabel": "Campenburg",
-      "altLabels": [],
-      "broader": "stm-00004",
-      "description": "",
-      "location": {
-        "lat": 5.89749329,
-        "lng": -54.967170822,
-        "wkt": "Polygon ((-54.96627832 5.87868582, -54.97184416 5.88177214, -54.96848256 5.92431015, -54.96297075 5.92401252, -54.96627832 5.87868582))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken"
-      ],
-      "wikidataQid": "Q2804081",
-      "fid": 1755,
-      "psurIds": [],
-      "district": "Divisie Beneden-Cottica",
-      "locationDescription": "Beneden-Commewijne",
-      "locationDescriptionOriginal": "Rivier Commewijne, (beneden) regterhand in het afvaren",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q2804081",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-00747",
       "@type": [
         "E25_Human-Made_Feature"
@@ -73770,6 +73732,63 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emQzVVV0ZmQzBIZUE/view?usp=sharing&resourcekey=0-nwGgT0t3PWA0lSjK6BZFRg",
           "author": "Philip Dikland",
           "year": "2010",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-00672",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-00672",
+      "type": "plantation",
+      "broader": "stm-00004",
+      "description": "",
+      "location": {
+        "lat": 5.89749329,
+        "lng": -54.967170822,
+        "wkt": "Polygon ((-54.96627832 5.87868582, -54.97184416 5.88177214, -54.96848256 5.92431015, -54.96297075 5.92401252, -54.96627832 5.87868582))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken"
+      ],
+      "wikidataQid": "Q2804081",
+      "fid": 1755,
+      "psurIds": [],
+      "district": "Divisie Beneden-Cottica",
+      "locationDescription": "Beneden-Commewijne",
+      "locationDescriptionOriginal": "Rivier Commewijne, (beneden) regterhand in het afvaren",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-20",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q2804081",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Campenburg",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "Lakroewa",
+          "language": "srn",
+          "type": "historical",
+          "isPreferred": false
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Campenburg 2001-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emSGFlMWRUaHQtS0E/view?usp=sharing&resourcekey=0-GlY9b6rMiPSkyZcAIA4ayg",
+          "author": "Philip Dikland",
+          "year": "2001",
           "notes": null
         }
       ]
