@@ -90853,37 +90853,6 @@
       "externalLinks": []
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00046",
-      "@type": [
-        "E26_Physical_Feature"
-      ],
-      "id": "stm-00046",
-      "type": "river",
-      "prefLabel": "Suriname",
-      "altLabels": [],
-      "broader": null,
-      "description": "Road or path from Surinaamse Almanakken",
-      "location": {
-        "lat": null,
-        "lng": null,
-        "wkt": null,
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "almanakken"
-      ],
-      "wikidataQid": null,
-      "fid": null,
-      "psurIds": [],
-      "district": null,
-      "locationDescription": null,
-      "locationDescriptionOriginal": null,
-      "placeType": null,
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": []
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-00264",
       "@type": [
         "E26_Physical_Feature"
@@ -93331,6 +93300,47 @@
       "modifiedBy": null,
       "modifiedAt": null,
       "externalLinks": []
+    },
+    {
+      "@id": "stm:place/stm-00046",
+      "@type": "E26_Physical_Feature",
+      "id": "stm-00046",
+      "type": "river",
+      "broader": null,
+      "description": "Road or path from Surinaamse Almanakken",
+      "location": {
+        "lat": null,
+        "lng": null,
+        "wkt": null,
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "almanakken"
+      ],
+      "wikidataQid": "Q635545",
+      "fid": null,
+      "psurIds": [],
+      "district": null,
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": "Thunnisvanoort",
+      "modifiedAt": "2026-04-20",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q635545",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Suriname",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        }
+      ]
     },
     {
       "@id": "https://data.suriname-timemachine.org/place/stm-00409",
