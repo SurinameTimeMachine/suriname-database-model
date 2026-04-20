@@ -10146,47 +10146,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00671",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-00671",
-      "type": "plantation",
-      "prefLabel": "Clifford Kocqshoven",
-      "altLabels": [],
-      "broader": "stm-00004",
-      "description": "",
-      "location": {
-        "lat": 5.9469002688888875,
-        "lng": -54.897041144444444,
-        "wkt": "Polygon ((-54.88092500 5.94644922, -54.88124867 5.94230243, -54.90509306 5.94477662, -54.90651200 5.94666677, -54.90827906 5.94858646, -54.91039620 5.94914136, -54.90984419 5.94969251, -54.89014712 5.94803783, -54.88092500 5.94644922))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q59115395",
-      "fid": 1754,
-      "psurIds": [
-        "PSUR0059"
-      ],
-      "district": "Divisie Beneden-Cottica",
-      "locationDescription": "Warappa Kreek",
-      "locationDescriptionOriginal": "Warrappa-kreek, regterhand in het opvaren",
-      "placeType": "koffie",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59115395",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-00925",
       "@type": [
         "E25_Human-Made_Feature"
@@ -73764,6 +73723,66 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emTWQtVnpudHhRM1k/view?usp=sharing&resourcekey=0-eb8JSEy1382c33QQN-6Ctg",
           "author": "Philip Dikland",
           "year": "2010",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-00671",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-00671",
+      "type": "plantation",
+      "broader": "stm-00004",
+      "description": "",
+      "location": {
+        "lat": 5.9469002688888875,
+        "lng": -54.897041144444444,
+        "wkt": "Polygon ((-54.88092500 5.94644922, -54.88124867 5.94230243, -54.90509306 5.94477662, -54.90651200 5.94666677, -54.90827906 5.94858646, -54.91039620 5.94914136, -54.90984419 5.94969251, -54.89014712 5.94803783, -54.88092500 5.94644922))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q59115395",
+      "fid": 1754,
+      "psurIds": [
+        "PSUR0059"
+      ],
+      "district": "Divisie Beneden-Cottica",
+      "locationDescription": "Warappa Kreek",
+      "locationDescriptionOriginal": "Warrappa-kreek, regterhand in het opvaren",
+      "placeType": "koffie",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-20",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59115395",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Clifford Kocqshoven",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "Kokkoe",
+          "language": "srn",
+          "type": "historical",
+          "isPreferred": false
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Clifford Kokshoven 2008-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emN1N4QnJiVGEtUUE/view?usp=sharing&resourcekey=0-0cAEIasx6pvqSRzZITVliQ",
+          "author": "Philip Dikland",
+          "year": "2008",
           "notes": null
         }
       ]
