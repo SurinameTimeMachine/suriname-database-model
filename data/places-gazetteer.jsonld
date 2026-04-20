@@ -5716,46 +5716,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-02514",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-02514",
-      "type": "plantation",
-      "prefLabel": "Berkshoven en Oostrust",
-      "altLabels": [],
-      "broader": "stm-00005",
-      "description": "Plantation from Surinaamse Almanakken (no QGIS geometry)",
-      "location": {
-        "lat": null,
-        "lng": null,
-        "wkt": null,
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q130536927",
-      "fid": null,
-      "psurIds": [
-        "PSUR0029"
-      ],
-      "district": "Divisie Boven-Commewijne",
-      "locationDescription": "Boven-Commewijne",
-      "locationDescriptionOriginal": "Beide oevers der Boven-Commewijne (rechts).{",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q130536927",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-00658",
       "@type": [
         "E25_Human-Made_Feature"
@@ -73611,6 +73571,65 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emRHF3SEkwYjc3clU/view?usp=sharing&resourcekey=0-D1hLifh2X8g-bdcDi9vcgQ",
           "author": "Philip Dikland",
           "year": null,
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-02514",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-02514",
+      "type": "plantation",
+      "broader": "stm-00005",
+      "description": "Plantation from Surinaamse Almanakken (no QGIS geometry)",
+      "location": {
+        "lat": null,
+        "lng": null,
+        "wkt": null,
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q130536927",
+      "fid": null,
+      "psurIds": [
+        "PSUR0029"
+      ],
+      "district": "Divisie Boven-Commewijne",
+      "locationDescription": "Boven-Commewijne",
+      "locationDescriptionOriginal": "Beide oevers der Boven-Commewijne (rechts).{",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-20",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q130536927",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Berkshoven en Oostrust",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "Verbergie",
+          "language": "srn",
+          "type": "historical",
+          "isPreferred": false
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Berkshoven 2001-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emRHF3SEkwYjc3clU/view?usp=sharing&resourcekey=0-D1hLifh2X8g-bdcDi9vcgQ",
+          "author": "Philip Dikland",
+          "year": "2001",
           "notes": null
         }
       ]
