@@ -90851,25 +90851,26 @@
     {
       "@id": "https://data.suriname-timemachine.org/place/stm-00044",
       "@type": [
-        "E26_Physical_Feature"
+        "E25_Human-Made_Feature"
       ],
       "id": "stm-00044",
-      "type": "river",
+      "type": "street",
       "prefLabel": "Rijweg naar Kwatta",
       "altLabels": [],
       "broader": null,
       "description": "Road or path from Surinaamse Almanakken",
       "location": {
-        "lat": null,
-        "lng": null,
-        "wkt": null,
+        "lat": 5.837630331407214,
+        "lng": -55.176279894377075,
+        "wkt": "LineString (-55.16568496 5.83420434, -55.16676692 5.83460426, -55.16902936 5.83542030, -55.17129731 5.83616675, -55.17408334 5.83705960, -55.17452563 5.83719601, -55.17835745 5.83842781, -55.18224301 5.83954388, -55.18455781 5.84013911, -55.18598286 5.84051165, -55.18655019 5.84065994)",
         "crs": "EPSG:4326"
       },
       "sources": [
-        "almanakken"
+        "almanakken",
+        "paramaribo-street-map-1916"
       ],
       "wikidataQid": null,
-      "fid": null,
+      "fid": 52,
       "psurIds": [],
       "district": null,
       "locationDescription": null,
@@ -103457,6 +103458,5126 @@
           "isPreferred": true
         }
       ]
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02944",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02944",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #1",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.825275254167417,
+        "lng": -55.15025494927365,
+        "wkt": "LineString (-55.15105104 5.82507663, -55.15068113 5.82500869, -55.15035458 5.82497149, -55.14975108 5.82552126, -55.14943693 5.82579820)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 1,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02945",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02945",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #2",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.826014183763849,
+        "lng": -55.14975133486515,
+        "wkt": "LineString (-55.15009416 5.82628183, -55.14966530 5.82608549, -55.14964050 5.82603795, -55.14960537 5.82565146)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 2,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02946",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02946",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #3",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.825809158660867,
+        "lng": -55.14981514686167,
+        "wkt": "LineString (-55.14966530 5.82608549, -55.14978931 5.82596665, -55.14995879 5.82584471, -55.14991125 5.82562769, -55.14975108 5.82552126)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 3,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02947",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02947",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #4",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.825194958106266,
+        "lng": -55.151428601424705,
+        "wkt": "LineString (-55.15105104 5.82507663, -55.15155331 5.82521485, -55.15168145 5.82529339)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 4,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02948",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02948",
+      "type": "street",
+      "prefLabel": "Waterkant",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.824621760973438,
+        "lng": -55.1554055058766,
+        "wkt": "LineString (-55.16004470 5.82340022, -55.15981012 5.82345085, -55.15839575 5.82380496, -55.15671270 5.82429135, -55.15644539 5.82444291, -55.15577059 5.82459482, -55.15553084 5.82454108, -55.15485604 5.82483560, -55.15415643 5.82513632, -55.15387535 5.82516835, -55.15330905 5.82521485, -55.15280269 5.82525722, -55.15228599 5.82527272, -55.15168145 5.82529339)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 5,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02949",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02949",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #6",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.825392096232436,
+        "lng": -55.151416679795204,
+        "wkt": "LineString (-55.15168145 5.82529339, -55.15115191 5.82549080)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 6,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02950",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02950",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #7",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.82553898151637,
+        "lng": -55.15169172589528,
+        "wkt": "LineString (-55.15164097 5.82593095, -55.15171142 5.82539673, -55.15172279 5.82528926)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 7,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02951",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02951",
+      "type": "street",
+      "prefLabel": "Heerenstraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.827441297636225,
+        "lng": -55.15455496104947,
+        "wkt": "LineString (-55.15238678 5.82629164, -55.15265594 5.82641669, -55.15358186 5.82684451, -55.15362113 5.82686312, -55.15412336 5.82713800, -55.15463592 5.82745215, -55.15494387 5.82764643, -55.15514952 5.82777250, -55.15667377 5.82868602, -55.15777744 5.82930192)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 8,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02952",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02952",
+      "type": "street",
+      "prefLabel": "Gravenstraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.829492757476289,
+        "lng": -55.15619904535643,
+        "wkt": "LineString (-55.15199248 5.82712915, -55.15239966 5.82733228, -55.15356946 5.82800811, -55.15437551 5.82846487, -55.15529006 5.82897847, -55.15617155 5.82947553, -55.15637797 5.82961495, -55.15844294 5.83080034, -55.15910018 5.83114343, -55.15952594 5.83137077, -55.16094375 5.83210242)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 9,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02953",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02953",
+      "type": "street",
+      "prefLabel": "Keizerstraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.827807260939458,
+        "lng": -55.15876357570578,
+        "wkt": "LineString (-55.15415643 5.82513632, -55.15499968 5.82571605, -55.15594627 5.82625755, -55.15621495 5.82638982, -55.15752529 5.82710080, -55.15759556 5.82714420, -55.15877156 5.82783244, -55.15952490 5.82825510, -55.16066267 5.82888857, -55.16422994 5.83086441, -55.16677209 5.83229463)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 10,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02954",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02954",
+      "type": "street",
+      "prefLabel": "Soldatenstraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.833484682614477,
+        "lng": -55.16407699890938,
+        "wkt": "LineString (-55.16094375 5.83210242, -55.16299814 5.83299320, -55.16528400 5.83402659, -55.16547415 5.83409686, -55.16568496 5.83420434)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 11,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02955",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02955",
+      "type": "street",
+      "prefLabel": "Wagenwegstraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.8311776777978555,
+        "lng": -55.16156821679526,
+        "wkt": "LineString (-55.16547415 5.83409686, -55.16554028 5.83384472, -55.16557335 5.83363804, -55.16558162 5.83345203, -55.16517240 5.83318335, -55.16425474 5.83265425, -55.16344456 5.83218302, -55.16137778 5.83097602, -55.15998890 5.83013277, -55.15980702 5.83004183, -55.15798412 5.82898777, -55.15689285 5.82832640, -55.15550397 5.82753275, -55.15535930 5.82743768)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 12,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02956",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02956",
+      "type": "street",
+      "prefLabel": "Watermolenstraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.826281444939541,
+        "lng": -55.154663566856264,
+        "wkt": "LineString (-55.15356946 5.82800811, -55.15412336 5.82713800, -55.15440444 5.82664817, -55.15449125 5.82653656, -55.15459045 5.82639189, -55.15499968 5.82571605, -55.15535930 5.82521795, -55.15577059 5.82459482)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 13,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02957",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02957",
+      "type": "street",
+      "prefLabel": "Oranjestraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.82635055307342,
+        "lng": -55.15262494149382,
+        "wkt": "LineString (-55.15239966 5.82733228, -55.15253400 5.82688585, -55.15265594 5.82641669, -55.15273241 5.82586072, -55.15280269 5.82525722)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 14,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02958",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02958",
+      "type": "street",
+      "prefLabel": "Kromme Elleboogstraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.826099438657971,
+        "lng": -55.15385416205833,
+        "wkt": "LineString (-55.15362113 5.82686312, -55.15397042 5.82635469, -55.15394975 5.82601160, -55.15387535 5.82516835)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 15,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02959",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02959",
+      "type": "street",
+      "prefLabel": "Oude Hofstraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.826501428401215,
+        "lng": -55.15418743118994,
+        "wkt": "LineString (-55.15440444 5.82664817, -55.15397042 5.82635469)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 16,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02960",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02960",
+      "type": "street",
+      "prefLabel": "Groote Hofstraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.826599084007223,
+        "lng": -55.15482115923633,
+        "wkt": "LineString (-55.15449125 5.82653656, -55.15459562 5.82657790, -55.15499038 5.82667504, -55.15510405 5.82679078, -55.15459045 5.82639189, -55.15468656 5.82642496, -55.15500691 5.82660477, -55.15510405 5.82679078)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 17,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02961",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02961",
+      "type": "street",
+      "prefLabel": "Kerkplein",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.82700314053578,
+        "lng": -55.155313398604896,
+        "wkt": "LineString (-55.15510405 5.82679078, -55.15463592 5.82745215, -55.15535930 5.82743768, -55.15573029 5.82682798, -55.15566415 5.82669157, -55.15535930 5.82743768, -55.15514952 5.82777250, -55.15566415 5.82669157, -55.15552567 5.82672051, -55.15532726 5.82673291, -55.15513712 5.82669157, -55.15510405 5.82679078)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 19,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02962",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02962",
+      "type": "street",
+      "prefLabel": "Korte Kerkstraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.826474560192159,
+        "lng": -55.15580520739317,
+        "wkt": "LineString (-55.15594627 5.82625755, -55.15566415 5.82669157)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 20,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02963",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02963",
+      "type": "street",
+      "prefLabel": "Klipsteenstraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.828100086840297,
+        "lng": -55.15701617135406,
+        "wkt": "LineString (-55.15759556 5.82714420, -55.15752426 5.82721860, -55.15723904 5.82774977, -55.15689285 5.82832640, -55.15667377 5.82868602, -55.15617155 5.82947553)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 24,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02964",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02964",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #25",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.8250319440441585,
+        "lng": -55.15510482552044,
+        "wkt": "LineString (-55.15535930 5.82521795, -55.15528593 5.82518075, -55.15491804 5.82489347, -55.15485604 5.82483560)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 25,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02965",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02965",
+      "type": "street",
+      "prefLabel": "Malabatrumstraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.828635125888024,
+        "lng": -55.15823032160899,
+        "wkt": "LineString (-55.15877156 5.82783244, -55.15838817 5.82841837, -55.15798412 5.82898777, -55.15777744 5.82930192)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 26,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02966",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02966",
+      "type": "street",
+      "prefLabel": "Princessestraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.835283612550314,
+        "lng": -55.15679364746878,
+        "wkt": "LineString (-55.15844294 5.83080034, -55.15780534 5.83216339, -55.15703649 5.83442858, -55.15614364 5.83710714, -55.15453982 5.84191861)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 27,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02967",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02967",
+      "type": "street",
+      "prefLabel": "Jessurunstraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.829925248815213,
+        "lng": -55.15479958172047,
+        "wkt": "LineString (-55.15434914 5.83080627, -55.15456875 5.83036942, -55.15499038 5.82954684, -55.15529006 5.82897847)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 28,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02968",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02968",
+      "type": "street",
+      "prefLabel": "Gonggrijpstraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.836745449801712,
+        "lng": -55.15733411182797,
+        "wkt": "LineString (-55.15551534 5.84299541, -55.15695382 5.83772097, -55.15816909 5.83392635, -55.15869819 5.83233906)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 29,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02969",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02969",
+      "type": "street",
+      "prefLabel": "Stoelmanstraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.831149973032836,
+        "lng": -55.15913841540561,
+        "wkt": "LineString (-55.15980702 5.83004183, -55.15910018 5.83114343, -55.15850805 5.83226466)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 30,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02970",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02970",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #31",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.832100091464118,
+        "lng": -55.15891649433272,
+        "wkt": "LineString (-55.15952594 5.83137077, -55.15893380 5.83242587, -55.15869819 5.83233906, -55.15850805 5.83226466)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 31,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02971",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02971",
+      "type": "street",
+      "prefLabel": "Swalmbergstraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.832093804992129,
+        "lng": -55.16094823041075,
+        "wkt": "LineString (-55.16137778 5.83097602, -55.16094375 5.83210242, -55.16052316 5.83320298)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 32,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02972",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02972",
+      "type": "street",
+      "prefLabel": "Knuffelsgracht",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.824911037103393,
+        "lng": -55.15654046626802,
+        "wkt": "LineString (-55.15640406 5.82442741, -55.15645986 5.82450595, -55.15675748 5.82579975)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 33,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02973",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02973",
+      "type": "street",
+      "prefLabel": "Vaillants Plein",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.826094788391021,
+        "lng": -55.156486213153585,
+        "wkt": "LineString (-55.15675748 5.82579975, -55.15621495 5.82638982)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 34,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02974",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02974",
+      "type": "street",
+      "prefLabel": "Heiligeweg",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.825723628195351,
+        "lng": -55.15711813276281,
+        "wkt": "LineString (-55.15752529 5.82710080, -55.15711710 5.82573775, -55.15671201 5.82433234)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 35,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02975",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02975",
+      "type": "street",
+      "prefLabel": "Maagdenstraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.825141483665712,
+        "lng": -55.15952128738472,
+        "wkt": "LineString (-55.15711710 5.82573775, -55.15876846 5.82536160, -55.16046322 5.82492344, -55.16173636 5.82454315)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 36,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02976",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02976",
+      "type": "street",
+      "prefLabel": "Domineestraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.826588646741397,
+        "lng": -55.15950444308443,
+        "wkt": "LineString (-55.15759556 5.82714420, -55.15766893 5.82707703, -55.15913222 5.82668847, -55.16079804 5.82622138, -55.16232747 5.82581216)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 37,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02977",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02977",
+      "type": "street",
+      "prefLabel": "Jodenbreestraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.826027531752319,
+        "lng": -55.15895533267346,
+        "wkt": "LineString (-55.15952490 5.82825510, -55.15913222 5.82668847, -55.15876846 5.82536160, -55.15839575 5.82380496)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 38,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02978",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02978",
+      "type": "street",
+      "prefLabel": "Steenbakkerijstraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.825214441187236,
+        "lng": -55.16052274820784,
+        "wkt": "LineString (-55.16120003 5.82791614, -55.16079804 5.82622138, -55.16046322 5.82492344, -55.16010774 5.82361103, -55.16004470 5.82340022)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 39,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02979",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02979",
+      "type": "street",
+      "prefLabel": "Straat langs de Steenbakkersgracht Noordzijde",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.829303989284716,
+        "lng": -55.170032211144076,
+        "wkt": "LineString (-55.16010774 5.82361103, -55.16053970 5.82384251, -55.16173636 5.82454315, -55.16270569 5.82511565, -55.16390856 5.82580596, -55.16513209 5.82648799, -55.16634323 5.82718657, -55.16894324 5.82867465, -55.17050987 5.82960057, -55.17095629 5.82984859, -55.17220877 5.83058850, -55.17229144 5.83065463, -55.17362245 5.83141934, -55.17443676 5.83188644, -55.17762788 5.83377135, -55.17866540 5.83427151, -55.17956652 5.83468486, -55.18127782 5.83547851)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 40,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02980",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02980",
+      "type": "street",
+      "prefLabel": "Zwartenhovenbrugstraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.820935459045192,
+        "lng": -55.16499886114348,
+        "wkt": "LineString (-55.15998890 5.83013277, -55.16030615 5.82953857, -55.16066267 5.82888857, -55.16111633 5.82807529, -55.16120003 5.82791614, -55.16152142 5.82731884, -55.16201331 5.82642186, -55.16232747 5.82581216, -55.16270569 5.82511565, -55.16278836 5.82501024, -55.16285450 5.82491930, -55.16324098 5.82421625, -55.16352827 5.82370403, -55.16418137 5.82253423, -55.16483861 5.82136030, -55.16486341 5.82126523, -55.16492955 5.82115362, -55.16502462 5.82106682, -55.16526850 5.82055012, -55.16556612 5.81999209, -55.16622749 5.81882642, -55.16636390 5.81850814, -55.16683616 5.81760495, -55.16696946 5.81734454, -55.16720508 5.81691464, -55.16725210 5.81682112, -55.16762980 5.81616337, -55.16768871 5.81594739, -55.16811446 5.81514961, -55.16893291 5.81369873, -55.16950334 5.81277694, -55.16960255 5.81253719, -55.16956948 5.81238012, -55.16913959 5.81214037)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 41,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02981",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02981",
+      "type": "street",
+      "prefLabel": "Saramaccastraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.822092324675411,
+        "lng": -55.16237213066962,
+        "wkt": "LineString (-55.16004470 5.82340022, -55.16009120 5.82335888, -55.16023174 5.82326794, -55.16117833 5.82272231, -55.16196784 5.82225970, -55.16319551 5.82160108, -55.16458439 5.82088701, -55.16478694 5.82078367, -55.16526850 5.82055012)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 42,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02982",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02982",
+      "type": "street",
+      "prefLabel": "Kleine Saramaccastraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.819989824438069,
+        "lng": -55.16507087659886,
+        "wkt": "LineString (-55.16478694 5.82078367, -55.16471977 5.82072063, -55.16472390 5.82059042, -55.16478797 5.82043335, -55.16515276 5.81976164, -55.16557370 5.81897695, -55.16575110 5.81866211)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 43,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02983",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02983",
+      "type": "street",
+      "prefLabel": "Rust en Vredestraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.825845740760881,
+        "lng": -55.16706247029309,
+        "wkt": "LineString (-55.16299814 5.83299320, -55.16344456 5.83218302, -55.16422994 5.83086441, -55.16513106 5.82931019, -55.16559402 5.82847107, -55.16634323 5.82718657, -55.16638560 5.82706359, -55.16645174 5.82696232, -55.16715238 5.82575945, -55.16779721 5.82458552, -55.16815270 5.82395722, -55.16823537 5.82377534, -55.16919436 5.82204751, -55.16986710 5.82084154, -55.17073205 5.81926975, -55.17129008 5.81826116)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 44,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02984",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02984",
+      "type": "street",
+      "prefLabel": "Wanicastraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.823416711576717,
+        "lng": -55.17216302484714,
+        "wkt": "LineString (-55.16568496 5.83420434, -55.16632566 5.83308001, -55.16677209 5.83229463, -55.16725985 5.83155885, -55.16772487 5.83080654, -55.16894324 5.82867465, -55.16900008 5.82857028, -55.16905795 5.82846281, -55.16975652 5.82728061, -55.16974412 5.82728474, -55.17055430 5.82590413, -55.17063698 5.82580079, -55.17166382 5.82408742, -55.17194318 5.82362240, -55.17264589 5.82242779, -55.17344367 5.82106785, -55.17412829 5.81989082, -55.17478295 5.81878612, -55.17542778 5.81767005, -55.17623900 5.81632561, -55.17644464 5.81597529, -55.17704814 5.81499150, -55.17749457 5.81504937, -55.17779219 5.81506591, -55.17784696 5.81499563, -55.17787692 5.81495637)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 45,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02985",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02985",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #46",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.8106426199729935,
+        "lng": -55.17979441490723,
+        "wkt": "LineString (-55.17787692 5.81495637, -55.17792136 5.81487266, -55.17790069 5.81474039, -55.17786349 5.81441383, -55.17785109 5.81420302, -55.17833885 5.81318203, -55.17941358 5.81113178, -55.17955412 5.81090857, -55.17974426 5.81047041, -55.17989307 5.81019759, -55.18000881 5.80985864, -55.18081899 5.80832922, -55.18135636 5.80739503, -55.18167051 5.80690727, -55.18192679 5.80671713, -55.18215827 5.80651871, -55.18220787 5.80612189)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 46,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02986",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02986",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #47",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.814021145292796,
+        "lng": -55.18126955253,
+        "wkt": "LineString (-55.17792136 5.81487266, -55.17861993 5.81481892, -55.18009975 5.81441383, -55.18022376 5.81436423, -55.18253029 5.81367806, -55.18454747 5.81304976, -55.18494430 5.81295055)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 47,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02987",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02987",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #48",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.81332532757098,
+        "lng": -55.18012179775322,
+        "wkt": "LineString (-55.18022376 5.81436423, -55.18017209 5.81422369, -55.17998401 5.81366152, -55.18006048 5.81284308, -55.18013075 5.81261986, -55.18015969 5.81223958)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 48,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02988",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02988",
+      "type": "street",
+      "prefLabel": "Groote Dwarsstraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.822622946779169,
+        "lng": -55.16566786715776,
+        "wkt": "LineString (-55.16837488 5.81774136, -55.16806073 5.81827046, -55.16740349 5.81946506, -55.16675039 5.82067826, -55.16606008 5.82192247, -55.16597741 5.82205887, -55.16588647 5.82221595, -55.16534911 5.82321627, -55.16470427 5.82438607, -55.16403876 5.82556827, -55.16396849 5.82567988, -55.16390856 5.82580596, -55.16319965 5.82708943)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 49,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02989",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02989",
+      "type": "street",
+      "prefLabel": "Burenstraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.827440523977499,
+        "lng": -55.163808575167025,
+        "wkt": "LineString (-55.16201331 5.82642186, -55.16319965 5.82708943, -55.16442732 5.82777974, -55.16559402 5.82847107)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 50,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02990",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02990",
+      "type": "street",
+      "prefLabel": "Weidestraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.829145191279888,
+        "lng": -55.16479245109176,
+        "wkt": "LineString (-55.16152142 5.82731884, -55.16513106 5.82931019, -55.16772487 5.83080654)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 51,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02991",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02991",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #53",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.841201697283234,
+        "lng": -55.18592033617904,
+        "wkt": "LineString (-55.18585782 5.84189175, -55.18598286 5.84051165)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 53,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02992",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02992",
+      "type": "street",
+      "prefLabel": "Eerste Rijweg",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.830852941537039,
+        "lng": -55.18484932803018,
+        "wkt": "LineString (-55.18455781 5.84013911, -55.18482752 5.83520673, -55.18498460 5.83239590, -55.18504247 5.83148651, -55.18518301 5.82887410, -55.18512514 5.82858475, -55.18483579 5.82846901, -55.18462084 5.82833673, -55.18464565 5.82778284, -55.18467045 5.82725374)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 54,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02993",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02993",
+      "type": "street",
+      "prefLabel": "Gemeene Landsweg",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.820653071837775,
+        "lng": -55.169520653073974,
+        "wkt": "LineString (-55.16622749 5.81882642, -55.16740349 5.81946506, -55.16801009 5.81978231, -55.16866630 5.82016673, -55.16986710 5.82084154, -55.17104000 5.82149774, -55.17229040 5.82222112, -55.17266036 5.82242366)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 55,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02994",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02994",
+      "type": "street",
+      "prefLabel": "Verlengde Gemeene Landsweg",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.825334285209855,
+        "lng": -55.17944458109924,
+        "wkt": "LineString (-55.17266036 5.82242366, -55.17274303 5.82245156, -55.17326799 5.82266444, -55.17561793 5.82364823, -55.17745323 5.82448321, -55.17819728 5.82495444, -55.17860030 5.82526652, -55.17955929 5.82594856, -55.18046661 5.82659547, -55.18290128 5.82696749, -55.18384787 5.82712043, -55.18467045 5.82725374, -55.18568937 5.82739531, -55.18654916 5.82750692)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 56,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02995",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02995",
+      "type": "street",
+      "prefLabel": "Molenpad",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.818199036980243,
+        "lng": -55.17119047207958,
+        "wkt": "LineString (-55.16762980 5.81616337, -55.16842345 5.81658086, -55.16960565 5.81727530, -55.17129008 5.81826116, -55.17186465 5.81858151, -55.17230900 5.81884192, -55.17242888 5.81892666, -55.17303445 5.81926975, -55.17412829 5.81989082)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 57,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02996",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02996",
+      "type": "street",
+      "prefLabel": "Verlengde Molenpad",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.821781510783491,
+        "lng": -55.177391746587794,
+        "wkt": "LineString (-55.17412829 5.81989082, -55.17430139 5.81997865, -55.17569853 5.82080537, -55.18129539 5.82406262, -55.18153513 5.82417009)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 58,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02997",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02997",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #59",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.817849038369742,
+        "lng": -55.18033309210502,
+        "wkt": "LineString (-55.17644464 5.81597529, -55.17654230 5.81603368, -55.17807585 5.81676945, -55.18401166 5.81959682, -55.18659101 5.82086996)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 59,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02998",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02998",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #60",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.810728928522391,
+        "lng": -55.1774916412112,
+        "wkt": "LineString (-55.17591813 5.81436371, -55.17628188 5.81367754, -55.17667044 5.81297484, -55.17752195 5.81067657, -55.17881163 5.80750199, -55.17974582 5.80517892)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 60,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02999",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02999",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #61",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.808621726075078,
+        "lng": -55.17971090935101,
+        "wkt": "LineString (-55.18166379 5.80526159, -55.18128350 5.80603044, -55.18107682 5.80616271, -55.18053946 5.80729531, -55.17959701 5.80913888, -55.17873722 5.81092458, -55.17859668 5.81106513, -55.17838174 5.81104032, -55.17752195 5.81067657)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 61,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03000",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03000",
+      "type": "street",
+      "prefLabel": "Koningsstraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.816530308778009,
+        "lng": -55.17464593618431,
+        "wkt": "LineString (-55.17591813 5.81436371, -55.17577759 5.81458693, -55.17510795 5.81573606, -55.17433910 5.81706707, -55.17369840 5.81815833, -55.17303445 5.81926975)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 62,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03001",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03001",
+      "type": "street",
+      "prefLabel": "Willemstraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.816030835660863,
+        "lng": -55.175673472948745,
+        "wkt": "LineString (-55.17623900 5.81632561, -55.17510795 5.81573606)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 63,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03002",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03002",
+      "type": "street",
+      "prefLabel": "Emmastraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.817368562454259,
+        "lng": -55.174883444263116,
+        "wkt": "LineString (-55.17542778 5.81767005, -55.17433910 5.81706707)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 64,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03003",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03003",
+      "type": "street",
+      "prefLabel": "Nassaustraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.8184722258110355,
+        "lng": -55.17424067403098,
+        "wkt": "LineString (-55.17478295 5.81878612, -55.17369840 5.81815833)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 65,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03004",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03004",
+      "type": "street",
+      "prefLabel": "Cornelisstraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.816636920453705,
+        "lng": -55.173576202553086,
+        "wkt": "LineString (-55.17230900 5.81884192, -55.17484340 5.81443192)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 66,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03005",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03005",
+      "type": "street",
+      "prefLabel": "Helenastraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.8163455037246665,
+        "lng": -55.17315767852733,
+        "wkt": "LineString (-55.17186465 5.81858151, -55.17445071 5.81410950)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 67,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03006",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03006",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #68",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.81568826599535,
+        "lng": -55.16890733453256,
+        "wkt": "LineString (-55.16842345 5.81658086, -55.16939122 5.81479567)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 68,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03007",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03007",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #69",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.816381586351579,
+        "lng": -55.16663068439501,
+        "wkt": "LineString (-55.16584668 5.81578360, -55.16679327 5.81654004, -55.16725210 5.81682112)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 69,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03008",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03008",
+      "type": "street",
+      "prefLabel": "Commissarisstraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.81793770345964,
+        "lng": -55.16744844245022,
+        "wkt": "LineString (-55.16683616 5.81760495, -55.16806073 5.81827046)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 70,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03009",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03009",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #71",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.816908056851863,
+        "lng": -55.16603644055969,
+        "wkt": "LineString (-55.16696946 5.81734454, -55.16598309 5.81683559, -55.16580121 5.81683972, -55.16539199 5.81661238)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 71,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03010",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03010",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #72",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.817112668597784,
+        "lng": -55.165723064236715,
+        "wkt": "LineString (-55.16683616 5.81760495, -55.16552013 5.81696373, -55.16535479 5.81698440, -55.16518118 5.81689759)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 72,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03011",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03011",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #73",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.818087674568864,
+        "lng": -55.16584784639991,
+        "wkt": "LineString (-55.16636390 5.81850814, -55.16622284 5.81827821, -55.16588389 5.81804673, -55.16492076 5.81751763)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 73,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03012",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03012",
+      "type": "street",
+      "prefLabel": "Hofstraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.823807185857047,
+        "lng": -55.16663636805461,
+        "wkt": "LineString (-55.16442732 5.82777974, -55.16513209 5.82648799, -55.16518686 5.82638466, -55.16524887 5.82628132, -55.16594744 5.82507431, -55.16659469 5.82390348, -55.16708004 5.82301166, -55.16716684 5.82286699, -55.16798116 5.82137890, -55.16866630 5.82016673, -55.16956845 5.81854327)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 74,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03013",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03013",
+      "type": "street",
+      "prefLabel": "Fredericistraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.826450792161075,
+        "lng": -55.168507497690705,
+        "wkt": "LineString (-55.16932870 5.82512805, -55.16846065 5.82653346, -55.16773314 5.82769086)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 75,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03014",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03014",
+      "type": "street",
+      "prefLabel": "Straat langs de Steenbakkersgracht Zuidzijde",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.829198435606273,
+        "lng": -55.17028237418224,
+        "wkt": "LineString (-55.16285450 5.82491930, -55.16403876 5.82556827, -55.16524887 5.82628132, -55.16645174 5.82696232, -55.16773314 5.82769086, -55.16905795 5.82846281, -55.17062664 5.82938149, -55.17107513 5.82966051, -55.17232141 5.83038388, -55.17307785 5.83080964, -55.17375162 5.83119406, -55.17442953 5.83159915, -55.17563653 5.83233493, -55.17764958 5.83352953)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 76,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03015",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03015",
+      "type": "street",
+      "prefLabel": "Verlengde Weidestraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.831641781821119,
+        "lng": -55.169153023636625,
+        "wkt": "LineString (-55.16772487 5.83080654, -55.16826224 5.83111966, -55.16962218 5.83193397, -55.17100280 5.83270695)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 77,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03016",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03016",
+      "type": "street",
+      "prefLabel": "Verlengde Keizerstraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.83359050202247,
+        "lng": -55.1691185772147,
+        "wkt": "LineString (-55.16677209 5.83229463, -55.16879547 5.83340759, -55.17178817 5.83506929)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 78,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03017",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03017",
+      "type": "street",
+      "prefLabel": "Van Radersstraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.832670782558489,
+        "lng": -55.16920882684006,
+        "wkt": "LineString (-55.16879547 5.83340759, -55.16962218 5.83193397)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 79,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03018",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03018",
+      "type": "street",
+      "prefLabel": "Oranjelaan",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.83196755885597,
+        "lng": -55.17147273180151,
+        "wkt": "LineString (-55.17229144 5.83065463, -55.17132108 5.83226673, -55.17127561 5.83224192, -55.17100280 5.83270695)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 80,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03019",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03019",
+      "type": "street",
+      "prefLabel": "Sophialaan",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.83267594952177,
+        "lng": -55.17199692022638,
+        "wkt": "LineString (-55.17132108 5.83226673, -55.17267276 5.83308517)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 81,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03020",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03020",
+      "type": "street",
+      "prefLabel": "Van Sijpesteijnlaan",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.834095831031331,
+        "lng": -55.174386124047416,
+        "wkt": "LineString (-55.17267276 5.83308517, -55.17609949 5.83510649)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 82,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03021",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03021",
+      "type": "street",
+      "prefLabel": "Van Idsingalaan",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.831866596393466,
+        "lng": -55.1734432565879,
+        "wkt": "LineString (-55.17129731 5.83616675, -55.17178817 5.83506929, -55.17216433 5.83423431, -55.17267276 5.83308517, -55.17362245 5.83141934, -55.17368962 5.83130774, -55.17375162 5.83119406, -55.17445433 5.82997259, -55.17511570 5.82878213, -55.17587628 5.82743458)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 83,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03022",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03022",
+      "type": "street",
+      "prefLabel": "Beethovenstraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.835262324661604,
+        "lng": -55.17386281400633,
+        "wkt": "LineString (-55.17216433 5.83423431, -55.17311505 5.83479854, -55.17439026 5.83552398, -55.17463414 5.83577613, -55.17501029 5.83597867)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 84,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03023",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03023",
+      "type": "street",
+      "prefLabel": "Van Esveldstraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.83624528775614,
+        "lng": -55.174906609481866,
+        "wkt": "LineString (-55.17452563 5.83719601, -55.17501029 5.83597867, -55.17518390 5.83556118)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 85,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03024",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03024",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #86",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.838719918703421,
+        "lng": -55.17371476328508,
+        "wkt": "LineString (-55.17408334 5.83705960, -55.17367515 5.83885564, -55.17338580 5.84024452)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 86,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03025",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03025",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #87",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.838283712181124,
+        "lng": -55.16882520852184,
+        "wkt": "LineString (-55.16902936 5.83542030, -55.16880580 5.83835961, -55.16864046 5.84107123)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 87,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03026",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03026",
+      "type": "street",
+      "prefLabel": "Nieuwe Weg van Charlesbrug",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.843096164370145,
+        "lng": -55.1665480990986,
+        "wkt": "LineString (-55.16676692 5.83460426, -55.16673488 5.83472620, -55.16660674 5.83636723, -55.16655714 5.83764863, -55.16655714 5.83853322, -55.16655714 5.83946741, -55.16655714 5.84095549, -55.16654061 5.84413007, -55.16646620 5.84780895, -55.16641660 5.85271137, -55.16640833 5.85486082, -55.16640833 5.85534032)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 88,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03027",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03027",
+      "type": "street",
+      "prefLabel": "Oude Weg van Charlesburg",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.838060648635218,
+        "lng": -55.16522902504265,
+        "wkt": "LineString (-55.16568496 5.83420434, -55.16542041 5.83504449, -55.16450276 5.83797932, -55.16427954 5.83874816, -55.16446142 5.83889697, -55.16482518 5.83892177, -55.16501532 5.83892177, -55.16545348 5.83913672, -55.16609005 5.83928553, -55.16655714 5.83946741)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 89,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03028",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03028",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #90",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.838256269865028,
+        "lng": -55.16552994898413,
+        "wkt": "LineString (-55.16655714 5.83853322, -55.16450276 5.83797932)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 90,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03029",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03029",
+      "type": "street",
+      "prefLabel": "Anniestraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.836480126237259,
+        "lng": -55.16450379007654,
+        "wkt": "LineString (-55.16528400 5.83402659, -55.16459370 5.83618328, -55.16438702 5.83685086, -55.16375045 5.83885977)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 91,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03030",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03030",
+      "type": "street",
+      "prefLabel": "Frederikalaan",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.837016198677643,
+        "lng": -55.162473173507244,
+        "wkt": "LineString (-55.16295267 5.83563145, -55.16199368 5.83840094)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 92,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03031",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03031",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #93",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.838627602292813,
+        "lng": -55.162845883791896,
+        "wkt": "LineString (-55.16375045 5.83885977, -55.16279353 5.83862209, -55.16199368 5.83840094)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 93,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03032",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03032",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #94",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.837884248508816,
+        "lng": -55.16334122333842,
+        "wkt": "LineString (-55.16270879 5.83768584, -55.16397366 5.83808266)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 94,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03033",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03033",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #95",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.83660594179315,
+        "lng": -55.163649174349956,
+        "wkt": "LineString (-55.16291133 5.83636103, -55.16438702 5.83685086)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 95,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03034",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03034",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #96",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.835907368357585,
+        "lng": -55.16377318146869,
+        "wkt": "LineString (-55.16295267 5.83563145, -55.16459370 5.83618328)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 96,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03035",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03035",
+      "type": "street",
+      "prefLabel": "Mangolaan",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.842238669906825,
+        "lng": -55.16262847766071,
+        "wkt": "LineString (-55.16279353 5.83862209, -55.16279146 5.83875850, -55.16274392 5.83977742, -55.16268192 5.84108777, -55.16256205 5.84321655, -55.16248764 5.84510560, -55.16233883 5.84910276)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 97,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03036",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03036",
+      "type": "street",
+      "prefLabel": "Koffielaan",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.841451519957876,
+        "lng": -55.16393576857994,
+        "wkt": "LineString (-55.16268192 5.84108777, -55.16378558 5.84140605, -55.16533980 5.84186074)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 98,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03037",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03037",
+      "type": "street",
+      "prefLabel": "Para-grasweg",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.84322895532647,
+        "lng": -55.163686376485586,
+        "wkt": "LineString (-55.16256205 5.84321655, -55.16481071 5.84324136)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 99,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03038",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03038",
+      "type": "street",
+      "prefLabel": "Hoenderparkweg",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.845124197457864,
+        "lng": -55.16382071753088,
+        "wkt": "LineString (-55.16248764 5.84510560, -55.16515379 5.84514280)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 100,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03039",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03039",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #101",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.838435285269778,
+        "lng": -55.15911091126281,
+        "wkt": "LineString (-55.16052316 5.83320298, -55.16023485 5.83411857, -55.16011911 5.83456499, -55.15961481 5.83649950, -55.15939160 5.83735102, -55.15896171 5.83900445, -55.15886457 5.83943640, -55.15883356 5.83957901, -55.15856488 5.84049253, -55.15853181 5.84063307, -55.15839954 5.84107123, -55.15829207 5.84155486, -55.15811019 5.84215009)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 101,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03040",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03040",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #102",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.840656324308965,
+        "lng": -55.16123336066801,
+        "wkt": "LineString (-55.16137984 5.84533294, -55.16138811 5.84339016, -55.16139431 5.84269572, -55.16140465 5.84035612, -55.16147078 5.84018251, -55.16148732 5.83974436, -55.16172706 5.83704927, -55.15961481 5.83649950)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 102,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03041",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03041",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #103",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.83539859470654,
+        "lng": -55.16187862826572,
+        "wkt": "LineString (-55.16180147 5.83634656, -55.16189241 5.83513129, -55.16194201 5.83471793)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 103,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03042",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03042",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #104",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.8348481408850255,
+        "lng": -55.161005755935506,
+        "wkt": "LineString (-55.16189241 5.83513129, -55.16011911 5.83456499)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 104,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03043",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03043",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #105",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.8393744007190005,
+        "lng": -55.16022451108744,
+        "wkt": "LineString (-55.16148732 5.83974436, -55.15896171 5.83900445)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 105,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03044",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03044",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #106",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.839989613813633,
+        "lng": -55.16020039859213,
+        "wkt": "LineString (-55.16140465 5.84035612, -55.16036299 5.84003371, -55.15883356 5.83957901)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 106,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03045",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03045",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #107",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.842485739328161,
+        "lng": -55.15902784239161,
+        "wkt": "LineString (-55.16138811 5.84339016, -55.15946187 5.84262959, -55.15868476 5.84235677, -55.15811019 5.84215009, -55.15749429 5.84190208)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 107,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03046",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03046",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #108",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.841857436593217,
+        "lng": -55.15911175387529,
+        "wkt": "LineString (-55.15722147 5.84118284, -55.15829207 5.84155486, -55.15896584 5.84179461, -55.15968508 5.84205915, -55.16139431 5.84269572)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 108,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03047",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03047",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #109",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.841043674322914,
+        "lng": -55.15831686824418,
+        "wkt": "LineString (-55.15740335 5.84072815, -55.15839954 5.84107123, -55.15914772 5.84133165)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 109,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03048",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03048",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #110",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.840767414019501,
+        "lng": -55.159310991979396,
+        "wkt": "LineString (-55.15856488 5.84049253, -55.16005710 5.84104230)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 110,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03049",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03049",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #111",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.841282043562268,
+        "lng": -55.1599529354974,
+        "wkt": "LineString (-55.15946187 5.84262959, -55.15968508 5.84205915, -55.16005710 5.84104230, -55.16019764 5.84064547, -55.16036299 5.84003371)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 111,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03050",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03050",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #112",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.841621513049816,
+        "lng": -55.15901595837605,
+        "wkt": "LineString (-55.15868476 5.84235677, -55.15896584 5.84179461, -55.15914772 5.84133165, -55.15926552 5.84100303)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 112,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03051",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03051",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #113",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.83838318927217,
+        "lng": -55.15871049690136,
+        "wkt": "LineString (-55.15833134 5.83694386, -55.15915805 5.83725801, -55.15905058 5.83758870, -55.15853801 5.83790285, -55.15848014 5.83808473, -55.15857108 5.83830794, -55.15881083 5.83869650, -55.15867029 5.83920596, -55.15863722 5.83939094, -55.15870336 5.83939920, -55.15886457 5.83943640)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 113,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03052",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03052",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #114",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.839273300470805,
+        "lng": -55.15848083321225,
+        "wkt": "LineString (-55.15863722 5.83939094, -55.15851941 5.83941160, -55.15825486 5.83932480, -55.15837060 5.83918012, -55.15843261 5.83912639, -55.15867029 5.83920596)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 114,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03053",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03053",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #115",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.8389527765152875,
+        "lng": -55.157999961162915,
+        "wkt": "LineString (-55.15843261 5.83912639, -55.15785804 5.83889077, -55.15770923 5.83884117)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 115,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03054",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03054",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #116",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.838679960854061,
+        "lng": -55.15790557796699,
+        "wkt": "LineString (-55.15785804 5.83889077, -55.15795311 5.83846915)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 116,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03055",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03055",
+      "type": "street",
+      "prefLabel": "Verlengde Hoogestraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.829081178345923,
+        "lng": -55.17291124308425,
+        "wkt": "LineString (-55.17507953 5.83031878, -55.17445433 5.82997259, -55.17373474 5.82957474, -55.17304030 5.82915036, -55.17141443 5.82818586, -55.16974412 5.82728474)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 117,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03056",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03056",
+      "type": "street",
+      "prefLabel": "Hoogestraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.824872112646679,
+        "lng": -55.16551728992403,
+        "wkt": "LineString (-55.16975652 5.82728061, -55.16846065 5.82653346, -55.16715238 5.82575945, -55.16594744 5.82507431, -55.16470427 5.82438607, -55.16352827 5.82370403, -55.16242392 5.82308365, -55.16216488 5.82315530)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 118,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03057",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03057",
+      "type": "street",
+      "prefLabel": "Ladesmastraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.823581887469053,
+        "lng": -55.16193560264751,
+        "wkt": "LineString (-55.16157653 5.82430030, -55.16160685 5.82420247, -55.16236191 5.82399166, -55.16216488 5.82315530, -55.16196784 5.82225970)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 119,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03058",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03058",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #120",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.824042183522387,
+        "lng": -55.16275414148831,
+        "wkt": "LineString (-55.16236191 5.82399166, -55.16265953 5.82391864, -55.16324098 5.82421625)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 120,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03059",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03059",
+      "type": "street",
+      "prefLabel": "Timmermansstraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.822065211514029,
+        "lng": -55.163566571830266,
+        "wkt": "LineString (-55.16486341 5.82126523, -55.16473320 5.82127866, -55.16342011 5.82202822, -55.16239222 5.82267030, -55.16242392 5.82308365)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 121,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03060",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03060",
+      "type": "street",
+      "prefLabel": "Prinsenstraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.822856898548826,
+        "lng": -55.16486887293921,
+        "wkt": "LineString (-55.16319551 5.82160108, -55.16342011 5.82202822, -55.16354411 5.82212949, -55.16418137 5.82253423, -55.16534911 5.82321627, -55.16659469 5.82390348, -55.16779721 5.82458552)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 122,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03061",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03061",
+      "type": "street",
+      "prefLabel": "Nieuwe Domineestraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.824413148521669,
+        "lng": -55.1692157161245,
+        "wkt": "LineString (-55.17166382 5.82408742, -55.16941172 5.82437884, -55.16876550 5.82449320, -55.16844033 5.82452076, -55.16779721 5.82458552)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 123,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03062",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03062",
+      "type": "street",
+      "prefLabel": "Straat langs de Drambrandersgracht Zuid",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.822407901742009,
+        "lng": -55.16662172832527,
+        "wkt": "LineString (-55.16502462 5.82106682, -55.16606008 5.82192247, -55.16716684 5.82286699, -55.16823537 5.82377534)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 124,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03063",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03063",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #125",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.821788124496475,
+        "lng": -55.16536253937371,
+        "wkt": "LineString (-55.16483861 5.82136030, -55.16588647 5.82221595)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 125,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03064",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03064",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #126",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.82518431205025,
+        "lng": -55.16944111054486,
+        "wkt": "LineString (-55.17055430 5.82590413, -55.16932870 5.82512805, -55.16844033 5.82452076)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 126,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03065",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03065",
+      "type": "street",
+      "prefLabel": "Pontenwerfstraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.821453502112584,
+        "lng": -55.16813478740604,
+        "wkt": "LineString (-55.17194318 5.82362240, -55.17035555 5.82269372, -55.16919436 5.82204751, -55.16798116 5.82137890, -55.16675039 5.82067826, -55.16556612 5.81999209, -55.16515276 5.81976164)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 127,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03066",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03066",
+      "type": "street",
+      "prefLabel": "Nepveustraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.821501048016613,
+        "lng": -55.171017332881206,
+        "wkt": "LineString (-55.17242888 5.81892666, -55.17185052 5.82000828, -55.17104000 5.82149774, -55.17035555 5.82269372, -55.16941172 5.82437884)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 128,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03067",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03067",
+      "type": "street",
+      "prefLabel": "Van Lansbergestraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.828633059102725,
+        "lng": -55.17335247304315,
+        "wkt": "LineString (-55.17232141 5.83038388, -55.17304030 5.82915036, -55.17372372 5.82800880, -55.17432446 5.82698919)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 129,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03068",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03068",
+      "type": "street",
+      "prefLabel": "Celinestraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.82900542492316,
+        "lng": -55.17406654736856,
+        "wkt": "LineString (-55.17307785 5.83080964, -55.17373474 5.82957474, -55.17439611 5.82838358, -55.17505748 5.82725374)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 130,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03069",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03069",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #131",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.828391503569349,
+        "lng": -55.1744118440425,
+        "wkt": "LineString (-55.17511570 5.82878213, -55.17439611 5.82838358, -55.17372372 5.82800880)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 131,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03070",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03070",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #132",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.818951806119559,
+        "lng": -55.16846392296711,
+        "wkt": "LineString (-55.16801009 5.81978231, -55.16891775 5.81812130)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 132,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03071",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03071",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #133",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.818497457815077,
+        "lng": -55.16482965322763,
+        "wkt": "LineString (-55.16414072 5.81805103, -55.16443834 5.81821086, -55.16464778 5.81831007, -55.16483516 5.81842030, -55.16490681 5.81866831, -55.16526506 5.81884468, -55.16557370 5.81897695)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 133,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03072",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03072",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #134",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.836609986938089,
+        "lng": -55.14936340513517,
+        "wkt": "LineString (-55.15057802 5.83635939, -55.14992813 5.83743059, -55.14758406 5.83603998)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 134,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03073",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03073",
+      "type": "street",
+      "prefLabel": "Bamboelaan",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.833693144158121,
+        "lng": -55.14375279890196,
+        "wkt": "LineString (-55.13947636 5.83170721, -55.14188345 5.83292680, -55.14223191 5.83309492, -55.14389013 5.83390187, -55.14507610 5.83432063, -55.14624373 5.83472410, -55.14746791 5.83517648)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 135,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03074",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03074",
+      "type": "street",
+      "prefLabel": "Groote Waterstraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.830020412697726,
+        "lng": -55.14397708967947,
+        "wkt": "LineString (-55.13947636 5.83170721, -55.14124080 5.83101871, -55.14632932 5.82909685, -55.14650966 5.82918244, -55.14632932 5.82909685)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 136,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03075",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03075",
+      "type": "street",
+      "prefLabel": "Mauriciusstraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.831980014998873,
+        "lng": -55.14289214062823,
+        "wkt": "LineString (-55.14223191 5.83309492, -55.14355237 5.83086511)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 137,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03076",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03076",
+      "type": "street",
+      "prefLabel": "Hofstede Crulllaan",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.8314659561693984,
+        "lng": -55.145388093288474,
+        "wkt": "LineString (-55.14882199 5.83275411, -55.14755044 5.83233229, -55.14638892 5.83189825, -55.14520295 5.83147032, -55.14355237 5.83086511, -55.14321003 5.83057779, -55.14298995 5.83036382)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 138,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03077",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03077",
+      "type": "street",
+      "prefLabel": "Wilhelminastraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.830675163610322,
+        "lng": -55.14567585270119,
+        "wkt": "LineString (-55.14389013 5.83390187, -55.14457328 5.83264407, -55.14520295 5.83147032, -55.14590597 5.83022322, -55.14650966 5.82918244, -55.14665179 5.82894555, -55.14699719 5.82835868)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 139,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03078",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03078",
+      "type": "street",
+      "prefLabel": "W. L. Lothlaan",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.833193495132323,
+        "lng": -55.1461731728698,
+        "wkt": "LineString (-55.14457328 5.83264407, -55.14573022 5.83303684, -55.14576078 5.83301239, -55.14591973 5.83310409, -55.14692841 5.83346477, -55.14812661 5.83389881)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 140,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03079",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03079",
+      "type": "street",
+      "prefLabel": "President Da Costalaan",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.830909050007039,
+        "lng": -55.14766162189579,
+        "wkt": "LineString (-55.14590597 5.83022322, -55.14706291 5.83068936, -55.14821220 5.83112951, -55.14946541 5.83159412)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 141,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03080",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03080",
+      "type": "street",
+      "prefLabel": "Sommelsdijkschestraat (Palmenlaan)",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.829677994279717,
+        "lng": -55.14835089083809,
+        "wkt": "LineString (-55.14665179 5.82894555, -55.14779650 5.82943003, -55.14886020 5.82990075, -55.15009508 5.83043566)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 142,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03081",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03081",
+      "type": "street",
+      "prefLabel": "Kleine Dwarsstraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.829189316354439,
+        "lng": -55.1486385956682,
+        "wkt": "LineString (-55.14886020 5.82990075, -55.14890911 5.82981822, -55.14862790 5.82912742, -55.14815718 5.82791088)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 143,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03082",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03082",
+      "type": "street",
+      "prefLabel": "Kleine Waterstraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.827972524877214,
+        "lng": -55.14796511928852,
+        "wkt": "LineString (-55.14699719 5.82835868, -55.14815718 5.82791088, -55.14874099 5.82764801)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 144,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03083",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03083",
+      "type": "street",
+      "prefLabel": "Crommelinstraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.832278545375949,
+        "lng": -55.146193550369894,
+        "wkt": "LineString (-55.14779650 5.82943003, -55.14706291 5.83068936, -55.14638892 5.83189825, -55.14576078 5.83301239, -55.14507610 5.83432063, -55.14507610 5.83432063)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 145,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03084",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03084",
+      "type": "street",
+      "prefLabel": "Wichersstraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.83231028333242,
+        "lng": -55.14755899571067,
+        "wkt": "LineString (-55.14886020 5.82990075, -55.14821220 5.83112951, -55.14755044 5.83233229, -55.14692841 5.83346477, -55.14624373 5.83472410)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 146,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03085",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03085",
+      "type": "street",
+      "prefLabel": "Groote Combéweg",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.831948589072869,
+        "lng": -55.14926128749667,
+        "wkt": "LineString (-55.14746791 5.83517648, -55.14750000 5.83510923, -55.14812661 5.83389881, -55.14882199 5.83275411, -55.14946541 5.83159412, -55.15009508 5.83043566, -55.15062082 5.82949116, -55.15199248 5.82712915)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 147,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03086",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03086",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #148",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.8319639677175035,
+        "lng": -55.13841143400938,
+        "wkt": "LineString (-55.13947636 5.83170721, -55.13922878 5.83166136, -55.13905149 5.83182642, -55.13774326 5.83204038, -55.13655729 5.83258446)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 148,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03087",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03087",
+      "type": "street",
+      "prefLabel": "Mahonylaan",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.836010599620681,
+        "lng": -55.1496512725188,
+        "wkt": "LineString (-55.14746791 5.83517648, -55.14788819 5.83540573, -55.14835280 5.83555856, -55.14894579 5.83577864, -55.14959379 5.83600483, -55.15023568 5.83623713, -55.15057802 5.83635939, -55.15121992 5.83655502, -55.15257935 5.83701963)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 149,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03088",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03088",
+      "type": "street",
+      "prefLabel": "Julianastraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.832471367471032,
+        "lng": -55.15082255424571,
+        "wkt": "LineString (-55.14894579 5.83577864, -55.15046187 5.83308881, -55.15173343 5.83085136, -55.15214913 5.83016667)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 150,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03089",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03089",
+      "type": "street",
+      "prefLabel": "Prins Hendrikstraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.832746463722947,
+        "lng": -55.1514472519844,
+        "wkt": "LineString (-55.14959379 5.83600483, -55.15108390 5.83337613, -55.15236004 5.83114479, -55.15275128 5.83046011)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 151,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03090",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03090",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #152",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.833262014476539,
+        "lng": -55.15083936568329,
+        "wkt": "LineString (-55.15108390 5.83337613, -55.15097233 5.83332111, -55.15046187 5.83308881)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 152,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03091",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03091",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #153",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.835050394832742,
+        "lng": -55.148613378511556,
+        "wkt": "LineString (-55.14835280 5.83555856, -55.14887396 5.83454223)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 153,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03092",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03092",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #154",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.837212192879047,
+        "lng": -55.14688154571824,
+        "wkt": "LineString (-55.14788819 5.83540573, -55.14758406 5.83603998, -55.14517238 5.84019087)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 154,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03093",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03093",
+      "type": "street",
+      "prefLabel": "Laan van Tourtonne",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.837984160509421,
+        "lng": -55.152058364723,
+        "wkt": "LineString (-55.15637797 5.82961495, -55.15552823 5.83124108, -55.15388376 5.83442608, -55.15257935 5.83701963, -55.15212315 5.83787395, -55.15104110 5.83991578, -55.14928049 5.84337588, -55.14906652 5.84385271, -55.14864471 5.84453739)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 155,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03094",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03094",
+      "type": "street",
+      "prefLabel": "Costerstraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.833079126412772,
+        "lng": -55.15311757019913,
+        "wkt": "LineString (-55.15434914 5.83080627, -55.15378366 5.83187609, -55.15121992 5.83655502)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 156,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03095",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03095",
+      "type": "street",
+      "prefLabel": "Koninginnestraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.831290746056563,
+        "lng": -55.15262570828947,
+        "wkt": "LineString (-55.15378366 5.83187609, -55.15236004 5.83114479, -55.15173343 5.83085136)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 157,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03096",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03096",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #158",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.830219908424108,
+        "lng": -55.152229365911715,
+        "wkt": "LineString (-55.15275128 5.83046011, -55.15214913 5.83016667, -55.15178768 5.83003294)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 158,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03097",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03097",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #159",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.83197275551445,
+        "lng": -55.14156212666552,
+        "wkt": "LineString (-55.14188345 5.83292680, -55.14124080 5.83101871)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 159,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03098",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03098",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #160",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.828162545066044,
+        "lng": -55.146695091592,
+        "wkt": "LineString (-55.14699719 5.82835868, -55.14698573 5.82830748, -55.14610236 5.82782148)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 160,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03099",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03099",
+      "type": "street",
+      "prefLabel": "Kleine Combéweg",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.826907196362638,
+        "lng": -55.14950377397422,
+        "wkt": "LineString (-55.14874099 5.82764801, -55.14898476 5.82753415, -55.15009416 5.82628183, -55.15019518 5.82616479)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 161,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03100",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03100",
+      "type": "street",
+      "prefLabel": "Gouvernementsplein",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.826288301334244,
+        "lng": -55.151258655904954,
+        "wkt": "LineString (-55.15019518 5.82616479, -55.15023797 5.82613269, -55.15046111 5.82593401, -55.15092266 5.82561307, -55.15102506 5.82554582, -55.15115191 5.82549080, -55.15164097 5.82593095, -55.15238678 5.82629164, -55.15195121 5.82709094, -55.15087375 5.82648115, -55.15023797 5.82613269, -55.15199248 5.82712915, -55.15195121 5.82709094, -55.15046111 5.82593401, -55.15049167 5.82597986, -55.15104798 5.82595541, -55.15164097 5.82593095, -55.15183048 5.82611435, -55.15191606 5.82636805, -55.15192829 5.82668900, -55.15185799 5.82690602, -55.15195121 5.82709094, -55.15185799 5.82690602, -55.15178463 5.82681738, -55.15153704 5.82657590, -55.15121304 5.82640779, -55.15097462 5.82639556, -55.15104492 5.82608073, -55.15104798 5.82595541, -55.15087375 5.82648115, -55.15097462 5.82639556, -55.15102506 5.82554582, -55.15104798 5.82595541)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 162,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03101",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03101",
+      "type": "street",
+      "prefLabel": "Unnamed street (Paramaribo 1916) #163",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.825317591327487,
+        "lng": -55.15109688634135,
+        "wkt": "LineString (-55.15115191 5.82549080, -55.15108772 5.82538535, -55.15105104 5.82507663)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 163,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03102",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03102",
+      "type": "street",
+      "prefLabel": "Noorderkerkstraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.828055650956088,
+        "lng": -55.1546596916338,
+        "wkt": "LineString (-55.15494387 5.82764643, -55.15437551 5.82846487)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 164,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-03103",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-03103",
+      "type": "street",
+      "prefLabel": "Kalkbranderijstraat",
+      "altLabels": [],
+      "broader": null,
+      "description": "Street line from the Paramaribo 1916 map.",
+      "location": {
+        "lat": 5.828399651134752,
+        "lng": -55.171252765746196,
+        "wkt": "LineString (-55.17062664 5.82938149, -55.17141443 5.82818586, -55.17171722 5.82763160)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "paramaribo-street-map-1916"
+      ],
+      "wikidataQid": null,
+      "fid": 165,
+      "psurIds": [],
+      "district": "Paramaribo",
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": null,
+      "modifiedAt": null,
+      "externalLinks": [],
+      "diklandRefs": []
     }
   ]
 }
