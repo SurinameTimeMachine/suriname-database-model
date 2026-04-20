@@ -1,0 +1,1765 @@
+[
+  {
+    "name": "Libanon",
+    "count": 10,
+    "plantations": [
+      {
+        "id": "stm-00844",
+        "locationDescription": "Boven-Saramacca",
+        "district": "Divisie Saramacca"
+      },
+      {
+        "id": "stm-00845",
+        "locationDescription": "Boven-Saramacca",
+        "district": "Divisie Saramacca"
+      },
+      {
+        "id": "stm-01113",
+        "locationDescription": "Boven-Cottica",
+        "district": "Divisie Boven-Cottica en Perica"
+      },
+      {
+        "id": "stm-01302",
+        "locationDescription": "Pararakweg",
+        "district": "Divisie Para"
+      },
+      {
+        "id": "stm-01466",
+        "locationDescription": "Marechals Kreek",
+        "district": "Divisie Boven-Suriname en Thorarica"
+      },
+      {
+        "id": "stm-01718",
+        "locationDescription": "Boven-Saramacca",
+        "district": "Divisie Saramacca"
+      },
+      {
+        "id": "stm-01887",
+        "locationDescription": "Marechals Kreek",
+        "district": "Divisie Boven-Suriname en Thorarica"
+      },
+      {
+        "id": "stm-02134",
+        "locationDescription": "Suriname",
+        "district": "Divisie Boven-Suriname en Thorarica"
+      },
+      {
+        "id": "stm-02256",
+        "locationDescription": "Saramacca",
+        "district": null
+      },
+      {
+        "id": "stm-02276",
+        "locationDescription": "Jonkermans Kreek",
+        "district": null
+      }
+    ]
+  },
+  {
+    "name": "Aan Onoribo",
+    "count": 6,
+    "plantations": [
+      {
+        "id": "stm-01297",
+        "locationDescription": "Pararakweg",
+        "district": "Divisie Para"
+      },
+      {
+        "id": "stm-01304",
+        "locationDescription": "Pararakweg",
+        "district": "Divisie Para"
+      },
+      {
+        "id": "stm-01307",
+        "locationDescription": null,
+        "district": null
+      },
+      {
+        "id": "stm-01310",
+        "locationDescription": "Pararakweg",
+        "district": "Divisie Para"
+      },
+      {
+        "id": "stm-01315",
+        "locationDescription": "Para Kreek",
+        "district": "Divisie Para"
+      },
+      {
+        "id": "stm-01322",
+        "locationDescription": null,
+        "district": null
+      }
+    ]
+  },
+  {
+    "name": "Charlottenburg",
+    "count": 5,
+    "plantations": [
+      {
+        "id": "stm-00822",
+        "locationDescription": "Boven-Cottica",
+        "district": "Divisie Matapplea"
+      },
+      {
+        "id": "stm-00825",
+        "locationDescription": "Boven-Cottica",
+        "district": "Divisie Matapplea"
+      },
+      {
+        "id": "stm-01510",
+        "locationDescription": null,
+        "district": null
+      },
+      {
+        "id": "stm-02150",
+        "locationDescription": "Coropina Kreek",
+        "district": "Divisie Para"
+      },
+      {
+        "id": "stm-02463",
+        "locationDescription": "Nickerierivier",
+        "district": "Divisie Nickerie"
+      }
+    ]
+  },
+  {
+    "name": "Onverwacht",
+    "count": 5,
+    "plantations": [
+      {
+        "id": "stm-00715",
+        "locationDescription": "Pararak Kreek",
+        "district": null
+      },
+      {
+        "id": "stm-00852",
+        "locationDescription": "Pad van Wanica",
+        "district": null
+      },
+      {
+        "id": "stm-00855",
+        "locationDescription": "Pad van Wanica",
+        "district": null
+      },
+      {
+        "id": "stm-00859",
+        "locationDescription": "Pad van Wanica",
+        "district": null
+      },
+      {
+        "id": "stm-02147",
+        "locationDescription": "Para Kreek",
+        "district": "Divisie Para"
+      }
+    ]
+  },
+  {
+    "name": "Waterloo",
+    "count": 5,
+    "plantations": [
+      {
+        "id": "stm-00706",
+        "locationDescription": "Tawayarie Kreek",
+        "district": "Divisie Saramacca"
+      },
+      {
+        "id": "stm-00744",
+        "locationDescription": "Nickerierivier",
+        "district": "Divisie Nickerie"
+      },
+      {
+        "id": "stm-00745",
+        "locationDescription": "Nickerierivier",
+        "district": "Divisie Nickerie"
+      },
+      {
+        "id": "stm-01643",
+        "locationDescription": "Nickerierivier",
+        "district": "Divisie Nickerie"
+      },
+      {
+        "id": "stm-02195",
+        "locationDescription": "Warappa Kreek",
+        "district": "Divisie Beneden-Cottica"
+      }
+    ]
+  },
+  {
+    "name": "Welgelegen",
+    "count": 5,
+    "plantations": [
+      {
+        "id": "stm-00578",
+        "locationDescription": "Beneden-Commewijne",
+        "district": "Divisie Beneden-Commewijne"
+      },
+      {
+        "id": "stm-00922",
+        "locationDescription": "Atlantische kust",
+        "district": "Divisie Nickerie"
+      },
+      {
+        "id": "stm-01097",
+        "locationDescription": "Boven-Cottica",
+        "district": "Divisie Boven-Cottica en Perica"
+      },
+      {
+        "id": "stm-01505",
+        "locationDescription": "Para Kreek",
+        "district": "Divisie Para"
+      },
+      {
+        "id": "stm-01546",
+        "locationDescription": "Atlantische kust",
+        "district": "Divisie Nickerie"
+      }
+    ]
+  },
+  {
+    "name": "Bigrar",
+    "count": 4,
+    "plantations": [
+      {
+        "id": "stm-00524",
+        "locationDescription": "Suriname",
+        "district": "Divisie Boven-Suriname en Thorarica"
+      },
+      {
+        "id": "stm-00887",
+        "locationDescription": "Marechals Kreek",
+        "district": null
+      },
+      {
+        "id": "stm-01443",
+        "locationDescription": "Marechals Kreek",
+        "district": null
+      },
+      {
+        "id": "stm-02494",
+        "locationDescription": "Jonkermans Kreek",
+        "district": "Divisie Boven-Suriname en Thorarica"
+      }
+    ]
+  },
+  {
+    "name": "Curacao",
+    "count": 4,
+    "plantations": [
+      {
+        "id": "stm-01223",
+        "locationDescription": "Marechals Kreek",
+        "district": "Divisie Boven-Suriname en Thorarica"
+      },
+      {
+        "id": "stm-01224",
+        "locationDescription": "Marechals Kreek",
+        "district": "Divisie Boven-Suriname en Thorarica"
+      },
+      {
+        "id": "stm-01457",
+        "locationDescription": "Marechals Kreek",
+        "district": "Divisie Boven-Suriname en Thorarica"
+      },
+      {
+        "id": "stm-01681",
+        "locationDescription": "Wanica Kreek",
+        "district": "Divisie Saramacca"
+      }
+    ]
+  },
+  {
+    "name": "La Solitude",
+    "count": 4,
+    "plantations": [
+      {
+        "id": "stm-00719",
+        "locationDescription": "Perica Kreek",
+        "district": null
+      },
+      {
+        "id": "stm-00856",
+        "locationDescription": "Boven-Saramacca",
+        "district": "Divisie Saramacca"
+      },
+      {
+        "id": "stm-02024",
+        "locationDescription": "Boven-Saramacca",
+        "district": "Divisie Saramacca"
+      },
+      {
+        "id": "stm-02080",
+        "locationDescription": "Commetewane Kreek",
+        "district": null
+      }
+    ]
+  },
+  {
+    "name": "La Sonnette",
+    "count": 4,
+    "plantations": [
+      {
+        "id": "stm-00860",
+        "locationDescription": "Boven-Saramacca",
+        "district": "Divisie Saramacca"
+      },
+      {
+        "id": "stm-00867",
+        "locationDescription": "Boven-Saramacca",
+        "district": "Divisie Saramacca"
+      },
+      {
+        "id": "stm-01999",
+        "locationDescription": "Boven-Saramacca",
+        "district": "Divisie Saramacca"
+      },
+      {
+        "id": "stm-02515",
+        "locationDescription": "Saramacca",
+        "district": "Divisie Saramacca"
+      }
+    ]
+  },
+  {
+    "name": "Maria's lust",
+    "count": 4,
+    "plantations": [
+      {
+        "id": "stm-00831",
+        "locationDescription": "Tapoeripa Kreek",
+        "district": "Divisie Matapplea"
+      },
+      {
+        "id": "stm-00870",
+        "locationDescription": "Boven-Saramacca",
+        "district": "Divisie Saramacca"
+      },
+      {
+        "id": "stm-01704",
+        "locationDescription": "Boven-Saramacca",
+        "district": "Divisie Saramacca"
+      },
+      {
+        "id": "stm-01928",
+        "locationDescription": "Boven-Saramacca",
+        "district": "Divisie Saramacca"
+      }
+    ]
+  },
+  {
+    "name": "Mon Plaisir",
+    "count": 4,
+    "plantations": [
+      {
+        "id": "stm-00542",
+        "locationDescription": "Suriname",
+        "district": "Divisie Para"
+      },
+      {
+        "id": "stm-01162",
+        "locationDescription": "Boven-Commewijne",
+        "district": null
+      },
+      {
+        "id": "stm-01705",
+        "locationDescription": "Wanica Kreek",
+        "district": "Divisie Saramacca"
+      },
+      {
+        "id": "stm-02283",
+        "locationDescription": "Orelana Kreek",
+        "district": null
+      }
+    ]
+  },
+  {
+    "name": "Nieuwzorg",
+    "count": 4,
+    "plantations": [
+      {
+        "id": "stm-01391",
+        "locationDescription": "Pad van Wanica",
+        "district": "Divisie Para"
+      },
+      {
+        "id": "stm-02067",
+        "locationDescription": "Commetewane Kreek",
+        "district": "Divisie Boven-Commewijne"
+      },
+      {
+        "id": "stm-02161",
+        "locationDescription": "Marechals Kreek",
+        "district": "Divisie Boven-Suriname en Thorarica"
+      },
+      {
+        "id": "stm-02279",
+        "locationDescription": "Jonkermans Kreek",
+        "district": null
+      }
+    ]
+  },
+  {
+    "name": "Smithfield",
+    "count": 4,
+    "plantations": [
+      {
+        "id": "stm-00958",
+        "locationDescription": "Beneden-Saramacca",
+        "district": "Divisie Saramacca"
+      },
+      {
+        "id": "stm-00959",
+        "locationDescription": "Beneden-Saramacca",
+        "district": "Divisie Saramacca"
+      },
+      {
+        "id": "stm-01041",
+        "locationDescription": "Beneden-Saramacca",
+        "district": "Divisie Saramacca"
+      },
+      {
+        "id": "stm-02390",
+        "locationDescription": "Beneden-Saramacca",
+        "district": null
+      }
+    ]
+  },
+  {
+    "name": "Staf Aarons",
+    "count": 4,
+    "plantations": [
+      {
+        "id": "stm-00756",
+        "locationDescription": "Warappa Kreek",
+        "district": "Divisie Beneden-Cottica"
+      },
+      {
+        "id": "stm-00840",
+        "locationDescription": "Boven-Saramacca",
+        "district": "Divisie Saramacca"
+      },
+      {
+        "id": "stm-00841",
+        "locationDescription": "Boven-Saramacca",
+        "district": "Divisie Saramacca"
+      },
+      {
+        "id": "stm-02007",
+        "locationDescription": "Boven-Saramacca",
+        "district": "Divisie Saramacca"
+      }
+    ]
+  },
+  {
+    "name": "Toevlugt",
+    "count": 4,
+    "plantations": [
+      {
+        "id": "stm-00784",
+        "locationDescription": "Mot Kreek",
+        "district": "Divisie Boven-Cottica en Perica"
+      },
+      {
+        "id": "stm-01408",
+        "locationDescription": "Suriname",
+        "district": "Divisie Boven-Suriname en Thorarica"
+      },
+      {
+        "id": "stm-02110",
+        "locationDescription": "Rijweg naar Kwatta",
+        "district": "Divisie Para"
+      },
+      {
+        "id": "stm-02386",
+        "locationDescription": "Boven-Saramacca",
+        "district": "Divisie Saramacca"
+      }
+    ]
+  },
+  {
+    "name": "Welbedacht",
+    "count": 4,
+    "plantations": [
+      {
+        "id": "stm-01175",
+        "locationDescription": null,
+        "district": null
+      },
+      {
+        "id": "stm-01329",
+        "locationDescription": "Suriname",
+        "district": "Divisie Boven-Suriname en Thorarica"
+      },
+      {
+        "id": "stm-02079",
+        "locationDescription": "Commetewane Kreek",
+        "district": "Divisie Boven-Commewijne"
+      },
+      {
+        "id": "stm-02300",
+        "locationDescription": "Pad van Wanica",
+        "district": null
+      }
+    ]
+  },
+  {
+    "name": "Zorg en Hoop",
+    "count": 4,
+    "plantations": [
+      {
+        "id": "stm-00667",
+        "locationDescription": "Matappica Kreek",
+        "district": "Divisie Matapplea"
+      },
+      {
+        "id": "stm-01361",
+        "locationDescription": "Pad van Wanica",
+        "district": null
+      },
+      {
+        "id": "stm-02172",
+        "locationDescription": "Beneden-Commewijne",
+        "district": "Divisie Beneden-Cottica"
+      },
+      {
+        "id": "stm-02388",
+        "locationDescription": "Boven-Saramacca",
+        "district": "Divisie Saramacca"
+      }
+    ]
+  },
+  {
+    "name": "Bergen op Zoom",
+    "count": 3,
+    "plantations": [
+      {
+        "id": "stm-01901",
+        "locationDescription": "Suriname",
+        "district": "Divisie Boven-Suriname en Thorarica"
+      },
+      {
+        "id": "stm-02162",
+        "locationDescription": "Marechals Kreek",
+        "district": "Divisie Boven-Suriname en Thorarica"
+      },
+      {
+        "id": "stm-02447",
+        "locationDescription": "Boven-Commewijne",
+        "district": null
+      }
+    ]
+  },
+  {
+    "name": "Concordia",
+    "count": 3,
+    "plantations": [
+      {
+        "id": "stm-01081",
+        "locationDescription": "Beneden-Saramacca",
+        "district": "Divisie Saramacca"
+      },
+      {
+        "id": "stm-01167",
+        "locationDescription": "Boven-Commewijne",
+        "district": "Divisie Boven-Commewijne"
+      },
+      {
+        "id": "stm-01294",
+        "locationDescription": "Para Kreek",
+        "district": null
+      }
+    ]
+  },
+  {
+    "name": "De Dageraad",
+    "count": 3,
+    "plantations": [
+      {
+        "id": "stm-00802",
+        "locationDescription": "Mot Kreek",
+        "district": null
+      },
+      {
+        "id": "stm-01026",
+        "locationDescription": "Boven-Commewijne",
+        "district": null
+      },
+      {
+        "id": "stm-02472",
+        "locationDescription": "Commetewane Kreek",
+        "district": "Divisie Boven-Commewijne"
+      }
+    ]
+  },
+  {
+    "name": "De Dankbaarheid",
+    "count": 3,
+    "plantations": [
+      {
+        "id": "stm-00919",
+        "locationDescription": "Beneden-Saramacca",
+        "district": "Divisie Saramacca"
+      },
+      {
+        "id": "stm-01250",
+        "locationDescription": "Mot Kreek",
+        "district": null
+      },
+      {
+        "id": "stm-01712",
+        "locationDescription": "Beneden-Saramacca",
+        "district": "Divisie Saramacca"
+      }
+    ]
+  },
+  {
+    "name": "De Eendragt",
+    "count": 3,
+    "plantations": [
+      {
+        "id": "stm-01217",
+        "locationDescription": "Boven-Cottica",
+        "district": "Divisie Matapplea"
+      },
+      {
+        "id": "stm-01263",
+        "locationDescription": "Boven-Cottica",
+        "district": "Divisie Matapplea"
+      },
+      {
+        "id": "stm-02285",
+        "locationDescription": "Cottica",
+        "district": null
+      }
+    ]
+  },
+  {
+    "name": "De Herstelling",
+    "count": 3,
+    "plantations": [
+      {
+        "id": "stm-00682",
+        "locationDescription": "Warappa Kreek",
+        "district": "Divisie Beneden-Cottica"
+      },
+      {
+        "id": "stm-01956",
+        "locationDescription": "Beneden-Saramacca",
+        "district": "Divisie Saramacca"
+      },
+      {
+        "id": "stm-02210",
+        "locationDescription": "Cassewinicakreek",
+        "district": "Divisie Boven-Commewijne"
+      }
+    ]
+  },
+  {
+    "name": "De Nieuwe Hoop",
+    "count": 3,
+    "plantations": [
+      {
+        "id": "stm-00951",
+        "locationDescription": "Saramacca",
+        "district": "Divisie Saramacca"
+      },
+      {
+        "id": "stm-01507",
+        "locationDescription": "Para Kreek",
+        "district": "Divisie Para"
+      },
+      {
+        "id": "stm-01720",
+        "locationDescription": "Saramacca",
+        "district": "Divisie Saramacca"
+      }
+    ]
+  },
+  {
+    "name": "De Vier Kinderen",
+    "count": 3,
+    "plantations": [
+      {
+        "id": "stm-01184",
+        "locationDescription": "Boven-Commewijne",
+        "district": "Divisie Boven-Commewijne"
+      },
+      {
+        "id": "stm-01386",
+        "locationDescription": null,
+        "district": null
+      },
+      {
+        "id": "stm-01491",
+        "locationDescription": "Coropina Kreek",
+        "district": "Divisie Para"
+      }
+    ]
+  },
+  {
+    "name": "Eendracht",
+    "count": 3,
+    "plantations": [
+      {
+        "id": "stm-00941",
+        "locationDescription": "Beneden-Saramacca",
+        "district": "Divisie Saramacca"
+      },
+      {
+        "id": "stm-01357",
+        "locationDescription": "Beneden-Saramacca",
+        "district": "Divisie Saramacca"
+      },
+      {
+        "id": "stm-02203",
+        "locationDescription": "Commetewane Kreek",
+        "district": null
+      }
+    ]
+  },
+  {
+    "name": "Groningen",
+    "count": 3,
+    "plantations": [
+      {
+        "id": "stm-00830",
+        "locationDescription": "Tapoeripa Kreek",
+        "district": "Divisie Matapplea"
+      },
+      {
+        "id": "stm-02245",
+        "locationDescription": "Beneden-Saramacca",
+        "district": "Divisie Saramacca"
+      },
+      {
+        "id": "stm-02384",
+        "locationDescription": "Boven-Saramacca",
+        "district": null
+      }
+    ]
+  },
+  {
+    "name": "Hamburg",
+    "count": 3,
+    "plantations": [
+      {
+        "id": "stm-00950",
+        "locationDescription": "Beneden-Saramacca",
+        "district": "Divisie Saramacca"
+      },
+      {
+        "id": "stm-01201",
+        "locationDescription": "Boven-Cottica",
+        "district": "Divisie Boven-Cottica en Perica"
+      },
+      {
+        "id": "stm-01945",
+        "locationDescription": "Beneden-Saramacca",
+        "district": "Divisie Saramacca"
+      }
+    ]
+  },
+  {
+    "name": "Hope",
+    "count": 3,
+    "plantations": [
+      {
+        "id": "stm-00751",
+        "locationDescription": "Atlantische kust",
+        "district": null
+      },
+      {
+        "id": "stm-01605",
+        "locationDescription": "Atlantische kust",
+        "district": "District Coronie"
+      },
+      {
+        "id": "stm-01655",
+        "locationDescription": "Atlantische kust",
+        "district": null
+      }
+    ]
+  },
+  {
+    "name": "Karelsburg",
+    "count": 3,
+    "plantations": [
+      {
+        "id": "stm-01256",
+        "locationDescription": null,
+        "district": null
+      },
+      {
+        "id": "stm-01934",
+        "locationDescription": "Boven-Saramacca",
+        "district": null
+      },
+      {
+        "id": "stm-02184",
+        "locationDescription": "Wayamoe Kreek",
+        "district": "Divisie Boven-Cottica en Perica"
+      }
+    ]
+  },
+  {
+    "name": "Lust en Rust",
+    "count": 3,
+    "plantations": [
+      {
+        "id": "stm-00562",
+        "locationDescription": "Suriname",
+        "district": null
+      },
+      {
+        "id": "stm-02126",
+        "locationDescription": "Suriname",
+        "district": "Divisie Boven-Suriname en Thorarica"
+      },
+      {
+        "id": "stm-02403",
+        "locationDescription": "Coropina Kreek",
+        "district": "Divisie Para"
+      }
+    ]
+  },
+  {
+    "name": "Ma Retraite",
+    "count": 3,
+    "plantations": [
+      {
+        "id": "stm-00546",
+        "locationDescription": "Para Kreek",
+        "district": "Divisie Para"
+      },
+      {
+        "id": "stm-02050",
+        "locationDescription": "Orelana Kreek",
+        "district": null
+      },
+      {
+        "id": "stm-02144",
+        "locationDescription": "Booms Kreek",
+        "district": "Divisie Para"
+      }
+    ]
+  },
+  {
+    "name": "Mijn Hoop",
+    "count": 3,
+    "plantations": [
+      {
+        "id": "stm-01170",
+        "locationDescription": "Boven-Commewijne",
+        "district": null
+      },
+      {
+        "id": "stm-01489",
+        "locationDescription": "Coropina Kreek",
+        "district": null
+      },
+      {
+        "id": "stm-02260",
+        "locationDescription": "Boven-Commewijne",
+        "district": null
+      }
+    ]
+  },
+  {
+    "name": "Nijd en Spijt",
+    "count": 3,
+    "plantations": [
+      {
+        "id": "stm-00553",
+        "locationDescription": "Beneden-Commewijne",
+        "district": "Divisie Beneden-Commewijne"
+      },
+      {
+        "id": "stm-01467",
+        "locationDescription": "Marechals Kreek",
+        "district": "Divisie Boven-Suriname en Thorarica"
+      },
+      {
+        "id": "stm-02277",
+        "locationDescription": "Jonkermans Kreek",
+        "district": null
+      }
+    ]
+  },
+  {
+    "name": "Onoribo",
+    "count": 3,
+    "plantations": [
+      {
+        "id": "stm-01319",
+        "locationDescription": "Para Kreek",
+        "district": "Divisie Para"
+      },
+      {
+        "id": "stm-02151",
+        "locationDescription": "Pararak Kreek",
+        "district": null
+      },
+      {
+        "id": "stm-02152",
+        "locationDescription": "Pararakweg",
+        "district": null
+      }
+    ]
+  },
+  {
+    "name": "Onverdacht",
+    "count": 3,
+    "plantations": [
+      {
+        "id": "stm-00713",
+        "locationDescription": null,
+        "district": null
+      },
+      {
+        "id": "stm-02146",
+        "locationDescription": "Para Kreek",
+        "district": "Divisie Para"
+      },
+      {
+        "id": "stm-02153",
+        "locationDescription": "Pararakweg",
+        "district": null
+      }
+    ]
+  },
+  {
+    "name": "Rustenburg",
+    "count": 3,
+    "plantations": [
+      {
+        "id": "stm-01200",
+        "locationDescription": "Perica Kreek",
+        "district": "Divisie Boven-Cottica en Perica"
+      },
+      {
+        "id": "stm-01219",
+        "locationDescription": "Boven-Commewijne",
+        "district": null
+      },
+      {
+        "id": "stm-01241",
+        "locationDescription": "Perica Kreek",
+        "district": "Divisie Boven-Cottica en Perica"
+      }
+    ]
+  },
+  {
+    "name": "Vaderszorg",
+    "count": 3,
+    "plantations": [
+      {
+        "id": "stm-00697",
+        "locationDescription": "Matappica Kreek",
+        "district": "Divisie Para"
+      },
+      {
+        "id": "stm-01369",
+        "locationDescription": null,
+        "district": null
+      },
+      {
+        "id": "stm-01950",
+        "locationDescription": "Saramacca",
+        "district": null
+      }
+    ]
+  },
+  {
+    "name": "Voorzorg",
+    "count": 3,
+    "plantations": [
+      {
+        "id": "stm-00779",
+        "locationDescription": "Mot Kreek",
+        "district": "Divisie Boven-Cottica en Perica"
+      },
+      {
+        "id": "stm-01148",
+        "locationDescription": "Vredenburger Kreek",
+        "district": "Divisie Boven-Cottica en Perica"
+      },
+      {
+        "id": "stm-02254",
+        "locationDescription": "Beneden-Saramacca",
+        "district": "Divisie Saramacca"
+      }
+    ]
+  },
+  {
+    "name": "Weltevreden",
+    "count": 3,
+    "plantations": [
+      {
+        "id": "stm-01938",
+        "locationDescription": "Beneden-Saramacca",
+        "district": "Divisie Saramacca"
+      },
+      {
+        "id": "stm-02056",
+        "locationDescription": "Beneden-Commewijne",
+        "district": "Divisie Beneden-Commewijne"
+      },
+      {
+        "id": "stm-02125",
+        "locationDescription": "Suriname",
+        "district": "Divisie Boven-Suriname en Thorarica"
+      }
+    ]
+  },
+  {
+    "name": "Adrichem",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-00597",
+        "locationDescription": "Matappica Kreek",
+        "district": "Divisie Matapplea"
+      },
+      {
+        "id": "stm-01856",
+        "locationDescription": "Suriname",
+        "district": "Divisie Para"
+      }
+    ]
+  },
+  {
+    "name": "Berlijn",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-00658",
+        "locationDescription": "Beneden-Commewijne",
+        "district": "Divisie Beneden-Cottica"
+      },
+      {
+        "id": "stm-01525",
+        "locationDescription": "Para Kreek",
+        "district": "Divisie Para"
+      }
+    ]
+  },
+  {
+    "name": "Bleyenhoop",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-02241",
+        "locationDescription": "Pad van Wanica",
+        "district": null
+      },
+      {
+        "id": "stm-02367",
+        "locationDescription": "Boven-Cottica",
+        "district": null
+      }
+    ]
+  },
+  {
+    "name": "Bremen",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-02200",
+        "locationDescription": "Warappa Kreek",
+        "district": "Divisie Beneden-Cottica"
+      },
+      {
+        "id": "stm-02315",
+        "locationDescription": "Suriname",
+        "district": "Divisie Beneden-Cottica"
+      }
+    ]
+  },
+  {
+    "name": "Broedershoop",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-00683",
+        "locationDescription": "Warappa Kreek",
+        "district": "Divisie Beneden-Cottica"
+      },
+      {
+        "id": "stm-02280",
+        "locationDescription": "Wanica Kreek",
+        "district": null
+      }
+    ]
+  },
+  {
+    "name": "De Goede Hoop",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-01423",
+        "locationDescription": "Suriname",
+        "district": "Divisie Boven-Suriname en Thorarica"
+      },
+      {
+        "id": "stm-01962",
+        "locationDescription": "Beneden-Saramacca",
+        "district": "Divisie Saramacca"
+      }
+    ]
+  },
+  {
+    "name": "De Goede Verwachting",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-00716",
+        "locationDescription": "Mot Kreek",
+        "district": "Divisie Boven-Cottica en Perica"
+      },
+      {
+        "id": "stm-01388",
+        "locationDescription": "Wanica Kreek",
+        "district": "Divisie Saramacca"
+      }
+    ]
+  },
+  {
+    "name": "De Hoop",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-00642",
+        "locationDescription": "Suriname",
+        "district": "Divisie Boven-Suriname en Thorarica"
+      },
+      {
+        "id": "stm-02269",
+        "locationDescription": "Atlantische kust",
+        "district": "Divisie Nickerie"
+      }
+    ]
+  },
+  {
+    "name": "De Hulp",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-01144",
+        "locationDescription": "Vredenburger Kreek",
+        "district": "Divisie Boven-Cottica en Perica"
+      },
+      {
+        "id": "stm-02083",
+        "locationDescription": "Orelana Kreek",
+        "district": "Divisie Beneden-Commewijne"
+      }
+    ]
+  },
+  {
+    "name": "De Resolutie",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-02106",
+        "locationDescription": "Jonkermans Kreek",
+        "district": "Divisie Beneden-Cottica"
+      },
+      {
+        "id": "stm-02316",
+        "locationDescription": "Suriname",
+        "district": "Divisie Boven-Suriname en Thorarica"
+      }
+    ]
+  },
+  {
+    "name": "De Vier Gezusters",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-01914",
+        "locationDescription": "Boven-Saramacca",
+        "district": "Divisie Saramacca"
+      },
+      {
+        "id": "stm-02063",
+        "locationDescription": "Orelana Kreek",
+        "district": "Divisie Beneden-Commewijne"
+      }
+    ]
+  },
+  {
+    "name": "De Vrede",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-01122",
+        "locationDescription": "Boven-Cottica",
+        "district": "Divisie Boven-Cottica en Perica"
+      },
+      {
+        "id": "stm-01535",
+        "locationDescription": "Para Kreek",
+        "district": "Divisie Para"
+      }
+    ]
+  },
+  {
+    "name": "De Zwarigheid",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-01154",
+        "locationDescription": "Boven-Cottica",
+        "district": "Divisie Boven-Cottica en Perica"
+      },
+      {
+        "id": "stm-02233",
+        "locationDescription": "Vredenburger Kreek",
+        "district": null
+      }
+    ]
+  },
+  {
+    "name": "Eendragt (Land van)",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-02228",
+        "locationDescription": "Perica Kreek",
+        "district": "Divisie Boven-Cottica en Perica"
+      },
+      {
+        "id": "stm-02358",
+        "locationDescription": "Commetewane Kreek",
+        "district": null
+      }
+    ]
+  },
+  {
+    "name": "Frederiksburg",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-00679",
+        "locationDescription": "Beneden-Commewijne",
+        "district": "Divisie Beneden-Cottica"
+      },
+      {
+        "id": "stm-01299",
+        "locationDescription": "Pararakweg",
+        "district": "Divisie Para"
+      }
+    ]
+  },
+  {
+    "name": "Frederikslust",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-00681",
+        "locationDescription": "Warappa Kreek",
+        "district": "Divisie Beneden-Cottica"
+      },
+      {
+        "id": "stm-02156",
+        "locationDescription": "Pararakweg",
+        "district": null
+      }
+    ]
+  },
+  {
+    "name": "Geertruidenberg",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-00576",
+        "locationDescription": "Beneden-Commewijne",
+        "district": "Divisie Beneden-Commewijne"
+      },
+      {
+        "id": "stm-00725",
+        "locationDescription": "Boven-Cottica",
+        "district": "Divisie Matapplea"
+      }
+    ]
+  },
+  {
+    "name": "Goosen",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-00593",
+        "locationDescription": "Matappica Kreek",
+        "district": null
+      },
+      {
+        "id": "stm-01871",
+        "locationDescription": "Suriname",
+        "district": "Divisie Matapplea"
+      }
+    ]
+  },
+  {
+    "name": "Hazard",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-01646",
+        "locationDescription": "Nickerierivier",
+        "district": "Divisie Nickerie"
+      },
+      {
+        "id": "stm-02155",
+        "locationDescription": "Pararakweg",
+        "district": null
+      }
+    ]
+  },
+  {
+    "name": "Klein Beekvliet",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-02216",
+        "locationDescription": "Boven-Cottica",
+        "district": "Divisie Boven-Cottica en Perica"
+      },
+      {
+        "id": "stm-02259",
+        "locationDescription": "Boven-Commewijne",
+        "district": null
+      }
+    ]
+  },
+  {
+    "name": "Kweeklust",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-01481",
+        "locationDescription": "Coropina Kreek",
+        "district": "Divisie Saramacca"
+      },
+      {
+        "id": "stm-01952",
+        "locationDescription": "Beneden-Saramacca",
+        "district": null
+      }
+    ]
+  },
+  {
+    "name": "L'Esperance",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-01288",
+        "locationDescription": "Para Kreek",
+        "district": "Divisie Para"
+      },
+      {
+        "id": "stm-01439",
+        "locationDescription": "Suriname",
+        "district": "Divisie Boven-Suriname en Thorarica"
+      }
+    ]
+  },
+  {
+    "name": "La Diligence",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-01430",
+        "locationDescription": "Suriname",
+        "district": "Divisie Boven-Suriname en Thorarica"
+      },
+      {
+        "id": "stm-01483",
+        "locationDescription": "Coropina Kreek",
+        "district": "Divisie Para"
+      }
+    ]
+  },
+  {
+    "name": "La Paix",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-00647",
+        "locationDescription": "Paulus Kreek",
+        "district": "Divisie Boven-Suriname en Thorarica"
+      },
+      {
+        "id": "stm-01129",
+        "locationDescription": "Boven-Cottica",
+        "district": "Divisie Boven-Cottica en Perica"
+      }
+    ]
+  },
+  {
+    "name": "La Paix (Land van)",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-02366",
+        "locationDescription": "Boven-Cottica",
+        "district": "Divisie Boven-Cottica en Perica"
+      },
+      {
+        "id": "stm-02375",
+        "locationDescription": "Vredenburger Kreek",
+        "district": "Divisie Boven-Cottica en Perica"
+      }
+    ]
+  },
+  {
+    "name": "Ma Retraite (Land van)",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-02117",
+        "locationDescription": "Suriname",
+        "district": "Divisie Para"
+      },
+      {
+        "id": "stm-02331",
+        "locationDescription": "Coropina Kreek",
+        "district": "Divisie Para"
+      }
+    ]
+  },
+  {
+    "name": "Marienburg",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-00583",
+        "locationDescription": "Beneden-Commewijne",
+        "district": "Divisie Beneden-Commewijne"
+      },
+      {
+        "id": "stm-01118",
+        "locationDescription": "Boven-Cottica",
+        "district": "Divisie Boven-Cottica en Perica"
+      }
+    ]
+  },
+  {
+    "name": "Meerzorg",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-00564",
+        "locationDescription": "Suriname",
+        "district": "Divisie Boven-Suriname en Thorarica"
+      },
+      {
+        "id": "stm-00630",
+        "locationDescription": "Tapoeripa Kreek",
+        "district": "Divisie Matapplea"
+      }
+    ]
+  },
+  {
+    "name": "Misgunst",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-00778",
+        "locationDescription": "Mot Kreek",
+        "district": "Divisie Boven-Cottica en Perica"
+      },
+      {
+        "id": "stm-01951",
+        "locationDescription": "Beneden-Saramacca",
+        "district": "Divisie Saramacca"
+      }
+    ]
+  },
+  {
+    "name": "Mocha",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-01117",
+        "locationDescription": "Para Kreek",
+        "district": "Divisie Para"
+      },
+      {
+        "id": "stm-01295",
+        "locationDescription": "Pararak Kreek",
+        "district": "Divisie Para"
+      }
+    ]
+  },
+  {
+    "name": "Moederzorg",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-00520",
+        "locationDescription": "Suriname",
+        "district": "Divisie Boven-Suriname en Thorarica"
+      },
+      {
+        "id": "stm-02247",
+        "locationDescription": "Wanica Kreek",
+        "district": "Divisie Para"
+      }
+    ]
+  },
+  {
+    "name": "Nieuwe Aanleg",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-02088",
+        "locationDescription": "Orelana Kreek",
+        "district": "Divisie Beneden-Commewijne"
+      },
+      {
+        "id": "stm-02457",
+        "locationDescription": "Beneden-Saramacca",
+        "district": "Divisie Saramacca"
+      }
+    ]
+  },
+  {
+    "name": "Nooit Gedacht",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-02395",
+        "locationDescription": "Wanica Kreek",
+        "district": "Divisie Saramacca"
+      },
+      {
+        "id": "stm-02493",
+        "locationDescription": "Suriname",
+        "district": "Divisie Boven-Suriname en Thorarica"
+      }
+    ]
+  },
+  {
+    "name": "Osembo",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-00738",
+        "locationDescription": "Para Kreek",
+        "district": "Divisie Para"
+      },
+      {
+        "id": "stm-02154",
+        "locationDescription": "Pararakweg",
+        "district": null
+      }
+    ]
+  },
+  {
+    "name": "Patientie",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-01099",
+        "locationDescription": "Boven-Cottica",
+        "district": "Divisie Boven-Cottica en Perica"
+      },
+      {
+        "id": "stm-02069",
+        "locationDescription": "Orelana Kreek",
+        "district": "Divisie Beneden-Commewijne"
+      }
+    ]
+  },
+  {
+    "name": "Pietersburg",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-01171",
+        "locationDescription": "Boven-Cottica",
+        "district": "Divisie Boven-Cottica en Perica"
+      },
+      {
+        "id": "stm-01723",
+        "locationDescription": "Boven-Saramacca",
+        "district": null
+      }
+    ]
+  },
+  {
+    "name": "Sara's lust",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-01427",
+        "locationDescription": "Suriname",
+        "district": "Divisie Boven-Suriname en Thorarica"
+      },
+      {
+        "id": "stm-01716",
+        "locationDescription": "Boven-Saramacca",
+        "district": "Divisie Saramacca"
+      }
+    ]
+  },
+  {
+    "name": "Staf Arons",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-01446",
+        "locationDescription": "Suriname",
+        "district": "Divisie Boven-Suriname en Thorarica"
+      },
+      {
+        "id": "stm-02239",
+        "locationDescription": "Pad van Wanica",
+        "district": null
+      }
+    ]
+  },
+  {
+    "name": "Standvastigheid",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-00812",
+        "locationDescription": "Tapoeripa Kreek",
+        "district": "Divisie Matapplea"
+      },
+      {
+        "id": "stm-02399",
+        "locationDescription": "Nickerierivier",
+        "district": null
+      }
+    ]
+  },
+  {
+    "name": "Tulpenburg",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-01331",
+        "locationDescription": "Suriname",
+        "district": "Divisie Boven-Suriname en Thorarica"
+      },
+      {
+        "id": "stm-02071",
+        "locationDescription": "Orelana Kreek",
+        "district": "Divisie Beneden-Commewijne"
+      }
+    ]
+  },
+  {
+    "name": "Vreeland",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-00637",
+        "locationDescription": "Suriname",
+        "district": "Divisie Boven-Suriname en Thorarica"
+      },
+      {
+        "id": "stm-01487",
+        "locationDescription": "Tawaycoera Kreek",
+        "district": null
+      }
+    ]
+  },
+  {
+    "name": "Watervliet",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-01413",
+        "locationDescription": "Suriname",
+        "district": "Divisie Boven-Suriname en Thorarica"
+      },
+      {
+        "id": "stm-02441",
+        "locationDescription": "Suriname",
+        "district": null
+      }
+    ]
+  },
+  {
+    "name": "Welgevallen",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-00693",
+        "locationDescription": "Beneden-Commewijne",
+        "district": "Divisie Beneden-Cottica"
+      },
+      {
+        "id": "stm-02142",
+        "locationDescription": "Suriname",
+        "district": null
+      }
+    ]
+  },
+  {
+    "name": "Welgevonden",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-02141",
+        "locationDescription": "Suriname",
+        "district": null
+      },
+      {
+        "id": "stm-02397",
+        "locationDescription": "Tawayarie Kreek",
+        "district": "Divisie Saramacca"
+      }
+    ]
+  },
+  {
+    "name": "Zeldenrust",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-01096",
+        "locationDescription": "Boven-Cottica",
+        "district": null
+      },
+      {
+        "id": "stm-01334",
+        "locationDescription": "Suriname",
+        "district": "Divisie Boven-Suriname en Thorarica"
+      }
+    ]
+  },
+  {
+    "name": "Zoelen",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-00559",
+        "locationDescription": "Beneden-Commewijne",
+        "district": "Divisie Beneden-Commewijne"
+      },
+      {
+        "id": "stm-02385",
+        "locationDescription": "Boven-Saramacca",
+        "district": "Divisie Saramacca"
+      }
+    ]
+  },
+  {
+    "name": "Zorgvliet",
+    "count": 2,
+    "plantations": [
+      {
+        "id": "stm-00555",
+        "locationDescription": "Beneden-Commewijne",
+        "district": "Divisie Beneden-Commewijne"
+      },
+      {
+        "id": "stm-02164",
+        "locationDescription": "Boven-Commewijne",
+        "district": null
+      }
+    ]
+  }
+]
