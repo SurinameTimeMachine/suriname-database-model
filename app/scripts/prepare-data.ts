@@ -201,8 +201,19 @@ if (existsSync(geojsonSrc)) {
       } | null;
       if (!loc) continue;
 
-      // LineString features (roads, railroad) — use WKT if available
-      if (loc.wkt && (type === 'road' || type === 'railroad')) {
+      const entryNames = Array.isArray(entry.names)
+        ? (entry.names as Record<string, unknown>[])
+        : [];
+      const preferredName = entryNames.find((n) => n.isPreferred === true);
+      const fallbackName = entryNames.length > 0 ? entryNames[0] : null;
+      const displayName =
+        (entry.prefLabel as string) ||
+        (preferredName?.text as string) ||
+        (fallbackName?.text as string) ||
+        '';
+
+      // LineString features (street/road/railroad) — use WKT if available
+      if (loc.wkt && (type === 'street' || type === 'road' || type === 'railroad')) {
         const match = loc.wkt.match(/LineString\s*\((.+?)\)/i);
         if (match) {
           const coords: number[][] = [];
@@ -221,7 +232,7 @@ if (existsSync(geojsonSrc)) {
               geometry: { type: 'LineString', coordinates: coords },
               properties: {
                 fid: entry.fid ?? null,
-                name: entry.prefLabel || '',
+                name: displayName,
                 stmId: entry.id as string,
                 placeUri: (entry['@id'] as string) || `stm:place/${entry.id}`,
                 status: 'infrastructure',
@@ -246,7 +257,7 @@ if (existsSync(geojsonSrc)) {
           },
           properties: {
             fid: entry.fid ?? null,
-            name: entry.prefLabel || '',
+            name: displayName,
             stmId: entry.id as string,
             placeUri: (entry['@id'] as string) || `stm:place/${entry.id}`,
             status: 'named',
