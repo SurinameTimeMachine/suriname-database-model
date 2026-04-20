@@ -7662,47 +7662,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00623",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-00623",
-      "type": "plantation",
-      "prefLabel": "Breukelerwaard",
-      "altLabels": [],
-      "broader": "stm-00005",
-      "description": "",
-      "location": {
-        "lat": 5.848672615999999,
-        "lng": -54.844362141,
-        "wkt": "Polygon ((-54.85641098 5.85664600, -54.85592571 5.85982361, -54.85297434 5.85990009, -54.85025090 5.86149893, -54.84737585 5.86453089, -54.84657529 5.86757081, -54.84563074 5.87005424, -54.84296331 5.87226768, -54.83984046 5.87121802, -54.83404707 5.86580629, -54.82761219 5.86265929, -54.82805483 5.84817948, -54.82875171 5.82857305, -54.83008684 5.82799411, -54.83310355 5.82791153, -54.83539015 5.83113933, -54.83596446 5.83500360, -54.83648020 5.83924542, -54.83711432 5.84191881, -54.84003861 5.84549614, -54.84153397 5.84685204, -54.84541029 5.84704208, -54.84897165 5.84574207, -54.85230881 5.84207657, -54.85388305 5.83988139, -54.85539662 5.83631067, -54.85612634 5.83320357, -54.85903182 5.82986728, -54.85719919 5.84511949, -54.85641098 5.85664600))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q59115312",
-      "fid": 1706,
-      "psurIds": [
-        "PSUR0042"
-      ],
-      "district": "Divisie Boven-Commewijne",
-      "locationDescription": "Boven-Commewijne",
-      "locationDescriptionOriginal": "Rivier Commewijne, (boven) regterhand in het afvaren",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59115312",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02373",
       "@type": [
         "E25_Human-Made_Feature"
@@ -73694,6 +73653,72 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emV2NBY1JweVZUQWs/view?usp=sharing&resourcekey=0-xR2GcRFSY5HlfywHy8zqlA",
           "author": "Philip Dikland",
           "year": "2005",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-00623",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-00623",
+      "type": "plantation",
+      "broader": "stm-00005",
+      "description": "",
+      "location": {
+        "lat": 5.848672615999999,
+        "lng": -54.844362141,
+        "wkt": "Polygon ((-54.85641098 5.85664600, -54.85592571 5.85982361, -54.85297434 5.85990009, -54.85025090 5.86149893, -54.84737585 5.86453089, -54.84657529 5.86757081, -54.84563074 5.87005424, -54.84296331 5.87226768, -54.83984046 5.87121802, -54.83404707 5.86580629, -54.82761219 5.86265929, -54.82805483 5.84817948, -54.82875171 5.82857305, -54.83008684 5.82799411, -54.83310355 5.82791153, -54.83539015 5.83113933, -54.83596446 5.83500360, -54.83648020 5.83924542, -54.83711432 5.84191881, -54.84003861 5.84549614, -54.84153397 5.84685204, -54.84541029 5.84704208, -54.84897165 5.84574207, -54.85230881 5.84207657, -54.85388305 5.83988139, -54.85539662 5.83631067, -54.85612634 5.83320357, -54.85903182 5.82986728, -54.85719919 5.84511949, -54.85641098 5.85664600))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q59115312",
+      "fid": 1706,
+      "psurIds": [
+        "PSUR0042"
+      ],
+      "district": "Divisie Boven-Commewijne",
+      "locationDescription": "Boven-Commewijne",
+      "locationDescriptionOriginal": "Rivier Commewijne, (boven) regterhand in het afvaren",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-20",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59115312",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Breukelerwaard",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "Brokwaarsi",
+          "language": "srn",
+          "type": "historical",
+          "isPreferred": false
+        },
+        {
+          "text": "Bigi Koederki",
+          "language": "srn",
+          "type": "historical",
+          "isPreferred": false
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Breukelerwaard 2003-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8embWotWE1hcDJ1UEk/view?usp=sharing&resourcekey=0-ckW2AfWiW9AKfCLXtF2otg",
+          "author": "Philip Dikland",
+          "year": "2003, aangevuld 2007",
           "notes": null
         }
       ]
