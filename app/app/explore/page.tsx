@@ -58,6 +58,7 @@ function ExplorePageInner() {
     if (placeParam) {
       const feature = data.geojson.features.find(
         (f) =>
+          f.properties.stmId === placeParam ||
           extractPlaceId(f.properties.placeUri) === placeParam ||
           extractPlaceId(f.properties.plantationUri) === placeParam ||
           extractPlaceId(f.properties.featureUri) === placeParam ||
@@ -95,12 +96,14 @@ function ExplorePageInner() {
     (feature: GeoJSONFeature) => {
       setSelectedFeature(feature);
       setHighlightedName(feature.properties.name);
-      const placeId = extractPlaceId(
-        feature.properties.placeUri ??
-          feature.properties.plantationUri ??
-          feature.properties.featureUri ??
-          feature.id,
-      );
+      const placeId =
+        feature.properties.stmId ??
+        extractPlaceId(
+          feature.properties.placeUri ??
+            feature.properties.plantationUri ??
+            feature.properties.featureUri ??
+            feature.id,
+        );
       syncUrl(placeId);
     },
     [syncUrl],
