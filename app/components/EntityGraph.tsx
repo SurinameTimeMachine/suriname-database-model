@@ -142,7 +142,9 @@ function buildGraph(
       x: CX + Math.cos(angle) * 120,
       y: CY + Math.sin(angle) * 100,
     });
-    const identifiesOrg = app.P1i_identifies?.includes('wikidata');
+    const identifiesOrg = Boolean(
+      organization && app.P1i_identifies?.includes('wikidata'),
+    );
     links.push({
       source: identifiesOrg ? 'e74' : centerId,
       target: `e41-${i}`,
