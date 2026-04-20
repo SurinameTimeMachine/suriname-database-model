@@ -119,6 +119,9 @@ export function uriLabel(uri: string): string {
   if (uri.includes('suriname-timemachine.org/ontology/')) {
     return uri.replace('https://suriname-timemachine.org/ontology/', '');
   }
+  if (uri.includes('data.suriname-timemachine.org/')) {
+    return uri.replace('https://data.suriname-timemachine.org/', '');
+  }
   return uri;
 }
 
