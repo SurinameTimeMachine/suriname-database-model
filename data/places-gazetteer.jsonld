@@ -7935,47 +7935,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00676",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-00676",
-      "type": "plantation",
-      "prefLabel": "Brouwerslust",
-      "altLabels": [],
-      "broader": "stm-00004",
-      "description": "",
-      "location": {
-        "lat": 5.900742148333333,
-        "lng": -54.997275785,
-        "wkt": "Polygon ((-54.99799435 5.91866832, -54.99190261 5.91813788, -54.99522833 5.87589302, -55.00153348 5.87138052, -54.99900159 5.90170483, -54.99799435 5.91866832))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q2638795",
-      "fid": 1759,
-      "psurIds": [
-        "PSUR0045"
-      ],
-      "district": "Divisie Beneden-Cottica",
-      "locationDescription": "Beneden-Commewijne",
-      "locationDescriptionOriginal": "Rivier Commewijne, (beneden) regterhand in het afvaren",
-      "placeType": "koffie",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q2638795",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02500",
       "@type": [
         "E25_Human-Made_Feature"
@@ -73719,6 +73678,66 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8embWotWE1hcDJ1UEk/view?usp=sharing&resourcekey=0-ckW2AfWiW9AKfCLXtF2otg",
           "author": "Philip Dikland",
           "year": "2003, aangevuld 2007",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-00676",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-00676",
+      "type": "plantation",
+      "broader": "stm-00004",
+      "description": "",
+      "location": {
+        "lat": 5.900742148333333,
+        "lng": -54.997275785,
+        "wkt": "Polygon ((-54.99799435 5.91866832, -54.99190261 5.91813788, -54.99522833 5.87589302, -55.00153348 5.87138052, -54.99900159 5.90170483, -54.99799435 5.91866832))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q2638795",
+      "fid": 1759,
+      "psurIds": [
+        "PSUR0045"
+      ],
+      "district": "Divisie Beneden-Cottica",
+      "locationDescription": "Beneden-Commewijne",
+      "locationDescriptionOriginal": "Rivier Commewijne, (beneden) regterhand in het afvaren",
+      "placeType": "koffie",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-20",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q2638795",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Brouwerslust",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "Brouwroe",
+          "language": "srn",
+          "type": "historical",
+          "isPreferred": false
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Brouwerslust 2020-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/1hP9e4QhXbGdu80iq0lM6o5bLCNBInT2F/view?usp=sharing",
+          "author": "Philip Dikland",
+          "year": "2020",
           "notes": null
         }
       ]
