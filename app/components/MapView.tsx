@@ -154,8 +154,8 @@ const OVERLAY_CONFIGS: OverlayConfig[] = [
     label: 'Paramaribo main map 1916-17',
     annotationUrl: 'https://annotations.allmaps.org/maps/a8b80690c8e2e4cb',
     defaultEnabled: false,
-    transformation: 'thinPlateSpline',
-    gcpCount: '1 mask',
+    transformation: 'polynominal',
+    gcpCount: '28',
   },
   {
     id: 'historic-map-32-districts',
@@ -163,7 +163,7 @@ const OVERLAY_CONFIGS: OverlayConfig[] = [
     annotationUrl: 'https://annotations.allmaps.org/maps/5f85ef4e29065511',
     defaultEnabled: false,
     transformation: 'thinPlateSpline',
-    gcpCount: '1 mask',
+    gcpCount: '13',
   },
   {
     id: 'leiden-overview',
