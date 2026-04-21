@@ -74201,8 +74201,8 @@
       "locationDescription": "Beneden-Commewijne",
       "locationDescriptionOriginal": "Rivier Commewijne, (beneden) regterhand in het afvaren",
       "placeType": "koffie",
-      "modifiedBy": "Thunnisvanoort",
-      "modifiedAt": "2026-04-14",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-21",
       "externalLinks": [
         {
           "authority": "wikidata",
@@ -74222,6 +74222,27 @@
           "language": "nl",
           "type": "variant",
           "isPreferred": false
+        },
+        {
+          "text": "Kreinhansi",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false
+        },
+        {
+          "text": "Kleinhans",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Elisabeth's hoop 2002-01 gescchiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emR19mUzJ6SExsUjg/view?usp=sharing&resourcekey=0-31NW6Vbgfq_SlYJ6_8C8gQ",
+          "author": "Philip Dikland",
+          "year": "2002, aangevuld 2010",
+          "notes": "De naam van de plantage was aanvankelijk Belgard, en is omstreeks 1770 veranderd tot\nElisabeth's Hoop. De naam Belgard refereert aan het stadje Belgard (Bialogard) in Pommern,\nvroeger een duits gebiedsdeel, maar tegenwoordig een deel van Polen. De eerste eigenaren,\nTheodoor en Jan Fredrik Knoffel, waren uit dit plaatsje afkomstig."
         }
       ]
     },
