@@ -72101,23 +72101,9 @@
           "language": "nl",
           "type": "official",
           "isPreferred": true
-        },
-        {
-          "text": "Goedoefrouw",
-          "language": "srn",
-          "type": "vernacular",
-          "isPreferred": false
         }
       ],
-      "diklandRefs": [
-        {
-          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Anna's Zorg 2006-01 geschiedenis.pdf",
-          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emZVZzNWJZSnR5MGs/view?usp=drive_link&resourcekey=0-eiUwMBYsdEKZMmlORoACAA",
-          "author": "Philip Dikland",
-          "year": "2006, aangevuld 2009",
-          "notes": null
-        }
-      ]
+      "diklandRefs": []
     },
     {
       "@id": "stm:place/stm-00696",
