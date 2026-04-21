@@ -73290,6 +73290,12 @@
           "language": "srn",
           "type": "vernacular",
           "isPreferred": false
+        },
+        {
+          "text": "Saffin",
+          "language": "nl",
+          "type": "variant",
+          "isPreferred": false
         }
       ],
       "diklandRefs": [
