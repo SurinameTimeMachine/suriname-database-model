@@ -71988,18 +71988,6 @@
           "language": "nl",
           "type": "official",
           "isPreferred": true
-        },
-        {
-          "text": "Saffyn",
-          "language": "srn",
-          "type": "vernacular",
-          "isPreferred": false
-        },
-        {
-          "text": "Saffin",
-          "language": "srn",
-          "type": "variant",
-          "isPreferred": false
         }
       ],
       "diklandRefs": [
