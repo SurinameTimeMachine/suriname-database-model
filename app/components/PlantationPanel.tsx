@@ -200,7 +200,32 @@ function CrmField({
   );
 }
 
-function TimelineEntry({ obs }: { obs: OrganizationObservation }) {
+function AppellationRow({
+  app,
+  sourceLabel,
+}: {
+  app: E41Appellation;
+  sourceLabel: string | null;
+}) {
+  return (
+    <div className="border border-stm-warm-200 bg-white px-2 py-1 text-[11px]">
+      <div className="text-stm-warm-800">{app.P190_has_symbolic_content}</div>
+      <div className="mt-0.5 text-[10px] text-stm-warm-500 flex flex-wrap gap-x-2 gap-y-0.5">
+        <span>lang: {app.P72_has_language || 'und'}</span>
+        {sourceLabel && <span>source: {sourceLabel}</span>}
+        {app.mapYear && <span>year: {app.mapYear}</span>}
+      </div>
+    </div>
+  );
+}
+
+function TimelineEntry({
+  obs,
+  sourceLabel,
+}: {
+  obs: OrganizationObservation;
+  sourceLabel?: string;
+}) {
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -297,9 +322,18 @@ function TimelineEntry({ obs }: { obs: OrganizationObservation }) {
             value={obs.deserted != null ? (obs.deserted ? 'Yes' : 'No') : null}
           />
           <CrmField
-            label="Page"
+            label="Source"
             crmClass="E22"
             property="prov:hadPrimarySource"
+            value={
+              sourceLabel ||
+              (obs.hadPrimarySource && uriLabel(obs.hadPrimarySource))
+            }
+          />
+          <CrmField
+            label="Page"
+            crmClass="E22"
+            property="P3 has note"
             value={obs.pageReference}
           />
         </div>
@@ -356,19 +390,25 @@ export default function PlantationPanel({
     ? (data.organizations[orgUri] as E74Organization | undefined)
     : undefined;
 
-  const placeUri = props.placeUri ?? null;
+  const placeUri = props.placeUri ?? physicalFeature?.P53_has_location ?? null;
   const place = placeUri
     ? (data.places[placeUri] as E53Place | undefined)
     : undefined;
 
-  // Appellations for both E25 and E74
+  // Appellations for E25, E26 and E74
   const plantationApps = plantationUri
     ? ((data.appellations[plantationUri] || []) as E41Appellation[])
+    : [];
+  const featureApps = featureUri
+    ? ((data.appellations[featureUri] || []) as E41Appellation[])
     : [];
   const orgApps = orgUri
     ? ((data.appellations[orgUri] || []) as E41Appellation[])
     : [];
-  const allApps = [...plantationApps, ...orgApps];
+  const allApps = [...plantationApps, ...featureApps, ...orgApps];
+  const uniqueApps = Array.from(
+    new Map(allApps.map((app) => [app['@id'], app])).values(),
+  );
 
   // Observations
   const observations = orgUri
@@ -412,6 +452,12 @@ export default function PlantationPanel({
       | ProvenanceRecord
       | undefined;
     if (p) provRecords.push({ label: 'Location (E53)', record: p });
+  }
+  if (physicalFeature?.wasDerivedFrom) {
+    const p = data.provenance[physicalFeature.wasDerivedFrom] as
+      | ProvenanceRecord
+      | undefined;
+    if (p) provRecords.push({ label: 'Physical Feature (E26)', record: p });
   }
 
   // Coordinates (for display in the Location section)
@@ -529,7 +575,7 @@ export default function PlantationPanel({
             plantation={plantation || null}
             organization={organization || null}
             place={place || null}
-            appellations={allApps}
+            appellations={uniqueApps}
             sources={sources}
             observationCount={observations.length}
             onNodeClick={scrollToSection}
@@ -608,6 +654,26 @@ export default function PlantationPanel({
                       </div>
                     </div>
                   )}
+                  {uniqueApps.length > 0 && (
+                    <div className="mt-2 space-y-1">
+                      <span className="text-[10px] text-stm-warm-400 uppercase tracking-wider">
+                        E41 Appellations
+                      </span>
+                      {uniqueApps.map((app) => (
+                        <AppellationRow
+                          key={app['@id']}
+                          app={app}
+                          sourceLabel={
+                            app.P128i_is_carried_by
+                              ? data.sources[app.P128i_is_carried_by]
+                                  ?.prefLabel ||
+                                uriLabel(app.P128i_is_carried_by)
+                              : null
+                          }
+                        />
+                      ))}
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="px-4 pb-3 space-y-0">
@@ -650,6 +716,26 @@ export default function PlantationPanel({
                       property="P4 has time-span"
                       value={props.mapYear}
                     />
+                  )}
+                  {uniqueApps.length > 0 && (
+                    <div className="mt-2 space-y-1">
+                      <span className="text-[10px] text-stm-warm-400 uppercase tracking-wider">
+                        E41 Appellations
+                      </span>
+                      {uniqueApps.map((app) => (
+                        <AppellationRow
+                          key={app['@id']}
+                          app={app}
+                          sourceLabel={
+                            app.P128i_is_carried_by
+                              ? data.sources[app.P128i_is_carried_by]
+                                  ?.prefLabel ||
+                                uriLabel(app.P128i_is_carried_by)
+                              : null
+                          }
+                        />
+                      ))}
+                    </div>
                   )}
                 </div>
               ))}
@@ -748,6 +834,16 @@ export default function PlantationPanel({
                         : null
                     }
                   />
+                  <CrmField
+                    label="Geometry Source"
+                    crmClass="E22"
+                    property="prov:wasDerivedFrom"
+                    value={
+                      place.hasGeometry?.geometrySource
+                        ? uriLabel(place.hasGeometry.geometrySource)
+                        : null
+                    }
+                  />
                   {feature.geometry.type === 'Point' && coords.length >= 2 && (
                     <CrmField
                       label="Coordinates"
@@ -761,13 +857,42 @@ export default function PlantationPanel({
               ) : (
                 <div className="px-4 pb-3 space-y-0">
                   {feature.geometry.type === 'Point' && coords.length >= 2 ? (
-                    <CrmField
-                      label="Coordinates"
-                      crmClass="E53"
-                      property="geo:asWKT"
-                      value={`${coords[1].toFixed(5)}, ${coords[0].toFixed(5)}`}
-                      mono
-                    />
+                    <>
+                      <CrmField
+                        label="Coordinates"
+                        crmClass="E53"
+                        property="geo:asWKT"
+                        value={`${coords[1].toFixed(5)}, ${coords[0].toFixed(5)}`}
+                        mono
+                      />
+                      {props.mapYear && (
+                        <CrmField
+                          label="Map Year"
+                          crmClass="E52"
+                          property="P4 has time-span"
+                          value={props.mapYear}
+                        />
+                      )}
+                    </>
+                  ) : feature.geometry.type === 'LineString' ||
+                    feature.geometry.type === 'MultiLineString' ||
+                    feature.geometry.type === 'Polygon' ? (
+                    <>
+                      <CrmField
+                        label="Geometry"
+                        crmClass="E53"
+                        property="geo:asWKT"
+                        value={feature.geometry.type}
+                      />
+                      {props.mapYear && (
+                        <CrmField
+                          label="Map Year"
+                          crmClass="E52"
+                          property="P4 has time-span"
+                          value={props.mapYear}
+                        />
+                      )}
+                    </>
                   ) : (
                     <NoDataPlaceholder />
                   )}
@@ -794,7 +919,16 @@ export default function PlantationPanel({
                   </p>
                   <div className="space-y-0.5 max-h-128 overflow-y-auto">
                     {sortedObservations.map((obs) => (
-                      <TimelineEntry key={obs['@id']} obs={obs} />
+                      <TimelineEntry
+                        key={obs['@id']}
+                        obs={obs}
+                        sourceLabel={
+                          obs.hadPrimarySource
+                            ? data.sources[obs.hadPrimarySource]?.prefLabel ||
+                              uriLabel(obs.hadPrimarySource)
+                            : undefined
+                        }
+                      />
                     ))}
                   </div>
                 </div>

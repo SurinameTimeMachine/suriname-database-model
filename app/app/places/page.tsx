@@ -6,10 +6,12 @@ import SourceFilter, {
   type SourceFilterState,
 } from '@/components/SourceFilter';
 import { useAuth } from '@/lib/auth';
+import { type AllData, loadAllData } from '@/lib/data';
 import { getActiveSources, useSourceRegistry } from '@/lib/sources';
 import { usePlaceTypes } from '@/lib/thesaurus';
-import type { GazetteerPlace } from '@/lib/types';
+import type { E41Appellation, GazetteerPlace } from '@/lib/types';
 import { getPreferredName } from '@/lib/types';
+import { extractPlaceId } from '@/lib/url';
 import { useSearchParams } from 'next/navigation';
 import {
   memo,
@@ -35,6 +37,44 @@ type SortKey =
   | 'map1930'
   | 'almanakken';
 type SortDir = 'asc' | 'desc';
+
+function normalizeNamesFromLegacy(entry: Record<string, unknown>) {
+  if (Array.isArray(entry.names)) {
+    return entry.names;
+  }
+
+  const prefLabel =
+    typeof entry.prefLabel === 'string' ? entry.prefLabel.trim() : '';
+  const altLabels = Array.isArray(entry.altLabels)
+    ? entry.altLabels.filter((x): x is string => typeof x === 'string')
+    : [];
+  const sources = Array.isArray(entry.sources)
+    ? entry.sources.filter((x): x is string => typeof x === 'string')
+    : [];
+  const sourceId = sources[0];
+
+  const names: Array<Record<string, unknown>> = [];
+  if (prefLabel) {
+    names.push({
+      text: prefLabel,
+      language: 'nl',
+      type: 'official',
+      isPreferred: true,
+      source: sourceId,
+    });
+  }
+  for (const label of altLabels) {
+    if (!label || label === prefLabel) continue;
+    names.push({
+      text: label,
+      language: 'und',
+      type: 'historical',
+      isPreferred: false,
+      source: sourceId,
+    });
+  }
+  return names;
+}
 
 function emptyPlace(): GazetteerPlace {
   return {
@@ -261,6 +301,7 @@ function PlacesPageInner() {
     [allTypes, labels],
   );
   const [places, setPlaces] = useState<GazetteerPlace[]>([]);
+  const [allData, setAllData] = useState<AllData | null>(null);
   const [loading, setLoading] = useState(true);
   const { canEdit } = useAuth();
   const [search, setSearch] = useState('');
@@ -293,15 +334,21 @@ function PlacesPageInner() {
       .then((data) => {
         const entries: GazetteerPlace[] = data['@graph'] || data;
         if (!Array.isArray(entries)) return;
-        // Normalize: guard against legacy entries that lack names[]
+        // Normalize: support legacy prefLabel/altLabels and preserve source metadata.
         setPlaces(
           entries.map((p) => ({
             ...p,
-            names: Array.isArray(p.names) ? p.names : [],
+            names: normalizeNamesFromLegacy(
+              p as unknown as Record<string, unknown>,
+            ),
           })),
         );
       })
       .finally(() => setLoading(false));
+
+    loadAllData()
+      .then(setAllData)
+      .catch(() => setAllData(null));
   }, []);
 
   // Initialize/update selection from URL ?place= param
@@ -472,6 +519,57 @@ function PlacesPageInner() {
     if (!selectedId) return null;
     return places.find((p) => p.id === selectedId) || null;
   }, [places, selectedId, isCreating]);
+
+  const selectedSourceAppellations = useMemo(() => {
+    if (!allData?.geojson || !selectedId || isCreating) return [];
+
+    const selectedFeature = allData.geojson.features.find((f) => {
+      const props = f.properties;
+      return (
+        props.stmId === selectedId ||
+        extractPlaceId(props.placeUri) === selectedId ||
+        extractPlaceId(props.plantationUri) === selectedId ||
+        extractPlaceId(props.featureUri) === selectedId ||
+        f.id === selectedId
+      );
+    });
+
+    if (!selectedFeature) return [];
+
+    const props = selectedFeature.properties;
+    const plantationUri = props.plantationUri ?? null;
+    const featureUri = props.featureUri ?? props.placeUri ?? null;
+    let orgUri = props.organizationQid
+      ? `http://www.wikidata.org/entity/${props.organizationQid}`
+      : null;
+    if (!orgUri && plantationUri) {
+      orgUri =
+        allData.plantations[plantationUri]?.P52_has_current_owner ?? null;
+    }
+
+    const uriCandidates = [plantationUri, featureUri, orgUri].filter(
+      (uri): uri is string => Boolean(uri),
+    );
+
+    const gathered: E41Appellation[] = [];
+    for (const uri of uriCandidates) {
+      const apps = allData.appellations[uri] || [];
+      gathered.push(...apps);
+    }
+
+    return Array.from(new Map(gathered.map((a) => [a['@id'], a])).values()).map(
+      (app) => ({
+        id: app['@id'],
+        text: app.P190_has_symbolic_content,
+        language: app.P72_has_language,
+        sourceUri: app.P128i_is_carried_by,
+        sourceLabel: app.P128i_is_carried_by
+          ? allData.sources[app.P128i_is_carried_by]?.prefLabel || null
+          : null,
+        sourceYear: app.mapYear ? Number(app.mapYear) : undefined,
+      }),
+    );
+  }, [allData, selectedId, isCreating]);
 
   const typeCounts = useMemo(() => {
     const counts: Record<string, number> = { all: places.length };
@@ -736,6 +834,7 @@ function PlacesPageInner() {
                 key={selectedPlace.id}
                 place={selectedPlace}
                 districts={districts}
+                sourceAppellations={selectedSourceAppellations}
                 canEdit={canEdit}
                 onSave={handleSave}
                 onCancel={handleCancel}

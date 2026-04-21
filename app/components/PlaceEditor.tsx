@@ -15,17 +15,36 @@ import { getPreferredName } from '@/lib/types';
 import { buildExploreUrl } from '@/lib/url';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 const PlaceMiniMap = dynamic(() => import('./PlaceMiniMap'), { ssr: false });
 
 interface PlaceEditorProps {
   place: GazetteerPlace;
   districts: GazetteerPlace[];
+  sourceAppellations?: SourceAppellationHint[];
   canEdit: boolean;
   onSave: (place: GazetteerPlace) => Promise<void>;
   onCancel: () => void;
   onDelete?: (id: string) => Promise<void>;
+}
+
+interface SourceAppellationHint {
+  id: string;
+  text: string;
+  language?: string;
+  sourceUri?: string;
+  sourceLabel?: string | null;
+  sourceYear?: number;
+}
+
+function normalizeAppellationText(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
 }
 
 const CATEGORY_ORDER = [
@@ -341,6 +360,7 @@ function DiklandRefAdder({ onAdd }: { onAdd: (ref: DiklandRef) => void }) {
 export default function PlaceEditor({
   place,
   districts,
+  sourceAppellations = [],
   canEdit,
   onSave,
   onCancel,
@@ -363,10 +383,135 @@ export default function PlaceEditor({
     [registryCategories],
   );
   const [draft, setDraft] = useState<GazetteerPlace>({ ...place });
+  const hydratedFromAppellations = useRef(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sourceDropdownOpen, setSourceDropdownOpen] = useState(false);
   const diklandRefs: DiklandRef[] = draft.diklandRefs ?? [];
+  const sourceIdByUri = useMemo(
+    () => new Map(registrySources.map((s) => [s.id, s.sourceId])),
+    [registrySources],
+  );
+  const sourceById = useMemo(
+    () => new Map(registrySources.map((s) => [s.sourceId, s])),
+    [registrySources],
+  );
+
+  const deriveYearFromSourceId = useCallback(
+    (sourceId?: string): number | undefined => {
+      if (!sourceId) return undefined;
+      const source = sourceById.get(sourceId);
+      if (!source) return undefined;
+      if (source.mapYear != null) return source.mapYear;
+      if (source.timeSpan) {
+        const match = source.timeSpan.match(/\b(\d{4})\b/);
+        if (match) return Number(match[1]);
+      }
+      return undefined;
+    },
+    [sourceById],
+  );
+
+  const sourceDisplayLabel = useCallback(
+    (sourceId: string): string => {
+      const source = sourceById.get(sourceId);
+      if (!source) return sourceId;
+      const yearOrRange =
+        source.mapYear != null
+          ? String(source.mapYear)
+          : source.timeSpan || 'n.d.';
+      return `${source.sourceId} (${yearOrRange})`;
+    },
+    [sourceById],
+  );
+
+  useEffect(() => {
+    if (hydratedFromAppellations.current) return;
+    if (sourceAppellations.length === 0) return;
+
+    hydratedFromAppellations.current = true;
+    setDraft((d) => {
+      let changed = false;
+      const nextNames = [...d.names];
+
+      for (const app of sourceAppellations) {
+        const text = app.text?.trim();
+        if (!text) continue;
+
+        const idx = nextNames.findIndex(
+          (n) =>
+            normalizeAppellationText(n.text) === normalizeAppellationText(text),
+        );
+        const sourceId =
+          (app.sourceUri ? sourceIdByUri.get(app.sourceUri) : undefined) ||
+          undefined;
+        const sourceYear =
+          app.sourceYear && Number.isFinite(app.sourceYear)
+            ? app.sourceYear
+            : undefined;
+        const hintedLanguage: LanguageCode =
+          app.language === 'nl' ||
+          app.language === 'en' ||
+          app.language === 'srn' ||
+          app.language === 'und'
+            ? app.language
+            : 'und';
+
+        if (idx >= 0) {
+          const current = nextNames[idx];
+          const patched: PlaceName = {
+            ...current,
+            text: current.text.length <= text.length ? current.text : text,
+            language:
+              current.language === 'und' && hintedLanguage !== 'und'
+                ? hintedLanguage
+                : current.language,
+            source: current.source || sourceId,
+            sourceYear: current.sourceYear ?? sourceYear,
+          };
+          if (JSON.stringify(current) !== JSON.stringify(patched)) {
+            nextNames[idx] = patched;
+            changed = true;
+          }
+          continue;
+        }
+
+        nextNames.push({
+          text,
+          language: hintedLanguage,
+          type: 'historical',
+          isPreferred: nextNames.length === 0,
+          source: sourceId,
+          sourceYear,
+        });
+        changed = true;
+      }
+
+      if (nextNames.length > 0 && !nextNames.some((n) => n.isPreferred)) {
+        nextNames[0] = { ...nextNames[0], isPreferred: true };
+        changed = true;
+      }
+
+      // Preferred label policy: map-1930 name is authoritative when present.
+      const preferredFrom1930 = nextNames.findIndex(
+        (n) => n.source === 'map-1930',
+      );
+      if (preferredFrom1930 >= 0) {
+        nextNames.forEach((name, idx) => {
+          const shouldBePreferred = idx === preferredFrom1930;
+          if (name.isPreferred !== shouldBePreferred) {
+            nextNames[idx] = {
+              ...name,
+              isPreferred: shouldBePreferred,
+            };
+            changed = true;
+          }
+        });
+      }
+
+      return changed ? { ...d, names: nextNames } : d;
+    });
+  }, [sourceAppellations, sourceIdByUri]);
 
   // --- Name helpers ---
   const updateName = (index: number, patch: Partial<PlaceName>) => {
@@ -573,6 +718,29 @@ export default function PlaceEditor({
                     <option value="variant">Variant spelling</option>
                   </select>
 
+                  {/* Source ID (registry only) */}
+                  <select
+                    value={nm.source ?? ''}
+                    onChange={(e) => {
+                      const nextSource = e.target.value || undefined;
+                      const sourceYearFromRegistry =
+                        deriveYearFromSourceId(nextSource);
+                      updateName(i, {
+                        source: nextSource,
+                        sourceYear: sourceYearFromRegistry,
+                      });
+                    }}
+                    disabled={!canEdit}
+                    className="px-2 py-1 text-xs border border-stm-warm-200 bg-white focus:ring-1 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50 w-48"
+                  >
+                    <option value="">Source (ID + year)</option>
+                    {registrySources.map((source) => (
+                      <option key={source.sourceId} value={source.sourceId}>
+                        {sourceDisplayLabel(source.sourceId)}
+                      </option>
+                    ))}
+                  </select>
+
                   {/* Preferred radio */}
                   {canEdit && (
                     <label className="flex items-center gap-1 text-xs text-stm-warm-600 cursor-pointer select-none">
@@ -609,6 +777,33 @@ export default function PlaceEditor({
               </div>
             ))}
           </div>
+          <p className="mt-1 text-[10px] text-stm-warm-400">
+            Each row is one appellation. Source is selected from one authority
+            dropdown (ID + year/range) and can be switched in edit mode. The
+            preferred display label defaults to the 1930 map appellation when
+            available.
+          </p>
+          {sourceAppellations.length > 0 && (
+            <div className="mt-2 border border-stm-warm-200 bg-stm-warm-50 p-2 space-y-1">
+              <p className="text-[10px] text-stm-warm-500 uppercase tracking-wider">
+                Appellations from sources
+              </p>
+              {sourceAppellations.map((app) => (
+                <div key={app.id} className="text-[10px] text-stm-warm-600">
+                  <span className="font-medium text-stm-warm-700">
+                    {app.text}
+                  </span>
+                  <span className="ml-1">lang: {app.language || 'und'}</span>
+                  {app.sourceLabel && (
+                    <span className="ml-1">source: {app.sourceLabel}</span>
+                  )}
+                  {app.sourceYear && (
+                    <span className="ml-1">year: {app.sourceYear}</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Type + District row */}

@@ -381,6 +381,34 @@ Observation (1818, Q4392658)
 
 PersonObservations can be linked to PersonReconstructions (derived identities).
 
+## Source Registry Authority (E22)
+
+All source references must resolve to a registered E22 in:
+
+- `data/sources-registry.jsonld`
+
+Rules:
+
+1. Never invent ad-hoc source IDs or source URIs in scripts/components.
+2. If a transformation or UI needs a new source, add it to the registry first.
+3. When source usage changes, update the registry and confirm it appears on `/sources`.
+4. Use source registry IDs consistently across gazetteer `sources[]`, E41 `P128i_is_carried_by`, E53 `P70i_is_documented_in`, and E13 `prov:hadPrimarySource` references.
+
+## Provenance Boundary: Where It Starts
+
+Treat provenance at two levels:
+
+- **Entity-level provenance**: `prov:wasDerivedFrom` on entity records (E25/E26/E53/E74) describes how the current record was derived.
+- **Assertion-level provenance**: each mutable value (name, product, location text, role, classification) is tied to a source assertion chain (E41/E13/E17 + E22 + time context).
+
+Boundary rules:
+
+1. Prefer assertion-level provenance when a value can change over time or differs by source.
+2. Keep convenience labels (`rdfs:label`, `prefLabel`) as display helpers, not provenance authority.
+3. For E41 names, provenance starts at `P128i_is_carried_by` (E22) with temporal scope inferred from source production/date metadata.
+4. For E13/E17 assertions, provenance starts at `prov:hadPrimarySource` plus explicit E52 time-span.
+5. For spatial assertions, provenance starts at E53 documentation/source chain (`P70i_is_documented_in`, geometry source metadata).
+
 ## Key Decisions
 
 1. **E25 is the main plantation entity** - physical thing depicted by sources

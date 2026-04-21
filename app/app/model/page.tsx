@@ -1286,6 +1286,70 @@ function TemporalModelSection() {
   );
 }
 
+function ProvenanceBoundarySection() {
+  return (
+    <div className="bg-white border border-stm-warm-200 p-6">
+      <h3 className="font-serif text-xl font-bold text-stm-warm-800 mb-3">
+        Provenance Boundary
+      </h3>
+      <p className="text-sm text-stm-warm-600 leading-relaxed mb-4">
+        Provenance starts at different levels depending on what is being
+        modeled. Entity-level provenance tracks how a current record was
+        derived, while assertion-level provenance tracks where each mutable
+        value comes from.
+      </p>
+      <div className="grid md:grid-cols-2 gap-6">
+        <div>
+          <h4 className="text-sm font-semibold text-stm-warm-700 mb-2">
+            Entity-level provenance
+          </h4>
+          <div className="bg-stm-warm-50 p-4 font-mono text-xs text-stm-warm-600 space-y-1.5">
+            <div>
+              <span style={{ color: CRM_COLORS.E25 }}>E25/E26/E53/E74</span>
+              {' -> prov:wasDerivedFrom -> PROV record'}
+            </div>
+            <div className="text-stm-warm-500">
+              Use for record lineage and transformation audit.
+            </div>
+          </div>
+        </div>
+        <div>
+          <h4 className="text-sm font-semibold text-stm-warm-700 mb-2">
+            Assertion-level provenance
+          </h4>
+          <div className="bg-stm-warm-50 p-4 font-mono text-xs text-stm-warm-600 space-y-1.5">
+            <div>
+              <span style={{ color: CRM_COLORS.E41 }}>E41 name</span>
+              {' -> P128i -> '}
+              <span style={{ color: CRM_COLORS.E22 }}>E22 source</span>
+              {' (+ source year/time)'}
+            </div>
+            <div>
+              <span style={{ color: CRM_COLORS.E13 }}>E13/E17 assertion</span>
+              {' -> prov:hadPrimarySource -> '}
+              <span style={{ color: CRM_COLORS.E22 }}>E22 source</span>
+              {' + P4 -> E52'}
+            </div>
+            <div>
+              <span style={{ color: CRM_COLORS.E53 }}>E53 location</span>
+              {' -> P70i is documented in -> '}
+              <span style={{ color: CRM_COLORS.E22 }}>E22 source</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="mt-4 bg-stm-sepia-50 border border-stm-sepia-200 p-3 text-xs text-stm-warm-600">
+        <p>
+          Source references are authoritative only when they resolve to
+          registered E22 entries in{' '}
+          <span className="font-mono">data/sources-registry.jsonld</span> and
+          are visible on the Sources page.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 /* ─── Main Page ────────────────────────────────────────────────── */
 export default function ModelPage() {
   return (
@@ -1400,6 +1464,10 @@ function ModelPageInner() {
         <div className="grid lg:grid-cols-2 gap-6 mb-10">
           <SpatialModelSection />
           <TemporalModelSection />
+        </div>
+
+        <div className="mb-10">
+          <ProvenanceBoundarySection />
         </div>
 
         {/* All entities quick reference */}
