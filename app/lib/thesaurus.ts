@@ -221,7 +221,7 @@ const FALLBACK_DATA: ThesaurusData = {
       definition: {},
       editorialNote: {},
       historyNote: null,
-      color: '#5a9e6f',
+      color: '#7ab56a',
       crmClass: 'E53_Place',
       crmBadge: 'E53',
       sortOrder: 0,
