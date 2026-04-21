@@ -10345,47 +10345,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01167",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01167",
-      "type": "plantation",
-      "prefLabel": "Concordia",
-      "altLabels": [],
-      "broader": "stm-00005",
-      "description": "",
-      "location": {
-        "lat": 5.706398762857143,
-        "lng": -54.727101905000005,
-        "wkt": "Polygon ((-54.73262007 5.70509072, -54.73035665 5.70601649, -54.72051231 5.70560795, -54.70574579 5.71787003, -54.70198336 5.71350652, -54.71109025 5.70622571, -54.72386453 5.69514195, -54.73027843 5.70282682, -54.73492112 5.69890739, -54.74235953 5.70759031, -54.74007263 5.70953004, -54.73794747 5.71018282, -54.73505446 5.70599521, -54.73262007 5.70509072))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q59115397",
-      "fid": 2251,
-      "psurIds": [
-        "PSUR0061"
-      ],
-      "district": "Divisie Boven-Commewijne",
-      "locationDescription": "Boven-Commewijne",
-      "locationDescriptionOriginal": "Rivier Commewijne, (boven) regterhand in het afvaren",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59115397",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-01294",
       "@type": [
         "E25_Human-Made_Feature"
@@ -10419,47 +10378,6 @@
         {
           "authority": "wikidata",
           "identifier": "Q124825046",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00689",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-00689",
-      "type": "plantation",
-      "prefLabel": "Constantia",
-      "altLabels": [],
-      "broader": "stm-00004",
-      "description": "",
-      "location": {
-        "lat": 5.892674124999999,
-        "lng": -54.905624035625,
-        "wkt": "Polygon ((-54.92188351 5.90123575, -54.92109485 5.90114502, -54.88898378 5.89930732, -54.88971282 5.89663589, -54.89032812 5.89435785, -54.89054062 5.89225190, -54.89098549 5.88905604, -54.89644097 5.88796218, -54.90032127 5.88671973, -54.90637739 5.88369287, -54.91126112 5.88165526, -54.91515477 5.88046953, -54.90310960 5.89510105, -54.91979919 5.89596099, -54.92210756 5.89599887, -54.92188351 5.90123575))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q124825047",
-      "fid": 1772,
-      "psurIds": [
-        "PSUR0064"
-      ],
-      "district": "Divisie Beneden-Cottica",
-      "locationDescription": "Matappica Kreek",
-      "locationDescriptionOriginal": "Matappica-kreek, linkerhand in het opvaren",
-      "placeType": "koffie",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q124825047",
           "matchType": "closeMatch"
         }
       ]
@@ -10692,47 +10610,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-02053",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-02053",
-      "type": "plantation",
-      "prefLabel": "Coresburg",
-      "altLabels": [],
-      "broader": "stm-00003",
-      "description": "",
-      "location": {
-        "lat": 5.82616495,
-        "lng": -54.98217367285714,
-        "wkt": "Polygon ((-55.00157447 5.82530524, -54.96748564 5.83129855, -54.96727807 5.82864262, -54.96746079 5.82713396, -54.96770301 5.82622893, -55.00213926 5.81924011, -55.00157447 5.82530524))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q59115406",
-      "fid": 3138,
-      "psurIds": [
-        "PSUR0066"
-      ],
-      "district": "Divisie Beneden-Commewijne",
-      "locationDescription": "Orelana Kreek",
-      "locationDescriptionOriginal": "Hoer-Helena-kreek, regterhand in het opvaren",
-      "placeType": "koffie en cacao",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59115406",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-01202",
       "@type": [
         "E25_Human-Made_Feature"
@@ -10769,47 +10646,6 @@
         {
           "authority": "wikidata",
           "identifier": "Q59115407",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00668",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-00668",
-      "type": "plantation",
-      "prefLabel": "Cornelia'sburg",
-      "altLabels": [],
-      "broader": "stm-00004",
-      "description": "",
-      "location": {
-        "lat": 5.932200267272727,
-        "lng": -54.92973638545455,
-        "wkt": "Polygon ((-54.95605027 5.93602974, -54.92016457 5.93449989, -54.89327382 5.93234160, -54.89382002 5.92913249, -54.89386060 5.92773825, -54.91152675 5.92898319, -54.94565125 5.93017576, -54.95034224 5.93047386, -54.95027907 5.93436633, -54.95608138 5.93443209, -54.95605027 5.93602974))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q59115408",
-      "fid": 1751,
-      "psurIds": [
-        "PSUR0068"
-      ],
-      "district": "Divisie Beneden-Cottica",
-      "locationDescription": "Warappa Kreek",
-      "locationDescriptionOriginal": "Warrappa-kreek, linkerhand in het opvaren",
-      "placeType": "koffie",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59115408",
           "matchType": "closeMatch"
         }
       ]
@@ -11108,44 +10944,6 @@
       ],
       "wikidataQid": "Q59115416",
       "fid": 2083,
-      "psurIds": [],
-      "district": "Divisie Boven-Commewijne",
-      "locationDescription": "Boven-Commewijne",
-      "locationDescriptionOriginal": "Rivier Commewijne, (boven) linkerhand in het afvaren",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59115416",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01247",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01247",
-      "type": "plantation",
-      "prefLabel": "Crawassibo",
-      "altLabels": [],
-      "broader": "stm-00005",
-      "description": "",
-      "location": {
-        "lat": 5.582043613,
-        "lng": -54.69067954699999,
-        "wkt": "Polygon ((-54.69420503 5.55956283, -54.70905869 5.57322340, -54.71565987 5.57869522, -54.68809684 5.59087810, -54.68296049 5.59362884, -54.68104263 5.59618172, -54.68144447 5.59856428, -54.67469464 5.59535751, -54.68542778 5.57478140, -54.69420503 5.55956283))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken"
-      ],
-      "wikidataQid": "Q59115416",
-      "fid": 2331,
       "psurIds": [],
       "district": "Divisie Boven-Commewijne",
       "locationDescription": "Boven-Commewijne",
@@ -73788,6 +73586,234 @@
       ]
     },
     {
+      "@id": "stm:place/stm-01167",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01167",
+      "type": "plantation",
+      "broader": "stm-00005",
+      "description": "",
+      "location": {
+        "lat": 5.706398762857143,
+        "lng": -54.727101905000005,
+        "wkt": "Polygon ((-54.73262007 5.70509072, -54.73035665 5.70601649, -54.72051231 5.70560795, -54.70574579 5.71787003, -54.70198336 5.71350652, -54.71109025 5.70622571, -54.72386453 5.69514195, -54.73027843 5.70282682, -54.73492112 5.69890739, -54.74235953 5.70759031, -54.74007263 5.70953004, -54.73794747 5.71018282, -54.73505446 5.70599521, -54.73262007 5.70509072))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q59115397",
+      "fid": 2251,
+      "psurIds": [
+        "PSUR0061"
+      ],
+      "district": "Divisie Boven-Commewijne",
+      "locationDescription": "Boven-Commewijne",
+      "locationDescriptionOriginal": "Rivier Commewijne, (boven) regterhand in het afvaren",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-21",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59115397",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Concordia",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Concordia 2001-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emWWxyX25jLU1FTGs/view?usp=sharing&resourcekey=0-TWH1TNJj08noefw94fw8IA",
+          "author": "Philip Dikland",
+          "year": "2001, aangevuld 2009, 2012",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-00689",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-00689",
+      "type": "plantation",
+      "broader": "stm-00004",
+      "description": "",
+      "location": {
+        "lat": 5.892674124999999,
+        "lng": -54.905624035625,
+        "wkt": "Polygon ((-54.92188351 5.90123575, -54.92109485 5.90114502, -54.88898378 5.89930732, -54.88971282 5.89663589, -54.89032812 5.89435785, -54.89054062 5.89225190, -54.89098549 5.88905604, -54.89644097 5.88796218, -54.90032127 5.88671973, -54.90637739 5.88369287, -54.91126112 5.88165526, -54.91515477 5.88046953, -54.90310960 5.89510105, -54.91979919 5.89596099, -54.92210756 5.89599887, -54.92188351 5.90123575))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q124825047",
+      "fid": 1772,
+      "psurIds": [
+        "PSUR0064"
+      ],
+      "district": "Divisie Beneden-Cottica",
+      "locationDescription": "Matappica Kreek",
+      "locationDescriptionOriginal": "Matappica-kreek, linkerhand in het opvaren",
+      "placeType": "koffie",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-21",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q124825047",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Constantia",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "Santi",
+          "language": "srn",
+          "type": "historical",
+          "isPreferred": false
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Constantia 2001-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emVEVwNlphU0JkczQ/view?usp=sharing&resourcekey=0-1-VYi_rc6cccjprpbH1nWA",
+          "author": "Philip Dikland",
+          "year": "2001",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-02053",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-02053",
+      "type": "plantation",
+      "broader": "stm-00003",
+      "description": "",
+      "location": {
+        "lat": 5.82616495,
+        "lng": -54.98217367285714,
+        "wkt": "Polygon ((-55.00157447 5.82530524, -54.96748564 5.83129855, -54.96727807 5.82864262, -54.96746079 5.82713396, -54.96770301 5.82622893, -55.00213926 5.81924011, -55.00157447 5.82530524))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q59115406",
+      "fid": 3138,
+      "psurIds": [
+        "PSUR0066"
+      ],
+      "district": "Divisie Beneden-Commewijne",
+      "locationDescription": "Orelana Kreek",
+      "locationDescriptionOriginal": "Hoer-Helena-kreek, regterhand in het opvaren",
+      "placeType": "koffie en cacao",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-21",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59115406",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Coresburg",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Coresburg 2005-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emLW5SclFOcTdEUTg/view?usp=sharing&resourcekey=0-tvJ-O9tdSRfc1n-IJuVmDg",
+          "author": "Philip Dikland",
+          "year": "2005",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-00668",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-00668",
+      "type": "plantation",
+      "broader": "stm-00004",
+      "description": "",
+      "location": {
+        "lat": 5.932200267272727,
+        "lng": -54.92973638545455,
+        "wkt": "Polygon ((-54.95605027 5.93602974, -54.92016457 5.93449989, -54.89327382 5.93234160, -54.89382002 5.92913249, -54.89386060 5.92773825, -54.91152675 5.92898319, -54.94565125 5.93017576, -54.95034224 5.93047386, -54.95027907 5.93436633, -54.95608138 5.93443209, -54.95605027 5.93602974))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q59115408",
+      "fid": 1751,
+      "psurIds": [
+        "PSUR0068"
+      ],
+      "district": "Divisie Beneden-Cottica",
+      "locationDescription": "Warappa Kreek",
+      "locationDescriptionOriginal": "Warrappa-kreek, linkerhand in het opvaren",
+      "placeType": "koffie",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-21",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59115408",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Cornelia'sburg",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "Santigron",
+          "language": "srn",
+          "type": "historical",
+          "isPreferred": false
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Cornelia's burg 2008-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emMTYxRHY0ejRXNkk/view?usp=sharing&resourcekey=0-7uzOofYvUT1fBYoY2Tj2AQ",
+          "author": "Philip Dikland",
+          "year": "2008",
+          "notes": null
+        }
+      ]
+    },
+    {
       "@id": "stm:place/stm-02065",
       "@type": "E25_Human-Made_Feature",
       "id": "stm-02065",
@@ -73835,6 +73861,57 @@
           "language": "nl",
           "type": "variant",
           "isPreferred": false
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01247",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01247",
+      "type": "plantation",
+      "broader": "stm-00005",
+      "description": "",
+      "location": {
+        "lat": 5.582043613,
+        "lng": -54.69067954699999,
+        "wkt": "Polygon ((-54.69420503 5.55956283, -54.70905869 5.57322340, -54.71565987 5.57869522, -54.68809684 5.59087810, -54.68296049 5.59362884, -54.68104263 5.59618172, -54.68144447 5.59856428, -54.67469464 5.59535751, -54.68542778 5.57478140, -54.69420503 5.55956283))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken"
+      ],
+      "wikidataQid": "Q59115416",
+      "fid": 2331,
+      "psurIds": [],
+      "district": "Divisie Boven-Commewijne",
+      "locationDescription": "Boven-Commewijne",
+      "locationDescriptionOriginal": "Rivier Commewijne, (boven) linkerhand in het afvaren",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-21",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59115416",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Crawassibo",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Crawassibo 2005-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emR1hORlhmMVlxNnc/view?usp=sharing&resourcekey=0-kQ32VNcZTwoCCnDcNI4XIw",
+          "author": "Philip Dikland",
+          "year": "2005, aangevuld 2010",
+          "notes": null
         }
       ]
     },
@@ -85921,37 +85998,6 @@
       "externalLinks": []
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-02556",
-      "@type": [
-        "E53_Place"
-      ],
-      "id": "stm-02556",
-      "type": "maroon-village",
-      "prefLabel": "Commissaris Kondre",
-      "altLabels": [],
-      "broader": null,
-      "description": "",
-      "location": {
-        "lat": 5.2377856816353106,
-        "lng": -55.36552898699526,
-        "wkt": null,
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930"
-      ],
-      "wikidataQid": null,
-      "fid": 56,
-      "psurIds": [],
-      "district": null,
-      "locationDescription": null,
-      "locationDescriptionOriginal": null,
-      "placeType": null,
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": []
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02580",
       "@type": [
         "E53_Place"
@@ -87654,6 +87700,53 @@
       "modifiedBy": null,
       "modifiedAt": null,
       "externalLinks": []
+    },
+    {
+      "@id": "stm:place/stm-02556",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-02556",
+      "type": "maroon-village",
+      "broader": null,
+      "description": "",
+      "location": {
+        "lat": 5.2377856816353106,
+        "lng": -55.36552898699526,
+        "wkt": null,
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930"
+      ],
+      "wikidataQid": null,
+      "fid": 56,
+      "psurIds": [],
+      "district": null,
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": "Thunnisvanoort",
+      "modifiedAt": "2026-04-21",
+      "externalLinks": [
+        {
+          "authority": "geonames",
+          "identifier": "https://www.geonames.org/3384415/commissaris-kondre.html",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Commissaris Kondre",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "Post Mindrineti",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false
+        }
+      ]
     },
     {
       "@id": "https://data.suriname-timemachine.org/place/stm-00205",
@@ -102872,37 +102965,6 @@
       "externalLinks": []
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00343",
-      "@type": [
-        "E26_Physical_Feature"
-      ],
-      "id": "stm-00343",
-      "type": "creek",
-      "prefLabel": "Warappa Kreek",
-      "altLabels": [],
-      "broader": null,
-      "description": "Creek segment of Commewijne (QGIS 1930 map)",
-      "location": {
-        "lat": 5.929093393589741,
-        "lng": -54.89843583820511,
-        "wkt": "LineString (-54.91673784 5.95241923, -54.91555455 5.95007586, -54.91452513 5.94899881, -54.91374231 5.94854549, -54.91288663 5.94853669, -54.91194389 5.94877786, -54.91059430 5.94907660, -54.90862769 5.94864318, -54.90740239 5.94808259, -54.90638531 5.94655718, -54.90508733 5.94440429, -54.90381872 5.94248535, -54.90227146 5.94226232, -54.90058469 5.94242065, -54.89598142 5.93960745, -54.89608681 5.93630992, -54.89566039 5.93501949, -54.89478643 5.93479853, -54.89344090 5.93512990, -54.89269767 5.93461502, -54.89281973 5.93325487, -54.89321007 5.93199769, -54.89382002 5.92913249, -54.89370897 5.92592290, -54.89253058 5.92318200, -54.89130256 5.92114969, -54.89105258 5.92008926, -54.89150189 5.91904678, -54.89427192 5.91889098, -54.89458987 5.91684494, -54.89377642 5.91558365, -54.89153085 5.91357831, -54.88983222 5.91117050, -54.88869513 5.90767509, -54.88811666 5.90224510, -54.88880555 5.89797630, -54.88995947 5.89332136, -54.89003271 5.88940075, -54.89062463 5.88741328)",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930"
-      ],
-      "wikidataQid": null,
-      "fid": 609,
-      "psurIds": [],
-      "district": null,
-      "locationDescription": "Commewijne",
-      "locationDescriptionOriginal": null,
-      "placeType": "creek",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": []
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-00140",
       "@type": [
         "E26_Physical_Feature"
@@ -103415,6 +103477,47 @@
           "language": "nl",
           "type": "official",
           "isPreferred": true
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-00343",
+      "@type": "E26_Physical_Feature",
+      "id": "stm-00343",
+      "type": "creek",
+      "broader": null,
+      "description": "Creek segment of Commewijne (QGIS 1930 map)",
+      "location": {
+        "lat": 5.929093393589741,
+        "lng": -54.89843583820511,
+        "wkt": "LineString (-54.91673784 5.95241923, -54.91555455 5.95007586, -54.91452513 5.94899881, -54.91374231 5.94854549, -54.91288663 5.94853669, -54.91194389 5.94877786, -54.91059430 5.94907660, -54.90862769 5.94864318, -54.90740239 5.94808259, -54.90638531 5.94655718, -54.90508733 5.94440429, -54.90381872 5.94248535, -54.90227146 5.94226232, -54.90058469 5.94242065, -54.89598142 5.93960745, -54.89608681 5.93630992, -54.89566039 5.93501949, -54.89478643 5.93479853, -54.89344090 5.93512990, -54.89269767 5.93461502, -54.89281973 5.93325487, -54.89321007 5.93199769, -54.89382002 5.92913249, -54.89370897 5.92592290, -54.89253058 5.92318200, -54.89130256 5.92114969, -54.89105258 5.92008926, -54.89150189 5.91904678, -54.89427192 5.91889098, -54.89458987 5.91684494, -54.89377642 5.91558365, -54.89153085 5.91357831, -54.88983222 5.91117050, -54.88869513 5.90767509, -54.88811666 5.90224510, -54.88880555 5.89797630, -54.88995947 5.89332136, -54.89003271 5.88940075, -54.89062463 5.88741328)",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930"
+      ],
+      "wikidataQid": null,
+      "fid": 609,
+      "psurIds": [],
+      "district": null,
+      "locationDescription": "Commewijne",
+      "locationDescriptionOriginal": null,
+      "placeType": "creek",
+      "modifiedBy": "Thunnisvanoort",
+      "modifiedAt": "2026-04-21",
+      "externalLinks": [],
+      "names": [
+        {
+          "text": "Warappa Kreek",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "Warapperkreek",
+          "language": "nl",
+          "type": "variant",
+          "isPreferred": false
         }
       ]
     },
