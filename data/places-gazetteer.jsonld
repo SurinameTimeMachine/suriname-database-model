@@ -73856,6 +73856,12 @@
           "language": "srn",
           "type": "historical",
           "isPreferred": false
+        },
+        {
+          "text": "Zandgrond",
+          "language": "nl",
+          "type": "vernacular",
+          "isPreferred": false
         }
       ],
       "diklandRefs": [
