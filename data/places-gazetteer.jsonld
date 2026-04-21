@@ -3863,43 +3863,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-02169",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-02169",
-      "type": "plantation",
-      "prefLabel": "Appecappe",
-      "altLabels": [],
-      "broader": "stm-00005",
-      "description": "Plantation from Surinaamse Almanakken (no QGIS geometry)",
-      "location": {
-        "lat": null,
-        "lng": null,
-        "wkt": null,
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "almanakken"
-      ],
-      "wikidataQid": "Q59115164",
-      "fid": null,
-      "psurIds": [],
-      "district": "Divisie Boven-Commewijne",
-      "locationDescription": "Boven-Commewijne",
-      "locationDescriptionOriginal": "Rivier Commewijne, (boven) linkerhand in het afvaren",
-      "placeType": "steen",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59115164",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02343",
       "@type": [
         "E25_Human-Made_Feature"
@@ -72526,6 +72489,56 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emZVZzNWJZSnR5MGs/view?usp=drive_link&resourcekey=0-eiUwMBYsdEKZMmlORoACAA",
           "author": "Philip Dikland",
           "year": "2006, aangevuld 2009",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-02169",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-02169",
+      "type": "plantation",
+      "broader": "stm-00005",
+      "description": "Plantation from Surinaamse Almanakken (no QGIS geometry)",
+      "location": {
+        "lat": null,
+        "lng": null,
+        "wkt": null,
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "almanakken"
+      ],
+      "wikidataQid": "Q59115164",
+      "fid": null,
+      "psurIds": [],
+      "district": "Divisie Boven-Commewijne",
+      "locationDescription": "Boven-Commewijne",
+      "locationDescriptionOriginal": "Rivier Commewijne, (boven) linkerhand in het afvaren",
+      "placeType": "steen",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-21",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59115164",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Appecappe",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Appecap geschiedenis dikland 005.pdf",
+          "driveUrl": "https://drive.google.com/drive/u/0/folders/0B88mZFitv8embmZaYWFQNnZacDQ?tid=0B88mZFitv8emcjVfcG5hWFJOdWs&resourcekey=0-sImlF_DkEFu3ebWbDQ58Kg",
+          "author": "Philip Dikland",
+          "year": "2005, aangevuld 2010, 2012",
           "notes": null
         }
       ]
