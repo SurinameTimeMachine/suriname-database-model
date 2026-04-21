@@ -8392,47 +8392,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01249",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01249",
-      "type": "plantation",
-      "prefLabel": "Cannawappibo",
-      "altLabels": [],
-      "broader": "stm-00005",
-      "description": "",
-      "location": {
-        "lat": 5.783352729523808,
-        "lng": -54.78818998428572,
-        "wkt": "Polygon ((-54.80385184 5.76447662, -54.81154238 5.78020346, -54.80114790 5.78756559, -54.77935814 5.80190993, -54.77908617 5.80114848, -54.77853512 5.79965741, -54.77975591 5.79800364, -54.78576637 5.79377221, -54.78791555 5.79191655, -54.78869517 5.78946426, -54.78794222 5.78776701, -54.78501414 5.78609585, -54.78315093 5.78581195, -54.78105103 5.78606705, -54.78068562 5.77824482, -54.78264410 5.77822667, -54.78264805 5.77572856, -54.78438866 5.77544083, -54.78324630 5.76419751, -54.80171223 5.76023230, -54.80385184 5.76447662))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q59115355",
-      "fid": 2333,
-      "psurIds": [
-        "PSUR0052"
-      ],
-      "district": "Divisie Boven-Commewijne",
-      "locationDescription": "Boven-Commewijne",
-      "locationDescriptionOriginal": "Rivier Commewijne, (boven) linkerhand in het afvaren",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59115355",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-00771",
       "@type": [
         "E25_Human-Made_Feature"
@@ -73409,6 +73368,78 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emSGFlMWRUaHQtS0E/view?usp=sharing&resourcekey=0-GlY9b6rMiPSkyZcAIA4ayg",
           "author": "Philip Dikland",
           "year": "2001",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01249",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01249",
+      "type": "plantation",
+      "broader": "stm-00005",
+      "description": "",
+      "location": {
+        "lat": 5.783352729523808,
+        "lng": -54.78818998428572,
+        "wkt": "Polygon ((-54.80385184 5.76447662, -54.81154238 5.78020346, -54.80114790 5.78756559, -54.77935814 5.80190993, -54.77908617 5.80114848, -54.77853512 5.79965741, -54.77975591 5.79800364, -54.78576637 5.79377221, -54.78791555 5.79191655, -54.78869517 5.78946426, -54.78794222 5.78776701, -54.78501414 5.78609585, -54.78315093 5.78581195, -54.78105103 5.78606705, -54.78068562 5.77824482, -54.78264410 5.77822667, -54.78264805 5.77572856, -54.78438866 5.77544083, -54.78324630 5.76419751, -54.80171223 5.76023230, -54.80385184 5.76447662))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q59115355",
+      "fid": 2333,
+      "psurIds": [
+        "PSUR0052"
+      ],
+      "district": "Divisie Boven-Commewijne",
+      "locationDescription": "Boven-Commewijne",
+      "locationDescriptionOriginal": "Rivier Commewijne, (boven) linkerhand in het afvaren",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-21",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59115355",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Cannawappibo",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "Snijman",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false
+        },
+        {
+          "text": "Snelleman",
+          "language": "nl",
+          "type": "vernacular",
+          "isPreferred": false
+        },
+        {
+          "text": "Cannewapibo",
+          "language": "nl",
+          "type": "variant",
+          "isPreferred": false
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Cannewapibo 2010-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emUFVKUGlNUXk3TXM/view?usp=sharing&resourcekey=0-o13_E4HUE5NUclc_wQLBgw",
+          "author": "Philip Dikland",
+          "year": "2010, aangevuld 2012",
           "notes": null
         }
       ]
