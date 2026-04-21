@@ -8392,47 +8392,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00747",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-00747",
-      "type": "plantation",
-      "prefLabel": "Cannawappibo",
-      "altLabels": [],
-      "broader": "stm-00005",
-      "description": "",
-      "location": {
-        "lat": 5.789660125999999,
-        "lng": -54.774741843,
-        "wkt": "Polygon ((-54.77551220 5.78559345, -54.78008261 5.78645546, -54.77740499 5.78992459, -54.77611104 5.79199944, -54.77465916 5.79307188, -54.77283204 5.79301085, -54.77132510 5.79223866, -54.77099408 5.79066955, -54.77298501 5.78804393, -54.77551220 5.78559345))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q59115355",
-      "fid": 1830,
-      "psurIds": [
-        "PSUR0052"
-      ],
-      "district": "Divisie Boven-Commewijne",
-      "locationDescription": "Boven-Commewijne",
-      "locationDescriptionOriginal": "Rivier Commewijne, (boven) linkerhand in het afvaren",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59115355",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-01249",
       "@type": [
         "E25_Human-Made_Feature"
@@ -73450,6 +73409,78 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emSGFlMWRUaHQtS0E/view?usp=sharing&resourcekey=0-GlY9b6rMiPSkyZcAIA4ayg",
           "author": "Philip Dikland",
           "year": "2001",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-00747",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-00747",
+      "type": "plantation",
+      "broader": "stm-00005",
+      "description": "",
+      "location": {
+        "lat": 5.789660125999999,
+        "lng": -54.774741843,
+        "wkt": "Polygon ((-54.77551220 5.78559345, -54.78008261 5.78645546, -54.77740499 5.78992459, -54.77611104 5.79199944, -54.77465916 5.79307188, -54.77283204 5.79301085, -54.77132510 5.79223866, -54.77099408 5.79066955, -54.77298501 5.78804393, -54.77551220 5.78559345))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q59115355",
+      "fid": 1830,
+      "psurIds": [
+        "PSUR0052"
+      ],
+      "district": "Divisie Boven-Commewijne",
+      "locationDescription": "Boven-Commewijne",
+      "locationDescriptionOriginal": "Rivier Commewijne, (boven) linkerhand in het afvaren",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-21",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59115355",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Cannawappibo",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "Snijman",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false
+        },
+        {
+          "text": "Snelleman",
+          "language": "nl",
+          "type": "vernacular",
+          "isPreferred": false
+        },
+        {
+          "text": "Cannewapibo",
+          "language": "nl",
+          "type": "variant",
+          "isPreferred": false
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Cannewapibo 2010-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emUFVKUGlNUXk3TXM/view?usp=sharing&resourcekey=0-o13_E4HUE5NUclc_wQLBgw",
+          "author": "Philip Dikland",
+          "year": "2010, aangevuld 2012",
           "notes": null
         }
       ]
