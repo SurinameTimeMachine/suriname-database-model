@@ -11235,43 +11235,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-02472",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-02472",
-      "type": "plantation",
-      "prefLabel": "De Dageraad",
-      "altLabels": [],
-      "broader": "stm-00005",
-      "description": "Plantation from Surinaamse Almanakken (no QGIS geometry)",
-      "location": {
-        "lat": null,
-        "lng": null,
-        "wkt": null,
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "almanakken"
-      ],
-      "wikidataQid": "Q130359651",
-      "fid": null,
-      "psurIds": [],
-      "district": "Divisie Boven-Commewijne",
-      "locationDescription": "Commetewane Kreek",
-      "locationDescriptionOriginal": "Commetewane-kreek, linkerhand in het opvaren",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q130359651",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02471",
       "@type": [
         "E25_Human-Made_Feature"
@@ -73982,6 +73945,68 @@
           "author": "Philip Dikland",
           "year": "2005, aangevuld 2008",
           "notes": "De eerstbekende naam van de plantage was Castanienboom. In 1737 en 1741 werd een deel\nvan de grond verkocht aan buurplantage Nieuwsorg, en de resterende grond werd omstreeks 1750 \"Eendragt\" genoemd. Omstreeks 1840 werd deze naam gewijzigd in \"Dageraad\"."
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-02472",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-02472",
+      "type": "plantation",
+      "broader": "stm-00005",
+      "description": "Plantation from Surinaamse Almanakken (no QGIS geometry)",
+      "location": {
+        "lat": null,
+        "lng": null,
+        "wkt": null,
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "almanakken"
+      ],
+      "wikidataQid": "Q130359651",
+      "fid": null,
+      "psurIds": [],
+      "district": "Divisie Boven-Commewijne",
+      "locationDescription": "Commetewane Kreek",
+      "locationDescriptionOriginal": "Commetewane-kreek, linkerhand in het opvaren",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-21",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q130359651",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "De Dageraad",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "Kakrakoe",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false
+        },
+        {
+          "text": "Craffort ?",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Dageraad Commetewane 2005-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emdndtbkNzMzRxTGc/view?usp=sharing&resourcekey=0-bfsaM172T5nIpn3Mmh0h6A",
+          "author": "Philip Dikland",
+          "year": "2005, aangevuld 2008",
+          "notes": null
         }
       ]
     },
