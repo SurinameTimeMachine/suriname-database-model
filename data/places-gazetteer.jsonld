@@ -10345,47 +10345,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01167",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01167",
-      "type": "plantation",
-      "prefLabel": "Concordia",
-      "altLabels": [],
-      "broader": "stm-00005",
-      "description": "",
-      "location": {
-        "lat": 5.706398762857143,
-        "lng": -54.727101905000005,
-        "wkt": "Polygon ((-54.73262007 5.70509072, -54.73035665 5.70601649, -54.72051231 5.70560795, -54.70574579 5.71787003, -54.70198336 5.71350652, -54.71109025 5.70622571, -54.72386453 5.69514195, -54.73027843 5.70282682, -54.73492112 5.69890739, -54.74235953 5.70759031, -54.74007263 5.70953004, -54.73794747 5.71018282, -54.73505446 5.70599521, -54.73262007 5.70509072))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q59115397",
-      "fid": 2251,
-      "psurIds": [
-        "PSUR0061"
-      ],
-      "district": "Divisie Boven-Commewijne",
-      "locationDescription": "Boven-Commewijne",
-      "locationDescriptionOriginal": "Rivier Commewijne, (boven) regterhand in het afvaren",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59115397",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-01294",
       "@type": [
         "E25_Human-Made_Feature"
@@ -73783,6 +73742,60 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emN1N4QnJiVGEtUUE/view?usp=sharing&resourcekey=0-0cAEIasx6pvqSRzZITVliQ",
           "author": "Philip Dikland",
           "year": "2008",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01167",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01167",
+      "type": "plantation",
+      "broader": "stm-00005",
+      "description": "",
+      "location": {
+        "lat": 5.706398762857143,
+        "lng": -54.727101905000005,
+        "wkt": "Polygon ((-54.73262007 5.70509072, -54.73035665 5.70601649, -54.72051231 5.70560795, -54.70574579 5.71787003, -54.70198336 5.71350652, -54.71109025 5.70622571, -54.72386453 5.69514195, -54.73027843 5.70282682, -54.73492112 5.69890739, -54.74235953 5.70759031, -54.74007263 5.70953004, -54.73794747 5.71018282, -54.73505446 5.70599521, -54.73262007 5.70509072))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q59115397",
+      "fid": 2251,
+      "psurIds": [
+        "PSUR0061"
+      ],
+      "district": "Divisie Boven-Commewijne",
+      "locationDescription": "Boven-Commewijne",
+      "locationDescriptionOriginal": "Rivier Commewijne, (boven) regterhand in het afvaren",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-21",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59115397",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Concordia",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Concordia 2001-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emWWxyX25jLU1FTGs/view?usp=sharing&resourcekey=0-TWH1TNJj08noefw94fw8IA",
+          "author": "Philip Dikland",
+          "year": "2001, aangevuld 2009, 2012",
           "notes": null
         }
       ]
