@@ -160,25 +160,24 @@ function geometryToSegments(geometry: RawGeometry): number[][][] {
   return geometry.coordinates as number[][][];
 }
 
-function segmentsToLineStringWkt(segments: number[][][]): string | null {
-  const points: number[][] = [];
+function segmentsToMultiLineStringWkt(segments: number[][][]): string | null {
+  const parts: string[] = [];
 
   for (const segment of segments) {
+    const pts: string[] = [];
     for (const coord of segment) {
       if (!Array.isArray(coord) || coord.length < 2) continue;
       const lng = Number(coord[0]);
       const lat = Number(coord[1]);
       if (Number.isNaN(lng) || Number.isNaN(lat)) continue;
-      points.push([lng, lat]);
+      pts.push(`${lng.toFixed(8)} ${lat.toFixed(8)}`);
     }
+    if (pts.length >= 2) parts.push(`(${pts.join(', ')})`);
   }
 
-  if (points.length < 2) return null;
-
-  const serialized = points.map(
-    ([lng, lat]) => `${lng.toFixed(8)} ${lat.toFixed(8)}`,
-  );
-  return `LineString (${serialized.join(', ')})`;
+  if (parts.length === 0) return null;
+  if (parts.length === 1) return `LineString ${parts[0]}`;
+  return `MultiLineString (${parts.join(', ')})`;
 }
 
 function centroidFromSegments(
@@ -279,7 +278,7 @@ function buildStreetAggregates(features: RawFeature[]): {
 
     const existing = byKey.get(key);
     if (existing) {
-      existing.featureIds.push(safeId);
+      if (safeId >= 0) existing.featureIds.push(safeId);
       existing.segments.push(...segments);
       continue;
     }
@@ -287,7 +286,7 @@ function buildStreetAggregates(features: RawFeature[]): {
     byKey.set(key, {
       key,
       label,
-      featureIds: [safeId],
+      featureIds: safeId >= 0 ? [safeId] : [],
       segments: [...segments],
     });
   }
@@ -417,7 +416,7 @@ function main() {
   let skippedNoWkt = 0;
 
   for (const aggregate of aggregates) {
-    const wkt = segmentsToLineStringWkt(aggregate.segments);
+    const wkt = segmentsToMultiLineStringWkt(aggregate.segments);
     const centroid = centroidFromSegments(aggregate.segments);
 
     if (!wkt || !centroid) {
@@ -446,8 +445,25 @@ function main() {
       const entry = matching[0];
       entry.type = 'road';
       entry['@type'] = determineCrmType('road', gazetteer['@context']);
-      entry.prefLabel = aggregate.label;
       entry.altLabels = Array.isArray(entry.altLabels) ? entry.altLabels : [];
+      if (Array.isArray(entry.names) && entry.names.length > 0) {
+        const names = entry.names as Array<Record<string, unknown>>;
+        const prefIdx = names.findIndex((n) => n.isPreferred === true);
+        const nameEntry = {
+          text: aggregate.label,
+          language: 'nl',
+          type: 'official',
+          isPreferred: true,
+        };
+        if (prefIdx >= 0) {
+          names[prefIdx] = nameEntry;
+        } else {
+          names.unshift(nameEntry);
+        }
+        delete (entry as Record<string, unknown>).prefLabel;
+      } else {
+        entry.prefLabel = aggregate.label;
+      }
       entry.location = {
         lat: centroid.lat,
         lng: centroid.lng,
@@ -455,9 +471,9 @@ function main() {
         crs: 'EPSG:4326',
       };
       entry.sources = ensureSource(entry.sources, SOURCE_TAG);
-      entry.fid = aggregate.featureIds[0] ?? null;
-      entry.modifiedBy = null;
-      entry.modifiedAt = null;
+      entry.fid = aggregate.featureIds.find((fid) => fid >= 0) ?? null;
+      entry.modifiedBy = SOURCE_TAG;
+      entry.modifiedAt = new Date().toISOString();
       if (!Array.isArray(entry.externalLinks)) entry.externalLinks = [];
       updated++;
       continue;
@@ -481,7 +497,7 @@ function main() {
       },
       sources: [SOURCE_TAG],
       wikidataQid: null,
-      fid: aggregate.featureIds[0] ?? null,
+      fid: aggregate.featureIds.find((fid) => fid >= 0) ?? null,
       psurIds: [],
       district: 'Paramaribo',
       locationDescription: null,

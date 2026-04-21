@@ -460,8 +460,8 @@ export default function MapView({
           };
         }
 
-        // LineString features
-        if (geomType === 'LineString') {
+        // LineString / MultiLineString features
+        if (geomType === 'LineString' || geomType === 'MultiLineString') {
           // Roads
           if (ft === 'road') {
             if (isSelected)
@@ -569,7 +569,10 @@ export default function MapView({
           if (featureIdentifier !== selectedUriRef.current) {
             if (feature.geometry?.type === 'Point') {
               target.setStyle({ fillOpacity: 0.9, weight: 2.5 });
-            } else if (feature.geometry?.type === 'LineString') {
+            } else if (
+              feature.geometry?.type === 'LineString' ||
+              feature.geometry?.type === 'MultiLineString'
+            ) {
               target.setStyle({ opacity: 0.9, weight: 3.5 });
             } else {
               target.setStyle({ fillOpacity: 0.5, weight: 2 });

@@ -135,7 +135,7 @@ export interface GeoJSONFeature {
   type: 'Feature';
   id: string;
   geometry: {
-    type: 'Polygon' | 'LineString' | 'Point';
+    type: 'Polygon' | 'LineString' | 'Point' | 'MultiLineString';
     coordinates: number[][][] | number[][] | number[];
   };
   properties: GeoJSONFeatureProperties;
