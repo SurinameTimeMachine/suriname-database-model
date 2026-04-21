@@ -3710,47 +3710,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00686",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-00686",
-      "type": "plantation",
-      "prefLabel": "Anna's zorg",
-      "altLabels": [],
-      "broader": "stm-00004",
-      "description": "",
-      "location": {
-        "lat": 5.959488911666667,
-        "lng": -54.90804620166666,
-        "wkt": "Polygon ((-54.91698485 5.95757466, -54.91637195 5.96018818, -54.91572877 5.96370217, -54.89083780 5.96206923, -54.89136899 5.95582457, -54.91698485 5.95757466))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q59115157",
-      "fid": 1769,
-      "psurIds": [
-        "PSUR0016"
-      ],
-      "district": "Divisie Beneden-Cottica",
-      "locationDescription": "Warappa Kreek",
-      "locationDescriptionOriginal": "Warrappa-kreek, regterhand in het opvaren",
-      "placeType": "koffie en katoen",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59115157",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02264",
       "@type": [
         "E25_Human-Made_Feature"
@@ -72666,6 +72625,66 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emalgtZlZKZ3BpeWs/view?usp=sharing&resourcekey=0-pNlCZfwJXF7lc5wn-BwG2w",
           "author": "Philip Dikland",
           "year": "2008",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-00686",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-00686",
+      "type": "plantation",
+      "broader": "stm-00004",
+      "description": "",
+      "location": {
+        "lat": 5.959488911666667,
+        "lng": -54.90804620166666,
+        "wkt": "Polygon ((-54.91698485 5.95757466, -54.91637195 5.96018818, -54.91572877 5.96370217, -54.89083780 5.96206923, -54.89136899 5.95582457, -54.91698485 5.95757466))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q59115157",
+      "fid": 1769,
+      "psurIds": [
+        "PSUR0016"
+      ],
+      "district": "Divisie Beneden-Cottica",
+      "locationDescription": "Warappa Kreek",
+      "locationDescriptionOriginal": "Warrappa-kreek, regterhand in het opvaren",
+      "placeType": "koffie en katoen",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-21",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59115157",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Anna's zorg",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "Goedoefrouw",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Anna's Zorg 2006-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emZVZzNWJZSnR5MGs/view?usp=drive_link&resourcekey=0-eiUwMBYsdEKZMmlORoACAA",
+          "author": "Philip Dikland",
+          "year": "2006, aangevuld 2009",
           "notes": null
         }
       ]
