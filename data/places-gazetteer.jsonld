@@ -4466,57 +4466,6 @@
       ]
     },
     {
-      "@id": "stm:place/stm-00684",
-      "@type": "E25_Human-Made_Feature",
-      "id": "stm-00684",
-      "type": "plantation",
-      "prefLabel": "Barbados",
-      "altLabels": [
-        "Schasie",
-        "Schas"
-      ],
-      "broader": "stm-00004",
-      "description": "",
-      "location": {
-        "lat": 5.952261355,
-        "lng": -54.90852536833333,
-        "wkt": "Polygon ((-54.91698485 5.95757466, -54.89136899 5.95582457, -54.88986037 5.95579336, -54.89014712 5.94803783, -54.90984419 5.94969251, -54.91039620 5.94914136, -54.91300837 5.94838975, -54.91396553 5.94856537, -54.91555900 5.95016527, -54.91692045 5.95170674, -54.91726450 5.95467018, -54.91698485 5.95757466))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q2649101",
-      "fid": 1767,
-      "psurIds": [
-        "PSUR0020"
-      ],
-      "district": "Divisie Beneden-Cottica",
-      "locationDescription": "Warappa Kreek",
-      "locationDescriptionOriginal": "Warrappa-kreek, regterhand in het opvaren",
-      "placeType": "koffie",
-      "modifiedBy": "Thunnisvanoort",
-      "modifiedAt": "2026-04-13",
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q2649101",
-          "matchType": "closeMatch"
-        }
-      ],
-      "diklandRefs": [
-        {
-          "folderPath": "Commewijne rivier\\plantages\\Barbados 2008-01 geschiedenis.pdf",
-          "driveUrl": "https://drive.google.com/drive/folders/0B88mZFitv8emS1hQN2JjNjl2NmM?tid=0B88mZFitv8emcjVfcG5hWFJOdWs&resourcekey=0-3bVNO9yHN3AcEqwuUzUrAw.google.com/drive/u/0/folders/0B88mZFitv8embmZaYWFQNnZacDQ?tid=0B88mZFitv8emcjVfcG5hWFJOdWs&resourcekey=0-sImlF_DkEFu3ebWbDQ58Kg",
-          "author": "Philip Dikland",
-          "year": "2008, 2010",
-          "notes": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02198",
       "@type": [
         "E25_Human-Made_Feature"
@@ -72795,6 +72744,72 @@
           "text": "Voogtoe",
           "language": "srn",
           "type": "vernacular",
+          "isPreferred": false
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-00684",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-00684",
+      "type": "plantation",
+      "broader": "stm-00004",
+      "description": "",
+      "location": {
+        "lat": 5.952261355,
+        "lng": -54.90852536833333,
+        "wkt": "Polygon ((-54.91698485 5.95757466, -54.89136899 5.95582457, -54.88986037 5.95579336, -54.89014712 5.94803783, -54.90984419 5.94969251, -54.91039620 5.94914136, -54.91300837 5.94838975, -54.91396553 5.94856537, -54.91555900 5.95016527, -54.91692045 5.95170674, -54.91726450 5.95467018, -54.91698485 5.95757466))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q2649101",
+      "fid": 1767,
+      "psurIds": [
+        "PSUR0020"
+      ],
+      "district": "Divisie Beneden-Cottica",
+      "locationDescription": "Warappa Kreek",
+      "locationDescriptionOriginal": "Warrappa-kreek, regterhand in het opvaren",
+      "placeType": "koffie",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-21",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q2649101",
+          "matchType": "closeMatch"
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Barbados 2008-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emUi05RWZlV0xNTEE/view?usp=sharing&resourcekey=0-IHf13HSASWJ3McMfW7CtZg",
+          "author": "Philip Dikland",
+          "year": "2008, aangevuld 2010",
+          "notes": null
+        }
+      ],
+      "names": [
+        {
+          "text": "Barbados",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "Schasie",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false
+        },
+        {
+          "text": "Schas",
+          "language": "srn",
+          "type": "variant",
           "isPreferred": false
         }
       ]
