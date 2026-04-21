@@ -73508,6 +73508,12 @@
           "language": "nl",
           "type": "vernacular",
           "isPreferred": false
+        },
+        {
+          "text": "Cannewapibo",
+          "language": "nl",
+          "type": "variant",
+          "isPreferred": false
         }
       ],
       "diklandRefs": [
