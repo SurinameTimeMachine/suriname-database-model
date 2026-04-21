@@ -10853,46 +10853,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-02073",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-02073",
-      "type": "plantation",
-      "prefLabel": "Dageraad",
-      "altLabels": [],
-      "broader": null,
-      "description": "",
-      "location": {
-        "lat": 5.803286128888889,
-        "lng": -54.89210447166667,
-        "wkt": "Polygon ((-54.94050723 5.81493741, -54.91086248 5.81061239, -54.88823701 5.80780467, -54.88133647 5.80800616, -54.87465380 5.80863035, -54.86651729 5.80922219, -54.86725557 5.79872157, -54.85526319 5.79876450, -54.85679258 5.78307459, -54.86239651 5.78332414, -54.87481033 5.78334197, -54.87376440 5.79842914, -54.89163223 5.79857513, -54.88838970 5.80635637, -54.91068423 5.80874114, -54.93370077 5.81224259, -54.94056947 5.81342860, -54.94050723 5.81493741))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q137554028",
-      "fid": 3158,
-      "psurIds": [
-        "PSUR0071"
-      ],
-      "district": null,
-      "locationDescription": null,
-      "locationDescriptionOriginal": null,
-      "placeType": null,
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q137554028",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02205",
       "@type": [
         "E25_Human-Made_Feature"
@@ -73997,6 +73957,71 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emR1hORlhmMVlxNnc/view?usp=sharing&resourcekey=0-kQ32VNcZTwoCCnDcNI4XIw",
           "author": "Philip Dikland",
           "year": "2005, aangevuld 2010",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-02073",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-02073",
+      "type": "plantation",
+      "broader": null,
+      "description": "",
+      "location": {
+        "lat": 5.803286128888889,
+        "lng": -54.89210447166667,
+        "wkt": "Polygon ((-54.94050723 5.81493741, -54.91086248 5.81061239, -54.88823701 5.80780467, -54.88133647 5.80800616, -54.87465380 5.80863035, -54.86651729 5.80922219, -54.86725557 5.79872157, -54.85526319 5.79876450, -54.85679258 5.78307459, -54.86239651 5.78332414, -54.87481033 5.78334197, -54.87376440 5.79842914, -54.89163223 5.79857513, -54.88838970 5.80635637, -54.91068423 5.80874114, -54.93370077 5.81224259, -54.94056947 5.81342860, -54.94050723 5.81493741))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q137554028",
+      "fid": 3158,
+      "psurIds": [
+        "PSUR0071"
+      ],
+      "district": null,
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-21",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q137554028",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Dageraad",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "Kakrakoe",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false
+        },
+        {
+          "text": "Craffort ?",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Dageraad Commetewane 2005-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emdndtbkNzMzRxTGc/view?usp=sharing&resourcekey=0-bfsaM172T5nIpn3Mmh0h6A",
+          "author": "Philip Dikland",
+          "year": "2005, aangevuld 2008",
           "notes": null
         }
       ]
