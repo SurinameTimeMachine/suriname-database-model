@@ -12448,44 +12448,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00682",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-00682",
-      "type": "plantation",
-      "prefLabel": "De Herstelling",
-      "altLabels": [],
-      "broader": "stm-00004",
-      "description": "",
-      "location": {
-        "lat": 5.9836901,
-        "lng": -54.93438627285715,
-        "wkt": "Polygon ((-54.96106722 5.98203529, -54.96076715 5.98958761, -54.91417428 5.98611100, -54.91418942 5.98566077, -54.91452857 5.98173968, -54.91491005 5.97866106, -54.96106722 5.98203529))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken"
-      ],
-      "wikidataQid": "Q59115688",
-      "fid": 1765,
-      "psurIds": [],
-      "district": "Divisie Beneden-Cottica",
-      "locationDescription": "Warappa Kreek",
-      "locationDescriptionOriginal": "Warrappa-kreek, linkerhand in het opvaren",
-      "placeType": "koffie en katoen",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59115688",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-01956",
       "@type": [
         "E25_Human-Made_Feature"
@@ -73375,6 +73337,69 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8embm45emxnU01malU/view?usp=sharing&resourcekey=0-f_INHt1s__h3KyVLUCG1jA",
           "author": "Philip Dikland",
           "year": "2003, aangevuld 2010",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-00682",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-00682",
+      "type": "plantation",
+      "broader": "stm-00004",
+      "description": "",
+      "location": {
+        "lat": 5.9836901,
+        "lng": -54.93438627285715,
+        "wkt": "Polygon ((-54.96106722 5.98203529, -54.96076715 5.98958761, -54.91417428 5.98611100, -54.91418942 5.98566077, -54.91452857 5.98173968, -54.91491005 5.97866106, -54.96106722 5.98203529))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken"
+      ],
+      "wikidataQid": "Q59115688",
+      "fid": 1765,
+      "psurIds": [],
+      "district": "Divisie Beneden-Cottica",
+      "locationDescription": "Warappa Kreek",
+      "locationDescriptionOriginal": "Warrappa-kreek, linkerhand in het opvaren",
+      "placeType": "koffie en katoen",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-22",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59115688",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "De Herstelling",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "Saffyn",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false
+        },
+        {
+          "text": "Saffin",
+          "language": "nl",
+          "type": "vernacular",
+          "isPreferred": false
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Herstelling 2006-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emLWlNRmY1U1VxQmc/view?usp=sharing&resourcekey=0-OtPHQ77TXlTu8cJPGcXHWA",
+          "author": "Philip Dikland",
+          "year": "2006",
           "notes": null
         }
       ]
