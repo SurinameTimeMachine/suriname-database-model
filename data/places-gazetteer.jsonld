@@ -32931,47 +32931,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00709",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-00709",
-      "type": "plantation",
-      "prefLabel": "Moed en Kommer",
-      "altLabels": [],
-      "broader": "stm-00004",
-      "description": "",
-      "location": {
-        "lat": 5.965793359999999,
-        "lng": -54.905019391428574,
-        "wkt": "Polygon ((-54.89083780 5.96206923, -54.91572877 5.96370217, -54.91563570 5.96505520, -54.91567767 5.96914871, -54.91564732 5.97010728, -54.89077068 5.96840170, -54.89083780 5.96206923))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q59119435",
-      "fid": 1792,
-      "psurIds": [
-        "PSUR0236"
-      ],
-      "district": "Divisie Beneden-Cottica",
-      "locationDescription": "Warappa Kreek",
-      "locationDescriptionOriginal": "Warrappa-kreek, regterhand in het opvaren",
-      "placeType": "koffie en katoen",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59119435",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-00520",
       "@type": [
         "E25_Human-Made_Feature"
@@ -75361,6 +75320,72 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emNlBtbVBrWERJMTQ/view?usp=sharing&resourcekey=0--HbOsoNG8X0ykUlgntSQkQ",
           "author": "Philip Dikland",
           "year": "2005",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-00709",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-00709",
+      "type": "plantation",
+      "broader": "stm-00004",
+      "description": "",
+      "location": {
+        "lat": 5.965793359999999,
+        "lng": -54.905019391428574,
+        "wkt": "Polygon ((-54.89083780 5.96206923, -54.91572877 5.96370217, -54.91563570 5.96505520, -54.91567767 5.96914871, -54.91564732 5.97010728, -54.89077068 5.96840170, -54.89083780 5.96206923))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q59119435",
+      "fid": 1792,
+      "psurIds": [
+        "PSUR0236"
+      ],
+      "district": "Divisie Beneden-Cottica",
+      "locationDescription": "Warappa Kreek",
+      "locationDescriptionOriginal": "Warrappa-kreek, regterhand in het opvaren",
+      "placeType": "koffie en katoen",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-22",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59119435",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Moed en Kommer",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "Korkoe",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false
+        },
+        {
+          "text": "Kurk",
+          "language": "nl",
+          "type": "vernacular",
+          "isPreferred": false
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Moed en Kommer 2008-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emWEl0bGNSMkxkUk0/view?usp=sharing&resourcekey=0-f_XIBh-hDQD_ZjALzg5FVw",
+          "author": "Philip Dikland",
+          "year": "2008",
           "notes": null
         }
       ]
