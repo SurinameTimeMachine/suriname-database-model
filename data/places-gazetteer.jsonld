@@ -24136,47 +24136,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00680",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-00680",
-      "type": "plantation",
-      "prefLabel": "Klein Lunenburg",
-      "altLabels": [],
-      "broader": "stm-00004",
-      "description": "",
-      "location": {
-        "lat": 5.9664657257142855,
-        "lng": -54.933675491428566,
-        "wkt": "Polygon ((-54.91572877 5.96370217, -54.94901933 5.96543242, -54.96221948 5.96623419, -54.96171872 5.97198522, -54.91567767 5.96914871, -54.91563570 5.96505520, -54.91572877 5.96370217))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q59116818",
-      "fid": 1763,
-      "psurIds": [
-        "PSUR0164"
-      ],
-      "district": "Divisie Beneden-Cottica",
-      "locationDescription": "Warappa Kreek",
-      "locationDescriptionOriginal": "Warrappa-kreek, linkerhand in het opvaren",
-      "placeType": "koffie en katoen",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59116818",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-01109",
       "@type": [
         "E25_Human-Made_Feature"
@@ -74847,6 +74806,66 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emOE1zN2pjRHQxcnc/view?usp=sharing&resourcekey=0-nfSrRIpI5inws9Q9kLXe_g",
           "author": "Philip Dikland",
           "year": "2005, aangevuld 2010",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-00680",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-00680",
+      "type": "plantation",
+      "broader": "stm-00004",
+      "description": "",
+      "location": {
+        "lat": 5.9664657257142855,
+        "lng": -54.933675491428566,
+        "wkt": "Polygon ((-54.91572877 5.96370217, -54.94901933 5.96543242, -54.96221948 5.96623419, -54.96171872 5.97198522, -54.91567767 5.96914871, -54.91563570 5.96505520, -54.91572877 5.96370217))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q59116818",
+      "fid": 1763,
+      "psurIds": [
+        "PSUR0164"
+      ],
+      "district": "Divisie Beneden-Cottica",
+      "locationDescription": "Warappa Kreek",
+      "locationDescriptionOriginal": "Warrappa-kreek, linkerhand in het opvaren",
+      "placeType": "koffie en katoen",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-22",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59116818",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Klein Lunenburg",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "Klein",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Klein Lunenburg 2008-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emMVp2OGdNTmFCUVU/view?usp=sharing&resourcekey=0-IFudKbcjwsWGa0cHLaRp9w",
+          "author": "Philip Dikland",
+          "year": "2008",
           "notes": null
         }
       ]
