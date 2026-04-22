@@ -13191,47 +13191,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01179",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01179",
-      "type": "plantation",
-      "prefLabel": "De Nieuwhoop",
-      "altLabels": [],
-      "broader": "stm-00005",
-      "description": "",
-      "location": {
-        "lat": 5.757479104000001,
-        "lng": -54.775640878666664,
-        "wkt": "Polygon ((-54.78188913 5.74203184, -54.78505472 5.73916108, -54.79111938 5.74622923, -54.78885729 5.74622569, -54.79296905 5.75034240, -54.78110419 5.76163790, -54.78324630 5.76419751, -54.77227969 5.76662007, -54.76987202 5.76693574, -54.76702698 5.76870307, -54.76473788 5.76742128, -54.76085148 5.76750214, -54.75783547 5.76738105, -54.75588047 5.76576572, -54.78188913 5.74203184))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q59132900",
-      "fid": 2263,
-      "psurIds": [
-        "PSUR0259"
-      ],
-      "district": "Divisie Boven-Commewijne",
-      "locationDescription": "Boven-Commewijne",
-      "locationDescriptionOriginal": "Rivier Commewijne, (boven) linkerhand in het afvaren",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59132900",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-01151",
       "@type": [
         "E25_Human-Made_Feature"
@@ -71983,6 +71942,60 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emLWlNRmY1U1VxQmc/view?usp=sharing&resourcekey=0-OtPHQ77TXlTu8cJPGcXHWA",
           "author": "Philip Dikland",
           "year": "2006",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01179",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01179",
+      "type": "plantation",
+      "broader": "stm-00005",
+      "description": "",
+      "location": {
+        "lat": 5.757479104000001,
+        "lng": -54.775640878666664,
+        "wkt": "Polygon ((-54.78188913 5.74203184, -54.78505472 5.73916108, -54.79111938 5.74622923, -54.78885729 5.74622569, -54.79296905 5.75034240, -54.78110419 5.76163790, -54.78324630 5.76419751, -54.77227969 5.76662007, -54.76987202 5.76693574, -54.76702698 5.76870307, -54.76473788 5.76742128, -54.76085148 5.76750214, -54.75783547 5.76738105, -54.75588047 5.76576572, -54.78188913 5.74203184))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q59132900",
+      "fid": 2263,
+      "psurIds": [
+        "PSUR0259"
+      ],
+      "district": "Divisie Boven-Commewijne",
+      "locationDescription": "Boven-Commewijne",
+      "locationDescriptionOriginal": "Rivier Commewijne, (boven) linkerhand in het afvaren",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-22",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59132900",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "De Nieuwhoop",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Nieuwe Hoop 2002-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emZW41LUtNQnhDT0U/view?usp=sharing&resourcekey=0-fK-pxmbrCgLCzlqIfw7FiQ",
+          "author": "Philip Dikland",
+          "year": "2002, aangevuld 2010",
           "notes": null
         }
       ]
