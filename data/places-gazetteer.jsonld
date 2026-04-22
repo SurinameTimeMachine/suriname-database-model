@@ -38924,47 +38924,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01181",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01181",
-      "type": "plantation",
-      "prefLabel": "Penoribo",
-      "altLabels": [],
-      "broader": "stm-00005",
-      "description": "",
-      "location": {
-        "lat": 5.793518247096774,
-        "lng": -54.77117234419356,
-        "wkt": "Polygon ((-54.77475112 5.78247983, -54.77340070 5.78572829, -54.77043549 5.78849373, -54.76935332 5.79153228, -54.76959011 5.79277799, -54.77062026 5.79419972, -54.77290106 5.79518954, -54.77490294 5.79478609, -54.77734159 5.79330856, -54.77905741 5.79040652, -54.78126581 5.78779574, -54.78287596 5.78749329, -54.78459272 5.78792682, -54.78576024 5.78847097, -54.78657023 5.78999060, -54.78595803 5.79178274, -54.78168989 5.79470979, -54.77903276 5.79678247, -54.77774586 5.79856897, -54.77708509 5.80079485, -54.77773277 5.80263352, -54.75553052 5.81138443, -54.75071268 5.81329363, -54.74496649 5.81531744, -54.74220312 5.80264813, -54.75289130 5.79360297, -54.75138676 5.79139288, -54.75858396 5.78867419, -54.77090280 5.78429342, -54.77175056 5.78012643, -54.77475112 5.78247983))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q59133053",
-      "fid": 2265,
-      "psurIds": [
-        "PSUR0278"
-      ],
-      "district": "Divisie Boven-Commewijne",
-      "locationDescription": "Boven-Commewijne",
-      "locationDescriptionOriginal": "Rivier Commewijne, (boven) regterhand in het afvaren",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59133053",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-00566",
       "@type": [
         "E25_Human-Made_Feature"
@@ -75934,6 +75893,66 @@
           "author": "Philip Dikland",
           "year": "2004",
           "notes": "De plantage Ostage ligt aan de linkeroever van de Commewijnerivier. Recht ertegenover ligt\nde plantage Goudmijn. Beide plantages zijn vrijwel hun gehele economische levensduur in\nhanden geweest van dezelfde eigenaar. Ostage is daarbij langzamerhand gedegradeerd van een zelfstandige suikerplantage tot een hulpgrond van plantage Goudmijn.\n\nEr was nog een derde grond die lange tijd tot het bezit behoorde ; dit is de grond  Schassenburg, later geheten Welbedacht. Deze grond ligt achter de plantages Cannewapibo en Fayerfield en voor een klein deel achter Ostage.\n\nDe grond heeft geen verbinding met de rivier. Als plantage is ze nooit van belang geweest, hoogstens is er wat hout gewerkt. Thans is deze grond een deel van Cannewapibo."
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01181",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01181",
+      "type": "plantation",
+      "broader": "stm-00005",
+      "description": "",
+      "location": {
+        "lat": 5.793518247096774,
+        "lng": -54.77117234419356,
+        "wkt": "Polygon ((-54.77475112 5.78247983, -54.77340070 5.78572829, -54.77043549 5.78849373, -54.76935332 5.79153228, -54.76959011 5.79277799, -54.77062026 5.79419972, -54.77290106 5.79518954, -54.77490294 5.79478609, -54.77734159 5.79330856, -54.77905741 5.79040652, -54.78126581 5.78779574, -54.78287596 5.78749329, -54.78459272 5.78792682, -54.78576024 5.78847097, -54.78657023 5.78999060, -54.78595803 5.79178274, -54.78168989 5.79470979, -54.77903276 5.79678247, -54.77774586 5.79856897, -54.77708509 5.80079485, -54.77773277 5.80263352, -54.75553052 5.81138443, -54.75071268 5.81329363, -54.74496649 5.81531744, -54.74220312 5.80264813, -54.75289130 5.79360297, -54.75138676 5.79139288, -54.75858396 5.78867419, -54.77090280 5.78429342, -54.77175056 5.78012643, -54.77475112 5.78247983))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q59133053",
+      "fid": 2265,
+      "psurIds": [
+        "PSUR0278"
+      ],
+      "district": "Divisie Boven-Commewijne",
+      "locationDescription": "Boven-Commewijne",
+      "locationDescriptionOriginal": "Rivier Commewijne, (boven) regterhand in het afvaren",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-22",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59133053",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Penoribo",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "Pardi",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Penoribo 2008-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emTWpsaVo2Zzk5dVk/view?usp=sharing&resourcekey=0-9mUNwqI_Qj_0we0pkwzDog",
+          "author": "Philip Dikland",
+          "year": "2007",
+          "notes": null
         }
       ]
     },
