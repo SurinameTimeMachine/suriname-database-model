@@ -34641,47 +34641,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01172",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01172",
-      "type": "plantation",
-      "prefLabel": "Nieuw Clarenbeek",
-      "altLabels": [],
-      "broader": "stm-00006",
-      "description": "",
-      "location": {
-        "lat": 5.846471488125,
-        "lng": -54.789951488124984,
-        "wkt": "Polygon ((-54.79707616 5.83877799, -54.79759027 5.84386218, -54.79816720 5.84589645, -54.79972970 5.84833893, -54.79969413 5.85252178, -54.79380538 5.85277390, -54.78689771 5.85534815, -54.78274851 5.85612579, -54.78069170 5.85446676, -54.77907266 5.85115270, -54.77764767 5.84767049, -54.77849491 5.84081786, -54.78545168 5.84356695, -54.79139598 5.83563184, -54.79368399 5.83781405, -54.79707616 5.83877799))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q59132838",
-      "fid": 2256,
-      "psurIds": [
-        "PSUR0251"
-      ],
-      "district": "Divisie Boven-Cottica en Perica",
-      "locationDescription": "Boven-Cottica",
-      "locationDescriptionOriginal": "Rivier Cottica, (boven) linkerhand in het afvaren",
-      "placeType": "koffie",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59132838",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-01511",
       "@type": [
         "E25_Human-Made_Feature"
@@ -75592,6 +75551,72 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8ema2J1LXBIS2FuQjg/view?usp=sharing&resourcekey=0-tBwmcosglIvTHboUAdgWlQ",
           "author": "Philip Dikland",
           "year": "2005, aangevuld 2010, 2012",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01172",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01172",
+      "type": "plantation",
+      "broader": "stm-00006",
+      "description": "",
+      "location": {
+        "lat": 5.846471488125,
+        "lng": -54.789951488124984,
+        "wkt": "Polygon ((-54.79707616 5.83877799, -54.79759027 5.84386218, -54.79816720 5.84589645, -54.79972970 5.84833893, -54.79969413 5.85252178, -54.79380538 5.85277390, -54.78689771 5.85534815, -54.78274851 5.85612579, -54.78069170 5.85446676, -54.77907266 5.85115270, -54.77764767 5.84767049, -54.77849491 5.84081786, -54.78545168 5.84356695, -54.79139598 5.83563184, -54.79368399 5.83781405, -54.79707616 5.83877799))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q59132838",
+      "fid": 2256,
+      "psurIds": [
+        "PSUR0251"
+      ],
+      "district": "Divisie Boven-Cottica en Perica",
+      "locationDescription": "Boven-Cottica",
+      "locationDescriptionOriginal": "Rivier Cottica, (boven) linkerhand in het afvaren",
+      "placeType": "koffie",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-22",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59132838",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Nieuw Clarenbeek",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "Komisi",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false
+        },
+        {
+          "text": "Commies",
+          "language": "nl",
+          "type": "vernacular",
+          "isPreferred": false
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Nieuw Clarenbeek 2002-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emenpqVlhER3Bfelk/view?usp=sharing&resourcekey=0-dSxqlBfBdQRY7NDs4eQZ2Q",
+          "author": "Philip Dikland",
+          "year": "2002",
           "notes": null
         }
       ]
