@@ -36043,47 +36043,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-02067",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-02067",
-      "type": "plantation",
-      "prefLabel": "Nieuwzorg",
-      "altLabels": [],
-      "broader": "stm-00005",
-      "description": "",
-      "location": {
-        "lat": 5.798908923157895,
-        "lng": -54.92364527947368,
-        "wkt": "Polygon ((-54.89526794 5.78421572, -54.91144551 5.78625986, -54.93964184 5.79124670, -54.96007439 5.79459272, -54.96013162 5.79697685, -54.95962257 5.80298681, -54.95906984 5.80848083, -54.95897103 5.80916725, -54.93514040 5.80593735, -54.93477419 5.80943748, -54.93388550 5.80927033, -54.93370077 5.81224259, -54.91068423 5.80874114, -54.88838970 5.80635637, -54.89163223 5.79857513, -54.89362947 5.79242172, -54.89423545 5.79000836, -54.89369569 5.78813661, -54.89526794 5.78421572))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q1840866",
-      "fid": 3152,
-      "psurIds": [
-        "PSUR0260"
-      ],
-      "district": "Divisie Boven-Commewijne",
-      "locationDescription": "Commetewane Kreek",
-      "locationDescriptionOriginal": "Commetewane-kreek, regterhand in het opvaren",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q1840866",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02161",
       "@type": [
         "E25_Human-Made_Feature"
@@ -75705,6 +75664,84 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emWHUtZGRPMzJlS2M/view?usp=sharing&resourcekey=0-ZxBTPNo29xA5ic_lUMQllA",
           "author": "Philip Dikland",
           "year": "2011",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-02067",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-02067",
+      "type": "plantation",
+      "broader": "stm-00005",
+      "description": "",
+      "location": {
+        "lat": 5.798908923157895,
+        "lng": -54.92364527947368,
+        "wkt": "Polygon ((-54.89526794 5.78421572, -54.91144551 5.78625986, -54.93964184 5.79124670, -54.96007439 5.79459272, -54.96013162 5.79697685, -54.95962257 5.80298681, -54.95906984 5.80848083, -54.95897103 5.80916725, -54.93514040 5.80593735, -54.93477419 5.80943748, -54.93388550 5.80927033, -54.93370077 5.81224259, -54.91068423 5.80874114, -54.88838970 5.80635637, -54.89163223 5.79857513, -54.89362947 5.79242172, -54.89423545 5.79000836, -54.89369569 5.78813661, -54.89526794 5.78421572))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q1840866",
+      "fid": 3152,
+      "psurIds": [
+        "PSUR0260"
+      ],
+      "district": "Divisie Boven-Commewijne",
+      "locationDescription": "Commetewane Kreek",
+      "locationDescriptionOriginal": "Commetewane-kreek, regterhand in het opvaren",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-22",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q1840866",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Nieuwzorg",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "Nieuwsorg",
+          "language": "nl",
+          "type": "variant",
+          "isPreferred": false
+        },
+        {
+          "text": "Nieuwsorgh",
+          "language": "nl",
+          "type": "variant",
+          "isPreferred": false
+        },
+        {
+          "text": "LaSalie",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false
+        },
+        {
+          "text": "de la Jaille",
+          "language": "nl",
+          "type": "vernacular",
+          "isPreferred": false
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Nieuwsorg 1999-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8embmpZRTJEYnNPUWs/view?usp=sharing&resourcekey=0-p1u-OPBObua0lRTtBKlWFA",
+          "author": "Philip Dikland",
+          "year": "1999, aangevuld 2005, 2010, 2011, 2012",
           "notes": null
         }
       ]
