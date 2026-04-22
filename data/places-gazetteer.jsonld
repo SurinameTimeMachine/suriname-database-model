@@ -31404,47 +31404,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00583",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-00583",
-      "type": "plantation",
-      "prefLabel": "Marienburg",
-      "altLabels": [],
-      "broader": "stm-00003",
-      "description": "",
-      "location": {
-        "lat": 5.856514305,
-        "lng": -55.04791193666666,
-        "wkt": "Polygon ((-55.04291026 5.88527437, -55.04761254 5.82611548, -55.05307717 5.82670521, -55.05294793 5.82802026, -55.04801346 5.88769614, -55.04291026 5.88527437))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q908006",
-      "fid": 1666,
-      "psurIds": [
-        "PSUR0229"
-      ],
-      "district": "Divisie Beneden-Commewijne",
-      "locationDescription": "Beneden-Commewijne",
-      "locationDescriptionOriginal": "Rivier Commewijne, (beneden) linkerhand in het afvaren",
-      "placeType": "koffie",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q908006",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-01118",
       "@type": [
         "E25_Human-Made_Feature"
@@ -75311,6 +75270,72 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emT1c3TG1aVWlHUEk/view?usp=sharing&resourcekey=0-Zaj7ai4dCbvo1228PkoxoA",
           "author": "Philip Dikland",
           "year": "2002, aangevuld 2005, 2008",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-00583",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-00583",
+      "type": "plantation",
+      "broader": "stm-00003",
+      "description": "",
+      "location": {
+        "lat": 5.856514305,
+        "lng": -55.04791193666666,
+        "wkt": "Polygon ((-55.04291026 5.88527437, -55.04761254 5.82611548, -55.05307717 5.82670521, -55.05294793 5.82802026, -55.04801346 5.88769614, -55.04291026 5.88527437))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q908006",
+      "fid": 1666,
+      "psurIds": [
+        "PSUR0229"
+      ],
+      "district": "Divisie Beneden-Commewijne",
+      "locationDescription": "Beneden-Commewijne",
+      "locationDescriptionOriginal": "Rivier Commewijne, (beneden) linkerhand in het afvaren",
+      "placeType": "koffie",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-22",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q908006",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Marienburg",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "di Hoi",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false
+        },
+        {
+          "text": "de Hoy",
+          "language": "nl",
+          "type": "vernacular",
+          "isPreferred": false
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Marienburg 2003-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emRkFPWU1jbzZSTkU/view?usp=sharing&resourcekey=0-wn_wdbU9Gjyp0Qot_5rP2Q",
+          "author": "Philip Dikland",
+          "year": "2003, aangevuld 2004, 2005, 2010",
           "notes": null
         }
       ]
