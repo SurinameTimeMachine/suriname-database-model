@@ -21109,47 +21109,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-02082",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-02082",
-      "type": "plantation",
-      "prefLabel": "Hooijland",
-      "altLabels": [],
-      "broader": "stm-00003",
-      "description": "",
-      "location": {
-        "lat": 5.837981487058824,
-        "lng": -54.90126510705882,
-        "wkt": "Polygon ((-54.89375271 5.84833486, -54.89356612 5.84366322, -54.89207258 5.83919459, -54.88978475 5.83753161, -54.88634930 5.83767763, -54.88264231 5.83806467, -54.88395877 5.83408313, -54.88577061 5.83136974, -54.88559501 5.82768785, -54.88445260 5.82581523, -54.92717991 5.82971676, -54.92700590 5.83201337, -54.92682460 5.83385737, -54.92643576 5.83778724, -54.92525457 5.85054291, -54.91710861 5.85001024, -54.89375271 5.84833486))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q2188906",
-      "fid": 3167,
-      "psurIds": [
-        "PSUR0142"
-      ],
-      "district": "Divisie Beneden-Commewijne",
-      "locationDescription": "Beneden-Commewijne",
-      "locationDescriptionOriginal": "Rivier Commewijne, (beneden) linkerhand in het afvaren",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q2188906",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-00571",
       "@type": [
         "E25_Human-Made_Feature"
@@ -74520,6 +74479,78 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emUVBJMnA5cUNxTTA/view?usp=sharing&resourcekey=0-1YTaoJviWCCNB3-8lldVew",
           "author": "Philip Dikland",
           "year": "2001",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-02082",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-02082",
+      "type": "plantation",
+      "broader": "stm-00003",
+      "description": "",
+      "location": {
+        "lat": 5.837981487058824,
+        "lng": -54.90126510705882,
+        "wkt": "Polygon ((-54.89375271 5.84833486, -54.89356612 5.84366322, -54.89207258 5.83919459, -54.88978475 5.83753161, -54.88634930 5.83767763, -54.88264231 5.83806467, -54.88395877 5.83408313, -54.88577061 5.83136974, -54.88559501 5.82768785, -54.88445260 5.82581523, -54.92717991 5.82971676, -54.92700590 5.83201337, -54.92682460 5.83385737, -54.92643576 5.83778724, -54.92525457 5.85054291, -54.91710861 5.85001024, -54.89375271 5.84833486))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q2188906",
+      "fid": 3167,
+      "psurIds": [
+        "PSUR0142"
+      ],
+      "district": "Divisie Beneden-Commewijne",
+      "locationDescription": "Beneden-Commewijne",
+      "locationDescriptionOriginal": "Rivier Commewijne, (beneden) linkerhand in het afvaren",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-22",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q2188906",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Hooijland",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "Hooyland",
+          "language": "nl",
+          "type": "variant",
+          "isPreferred": false
+        },
+        {
+          "text": "di Hoi",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false
+        },
+        {
+          "text": "de Hoy",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Hooyland 2003-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emelNRb0s0U1IzRVE/view?usp=sharing&resourcekey=0-Wl5O-B2A45uJEAKpwfGU9Q",
+          "author": "Philip Dikland",
+          "year": "2003, aangevuld 2010, 2010-2",
           "notes": null
         }
       ]
