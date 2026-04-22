@@ -34716,47 +34716,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-02058",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-02058",
-      "type": "plantation",
-      "prefLabel": "Nieuw Grond",
-      "altLabels": [],
-      "broader": "stm-00003",
-      "description": "",
-      "location": {
-        "lat": 5.840342227142857,
-        "lng": -54.933985407142856,
-        "wkt": "Polygon ((-54.92700590 5.83201337, -54.94307967 5.83265922, -54.93984838 5.85882539, -54.93578752 5.85863116, -54.93834588 5.83439571, -54.92682460 5.83385737, -54.92700590 5.83201337))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q59132908",
-      "fid": 3143,
-      "psurIds": [
-        "PSUR0086"
-      ],
-      "district": "Divisie Beneden-Commewijne",
-      "locationDescription": "Beneden-Commewijne",
-      "locationDescriptionOriginal": "Rivier Commewijne, (beneden) linkerhand in het afvaren",
-      "placeType": "koffie",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59132908",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-01894",
       "@type": [
         "E25_Human-Made_Feature"
@@ -75542,6 +75501,78 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emenpqVlhER3Bfelk/view?usp=sharing&resourcekey=0-dSxqlBfBdQRY7NDs4eQZ2Q",
           "author": "Philip Dikland",
           "year": "2002",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-02058",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-02058",
+      "type": "plantation",
+      "broader": "stm-00003",
+      "description": "",
+      "location": {
+        "lat": 5.840342227142857,
+        "lng": -54.933985407142856,
+        "wkt": "Polygon ((-54.92700590 5.83201337, -54.94307967 5.83265922, -54.93984838 5.85882539, -54.93578752 5.85863116, -54.93834588 5.83439571, -54.92682460 5.83385737, -54.92700590 5.83201337))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q59132908",
+      "fid": 3143,
+      "psurIds": [
+        "PSUR0086"
+      ],
+      "district": "Divisie Beneden-Commewijne",
+      "locationDescription": "Beneden-Commewijne",
+      "locationDescriptionOriginal": "Rivier Commewijne, (beneden) linkerhand in het afvaren",
+      "placeType": "koffie",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-22",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59132908",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Nieuw Grond",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "njoengron",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false
+        },
+        {
+          "text": "nieuwegrond",
+          "language": "nl",
+          "type": "vernacular",
+          "isPreferred": false
+        },
+        {
+          "text": "De Nieuwe Grond",
+          "language": "nl",
+          "type": "variant",
+          "isPreferred": false
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Nieuwe Grond 2004-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emeGFWVThjd0Q2aGc/view?usp=sharing&resourcekey=0-beOLMGc6CXHOOXPW7LJkOA",
+          "author": "Philip Dikland",
+          "year": "2004",
           "notes": null
         }
       ]
