@@ -32049,44 +32049,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00630",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-00630",
-      "type": "plantation",
-      "prefLabel": "Meerzorg",
-      "altLabels": [],
-      "broader": "stm-00008",
-      "description": "",
-      "location": {
-        "lat": 5.953240309411765,
-        "lng": -54.82063672705882,
-        "wkt": "Polygon ((-54.82631440 5.92860367, -54.82652961 5.93952607, -54.82664027 5.94301200, -54.82680966 5.94603326, -54.82645252 5.95184231, -54.82632512 5.95916220, -54.82626394 5.96119547, -54.81727091 5.96065854, -54.81729532 5.96359242, -54.81711176 5.96963410, -54.81696199 5.97262580, -54.81689839 5.97616954, -54.81148746 5.97614646, -54.81147712 5.97351761, -54.81155048 5.92698299, -54.81912101 5.92777915, -54.82631440 5.92860367))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken"
-      ],
-      "wikidataQid": "Q124806237",
-      "fid": 1713,
-      "psurIds": [],
-      "district": "Divisie Matapplea",
-      "locationDescription": "Tapoeripa Kreek",
-      "locationDescriptionOriginal": "Tapoeripa-kreek, linkerhand in het opvaren",
-      "placeType": "katoen",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q124806237",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02323",
       "@type": [
         "E25_Human-Made_Feature"
@@ -75336,6 +75298,69 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emRkFPWU1jbzZSTkU/view?usp=sharing&resourcekey=0-wn_wdbU9Gjyp0Qot_5rP2Q",
           "author": "Philip Dikland",
           "year": "2003, aangevuld 2004, 2005, 2010",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-00630",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-00630",
+      "type": "plantation",
+      "broader": "stm-00008",
+      "description": "",
+      "location": {
+        "lat": 5.953240309411765,
+        "lng": -54.82063672705882,
+        "wkt": "Polygon ((-54.82631440 5.92860367, -54.82652961 5.93952607, -54.82664027 5.94301200, -54.82680966 5.94603326, -54.82645252 5.95184231, -54.82632512 5.95916220, -54.82626394 5.96119547, -54.81727091 5.96065854, -54.81729532 5.96359242, -54.81711176 5.96963410, -54.81696199 5.97262580, -54.81689839 5.97616954, -54.81148746 5.97614646, -54.81147712 5.97351761, -54.81155048 5.92698299, -54.81912101 5.92777915, -54.82631440 5.92860367))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken"
+      ],
+      "wikidataQid": "Q124806237",
+      "fid": 1713,
+      "psurIds": [],
+      "district": "Divisie Matapplea",
+      "locationDescription": "Tapoeripa Kreek",
+      "locationDescriptionOriginal": "Tapoeripa-kreek, linkerhand in het opvaren",
+      "placeType": "katoen",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-22",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q124806237",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Meerzorg",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "Hattriman",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false
+        },
+        {
+          "text": "Hatterman",
+          "language": "nl",
+          "type": "vernacular",
+          "isPreferred": false
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Meerzorg Tapoeripa 2005-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emNlBtbVBrWERJMTQ/view?usp=sharing&resourcekey=0--HbOsoNG8X0ykUlgntSQkQ",
+          "author": "Philip Dikland",
+          "year": "2005",
           "notes": null
         }
       ]
