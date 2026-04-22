@@ -16590,47 +16590,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00869",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-00869",
-      "type": "plantation",
-      "prefLabel": "Esther's rust",
-      "altLabels": [],
-      "broader": "stm-00004",
-      "description": "",
-      "location": {
-        "lat": 5.992751512,
-        "lng": -54.941903356,
-        "wkt": "Polygon ((-54.96046928 5.99545509, -54.91396345 5.99162994, -54.91408333 5.98889954, -54.96053144 5.99231790, -54.96046928 5.99545509))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q59115566",
-      "fid": 1953,
-      "psurIds": [
-        "PSUR0107"
-      ],
-      "district": "Divisie Beneden-Cottica",
-      "locationDescription": "Warappa Kreek",
-      "locationDescriptionOriginal": "Warrappa-kreek, linkerhand in het opvaren",
-      "placeType": "katoen",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59115566",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02467",
       "@type": [
         "E25_Human-Made_Feature"
@@ -74123,6 +74082,66 @@
           "author": "Philip Dikland",
           "year": "2002, aangevuld 2010",
           "notes": "De naam van de plantage was aanvankelijk Belgard, en is omstreeks 1770 veranderd tot\nElisabeth's Hoop. De naam Belgard refereert aan het stadje Belgard (Bialogard) in Pommern,\nvroeger een duits gebiedsdeel, maar tegenwoordig een deel van Polen. De eerste eigenaren,\nTheodoor en Jan Fredrik Knoffel, waren uit dit plaatsje afkomstig."
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-00869",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-00869",
+      "type": "plantation",
+      "broader": "stm-00004",
+      "description": "",
+      "location": {
+        "lat": 5.992751512,
+        "lng": -54.941903356,
+        "wkt": "Polygon ((-54.96046928 5.99545509, -54.91396345 5.99162994, -54.91408333 5.98889954, -54.96053144 5.99231790, -54.96046928 5.99545509))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q59115566",
+      "fid": 1953,
+      "psurIds": [
+        "PSUR0107"
+      ],
+      "district": "Divisie Beneden-Cottica",
+      "locationDescription": "Warappa Kreek",
+      "locationDescriptionOriginal": "Warrappa-kreek, linkerhand in het opvaren",
+      "placeType": "katoen",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-22",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59115566",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Esther's rust",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "Esthersrust",
+          "language": "nl",
+          "type": "variant",
+          "isPreferred": false
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Esthersrust 2020-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/10AdWd42gb1uwTISyw6Ahip8B736TPjrK/view?usp=sharing",
+          "author": "Philip Dikland",
+          "year": "2020",
+          "notes": null
         }
       ]
     },
