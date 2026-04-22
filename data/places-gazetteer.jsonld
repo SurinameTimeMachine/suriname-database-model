@@ -30678,47 +30678,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00657",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-00657",
-      "type": "plantation",
-      "prefLabel": "Maasstroom",
-      "altLabels": [],
-      "broader": "stm-00004",
-      "description": "",
-      "location": {
-        "lat": 5.920381272000001,
-        "lng": -55.05355526599999,
-        "wkt": "Polygon ((-55.05757376 5.90213693, -55.05363311 5.94904744, -55.04719257 5.94869146, -55.05180313 5.89989360, -55.05757376 5.90213693))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q2055473",
-      "fid": 1740,
-      "psurIds": [
-        "PSUR0222"
-      ],
-      "district": "Divisie Beneden-Cottica",
-      "locationDescription": "Beneden-Commewijne",
-      "locationDescriptionOriginal": "Rivier Commewijne, (beneden) regterhand in het afvaren",
-      "placeType": "koffie",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q2055473",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-01230",
       "@type": [
         "E25_Human-Made_Feature"
@@ -75202,6 +75161,60 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emSnBXME5Dd2RFRnc/view?usp=sharing&resourcekey=0-VwO56pqepjEsJzKtuFSJ-Q",
           "author": "Philip Dikland",
           "year": "2000",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-00657",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-00657",
+      "type": "plantation",
+      "broader": "stm-00004",
+      "description": "",
+      "location": {
+        "lat": 5.920381272000001,
+        "lng": -55.05355526599999,
+        "wkt": "Polygon ((-55.05757376 5.90213693, -55.05363311 5.94904744, -55.04719257 5.94869146, -55.05180313 5.89989360, -55.05757376 5.90213693))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q2055473",
+      "fid": 1740,
+      "psurIds": [
+        "PSUR0222"
+      ],
+      "district": "Divisie Beneden-Cottica",
+      "locationDescription": "Beneden-Commewijne",
+      "locationDescriptionOriginal": "Rivier Commewijne, (beneden) regterhand in het afvaren",
+      "placeType": "koffie",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-22",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q2055473",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Maasstroom",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Maasstroom 2001-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emdDlxWDYzcEM1ZUk/view?usp=sharing&resourcekey=0-2VGfRSXawkBefqWoyrRguA",
+          "author": "Philip Dikland",
+          "year": "2004",
           "notes": null
         }
       ]
