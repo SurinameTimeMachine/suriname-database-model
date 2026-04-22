@@ -35071,44 +35071,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00519",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-00519",
-      "type": "plantation",
-      "prefLabel": "Nieuw Roland",
-      "altLabels": [],
-      "broader": "stm-00003",
-      "description": "",
-      "location": {
-        "lat": 5.877874793,
-        "lng": -54.893427933,
-        "wkt": "Polygon ((-54.90059660 5.88259178, -54.89670676 5.88447447, -54.89287561 5.88586338, -54.88903109 5.88533502, -54.88614929 5.88321039, -54.88455810 5.88103018, -54.88589916 5.86422944, -54.89560163 5.86447347, -54.90226449 5.86494802, -54.90059660 5.88259178))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken"
-      ],
-      "wikidataQid": "Q59132858",
-      "fid": 1602,
-      "psurIds": [],
-      "district": "Divisie Beneden-Commewijne",
-      "locationDescription": "Beneden-Commewijne",
-      "locationDescriptionOriginal": "Rivier Commewijne, (beneden) linkerhand in het afvaren",
-      "placeType": "koffie",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59132858",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02351",
       "@type": [
         "E25_Human-Made_Feature"
@@ -75630,6 +75592,75 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emeTRCVXVaT0pKOHM/view?usp=sharing&resourcekey=0-tFEwWjiVjAelmoYxUuBhrw",
           "author": "Philip Dikland",
           "year": "2005",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-00519",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-00519",
+      "type": "plantation",
+      "broader": "stm-00003",
+      "description": "",
+      "location": {
+        "lat": 5.877874793,
+        "lng": -54.893427933,
+        "wkt": "Polygon ((-54.90059660 5.88259178, -54.89670676 5.88447447, -54.89287561 5.88586338, -54.88903109 5.88533502, -54.88614929 5.88321039, -54.88455810 5.88103018, -54.88589916 5.86422944, -54.89560163 5.86447347, -54.90226449 5.86494802, -54.90059660 5.88259178))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken"
+      ],
+      "wikidataQid": "Q59132858",
+      "fid": 1602,
+      "psurIds": [],
+      "district": "Divisie Beneden-Commewijne",
+      "locationDescription": "Beneden-Commewijne",
+      "locationDescriptionOriginal": "Rivier Commewijne, (beneden) linkerhand in het afvaren",
+      "placeType": "koffie",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-22",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59132858",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Nieuw Roland",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "Nieuw Roeland",
+          "language": "nl",
+          "type": "variant",
+          "isPreferred": false
+        },
+        {
+          "text": "Rollo",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false
+        },
+        {
+          "text": "Rouleau",
+          "language": "nl",
+          "type": "vernacular",
+          "isPreferred": false
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Nieuw Roeland 2011-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emWHUtZGRPMzJlS2M/view?usp=sharing&resourcekey=0-ZxBTPNo29xA5ic_lUMQllA",
+          "author": "Philip Dikland",
+          "year": "2011",
           "notes": null
         }
       ]
