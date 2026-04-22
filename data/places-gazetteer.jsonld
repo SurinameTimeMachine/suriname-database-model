@@ -30526,47 +30526,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-02050",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-02050",
-      "type": "plantation",
-      "prefLabel": "Ma Retraite",
-      "altLabels": [],
-      "broader": null,
-      "description": "",
-      "location": {
-        "lat": 5.795420281666668,
-        "lng": -55.00715541833333,
-        "wkt": "Polygon ((-55.03034721 5.79054368, -54.97053931 5.80629406, -54.97040967 5.80392474, -55.01069772 5.79338763, -55.03059139 5.78782790, -55.03034721 5.79054368))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q124831359",
-      "fid": 3135,
-      "psurIds": [
-        "PSUR0225"
-      ],
-      "district": null,
-      "locationDescription": "Orelana Kreek",
-      "locationDescriptionOriginal": "Hoer-Helena-kreek, regterhand in het opvaren",
-      "placeType": "koffie",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q124831359",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02144",
       "@type": [
         "E25_Human-Made_Feature"
@@ -75116,6 +75075,72 @@
           "author": "Philip Dikland",
           "year": "2005",
           "notes": "In het begin was Lustrijk geen aparte plantage, maar vormde een onderdeel van de grote\nsuikerplantage Schoonoord. Lavaux geeft dit in 1737 duidelijk op zijn kaart aan. Maar toch is de situatie onduidelijk. Er bestaat een meetkaart uit 1739 van Schoonoord, en hierop staat de grond van Lustrijck niet aangegeven. Van Lustrijk zelf zijn geen kaarten of certificaten bekend."
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-02050",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-02050",
+      "type": "plantation",
+      "broader": null,
+      "description": "",
+      "location": {
+        "lat": 5.795420281666668,
+        "lng": -55.00715541833333,
+        "wkt": "Polygon ((-55.03034721 5.79054368, -54.97053931 5.80629406, -54.97040967 5.80392474, -55.01069772 5.79338763, -55.03059139 5.78782790, -55.03034721 5.79054368))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q124831359",
+      "fid": 3135,
+      "psurIds": [
+        "PSUR0225"
+      ],
+      "district": null,
+      "locationDescription": "Orelana Kreek",
+      "locationDescriptionOriginal": "Hoer-Helena-kreek, regterhand in het opvaren",
+      "placeType": "koffie",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-22",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q124831359",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Ma Retraite",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "Ferran",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false
+        },
+        {
+          "text": "Ferrand",
+          "language": "nl",
+          "type": "vernacular",
+          "isPreferred": false
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Ma Retraite aan de Orleanekreek 2000-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emSnBXME5Dd2RFRnc/view?usp=sharing&resourcekey=0-VwO56pqepjEsJzKtuFSJ-Q",
+          "author": "Philip Dikland",
+          "year": "2000",
+          "notes": null
         }
       ]
     },
