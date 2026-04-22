@@ -30444,47 +30444,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-02103",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-02103",
-      "type": "plantation",
-      "prefLabel": "Lustrijk",
-      "altLabels": [],
-      "broader": "stm-00003",
-      "description": "",
-      "location": {
-        "lat": 5.847761121052632,
-        "lng": -54.884817010526326,
-        "wkt": "Polygon ((-54.87760878 5.85446299, -54.87781385 5.85033295, -54.87820337 5.84753188, -54.87841441 5.84448640, -54.87929755 5.84295521, -54.88047923 5.84091947, -54.88264231 5.83806467, -54.88634930 5.83767763, -54.88978475 5.83753161, -54.89207258 5.83919459, -54.89356612 5.84366322, -54.89375271 5.84833486, -54.89301322 5.85119304, -54.89119729 5.85346330, -54.88897586 5.85503138, -54.88740757 5.85644946, -54.88306822 5.85641311, -54.88026730 5.85529254, -54.87760878 5.85446299))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q4465180",
-      "fid": 3188,
-      "psurIds": [
-        "PSUR0219"
-      ],
-      "district": "Divisie Beneden-Commewijne",
-      "locationDescription": "Boven-Commewijne",
-      "locationDescriptionOriginal": "Rivier Commewijne, (boven) regterhand in het afvaren",
-      "placeType": "koffie",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q4465180",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-01003",
       "@type": [
         "E25_Human-Made_Feature"
@@ -75115,6 +75074,72 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emTzVZR2J6TW8tbjA/view?usp=sharing&resourcekey=0-Gwdlc4aI44bPVFTq3AlkCA",
           "author": "Philip Dikland",
           "year": "2008",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-02103",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-02103",
+      "type": "plantation",
+      "broader": "stm-00003",
+      "description": "",
+      "location": {
+        "lat": 5.847761121052632,
+        "lng": -54.884817010526326,
+        "wkt": "Polygon ((-54.87760878 5.85446299, -54.87781385 5.85033295, -54.87820337 5.84753188, -54.87841441 5.84448640, -54.87929755 5.84295521, -54.88047923 5.84091947, -54.88264231 5.83806467, -54.88634930 5.83767763, -54.88978475 5.83753161, -54.89207258 5.83919459, -54.89356612 5.84366322, -54.89375271 5.84833486, -54.89301322 5.85119304, -54.89119729 5.85346330, -54.88897586 5.85503138, -54.88740757 5.85644946, -54.88306822 5.85641311, -54.88026730 5.85529254, -54.87760878 5.85446299))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q4465180",
+      "fid": 3188,
+      "psurIds": [
+        "PSUR0219"
+      ],
+      "district": "Divisie Beneden-Commewijne",
+      "locationDescription": "Boven-Commewijne",
+      "locationDescriptionOriginal": "Rivier Commewijne, (boven) regterhand in het afvaren",
+      "placeType": "koffie",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-22",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q4465180",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Lustrijk",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "Saille",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false
+        },
+        {
+          "text": "Cellier",
+          "language": "nl",
+          "type": "vernacular",
+          "isPreferred": false
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Lustrijk 2002-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emNlBTTzJoY1pRWDg/view?usp=sharing&resourcekey=0-3tJ3FG-lJyp7p_wmGkedGw",
+          "author": "Philip Dikland",
+          "year": "2005",
           "notes": null
         }
       ]
