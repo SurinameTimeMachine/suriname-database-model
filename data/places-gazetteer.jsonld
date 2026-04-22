@@ -18970,49 +18970,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01173",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01173",
-      "type": "plantation",
-      "prefLabel": "Goudmijn",
-      "altLabels": [
-        "De Goudmijn"
-      ],
-      "broader": "stm-00005",
-      "description": "",
-      "location": {
-        "lat": 5.829425250666666,
-        "lng": -54.78111939466666,
-        "wkt": "Polygon ((-54.77849491 5.84081786, -54.77174173 5.83744485, -54.77224280 5.83250755, -54.76544288 5.82551603, -54.76608148 5.81543930, -54.78938604 5.81582527, -54.78688571 5.81956848, -54.78618747 5.82161173, -54.78552395 5.82374186, -54.78526960 5.82676020, -54.78606869 5.82949427, -54.78812309 5.83263471, -54.79139598 5.83563184, -54.78545168 5.84356695, -54.77849491 5.84081786))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q59115453",
-      "fid": 2257,
-      "psurIds": [
-        "PSUR0123"
-      ],
-      "district": "Divisie Boven-Commewijne",
-      "locationDescription": "Boven-Commewijne",
-      "locationDescriptionOriginal": "Rivier Commewijne, (boven) regterhand in het afvaren",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59115453",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02178",
       "@type": [
         "E25_Human-Made_Feature"
@@ -74372,6 +74329,78 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8embUU2eHpZUzNNRGM/view?usp=sharing&resourcekey=0-NC7MNHixbI1LfUkijR2fgQ",
           "author": "Philip Dikland",
           "year": "2005",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01173",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01173",
+      "type": "plantation",
+      "broader": "stm-00005",
+      "description": "",
+      "location": {
+        "lat": 5.829425250666666,
+        "lng": -54.78111939466666,
+        "wkt": "Polygon ((-54.77849491 5.84081786, -54.77174173 5.83744485, -54.77224280 5.83250755, -54.76544288 5.82551603, -54.76608148 5.81543930, -54.78938604 5.81582527, -54.78688571 5.81956848, -54.78618747 5.82161173, -54.78552395 5.82374186, -54.78526960 5.82676020, -54.78606869 5.82949427, -54.78812309 5.83263471, -54.79139598 5.83563184, -54.78545168 5.84356695, -54.77849491 5.84081786))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q59115453",
+      "fid": 2257,
+      "psurIds": [
+        "PSUR0123"
+      ],
+      "district": "Divisie Boven-Commewijne",
+      "locationDescription": "Boven-Commewijne",
+      "locationDescriptionOriginal": "Rivier Commewijne, (boven) regterhand in het afvaren",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-22",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59115453",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Goudmijn",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "De Goudmijn",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false
+        },
+        {
+          "text": "Skassie",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false
+        },
+        {
+          "text": "Schas",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Goudmijn 2002-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emWnZVNDlpMFZXUjg/view?usp=sharing&resourcekey=0-jryxh1XYm97Cz_qnXOvz0A",
+          "author": "Philip Dikland",
+          "year": "2002",
           "notes": null
         }
       ]
