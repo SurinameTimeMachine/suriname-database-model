@@ -26446,44 +26446,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01021",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01021",
-      "type": "plantation",
-      "prefLabel": "l'Esperance",
-      "altLabels": [],
-      "broader": "stm-00005",
-      "description": "",
-      "location": {
-        "lat": 5.671133116153846,
-        "lng": -54.69385861153846,
-        "wkt": "Polygon ((-54.66880816 5.66433042, -54.68591351 5.66569631, -54.69402376 5.66144909, -54.69861892 5.66272619, -54.70180869 5.66261541, -54.70319854 5.66377966, -54.70759689 5.66918989, -54.71020190 5.67198282, -54.71495358 5.67425649, -54.70300994 5.68530103, -54.69543844 5.69141943, -54.66778146 5.68765335, -54.66880816 5.66433042))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken"
-      ],
-      "wikidataQid": "Q59116850",
-      "fid": 2105,
-      "psurIds": [],
-      "district": "Divisie Boven-Commewijne",
-      "locationDescription": "Boven-Commewijne",
-      "locationDescriptionOriginal": "Rivier Commewijne, (boven) regterhand in het afvaren",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59116850",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-01288",
       "@type": [
         "E25_Human-Made_Feature"
@@ -74353,6 +74315,57 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emOE1zN2pjRHQxcnc/view?usp=sharing&resourcekey=0-nfSrRIpI5inws9Q9kLXe_g",
           "author": "Philip Dikland",
           "year": "2005, aangevuld 2010",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01021",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01021",
+      "type": "plantation",
+      "broader": "stm-00005",
+      "description": "",
+      "location": {
+        "lat": 5.671133116153846,
+        "lng": -54.69385861153846,
+        "wkt": "Polygon ((-54.66880816 5.66433042, -54.68591351 5.66569631, -54.69402376 5.66144909, -54.69861892 5.66272619, -54.70180869 5.66261541, -54.70319854 5.66377966, -54.70759689 5.66918989, -54.71020190 5.67198282, -54.71495358 5.67425649, -54.70300994 5.68530103, -54.69543844 5.69141943, -54.66778146 5.68765335, -54.66880816 5.66433042))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken"
+      ],
+      "wikidataQid": "Q59116850",
+      "fid": 2105,
+      "psurIds": [],
+      "district": "Divisie Boven-Commewijne",
+      "locationDescription": "Boven-Commewijne",
+      "locationDescriptionOriginal": "Rivier Commewijne, (boven) regterhand in het afvaren",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-22",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59116850",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "l'Esperance",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Esperance 2011-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emUGxkRFpWVVBDek0/view?usp=sharing&resourcekey=0-NJjXkeEEsKGDSEibpxepEQ",
+          "author": "Philip Dikland",
+          "year": "2011",
           "notes": null
         }
       ]
