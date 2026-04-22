@@ -22700,43 +22700,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-02499",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-02499",
-      "type": "plantation",
-      "prefLabel": "Johan en Margaretha en Buitenrust",
-      "altLabels": [],
-      "broader": null,
-      "description": "Plantation from Surinaamse Almanakken (no QGIS geometry)",
-      "location": {
-        "lat": null,
-        "lng": null,
-        "wkt": null,
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "almanakken"
-      ],
-      "wikidataQid": "Q131419778",
-      "fid": null,
-      "psurIds": [],
-      "district": null,
-      "locationDescription": "Beneden-Commewijne",
-      "locationDescriptionOriginal": "Rivier Beneden-Commewijne, regts in 't afvaren. {",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q131419778",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-00936",
       "@type": [
         "E25_Human-Made_Feature"
@@ -74609,6 +74572,56 @@
       "names": [
         {
           "text": "Johan en Margaretha",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Johan en Margaretha en Buitenrust 2003-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emamRLNXVKUnQ2T3M/view?usp=sharing&resourcekey=0-EFYEspUYmdzFlJvZIMxgOQ",
+          "author": "Philip Dikland",
+          "year": "2003",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-02499",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-02499",
+      "type": "plantation",
+      "broader": null,
+      "description": "Plantation from Surinaamse Almanakken (no QGIS geometry)",
+      "location": {
+        "lat": null,
+        "lng": null,
+        "wkt": null,
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "almanakken"
+      ],
+      "wikidataQid": "Q131419778",
+      "fid": null,
+      "psurIds": [],
+      "district": null,
+      "locationDescription": "Beneden-Commewijne",
+      "locationDescriptionOriginal": "Rivier Beneden-Commewijne, regts in 't afvaren. {",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-22",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q131419778",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Johan en Margaretha en Buitenrust",
           "language": "nl",
           "type": "official",
           "isPreferred": true
