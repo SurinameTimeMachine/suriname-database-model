@@ -19626,47 +19626,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00654",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-00654",
-      "type": "plantation",
-      "prefLabel": "Guadeloupe",
-      "altLabels": [],
-      "broader": "stm-00004",
-      "description": "",
-      "location": {
-        "lat": 5.911208559999999,
-        "lng": -55.02539713875001,
-        "wkt": "Polygon ((-55.02584245 5.94564531, -55.02033145 5.94441864, -55.02236267 5.91980178, -55.02539525 5.88218644, -55.02557009 5.88151851, -55.02696006 5.88364076, -55.03087269 5.88681173, -55.02584245 5.94564531))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q2238358",
-      "fid": 1737,
-      "psurIds": [
-        "PSUR0127"
-      ],
-      "district": "Divisie Beneden-Cottica",
-      "locationDescription": "Beneden-Commewijne",
-      "locationDescriptionOriginal": "Rivier Commewijne, (beneden) regterhand in het afvaren",
-      "placeType": "koffie",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q2238358",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-01333",
       "@type": [
         "E25_Human-Made_Feature"
@@ -74360,6 +74319,72 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emWnZVNDlpMFZXUjg/view?usp=sharing&resourcekey=0-jryxh1XYm97Cz_qnXOvz0A",
           "author": "Philip Dikland",
           "year": "2002",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-00654",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-00654",
+      "type": "plantation",
+      "broader": "stm-00004",
+      "description": "",
+      "location": {
+        "lat": 5.911208559999999,
+        "lng": -55.02539713875001,
+        "wkt": "Polygon ((-55.02584245 5.94564531, -55.02033145 5.94441864, -55.02236267 5.91980178, -55.02539525 5.88218644, -55.02557009 5.88151851, -55.02696006 5.88364076, -55.03087269 5.88681173, -55.02584245 5.94564531))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q2238358",
+      "fid": 1737,
+      "psurIds": [
+        "PSUR0127"
+      ],
+      "district": "Divisie Beneden-Cottica",
+      "locationDescription": "Beneden-Commewijne",
+      "locationDescriptionOriginal": "Rivier Commewijne, (beneden) regterhand in het afvaren",
+      "placeType": "koffie",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-22",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q2238358",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Guadeloupe",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "Spierien",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false
+        },
+        {
+          "text": "Spiering",
+          "language": "nl",
+          "type": "vernacular",
+          "isPreferred": false
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Guadeloupe 2003-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emQndTQzVKckFYdkU/view?usp=sharing&resourcekey=0-QTwnb0o4lbYoG1Pofla2Tw",
+          "author": "Philip Dikland",
+          "year": "2003, aangevuld 2008",
           "notes": null
         }
       ]
