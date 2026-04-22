@@ -16747,46 +16747,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01025",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01025",
-      "type": "plantation",
-      "prefLabel": "Fauqemburg",
-      "altLabels": [
-        "Faugemburg"
-      ],
-      "broader": "stm-00005",
-      "description": "",
-      "location": {
-        "lat": 5.632958795555554,
-        "lng": -54.70065902777778,
-        "wkt": "Polygon ((-54.70786345 5.62088821, -54.71283696 5.62902978, -54.71555417 5.63403046, -54.70934406 5.63715722, -54.70933796 5.64080992, -54.69298593 5.64009243, -54.67541696 5.63895845, -54.67472831 5.63477448, -54.70786345 5.62088821))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken"
-      ],
-      "wikidataQid": "Q59115576",
-      "fid": 2109,
-      "psurIds": [],
-      "district": "Divisie Boven-Commewijne",
-      "locationDescription": "Boven-Commewijne",
-      "locationDescriptionOriginal": "Rivier Commewijne, (boven) linkerhand in het afvaren",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59115576",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02177",
       "@type": [
         "E25_Human-Made_Feature"
@@ -74261,6 +74221,75 @@
           "driveUrl": "https://drive.google.com/file/d/10AdWd42gb1uwTISyw6Ahip8B736TPjrK/view?usp=sharing",
           "author": "Philip Dikland",
           "year": "2020",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01025",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01025",
+      "type": "plantation",
+      "broader": "stm-00005",
+      "description": "",
+      "location": {
+        "lat": 5.632958795555554,
+        "lng": -54.70065902777778,
+        "wkt": "Polygon ((-54.70786345 5.62088821, -54.71283696 5.62902978, -54.71555417 5.63403046, -54.70934406 5.63715722, -54.70933796 5.64080992, -54.69298593 5.64009243, -54.67541696 5.63895845, -54.67472831 5.63477448, -54.70786345 5.62088821))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken"
+      ],
+      "wikidataQid": "Q59115576",
+      "fid": 2109,
+      "psurIds": [],
+      "district": "Divisie Boven-Commewijne",
+      "locationDescription": "Boven-Commewijne",
+      "locationDescriptionOriginal": "Rivier Commewijne, (boven) linkerhand in het afvaren",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-22",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59115576",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Fauqemburg",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "Faugemburg",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false
+        },
+        {
+          "text": "Gieskie",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false
+        },
+        {
+          "text": "Gieske",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Fauquembergue 2002-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emMXZUa3ZfVF9iUFU/view?usp=sharing&resourcekey=0-7opVKzumyxnrq2MFs-WRLQ",
+          "author": "Philip Dikland",
+          "year": "2002, aangevuld 2011",
           "notes": null
         }
       ]
