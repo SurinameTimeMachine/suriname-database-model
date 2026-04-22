@@ -7955,48 +7955,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00746",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-00746",
-      "type": "plantation",
-      "prefLabel": "Buitenrust",
-      "altLabels": [],
-      "broader": "stm-00004",
-      "description": "",
-      "location": {
-        "lat": 5.913501352,
-        "lng": -55.03502760799999,
-        "wkt": "Polygon ((-55.03793074 5.89190360, -55.03297814 5.94693193, -55.03059948 5.94658053, -55.03569894 5.89018710, -55.03793074 5.89190360))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q2365469",
-      "fid": 1829,
-      "psurIds": [
-        "PSUR0049",
-        "PSUR0055"
-      ],
-      "district": "Divisie Beneden-Cottica",
-      "locationDescription": "Beneden-Commewijne",
-      "locationDescriptionOriginal": "Rivier Commewijne, (beneden) regterhand in het afvaren",
-      "placeType": "koffie",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q2365469",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-00907",
       "@type": [
         "E25_Human-Made_Feature"
@@ -72156,6 +72114,67 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emQzVVV0ZmQzBIZUE/view?usp=sharing&resourcekey=0-nwGgT0t3PWA0lSjK6BZFRg",
           "author": "Philip Dikland",
           "year": "2010",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-00746",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-00746",
+      "type": "plantation",
+      "broader": "stm-00004",
+      "description": "",
+      "location": {
+        "lat": 5.913501352,
+        "lng": -55.03502760799999,
+        "wkt": "Polygon ((-55.03793074 5.89190360, -55.03297814 5.94693193, -55.03059948 5.94658053, -55.03569894 5.89018710, -55.03793074 5.89190360))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q2365469",
+      "fid": 1829,
+      "psurIds": [
+        "PSUR0049",
+        "PSUR0055"
+      ],
+      "district": "Divisie Beneden-Cottica",
+      "locationDescription": "Beneden-Commewijne",
+      "locationDescriptionOriginal": "Rivier Commewijne, (beneden) regterhand in het afvaren",
+      "placeType": "koffie",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-22",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q2365469",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Buitenrust",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "Knoffelsgift",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Johan en Margaretha en Buitenrust 2003-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emamRLNXVKUnQ2T3M/view?usp=sharing&resourcekey=0-EFYEspUYmdzFlJvZIMxgOQ",
+          "author": "Philip Dikland",
+          "year": "2003",
           "notes": null
         }
       ]
