@@ -30678,43 +30678,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-02454",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-02454",
-      "type": "plantation",
-      "prefLabel": "Ma Retraite en Grond Mijn Geluk",
-      "altLabels": [],
-      "broader": "stm-00003",
-      "description": "Plantation from Surinaamse Almanakken (no QGIS geometry)",
-      "location": {
-        "lat": null,
-        "lng": null,
-        "wkt": null,
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "almanakken"
-      ],
-      "wikidataQid": "Q59117029",
-      "fid": null,
-      "psurIds": [],
-      "district": "Divisie Beneden-Commewijne",
-      "locationDescription": "Orelana Kreek",
-      "locationDescriptionOriginal": "Hoer-Helena-kreek, regterhand in het opvaren",
-      "placeType": "kost",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59117029",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-00639",
       "@type": [
         "E25_Human-Made_Feature"
@@ -75153,6 +75116,68 @@
           "author": "Philip Dikland",
           "year": "2005",
           "notes": "In het begin was Lustrijk geen aparte plantage, maar vormde een onderdeel van de grote\nsuikerplantage Schoonoord. Lavaux geeft dit in 1737 duidelijk op zijn kaart aan. Maar toch is de situatie onduidelijk. Er bestaat een meetkaart uit 1739 van Schoonoord, en hierop staat de grond van Lustrijck niet aangegeven. Van Lustrijk zelf zijn geen kaarten of certificaten bekend."
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-02454",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-02454",
+      "type": "plantation",
+      "broader": "stm-00003",
+      "description": "Plantation from Surinaamse Almanakken (no QGIS geometry)",
+      "location": {
+        "lat": null,
+        "lng": null,
+        "wkt": null,
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "almanakken"
+      ],
+      "wikidataQid": "Q59117029",
+      "fid": null,
+      "psurIds": [],
+      "district": "Divisie Beneden-Commewijne",
+      "locationDescription": "Orelana Kreek",
+      "locationDescriptionOriginal": "Hoer-Helena-kreek, regterhand in het opvaren",
+      "placeType": "kost",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-22",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59117029",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Ma Retraite en Grond Mijn Geluk",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "Ferran",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false
+        },
+        {
+          "text": "Ferrand",
+          "language": "nl",
+          "type": "vernacular",
+          "isPreferred": false
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Ma Retraite aan de Orleanekreek 2000-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emSnBXME5Dd2RFRnc/view?usp=sharing&resourcekey=0-VwO56pqepjEsJzKtuFSJ-Q",
+          "author": "Philip Dikland",
+          "year": "2000",
+          "notes": null
         }
       ]
     },
