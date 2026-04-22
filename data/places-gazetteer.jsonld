@@ -28338,47 +28338,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00581",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-00581",
-      "type": "plantation",
-      "prefLabel": "Leliendaal",
-      "altLabels": [],
-      "broader": "stm-00003",
-      "description": "",
-      "location": {
-        "lat": 5.846679247142857,
-        "lng": -55.038219087142856,
-        "wkt": "Polygon ((-55.04224660 5.82048363, -55.04203320 5.82403355, -55.03722329 5.88216788, -55.03431749 5.88034732, -55.03313091 5.87900561, -55.03633552 5.82023311, -55.04224660 5.82048363))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q2467525",
-      "fid": 1664,
-      "psurIds": [
-        "PSUR0196"
-      ],
-      "district": "Divisie Beneden-Commewijne",
-      "locationDescription": "Beneden-Commewijne",
-      "locationDescriptionOriginal": "Rivier Commewijne, (beneden) linkerhand in het afvaren",
-      "placeType": "koffie",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q2467525",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-01282",
       "@type": [
         "E25_Human-Made_Feature"
@@ -75014,6 +74973,72 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emVzJyY2VLaEhZVlU/view?usp=sharing&resourcekey=0-Ntl7daVG5On25_RCvdVXpg",
           "author": "Philip Dikland",
           "year": "2002, aangevuld 2010",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-00581",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-00581",
+      "type": "plantation",
+      "broader": "stm-00003",
+      "description": "",
+      "location": {
+        "lat": 5.846679247142857,
+        "lng": -55.038219087142856,
+        "wkt": "Polygon ((-55.04224660 5.82048363, -55.04203320 5.82403355, -55.03722329 5.88216788, -55.03431749 5.88034732, -55.03313091 5.87900561, -55.03633552 5.82023311, -55.04224660 5.82048363))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q2467525",
+      "fid": 1664,
+      "psurIds": [
+        "PSUR0196"
+      ],
+      "district": "Divisie Beneden-Commewijne",
+      "locationDescription": "Beneden-Commewijne",
+      "locationDescriptionOriginal": "Rivier Commewijne, (beneden) linkerhand in het afvaren",
+      "placeType": "koffie",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-22",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q2467525",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Leliendaal",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "Addowien",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false
+        },
+        {
+          "text": "Aardewijn",
+          "language": "nl",
+          "type": "vernacular",
+          "isPreferred": false
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Leliendaal 2003-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emWjFDTHFfUjNxRDQ/view?usp=sharing&resourcekey=0-NIOqTT0l9_LHpCvwlc-jGA",
+          "author": "Philip Dikland",
+          "year": "2003, aangevuld 2008",
           "notes": null
         }
       ]
