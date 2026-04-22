@@ -18663,44 +18663,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01002",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01002",
-      "type": "plantation",
-      "prefLabel": "Goed Accoord",
-      "altLabels": [],
-      "broader": "stm-00005",
-      "description": "",
-      "location": {
-        "lat": 5.560592608518518,
-        "lng": -54.67164610148147,
-        "wkt": "Polygon ((-54.63274190 5.60383808, -54.62487198 5.59490657, -54.62914110 5.59084773, -54.64348651 5.57762797, -54.64411895 5.58067901, -54.66170299 5.56358662, -54.66278820 5.56472133, -54.66435236 5.56550831, -54.68131387 5.54736837, -54.66896514 5.54670827, -54.66881651 5.54885750, -54.67702041 5.54907486, -54.66881651 5.54885750, -54.66896514 5.54670827, -54.67071319 5.53359691, -54.70669707 5.53730234, -54.70762451 5.53744910, -54.70709100 5.54456485, -54.70669626 5.55370157, -54.70003233 5.54779500, -54.70117505 5.54571695, -54.69810458 5.54420138, -54.69013723 5.55853742, -54.68283717 5.55518465, -54.68080090 5.55927685, -54.65269198 5.58554494, -54.63274190 5.60383808))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken"
-      ],
-      "wikidataQid": "Q59115621",
-      "fid": 2086,
-      "psurIds": [],
-      "district": "Divisie Boven-Commewijne",
-      "locationDescription": "Boven-Commewijne",
-      "locationDescriptionOriginal": "Rivier Commewijne, (boven) linkerhand in het afvaren",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59115621",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02179",
       "@type": [
         "E25_Human-Made_Feature"
@@ -74353,6 +74315,63 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emYWNxczBaYy1sY00/view?usp=sharing&resourcekey=0-rMb45_M495PGQVG2zPaflw",
           "author": "Philip Dikland",
           "year": "2001",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01002",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01002",
+      "type": "plantation",
+      "broader": "stm-00005",
+      "description": "",
+      "location": {
+        "lat": 5.560592608518518,
+        "lng": -54.67164610148147,
+        "wkt": "Polygon ((-54.63274190 5.60383808, -54.62487198 5.59490657, -54.62914110 5.59084773, -54.64348651 5.57762797, -54.64411895 5.58067901, -54.66170299 5.56358662, -54.66278820 5.56472133, -54.66435236 5.56550831, -54.68131387 5.54736837, -54.66896514 5.54670827, -54.66881651 5.54885750, -54.67702041 5.54907486, -54.66881651 5.54885750, -54.66896514 5.54670827, -54.67071319 5.53359691, -54.70669707 5.53730234, -54.70762451 5.53744910, -54.70709100 5.54456485, -54.70669626 5.55370157, -54.70003233 5.54779500, -54.70117505 5.54571695, -54.69810458 5.54420138, -54.69013723 5.55853742, -54.68283717 5.55518465, -54.68080090 5.55927685, -54.65269198 5.58554494, -54.63274190 5.60383808))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken"
+      ],
+      "wikidataQid": "Q59115621",
+      "fid": 2086,
+      "psurIds": [],
+      "district": "Divisie Boven-Commewijne",
+      "locationDescription": "Boven-Commewijne",
+      "locationDescriptionOriginal": "Rivier Commewijne, (boven) linkerhand in het afvaren",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-22",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59115621",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Goed Accoord",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "Goed-accoord",
+          "language": "nl",
+          "type": "variant",
+          "isPreferred": false
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Goed Accoord 2005-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8embUU2eHpZUzNNRGM/view?usp=sharing&resourcekey=0-NC7MNHixbI1LfUkijR2fgQ",
+          "author": "Philip Dikland",
+          "year": "2005",
           "notes": null
         }
       ]
