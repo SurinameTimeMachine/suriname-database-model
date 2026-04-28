@@ -59175,44 +59175,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-02086",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-02086",
-      "type": "plantation",
-      "prefLabel": "Sinabo",
-      "altLabels": [],
-      "broader": null,
-      "description": "",
-      "location": {
-        "lat": 5.784237455,
-        "lng": -54.91873005583334,
-        "wkt": "Polygon ((-54.93823337 5.78536018, -54.94007070 5.78587561, -54.93982642 5.78834987, -54.93964184 5.79124670, -54.91144551 5.78625986, -54.89526794 5.78421572, -54.89575354 5.78168148, -54.89449014 5.78017085, -54.89500412 5.77890411, -54.91771916 5.78153047, -54.91907456 5.78189443, -54.93823337 5.78536018))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken"
-      ],
-      "wikidataQid": "Q124831918",
-      "fid": 3171,
-      "psurIds": [],
-      "district": null,
-      "locationDescription": "Commetewane Kreek",
-      "locationDescriptionOriginal": "Commetewane-kreek, linkerhand in het opvaren",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q124831918",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02420",
       "@type": [
         "E25_Human-Made_Feature"
@@ -76859,6 +76821,81 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emam1MTjdHbUJ6Q28/view?usp=sharing&resourcekey=0-goFySPvBGpgJkJUg4OPhJA",
           "author": "Philip Dikland",
           "year": "2002, aangevuld 2010",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-02086",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-02086",
+      "type": "plantation",
+      "broader": null,
+      "description": "",
+      "location": {
+        "lat": 5.784237455,
+        "lng": -54.91873005583334,
+        "wkt": "Polygon ((-54.93823337 5.78536018, -54.94007070 5.78587561, -54.93982642 5.78834987, -54.93964184 5.79124670, -54.91144551 5.78625986, -54.89526794 5.78421572, -54.89575354 5.78168148, -54.89449014 5.78017085, -54.89500412 5.77890411, -54.91771916 5.78153047, -54.91907456 5.78189443, -54.93823337 5.78536018))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken"
+      ],
+      "wikidataQid": "Q124831918",
+      "fid": 3171,
+      "psurIds": [],
+      "district": null,
+      "locationDescription": "Commetewane Kreek",
+      "locationDescriptionOriginal": "Commetewane-kreek, linkerhand in het opvaren",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-28",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q124831918",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Sinabo",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "Ganda",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false
+        },
+        {
+          "text": "Granda",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false
+        },
+        {
+          "text": "Granman",
+          "language": "nl",
+          "type": "vernacular",
+          "isPreferred": false
+        },
+        {
+          "text": "gouverneur van der Veen",
+          "language": "nl",
+          "type": "vernacular",
+          "isPreferred": false
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Sinabo 2004-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emOWZLWmRKR2loZWc/view?usp=sharing&resourcekey=0-FuSsfxEm176p5v_uX9-GWw",
+          "author": "Philip Dikland",
+          "year": "2004, aangevuld 2005, 2007, 2008, 2009",
           "notes": null
         }
       ]
