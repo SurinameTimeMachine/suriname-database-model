@@ -645,9 +645,7 @@ export default function PlaceEditor({
       const next = districtAssertions.map((a, i) => {
         if (i !== idx) return a;
         const updated = { ...a, ...patch };
-        if (updated.districtId) {
-          updated.districtLabel = deriveDistrictLabelById(updated.districtId);
-        }
+        updated.districtLabel = deriveDistrictLabelById(updated.districtId);
         return updated;
       });
 

@@ -55,6 +55,31 @@ const PUBLIC_GAZETTEER = join(
 const FORCE = process.argv.includes('--force');
 const SOURCE_ID = 'almanakken'; // registry sourceId (prov:hadPrimarySource)
 
+// ── Validate SOURCE_ID against sources-registry.jsonld ─────────────────────
+
+{
+  const registryPath = join(DATA_DIR, 'sources-registry.jsonld');
+  let registry: { '@graph': Array<{ '@type'?: string[]; sourceId?: string }> };
+  try {
+    registry = JSON.parse(readFileSync(registryPath, 'utf-8'));
+  } catch {
+    console.error(`Error: could not read sources registry at ${registryPath}`);
+    process.exit(1);
+  }
+  const entry = (registry['@graph'] ?? []).find(
+    (n) =>
+      n.sourceId === SOURCE_ID &&
+      Array.isArray(n['@type']) &&
+      n['@type'].includes('crm:E22_Human-Made_Object'),
+  );
+  if (!entry) {
+    console.error(
+      `Error: SOURCE_ID "${SOURCE_ID}" not found as an E22 entry in sources registry.`,
+    );
+    if (!FORCE) process.exit(1);
+  }
+}
+
 // ── Types ──────────────────────────────────────────────────────────────────
 
 interface AlmanakRow {
