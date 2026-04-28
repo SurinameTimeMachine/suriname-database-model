@@ -200,6 +200,41 @@ export interface DiklandRef {
   notes: string | null;
 }
 
+export type AssertionCertainty = 'certain' | 'probable' | 'uncertain';
+
+/** District membership assertion with source/time context (interim Gazetteer model). */
+export interface DistrictAssertion {
+  id: string;
+  districtId: string | null;
+  districtLabel?: string | null;
+  source: string;
+  sourceYear?: number;
+  certainty?: AssertionCertainty;
+  note?: string | null;
+  isCurrent?: boolean;
+}
+
+/** Product/commodity observation per year/source — from Almanakken E13 assignments. */
+export interface ProductAssertion {
+  id: string;
+  value: string; // e.g. "koffie", "suiker" (CRM: P141 assigned -> E55 Type)
+  source: string; // registry sourceId
+  startYear?: number;
+  endYear?: number;
+  note?: string | null;
+}
+
+/** Location observation (standardized + original) per year/source — from Almanakken. */
+export interface LocationAssertion {
+  id: string;
+  standardized: string | null; // loc_std (CRM: P7 took place at -> E53 text)
+  original: string | null; // loc_org (verbatim source text)
+  source: string; // registry sourceId
+  startYear?: number;
+  endYear?: number;
+  note?: string | null;
+}
+
 /** All valid gazetteer place types */
 export type PlaceType =
   | 'plantation'
@@ -248,9 +283,12 @@ export interface GazetteerPlace {
   fid: number | null;
   psurIds: string[];
   district: string | null;
+  districtAssertions?: DistrictAssertion[];
   locationDescription: string | null;
   locationDescriptionOriginal: string | null;
   placeType: string | null;
+  productAssertions?: ProductAssertion[];
+  locationAssertions?: LocationAssertion[];
   diklandRefs: DiklandRef[];
   modifiedBy: string | null;
   modifiedAt: string | null;

@@ -3,12 +3,16 @@
 import { getSourcesByCategory, useSourceRegistry } from '@/lib/sources';
 import { usePlaceTypes } from '@/lib/thesaurus';
 import type {
+  AssertionCertainty,
   DiklandRef,
+  DistrictAssertion,
   ExternalLink,
   GazetteerPlace,
   LanguageCode,
+  LocationAssertion,
   NameType,
   PlaceName,
+  ProductAssertion,
   SkosMatchType,
 } from '@/lib/types';
 import { getPreferredName } from '@/lib/types';
@@ -45,6 +49,116 @@ function normalizeAppellationText(text: string): string {
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9]+/g, ' ')
     .trim();
+}
+
+function getEffectiveDistrictAssertion(
+  assertions: DistrictAssertion[],
+): DistrictAssertion | null {
+  if (assertions.length === 0) return null;
+  const explicitCurrent = assertions.find((a) => a.isCurrent);
+  if (explicitCurrent) return explicitCurrent;
+  const withYear = assertions.filter((a) => typeof a.sourceYear === 'number');
+  if (withYear.length > 0) {
+    return withYear.sort(
+      (a, b) => (b.sourceYear || 0) - (a.sourceYear || 0),
+    )[0];
+  }
+  return assertions[0];
+}
+
+function normalizeDistrictAssertions(
+  place: GazetteerPlace,
+): DistrictAssertion[] {
+  if (Array.isArray(place.districtAssertions)) {
+    return place.districtAssertions.map((a, idx) => ({
+      id: a.id || `district-assertion-${idx + 1}`,
+      districtId: a.districtId ?? null,
+      districtLabel: a.districtLabel ?? null,
+      source: a.source || place.sources[0] || 'almanakken',
+      sourceYear: a.sourceYear,
+      certainty: a.certainty,
+      note: a.note ?? null,
+      isCurrent: a.isCurrent,
+    }));
+  }
+
+  if (!place.broader && !place.district) return [];
+
+  return [
+    {
+      id: 'district-assertion-1',
+      districtId: place.broader ?? null,
+      districtLabel: place.district ?? null,
+      source: place.sources[0] || 'almanakken',
+      sourceYear: undefined,
+      certainty: 'certain',
+      note: null,
+      isCurrent: true,
+    },
+  ];
+}
+
+function preferAlmanakkenSource(sources: string[]): string {
+  return sources.includes('almanakken')
+    ? 'almanakken'
+    : sources[0] || 'almanakken';
+}
+
+function normalizeProductAssertions(place: GazetteerPlace): ProductAssertion[] {
+  if (Array.isArray(place.productAssertions)) {
+    return place.productAssertions
+      .map((a, idx) => ({
+        id: a.id || `product-assertion-${idx + 1}`,
+        value: a.value || '',
+        source: a.source || preferAlmanakkenSource(place.sources),
+        startYear: a.startYear,
+        endYear: a.endYear,
+        note: a.note ?? null,
+      }))
+      .filter((a) => Boolean(a.value));
+  }
+  if (!place.placeType) return [];
+  return [
+    {
+      id: 'product-assertion-1',
+      value: place.placeType,
+      source: preferAlmanakkenSource(place.sources),
+      startYear: undefined,
+      endYear: undefined,
+      note: null,
+    },
+  ];
+}
+
+function normalizeLocationAssertions(
+  place: GazetteerPlace,
+): LocationAssertion[] {
+  if (Array.isArray(place.locationAssertions)) {
+    return place.locationAssertions
+      .map((a, idx) => ({
+        id: a.id || `location-assertion-${idx + 1}`,
+        standardized: a.standardized ?? null,
+        original: a.original ?? null,
+        source: a.source || preferAlmanakkenSource(place.sources),
+        startYear: a.startYear,
+        endYear: a.endYear,
+        note: a.note ?? null,
+      }))
+      .filter((a) => Boolean(a.standardized || a.original));
+  }
+  if (!place.locationDescription && !place.locationDescriptionOriginal)
+    return [];
+  return [
+    {
+      id: 'location-assertion-1',
+      standardized: place.locationDescription ?? null,
+      original: place.locationDescriptionOriginal ?? null,
+      source: preferAlmanakkenSource(place.sources),
+      startYear: undefined,
+      endYear: undefined,
+      note: null,
+    },
+  ];
 }
 
 const CATEGORY_ORDER = [
@@ -382,7 +496,12 @@ export default function PlaceEditor({
       }),
     [registryCategories],
   );
-  const [draft, setDraft] = useState<GazetteerPlace>({ ...place });
+  const [draft, setDraft] = useState<GazetteerPlace>({
+    ...place,
+    districtAssertions: normalizeDistrictAssertions(place),
+    productAssertions: normalizeProductAssertions(place),
+    locationAssertions: normalizeLocationAssertions(place),
+  });
   const hydratedFromAppellations = useRef(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -423,6 +542,242 @@ export default function PlaceEditor({
       return `${source.sourceId} (${yearOrRange})`;
     },
     [sourceById],
+  );
+
+  const deriveDistrictLabelById = useCallback(
+    (districtId: string | null): string | null => {
+      if (!districtId) return null;
+      const match = districts.find((d) => d.id === districtId);
+      return match ? getPreferredName(match) : null;
+    },
+    [districts],
+  );
+
+  const applyDistrictAssertions = useCallback(
+    (nextAssertions: DistrictAssertion[]) => {
+      const effective = getEffectiveDistrictAssertion(nextAssertions);
+      const effectiveDistrictId = effective?.districtId ?? null;
+      const effectiveDistrictLabel =
+        effective?.districtLabel ??
+        deriveDistrictLabelById(effectiveDistrictId);
+      setDraft((d) => ({
+        ...d,
+        districtAssertions: nextAssertions,
+        broader: effectiveDistrictId,
+        district: effectiveDistrictLabel ?? null,
+      }));
+    },
+    [deriveDistrictLabelById],
+  );
+
+  const districtSourceSummary = useMemo(() => {
+    const assertionSources = (draft.districtAssertions || [])
+      .map((a) => a.source)
+      .filter(Boolean);
+    const sourceIds =
+      assertionSources.length > 0 ? assertionSources : draft.sources;
+    const labels = Array.from(
+      new Set(
+        sourceIds
+          .map((sourceId) => sourceById.get(sourceId)?.prefLabel || sourceId)
+          .filter(Boolean),
+      ),
+    );
+    if (labels.length === 0) return 'source metadata unavailable';
+    if (labels.length === 1) return labels[0];
+    if (labels.length === 2) return `${labels[0]} + ${labels[1]}`;
+    return `${labels[0]} + ${labels[1]} + ${labels.length - 2} more`;
+  }, [draft.districtAssertions, draft.sources, sourceById]);
+
+  const districtAssertions = draft.districtAssertions || [];
+
+  const addDistrictAssertion = useCallback(() => {
+    const next: DistrictAssertion[] = [
+      ...districtAssertions,
+      {
+        id: `district-assertion-${Date.now()}`,
+        districtId: draft.broader ?? null,
+        districtLabel: draft.district ?? null,
+        source: draft.sources[0] || 'almanakken',
+        sourceYear: undefined,
+        certainty: 'certain',
+        note: null,
+        isCurrent: districtAssertions.length === 0,
+      },
+    ];
+    applyDistrictAssertions(next);
+  }, [
+    applyDistrictAssertions,
+    districtAssertions,
+    draft.broader,
+    draft.district,
+    draft.sources,
+  ]);
+
+  const updateDistrictAssertion = useCallback(
+    (idx: number, patch: Partial<DistrictAssertion>) => {
+      const next = districtAssertions.map((a, i) => {
+        if (i !== idx) return a;
+        const updated = { ...a, ...patch };
+        if (updated.districtId) {
+          updated.districtLabel = deriveDistrictLabelById(updated.districtId);
+        }
+        return updated;
+      });
+
+      if (patch.isCurrent) {
+        for (let i = 0; i < next.length; i += 1) {
+          next[i] = { ...next[i], isCurrent: i === idx };
+        }
+      }
+
+      applyDistrictAssertions(next);
+    },
+    [applyDistrictAssertions, deriveDistrictLabelById, districtAssertions],
+  );
+
+  const removeDistrictAssertion = useCallback(
+    (idx: number) => {
+      const next = districtAssertions.filter((_, i) => i !== idx);
+      if (next.length > 0 && !next.some((a) => a.isCurrent)) {
+        next[0] = { ...next[0], isCurrent: true };
+      }
+      applyDistrictAssertions(next);
+    },
+    [applyDistrictAssertions, districtAssertions],
+  );
+
+  const handleDistrictSelection = useCallback(
+    (districtId: string | null) => {
+      const districtLabel = deriveDistrictLabelById(districtId);
+      if (districtAssertions.length === 0) {
+        setDraft((d) => ({
+          ...d,
+          broader: districtId,
+          district: districtLabel,
+        }));
+        return;
+      }
+
+      const currentIdx = districtAssertions.findIndex((a) => a.isCurrent);
+      const targetIdx = currentIdx >= 0 ? currentIdx : 0;
+      const next = districtAssertions.map((a, i) =>
+        i === targetIdx ? { ...a, districtId, districtLabel } : a,
+      );
+      if (currentIdx < 0 && next.length > 0) {
+        next[0] = { ...next[0], isCurrent: true };
+      }
+      applyDistrictAssertions(next);
+    },
+    [applyDistrictAssertions, deriveDistrictLabelById, districtAssertions],
+  );
+
+  // ── Product assertions ────────────────────────────────────────────────────
+
+  const productAssertions = draft.productAssertions || [];
+
+  const applyProductAssertions = useCallback(
+    (nextAssertions: ProductAssertion[]) => {
+      const latest = [...nextAssertions]
+        .filter((a) => a.value)
+        .sort(
+          (a, b) =>
+            (b.endYear || b.startYear || 0) - (a.endYear || a.startYear || 0),
+        )[0];
+      setDraft((d) => ({
+        ...d,
+        productAssertions: nextAssertions,
+        placeType: latest?.value ?? null,
+      }));
+    },
+    [],
+  );
+
+  const addProductAssertion = useCallback(() => {
+    const next: ProductAssertion[] = [
+      ...productAssertions,
+      {
+        id: `product-assertion-${Date.now()}`,
+        value: '',
+        source: preferAlmanakkenSource(draft.sources),
+        startYear: undefined,
+        endYear: undefined,
+        note: null,
+      },
+    ];
+    applyProductAssertions(next);
+  }, [applyProductAssertions, productAssertions, draft.sources]);
+
+  const updateProductAssertion = useCallback(
+    (idx: number, patch: Partial<ProductAssertion>) => {
+      const next = productAssertions.map((a, i) =>
+        i === idx ? { ...a, ...patch } : a,
+      );
+      applyProductAssertions(next);
+    },
+    [applyProductAssertions, productAssertions],
+  );
+
+  const removeProductAssertion = useCallback(
+    (idx: number) => {
+      const next = productAssertions.filter((_, i) => i !== idx);
+      applyProductAssertions(next);
+    },
+    [applyProductAssertions, productAssertions],
+  );
+
+  // ── Location assertions ───────────────────────────────────────────────────
+
+  const locationAssertions = draft.locationAssertions || [];
+
+  const applyLocationAssertions = useCallback(
+    (nextAssertions: LocationAssertion[]) => {
+      const latest = [...nextAssertions].sort(
+        (a, b) =>
+          (b.endYear || b.startYear || 0) - (a.endYear || a.startYear || 0),
+      )[0];
+      setDraft((d) => ({
+        ...d,
+        locationAssertions: nextAssertions,
+        locationDescription: latest?.standardized ?? null,
+        locationDescriptionOriginal: latest?.original ?? null,
+      }));
+    },
+    [],
+  );
+
+  const addLocationAssertion = useCallback(() => {
+    const next: LocationAssertion[] = [
+      ...locationAssertions,
+      {
+        id: `location-assertion-${Date.now()}`,
+        standardized: null,
+        original: null,
+        source: preferAlmanakkenSource(draft.sources),
+        startYear: undefined,
+        endYear: undefined,
+        note: null,
+      },
+    ];
+    applyLocationAssertions(next);
+  }, [applyLocationAssertions, locationAssertions, draft.sources]);
+
+  const updateLocationAssertion = useCallback(
+    (idx: number, patch: Partial<LocationAssertion>) => {
+      const next = locationAssertions.map((a, i) =>
+        i === idx ? { ...a, ...patch } : a,
+      );
+      applyLocationAssertions(next);
+    },
+    [applyLocationAssertions, locationAssertions],
+  );
+
+  const removeLocationAssertion = useCallback(
+    (idx: number) => {
+      const next = locationAssertions.filter((_, i) => i !== idx);
+      applyLocationAssertions(next);
+    },
+    [applyLocationAssertions, locationAssertions],
   );
 
   useEffect(() => {
@@ -806,8 +1161,8 @@ export default function PlaceEditor({
           )}
         </div>
 
-        {/* Type + District row */}
-        <div className="grid grid-cols-2 gap-3">
+        {/* Type */}
+        <div>
           <div>
             <label className="block text-sm font-medium text-stm-warm-700 mb-1">
               Type
@@ -835,25 +1190,6 @@ export default function PlaceEditor({
                 {biasTypes[draft.type].editorialNote}
               </p>
             )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-stm-warm-700 mb-1">
-              Part of (District)
-            </label>
-            <select
-              value={draft.broader || ''}
-              onChange={(e) => update('broader', e.target.value || null)}
-              disabled={!canEdit}
-              className="w-full px-3 py-2 border border-stm-warm-200 rounded text-sm bg-white focus:ring-2 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50"
-            >
-              <option value="">-- None --</option>
-              {districts.map((d) => (
-                <option key={d.id} value={d.id}>
-                  {getPreferredName(d)}
-                </option>
-              ))}
-            </select>
           </div>
         </div>
 
@@ -1465,60 +1801,357 @@ export default function PlaceEditor({
           />
         </div>
 
-        {/* Location Description + Original + Place Type */}
+        {/* Location Context */}
         <div className="space-y-3">
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-sm font-medium text-stm-warm-700 mb-1">
-                Location
-                <span className="text-stm-warm-400 font-normal">
-                  {' '}
-                  (standardized)
-                </span>
-              </label>
-              <input
-                type="text"
-                value={draft.locationDescription || ''}
-                onChange={(e) =>
-                  update('locationDescription', e.target.value || null)
-                }
-                disabled={!canEdit}
-                placeholder="e.g. Suriname"
-                className="w-full px-3 py-2 border border-stm-warm-200 rounded text-sm bg-white focus:ring-2 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-stm-warm-700 mb-1">
-                Place Type / Product
-              </label>
-              <input
-                type="text"
-                value={draft.placeType || ''}
-                onChange={(e) => update('placeType', e.target.value || null)}
-                disabled={!canEdit}
-                placeholder="e.g. koffie, suiker"
-                className="w-full px-3 py-2 border border-stm-warm-200 rounded text-sm bg-white focus:ring-2 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50"
-              />
-            </div>
-          </div>
+          <label className="block text-sm font-medium text-stm-warm-700">
+            Location Context
+          </label>
           <div>
             <label className="block text-sm font-medium text-stm-warm-700 mb-1">
-              Location Description
-              <span className="text-stm-warm-400 font-normal">
-                {' '}
-                (original from source)
-              </span>
+              District (according to {districtSourceSummary})
             </label>
-            <input
-              type="text"
-              value={draft.locationDescriptionOriginal || ''}
-              onChange={(e) =>
-                update('locationDescriptionOriginal', e.target.value || null)
-              }
+            <select
+              value={draft.broader || ''}
+              onChange={(e) => handleDistrictSelection(e.target.value || null)}
               disabled={!canEdit}
-              placeholder="e.g. Rivier Suriname, regterhand"
               className="w-full px-3 py-2 border border-stm-warm-200 rounded text-sm bg-white focus:ring-2 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50"
-            />
+            >
+              <option value="">-- None --</option>
+              {districts.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {getPreferredName(d)}
+                </option>
+              ))}
+            </select>
+            <div className="mt-2 space-y-2">
+              <div className="flex items-center justify-between">
+                <p className="text-[10px] text-stm-warm-500 uppercase tracking-wider">
+                  District Statements
+                </p>
+                {canEdit && (
+                  <button
+                    type="button"
+                    onClick={addDistrictAssertion}
+                    className="text-xs text-stm-teal-600 hover:text-stm-teal-700 font-medium"
+                  >
+                    + Add district statement
+                  </button>
+                )}
+              </div>
+
+              {districtAssertions.length === 0 && (
+                <p className="text-xs text-stm-warm-400 italic">
+                  No district statements yet.
+                </p>
+              )}
+
+              {districtAssertions.map((assertion, i) => (
+                <div
+                  key={assertion.id}
+                  className="border border-stm-warm-200 bg-white p-2.5 space-y-2"
+                >
+                  <div className="grid grid-cols-2 gap-2">
+                    <select
+                      value={assertion.districtId || ''}
+                      onChange={(e) =>
+                        updateDistrictAssertion(i, {
+                          districtId: e.target.value || null,
+                        })
+                      }
+                      disabled={!canEdit}
+                      className="px-2 py-1 text-xs border border-stm-warm-200 bg-white focus:ring-1 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50"
+                    >
+                      <option value="">District target</option>
+                      {districts.map((d) => (
+                        <option key={d.id} value={d.id}>
+                          {getPreferredName(d)}
+                        </option>
+                      ))}
+                    </select>
+                    <select
+                      value={assertion.source}
+                      onChange={(e) =>
+                        updateDistrictAssertion(i, { source: e.target.value })
+                      }
+                      disabled={!canEdit}
+                      className="px-2 py-1 text-xs border border-stm-warm-200 bg-white focus:ring-1 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50"
+                    >
+                      {registrySources.map((source) => (
+                        <option key={source.sourceId} value={source.sourceId}>
+                          {sourceDisplayLabel(source.sourceId)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <input
+                      type="number"
+                      value={assertion.sourceYear ?? ''}
+                      onChange={(e) =>
+                        updateDistrictAssertion(i, {
+                          sourceYear: e.target.value
+                            ? Number(e.target.value)
+                            : undefined,
+                        })
+                      }
+                      disabled={!canEdit}
+                      placeholder="Year"
+                      className="px-2 py-1 text-xs border border-stm-warm-200 bg-white focus:ring-1 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50"
+                    />
+                    <select
+                      value={assertion.certainty || 'certain'}
+                      onChange={(e) =>
+                        updateDistrictAssertion(i, {
+                          certainty: e.target.value as AssertionCertainty,
+                        })
+                      }
+                      disabled={!canEdit}
+                      className="px-2 py-1 text-xs border border-stm-warm-200 bg-white focus:ring-1 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50"
+                    >
+                      <option value="certain">Certain</option>
+                      <option value="probable">Probable</option>
+                      <option value="uncertain">Uncertain</option>
+                    </select>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <label className="flex items-center gap-1 text-xs text-stm-warm-600">
+                      <input
+                        type="checkbox"
+                        checked={Boolean(assertion.isCurrent)}
+                        onChange={(e) =>
+                          updateDistrictAssertion(i, {
+                            isCurrent: e.target.checked,
+                          })
+                        }
+                        disabled={!canEdit}
+                      />
+                      Current
+                    </label>
+                    {canEdit && (
+                      <button
+                        type="button"
+                        onClick={() => removeDistrictAssertion(i)}
+                        className="text-xs text-stm-warm-400 hover:text-red-500"
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          {/* Product observations */}
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-sm font-medium text-stm-warm-700">
+                Product (per year / source)
+              </label>
+              {canEdit && (
+                <button
+                  type="button"
+                  onClick={addProductAssertion}
+                  className="text-xs text-stm-sepia-600 hover:text-stm-sepia-800"
+                >
+                  + Add product observation
+                </button>
+              )}
+            </div>
+            {productAssertions.length === 0 && (
+              <p className="text-xs text-stm-warm-400 italic">
+                No product observations recorded.
+              </p>
+            )}
+            <div className="space-y-2">
+              {productAssertions.map((assertion, i) => (
+                <div
+                  key={assertion.id}
+                  className="border border-stm-warm-200 bg-stm-warm-50 p-2 space-y-2"
+                >
+                  <div className="grid grid-cols-3 gap-2">
+                    <input
+                      type="text"
+                      value={assertion.value}
+                      onChange={(e) =>
+                        updateProductAssertion(i, { value: e.target.value })
+                      }
+                      disabled={!canEdit}
+                      placeholder="e.g. koffie, suiker"
+                      className="px-2 py-1 text-xs border border-stm-warm-200 bg-white focus:ring-1 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50"
+                    />
+                    <input
+                      type="number"
+                      value={assertion.startYear ?? ''}
+                      onChange={(e) =>
+                        updateProductAssertion(i, {
+                          startYear: e.target.value
+                            ? Number(e.target.value)
+                            : undefined,
+                        })
+                      }
+                      disabled={!canEdit}
+                      placeholder="From"
+                      className="px-2 py-1 text-xs border border-stm-warm-200 bg-white focus:ring-1 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50"
+                    />
+                    <input
+                      type="number"
+                      value={assertion.endYear ?? ''}
+                      onChange={(e) =>
+                        updateProductAssertion(i, {
+                          endYear: e.target.value
+                            ? Number(e.target.value)
+                            : undefined,
+                        })
+                      }
+                      disabled={!canEdit}
+                      placeholder="To"
+                      className="px-2 py-1 text-xs border border-stm-warm-200 bg-white focus:ring-1 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={assertion.source}
+                      onChange={(e) =>
+                        updateProductAssertion(i, { source: e.target.value })
+                      }
+                      disabled={!canEdit}
+                      className="flex-1 px-2 py-1 text-xs border border-stm-warm-200 bg-white focus:ring-1 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50"
+                    >
+                      {registrySources.map((source) => (
+                        <option key={source.sourceId} value={source.sourceId}>
+                          {sourceDisplayLabel(source.sourceId)}
+                        </option>
+                      ))}
+                    </select>
+                    {canEdit && (
+                      <button
+                        type="button"
+                        onClick={() => removeProductAssertion(i)}
+                        className="text-xs text-stm-warm-400 hover:text-red-500 shrink-0"
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Location observations */}
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-sm font-medium text-stm-warm-700">
+                Location Observations (Almanakken)
+              </label>
+              {canEdit && (
+                <button
+                  type="button"
+                  onClick={addLocationAssertion}
+                  className="text-xs text-stm-sepia-600 hover:text-stm-sepia-800"
+                >
+                  + Add location observation
+                </button>
+              )}
+            </div>
+            {locationAssertions.length === 0 && (
+              <p className="text-xs text-stm-warm-400 italic">
+                No location observations recorded.
+              </p>
+            )}
+            <div className="space-y-2">
+              {locationAssertions.map((assertion, i) => (
+                <div
+                  key={assertion.id}
+                  className="border border-stm-warm-200 bg-stm-warm-50 p-2 space-y-2"
+                >
+                  <div className="grid grid-cols-2 gap-2">
+                    <input
+                      type="text"
+                      value={assertion.standardized || ''}
+                      onChange={(e) =>
+                        updateLocationAssertion(i, {
+                          standardized: e.target.value || null,
+                        })
+                      }
+                      disabled={!canEdit}
+                      placeholder="Standardized (e.g. Suriname)"
+                      className="px-2 py-1 text-xs border border-stm-warm-200 bg-white focus:ring-1 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50"
+                    />
+                    <input
+                      type="text"
+                      value={assertion.original || ''}
+                      onChange={(e) =>
+                        updateLocationAssertion(i, {
+                          original: e.target.value || null,
+                        })
+                      }
+                      disabled={!canEdit}
+                      placeholder="Original (e.g. Rivier Suriname, regterhand)"
+                      className="px-2 py-1 text-xs border border-stm-warm-200 bg-white focus:ring-1 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <select
+                      value={assertion.source}
+                      onChange={(e) =>
+                        updateLocationAssertion(i, { source: e.target.value })
+                      }
+                      disabled={!canEdit}
+                      className="px-2 py-1 text-xs border border-stm-warm-200 bg-white focus:ring-1 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50"
+                    >
+                      {registrySources.map((source) => (
+                        <option key={source.sourceId} value={source.sourceId}>
+                          {sourceDisplayLabel(source.sourceId)}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="flex items-center gap-1">
+                      <input
+                        type="number"
+                        value={assertion.startYear ?? ''}
+                        onChange={(e) =>
+                          updateLocationAssertion(i, {
+                            startYear: e.target.value
+                              ? Number(e.target.value)
+                              : undefined,
+                          })
+                        }
+                        disabled={!canEdit}
+                        placeholder="From"
+                        className="w-full px-2 py-1 text-xs border border-stm-warm-200 bg-white focus:ring-1 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50"
+                      />
+                      <span className="text-xs text-stm-warm-400 shrink-0">
+                        –
+                      </span>
+                      <input
+                        type="number"
+                        value={assertion.endYear ?? ''}
+                        onChange={(e) =>
+                          updateLocationAssertion(i, {
+                            endYear: e.target.value
+                              ? Number(e.target.value)
+                              : undefined,
+                          })
+                        }
+                        disabled={!canEdit}
+                        placeholder="To"
+                        className="w-full px-2 py-1 text-xs border border-stm-warm-200 bg-white focus:ring-1 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50"
+                      />
+                      {canEdit && (
+                        <button
+                          type="button"
+                          onClick={() => removeLocationAssertion(i)}
+                          className="text-xs text-stm-warm-400 hover:text-red-500 shrink-0"
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 

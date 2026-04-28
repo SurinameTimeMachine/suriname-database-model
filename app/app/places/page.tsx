@@ -9,7 +9,13 @@ import { useAuth } from '@/lib/auth';
 import { type AllData, loadAllData } from '@/lib/data';
 import { getActiveSources, useSourceRegistry } from '@/lib/sources';
 import { usePlaceTypes } from '@/lib/thesaurus';
-import type { E41Appellation, GazetteerPlace } from '@/lib/types';
+import type {
+  DistrictAssertion,
+  E41Appellation,
+  GazetteerPlace,
+  LocationAssertion,
+  ProductAssertion,
+} from '@/lib/types';
 import { getPreferredName } from '@/lib/types';
 import { extractPlaceId } from '@/lib/url';
 import { useSearchParams } from 'next/navigation';
@@ -76,6 +82,211 @@ function normalizeNamesFromLegacy(entry: Record<string, unknown>) {
   return names;
 }
 
+function getEffectiveDistrictAssertion(
+  assertions: DistrictAssertion[],
+): DistrictAssertion | null {
+  if (assertions.length === 0) return null;
+  const explicitCurrent = assertions.find((a) => a.isCurrent);
+  if (explicitCurrent) return explicitCurrent;
+  const withYear = assertions.filter((a) => typeof a.sourceYear === 'number');
+  if (withYear.length > 0) {
+    return withYear.sort(
+      (a, b) => (b.sourceYear || 0) - (a.sourceYear || 0),
+    )[0];
+  }
+  return assertions[0];
+}
+
+function normalizeDistrictAssertionsFromLegacy(
+  entry: Record<string, unknown>,
+): DistrictAssertion[] {
+  if (Array.isArray(entry.districtAssertions)) {
+    return entry.districtAssertions
+      .filter((a): a is Record<string, unknown> =>
+        Boolean(a && typeof a === 'object'),
+      )
+      .map((a, idx) => ({
+        id:
+          typeof a.id === 'string' && a.id.trim()
+            ? a.id
+            : `district-assertion-${idx + 1}`,
+        districtId:
+          typeof a.districtId === 'string' && a.districtId.trim()
+            ? a.districtId
+            : null,
+        districtLabel:
+          typeof a.districtLabel === 'string' && a.districtLabel.trim()
+            ? a.districtLabel
+            : null,
+        source:
+          typeof a.source === 'string' && a.source.trim()
+            ? a.source
+            : 'almanakken',
+        sourceYear:
+          typeof a.sourceYear === 'number' && Number.isFinite(a.sourceYear)
+            ? a.sourceYear
+            : undefined,
+        certainty:
+          a.certainty === 'certain' ||
+          a.certainty === 'probable' ||
+          a.certainty === 'uncertain'
+            ? a.certainty
+            : undefined,
+        note: typeof a.note === 'string' && a.note.trim() ? a.note : null,
+        isCurrent: Boolean(a.isCurrent),
+      }));
+  }
+
+  const broader = typeof entry.broader === 'string' ? entry.broader : null;
+  const district = typeof entry.district === 'string' ? entry.district : null;
+  const sources = Array.isArray(entry.sources)
+    ? entry.sources.filter((x): x is string => typeof x === 'string')
+    : [];
+
+  if (!broader && !district) return [];
+
+  return [
+    {
+      id: 'district-assertion-1',
+      districtId: broader,
+      districtLabel: district,
+      source: sources[0] || 'almanakken',
+      sourceYear: undefined,
+      certainty: 'certain',
+      note: null,
+      isCurrent: true,
+    },
+  ];
+}
+
+function preferAlmanakkenSource(sources: string[]): string {
+  return sources.includes('almanakken')
+    ? 'almanakken'
+    : sources[0] || 'almanakken';
+}
+
+function normalizeProductAssertionsFromLegacy(
+  entry: Record<string, unknown>,
+): ProductAssertion[] {
+  const sources = Array.isArray(entry.sources)
+    ? entry.sources.filter((x): x is string => typeof x === 'string')
+    : [];
+  if (Array.isArray(entry.productAssertions)) {
+    return entry.productAssertions
+      .filter((a): a is Record<string, unknown> =>
+        Boolean(a && typeof a === 'object'),
+      )
+      .map((a, idx) => ({
+        id:
+          typeof a.id === 'string' && a.id.trim()
+            ? a.id
+            : `product-assertion-${idx + 1}`,
+        value: typeof a.value === 'string' && a.value.trim() ? a.value : '',
+        source:
+          typeof a.source === 'string' && a.source.trim()
+            ? a.source
+            : preferAlmanakkenSource(sources),
+        startYear:
+          typeof a.startYear === 'number' && Number.isFinite(a.startYear)
+            ? a.startYear
+            : undefined,
+        endYear:
+          typeof a.endYear === 'number' && Number.isFinite(a.endYear)
+            ? a.endYear
+            : undefined,
+        note: typeof a.note === 'string' && a.note.trim() ? a.note : null,
+      }))
+      .filter((a) => Boolean(a.value));
+  }
+
+  const placeType =
+    typeof entry.placeType === 'string' && entry.placeType.trim()
+      ? entry.placeType
+      : null;
+  if (!placeType) return [];
+  return [
+    {
+      id: 'product-assertion-1',
+      value: placeType,
+      source: preferAlmanakkenSource(sources),
+      startYear: undefined,
+      endYear: undefined,
+      note: null,
+    },
+  ];
+}
+
+function normalizeLocationAssertionsFromLegacy(
+  entry: Record<string, unknown>,
+): LocationAssertion[] {
+  const sources = Array.isArray(entry.sources)
+    ? entry.sources.filter((x): x is string => typeof x === 'string')
+    : [];
+  if (Array.isArray(entry.locationAssertions)) {
+    return entry.locationAssertions
+      .filter((a): a is Record<string, unknown> =>
+        Boolean(a && typeof a === 'object'),
+      )
+      .map((a, idx) => ({
+        id:
+          typeof a.id === 'string' && a.id.trim()
+            ? a.id
+            : `location-assertion-${idx + 1}`,
+        standardized:
+          typeof a.standardized === 'string' && a.standardized.trim()
+            ? a.standardized
+            : null,
+        original:
+          typeof a.original === 'string' && a.original.trim()
+            ? a.original
+            : null,
+        source:
+          typeof a.source === 'string' && a.source.trim()
+            ? a.source
+            : preferAlmanakkenSource(sources),
+        startYear:
+          typeof a.startYear === 'number' && Number.isFinite(a.startYear)
+            ? a.startYear
+            : undefined,
+        endYear:
+          typeof a.endYear === 'number' && Number.isFinite(a.endYear)
+            ? a.endYear
+            : undefined,
+        note: typeof a.note === 'string' && a.note.trim() ? a.note : null,
+      }))
+      .filter((a) => Boolean(a.standardized || a.original));
+  }
+
+  const locationDescription =
+    typeof entry.locationDescription === 'string' &&
+    entry.locationDescription.trim()
+      ? entry.locationDescription
+      : null;
+  const locationDescriptionOriginal =
+    typeof entry.locationDescriptionOriginal === 'string' &&
+    entry.locationDescriptionOriginal.trim()
+      ? entry.locationDescriptionOriginal
+      : null;
+  if (!locationDescription && !locationDescriptionOriginal) return [];
+  return [
+    {
+      id: 'location-assertion-1',
+      standardized: locationDescription,
+      original: locationDescriptionOriginal,
+      source: preferAlmanakkenSource(sources),
+      startYear: undefined,
+      endYear: undefined,
+      note: null,
+    },
+  ];
+}
+
+function getCurrentDistrictLabel(place: GazetteerPlace): string | null {
+  const assertions = place.districtAssertions || [];
+  const effective = getEffectiveDistrictAssertion(assertions);
+  return effective?.districtLabel || place.district || null;
+}
+
 function emptyPlace(): GazetteerPlace {
   return {
     id: `stm-new-${Date.now()}`,
@@ -90,9 +301,12 @@ function emptyPlace(): GazetteerPlace {
     fid: null,
     psurIds: [],
     district: null,
+    districtAssertions: [],
     locationDescription: null,
     locationDescriptionOriginal: null,
     placeType: null,
+    productAssertions: [],
+    locationAssertions: [],
     diklandRefs: [],
     modifiedBy: null,
     modifiedAt: null,
@@ -166,7 +380,9 @@ const PlaceRow = memo(function PlaceRow({
 
       {/* District */}
       <td className="py-1.5 px-2 text-stm-warm-600 max-w-35 truncate">
-        {place.district ?? <span className="text-stm-warm-200">--</span>}
+        {getCurrentDistrictLabel(place) ?? (
+          <span className="text-stm-warm-200">--</span>
+        )}
       </td>
 
       {/* Product / Type */}
@@ -341,6 +557,15 @@ function PlacesPageInner() {
             names: normalizeNamesFromLegacy(
               p as unknown as Record<string, unknown>,
             ),
+            districtAssertions: normalizeDistrictAssertionsFromLegacy(
+              p as unknown as Record<string, unknown>,
+            ),
+            productAssertions: normalizeProductAssertionsFromLegacy(
+              p as unknown as Record<string, unknown>,
+            ),
+            locationAssertions: normalizeLocationAssertionsFromLegacy(
+              p as unknown as Record<string, unknown>,
+            ),
           })),
         );
       })
@@ -437,7 +662,8 @@ function PlacesPageInner() {
               l.identifier.toLowerCase().includes(q) ||
               l.authority.toLowerCase().includes(q),
           ) ||
-          (p.district && p.district.toLowerCase().includes(q)) ||
+          (getCurrentDistrictLabel(p) &&
+            getCurrentDistrictLabel(p)?.toLowerCase().includes(q)) ||
           p.psurIds.some((id) => id.toLowerCase().includes(q)) ||
           (p.locationDescription &&
             p.locationDescription.toLowerCase().includes(q)),
@@ -461,7 +687,7 @@ function PlacesPageInner() {
         case 'type':
           return cmp(a.type, b.type);
         case 'district':
-          return cmp(a.district, b.district);
+          return cmp(getCurrentDistrictLabel(a), getCurrentDistrictLabel(b));
         case 'psurIds':
           return cmp(a.psurIds[0] ?? null, b.psurIds[0] ?? null);
         case 'externalLinks':
