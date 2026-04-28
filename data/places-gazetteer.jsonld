@@ -15694,46 +15694,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-02170",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-02170",
-      "type": "plantation",
-      "prefLabel": "Einde Rust en Lust tot Rust",
-      "altLabels": [],
-      "broader": "stm-00004",
-      "description": "Plantation from Surinaamse Almanakken (no QGIS geometry)",
-      "location": {
-        "lat": null,
-        "lng": null,
-        "wkt": null,
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q130536939",
-      "fid": null,
-      "psurIds": [
-        "PSUR0218"
-      ],
-      "district": "Divisie Beneden-Cottica",
-      "locationDescription": "Commewijne",
-      "locationDescriptionOriginal": "Rivier Commewijne, (beneden) regterhand in het afvaren",
-      "placeType": "koffie",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q130536939",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02289",
       "@type": [
         "E25_Human-Made_Feature"
@@ -71764,6 +71724,65 @@
           "language": "nl",
           "type": "official",
           "isPreferred": true
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Rust en Werk 2002-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emY1UxYW4zYURJcWM/view?usp=sharing&resourcekey=0-TD-o8jYwbnS8fcVIvIvI8w",
+          "author": "Philip Dikland",
+          "year": "2002, aangevuld 2009, 2012",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-02170",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-02170",
+      "type": "plantation",
+      "broader": "stm-00004",
+      "description": "Plantation from Surinaamse Almanakken (no QGIS geometry)",
+      "location": {
+        "lat": null,
+        "lng": null,
+        "wkt": null,
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q130536939",
+      "fid": null,
+      "psurIds": [
+        "PSUR0218"
+      ],
+      "district": "Divisie Beneden-Cottica",
+      "locationDescription": "Commewijne",
+      "locationDescriptionOriginal": "Rivier Commewijne, (beneden) regterhand in het afvaren",
+      "placeType": "koffie",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-28",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q130536939",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Einde Rust en Lust tot Rust",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "pikien gron",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false
         }
       ],
       "diklandRefs": [
