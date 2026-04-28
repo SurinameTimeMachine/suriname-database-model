@@ -59175,46 +59175,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-02420",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-02420",
-      "type": "plantation",
-      "prefLabel": "Sinabo en Gelre",
-      "altLabels": [],
-      "broader": "stm-00005",
-      "description": "Plantation from Surinaamse Almanakken (no QGIS geometry)",
-      "location": {
-        "lat": null,
-        "lng": null,
-        "wkt": null,
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q2804784",
-      "fid": null,
-      "psurIds": [
-        "PSUR0312"
-      ],
-      "district": "Divisie Boven-Commewijne",
-      "locationDescription": "Commetewane Kreek",
-      "locationDescriptionOriginal": "Commetewane-kreek, linkerhand in het opvaren",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q2804784",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-00749",
       "@type": [
         "E25_Human-Made_Feature"
@@ -76939,6 +76899,83 @@
       "names": [
         {
           "text": "Sinabo",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "Ganda",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false
+        },
+        {
+          "text": "Granda",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false
+        },
+        {
+          "text": "Granman",
+          "language": "nl",
+          "type": "vernacular",
+          "isPreferred": false
+        },
+        {
+          "text": "gouverneur van der Veen",
+          "language": "nl",
+          "type": "vernacular",
+          "isPreferred": false
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Sinabo 2004-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emOWZLWmRKR2loZWc/view?usp=sharing&resourcekey=0-FuSsfxEm176p5v_uX9-GWw",
+          "author": "Philip Dikland",
+          "year": "2004, aangevuld 2005, 2007, 2008, 2009",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-02420",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-02420",
+      "type": "plantation",
+      "broader": "stm-00005",
+      "description": "Plantation from Surinaamse Almanakken (no QGIS geometry)",
+      "location": {
+        "lat": null,
+        "lng": null,
+        "wkt": null,
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q2804784",
+      "fid": null,
+      "psurIds": [
+        "PSUR0312"
+      ],
+      "district": "Divisie Boven-Commewijne",
+      "locationDescription": "Commetewane Kreek",
+      "locationDescriptionOriginal": "Commetewane-kreek, linkerhand in het opvaren",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-28",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q2804784",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Sinabo en Gelre",
           "language": "nl",
           "type": "official",
           "isPreferred": true
