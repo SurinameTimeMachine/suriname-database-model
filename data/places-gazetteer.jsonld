@@ -74133,7 +74133,7 @@
       "psurIds": [],
       "district": null,
       "locationDescription": "Tempati Kreek",
-      "locationDescriptionOriginal": null,
+      "locationDescriptionOriginal": "Tempati, linkeroever in het afvaren. Op de samenvloeiing van boven-Commewijne kreek en Tempati kreek",
       "placeType": null,
       "diklandRefs": [
         {
@@ -74141,6 +74141,13 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emLWFkSXRpSWFkUG8/view?usp=sharing&resourcekey=0-Dkq3zQTx0BUqiU449CimrA",
           "author": "Philip Dikland",
           "year": "2004, aangevuld 2012",
+          "notes": null
+        },
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Paix Tempati 2004-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emUkN6NXAzU0RuVW8/view?usp=sharing&resourcekey=0-7d50s_Q_FNm5wi0JOselEA",
+          "author": "Philip Dikland",
+          "year": "2004",
           "notes": null
         }
       ],
