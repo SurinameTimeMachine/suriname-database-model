@@ -70906,7 +70906,7 @@
       "locationDescriptionOriginal": "Rivier Commewijne, (boven) linkerhand in het afvaren",
       "placeType": "suiker",
       "modifiedBy": "GerDijkstra",
-      "modifiedAt": "2026-04-21",
+      "modifiedAt": "2026-04-28",
       "externalLinks": [
         {
           "authority": "wikidata",
@@ -70938,6 +70938,18 @@
           "language": "nl",
           "type": "variant",
           "isPreferred": false
+        },
+        {
+          "text": "Schassenburg",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false
+        },
+        {
+          "text": "Schatzenburg",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false
         }
       ],
       "diklandRefs": [
@@ -70947,6 +70959,13 @@
           "author": "Philip Dikland",
           "year": "2010, aangevuld 2012",
           "notes": null
+        },
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Ostage 2004-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emTjBwYzJmQVByQzA/view?usp=sharing&resourcekey=0-cE-3yvzRH6OLJpYV1WkuLg",
+          "author": "Philip Dikland",
+          "year": "2004",
+          "notes": "Er was nog een derde grond die lange tijd tot het bezit (De gronden Ostage en Schatzenburg aan de Commewijne-rivier) behoorde; dit is de grond Schassenburg, later geheten Welbedacht. \n\nDeze grond ligt achter de plantages Cannewapibo en Fayerfield en voor een klein deel achter Ostage. De grond heeft geen verbinding met de rivier. \n\nAls plantage is ze nooit van belang geweest, hoogstens is er wat hout gewerkt. Thans is deze grond een deel van Cannewapibo."
         }
       ]
     },
