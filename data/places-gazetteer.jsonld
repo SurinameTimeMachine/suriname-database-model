@@ -72643,6 +72643,48 @@
       ]
     },
     {
+      "id": "stm-new-1777376467791",
+      "type": "plantation",
+      "names": [
+        {
+          "text": "Grond van Naveau",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": true
+        }
+      ],
+      "broader": null,
+      "description": "",
+      "location": {
+        "lat": null,
+        "lng": null,
+        "wkt": null,
+        "crs": "EPSG:4326"
+      },
+      "sources": [],
+      "wikidataQid": null,
+      "externalLinks": [],
+      "fid": null,
+      "psurIds": [],
+      "district": null,
+      "locationDescription": "Tempati Kreek",
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\plantages Tempatie geschiedenis Dikland 2004.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emLWFkSXRpSWFkUG8/view?usp=sharing&resourcekey=0-Dkq3zQTx0BUqiU449CimrA",
+          "author": "Philip Dikland",
+          "year": "2004, aangevuld 2012",
+          "notes": null
+        }
+      ],
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-28",
+      "@id": "stm:place/stm-new-1777376467791",
+      "@type": "E25_Human-Made_Feature"
+    },
+    {
       "@id": "stm:place/stm-00654",
       "@type": "E25_Human-Made_Feature",
       "id": "stm-00654",
