@@ -15694,47 +15694,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00663",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-00663",
-      "type": "plantation",
-      "prefLabel": "Einde Rust",
-      "altLabels": [],
-      "broader": "stm-00004",
-      "description": "",
-      "location": {
-        "lat": 5.93141636375,
-        "lng": -55.075613718750006,
-        "wkt": "Polygon ((-55.06854442 5.95045863, -55.07085734 5.90526003, -55.07586136 5.90552068, -55.07990803 5.90599617, -55.07795512 5.94102792, -55.08192965 5.94126465, -55.08130941 5.95134420, -55.06854442 5.95045863))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q59115545",
-      "fid": 1746,
-      "psurIds": [
-        "PSUR0218"
-      ],
-      "district": "Divisie Beneden-Cottica",
-      "locationDescription": "Beneden-Commewijne",
-      "locationDescriptionOriginal": "Rivier Commewijne, (beneden) regterhand in het afvaren",
-      "placeType": "koffie",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59115545",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-00742",
       "@type": [
         "E25_Human-Made_Feature"
@@ -71746,6 +71705,60 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emdFBGSzVQNkcyZWs/view?usp=sharing&resourcekey=0-SMXBqRgSnkLthaUj6h_usA",
           "author": "Philip Dikland",
           "year": "2008",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-00663",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-00663",
+      "type": "plantation",
+      "broader": "stm-00004",
+      "description": "",
+      "location": {
+        "lat": 5.93141636375,
+        "lng": -55.075613718750006,
+        "wkt": "Polygon ((-55.06854442 5.95045863, -55.07085734 5.90526003, -55.07586136 5.90552068, -55.07990803 5.90599617, -55.07795512 5.94102792, -55.08192965 5.94126465, -55.08130941 5.95134420, -55.06854442 5.95045863))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q59115545",
+      "fid": 1746,
+      "psurIds": [
+        "PSUR0218"
+      ],
+      "district": "Divisie Beneden-Cottica",
+      "locationDescription": "Beneden-Commewijne",
+      "locationDescriptionOriginal": "Rivier Commewijne, (beneden) regterhand in het afvaren",
+      "placeType": "koffie",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-28",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59115545",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Einde Rust",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Rust en Werk 2002-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emY1UxYW4zYURJcWM/view?usp=sharing&resourcekey=0-TD-o8jYwbnS8fcVIvIvI8w",
+          "author": "Philip Dikland",
+          "year": "2002, aangevuld 2009, 2012",
           "notes": null
         }
       ]
