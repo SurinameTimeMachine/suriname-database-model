@@ -27073,44 +27073,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-02080",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-02080",
-      "type": "plantation",
-      "prefLabel": "La Solitude",
-      "altLabels": [],
-      "broader": null,
-      "description": "",
-      "location": {
-        "lat": 5.768007103846154,
-        "lng": -54.90835316538461,
-        "wkt": "Polygon ((-54.91907456 5.78189443, -54.91953818 5.77320389, -54.89887263 5.77033905, -54.87296300 5.76873349, -54.87351783 5.75992249, -54.89322094 5.76109691, -54.89389596 5.75228601, -54.90335497 5.75344577, -54.90298205 5.76177427, -54.93437111 5.76658451, -54.93949199 5.76755692, -54.93823337 5.78536018, -54.91907456 5.78189443))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken"
-      ],
-      "wikidataQid": "Q124831242",
-      "fid": 3165,
-      "psurIds": [],
-      "district": null,
-      "locationDescription": "Commetewane Kreek",
-      "locationDescriptionOriginal": "Commetewana-kreek, regterhand",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q124831242",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-00860",
       "@type": [
         "E25_Human-Made_Feature"
@@ -73604,6 +73566,57 @@
       "modifiedAt": "2026-04-28",
       "@id": "stm:place/stm-new-1777376241334",
       "@type": "E25_Human-Made_Feature"
+    },
+    {
+      "@id": "stm:place/stm-02080",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-02080",
+      "type": "plantation",
+      "broader": null,
+      "description": "",
+      "location": {
+        "lat": 5.768007103846154,
+        "lng": -54.90835316538461,
+        "wkt": "Polygon ((-54.91907456 5.78189443, -54.91953818 5.77320389, -54.89887263 5.77033905, -54.87296300 5.76873349, -54.87351783 5.75992249, -54.89322094 5.76109691, -54.89389596 5.75228601, -54.90335497 5.75344577, -54.90298205 5.76177427, -54.93437111 5.76658451, -54.93949199 5.76755692, -54.93823337 5.78536018, -54.91907456 5.78189443))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken"
+      ],
+      "wikidataQid": "Q124831242",
+      "fid": 3165,
+      "psurIds": [],
+      "district": null,
+      "locationDescription": "Commetewane Kreek",
+      "locationDescriptionOriginal": "Commetewana-kreek, regterhand",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-28",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q124831242",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "La Solitude",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Solitude 1999-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emaVVyX2xsRFJRVlU/view?usp=sharing&resourcekey=0-CxMRoZkLGYZjXqiG3_cdSQ",
+          "author": "Philip Dikland",
+          "year": "1999-2005",
+          "notes": "De plantage la Solitude en de bijbehorende grond Oosterhuijsen zijn alleen in het prille begin\nzelfstandige plantages geweest. Daarna zijn ze tot kost- en weidegronden geworden van de\nplantage Nieuwsorg."
+        }
+      ]
     },
     {
       "@id": "stm:place/stm-00581",
