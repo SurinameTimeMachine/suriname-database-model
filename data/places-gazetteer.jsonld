@@ -17960,47 +17960,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-02074",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-02074",
-      "type": "plantation",
-      "prefLabel": "Gelre",
-      "altLabels": [],
-      "broader": null,
-      "description": "",
-      "location": {
-        "lat": 5.789808827499999,
-        "lng": -54.88648073000001,
-        "wkt": "Polygon ((-54.87481033 5.78334197, -54.89526794 5.78421572, -54.89369569 5.78813661, -54.89423545 5.79000836, -54.89362947 5.79242172, -54.89163223 5.79857513, -54.87376440 5.79842914, -54.87481033 5.78334197))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q124830525",
-      "fid": 3159,
-      "psurIds": [
-        "PSUR0312"
-      ],
-      "district": null,
-      "locationDescription": "Commetewane Kreek",
-      "locationDescriptionOriginal": "Commetewane-kreek, linkerhand in het opvaren",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q124830525",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-01128",
       "@type": [
         "E25_Human-Made_Feature"
@@ -72141,6 +72100,84 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emYWNxczBaYy1sY00/view?usp=sharing&resourcekey=0-rMb45_M495PGQVG2zPaflw",
           "author": "Philip Dikland",
           "year": "2001",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-02074",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-02074",
+      "type": "plantation",
+      "broader": null,
+      "description": "",
+      "location": {
+        "lat": 5.789808827499999,
+        "lng": -54.88648073000001,
+        "wkt": "Polygon ((-54.87481033 5.78334197, -54.89526794 5.78421572, -54.89369569 5.78813661, -54.89423545 5.79000836, -54.89362947 5.79242172, -54.89163223 5.79857513, -54.87376440 5.79842914, -54.87481033 5.78334197))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q124830525",
+      "fid": 3159,
+      "psurIds": [
+        "PSUR0312"
+      ],
+      "district": null,
+      "locationDescription": "Commetewane Kreek",
+      "locationDescriptionOriginal": "Commetewane-kreek, linkerhand in het opvaren",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-28",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q124830525",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Gelre",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "Ganda",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false
+        },
+        {
+          "text": "Granda",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false
+        },
+        {
+          "text": "Granman",
+          "language": "nl",
+          "type": "vernacular",
+          "isPreferred": false
+        },
+        {
+          "text": "gouverneur van der Veen",
+          "language": "nl",
+          "type": "vernacular",
+          "isPreferred": false
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Sinabo 2004-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emOWZLWmRKR2loZWc/view?usp=sharing&resourcekey=0-FuSsfxEm176p5v_uX9-GWw",
+          "author": "Philip Dikland",
+          "year": "2004, aangevuld 2005, 2007, 2008, 2009",
           "notes": null
         }
       ]
