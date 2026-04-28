@@ -241,8 +241,12 @@ console.log(`  Wrote ${GAZETTEER_PATH}`);
 try {
   writeFileSync(PUBLIC_GAZETTEER, outStr, 'utf-8');
   console.log(`  Wrote public copy: ${PUBLIC_GAZETTEER}`);
-} catch {
-  console.warn(`  Warning: could not write public copy at ${PUBLIC_GAZETTEER}`);
+} catch (err) {
+  console.error(
+    `Error: could not write public copy at ${PUBLIC_GAZETTEER}`,
+    err,
+  );
+  process.exit(1);
 }
 
 console.log('Done.');
