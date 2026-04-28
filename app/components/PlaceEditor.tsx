@@ -947,6 +947,8 @@ export default function PlaceEditor({
   useEffect(() => {
     if (hydratedFromAppellations.current) return;
     if (sourceAppellations.length === 0) return;
+    // Wait for registry to resolve before hydrating
+    if (sourceIdByUri.size === 0) return;
 
     hydratedFromAppellations.current = true;
     setDraft((d) => {
@@ -980,7 +982,7 @@ export default function PlaceEditor({
           const current = nextNames[idx];
           const patched: PlaceName = {
             ...current,
-            text: current.text.length <= text.length ? current.text : text,
+            text: current.text.length >= text.length ? current.text : text,
             language:
               current.language === 'und' && hintedLanguage !== 'und'
                 ? hintedLanguage

@@ -405,6 +405,19 @@ export default function PlantationPanel({
   const orgApps = orgUri
     ? ((data.appellations[orgUri] || []) as E41Appellation[])
     : [];
+
+  // Deduplicate per-entity to preserve entity scoping
+  const uniquePlantationApps = Array.from(
+    new Map(plantationApps.map((app) => [app['@id'], app])).values(),
+  );
+  const uniqueFeatureApps = Array.from(
+    new Map(featureApps.map((app) => [app['@id'], app])).values(),
+  );
+  const uniqueOrgApps = Array.from(
+    new Map(orgApps.map((app) => [app['@id'], app])).values(),
+  );
+
+  // Combined for EntityGraph consumption
   const allApps = [...plantationApps, ...featureApps, ...orgApps];
   const uniqueApps = Array.from(
     new Map(allApps.map((app) => [app['@id'], app])).values(),
@@ -654,12 +667,12 @@ export default function PlantationPanel({
                       </div>
                     </div>
                   )}
-                  {uniqueApps.length > 0 && (
+                  {uniquePlantationApps.length > 0 && (
                     <div className="mt-2 space-y-1">
                       <span className="text-[10px] text-stm-warm-400 uppercase tracking-wider">
                         E41 Appellations
                       </span>
-                      {uniqueApps.map((app) => (
+                      {uniquePlantationApps.map((app) => (
                         <AppellationRow
                           key={app['@id']}
                           app={app}
@@ -717,12 +730,12 @@ export default function PlantationPanel({
                       value={props.mapYear}
                     />
                   )}
-                  {uniqueApps.length > 0 && (
+                  {uniqueFeatureApps.length > 0 && (
                     <div className="mt-2 space-y-1">
                       <span className="text-[10px] text-stm-warm-400 uppercase tracking-wider">
                         E41 Appellations
                       </span>
-                      {uniqueApps.map((app) => (
+                      {uniqueFeatureApps.map((app) => (
                         <AppellationRow
                           key={app['@id']}
                           app={app}

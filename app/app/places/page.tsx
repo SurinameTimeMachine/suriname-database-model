@@ -68,7 +68,6 @@ function normalizeNamesFromLegacy(entry: Record<string, unknown>) {
       language: 'nl',
       type: 'official',
       isPreferred: true,
-      source: sourceId,
     });
   }
   for (const label of altLabels) {
@@ -78,7 +77,6 @@ function normalizeNamesFromLegacy(entry: Record<string, unknown>) {
       language: 'und',
       type: 'historical',
       isPreferred: false,
-      source: sourceId,
     });
   }
   return names;

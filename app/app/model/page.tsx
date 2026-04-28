@@ -1305,7 +1305,46 @@ function ProvenanceBoundarySection() {
           </h4>
           <div className="bg-stm-warm-50 p-4 font-mono text-xs text-stm-warm-600 space-y-1.5">
             <div>
-              <span style={{ color: CRM_COLORS.E25 }}>E25/E26/E53/E74</span>
+              <span
+                className="inline-block px-1.5 py-0.5 text-[10px] font-bold mr-0.5"
+                style={{
+                  backgroundColor: CRM_COLORS['E25'],
+                  color: '#0f172a',
+                  borderRadius: '2px',
+                }}
+              >
+                E25
+              </span>
+              <span
+                className="inline-block px-1.5 py-0.5 text-[10px] font-bold mr-0.5"
+                style={{
+                  backgroundColor: CRM_COLORS['E26'],
+                  color: '#0f172a',
+                  borderRadius: '2px',
+                }}
+              >
+                E26
+              </span>
+              <span
+                className="inline-block px-1.5 py-0.5 text-[10px] font-bold mr-0.5"
+                style={{
+                  backgroundColor: CRM_COLORS['E53'],
+                  color: '#0f172a',
+                  borderRadius: '2px',
+                }}
+              >
+                E53
+              </span>
+              <span
+                className="inline-block px-1.5 py-0.5 text-[10px] font-bold mr-0.5"
+                style={{
+                  backgroundColor: CRM_COLORS['E74'],
+                  color: '#0f172a',
+                  borderRadius: '2px',
+                }}
+              >
+                E74
+              </span>
               {' -> prov:wasDerivedFrom -> PROV record'}
             </div>
             <div className="text-stm-warm-500">
@@ -1319,21 +1358,86 @@ function ProvenanceBoundarySection() {
           </h4>
           <div className="bg-stm-warm-50 p-4 font-mono text-xs text-stm-warm-600 space-y-1.5">
             <div>
-              <span style={{ color: CRM_COLORS.E41 }}>E41 name</span>
-              {' -> P128i -> '}
-              <span style={{ color: CRM_COLORS.E22 }}>E22 source</span>
-              {' (+ source year/time)'}
+              <span
+                className="inline-block px-1.5 py-0.5 text-[10px] font-bold mr-0.5"
+                style={{
+                  backgroundColor: CRM_COLORS['E41'],
+                  color: '#0f172a',
+                  borderRadius: '2px',
+                }}
+              >
+                E41
+              </span>
+              {' name -> P128i -> '}
+              <span
+                className="inline-block px-1.5 py-0.5 text-[10px] font-bold mr-0.5"
+                style={{
+                  backgroundColor: CRM_COLORS['E22'],
+                  color: '#0f172a',
+                  borderRadius: '2px',
+                }}
+              >
+                E22
+              </span>
+              {' source (+ source year/time)'}
             </div>
             <div>
-              <span style={{ color: CRM_COLORS.E13 }}>E13/E17 assertion</span>
-              {' -> prov:hadPrimarySource -> '}
-              <span style={{ color: CRM_COLORS.E22 }}>E22 source</span>
-              {' + P4 -> E52'}
+              <span
+                className="inline-block px-1.5 py-0.5 text-[10px] font-bold mr-0.5"
+                style={{
+                  backgroundColor: CRM_COLORS['E13'],
+                  color: '#0f172a',
+                  borderRadius: '2px',
+                }}
+              >
+                E13
+              </span>
+              <span
+                className="inline-block px-1.5 py-0.5 text-[10px] font-bold mr-0.5"
+                style={{
+                  backgroundColor: CRM_COLORS['E17'],
+                  color: '#0f172a',
+                  borderRadius: '2px',
+                }}
+              >
+                E17
+              </span>
+              {' assertion -> prov:hadPrimarySource -> '}
+              <span
+                className="inline-block px-1.5 py-0.5 text-[10px] font-bold mr-0.5"
+                style={{
+                  backgroundColor: CRM_COLORS['E22'],
+                  color: '#0f172a',
+                  borderRadius: '2px',
+                }}
+              >
+                E22
+              </span>
+              {' source + P4 -> E52'}
             </div>
             <div>
-              <span style={{ color: CRM_COLORS.E53 }}>E53 location</span>
-              {' -> P70i is documented in -> '}
-              <span style={{ color: CRM_COLORS.E22 }}>E22 source</span>
+              <span
+                className="inline-block px-1.5 py-0.5 text-[10px] font-bold mr-0.5"
+                style={{
+                  backgroundColor: CRM_COLORS['E53'],
+                  color: '#0f172a',
+                  borderRadius: '2px',
+                }}
+              >
+                E53
+              </span>
+              {' location -> P70i is documented in -> '}
+              <span
+                className="inline-block px-1.5 py-0.5 text-[10px] font-bold mr-0.5"
+                style={{
+                  backgroundColor: CRM_COLORS['E22'],
+                  color: '#0f172a',
+                  borderRadius: '2px',
+                }}
+              >
+                E22
+              </span>
+              {' source'}
             </div>
           </div>
         </div>
