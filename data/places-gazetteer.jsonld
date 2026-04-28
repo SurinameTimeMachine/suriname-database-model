@@ -58244,47 +58244,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01174",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01174",
-      "type": "plantation",
-      "prefLabel": "Rozenburg",
-      "altLabels": [],
-      "broader": "stm-00005",
-      "description": "",
-      "location": {
-        "lat": 5.807542926666667,
-        "lng": -54.77762015416667,
-        "wkt": "Polygon ((-54.79141246 5.79988119, -54.79109408 5.80292438, -54.78938604 5.81582527, -54.76608148 5.81543930, -54.76199215 5.81525835, -54.75668488 5.81493014, -54.75553052 5.81138443, -54.77773277 5.80263352, -54.78026711 5.80483069, -54.78302272 5.80468984, -54.78682518 5.80283682, -54.79141246 5.79988119))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q59133171",
-      "fid": 2258,
-      "psurIds": [
-        "PSUR0300"
-      ],
-      "district": "Divisie Boven-Commewijne",
-      "locationDescription": "Boven-Commewijne",
-      "locationDescriptionOriginal": "Rivier Commewijne, (boven) regterhand in het afvaren",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59133171",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02475",
       "@type": [
         "E25_Human-Made_Feature"
@@ -76699,6 +76658,78 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emU0dWMU1PZTZjT0E/view?usp=sharing&resourcekey=0-ZsaGtw7z3KIBKE-d5Ti0og",
           "author": "Philip Dikland",
           "year": "2008",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01174",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01174",
+      "type": "plantation",
+      "broader": "stm-00005",
+      "description": "",
+      "location": {
+        "lat": 5.807542926666667,
+        "lng": -54.77762015416667,
+        "wkt": "Polygon ((-54.79141246 5.79988119, -54.79109408 5.80292438, -54.78938604 5.81582527, -54.76608148 5.81543930, -54.76199215 5.81525835, -54.75668488 5.81493014, -54.75553052 5.81138443, -54.77773277 5.80263352, -54.78026711 5.80483069, -54.78302272 5.80468984, -54.78682518 5.80283682, -54.79141246 5.79988119))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q59133171",
+      "fid": 2258,
+      "psurIds": [
+        "PSUR0300"
+      ],
+      "district": "Divisie Boven-Commewijne",
+      "locationDescription": "Boven-Commewijne",
+      "locationDescriptionOriginal": "Rivier Commewijne, (boven) regterhand in het afvaren",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-28",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59133171",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Rozenburg",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "Roozenburg",
+          "language": "nl",
+          "type": "variant",
+          "isPreferred": false
+        },
+        {
+          "text": "sandiki",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false
+        },
+        {
+          "text": "van Sandick",
+          "language": "nl",
+          "type": "vernacular",
+          "isPreferred": false
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Roozenburg 2004-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emdU52T3hfNHpRblU/view?usp=sharing&resourcekey=0-dnq6ZlWcnf4j93kAV-uydA",
+          "author": "Philip Dikland",
+          "year": "2004, aangevuld 2007",
           "notes": null
         }
       ]
