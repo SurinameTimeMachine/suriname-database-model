@@ -59134,44 +59134,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00749",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-00749",
-      "type": "plantation",
-      "prefLabel": "Siparipabo",
-      "altLabels": [],
-      "broader": "stm-00005",
-      "description": "",
-      "location": {
-        "lat": 5.776754907058824,
-        "lng": -54.77647056647058,
-        "wkt": "Polygon ((-54.77442589 5.77913332, -54.77016166 5.77623148, -54.76873342 5.77162512, -54.76702698 5.76870307, -54.76987202 5.76693574, -54.77227969 5.76662007, -54.78324630 5.76419751, -54.78438866 5.77544083, -54.78264805 5.77572856, -54.78264410 5.77822667, -54.78068562 5.77824482, -54.78105103 5.78606705, -54.78008261 5.78645546, -54.77551220 5.78559345, -54.77635514 5.78440225, -54.77646037 5.78209470, -54.77442589 5.77913332))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken"
-      ],
-      "wikidataQid": "Q59133831",
-      "fid": 1832,
-      "psurIds": [],
-      "district": "Divisie Boven-Commewijne",
-      "locationDescription": "Boven-Commewijne",
-      "locationDescriptionOriginal": "Rivier Commewijne, (boven) linkerhand in het afvaren",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59133831",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02112",
       "@type": [
         "E25_Human-Made_Feature"
@@ -77015,6 +76977,75 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emOWZLWmRKR2loZWc/view?usp=sharing&resourcekey=0-FuSsfxEm176p5v_uX9-GWw",
           "author": "Philip Dikland",
           "year": "2004, aangevuld 2005, 2007, 2008, 2009",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-00749",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-00749",
+      "type": "plantation",
+      "broader": "stm-00005",
+      "description": "",
+      "location": {
+        "lat": 5.776754907058824,
+        "lng": -54.77647056647058,
+        "wkt": "Polygon ((-54.77442589 5.77913332, -54.77016166 5.77623148, -54.76873342 5.77162512, -54.76702698 5.76870307, -54.76987202 5.76693574, -54.77227969 5.76662007, -54.78324630 5.76419751, -54.78438866 5.77544083, -54.78264805 5.77572856, -54.78264410 5.77822667, -54.78068562 5.77824482, -54.78105103 5.78606705, -54.78008261 5.78645546, -54.77551220 5.78559345, -54.77635514 5.78440225, -54.77646037 5.78209470, -54.77442589 5.77913332))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken"
+      ],
+      "wikidataQid": "Q59133831",
+      "fid": 1832,
+      "psurIds": [],
+      "district": "Divisie Boven-Commewijne",
+      "locationDescription": "Boven-Commewijne",
+      "locationDescriptionOriginal": "Rivier Commewijne, (boven) linkerhand in het afvaren",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-28",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59133831",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Siparipabo",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "ma-rika",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false
+        },
+        {
+          "text": "morico kreek ?",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false
+        },
+        {
+          "text": "Marcus ?",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Siparipabo 2001-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emeXlwWkZEYlhjLUk/view?usp=sharing&resourcekey=0-wPIylUP74CaSKng7UZfFsQ",
+          "author": "Philip Dikland",
+          "year": "2001, aangevuld 2010",
           "notes": null
         }
       ]
