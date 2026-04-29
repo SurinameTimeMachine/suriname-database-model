@@ -7,7 +7,10 @@ import type {
   PlaceName,
 } from '@/lib/types';
 import { getPreferredName } from '@/lib/types';
+import dynamic from 'next/dynamic';
 import { type ReactNode, useCallback, useMemo, useState } from 'react';
+
+const PlaceMergeMap = dynamic(() => import('./PlaceMergeMap'), { ssr: false });
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -97,18 +100,21 @@ function computeMergedPlace(
   const pick = <T,>(choice: ScalarChoice, va: T, vb: T): T =>
     choice === 'a' ? va : vb;
 
-  const sources = [...new Set([...placeA.sources, ...placeB.sources])].filter(
-    (s) => !resolution.excludedSources.has(s),
-  );
+  const sources = [
+    ...new Set([...(placeA.sources || []), ...(placeB.sources || [])]),
+  ].filter((s) => !resolution.excludedSources.has(s));
 
-  const psurIds = [...new Set([...placeA.psurIds, ...placeB.psurIds])].filter(
-    (id) => !resolution.excludedPsurIds.has(id),
-  );
+  const psurIds = [
+    ...new Set([...(placeA.psurIds || []), ...(placeB.psurIds || [])]),
+  ].filter((id) => !resolution.excludedPsurIds.has(id));
 
   // Deduplicate external links by authority+identifier
   const seenLinks = new Set<string>();
   const externalLinks: ExternalLink[] = [];
-  for (const l of [...placeA.externalLinks, ...placeB.externalLinks]) {
+  for (const l of [
+    ...(placeA.externalLinks || []),
+    ...(placeB.externalLinks || []),
+  ]) {
     const dedupeKey = `${l.authority}:${l.identifier}`;
     const jsonKey = JSON.stringify(l);
     if (
@@ -123,7 +129,10 @@ function computeMergedPlace(
   // Deduplicate dikland refs by JSON equality
   const seenDikland = new Set<string>();
   const diklandRefs: DiklandRef[] = [];
-  for (const r of [...placeA.diklandRefs, ...placeB.diklandRefs]) {
+  for (const r of [
+    ...(placeA.diklandRefs || []),
+    ...(placeB.diklandRefs || []),
+  ]) {
     const key = JSON.stringify(r);
     if (!seenDikland.has(key) && !resolution.excludedDiklandRefs.has(key)) {
       seenDikland.add(key);
@@ -427,19 +436,22 @@ export default function PlaceMergeView({
 
   // Derive union arrays for display
   const allSources = useMemo(
-    () => [...new Set([...placeA.sources, ...placeB.sources])],
+    () => [...new Set([...(placeA.sources || []), ...(placeB.sources || [])])],
     [placeA.sources, placeB.sources],
   );
 
   const allPsurIds = useMemo(
-    () => [...new Set([...placeA.psurIds, ...placeB.psurIds])],
+    () => [...new Set([...(placeA.psurIds || []), ...(placeB.psurIds || [])])],
     [placeA.psurIds, placeB.psurIds],
   );
 
   const allExternalLinks = useMemo(() => {
     const seen = new Set<string>();
     const result: ExternalLink[] = [];
-    for (const l of [...placeA.externalLinks, ...placeB.externalLinks]) {
+    for (const l of [
+      ...(placeA.externalLinks || []),
+      ...(placeB.externalLinks || []),
+    ]) {
       const key = `${l.authority}:${l.identifier}`;
       if (!seen.has(key)) {
         seen.add(key);
@@ -452,7 +464,10 @@ export default function PlaceMergeView({
   const allDiklandRefs = useMemo(() => {
     const seen = new Set<string>();
     const result: DiklandRef[] = [];
-    for (const r of [...placeA.diklandRefs, ...placeB.diklandRefs]) {
+    for (const r of [
+      ...(placeA.diklandRefs || []),
+      ...(placeB.diklandRefs || []),
+    ]) {
       const key = JSON.stringify(r);
       if (!seen.has(key)) {
         seen.add(key);
@@ -511,6 +526,17 @@ export default function PlaceMergeView({
                 onSetPrimary={() => setPrimaryId(placeB.id)}
               />
             </div>
+          </section>
+
+          {/* Comparison map */}
+          <section>
+            <SectionHeader>Location overview</SectionHeader>
+            <PlaceMergeMap
+              locationA={placeA.location}
+              locationB={placeB.location}
+              nameA={getPreferredName(placeA)}
+              nameB={getPreferredName(placeB)}
+            />
           </section>
 
           {/* Names */}
