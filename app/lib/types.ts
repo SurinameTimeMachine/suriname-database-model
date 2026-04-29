@@ -322,6 +322,8 @@ export interface GazetteerPlace {
   diklandRefs: DiklandRef[];
   modifiedBy: string | null;
   modifiedAt: string | null;
+  /** Set when this entry has been merged into another place. The value is the surviving place ID. */
+  mergedInto?: string;
 }
 
 // Union type for entity lookups

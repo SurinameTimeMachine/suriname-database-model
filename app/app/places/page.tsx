@@ -1,6 +1,7 @@
 'use client';
 
 import PlaceEditor from '@/components/PlaceEditor';
+import PlaceMergeView from '@/components/PlaceMergeView';
 import SourceFilter, {
   emptyFilterState,
   type SourceFilterState,
@@ -323,6 +324,25 @@ function normalizeStatusAssertionsFromLegacy(
   return [];
 }
 
+function normalizePlaceEntry(p: GazetteerPlace): GazetteerPlace {
+  return {
+    ...p,
+    names: normalizeNamesFromLegacy(p as unknown as Record<string, unknown>),
+    districtAssertions: normalizeDistrictAssertionsFromLegacy(
+      p as unknown as Record<string, unknown>,
+    ),
+    productAssertions: normalizeProductAssertionsFromLegacy(
+      p as unknown as Record<string, unknown>,
+    ),
+    locationAssertions: normalizeLocationAssertionsFromLegacy(
+      p as unknown as Record<string, unknown>,
+    ),
+    statusAssertions: normalizeStatusAssertionsFromLegacy(
+      p as unknown as Record<string, unknown>,
+    ),
+  };
+}
+
 function getCurrentDistrictLabel(place: GazetteerPlace): string | null {
   const assertions = place.districtAssertions || [];
   const effective = getEffectiveDistrictAssertion(assertions);
@@ -412,6 +432,8 @@ interface PlaceRowProps {
   place: GazetteerPlace;
   isSelected: boolean;
   onSelect: (id: string) => void;
+  mergeChecked?: boolean;
+  onMergeCheck?: (id: string, checked: boolean) => void;
   colors: Record<string, string>;
   labels: Record<string, string>;
   visibleColumns: Set<SortKey>;
@@ -421,6 +443,8 @@ const PlaceRow = memo(function PlaceRow({
   place,
   isSelected,
   onSelect,
+  mergeChecked,
+  onMergeCheck,
   colors,
   labels,
   visibleColumns,
@@ -439,6 +463,22 @@ const PlaceRow = memo(function PlaceRow({
         isSelected ? 'bg-stm-sepia-50' : 'bg-white hover:bg-stm-warm-50'
       }`}
     >
+      {/* Merge checkbox */}
+      {onMergeCheck !== undefined && (
+        <td
+          className="py-1.5 px-2 w-8"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <input
+            type="checkbox"
+            checked={!!mergeChecked}
+            onChange={(e) => onMergeCheck(place.id, e.target.checked)}
+            className="accent-stm-sepia-500 cursor-pointer"
+            aria-label={`Select ${getPreferredName(place)} for merge`}
+            disabled={!!place.mergedInto}
+          />
+        </td>
+      )}
       {/* Name — always visible */}
       <td className="py-1.5 px-2 font-medium text-stm-warm-800 max-w-55 truncate">
         {getPreferredName(place)}
@@ -646,6 +686,12 @@ function PlacesPageInner() {
     loadVisibleColumns(),
   );
   const [columnsOpen, setColumnsOpen] = useState(false);
+  const [mergeCheckIds, setMergeCheckIds] = useState<string[]>([]);
+  const [showMerged, setShowMerged] = useState(false);
+  const [mergeView, setMergeView] = useState<{
+    placeA: GazetteerPlace;
+    placeB: GazetteerPlace;
+  } | null>(null);
   const columnsRef = useRef<HTMLDivElement>(null);
 
   // URL sync: read ?place= query param
@@ -669,26 +715,7 @@ function PlacesPageInner() {
         const entries: GazetteerPlace[] = data['@graph'] || data;
         if (!Array.isArray(entries)) return;
         // Normalize: support legacy prefLabel/altLabels and preserve source metadata.
-        setPlaces(
-          entries.map((p) => ({
-            ...p,
-            names: normalizeNamesFromLegacy(
-              p as unknown as Record<string, unknown>,
-            ),
-            districtAssertions: normalizeDistrictAssertionsFromLegacy(
-              p as unknown as Record<string, unknown>,
-            ),
-            productAssertions: normalizeProductAssertionsFromLegacy(
-              p as unknown as Record<string, unknown>,
-            ),
-            locationAssertions: normalizeLocationAssertionsFromLegacy(
-              p as unknown as Record<string, unknown>,
-            ),
-            statusAssertions: normalizeStatusAssertionsFromLegacy(
-              p as unknown as Record<string, unknown>,
-            ),
-          })),
-        );
+        setPlaces(entries.map(normalizePlaceEntry));
       })
       .finally(() => setLoading(false));
 
@@ -748,9 +775,69 @@ function PlacesPageInner() {
     [syncUrlToSelection],
   );
 
+  const handleMergeCheck = useCallback(
+    (id: string, checked: boolean) => {
+      setMergeCheckIds((prev) => {
+        if (checked) {
+          const place = places.find((p) => p.id === id);
+          if (!place || place.mergedInto) return prev;
+          if (prev.length >= 2 || prev.includes(id)) return prev;
+          return [...prev, id];
+        }
+        return prev.filter((x) => x !== id);
+      });
+    },
+    [places],
+  );
+
+  const handleOpenMergeView = useCallback(() => {
+    if (mergeCheckIds.length !== 2) return;
+    const placeA = places.find((p) => p.id === mergeCheckIds[0]);
+    const placeB = places.find((p) => p.id === mergeCheckIds[1]);
+    if (placeA && placeB) {
+      setMergeView({ placeA, placeB });
+      setSelectedIds([]);
+      setIsCreating(false);
+    }
+  }, [mergeCheckIds, places]);
+
+  const handleMergeConfirm = useCallback(
+    async (merged: GazetteerPlace, retiredId: string) => {
+      const res = await fetch('/api/places/merge', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          primaryId: merged.id,
+          retiredId,
+          mergedPlace: merged,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to merge');
+      }
+      // Reload gazetteer from the updated public copy
+      const gazetteRes = await fetch('/data/places-gazetteer.jsonld');
+      const gazetteData = await gazetteRes.json();
+      const entries: GazetteerPlace[] = gazetteData['@graph'] || gazetteData;
+      if (Array.isArray(entries)) {
+        setPlaces(entries.map(normalizePlaceEntry));
+      }
+      setMergeView(null);
+      setMergeCheckIds([]);
+      setSelectedIds([merged.id]);
+      syncUrlToSelection([merged.id]);
+    },
+    [syncUrlToSelection],
+  );
+
   // Filter, search, and sort
   const filtered = useMemo(() => {
     let list = places;
+    // Hide merged-retired entries unless explicitly shown
+    if (!showMerged) {
+      list = list.filter((p) => !p.mergedInto);
+    }
     if (typeFilter !== 'all') {
       list = list.filter((p) => p.type === typeFilter);
     }
@@ -851,7 +938,12 @@ function PlacesPageInner() {
       }
     });
     return list;
-  }, [places, typeFilter, search, sortKey, sortDir, sourceFilter]);
+  }, [places, typeFilter, search, sortKey, sortDir, sourceFilter, showMerged]);
+
+  const mergedCount = useMemo(
+    () => places.filter((p) => p.mergedInto).length,
+    [places],
+  );
 
   const districts = useMemo(
     () => places.filter((p) => p.type === 'district'),
@@ -1053,6 +1145,15 @@ function PlacesPageInner() {
         </div>
       </div>
 
+      {mergeView ? (
+        <PlaceMergeView
+          placeA={mergeView.placeA}
+          placeB={mergeView.placeB}
+          districts={districts}
+          onMerge={handleMergeConfirm}
+          onCancel={() => setMergeView(null)}
+        />
+      ) : (
       <>
         {/* Search + filters */}
         <div className="border-b border-stm-warm-100 bg-white/50">
@@ -1205,6 +1306,31 @@ function PlacesPageInner() {
                 )}
               </div>
 
+              {/* Merge selection controls — shown when 1 or 2 entries are checked */}
+              {canEdit && mergeCheckIds.length > 0 && (
+                <div className="flex items-center gap-2 border-l border-stm-warm-200 pl-3 shrink-0">
+                  <span className="text-xs text-stm-sepia-600 whitespace-nowrap">
+                    {mergeCheckIds.length === 1
+                      ? '1 selected — pick 1 more'
+                      : '2 selected'}
+                  </span>
+                  {mergeCheckIds.length === 2 && (
+                    <button
+                      onClick={handleOpenMergeView}
+                      className="px-3 py-1.5 text-sm font-medium bg-stm-sepia-600 text-white hover:bg-stm-sepia-700 transition-colors"
+                    >
+                      Merge selected
+                    </button>
+                  )}
+                  <button
+                    onClick={() => setMergeCheckIds([])}
+                    className="text-xs text-stm-warm-400 hover:text-stm-warm-600 underline"
+                  >
+                    clear
+                  </button>
+                </div>
+              )}
+
               {/* Add button */}
               {canEdit && (
                 <button
@@ -1226,14 +1352,48 @@ function PlacesPageInner() {
         <div className="flex-1 overflow-hidden flex">
           {/* Place table */}
           <div className="flex-1 overflow-auto">
-            <div className="text-xs text-stm-warm-400 px-4 sm:px-6 lg:px-8 pt-2 pb-1 max-w-350 mx-auto">
-              {filtered.length} of {places.length} places
+            <div className="text-xs text-stm-warm-400 px-4 sm:px-6 lg:px-8 pt-2 pb-1 max-w-350 mx-auto flex items-center gap-3">
+              <span>
+                {filtered.length} of {places.length} places
+              </span>
+              {mergedCount > 0 && (
+                <span>
+                  &middot;{' '}
+                  {showMerged ? (
+                    <>
+                      {mergedCount} merged shown{' '}
+                      <button
+                        onClick={() => setShowMerged(false)}
+                        className="underline hover:text-stm-sepia-600"
+                      >
+                        hide
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      {mergedCount} merged hidden{' '}
+                      <button
+                        onClick={() => setShowMerged(true)}
+                        className="underline hover:text-stm-sepia-600"
+                      >
+                        show
+                      </button>
+                    </>
+                  )}
+                </span>
+              )}
             </div>
 
             <div className="px-4 sm:px-6 lg:px-8 pb-4 max-w-350 mx-auto">
               <table className="w-full text-sm border-collapse">
                 <thead className="sticky top-0 z-10 bg-white">
                   <tr className="text-left text-xs text-stm-warm-500 border-b border-stm-warm-200">
+                    {canEdit && (
+                      <th
+                        className="py-2 px-2 w-8"
+                        aria-label="Select for merge"
+                      />
+                    )}
                     {COLUMN_DEFS.filter(
                       (col) => col.alwaysVisible || visibleColumns.has(col.key),
                     ).map((col) => (
@@ -1255,6 +1415,10 @@ function PlacesPageInner() {
                       place={place}
                       isSelected={selectedIds.includes(place.id)}
                       onSelect={handleRowSelect}
+                      mergeChecked={
+                        canEdit ? mergeCheckIds.includes(place.id) : undefined
+                      }
+                      onMergeCheck={canEdit ? handleMergeCheck : undefined}
                       colors={colors}
                       labels={labels}
                       visibleColumns={visibleColumns}
@@ -1288,6 +1452,7 @@ function PlacesPageInner() {
           )}
         </div>
       </>
+      )}
     </div>
   );
 }
