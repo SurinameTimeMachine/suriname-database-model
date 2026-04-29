@@ -35,6 +35,18 @@ Primary data lives in `/data/` with these key sources:
 - `06-almanakken/` — Annual plantation observations
 - `05-slave-emancipation/` — Slave registers with PSUR IDs
 
+## Source Registry Rules (Mandatory)
+
+- The canonical source authority is `data/sources-registry.jsonld`.
+- Every source reference used in transformations, JSON-LD, or UI must resolve to a registry E22 entry.
+- Never introduce ad-hoc source IDs/URIs in scripts or components.
+- If a new source is needed, add/update it in the registry and ensure it is visible on `/sources`.
+
+## Provenance Boundary (Mandatory)
+
+- Distinguish entity-level provenance (`prov:wasDerivedFrom`) from assertion-level provenance (E41/E13/E17 statements tied to E22 + time context).
+- For changeable values (names, roles, products, locations, notes), prefer assertion-level provenance over flat record fields.
+
 ## Output Locations
 
 - RDF/Turtle files → `/lod/ttl/`

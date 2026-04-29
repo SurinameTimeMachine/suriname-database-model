@@ -13,6 +13,9 @@
     "pipeline": "tsx scripts/generate-database.ts && tsx scripts/prepare-data.ts",
     "prepare-data": "tsx scripts/prepare-data.ts",
     "seed-gazetteer": "tsx scripts/seed-gazetteer.ts",
+    "derive-lifecycle": "tsx scripts/derive-lifecycle-status.ts",
+    "derive-products": "tsx scripts/derive-product-assertions.ts",
+    "derive-presence": "tsx scripts/derive-source-presence.ts",
     "start": "next start"
   },
   "dependencies": {

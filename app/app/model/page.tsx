@@ -1286,6 +1286,174 @@ function TemporalModelSection() {
   );
 }
 
+function ProvenanceBoundarySection() {
+  return (
+    <div className="bg-white border border-stm-warm-200 p-6">
+      <h3 className="font-serif text-xl font-bold text-stm-warm-800 mb-3">
+        Provenance Boundary
+      </h3>
+      <p className="text-sm text-stm-warm-600 leading-relaxed mb-4">
+        Provenance starts at different levels depending on what is being
+        modeled. Entity-level provenance tracks how a current record was
+        derived, while assertion-level provenance tracks where each mutable
+        value comes from.
+      </p>
+      <div className="grid md:grid-cols-2 gap-6">
+        <div>
+          <h4 className="text-sm font-semibold text-stm-warm-700 mb-2">
+            Entity-level provenance
+          </h4>
+          <div className="bg-stm-warm-50 p-4 font-mono text-xs text-stm-warm-600 space-y-1.5">
+            <div>
+              <span
+                className="inline-block px-1.5 py-0.5 text-[10px] font-bold mr-0.5"
+                style={{
+                  backgroundColor: CRM_COLORS['E25'],
+                  color: '#0f172a',
+                  borderRadius: '2px',
+                }}
+              >
+                E25
+              </span>
+              <span
+                className="inline-block px-1.5 py-0.5 text-[10px] font-bold mr-0.5"
+                style={{
+                  backgroundColor: CRM_COLORS['E26'],
+                  color: '#0f172a',
+                  borderRadius: '2px',
+                }}
+              >
+                E26
+              </span>
+              <span
+                className="inline-block px-1.5 py-0.5 text-[10px] font-bold mr-0.5"
+                style={{
+                  backgroundColor: CRM_COLORS['E53'],
+                  color: '#0f172a',
+                  borderRadius: '2px',
+                }}
+              >
+                E53
+              </span>
+              <span
+                className="inline-block px-1.5 py-0.5 text-[10px] font-bold mr-0.5"
+                style={{
+                  backgroundColor: CRM_COLORS['E74'],
+                  color: '#0f172a',
+                  borderRadius: '2px',
+                }}
+              >
+                E74
+              </span>
+              {' -> prov:wasDerivedFrom -> PROV record'}
+            </div>
+            <div className="text-stm-warm-500">
+              Use for record lineage and transformation audit.
+            </div>
+          </div>
+        </div>
+        <div>
+          <h4 className="text-sm font-semibold text-stm-warm-700 mb-2">
+            Assertion-level provenance
+          </h4>
+          <div className="bg-stm-warm-50 p-4 font-mono text-xs text-stm-warm-600 space-y-1.5">
+            <div>
+              <span
+                className="inline-block px-1.5 py-0.5 text-[10px] font-bold mr-0.5"
+                style={{
+                  backgroundColor: CRM_COLORS['E41'],
+                  color: '#0f172a',
+                  borderRadius: '2px',
+                }}
+              >
+                E41
+              </span>
+              {' name -> P128i -> '}
+              <span
+                className="inline-block px-1.5 py-0.5 text-[10px] font-bold mr-0.5"
+                style={{
+                  backgroundColor: CRM_COLORS['E22'],
+                  color: '#0f172a',
+                  borderRadius: '2px',
+                }}
+              >
+                E22
+              </span>
+              {' source (+ source year/time)'}
+            </div>
+            <div>
+              <span
+                className="inline-block px-1.5 py-0.5 text-[10px] font-bold mr-0.5"
+                style={{
+                  backgroundColor: CRM_COLORS['E13'],
+                  color: '#0f172a',
+                  borderRadius: '2px',
+                }}
+              >
+                E13
+              </span>
+              <span
+                className="inline-block px-1.5 py-0.5 text-[10px] font-bold mr-0.5"
+                style={{
+                  backgroundColor: CRM_COLORS['E17'],
+                  color: '#0f172a',
+                  borderRadius: '2px',
+                }}
+              >
+                E17
+              </span>
+              {' assertion -> prov:hadPrimarySource -> '}
+              <span
+                className="inline-block px-1.5 py-0.5 text-[10px] font-bold mr-0.5"
+                style={{
+                  backgroundColor: CRM_COLORS['E22'],
+                  color: '#0f172a',
+                  borderRadius: '2px',
+                }}
+              >
+                E22
+              </span>
+              {' source + P4 -> E52'}
+            </div>
+            <div>
+              <span
+                className="inline-block px-1.5 py-0.5 text-[10px] font-bold mr-0.5"
+                style={{
+                  backgroundColor: CRM_COLORS['E53'],
+                  color: '#0f172a',
+                  borderRadius: '2px',
+                }}
+              >
+                E53
+              </span>
+              {' location -> P70i is documented in -> '}
+              <span
+                className="inline-block px-1.5 py-0.5 text-[10px] font-bold mr-0.5"
+                style={{
+                  backgroundColor: CRM_COLORS['E22'],
+                  color: '#0f172a',
+                  borderRadius: '2px',
+                }}
+              >
+                E22
+              </span>
+              {' source'}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="mt-4 bg-stm-sepia-50 border border-stm-sepia-200 p-3 text-xs text-stm-warm-600">
+        <p>
+          Source references are authoritative only when they resolve to
+          registered E22 entries in{' '}
+          <span className="font-mono">data/sources-registry.jsonld</span> and
+          are visible on the Sources page.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 /* ─── Main Page ────────────────────────────────────────────────── */
 export default function ModelPage() {
   return (
@@ -1400,6 +1568,10 @@ function ModelPageInner() {
         <div className="grid lg:grid-cols-2 gap-6 mb-10">
           <SpatialModelSection />
           <TemporalModelSection />
+        </div>
+
+        <div className="mb-10">
+          <ProvenanceBoundarySection />
         </div>
 
         {/* All entities quick reference */}

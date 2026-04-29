@@ -6,10 +6,20 @@ import SourceFilter, {
   type SourceFilterState,
 } from '@/components/SourceFilter';
 import { useAuth } from '@/lib/auth';
+import { type AllData, loadAllData } from '@/lib/data';
 import { getActiveSources, useSourceRegistry } from '@/lib/sources';
 import { usePlaceTypes } from '@/lib/thesaurus';
-import type { GazetteerPlace } from '@/lib/types';
+import type {
+  DistrictAssertion,
+  E41Appellation,
+  GazetteerPlace,
+  LocationAssertion,
+  PlantationStatusType,
+  ProductAssertion,
+  StatusAssertion,
+} from '@/lib/types';
 import { getPreferredName } from '@/lib/types';
+import { extractPlaceId } from '@/lib/url';
 import { useSearchParams } from 'next/navigation';
 import {
   memo,
@@ -36,6 +46,289 @@ type SortKey =
   | 'almanakken';
 type SortDir = 'asc' | 'desc';
 
+function normalizeNamesFromLegacy(entry: Record<string, unknown>) {
+  if (Array.isArray(entry.names)) {
+    return entry.names;
+  }
+
+  const prefLabel =
+    typeof entry.prefLabel === 'string' ? entry.prefLabel.trim() : '';
+  const altLabels = Array.isArray(entry.altLabels)
+    ? entry.altLabels.filter((x): x is string => typeof x === 'string')
+    : [];
+  const sources = Array.isArray(entry.sources)
+    ? entry.sources.filter((x): x is string => typeof x === 'string')
+    : [];
+  const sourceId = sources[0];
+
+  const names: Array<Record<string, unknown>> = [];
+  if (prefLabel) {
+    names.push({
+      text: prefLabel,
+      language: 'nl',
+      type: 'official',
+      isPreferred: true,
+    });
+  }
+  for (const label of altLabels) {
+    if (!label || label === prefLabel) continue;
+    names.push({
+      text: label,
+      language: 'und',
+      type: 'historical',
+      isPreferred: false,
+    });
+  }
+  return names;
+}
+
+function getEffectiveDistrictAssertion(
+  assertions: DistrictAssertion[],
+): DistrictAssertion | null {
+  if (assertions.length === 0) return null;
+  const explicitCurrent = assertions.find((a) => a.isCurrent);
+  if (explicitCurrent) return explicitCurrent;
+  const withYear = assertions.filter((a) => typeof a.sourceYear === 'number');
+  if (withYear.length > 0) {
+    return withYear.sort(
+      (a, b) => (b.sourceYear || 0) - (a.sourceYear || 0),
+    )[0];
+  }
+  return assertions[0];
+}
+
+function normalizeDistrictAssertionsFromLegacy(
+  entry: Record<string, unknown>,
+): DistrictAssertion[] {
+  if (Array.isArray(entry.districtAssertions)) {
+    return entry.districtAssertions
+      .filter((a): a is Record<string, unknown> =>
+        Boolean(a && typeof a === 'object'),
+      )
+      .map((a, idx) => ({
+        id:
+          typeof a.id === 'string' && a.id.trim()
+            ? a.id
+            : `district-assertion-${idx + 1}`,
+        districtId:
+          typeof a.districtId === 'string' && a.districtId.trim()
+            ? a.districtId
+            : null,
+        districtLabel:
+          typeof a.districtLabel === 'string' && a.districtLabel.trim()
+            ? a.districtLabel
+            : null,
+        source:
+          typeof a.source === 'string' && a.source.trim()
+            ? a.source
+            : 'almanakken',
+        sourceYear:
+          typeof a.sourceYear === 'number' && Number.isFinite(a.sourceYear)
+            ? a.sourceYear
+            : undefined,
+        certainty:
+          a.certainty === 'certain' ||
+          a.certainty === 'probable' ||
+          a.certainty === 'uncertain'
+            ? a.certainty
+            : undefined,
+        note: typeof a.note === 'string' && a.note.trim() ? a.note : null,
+        isCurrent: Boolean(a.isCurrent),
+      }));
+  }
+
+  const broader = typeof entry.broader === 'string' ? entry.broader : null;
+  const district = typeof entry.district === 'string' ? entry.district : null;
+  const sources = Array.isArray(entry.sources)
+    ? entry.sources.filter((x): x is string => typeof x === 'string')
+    : [];
+
+  if (!broader && !district) return [];
+
+  return [
+    {
+      id: 'district-assertion-1',
+      districtId: broader,
+      districtLabel: district,
+      source: preferAlmanakkenSource(sources),
+      sourceYear: undefined,
+      certainty: 'certain',
+      note: null,
+      isCurrent: true,
+    },
+  ];
+}
+
+function preferAlmanakkenSource(sources: string[]): string {
+  return sources.includes('almanakken')
+    ? 'almanakken'
+    : sources[0] || 'almanakken';
+}
+
+function normalizeProductAssertionsFromLegacy(
+  entry: Record<string, unknown>,
+): ProductAssertion[] {
+  const sources = Array.isArray(entry.sources)
+    ? entry.sources.filter((x): x is string => typeof x === 'string')
+    : [];
+  if (Array.isArray(entry.productAssertions)) {
+    return entry.productAssertions
+      .filter((a): a is Record<string, unknown> =>
+        Boolean(a && typeof a === 'object'),
+      )
+      .map((a, idx) => ({
+        id:
+          typeof a.id === 'string' && a.id.trim()
+            ? a.id
+            : `product-assertion-${idx + 1}`,
+        value: typeof a.value === 'string' && a.value.trim() ? a.value : '',
+        source:
+          typeof a.source === 'string' && a.source.trim()
+            ? a.source
+            : preferAlmanakkenSource(sources),
+        startYear:
+          typeof a.startYear === 'number' && Number.isFinite(a.startYear)
+            ? a.startYear
+            : undefined,
+        endYear:
+          typeof a.endYear === 'number' && Number.isFinite(a.endYear)
+            ? a.endYear
+            : undefined,
+        note: typeof a.note === 'string' && a.note.trim() ? a.note : null,
+      }))
+      .filter((a) => Boolean(a.value));
+  }
+
+  const placeType =
+    typeof entry.placeType === 'string' && entry.placeType.trim()
+      ? entry.placeType
+      : null;
+  if (!placeType) return [];
+  return [
+    {
+      id: 'product-assertion-1',
+      value: placeType,
+      source: preferAlmanakkenSource(sources),
+      startYear: undefined,
+      endYear: undefined,
+      note: null,
+    },
+  ];
+}
+
+function normalizeLocationAssertionsFromLegacy(
+  entry: Record<string, unknown>,
+): LocationAssertion[] {
+  const sources = Array.isArray(entry.sources)
+    ? entry.sources.filter((x): x is string => typeof x === 'string')
+    : [];
+  if (Array.isArray(entry.locationAssertions)) {
+    return entry.locationAssertions
+      .filter((a): a is Record<string, unknown> =>
+        Boolean(a && typeof a === 'object'),
+      )
+      .map((a, idx) => ({
+        id:
+          typeof a.id === 'string' && a.id.trim()
+            ? a.id
+            : `location-assertion-${idx + 1}`,
+        standardized:
+          typeof a.standardized === 'string' && a.standardized.trim()
+            ? a.standardized
+            : null,
+        original:
+          typeof a.original === 'string' && a.original.trim()
+            ? a.original
+            : null,
+        source:
+          typeof a.source === 'string' && a.source.trim()
+            ? a.source
+            : preferAlmanakkenSource(sources),
+        startYear:
+          typeof a.startYear === 'number' && Number.isFinite(a.startYear)
+            ? a.startYear
+            : undefined,
+        endYear:
+          typeof a.endYear === 'number' && Number.isFinite(a.endYear)
+            ? a.endYear
+            : undefined,
+        note: typeof a.note === 'string' && a.note.trim() ? a.note : null,
+      }))
+      .filter((a) => Boolean(a.standardized || a.original));
+  }
+
+  const locationDescription =
+    typeof entry.locationDescription === 'string' &&
+    entry.locationDescription.trim()
+      ? entry.locationDescription
+      : null;
+  const locationDescriptionOriginal =
+    typeof entry.locationDescriptionOriginal === 'string' &&
+    entry.locationDescriptionOriginal.trim()
+      ? entry.locationDescriptionOriginal
+      : null;
+  if (!locationDescription && !locationDescriptionOriginal) return [];
+  return [
+    {
+      id: 'location-assertion-1',
+      standardized: locationDescription,
+      original: locationDescriptionOriginal,
+      source: preferAlmanakkenSource(sources),
+      startYear: undefined,
+      endYear: undefined,
+      note: null,
+    },
+  ];
+}
+
+function normalizeStatusAssertionsFromLegacy(
+  entry: Record<string, unknown>,
+): StatusAssertion[] {
+  const sources = Array.isArray(entry.sources)
+    ? entry.sources.filter((x): x is string => typeof x === 'string')
+    : [];
+  if (Array.isArray(entry.statusAssertions)) {
+    return entry.statusAssertions
+      .filter((a): a is Record<string, unknown> =>
+        Boolean(a && typeof a === 'object'),
+      )
+      .map((a, idx) => ({
+        id:
+          typeof a.id === 'string' && a.id.trim()
+            ? a.id
+            : `status-assertion-${idx + 1}`,
+        status:
+          a.status === 'planned' ||
+          a.status === 'built' ||
+          a.status === 'abandoned' ||
+          a.status === 'reactivated' ||
+          a.status === 'unknown'
+            ? (a.status as PlantationStatusType)
+            : 'unknown',
+        source:
+          typeof a.source === 'string' && a.source.trim()
+            ? a.source
+            : preferAlmanakkenSource(sources),
+        startYear:
+          typeof a.startYear === 'number' && Number.isFinite(a.startYear)
+            ? a.startYear
+            : undefined,
+        endYear:
+          typeof a.endYear === 'number' && Number.isFinite(a.endYear)
+            ? a.endYear
+            : undefined,
+        note: typeof a.note === 'string' && a.note.trim() ? a.note : null,
+      }));
+  }
+  return [];
+}
+
+function getCurrentDistrictLabel(place: GazetteerPlace): string | null {
+  const assertions = place.districtAssertions || [];
+  const effective = getEffectiveDistrictAssertion(assertions);
+  return effective?.districtLabel || place.district || null;
+}
+
 function emptyPlace(): GazetteerPlace {
   return {
     id: `stm-new-${Date.now()}`,
@@ -50,9 +343,13 @@ function emptyPlace(): GazetteerPlace {
     fid: null,
     psurIds: [],
     district: null,
+    districtAssertions: [],
     locationDescription: null,
     locationDescriptionOriginal: null,
     placeType: null,
+    productAssertions: [],
+    locationAssertions: [],
+    statusAssertions: [],
     diklandRefs: [],
     modifiedBy: null,
     modifiedAt: null,
@@ -126,7 +423,9 @@ const PlaceRow = memo(function PlaceRow({
 
       {/* District */}
       <td className="py-1.5 px-2 text-stm-warm-600 max-w-35 truncate">
-        {place.district ?? <span className="text-stm-warm-200">--</span>}
+        {getCurrentDistrictLabel(place) ?? (
+          <span className="text-stm-warm-200">--</span>
+        )}
       </td>
 
       {/* Product / Type */}
@@ -261,6 +560,7 @@ function PlacesPageInner() {
     [allTypes, labels],
   );
   const [places, setPlaces] = useState<GazetteerPlace[]>([]);
+  const [allData, setAllData] = useState<AllData | null>(null);
   const [loading, setLoading] = useState(true);
   const { canEdit } = useAuth();
   const [search, setSearch] = useState('');
@@ -293,15 +593,33 @@ function PlacesPageInner() {
       .then((data) => {
         const entries: GazetteerPlace[] = data['@graph'] || data;
         if (!Array.isArray(entries)) return;
-        // Normalize: guard against legacy entries that lack names[]
+        // Normalize: support legacy prefLabel/altLabels and preserve source metadata.
         setPlaces(
           entries.map((p) => ({
             ...p,
-            names: Array.isArray(p.names) ? p.names : [],
+            names: normalizeNamesFromLegacy(
+              p as unknown as Record<string, unknown>,
+            ),
+            districtAssertions: normalizeDistrictAssertionsFromLegacy(
+              p as unknown as Record<string, unknown>,
+            ),
+            productAssertions: normalizeProductAssertionsFromLegacy(
+              p as unknown as Record<string, unknown>,
+            ),
+            locationAssertions: normalizeLocationAssertionsFromLegacy(
+              p as unknown as Record<string, unknown>,
+            ),
+            statusAssertions: normalizeStatusAssertionsFromLegacy(
+              p as unknown as Record<string, unknown>,
+            ),
           })),
         );
       })
       .finally(() => setLoading(false));
+
+    loadAllData()
+      .then(setAllData)
+      .catch(() => setAllData(null));
   }, []);
 
   // Initialize/update selection from URL ?place= param
@@ -390,7 +708,8 @@ function PlacesPageInner() {
               l.identifier.toLowerCase().includes(q) ||
               l.authority.toLowerCase().includes(q),
           ) ||
-          (p.district && p.district.toLowerCase().includes(q)) ||
+          (getCurrentDistrictLabel(p) &&
+            getCurrentDistrictLabel(p)?.toLowerCase().includes(q)) ||
           p.psurIds.some((id) => id.toLowerCase().includes(q)) ||
           (p.locationDescription &&
             p.locationDescription.toLowerCase().includes(q)),
@@ -414,7 +733,7 @@ function PlacesPageInner() {
         case 'type':
           return cmp(a.type, b.type);
         case 'district':
-          return cmp(a.district, b.district);
+          return cmp(getCurrentDistrictLabel(a), getCurrentDistrictLabel(b));
         case 'psurIds':
           return cmp(a.psurIds[0] ?? null, b.psurIds[0] ?? null);
         case 'externalLinks':
@@ -472,6 +791,57 @@ function PlacesPageInner() {
     if (!selectedId) return null;
     return places.find((p) => p.id === selectedId) || null;
   }, [places, selectedId, isCreating]);
+
+  const selectedSourceAppellations = useMemo(() => {
+    if (!allData?.geojson || !selectedId || isCreating) return [];
+
+    const selectedFeature = allData.geojson.features.find((f) => {
+      const props = f.properties;
+      return (
+        props.stmId === selectedId ||
+        extractPlaceId(props.placeUri) === selectedId ||
+        extractPlaceId(props.plantationUri) === selectedId ||
+        extractPlaceId(props.featureUri) === selectedId ||
+        f.id === selectedId
+      );
+    });
+
+    if (!selectedFeature) return [];
+
+    const props = selectedFeature.properties;
+    const plantationUri = props.plantationUri ?? null;
+    const featureUri = props.featureUri ?? props.placeUri ?? null;
+    let orgUri = props.organizationQid
+      ? `http://www.wikidata.org/entity/${props.organizationQid}`
+      : null;
+    if (!orgUri && plantationUri) {
+      orgUri =
+        allData.plantations[plantationUri]?.P52_has_current_owner ?? null;
+    }
+
+    const uriCandidates = [plantationUri, featureUri, orgUri].filter(
+      (uri): uri is string => Boolean(uri),
+    );
+
+    const gathered: E41Appellation[] = [];
+    for (const uri of uriCandidates) {
+      const apps = allData.appellations[uri] || [];
+      gathered.push(...apps);
+    }
+
+    return Array.from(new Map(gathered.map((a) => [a['@id'], a])).values()).map(
+      (app) => ({
+        id: app['@id'],
+        text: app.P190_has_symbolic_content,
+        language: app.P72_has_language,
+        sourceUri: app.P128i_is_carried_by,
+        sourceLabel: app.P128i_is_carried_by
+          ? allData.sources[app.P128i_is_carried_by]?.prefLabel || null
+          : null,
+        sourceYear: app.mapYear ? Number(app.mapYear) : undefined,
+      }),
+    );
+  }, [allData, selectedId, isCreating]);
 
   const typeCounts = useMemo(() => {
     const counts: Record<string, number> = { all: places.length };
@@ -736,6 +1106,7 @@ function PlacesPageInner() {
                 key={selectedPlace.id}
                 place={selectedPlace}
                 districts={districts}
+                sourceAppellations={selectedSourceAppellations}
                 canEdit={canEdit}
                 onSave={handleSave}
                 onCancel={handleCancel}
