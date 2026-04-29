@@ -1323,7 +1323,7 @@ function PlacesPageInner() {
                     <span className="text-xs text-stm-sepia-600 whitespace-nowrap">
                       {mergeCheckIds.length === 1
                         ? '1 of 2 selected'
-                        : '2 selected — ready to merge'}
+                        : '2 selected, ready to merge'}
                     </span>
                     {mergeCheckIds.length === 2 && (
                       <button

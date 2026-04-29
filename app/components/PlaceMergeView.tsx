@@ -234,7 +234,7 @@ function PlaceCard({
         </p>
         {isPrimary && (
           <p className="text-xs text-stm-sepia-600 font-medium mt-1.5">
-            Primary &mdash; this ID survives
+          Primary - this ID survives
           </p>
         )}
       </div>
@@ -489,37 +489,37 @@ export default function PlaceMergeView({
     return result;
   }, [placeA.diklandRefs, placeB.diklandRefs]);
 
-  const allStatusAssertions = useMemo(
-    () => [
+  const allStatusAssertions = useMemo(() => {
+    const seen = new Set<string>();
+    return [
       ...(placeA.statusAssertions || []),
       ...(placeB.statusAssertions || []),
-    ],
-    [placeA.statusAssertions, placeB.statusAssertions],
-  );
+    ].filter((a) => (seen.has(a.id) ? false : seen.add(a.id) && true));
+  }, [placeA.statusAssertions, placeB.statusAssertions]);
 
-  const allProductAssertions = useMemo(
-    () => [
+  const allProductAssertions = useMemo(() => {
+    const seen = new Set<string>();
+    return [
       ...(placeA.productAssertions || []),
       ...(placeB.productAssertions || []),
-    ],
-    [placeA.productAssertions, placeB.productAssertions],
-  );
+    ].filter((a) => (seen.has(a.id) ? false : seen.add(a.id) && true));
+  }, [placeA.productAssertions, placeB.productAssertions]);
 
-  const allDistrictAssertions = useMemo(
-    () => [
+  const allDistrictAssertions = useMemo(() => {
+    const seen = new Set<string>();
+    return [
       ...(placeA.districtAssertions || []),
       ...(placeB.districtAssertions || []),
-    ],
-    [placeA.districtAssertions, placeB.districtAssertions],
-  );
+    ].filter((a) => (seen.has(a.id) ? false : seen.add(a.id) && true));
+  }, [placeA.districtAssertions, placeB.districtAssertions]);
 
-  const allLocationAssertions = useMemo(
-    () => [
+  const allLocationAssertions = useMemo(() => {
+    const seen = new Set<string>();
+    return [
       ...(placeA.locationAssertions || []),
       ...(placeB.locationAssertions || []),
-    ],
-    [placeA.locationAssertions, placeB.locationAssertions],
-  );
+    ].filter((a) => (seen.has(a.id) ? false : seen.add(a.id) && true));
+  }, [placeA.locationAssertions, placeB.locationAssertions]);
 
   const includedNameCount = mergedNames.filter((n) => n.included).length;
 
@@ -544,7 +544,7 @@ export default function PlaceMergeView({
           {/* Primary selection */}
           <section>
             <SectionHeader>
-              Choose primary place &mdash; its ID survives
+              Choose primary place - its ID survives
             </SectionHeader>
             <div className="grid grid-cols-2 gap-4">
               <PlaceCard
@@ -568,7 +568,7 @@ export default function PlaceMergeView({
               Names &amp; alternative labels ({includedNameCount} kept)
             </SectionHeader>
             <p className="text-xs text-stm-warm-400 mb-3">
-              All names from both entries &mdash; official, historical,
+              All names from both entries: official, historical,
               vernacular, and variant spellings. Check to keep a name; use the
               radio button to set the preferred display name.
             </p>
@@ -691,7 +691,7 @@ export default function PlaceMergeView({
           <section>
             <SectionHeader>Location &amp; GIS polygon</SectionHeader>
             <p className="text-xs text-stm-warm-400 mb-3">
-              Only one GIS polygon can be kept after the merge &mdash; choose
+              Only one GIS polygon can be kept after the merge. Choose
               which place&apos;s coordinates and polygon to use.
             </p>
             <PlaceMergeMap
@@ -925,7 +925,7 @@ export default function PlaceMergeView({
                     {r.folderPath}
                     {r.author && (
                       <span className="text-stm-warm-400 ml-1">
-                        &mdash; {r.author}
+                        - {r.author}
                       </span>
                     )}
                     {r.year && (
@@ -949,8 +949,8 @@ export default function PlaceMergeView({
                 of {allStatusAssertions.length} kept)
               </SectionHeader>
               <p className="text-xs text-stm-warm-400 mb-2">
-                Records of when this place was built, active, or abandoned
-                &mdash; each tied to a specific source and time period.
+                records of when this place was built, active, or abandoned,
+                each tied to a specific source and time period.
               </p>
               <MergeArraySection
                 items={allStatusAssertions}
