@@ -28,6 +28,10 @@ interface MergeResolution {
   excludedPsurIds: Set<string>;
   excludedExternalLinks: Set<string>; // JSON.stringify'd link objects
   excludedDiklandRefs: Set<string>; // JSON.stringify'd ref objects
+  excludedStatusAssertions: Set<string>; // assertion .id values
+  excludedProductAssertions: Set<string>;
+  excludedDistrictAssertions: Set<string>;
+  excludedLocationAssertions: Set<string>;
 }
 
 interface MergedName {
@@ -86,6 +90,10 @@ function buildInitialResolution(): MergeResolution {
     excludedPsurIds: new Set(),
     excludedExternalLinks: new Set(),
     excludedDiklandRefs: new Set(),
+    excludedStatusAssertions: new Set(),
+    excludedProductAssertions: new Set(),
+    excludedDistrictAssertions: new Set(),
+    excludedLocationAssertions: new Set(),
   };
 }
 
@@ -166,19 +174,19 @@ function computeMergedPlace(
     statusAssertions: [
       ...(placeA.statusAssertions || []),
       ...(placeB.statusAssertions || []),
-    ],
+    ].filter((a) => !resolution.excludedStatusAssertions.has(a.id)),
     productAssertions: [
       ...(placeA.productAssertions || []),
       ...(placeB.productAssertions || []),
-    ],
+    ].filter((a) => !resolution.excludedProductAssertions.has(a.id)),
     districtAssertions: [
       ...(placeA.districtAssertions || []),
       ...(placeB.districtAssertions || []),
-    ],
+    ].filter((a) => !resolution.excludedDistrictAssertions.has(a.id)),
     locationAssertions: [
       ...(placeA.locationAssertions || []),
       ...(placeB.locationAssertions || []),
-    ],
+    ].filter((a) => !resolution.excludedLocationAssertions.has(a.id)),
   };
 }
 
@@ -410,7 +418,11 @@ export default function PlaceMergeView({
         | 'excludedSources'
         | 'excludedPsurIds'
         | 'excludedExternalLinks'
-        | 'excludedDiklandRefs',
+        | 'excludedDiklandRefs'
+        | 'excludedStatusAssertions'
+        | 'excludedProductAssertions'
+        | 'excludedDistrictAssertions'
+        | 'excludedLocationAssertions',
     ) =>
       (key: string) => {
         setResolution((r) => {
@@ -477,15 +489,37 @@ export default function PlaceMergeView({
     return result;
   }, [placeA.diklandRefs, placeB.diklandRefs]);
 
-  const totalAssertions =
-    (placeA.statusAssertions?.length ?? 0) +
-    (placeB.statusAssertions?.length ?? 0) +
-    (placeA.productAssertions?.length ?? 0) +
-    (placeB.productAssertions?.length ?? 0) +
-    (placeA.districtAssertions?.length ?? 0) +
-    (placeB.districtAssertions?.length ?? 0) +
-    (placeA.locationAssertions?.length ?? 0) +
-    (placeB.locationAssertions?.length ?? 0);
+  const allStatusAssertions = useMemo(
+    () => [
+      ...(placeA.statusAssertions || []),
+      ...(placeB.statusAssertions || []),
+    ],
+    [placeA.statusAssertions, placeB.statusAssertions],
+  );
+
+  const allProductAssertions = useMemo(
+    () => [
+      ...(placeA.productAssertions || []),
+      ...(placeB.productAssertions || []),
+    ],
+    [placeA.productAssertions, placeB.productAssertions],
+  );
+
+  const allDistrictAssertions = useMemo(
+    () => [
+      ...(placeA.districtAssertions || []),
+      ...(placeB.districtAssertions || []),
+    ],
+    [placeA.districtAssertions, placeB.districtAssertions],
+  );
+
+  const allLocationAssertions = useMemo(
+    () => [
+      ...(placeA.locationAssertions || []),
+      ...(placeB.locationAssertions || []),
+    ],
+    [placeA.locationAssertions, placeB.locationAssertions],
+  );
 
   const includedNameCount = mergedNames.filter((n) => n.included).length;
 
@@ -528,20 +562,16 @@ export default function PlaceMergeView({
             </div>
           </section>
 
-          {/* Comparison map */}
-          <section>
-            <SectionHeader>Location overview</SectionHeader>
-            <PlaceMergeMap
-              locationA={placeA.location}
-              locationB={placeB.location}
-              nameA={getPreferredName(placeA)}
-              nameB={getPreferredName(placeB)}
-            />
-          </section>
-
           {/* Names */}
           <section>
-            <SectionHeader>Names ({includedNameCount} included)</SectionHeader>
+            <SectionHeader>
+              Names &amp; alternative labels ({includedNameCount} kept)
+            </SectionHeader>
+            <p className="text-xs text-stm-warm-400 mb-3">
+              All names from both entries &mdash; official, historical,
+              vernacular, and variant spellings. Check to keep a name; use the
+              radio button to set the preferred display name.
+            </p>
             <div className="space-y-1.5">
               {mergedNames.map((mn, i) => {
                 const originBadge =
@@ -659,45 +689,72 @@ export default function PlaceMergeView({
 
           {/* Location */}
           <section>
-            <SectionHeader>Location</SectionHeader>
-            {JSON.stringify(placeA.location) ===
-            JSON.stringify(placeB.location) ? (
-              <SameValueRow
-                value={
-                  placeA.location.lat != null ? (
-                    <span className="font-mono text-xs">
-                      {placeA.location.lat.toFixed(4)},{' '}
-                      {placeA.location.lng?.toFixed(4)}
-                    </span>
-                  ) : (
-                    <em className="text-stm-warm-300 text-xs">
-                      no coordinates
-                    </em>
-                  )
-                }
-              />
-            ) : (
-              <MergeFieldRow
-                valueA={
-                  placeA.location.lat != null ? (
-                    <span className="font-mono text-xs">
-                      {placeA.location.lat.toFixed(4)},{' '}
-                      {placeA.location.lng?.toFixed(4)}
-                    </span>
-                  ) : null
-                }
-                valueB={
-                  placeB.location.lat != null ? (
-                    <span className="font-mono text-xs">
-                      {placeB.location.lat.toFixed(4)},{' '}
-                      {placeB.location.lng?.toFixed(4)}
-                    </span>
-                  ) : null
-                }
-                choice={resolution.location}
-                onChange={setScalar('location')}
-              />
-            )}
+            <SectionHeader>Location &amp; GIS polygon</SectionHeader>
+            <p className="text-xs text-stm-warm-400 mb-3">
+              Only one GIS polygon can be kept after the merge &mdash; choose
+              which place&apos;s coordinates and polygon to use.
+            </p>
+            <PlaceMergeMap
+              locationA={placeA.location}
+              locationB={placeB.location}
+              nameA={getPreferredName(placeA)}
+              nameB={getPreferredName(placeB)}
+            />
+            <div className="mt-3">
+              {JSON.stringify(placeA.location) ===
+              JSON.stringify(placeB.location) ? (
+                <SameValueRow
+                  value={
+                    placeA.location.lat != null ? (
+                      <span className="font-mono text-xs">
+                        {placeA.location.lat.toFixed(4)},{' '}
+                        {placeA.location.lng?.toFixed(4)}
+                        {placeA.location.wkt && (
+                          <span className="ml-2 text-stm-warm-400">
+                            + polygon
+                          </span>
+                        )}
+                      </span>
+                    ) : (
+                      <em className="text-stm-warm-300 text-xs">
+                        no coordinates
+                      </em>
+                    )
+                  }
+                />
+              ) : (
+                <MergeFieldRow
+                  valueA={
+                    placeA.location.lat != null ? (
+                      <span className="font-mono text-xs">
+                        {placeA.location.lat.toFixed(4)},{' '}
+                        {placeA.location.lng?.toFixed(4)}
+                        {placeA.location.wkt && (
+                          <span className="block text-stm-warm-400 text-[10px] mt-0.5">
+                            + GIS polygon
+                          </span>
+                        )}
+                      </span>
+                    ) : null
+                  }
+                  valueB={
+                    placeB.location.lat != null ? (
+                      <span className="font-mono text-xs">
+                        {placeB.location.lat.toFixed(4)},{' '}
+                        {placeB.location.lng?.toFixed(4)}
+                        {placeB.location.wkt && (
+                          <span className="block text-stm-warm-400 text-[10px] mt-0.5">
+                            + GIS polygon
+                          </span>
+                        )}
+                      </span>
+                    ) : null
+                  }
+                  choice={resolution.location}
+                  onChange={setScalar('location')}
+                />
+              )}
+            </div>
           </section>
 
           {/* Wikidata QID */}
@@ -882,36 +939,162 @@ export default function PlaceMergeView({
             </section>
           )}
 
-          {/* Assertions summary */}
-          {totalAssertions > 0 && (
+          {/* Status assertions */}
+          {allStatusAssertions.length > 0 && (
             <section>
-              <SectionHeader>Assertions (auto-merged)</SectionHeader>
-              <div className="p-3 border border-stm-warm-100 bg-white text-sm text-stm-warm-600">
-                All {totalAssertions} assertion
-                {totalAssertions !== 1 ? 's' : ''} from both entries will be
-                merged:{' '}
-                {[
-                  (placeA.statusAssertions?.length ?? 0) +
-                    (placeB.statusAssertions?.length ?? 0) >
-                    0 &&
-                    `${(placeA.statusAssertions?.length ?? 0) + (placeB.statusAssertions?.length ?? 0)} status`,
-                  (placeA.productAssertions?.length ?? 0) +
-                    (placeB.productAssertions?.length ?? 0) >
-                    0 &&
-                    `${(placeA.productAssertions?.length ?? 0) + (placeB.productAssertions?.length ?? 0)} product`,
-                  (placeA.districtAssertions?.length ?? 0) +
-                    (placeB.districtAssertions?.length ?? 0) >
-                    0 &&
-                    `${(placeA.districtAssertions?.length ?? 0) + (placeB.districtAssertions?.length ?? 0)} district`,
-                  (placeA.locationAssertions?.length ?? 0) +
-                    (placeB.locationAssertions?.length ?? 0) >
-                    0 &&
-                    `${(placeA.locationAssertions?.length ?? 0) + (placeB.locationAssertions?.length ?? 0)} location`,
-                ]
-                  .filter(Boolean)
-                  .join(', ')}
-                .
-              </div>
+              <SectionHeader>
+                Lifecycle status (
+                {allStatusAssertions.length -
+                  resolution.excludedStatusAssertions.size}{' '}
+                of {allStatusAssertions.length} kept)
+              </SectionHeader>
+              <p className="text-xs text-stm-warm-400 mb-2">
+                Records of when this place was built, active, or abandoned
+                &mdash; each tied to a specific source and time period.
+              </p>
+              <MergeArraySection
+                items={allStatusAssertions}
+                keyFn={(a) => a.id}
+                labelFn={(a) => (
+                  <span className="text-xs">
+                    <span className="font-semibold text-stm-warm-700 capitalize">
+                      {a.status}
+                    </span>
+                    {(a.startYear || a.endYear) && (
+                      <span className="text-stm-warm-400 ml-1.5">
+                        {a.startYear}
+                        {a.endYear && a.endYear !== a.startYear
+                          ? `\u2013${a.endYear}`
+                          : ''}
+                      </span>
+                    )}
+                    <span className="font-mono text-stm-warm-300 ml-1.5 text-[10px]">
+                      {a.source}
+                    </span>
+                  </span>
+                )}
+                excluded={resolution.excludedStatusAssertions}
+                onToggle={toggleArrayItem('excludedStatusAssertions')}
+              />
+            </section>
+          )}
+
+          {/* Product assertions */}
+          {allProductAssertions.length > 0 && (
+            <section>
+              <SectionHeader>
+                Crops &amp; products (
+                {allProductAssertions.length -
+                  resolution.excludedProductAssertions.size}{' '}
+                of {allProductAssertions.length} kept)
+              </SectionHeader>
+              <p className="text-xs text-stm-warm-400 mb-2">
+                What was cultivated or produced here, as recorded per source
+                and year in the Surinaamse Almanakken.
+              </p>
+              <MergeArraySection
+                items={allProductAssertions}
+                keyFn={(a) => a.id}
+                labelFn={(a) => (
+                  <span className="text-xs">
+                    <span className="font-semibold text-stm-warm-700 capitalize">
+                      {a.value}
+                    </span>
+                    {(a.startYear || a.endYear) && (
+                      <span className="text-stm-warm-400 ml-1.5">
+                        {a.startYear}
+                        {a.endYear && a.endYear !== a.startYear
+                          ? `\u2013${a.endYear}`
+                          : ''}
+                      </span>
+                    )}
+                    <span className="font-mono text-stm-warm-300 ml-1.5 text-[10px]">
+                      {a.source}
+                    </span>
+                  </span>
+                )}
+                excluded={resolution.excludedProductAssertions}
+                onToggle={toggleArrayItem('excludedProductAssertions')}
+              />
+            </section>
+          )}
+
+          {/* District assertions */}
+          {allDistrictAssertions.length > 0 && (
+            <section>
+              <SectionHeader>
+                District membership (
+                {allDistrictAssertions.length -
+                  resolution.excludedDistrictAssertions.size}{' '}
+                of {allDistrictAssertions.length} kept)
+              </SectionHeader>
+              <p className="text-xs text-stm-warm-400 mb-2">
+                Which administrative district this place belonged to, per
+                source. District boundaries changed over time.
+              </p>
+              <MergeArraySection
+                items={allDistrictAssertions}
+                keyFn={(a) => a.id}
+                labelFn={(a) => (
+                  <span className="text-xs">
+                    <span className="font-semibold text-stm-warm-700">
+                      {a.districtLabel || a.districtId || '\u2014'}
+                    </span>
+                    {a.sourceYear && (
+                      <span className="text-stm-warm-400 ml-1.5">
+                        {a.sourceYear}
+                      </span>
+                    )}
+                    <span className="font-mono text-stm-warm-300 ml-1.5 text-[10px]">
+                      {a.source}
+                    </span>
+                    {a.certainty && a.certainty !== 'certain' && (
+                      <span className="text-stm-warm-300 ml-1 italic">
+                        {a.certainty}
+                      </span>
+                    )}
+                  </span>
+                )}
+                excluded={resolution.excludedDistrictAssertions}
+                onToggle={toggleArrayItem('excludedDistrictAssertions')}
+              />
+            </section>
+          )}
+
+          {/* Location assertions */}
+          {allLocationAssertions.length > 0 && (
+            <section>
+              <SectionHeader>
+                Historical location descriptions (
+                {allLocationAssertions.length -
+                  resolution.excludedLocationAssertions.size}{' '}
+                of {allLocationAssertions.length} kept)
+              </SectionHeader>
+              <p className="text-xs text-stm-warm-400 mb-2">
+                Textual location descriptions copied from historical sources,
+                e.g. &ldquo;op de Commewijne rivier&rdquo;.
+              </p>
+              <MergeArraySection
+                items={allLocationAssertions}
+                keyFn={(a) => a.id}
+                labelFn={(a) => (
+                  <span className="text-xs">
+                    <span className="text-stm-warm-700">
+                      {a.standardized || a.original || '\u2014'}
+                    </span>
+                    {a.startYear && (
+                      <span className="text-stm-warm-400 ml-1.5">
+                        {a.startYear}
+                      </span>
+                    )}
+                    <span className="font-mono text-stm-warm-300 ml-1.5 text-[10px]">
+                      {a.source}
+                    </span>
+                  </span>
+                )}
+                excluded={resolution.excludedLocationAssertions}
+                onToggle={toggleArrayItem('excludedLocationAssertions')}
+              />
             </section>
           )}
         </div>
