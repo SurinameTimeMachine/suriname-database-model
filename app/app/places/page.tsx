@@ -433,6 +433,7 @@ interface PlaceRowProps {
   isSelected: boolean;
   onSelect: (id: string) => void;
   mergeChecked?: boolean;
+  mergeDisabled?: boolean;
   onMergeCheck?: (id: string, checked: boolean) => void;
   colors: Record<string, string>;
   labels: Record<string, string>;
@@ -444,6 +445,7 @@ const PlaceRow = memo(function PlaceRow({
   isSelected,
   onSelect,
   mergeChecked,
+  mergeDisabled,
   onMergeCheck,
   colors,
   labels,
@@ -470,9 +472,14 @@ const PlaceRow = memo(function PlaceRow({
             type="checkbox"
             checked={!!mergeChecked}
             onChange={(e) => onMergeCheck(place.id, e.target.checked)}
-            className="accent-stm-sepia-500 cursor-pointer"
+            className="accent-stm-sepia-500 cursor-pointer disabled:cursor-not-allowed"
             aria-label={`Select ${getPreferredName(place)} for merge`}
-            disabled={!!place.mergedInto}
+            disabled={!!place.mergedInto || (mergeDisabled && !mergeChecked)}
+            title={
+              mergeDisabled && !mergeChecked
+                ? 'Deselect one of the 2 chosen places first'
+                : undefined
+            }
           />
         </td>
       )}
@@ -1315,8 +1322,8 @@ function PlacesPageInner() {
                   <div className="flex items-center gap-2 border-l border-stm-warm-200 pl-3 shrink-0">
                     <span className="text-xs text-stm-sepia-600 whitespace-nowrap">
                       {mergeCheckIds.length === 1
-                        ? '1 selected — pick 1 more'
-                        : '2 selected'}
+                        ? '1 of 2 selected'
+                        : '2 selected — ready to merge'}
                     </span>
                     {mergeCheckIds.length === 2 && (
                       <button
@@ -1422,6 +1429,7 @@ function PlacesPageInner() {
                         isSelected={selectedIds.includes(place.id)}
                         onSelect={handleRowSelect}
                         mergeChecked={mergeCheckIds.includes(place.id)}
+                        mergeDisabled={mergeCheckIds.length >= 2}
                         onMergeCheck={handleMergeCheck}
                         colors={colors}
                         labels={labels}

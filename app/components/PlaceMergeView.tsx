@@ -989,8 +989,8 @@ export default function PlaceMergeView({
                 of {allProductAssertions.length} kept)
               </SectionHeader>
               <p className="text-xs text-stm-warm-400 mb-2">
-                What was cultivated or produced here, as recorded per source
-                and year in the Surinaamse Almanakken.
+                What was cultivated or produced here, as recorded per source and
+                year in the Surinaamse Almanakken.
               </p>
               <MergeArraySection
                 items={allProductAssertions}
