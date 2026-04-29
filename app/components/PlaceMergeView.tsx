@@ -234,7 +234,7 @@ function PlaceCard({
         </p>
         {isPrimary && (
           <p className="text-xs text-stm-sepia-600 font-medium mt-1.5">
-          Primary - this ID survives
+            Primary - this ID survives
           </p>
         )}
       </div>
@@ -568,9 +568,9 @@ export default function PlaceMergeView({
               Names &amp; alternative labels ({includedNameCount} kept)
             </SectionHeader>
             <p className="text-xs text-stm-warm-400 mb-3">
-              All names from both entries: official, historical,
-              vernacular, and variant spellings. Check to keep a name; use the
-              radio button to set the preferred display name.
+              All names from both entries: official, historical, vernacular, and
+              variant spellings. Check to keep a name; use the radio button to
+              set the preferred display name.
             </p>
             <div className="space-y-1.5">
               {mergedNames.map((mn, i) => {
@@ -691,8 +691,8 @@ export default function PlaceMergeView({
           <section>
             <SectionHeader>Location &amp; GIS polygon</SectionHeader>
             <p className="text-xs text-stm-warm-400 mb-3">
-              Only one GIS polygon can be kept after the merge. Choose
-              which place&apos;s coordinates and polygon to use.
+              Only one GIS polygon can be kept after the merge. Choose which
+              place&apos;s coordinates and polygon to use.
             </p>
             <PlaceMergeMap
               locationA={placeA.location}
@@ -949,8 +949,8 @@ export default function PlaceMergeView({
                 of {allStatusAssertions.length} kept)
               </SectionHeader>
               <p className="text-xs text-stm-warm-400 mb-2">
-                records of when this place was built, active, or abandoned,
-                each tied to a specific source and time period.
+                records of when this place was built, active, or abandoned, each
+                tied to a specific source and time period.
               </p>
               <MergeArraySection
                 items={allStatusAssertions}
