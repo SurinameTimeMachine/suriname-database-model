@@ -356,6 +356,49 @@ function emptyPlace(): GazetteerPlace {
   };
 }
 
+const COLUMN_DEFS: {
+  key: SortKey;
+  label: string;
+  defaultVisible: boolean;
+  alwaysVisible?: boolean;
+}[] = [
+  { key: 'name', label: 'Name', defaultVisible: true, alwaysVisible: true },
+  { key: 'type', label: 'Type', defaultVisible: true },
+  { key: 'district', label: 'District', defaultVisible: true },
+  { key: 'placeType', label: 'Product / Type', defaultVisible: false },
+  { key: 'psurIds', label: 'PSUR', defaultVisible: true },
+  { key: 'externalLinks', label: 'Links', defaultVisible: true },
+  { key: 'wikidata', label: 'WD', defaultVisible: true },
+  { key: 'dikland', label: 'Dik.', defaultVisible: true },
+  { key: 'lat', label: 'Coords', defaultVisible: true },
+  { key: 'modifiedAt', label: 'Modified', defaultVisible: true },
+  { key: 'map1930', label: 'Map', defaultVisible: true },
+  { key: 'almanakken', label: 'Alm.', defaultVisible: true },
+];
+
+const LS_COLUMNS_KEY = 'stm-places-visible-columns';
+
+function loadVisibleColumns(): Set<SortKey> {
+  try {
+    const stored = localStorage.getItem(LS_COLUMNS_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored) as SortKey[];
+      return new Set(parsed);
+    }
+  } catch {
+    // ignore
+  }
+  return new Set(COLUMN_DEFS.filter((c) => c.defaultVisible).map((c) => c.key));
+}
+
+function saveVisibleColumns(cols: Set<SortKey>) {
+  try {
+    localStorage.setItem(LS_COLUMNS_KEY, JSON.stringify([...cols]));
+  } catch {
+    // ignore
+  }
+}
+
 function SortArrow({ active, dir }: { active: boolean; dir: SortDir }) {
   if (!active) return <span className="text-stm-warm-200 ml-0.5">&#8597;</span>;
   return (
@@ -371,6 +414,7 @@ interface PlaceRowProps {
   onSelect: (id: string) => void;
   colors: Record<string, string>;
   labels: Record<string, string>;
+  visibleColumns: Set<SortKey>;
 }
 
 const PlaceRow = memo(function PlaceRow({
@@ -379,12 +423,14 @@ const PlaceRow = memo(function PlaceRow({
   onSelect,
   colors,
   labels,
+  visibleColumns,
 }: PlaceRowProps) {
   const handleClick = useCallback(
     () => onSelect(place.id),
     [onSelect, place.id],
   );
   const altNames = place.names.filter((n) => !n.isPreferred);
+  const vis = (key: SortKey) => visibleColumns.has(key);
 
   return (
     <tr
@@ -393,7 +439,7 @@ const PlaceRow = memo(function PlaceRow({
         isSelected ? 'bg-stm-sepia-50' : 'bg-white hover:bg-stm-warm-50'
       }`}
     >
-      {/* Name */}
+      {/* Name — always visible */}
       <td className="py-1.5 px-2 font-medium text-stm-warm-800 max-w-55 truncate">
         {getPreferredName(place)}
         {altNames.length > 0 && (
@@ -409,132 +455,156 @@ const PlaceRow = memo(function PlaceRow({
       </td>
 
       {/* Type */}
-      <td className="py-1.5 px-2">
-        <span
-          className="inline-block px-1.5 py-0.5 text-[10px] font-medium rounded"
-          style={{
-            backgroundColor: (colors[place.type] || '#888') + '20',
-            color: colors[place.type] || '#888',
-          }}
-        >
-          {labels[place.type] || place.type}
-        </span>
-      </td>
+      {vis('type') && (
+        <td className="py-1.5 px-2">
+          <span
+            className="inline-block px-1.5 py-0.5 text-[10px] font-medium rounded"
+            style={{
+              backgroundColor: (colors[place.type] || '#888') + '20',
+              color: colors[place.type] || '#888',
+            }}
+          >
+            {labels[place.type] || place.type}
+          </span>
+        </td>
+      )}
 
       {/* District */}
-      <td className="py-1.5 px-2 text-stm-warm-600 max-w-35 truncate">
-        {getCurrentDistrictLabel(place) ?? (
-          <span className="text-stm-warm-200">--</span>
-        )}
-      </td>
+      {vis('district') && (
+        <td className="py-1.5 px-2 text-stm-warm-600 max-w-35 truncate">
+          {getCurrentDistrictLabel(place) ?? (
+            <span className="text-stm-warm-200">--</span>
+          )}
+        </td>
+      )}
 
       {/* Product / Type */}
-      <td className="py-1.5 px-2 text-stm-warm-500 text-xs max-w-30 truncate hidden 2xl:table-cell">
-        {place.placeType ?? <span className="text-stm-warm-200">--</span>}
-      </td>
+      {vis('placeType') && (
+        <td className="py-1.5 px-2 text-stm-warm-500 text-xs max-w-30 truncate">
+          {place.placeType ?? <span className="text-stm-warm-200">--</span>}
+        </td>
+      )}
 
       {/* PSUR */}
-      <td className="py-1.5 px-2 text-stm-warm-500 font-mono text-xs">
-        {place.psurIds.length > 0 ? (
-          place.psurIds.join(', ')
-        ) : (
-          <span className="text-stm-warm-200">--</span>
-        )}
-      </td>
+      {vis('psurIds') && (
+        <td className="py-1.5 px-2 text-stm-warm-500 font-mono text-xs">
+          {place.psurIds.length > 0 ? (
+            place.psurIds.join(', ')
+          ) : (
+            <span className="text-stm-warm-200">--</span>
+          )}
+        </td>
+      )}
 
       {/* External Links */}
-      <td className="py-1.5 px-2 text-center">
-        {(place.externalLinks || []).length > 0 ? (
-          <span
-            className="inline-block min-w-5 px-1 py-0.5 text-[10px] font-medium rounded bg-stm-teal-100 text-stm-teal-700"
-            title={(place.externalLinks || [])
-              .map(
-                (l) =>
-                  `${l.authority}: ${l.identifier} (${l.matchType.replace('Match', '')})`,
-              )
-              .join('\n')}
-          >
-            {(place.externalLinks || []).length}
-          </span>
-        ) : (
-          <span className="text-stm-warm-200">--</span>
-        )}
-      </td>
+      {vis('externalLinks') && (
+        <td className="py-1.5 px-2 text-center">
+          {(place.externalLinks || []).length > 0 ? (
+            <span
+              className="inline-block min-w-5 px-1 py-0.5 text-[10px] font-medium rounded bg-stm-teal-100 text-stm-teal-700"
+              title={(place.externalLinks || [])
+                .map(
+                  (l) =>
+                    `${l.authority}: ${l.identifier} (${l.matchType.replace('Match', '')})`,
+                )
+                .join('\n')}
+            >
+              {(place.externalLinks || []).length}
+            </span>
+          ) : (
+            <span className="text-stm-warm-200">--</span>
+          )}
+        </td>
+      )}
 
       {/* Wikidata */}
-      <td className="py-1.5 px-2 text-center">
-        {(place.externalLinks || []).some((l) => l.authority === 'wikidata') ? (
-          <span
-            className="text-stm-teal-600"
-            title={
-              (place.externalLinks || [])
-                .filter((l) => l.authority === 'wikidata')
-                .map((l) => l.identifier)
-                .join(', ') || undefined
-            }
-          >
-            &#10003;
-          </span>
-        ) : (
-          <span className="text-stm-warm-200">-</span>
-        )}
-      </td>
+      {vis('wikidata') && (
+        <td className="py-1.5 px-2 text-center">
+          {(place.externalLinks || []).some(
+            (l) => l.authority === 'wikidata',
+          ) ? (
+            <span
+              className="text-stm-teal-600"
+              title={
+                (place.externalLinks || [])
+                  .filter((l) => l.authority === 'wikidata')
+                  .map((l) => l.identifier)
+                  .join(', ') || undefined
+              }
+            >
+              &#10003;
+            </span>
+          ) : (
+            <span className="text-stm-warm-200">-</span>
+          )}
+        </td>
+      )}
 
       {/* Dikland */}
-      <td className="py-1.5 px-2 text-center">
-        {(place.diklandRefs || []).length > 0 ? (
-          <span
-            className="text-stm-sepia-500"
-            title={`${place.diklandRefs.length} Dikland ref${place.diklandRefs.length > 1 ? 's' : ''}`}
-          >
-            &#10003;
-          </span>
-        ) : (
-          <span className="text-stm-warm-200">-</span>
-        )}
-      </td>
+      {vis('dikland') && (
+        <td className="py-1.5 px-2 text-center">
+          {(place.diklandRefs || []).length > 0 ? (
+            <span
+              className="text-stm-sepia-500"
+              title={`${place.diklandRefs.length} Dikland ref${place.diklandRefs.length > 1 ? 's' : ''}`}
+            >
+              &#10003;
+            </span>
+          ) : (
+            <span className="text-stm-warm-200">-</span>
+          )}
+        </td>
+      )}
 
       {/* Coords */}
-      <td className="py-1.5 px-2 text-stm-warm-400 font-mono text-xs whitespace-nowrap">
-        {place.location.lat != null ? (
-          <>
-            {place.location.lat.toFixed(2)}, {place.location.lng?.toFixed(2)}
-          </>
-        ) : (
-          <span className="text-stm-warm-200">--</span>
-        )}
-      </td>
+      {vis('lat') && (
+        <td className="py-1.5 px-2 text-stm-warm-400 font-mono text-xs whitespace-nowrap">
+          {place.location.lat != null ? (
+            <>
+              {place.location.lat.toFixed(2)}, {place.location.lng?.toFixed(2)}
+            </>
+          ) : (
+            <span className="text-stm-warm-200">--</span>
+          )}
+        </td>
+      )}
 
       {/* Modified */}
-      <td className="py-1.5 px-2 text-stm-warm-400 text-xs whitespace-nowrap hidden 2xl:table-cell">
-        {place.modifiedAt ? (
-          new Date(place.modifiedAt).toLocaleDateString()
-        ) : (
-          <span className="text-stm-warm-200">--</span>
-        )}
-      </td>
+      {vis('modifiedAt') && (
+        <td className="py-1.5 px-2 text-stm-warm-400 text-xs whitespace-nowrap">
+          {place.modifiedAt ? (
+            new Date(place.modifiedAt).toLocaleDateString()
+          ) : (
+            <span className="text-stm-warm-200">--</span>
+          )}
+        </td>
+      )}
 
       {/* Map 1930 */}
-      <td className="py-1.5 px-2 text-center">
-        {place.sources.includes('map-1930') ? (
-          <span className="text-stm-sepia-500" title="In Map 1930">
-            &#10003;
-          </span>
-        ) : (
-          <span className="text-stm-warm-200">-</span>
-        )}
-      </td>
+      {vis('map1930') && (
+        <td className="py-1.5 px-2 text-center">
+          {place.sources.includes('map-1930') ? (
+            <span className="text-stm-sepia-500" title="In Map 1930">
+              &#10003;
+            </span>
+          ) : (
+            <span className="text-stm-warm-200">-</span>
+          )}
+        </td>
+      )}
 
       {/* Almanakken */}
-      <td className="py-1.5 px-2 text-center">
-        {place.sources.includes('almanakken') ? (
-          <span className="text-stm-teal-600" title="In Almanakken">
-            &#10003;
-          </span>
-        ) : (
-          <span className="text-stm-warm-200">-</span>
-        )}
-      </td>
+      {vis('almanakken') && (
+        <td className="py-1.5 px-2 text-center">
+          {place.sources.includes('almanakken') ? (
+            <span className="text-stm-teal-600" title="In Almanakken">
+              &#10003;
+            </span>
+          ) : (
+            <span className="text-stm-warm-200">-</span>
+          )}
+        </td>
+      )}
     </tr>
   );
 });
@@ -572,6 +642,11 @@ function PlacesPageInner() {
   const [sortDir, setSortDir] = useState<SortDir>('asc');
   const [sourceFilter, setSourceFilter] =
     useState<SourceFilterState>(emptyFilterState());
+  const [visibleColumns, setVisibleColumns] = useState<Set<SortKey>>(() =>
+    loadVisibleColumns(),
+  );
+  const [columnsOpen, setColumnsOpen] = useState(false);
+  const columnsRef = useRef<HTMLDivElement>(null);
 
   // URL sync: read ?place= query param
   const searchParams = useSearchParams();
@@ -916,6 +991,42 @@ function PlacesPageInner() {
     return () => window.removeEventListener('keydown', handler);
   }, [handleCancel]);
 
+  // Close columns popover on outside click
+  useEffect(() => {
+    if (!columnsOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (
+        columnsRef.current &&
+        !columnsRef.current.contains(e.target as Node)
+      ) {
+        setColumnsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [columnsOpen]);
+
+  const toggleColumn = useCallback((key: SortKey) => {
+    setVisibleColumns((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
+      }
+      saveVisibleColumns(next);
+      return next;
+    });
+  }, []);
+
+  const resetColumns = useCallback(() => {
+    const defaults = new Set(
+      COLUMN_DEFS.filter((c) => c.defaultVisible).map((c) => c.key),
+    );
+    saveVisibleColumns(defaults);
+    setVisibleColumns(defaults);
+  }, []);
+
   if (loading) {
     return (
       <div className="w-full h-full flex items-center justify-center bg-stm-warm-50">
@@ -1017,6 +1128,83 @@ function PlacesPageInner() {
                 </div>
               )}
 
+              {/* Columns toggle */}
+              <div
+                className="relative border-l border-stm-warm-200 pl-3 shrink-0"
+                ref={columnsRef}
+              >
+                <button
+                  onClick={() => setColumnsOpen((o) => !o)}
+                  className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs border transition-colors ${
+                    columnsOpen
+                      ? 'border-stm-sepia-400 bg-stm-sepia-50 text-stm-sepia-700'
+                      : 'border-stm-warm-200 bg-white text-stm-warm-600 hover:border-stm-warm-300 hover:text-stm-warm-800'
+                  }`}
+                  aria-expanded={columnsOpen}
+                  aria-haspopup="true"
+                >
+                  <svg
+                    className="w-3.5 h-3.5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeWidth="2"
+                      d="M9 4h1v16H9zM14 4h1v16h-1z"
+                    />
+                    <rect x="3" y="4" width="4" height="16" strokeWidth="2" />
+                    <rect x="17" y="4" width="4" height="16" strokeWidth="2" />
+                  </svg>
+                  Columns
+                  <span className="text-stm-warm-400">
+                    ({visibleColumns.size}/{COLUMN_DEFS.length})
+                  </span>
+                </button>
+
+                {columnsOpen && (
+                  <div className="absolute top-full left-0 mt-1 z-20 bg-white border border-stm-warm-200 shadow-md min-w-44 py-1">
+                    {COLUMN_DEFS.map((col) => (
+                      <label
+                        key={col.key}
+                        className={`flex items-center gap-2 px-3 py-1.5 text-xs cursor-pointer select-none ${
+                          col.alwaysVisible
+                            ? 'text-stm-warm-400 cursor-not-allowed'
+                            : 'text-stm-warm-700 hover:bg-stm-warm-50'
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={
+                            col.alwaysVisible || visibleColumns.has(col.key)
+                          }
+                          disabled={col.alwaysVisible}
+                          onChange={() =>
+                            !col.alwaysVisible && toggleColumn(col.key)
+                          }
+                          className="accent-stm-sepia-500"
+                        />
+                        {col.label}
+                        {col.alwaysVisible && (
+                          <span className="ml-auto text-stm-warm-300 text-[10px]">
+                            always
+                          </span>
+                        )}
+                      </label>
+                    ))}
+                    <div className="border-t border-stm-warm-100 mt-1 pt-1 px-3 pb-1">
+                      <button
+                        onClick={resetColumns}
+                        className="text-[11px] text-stm-warm-400 hover:text-stm-sepia-600 transition-colors"
+                      >
+                        Reset to defaults
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {/* Add button */}
               {canEdit && (
                 <button
@@ -1046,33 +1234,16 @@ function PlacesPageInner() {
               <table className="w-full text-sm border-collapse">
                 <thead className="sticky top-0 z-10 bg-white">
                   <tr className="text-left text-xs text-stm-warm-500 border-b border-stm-warm-200">
-                    {(
-                      [
-                        ['name', 'Name', ''],
-                        ['type', 'Type', ''],
-                        ['district', 'District', ''],
-                        [
-                          'placeType',
-                          'Product / Type',
-                          'hidden 2xl:table-cell',
-                        ],
-                        ['psurIds', 'PSUR', ''],
-                        ['externalLinks', 'Links', ''],
-                        ['wikidata', 'WD', ''],
-                        ['dikland', 'Dik.', ''],
-                        ['lat', 'Coords', ''],
-                        ['modifiedAt', 'Modified', 'hidden 2xl:table-cell'],
-                        ['map1930', 'Map', ''],
-                        ['almanakken', 'Alm.', ''],
-                      ] as [SortKey, string, string][]
-                    ).map(([key, label, extraClass]) => (
+                    {COLUMN_DEFS.filter(
+                      (col) => col.alwaysVisible || visibleColumns.has(col.key),
+                    ).map((col) => (
                       <th
-                        key={key}
-                        className={`py-2 px-2 font-medium cursor-pointer hover:text-stm-warm-700 select-none whitespace-nowrap ${extraClass}`}
-                        onClick={() => toggleSort(key)}
+                        key={col.key}
+                        className="py-2 px-2 font-medium cursor-pointer hover:text-stm-warm-700 select-none whitespace-nowrap"
+                        onClick={() => toggleSort(col.key)}
                       >
-                        {label}
-                        <SortArrow active={sortKey === key} dir={sortDir} />
+                        {col.label}
+                        <SortArrow active={sortKey === col.key} dir={sortDir} />
                       </th>
                     ))}
                   </tr>
@@ -1086,6 +1257,7 @@ function PlacesPageInner() {
                       onSelect={handleRowSelect}
                       colors={colors}
                       labels={labels}
+                      visibleColumns={visibleColumns}
                     />
                   ))}
                 </tbody>
