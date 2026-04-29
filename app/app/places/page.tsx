@@ -1,6 +1,7 @@
 'use client';
 
 import PlaceEditor from '@/components/PlaceEditor';
+import PlaceMergeView from '@/components/PlaceMergeView';
 import SourceFilter, {
   emptyFilterState,
   type SourceFilterState,
@@ -323,6 +324,25 @@ function normalizeStatusAssertionsFromLegacy(
   return [];
 }
 
+function normalizePlaceEntry(p: GazetteerPlace): GazetteerPlace {
+  return {
+    ...p,
+    names: normalizeNamesFromLegacy(p as unknown as Record<string, unknown>),
+    districtAssertions: normalizeDistrictAssertionsFromLegacy(
+      p as unknown as Record<string, unknown>,
+    ),
+    productAssertions: normalizeProductAssertionsFromLegacy(
+      p as unknown as Record<string, unknown>,
+    ),
+    locationAssertions: normalizeLocationAssertionsFromLegacy(
+      p as unknown as Record<string, unknown>,
+    ),
+    statusAssertions: normalizeStatusAssertionsFromLegacy(
+      p as unknown as Record<string, unknown>,
+    ),
+  };
+}
+
 function getCurrentDistrictLabel(place: GazetteerPlace): string | null {
   const assertions = place.districtAssertions || [];
   const effective = getEffectiveDistrictAssertion(assertions);
@@ -412,6 +432,9 @@ interface PlaceRowProps {
   place: GazetteerPlace;
   isSelected: boolean;
   onSelect: (id: string) => void;
+  mergeChecked?: boolean;
+  mergeDisabled?: boolean;
+  onMergeCheck?: (id: string, checked: boolean) => void;
   colors: Record<string, string>;
   labels: Record<string, string>;
   visibleColumns: Set<SortKey>;
@@ -421,6 +444,9 @@ const PlaceRow = memo(function PlaceRow({
   place,
   isSelected,
   onSelect,
+  mergeChecked,
+  mergeDisabled,
+  onMergeCheck,
   colors,
   labels,
   visibleColumns,
@@ -439,6 +465,24 @@ const PlaceRow = memo(function PlaceRow({
         isSelected ? 'bg-stm-sepia-50' : 'bg-white hover:bg-stm-warm-50'
       }`}
     >
+      {/* Merge checkbox */}
+      {onMergeCheck !== undefined && (
+        <td className="py-1.5 px-2 w-8" onClick={(e) => e.stopPropagation()}>
+          <input
+            type="checkbox"
+            checked={!!mergeChecked}
+            onChange={(e) => onMergeCheck(place.id, e.target.checked)}
+            className="accent-stm-sepia-500 cursor-pointer disabled:cursor-not-allowed"
+            aria-label={`Select ${getPreferredName(place)} for merge`}
+            disabled={!!place.mergedInto || (mergeDisabled && !mergeChecked)}
+            title={
+              mergeDisabled && !mergeChecked
+                ? 'Deselect one of the 2 chosen places first'
+                : undefined
+            }
+          />
+        </td>
+      )}
       {/* Name — always visible */}
       <td className="py-1.5 px-2 font-medium text-stm-warm-800 max-w-55 truncate">
         {getPreferredName(place)}
@@ -646,6 +690,12 @@ function PlacesPageInner() {
     loadVisibleColumns(),
   );
   const [columnsOpen, setColumnsOpen] = useState(false);
+  const [mergeCheckIds, setMergeCheckIds] = useState<string[]>([]);
+  const [showMerged, setShowMerged] = useState(false);
+  const [mergeView, setMergeView] = useState<{
+    placeA: GazetteerPlace;
+    placeB: GazetteerPlace;
+  } | null>(null);
   const columnsRef = useRef<HTMLDivElement>(null);
 
   // URL sync: read ?place= query param
@@ -669,26 +719,7 @@ function PlacesPageInner() {
         const entries: GazetteerPlace[] = data['@graph'] || data;
         if (!Array.isArray(entries)) return;
         // Normalize: support legacy prefLabel/altLabels and preserve source metadata.
-        setPlaces(
-          entries.map((p) => ({
-            ...p,
-            names: normalizeNamesFromLegacy(
-              p as unknown as Record<string, unknown>,
-            ),
-            districtAssertions: normalizeDistrictAssertionsFromLegacy(
-              p as unknown as Record<string, unknown>,
-            ),
-            productAssertions: normalizeProductAssertionsFromLegacy(
-              p as unknown as Record<string, unknown>,
-            ),
-            locationAssertions: normalizeLocationAssertionsFromLegacy(
-              p as unknown as Record<string, unknown>,
-            ),
-            statusAssertions: normalizeStatusAssertionsFromLegacy(
-              p as unknown as Record<string, unknown>,
-            ),
-          })),
-        );
+        setPlaces(entries.map(normalizePlaceEntry));
       })
       .finally(() => setLoading(false));
 
@@ -748,9 +779,69 @@ function PlacesPageInner() {
     [syncUrlToSelection],
   );
 
+  const handleMergeCheck = useCallback(
+    (id: string, checked: boolean) => {
+      setMergeCheckIds((prev) => {
+        if (checked) {
+          const place = places.find((p) => p.id === id);
+          if (!place || place.mergedInto) return prev;
+          if (prev.length >= 2 || prev.includes(id)) return prev;
+          return [...prev, id];
+        }
+        return prev.filter((x) => x !== id);
+      });
+    },
+    [places],
+  );
+
+  const handleOpenMergeView = useCallback(() => {
+    if (mergeCheckIds.length !== 2) return;
+    const placeA = places.find((p) => p.id === mergeCheckIds[0]);
+    const placeB = places.find((p) => p.id === mergeCheckIds[1]);
+    if (placeA && placeB) {
+      setMergeView({ placeA, placeB });
+      setSelectedIds([]);
+      setIsCreating(false);
+    }
+  }, [mergeCheckIds, places]);
+
+  const handleMergeConfirm = useCallback(
+    async (merged: GazetteerPlace, retiredId: string) => {
+      const res = await fetch('/api/places/merge', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          primaryId: merged.id,
+          retiredId,
+          mergedPlace: merged,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to merge');
+      }
+      // Reload gazetteer from the updated public copy
+      const gazetteRes = await fetch('/data/places-gazetteer.jsonld');
+      const gazetteData = await gazetteRes.json();
+      const entries: GazetteerPlace[] = gazetteData['@graph'] || gazetteData;
+      if (Array.isArray(entries)) {
+        setPlaces(entries.map(normalizePlaceEntry));
+      }
+      setMergeView(null);
+      setMergeCheckIds([]);
+      setSelectedIds([merged.id]);
+      syncUrlToSelection([merged.id]);
+    },
+    [syncUrlToSelection],
+  );
+
   // Filter, search, and sort
   const filtered = useMemo(() => {
     let list = places;
+    // Hide merged-retired entries unless explicitly shown
+    if (!showMerged) {
+      list = list.filter((p) => !p.mergedInto);
+    }
     if (typeFilter !== 'all') {
       list = list.filter((p) => p.type === typeFilter);
     }
@@ -851,7 +942,12 @@ function PlacesPageInner() {
       }
     });
     return list;
-  }, [places, typeFilter, search, sortKey, sortDir, sourceFilter]);
+  }, [places, typeFilter, search, sortKey, sortDir, sourceFilter, showMerged]);
+
+  const mergedCount = useMemo(
+    () => places.filter((p) => p.mergedInto).length,
+    [places],
+  );
 
   const districts = useMemo(
     () => places.filter((p) => p.type === 'district'),
@@ -1053,34 +1149,105 @@ function PlacesPageInner() {
         </div>
       </div>
 
-      <>
-        {/* Search + filters */}
-        <div className="border-b border-stm-warm-100 bg-white/50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
-            <div className="flex items-center gap-3 flex-wrap">
-              {/* Search */}
-              <div className="relative flex-1 min-w-48">
-                <input
-                  type="text"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search by name, district, PSUR ID..."
-                  className="w-full pl-8 pr-8 py-1.5 text-sm border border-stm-warm-200 rounded bg-white focus:ring-2 focus:ring-stm-sepia-400 focus:border-stm-sepia-400 outline-none"
-                />
-                <svg
-                  className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stm-warm-400 pointer-events-none"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+      {mergeView ? (
+        <PlaceMergeView
+          placeA={mergeView.placeA}
+          placeB={mergeView.placeB}
+          districts={districts}
+          canEdit={canEdit}
+          onMerge={handleMergeConfirm}
+          onCancel={() => setMergeView(null)}
+        />
+      ) : (
+        <>
+          {/* Search + filters */}
+          <div className="border-b border-stm-warm-100 bg-white/50">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+              <div className="flex items-center gap-3 flex-wrap">
+                {/* Search */}
+                <div className="relative flex-1 min-w-48">
+                  <input
+                    type="text"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Search by name, district, PSUR ID..."
+                    className="w-full pl-8 pr-8 py-1.5 text-sm border border-stm-warm-200 rounded bg-white focus:ring-2 focus:ring-stm-sepia-400 focus:border-stm-sepia-400 outline-none"
+                  />
+                  <svg
+                    className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stm-warm-400 pointer-events-none"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle cx="11" cy="11" r="8" strokeWidth="2" />
+                    <path d="m21 21-4.35-4.35" strokeWidth="2" />
+                  </svg>
+                  {search && (
+                    <button
+                      onClick={() => setSearch('')}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-stm-warm-400 hover:text-stm-warm-600"
+                      aria-label="Clear search"
+                    >
+                      <svg
+                        className="w-3.5 h-3.5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          d="M18 6 6 18M6 6l12 12"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                    </button>
+                  )}
+                </div>
+
+                {/* Type filter */}
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <label className="text-xs text-stm-warm-500 whitespace-nowrap">
+                    Place type
+                  </label>
+                  <select
+                    value={typeFilter}
+                    onChange={(e) => setTypeFilter(e.target.value)}
+                    className="text-sm border border-stm-warm-200 rounded bg-white pl-2.5 pr-7 py-1.5 text-stm-warm-700 focus:ring-2 focus:ring-stm-sepia-400 focus:border-stm-sepia-400 outline-none cursor-pointer"
+                  >
+                    {typeFilters.map(({ value, label }) => (
+                      <option key={value} value={value}>
+                        {label} ({typeCounts[value] ?? 0})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Source filter */}
+                {!registryLoading && (
+                  <div className="border-l border-stm-warm-200 pl-3">
+                    <SourceFilter
+                      sources={activeRegistrySources}
+                      categories={registryCategories}
+                      value={sourceFilter}
+                      onChange={setSourceFilter}
+                    />
+                  </div>
+                )}
+
+                {/* Columns toggle */}
+                <div
+                  className="relative border-l border-stm-warm-200 pl-3 shrink-0"
+                  ref={columnsRef}
                 >
-                  <circle cx="11" cy="11" r="8" strokeWidth="2" />
-                  <path d="m21 21-4.35-4.35" strokeWidth="2" />
-                </svg>
-                {search && (
                   <button
-                    onClick={() => setSearch('')}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 text-stm-warm-400 hover:text-stm-warm-600"
-                    aria-label="Clear search"
+                    onClick={() => setColumnsOpen((o) => !o)}
+                    className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs border transition-colors ${
+                      columnsOpen
+                        ? 'border-stm-sepia-400 bg-stm-sepia-50 text-stm-sepia-700'
+                        : 'border-stm-warm-200 bg-white text-stm-warm-600 hover:border-stm-warm-300 hover:text-stm-warm-800'
+                    }`}
+                    aria-expanded={columnsOpen}
+                    aria-haspopup="true"
                   >
                     <svg
                       className="w-3.5 h-3.5"
@@ -1089,205 +1256,221 @@ function PlacesPageInner() {
                       viewBox="0 0 24 24"
                     >
                       <path
-                        d="M18 6 6 18M6 6l12 12"
-                        strokeWidth="2"
                         strokeLinecap="round"
+                        strokeWidth="2"
+                        d="M9 4h1v16H9zM14 4h1v16h-1z"
+                      />
+                      <rect x="3" y="4" width="4" height="16" strokeWidth="2" />
+                      <rect
+                        x="17"
+                        y="4"
+                        width="4"
+                        height="16"
+                        strokeWidth="2"
                       />
                     </svg>
+                    Columns
+                    <span className="text-stm-warm-400">
+                      ({visibleColumns.size}/{COLUMN_DEFS.length})
+                    </span>
+                  </button>
+
+                  {columnsOpen && (
+                    <div className="absolute top-full left-0 mt-1 z-20 bg-white border border-stm-warm-200 shadow-md min-w-44 py-1">
+                      {COLUMN_DEFS.map((col) => (
+                        <label
+                          key={col.key}
+                          className={`flex items-center gap-2 px-3 py-1.5 text-xs cursor-pointer select-none ${
+                            col.alwaysVisible
+                              ? 'text-stm-warm-400 cursor-not-allowed'
+                              : 'text-stm-warm-700 hover:bg-stm-warm-50'
+                          }`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={
+                              col.alwaysVisible || visibleColumns.has(col.key)
+                            }
+                            disabled={col.alwaysVisible}
+                            onChange={() =>
+                              !col.alwaysVisible && toggleColumn(col.key)
+                            }
+                            className="accent-stm-sepia-500"
+                          />
+                          {col.label}
+                          {col.alwaysVisible && (
+                            <span className="ml-auto text-stm-warm-300 text-[10px]">
+                              always
+                            </span>
+                          )}
+                        </label>
+                      ))}
+                      <div className="border-t border-stm-warm-100 mt-1 pt-1 px-3 pb-1">
+                        <button
+                          onClick={resetColumns}
+                          className="text-[11px] text-stm-warm-400 hover:text-stm-sepia-600 transition-colors"
+                        >
+                          Reset to defaults
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Merge selection controls — only shown when logged in and 1+ entries are checked */}
+                {canEdit && mergeCheckIds.length > 0 && (
+                  <div className="flex items-center gap-2 border-l border-stm-warm-200 pl-3 shrink-0">
+                    <span className="text-xs text-stm-sepia-600 whitespace-nowrap">
+                      {mergeCheckIds.length === 1
+                        ? '1 of 2 selected'
+                        : '2 selected, ready to merge'}
+                    </span>
+                    {mergeCheckIds.length === 2 && (
+                      <button
+                        onClick={handleOpenMergeView}
+                        className="px-3 py-1.5 text-sm font-medium bg-stm-sepia-600 text-white hover:bg-stm-sepia-700 transition-colors"
+                      >
+                        Merge selected
+                      </button>
+                    )}
+                    <button
+                      onClick={() => setMergeCheckIds([])}
+                      className="text-xs text-stm-warm-400 hover:text-stm-warm-600 underline"
+                    >
+                      clear
+                    </button>
+                  </div>
+                )}
+
+                {/* Add button */}
+                {canEdit && (
+                  <button
+                    onClick={() => {
+                      setIsCreating(true);
+                      setSelectedIds([]);
+                      syncUrlToSelection([]);
+                    }}
+                    className="px-3 py-1.5 text-sm font-medium bg-stm-teal-600 text-white rounded hover:bg-stm-teal-700 transition-colors shrink-0"
+                  >
+                    + Add Place
                   </button>
                 )}
               </div>
+            </div>
+          </div>
 
-              {/* Type filter */}
-              <div className="flex items-center gap-1.5 shrink-0">
-                <label className="text-xs text-stm-warm-500 whitespace-nowrap">
-                  Place type
-                </label>
-                <select
-                  value={typeFilter}
-                  onChange={(e) => setTypeFilter(e.target.value)}
-                  className="text-sm border border-stm-warm-200 rounded bg-white pl-2.5 pr-7 py-1.5 text-stm-warm-700 focus:ring-2 focus:ring-stm-sepia-400 focus:border-stm-sepia-400 outline-none cursor-pointer"
-                >
-                  {typeFilters.map(({ value, label }) => (
-                    <option key={value} value={value}>
-                      {label} ({typeCounts[value] ?? 0})
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Source filter */}
-              {!registryLoading && (
-                <div className="border-l border-stm-warm-200 pl-3">
-                  <SourceFilter
-                    sources={activeRegistrySources}
-                    categories={registryCategories}
-                    value={sourceFilter}
-                    onChange={setSourceFilter}
-                  />
-                </div>
-              )}
-
-              {/* Columns toggle */}
-              <div
-                className="relative border-l border-stm-warm-200 pl-3 shrink-0"
-                ref={columnsRef}
-              >
-                <button
-                  onClick={() => setColumnsOpen((o) => !o)}
-                  className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs border transition-colors ${
-                    columnsOpen
-                      ? 'border-stm-sepia-400 bg-stm-sepia-50 text-stm-sepia-700'
-                      : 'border-stm-warm-200 bg-white text-stm-warm-600 hover:border-stm-warm-300 hover:text-stm-warm-800'
-                  }`}
-                  aria-expanded={columnsOpen}
-                  aria-haspopup="true"
-                >
-                  <svg
-                    className="w-3.5 h-3.5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeWidth="2"
-                      d="M9 4h1v16H9zM14 4h1v16h-1z"
-                    />
-                    <rect x="3" y="4" width="4" height="16" strokeWidth="2" />
-                    <rect x="17" y="4" width="4" height="16" strokeWidth="2" />
-                  </svg>
-                  Columns
-                  <span className="text-stm-warm-400">
-                    ({visibleColumns.size}/{COLUMN_DEFS.length})
+          {/* Main content: table + editor */}
+          <div className="flex-1 overflow-hidden flex">
+            {/* Place table */}
+            <div className="flex-1 overflow-auto">
+              <div className="text-xs text-stm-warm-400 px-4 sm:px-6 lg:px-8 pt-2 pb-1 max-w-350 mx-auto flex items-center gap-3">
+                <span>
+                  {filtered.length} of {places.length} places
+                </span>
+                {mergedCount > 0 && (
+                  <span>
+                    &middot;{' '}
+                    {showMerged ? (
+                      <>
+                        {mergedCount} merged shown{' '}
+                        <button
+                          onClick={() => setShowMerged(false)}
+                          className="underline hover:text-stm-sepia-600"
+                        >
+                          hide
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        {mergedCount} merged hidden{' '}
+                        <button
+                          onClick={() => setShowMerged(true)}
+                          className="underline hover:text-stm-sepia-600"
+                        >
+                          show
+                        </button>
+                      </>
+                    )}
                   </span>
-                </button>
-
-                {columnsOpen && (
-                  <div className="absolute top-full left-0 mt-1 z-20 bg-white border border-stm-warm-200 shadow-md min-w-44 py-1">
-                    {COLUMN_DEFS.map((col) => (
-                      <label
-                        key={col.key}
-                        className={`flex items-center gap-2 px-3 py-1.5 text-xs cursor-pointer select-none ${
-                          col.alwaysVisible
-                            ? 'text-stm-warm-400 cursor-not-allowed'
-                            : 'text-stm-warm-700 hover:bg-stm-warm-50'
-                        }`}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={
-                            col.alwaysVisible || visibleColumns.has(col.key)
-                          }
-                          disabled={col.alwaysVisible}
-                          onChange={() =>
-                            !col.alwaysVisible && toggleColumn(col.key)
-                          }
-                          className="accent-stm-sepia-500"
-                        />
-                        {col.label}
-                        {col.alwaysVisible && (
-                          <span className="ml-auto text-stm-warm-300 text-[10px]">
-                            always
-                          </span>
-                        )}
-                      </label>
-                    ))}
-                    <div className="border-t border-stm-warm-100 mt-1 pt-1 px-3 pb-1">
-                      <button
-                        onClick={resetColumns}
-                        className="text-[11px] text-stm-warm-400 hover:text-stm-sepia-600 transition-colors"
-                      >
-                        Reset to defaults
-                      </button>
-                    </div>
-                  </div>
                 )}
               </div>
 
-              {/* Add button */}
-              {canEdit && (
-                <button
-                  onClick={() => {
-                    setIsCreating(true);
-                    setSelectedIds([]);
-                    syncUrlToSelection([]);
-                  }}
-                  className="px-3 py-1.5 text-sm font-medium bg-stm-teal-600 text-white rounded hover:bg-stm-teal-700 transition-colors shrink-0"
-                >
-                  + Add Place
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Main content: table + editor */}
-        <div className="flex-1 overflow-hidden flex">
-          {/* Place table */}
-          <div className="flex-1 overflow-auto">
-            <div className="text-xs text-stm-warm-400 px-4 sm:px-6 lg:px-8 pt-2 pb-1 max-w-350 mx-auto">
-              {filtered.length} of {places.length} places
-            </div>
-
-            <div className="px-4 sm:px-6 lg:px-8 pb-4 max-w-350 mx-auto">
-              <table className="w-full text-sm border-collapse">
-                <thead className="sticky top-0 z-10 bg-white">
-                  <tr className="text-left text-xs text-stm-warm-500 border-b border-stm-warm-200">
-                    {COLUMN_DEFS.filter(
-                      (col) => col.alwaysVisible || visibleColumns.has(col.key),
-                    ).map((col) => (
-                      <th
-                        key={col.key}
-                        className="py-2 px-2 font-medium cursor-pointer hover:text-stm-warm-700 select-none whitespace-nowrap"
-                        onClick={() => toggleSort(col.key)}
-                      >
-                        {col.label}
-                        <SortArrow active={sortKey === col.key} dir={sortDir} />
-                      </th>
+              <div className="px-4 sm:px-6 lg:px-8 pb-4 max-w-350 mx-auto">
+                <table className="w-full text-sm border-collapse">
+                  <thead className="sticky top-0 z-10 bg-white">
+                    <tr className="text-left text-xs text-stm-warm-500 border-b border-stm-warm-200">
+                      {canEdit && (
+                        <th
+                          className="py-2 px-2 w-8"
+                          aria-label="Select for merge"
+                        />
+                      )}
+                      {COLUMN_DEFS.filter(
+                        (col) =>
+                          col.alwaysVisible || visibleColumns.has(col.key),
+                      ).map((col) => (
+                        <th
+                          key={col.key}
+                          className="py-2 px-2 font-medium cursor-pointer hover:text-stm-warm-700 select-none whitespace-nowrap"
+                          onClick={() => toggleSort(col.key)}
+                        >
+                          {col.label}
+                          <SortArrow
+                            active={sortKey === col.key}
+                            dir={sortDir}
+                          />
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filtered.map((place) => (
+                      <PlaceRow
+                        key={place.id}
+                        place={place}
+                        isSelected={selectedIds.includes(place.id)}
+                        onSelect={handleRowSelect}
+                        mergeChecked={
+                          canEdit ? mergeCheckIds.includes(place.id) : undefined
+                        }
+                        mergeDisabled={
+                          canEdit ? mergeCheckIds.length >= 2 : undefined
+                        }
+                        onMergeCheck={canEdit ? handleMergeCheck : undefined}
+                        colors={colors}
+                        labels={labels}
+                        visibleColumns={visibleColumns}
+                      />
                     ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {filtered.map((place) => (
-                    <PlaceRow
-                      key={place.id}
-                      place={place}
-                      isSelected={selectedIds.includes(place.id)}
-                      onSelect={handleRowSelect}
-                      colors={colors}
-                      labels={labels}
-                      visibleColumns={visibleColumns}
-                    />
-                  ))}
-                </tbody>
-              </table>
+                  </tbody>
+                </table>
 
-              {filtered.length === 0 && (
-                <p className="text-sm text-stm-warm-400 text-center py-8">
-                  No places match your search.
-                </p>
-              )}
+                {filtered.length === 0 && (
+                  <p className="text-sm text-stm-warm-400 text-center py-8">
+                    No places match your search.
+                  </p>
+                )}
+              </div>
             </div>
+
+            {/* Editor panel — future: map over selectedIds for dual-panel compare/merge */}
+            {selectedPlace && (
+              <div className="w-[40%] min-w-105 max-w-160 shrink-0 border-l border-stm-warm-200 bg-stm-warm-50 overflow-hidden flex flex-col">
+                <PlaceEditor
+                  key={selectedPlace.id}
+                  place={selectedPlace}
+                  districts={districts}
+                  sourceAppellations={selectedSourceAppellations}
+                  canEdit={canEdit}
+                  onSave={handleSave}
+                  onCancel={handleCancel}
+                  onDelete={canEdit ? handleDelete : undefined}
+                />
+              </div>
+            )}
           </div>
-
-          {/* Editor panel — future: map over selectedIds for dual-panel compare/merge */}
-          {selectedPlace && (
-            <div className="w-[40%] min-w-105 max-w-160 shrink-0 border-l border-stm-warm-200 bg-stm-warm-50 overflow-hidden flex flex-col">
-              <PlaceEditor
-                key={selectedPlace.id}
-                place={selectedPlace}
-                districts={districts}
-                sourceAppellations={selectedSourceAppellations}
-                canEdit={canEdit}
-                onSave={handleSave}
-                onCancel={handleCancel}
-                onDelete={canEdit ? handleDelete : undefined}
-              />
-            </div>
-          )}
-        </div>
-      </>
+        </>
+      )}
     </div>
   );
 }
