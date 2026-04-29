@@ -292,8 +292,22 @@ export function getPreferredName(place: GazetteerPlace): string {
 }
 // For server-side / Node scripts, read the thesaurus file directly.
 
+/** Tombstone fields present on deprecated (soft-deleted) entities. Added at deprecation time; omitted entirely on active entries. */
+export interface TombstoneFields {
+  /** Present and true when the entry has been deprecated (soft-deleted). */
+  deprecated?: true;
+  /** ISO date (YYYY-MM-DD) when the entry was deprecated. */
+  deprecatedAt?: string;
+  /** GitHub login of the user who deprecated the entry. */
+  deprecatedBy?: string;
+  /** URI of the entity that supersedes this one (optional). */
+  replacedBy?: string;
+  /** Free-text reason for deprecation (optional). */
+  deprecationNote?: string;
+}
+
 /** Place gazetteer entry — authority record for a named place */
-export interface GazetteerPlace {
+export interface GazetteerPlace extends TombstoneFields {
   id: string;
   type: PlaceType;
   /** All named forms for this place — replaces flat prefLabel + altLabels. */
@@ -324,6 +338,7 @@ export interface GazetteerPlace {
   modifiedAt: string | null;
   /** Set when this entry has been merged into another place. The value is the surviving place ID. */
   mergedInto?: string;
+  // TombstoneFields inherited: deprecated, deprecatedAt, deprecatedBy, replacedBy, deprecationNote
 }
 
 // Union type for entity lookups

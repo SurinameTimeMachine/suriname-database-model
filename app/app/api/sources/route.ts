@@ -227,13 +227,14 @@ export async function PUT(request: NextRequest) {
   }
 }
 
-/** Delete a source from the registry. */
+/** Deprecate (soft-delete) a source from the registry.
+ *  The entry is kept in the file with tombstone fields so its sourceId is never reused. */
 export async function DELETE(request: NextRequest) {
   const auth = await authorize();
   if (auth.error) return auth.error;
   const { token } = auth;
 
-  const { sourceId } = await request.json();
+  const { sourceId, deprecationNote } = await request.json();
 
   if (!sourceId) {
     return NextResponse.json(
@@ -264,8 +265,29 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
+    if (graph[idx].deprecated === true) {
+      return NextResponse.json(
+        { error: `Source "${sourceId}" is already deprecated.` },
+        { status: 409 },
+      );
+    }
+
     const label = graph[idx].prefLabel;
-    graph.splice(idx, 1);
+    const now = new Date().toISOString().split('T')[0];
+    const { login } = await (
+      await fetch('https://api.github.com/user', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+    ).json();
+
+    // Tombstone: mark deprecated in-place — never remove the entry
+    graph[idx].deprecated = true;
+    graph[idx].deprecatedAt = now;
+    graph[idx].deprecatedBy = login;
+    if (typeof deprecationNote === 'string' && deprecationNote.trim()) {
+      graph[idx].deprecationNote = deprecationNote.trim();
+    }
+
     jsonld['@graph'] = graph;
 
     await writeRepoFile(
@@ -273,7 +295,7 @@ export async function DELETE(request: NextRequest) {
       REGISTRY_PATH,
       JSON.stringify(jsonld, null, 2),
       sha,
-      `Delete source: ${label}`,
+      `Deprecate source: ${label} (id: ${sourceId})`,
     );
 
     return NextResponse.json({ ok: true });

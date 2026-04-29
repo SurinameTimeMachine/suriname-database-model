@@ -838,6 +838,8 @@ function PlacesPageInner() {
   // Filter, search, and sort
   const filtered = useMemo(() => {
     let list = places;
+    // Always hide deprecated (tombstoned) entries — they are archived, not live
+    list = list.filter((p) => !p.deprecated);
     // Hide merged-retired entries unless explicitly shown
     if (!showMerged) {
       list = list.filter((p) => !p.mergedInto);
@@ -945,7 +947,12 @@ function PlacesPageInner() {
   }, [places, typeFilter, search, sortKey, sortDir, sourceFilter, showMerged]);
 
   const mergedCount = useMemo(
-    () => places.filter((p) => p.mergedInto).length,
+    () => places.filter((p) => p.mergedInto && !p.deprecated).length,
+    [places],
+  );
+
+  const deprecatedCount = useMemo(
+    () => places.filter((p) => p.deprecated).length,
     [places],
   );
 
@@ -1365,7 +1372,7 @@ function PlacesPageInner() {
             <div className="flex-1 overflow-auto">
               <div className="text-xs text-stm-warm-400 px-4 sm:px-6 lg:px-8 pt-2 pb-1 max-w-350 mx-auto flex items-center gap-3">
                 <span>
-                  {filtered.length} of {places.length} places
+                  {filtered.length} of {places.length - deprecatedCount} places
                 </span>
                 {mergedCount > 0 && (
                   <span>
@@ -1391,6 +1398,11 @@ function PlacesPageInner() {
                         </button>
                       </>
                     )}
+                  </span>
+                )}
+                {deprecatedCount > 0 && (
+                  <span className="text-stm-warm-300">
+                    &middot; {deprecatedCount} deprecated
                   </span>
                 )}
               </div>

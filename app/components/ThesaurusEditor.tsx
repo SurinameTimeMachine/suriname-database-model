@@ -417,8 +417,14 @@ export default function ThesaurusEditor({ canEdit }: ThesaurusEditorProps) {
             {langEn(scheme.prefLabel)}
           </h2>
           <p className="text-xs text-stm-warm-400 mt-0.5">
-            SKOS ConceptScheme -- {concepts.length} place type concepts -- en /
-            nl / srn
+            SKOS ConceptScheme -- {concepts.filter((c) => !c.deprecated).length}{' '}
+            place type concepts -- en / nl / srn
+            {concepts.some((c) => c.deprecated) && (
+              <span className="text-stm-warm-300">
+                {' '}
+                ({concepts.filter((c) => c.deprecated).length} deprecated)
+              </span>
+            )}
           </p>
         </div>
         {canEdit && !isCreating && (
@@ -604,11 +610,13 @@ export default function ThesaurusEditor({ canEdit }: ThesaurusEditorProps) {
                 ))}
               </optgroup>
               <optgroup label="Existing Concepts">
-                {concepts.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {langEn(c.prefLabel)} ({c.crmBadge}) [{c.typeId}]
-                  </option>
-                ))}
+                {concepts
+                  .filter((c) => !c.deprecated)
+                  .map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {langEn(c.prefLabel)} ({c.crmBadge}) [{c.typeId}]
+                    </option>
+                  ))}
               </optgroup>
             </select>
           </div>
@@ -763,35 +771,37 @@ export default function ThesaurusEditor({ canEdit }: ThesaurusEditorProps) {
               Related Concepts
             </label>
             <div className="mt-1 max-h-32 overflow-y-auto border border-stm-warm-200 rounded bg-white p-2 grid grid-cols-2 gap-x-4 gap-y-1">
-              {concepts.map((c) => {
-                const cId = c.id;
-                const checked = createDraft.related.includes(cId);
-                return (
-                  <label
-                    key={c.typeId}
-                    className="flex items-center gap-1.5 cursor-pointer text-xs text-stm-warm-700 hover:text-stm-warm-900"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={checked}
-                      onChange={() =>
-                        setCreateDraft({
-                          ...createDraft,
-                          related: checked
-                            ? createDraft.related.filter((r) => r !== cId)
-                            : [...createDraft.related, cId],
-                        })
-                      }
-                      className="rounded border-stm-warm-300"
-                    />
-                    <span
-                      className="w-2.5 h-2.5 rounded-sm shrink-0 inline-block"
-                      style={{ backgroundColor: c.color }}
-                    />
-                    {langEn(c.prefLabel)}
-                  </label>
-                );
-              })}
+              {concepts
+                .filter((c) => !c.deprecated)
+                .map((c) => {
+                  const cId = c.id;
+                  const checked = createDraft.related.includes(cId);
+                  return (
+                    <label
+                      key={c.typeId}
+                      className="flex items-center gap-1.5 cursor-pointer text-xs text-stm-warm-700 hover:text-stm-warm-900"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() =>
+                          setCreateDraft({
+                            ...createDraft,
+                            related: checked
+                              ? createDraft.related.filter((r) => r !== cId)
+                              : [...createDraft.related, cId],
+                          })
+                        }
+                        className="rounded border-stm-warm-300"
+                      />
+                      <span
+                        className="w-2.5 h-2.5 rounded-sm shrink-0 inline-block"
+                        style={{ backgroundColor: c.color }}
+                      />
+                      {langEn(c.prefLabel)}
+                    </label>
+                  );
+                })}
             </div>
           </div>
 
@@ -1212,7 +1222,7 @@ export default function ThesaurusEditor({ canEdit }: ThesaurusEditorProps) {
                             if (!draft || !rawJsonLd) return;
                             if (
                               !confirm(
-                                `Delete "${langEn(draft.prefLabel)}"? This cannot be undone.`,
+                                `Deprecate "${langEn(draft.prefLabel)}"? The entry will be archived but kept in the file so its ID is never reused.`,
                               )
                             )
                               return;
@@ -1230,10 +1240,20 @@ export default function ThesaurusEditor({ canEdit }: ThesaurusEditorProps) {
                                   data.error || 'Failed to delete',
                                 );
                               }
+                              // Mark deprecated in local state — entry stays in rawJsonLd
+                              const today = new Date()
+                                .toISOString()
+                                .slice(0, 10);
                               const updatedGraph = (
                                 rawJsonLd['@graph'] as Record<string, unknown>[]
-                              ).filter(
-                                (entry) => entry.typeId !== draft.typeId,
+                              ).map((entry) =>
+                                entry.typeId === draft.typeId
+                                  ? {
+                                      ...entry,
+                                      deprecated: true,
+                                      deprecatedAt: today,
+                                    }
+                                  : entry,
                               );
                               const updatedJsonLd = {
                                 ...rawJsonLd,
@@ -1246,7 +1266,9 @@ export default function ThesaurusEditor({ canEdit }: ThesaurusEditorProps) {
                               invalidateThesaurusCache();
                               setEditingId(null);
                               setDraft(null);
-                              setSuccess(`Deleted: ${langEn(draft.prefLabel)}`);
+                              setSuccess(
+                                `Deprecated: ${langEn(draft.prefLabel)}`,
+                              );
                             } catch (err) {
                               setError(
                                 err instanceof Error

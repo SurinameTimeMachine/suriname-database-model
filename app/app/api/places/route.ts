@@ -275,13 +275,14 @@ export async function PUT(request: NextRequest) {
   }
 }
 
-/** Delete a place from the gazetteer. */
+/** Deprecate (soft-delete) a place from the gazetteer.
+ *  The entry is kept in the file with tombstone fields so its URI is never reused. */
 export async function DELETE(request: NextRequest) {
   const auth = await authorize();
   if (auth.error) return auth.error;
   const { token } = auth;
 
-  const { id } = await request.json();
+  const { id, deprecationNote } = await request.json();
 
   if (!id) {
     return NextResponse.json(
@@ -303,8 +304,40 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
+    if (gazetteer[idx].mergedInto) {
+      return NextResponse.json(
+        {
+          error:
+            'This place has already been merged into another entry and cannot be deprecated separately.',
+        },
+        { status: 409 },
+      );
+    }
+
+    if (gazetteer[idx].deprecated) {
+      return NextResponse.json(
+        { error: `Place "${id}" is already deprecated.` },
+        { status: 409 },
+      );
+    }
+
     const label = getPreferredName(gazetteer[idx]);
-    gazetteer.splice(idx, 1);
+    const now = new Date().toISOString().split('T')[0];
+    const { login } = await (
+      await fetch('https://api.github.com/user', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+    ).json();
+
+    // Tombstone: mark deprecated in-place — never remove the entry
+    const entry = gazetteer[idx] as Record<string, unknown>;
+    entry.deprecated = true;
+    entry.deprecatedAt = now;
+    entry.deprecatedBy = login;
+    if (typeof deprecationNote === 'string' && deprecationNote.trim()) {
+      entry.deprecationNote = deprecationNote.trim();
+    }
+
     jsonld['@graph'] = gazetteer;
 
     const jsonStr = JSON.stringify(jsonld, null, 2);
@@ -313,7 +346,7 @@ export async function DELETE(request: NextRequest) {
       GAZETTEER_PATH,
       jsonStr,
       sha,
-      `Delete place: ${label}`,
+      `Deprecate place: ${label} (id: ${id})`,
     );
     syncPublicCopy(jsonStr);
 

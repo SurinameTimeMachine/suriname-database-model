@@ -1,8 +1,33 @@
 import { hasRepoAccess, readRepoFile, writeRepoFile } from '@/lib/github';
 import { getSessionToken } from '@/lib/session';
+import { readFileSync } from 'fs';
 import { NextRequest, NextResponse } from 'next/server';
+import { join } from 'path';
 
 const THESAURUS_PATH = 'data/place-types-thesaurus.jsonld';
+
+/** Path to the local gazetteer file — used for the typeId-in-use guard. */
+const GAZETTEER_FILE = join(
+  process.cwd(),
+  '..',
+  'data',
+  'places-gazetteer.jsonld',
+);
+
+/** Count active (non-deprecated, non-merged) gazetteer entries using a given typeId. */
+function countActivePlacesUsingType(typeId: string): number {
+  try {
+    const data = JSON.parse(readFileSync(GAZETTEER_FILE, 'utf-8'));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const graph: any[] = data['@graph'] || [];
+    return graph.filter(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (e: any) => e.type === typeId && !e.deprecated && !e.mergedInto,
+    ).length;
+  } catch {
+    return 0;
+  }
+}
 
 async function authorize(): Promise<
   | { token: string; error?: undefined }
@@ -132,18 +157,32 @@ export async function PUT(request: NextRequest) {
   }
 }
 
-/** Delete a concept from the thesaurus. */
+/** Deprecate (soft-delete) a concept from the thesaurus.
+ *  The entry is kept in the file with tombstone fields and owl:deprecated so its typeId is never reused.
+ *  Blocked if active gazetteer places still reference this typeId and no replacedBy is provided. */
 export async function DELETE(request: NextRequest) {
   const auth = await authorize();
   if (auth.error) return auth.error;
   const { token } = auth;
 
-  const { typeId } = await request.json();
+  const { typeId, replacedBy, deprecationNote } = await request.json();
 
   if (!typeId) {
     return NextResponse.json(
       { error: 'Missing required field: typeId' },
       { status: 400 },
+    );
+  }
+
+  // Guard: block if active places use this typeId and no replacement is specified
+  const activeCount = countActivePlacesUsingType(typeId);
+  if (activeCount > 0 && !replacedBy) {
+    return NextResponse.json(
+      {
+        error: `${activeCount} active place${activeCount === 1 ? '' : 's'} use the type "${typeId}". Provide a replacedBy typeId or re-assign them first.`,
+        activeCount,
+      },
+      { status: 409 },
     );
   }
 
@@ -165,8 +204,38 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
+    if (graph[idx].deprecated === true) {
+      return NextResponse.json(
+        { error: `Concept "${typeId}" is already deprecated.` },
+        { status: 409 },
+      );
+    }
+
     const label = graph[idx].prefLabel || typeId;
-    graph.splice(idx, 1);
+    const now = new Date().toISOString().split('T')[0];
+    const { login } = await (
+      await fetch('https://api.github.com/user', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+    ).json();
+
+    // Tombstone fields
+    graph[idx].deprecated = true;
+    graph[idx].deprecatedAt = now;
+    graph[idx].deprecatedBy = login;
+    if (replacedBy) {
+      graph[idx].replacedBy = replacedBy;
+    }
+    if (typeof deprecationNote === 'string' && deprecationNote.trim()) {
+      graph[idx].deprecationNote = deprecationNote.trim();
+    }
+
+    // Append to skos:historyNote
+    const replacedMsg = replacedBy ? ` Replaced by: ${replacedBy}.` : '';
+    const noteMsg = `Deprecated ${now} by ${login}.${replacedMsg}`;
+    const existing = graph[idx].historyNote;
+    graph[idx].historyNote = existing ? `${existing} | ${noteMsg}` : noteMsg;
+
     jsonld['@graph'] = graph;
 
     await writeRepoFile(
@@ -174,7 +243,7 @@ export async function DELETE(request: NextRequest) {
       THESAURUS_PATH,
       JSON.stringify(jsonld, null, 2) + '\n',
       sha,
-      `Delete concept: ${label}`,
+      `Deprecate concept: ${label} (id: ${typeId})`,
     );
 
     return NextResponse.json({ ok: true });

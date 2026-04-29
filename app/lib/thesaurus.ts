@@ -32,6 +32,8 @@ export interface PlaceTypeConcept {
   closeMatch: string[];
   created: string | null;
   modified: string | null;
+  /** Present and true when the concept has been deprecated (soft-deleted). */
+  deprecated?: true;
 }
 
 export interface ThesaurusScheme {
@@ -130,6 +132,7 @@ export function parseThesaurus(data: any): ThesaurusData {
       closeMatch: toArray(e.closeMatch),
       created: e.created || null,
       modified: e.modified || null,
+      ...(e.deprecated === true ? { deprecated: true as const } : {}),
     }))
     .sort((a, b) => a.sortOrder - b.sortOrder);
 

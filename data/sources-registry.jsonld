@@ -2,6 +2,9 @@
   "@context": {
     "crm": "http://www.cidoc-crm.org/cidoc-crm/",
     "dct": "http://purl.org/dc/terms/",
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "prov": "http://www.w3.org/ns/prov#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
     "sdo": "https://schema.org/",
     "stm": "https://data.suriname-timemachine.org/",
     "prefLabel": "crm:P1_is_identified_by",
@@ -25,7 +28,18 @@
     "iiifInfoUrl": "stm:iiifInfoUrl",
     "linkedToGazetteer": "stm:linkedToGazetteer",
     "description": "dct:description",
-    "collectionUrl": "stm:collectionUrl"
+    "collectionUrl": "stm:collectionUrl",
+    "deprecated": "owl:deprecated",
+    "deprecatedAt": {
+      "@id": "prov:invalidatedAtTime",
+      "@type": "xsd:date"
+    },
+    "deprecatedBy": "stm:deprecatedBy",
+    "replacedBy": {
+      "@id": "dct:isReplacedBy",
+      "@type": "@id"
+    },
+    "deprecationNote": "stm:deprecationNote"
   },
   "@id": "https://data.suriname-timemachine.org/registry/sources",
   "@type": "dct:Dataset",

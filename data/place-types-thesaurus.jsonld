@@ -70,7 +70,20 @@
       "@type": "xsd:integer"
     },
     "created": "dct:created",
-    "modified": "dct:modified"
+    "modified": "dct:modified",
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "prov": "http://www.w3.org/ns/prov#",
+    "deprecated": "owl:deprecated",
+    "deprecatedAt": {
+      "@id": "prov:invalidatedAtTime",
+      "@type": "xsd:date"
+    },
+    "deprecatedBy": "stm:deprecatedBy",
+    "replacedBy": {
+      "@id": "dct:isReplacedBy",
+      "@type": "@id"
+    },
+    "deprecationNote": "stm:deprecationNote"
   },
   "@graph": [
     {
