@@ -7,7 +7,7 @@ import type {
   PlaceName,
 } from '@/lib/types';
 import { getPreferredName } from '@/lib/types';
-import { useCallback, useMemo, useState, type ReactNode } from 'react';
+import { type ReactNode, useCallback, useMemo, useState } from 'react';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -37,6 +37,7 @@ export interface PlaceMergeViewProps {
   placeA: GazetteerPlace;
   placeB: GazetteerPlace;
   districts: GazetteerPlace[];
+  canEdit: boolean;
   onMerge: (merged: GazetteerPlace, retiredId: string) => Promise<void>;
   onCancel: () => void;
 }
@@ -96,13 +97,13 @@ function computeMergedPlace(
   const pick = <T,>(choice: ScalarChoice, va: T, vb: T): T =>
     choice === 'a' ? va : vb;
 
-  const sources = [
-    ...new Set([...placeA.sources, ...placeB.sources]),
-  ].filter((s) => !resolution.excludedSources.has(s));
+  const sources = [...new Set([...placeA.sources, ...placeB.sources])].filter(
+    (s) => !resolution.excludedSources.has(s),
+  );
 
-  const psurIds = [
-    ...new Set([...placeA.psurIds, ...placeB.psurIds]),
-  ].filter((id) => !resolution.excludedPsurIds.has(id));
+  const psurIds = [...new Set([...placeA.psurIds, ...placeB.psurIds])].filter(
+    (id) => !resolution.excludedPsurIds.has(id),
+  );
 
   // Deduplicate external links by authority+identifier
   const seenLinks = new Set<string>();
@@ -204,12 +205,16 @@ function PlaceCard({
           <span className="text-xs font-semibold text-stm-warm-500 uppercase tracking-wide">
             {label}
           </span>
-          <span className="text-xs font-mono text-stm-warm-300">{place.id}</span>
+          <span className="text-xs font-mono text-stm-warm-300">
+            {place.id}
+          </span>
         </div>
         <p className="font-medium text-stm-warm-800 truncate">
           {getPreferredName(place)}
         </p>
-        <p className="text-xs text-stm-warm-500 mt-0.5 capitalize">{place.type}</p>
+        <p className="text-xs text-stm-warm-500 mt-0.5 capitalize">
+          {place.type}
+        </p>
         {isPrimary && (
           <p className="text-xs text-stm-sepia-600 font-medium mt-1.5">
             Primary &mdash; this ID survives
@@ -304,7 +309,7 @@ function SameValueRow({ value }: { value: ReactNode }) {
   );
 }
 
-function MergeArraySection<T,>({
+function MergeArraySection<T>({
   items,
   keyFn,
   labelFn,
@@ -350,6 +355,7 @@ function MergeArraySection<T,>({
 export default function PlaceMergeView({
   placeA,
   placeB,
+  canEdit,
   onMerge,
   onCancel,
 }: PlaceMergeViewProps) {
@@ -373,17 +379,17 @@ export default function PlaceMergeView({
 
   const setScalar = useCallback(
     (
-        field: keyof Pick<
-          MergeResolution,
-          | 'type'
-          | 'description'
-          | 'location'
-          | 'wikidataQid'
-          | 'fid'
-          | 'broader'
-          | 'district'
-        >,
-      ) =>
+      field: keyof Pick<
+        MergeResolution,
+        | 'type'
+        | 'description'
+        | 'location'
+        | 'wikidataQid'
+        | 'fid'
+        | 'broader'
+        | 'district'
+      >,
+    ) =>
       (choice: ScalarChoice) =>
         setResolution((r) => ({ ...r, [field]: choice })),
     [],
@@ -391,12 +397,12 @@ export default function PlaceMergeView({
 
   const toggleArrayItem = useCallback(
     (
-        field:
-          | 'excludedSources'
-          | 'excludedPsurIds'
-          | 'excludedExternalLinks'
-          | 'excludedDiklandRefs',
-      ) =>
+      field:
+        | 'excludedSources'
+        | 'excludedPsurIds'
+        | 'excludedExternalLinks'
+        | 'excludedDiklandRefs',
+    ) =>
       (key: string) => {
         setResolution((r) => {
           const next = new Set(r[field]);
@@ -486,7 +492,6 @@ export default function PlaceMergeView({
       {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-4xl mx-auto px-6 py-6 space-y-8">
-
           {/* Primary selection */}
           <section>
             <SectionHeader>
@@ -510,9 +515,7 @@ export default function PlaceMergeView({
 
           {/* Names */}
           <section>
-            <SectionHeader>
-              Names ({includedNameCount} included)
-            </SectionHeader>
+            <SectionHeader>Names ({includedNameCount} included)</SectionHeader>
             <div className="space-y-1.5">
               {mergedNames.map((mn, i) => {
                 const originBadge =
@@ -641,7 +644,9 @@ export default function PlaceMergeView({
                       {placeA.location.lng?.toFixed(4)}
                     </span>
                   ) : (
-                    <em className="text-stm-warm-300 text-xs">no coordinates</em>
+                    <em className="text-stm-warm-300 text-xs">
+                      no coordinates
+                    </em>
                   )
                 }
               />
@@ -777,9 +782,7 @@ export default function PlaceMergeView({
               <MergeArraySection
                 items={allSources}
                 keyFn={(s) => s}
-                labelFn={(s) => (
-                  <span className="font-mono text-xs">{s}</span>
-                )}
+                labelFn={(s) => <span className="font-mono text-xs">{s}</span>}
                 excluded={resolution.excludedSources}
                 onToggle={toggleArrayItem('excludedSources')}
               />
@@ -892,11 +895,14 @@ export default function PlaceMergeView({
       <div className="border-t border-stm-warm-200 bg-white px-6 py-4 flex items-center justify-between shrink-0">
         {error ? (
           <p className="text-sm text-red-600">{error}</p>
+        ) : !canEdit ? (
+          <p className="text-sm text-stm-warm-400">
+            Sign in with GitHub to save a merge.
+          </p>
         ) : (
           <p className="text-sm text-stm-warm-500">
-            Merging{' '}
-            <span className="font-mono font-medium">{retiredId}</span> into{' '}
-            <span className="font-mono font-medium">{primaryId}</span>
+            Merging <span className="font-mono font-medium">{retiredId}</span>{' '}
+            into <span className="font-mono font-medium">{primaryId}</span>
           </p>
         )}
         <div className="flex items-center gap-3">
@@ -909,7 +915,8 @@ export default function PlaceMergeView({
           </button>
           <button
             onClick={handleConfirm}
-            disabled={saving || includedNameCount === 0}
+            disabled={saving || includedNameCount === 0 || !canEdit}
+            title={!canEdit ? 'Sign in with GitHub to save' : undefined}
             className="px-4 py-2 text-sm font-medium bg-stm-sepia-600 text-white hover:bg-stm-sepia-700 disabled:opacity-50 transition-colors"
           >
             {saving ? 'Merging...' : 'Confirm Merge'}

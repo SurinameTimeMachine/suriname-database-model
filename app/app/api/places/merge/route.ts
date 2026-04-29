@@ -111,14 +111,12 @@ export async function POST(request: NextRequest) {
     mergedPlace: GazetteerPlace;
   } = body;
 
-  if (
-    !primaryId ||
-    !retiredId ||
-    !mergedPlace ||
-    primaryId === retiredId
-  ) {
+  if (!primaryId || !retiredId || !mergedPlace || primaryId === retiredId) {
     return NextResponse.json(
-      { error: 'Invalid merge request: primaryId, retiredId and mergedPlace are required and must differ' },
+      {
+        error:
+          'Invalid merge request: primaryId, retiredId and mergedPlace are required and must differ',
+      },
       { status: 400 },
     );
   }
