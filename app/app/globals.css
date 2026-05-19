@@ -1,9 +1,26 @@
 @import 'tailwindcss';
 
 /* ──────────────────────────────────────────────────────────
-   Design Tokens — Suriname Time Machine
-   Aligned with surinametijdmachine.org visual identity
+   Brand Tokens — Suriname Time Machine Design System
+   Official palette from surinametijdmachine.org kit/
    ────────────────────────────────────────────────────────── */
+:root {
+  --background: #f4f8f7;
+  --foreground: #0e231f;
+  --ink: #0b3c34;
+  --teal-strong: #006d5b;
+  --teal-bright: #34d1b3;
+  --teal-soft: #b9f4e6;
+  --sand: #fff7e6;
+  --deep-teal: #003c34;
+  --cream: #fdf8f2;
+}
+
+::selection {
+  background: var(--teal-bright);
+  color: var(--ink);
+}
+
 @theme {
   /* Sharp corners -- no border-radius anywhere (matches navbar aesthetic) */
   --radius-xs: 0px;
@@ -16,38 +33,39 @@
   --radius-4xl: 0px;
   --radius: 0px;
 
-  --color-stm-sepia-50: #fdf8f0;
-  --color-stm-sepia-100: #f5ead6;
-  --color-stm-sepia-200: #e8d5b0;
-  --color-stm-sepia-300: #d4b67e;
-  --color-stm-sepia-400: #c0944e;
-  --color-stm-sepia-500: #a67830;
-  --color-stm-sepia-600: #8c6228;
-  --color-stm-sepia-700: #6e4d20;
-  --color-stm-sepia-800: #503818;
-  --color-stm-sepia-900: #3a2810;
+  /* Legacy aliases mapped to STM 2026 palette for backward compatibility */
+  --color-stm-sepia-50: #fff7e6;
+  --color-stm-sepia-100: #fff1da;
+  --color-stm-sepia-200: #fbe4b8;
+  --color-stm-sepia-300: #f2c98a;
+  --color-stm-sepia-400: #e3ac5d;
+  --color-stm-sepia-500: #c78930;
+  --color-stm-sepia-600: #a96d23;
+  --color-stm-sepia-700: #83531b;
+  --color-stm-sepia-800: #603b14;
+  --color-stm-sepia-900: #3f270d;
 
-  --color-stm-teal-50: #eefcfa;
-  --color-stm-teal-100: #c5f5ee;
-  --color-stm-teal-200: #87e8d8;
-  --color-stm-teal-300: #4dd4be;
-  --color-stm-teal-400: #22b8a0;
-  --color-stm-teal-500: #0f9683;
-  --color-stm-teal-600: #0b7a6b;
-  --color-stm-teal-700: #095e52;
-  --color-stm-teal-800: #074a41;
-  --color-stm-teal-900: #053630;
+  --color-stm-teal-50: #ecfbf7;
+  --color-stm-teal-100: #d6f8ef;
+  --color-stm-teal-200: #b9f4e6;
+  --color-stm-teal-300: #7fe9d3;
+  --color-stm-teal-400: #34d1b3;
+  --color-stm-teal-500: #14aa8f;
+  --color-stm-teal-600: #006d5b;
+  --color-stm-teal-700: #005449;
+  --color-stm-teal-800: #003c34;
+  --color-stm-teal-900: #002a25;
 
-  --color-stm-warm-50: #faf9f7;
-  --color-stm-warm-100: #f0eeea;
-  --color-stm-warm-200: #ddd9d2;
-  --color-stm-warm-300: #c4beb4;
-  --color-stm-warm-400: #a39b8e;
-  --color-stm-warm-500: #8a8172;
-  --color-stm-warm-600: #6e6658;
-  --color-stm-warm-700: #534c40;
-  --color-stm-warm-800: #3a352c;
-  --color-stm-warm-900: #242019;
+  --color-stm-warm-50: #f4f8f7;
+  --color-stm-warm-100: #edf3f1;
+  --color-stm-warm-200: #dce8e4;
+  --color-stm-warm-300: #b7cbc5;
+  --color-stm-warm-400: #7e9a93;
+  --color-stm-warm-500: #5f7e76;
+  --color-stm-warm-600: #49635d;
+  --color-stm-warm-700: #29473f;
+  --color-stm-warm-800: #16362f;
+  --color-stm-warm-900: #0e231f;
 
   /* Entity type colors — CRITERIA / George Bruseker CIDOC-CRM scheme
      Canonical across all pages: model, places, sources, vocabulary, homepage.
@@ -71,8 +89,20 @@
   --color-entity-e68: #e0b0b0; /* E68 Dissolution — org absorption (dusty rose) */
   --color-entity-prov: #d4c4fb; /* prov:ProvenanceRecord — provenance (lavender) */
 
-  --font-serif: var(--font-serif);
-  --font-sans: var(--font-sans);
+  /* Brand tokens re-exposed to Tailwind v4 */
+  --color-background: #f4f8f7;
+  --color-foreground: #0e231f;
+  --color-ink: #0b3c34;
+  --color-teal-strong: #006d5b;
+  --color-teal-bright: #34d1b3;
+  --color-teal-soft: #b9f4e6;
+  --color-sand: #fff7e6;
+  --color-deep-teal: #003c34;
+  --color-cream: #fdf8f2;
+
+  --font-sans: var(--font-geist-sans);
+  --font-serif: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
 }
 
 html,
@@ -80,6 +110,186 @@ body {
   margin: 0;
   padding: 0;
   height: 100%;
+}
+
+body {
+  background: var(--background);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* ──────────────────────────────────────────────────────────
+   STM Design System — Utility Classes (kit/globals.css)
+   ────────────────────────────────────────────────────────── */
+
+/* .flag-label — skewed teal marker + spaced uppercase text */
+.flag-label {
+  position: relative;
+  padding-left: 1.5rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+}
+.flag-label::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 0.75rem;
+  height: 0.75rem;
+  background: var(--teal-bright);
+  transform: translateY(-50%) skewX(-20deg);
+}
+
+/* .hero-surface — deep-teal gradient hero background */
+.hero-surface {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    var(--deep-teal) 0%,
+    #004f43 55%,
+    var(--teal-strong) 100%
+  );
+  color: white;
+  overflow: hidden;
+}
+.hero-surface::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    140deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    transparent 50%
+  );
+  pointer-events: none;
+}
+.hero-surface::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 40%;
+  height: 60%;
+  background: var(--teal-bright);
+  opacity: 0.07;
+  clip-path: polygon(40% 0, 100% 30%, 100% 100%, 0 100%);
+  pointer-events: none;
+}
+
+/* .angled-card — white card with diagonal bottom-right cut */
+.angled-card {
+  position: relative;
+  background: white;
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% calc(100% - 30px),
+    calc(100% - 30px) 100%,
+    0 100%
+  );
+}
+.angled-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 30px;
+  height: 30px;
+  background: var(--cream);
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+  pointer-events: none;
+}
+
+/* .cut-corner — section container with top-left corner cut + teal-soft accent */
+.cut-corner {
+  position: relative;
+  clip-path: polygon(2.25rem 0, 100% 0, 100% 100%, 0 100%, 0 2.25rem);
+}
+.cut-corner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4rem;
+  height: 4rem;
+  background: radial-gradient(
+    circle at top left,
+    var(--teal-soft),
+    transparent 70%
+  );
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* .angled-panel — subtle 120deg teal-bright gradient overlay */
+.angled-panel {
+  position: relative;
+  overflow: hidden;
+}
+.angled-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, var(--teal-bright), transparent);
+  opacity: 0.2;
+  pointer-events: none;
+}
+
+/* .diagonal-stack — two overlapping diagonal colour overlays */
+.diagonal-stack {
+  position: relative;
+  overflow: hidden;
+}
+.diagonal-stack::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--teal-strong), transparent 60%);
+  opacity: 0.12;
+  pointer-events: none;
+}
+.diagonal-stack::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(315deg, var(--teal-bright), transparent 50%);
+  opacity: 0.08;
+  pointer-events: none;
+}
+
+/* ──────────────────────────────────────────────────────────
+   Link & Button Styling
+   ────────────────────────────────────────────────────────── */
+
+a {
+  color: var(--ink);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+a:hover {
+  color: var(--teal-strong);
+}
+
+a.rich-text-link {
+  color: var(--teal-strong);
+  text-decoration: underline;
+  text-decoration-color: rgba(0, 109, 91, 0.35);
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.15s ease;
+}
+
+a.rich-text-link:hover {
+  text-decoration-color: var(--teal-strong);
+}
+
+button {
+  font-family: var(--font-sans);
+  transition: all 0.15s ease;
+  cursor: pointer;
 }
 
 /* Leaflet tooltip */

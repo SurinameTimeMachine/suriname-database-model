@@ -6,12 +6,18 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
 const NAV_ITEMS = [
-  { href: '/explore', label: 'Explore Map' },
+  { href: '/explore', label: 'Map' },
   { href: '/places', label: 'Places' },
   { href: '/sources', label: 'Sources' },
-  { href: '/model', label: 'Data Model' },
+  { href: '/model', label: 'Model' },
   { href: '/vocabulary', label: 'Vocabulary' },
 ] as const;
+
+const DOMAIN_LINKS: { label: string; href: string; isCurrent?: boolean }[] = [
+  { label: 'About', href: 'https://surinametijdmachine.org' },
+  { label: 'Images', href: 'https://images.surinametijdmachine.org' },
+  { label: 'Data', href: '/', isCurrent: true },
+];
 
 export default function Navigation() {
   const pathname = usePathname();
@@ -28,7 +34,6 @@ export default function Navigation() {
           ? 'GitHub login failed: no authorization code received.'
           : 'GitHub login failed: could not exchange token. Please try again.',
       );
-      // Clean URL without reloading
       window.history.replaceState({}, '', pathname);
     }
   }, [searchParams, pathname]);
@@ -44,36 +49,63 @@ export default function Navigation() {
 
   return (
     <>
-      <nav
-        className="relative bg-stm-warm-900/95 backdrop-blur-sm border-b border-stm-sepia-700/30 z-1000"
-        role="navigation"
-        aria-label="Main navigation"
+      <header
+        id="site-header"
+        className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur-sm font-sans"
+        role="banner"
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex h-14 items-center justify-between">
-            {/* Brand */}
-            <Link
-              href="/"
-              className="flex items-center gap-2.5 shrink-0"
-              aria-label="Suriname Time Machine - Home"
-            >
-              <span className="text-stm-sepia-300 font-bold text-lg tracking-tight font-serif">
-                Suriname Time Machine
-              </span>
-            </Link>
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-10">
+          <div className="flex items-center justify-between gap-3 py-3">
+            <div className="flex min-w-0 items-center gap-3 sm:gap-4">
+              <Link
+                href="/"
+                aria-label="Suriname Time Machine — Home"
+                className="flex shrink-0 items-center gap-2"
+              >
+                <span
+                  className="h-3 w-3 -skew-x-12 bg-teal-strong"
+                  aria-hidden
+                />
+                <span className="text-xs font-semibold uppercase tracking-[0.35em] text-ink transition-colors hover:text-teal-strong">
+                  STM
+                </span>
+              </Link>
 
-            {/* Desktop nav + auth */}
-            <div className="hidden sm:flex items-center gap-1">
+              <nav
+                aria-label="STM domains"
+                className="flex min-w-0 items-center gap-2 whitespace-nowrap text-sm"
+              >
+                {DOMAIN_LINKS.map(({ label, href, isCurrent }, index) => (
+                  <div key={label} className="flex items-center gap-2">
+                    {index > 0 && <span className="text-ink/20">•</span>}
+                    <a
+                      href={href}
+                      aria-current={isCurrent ? 'page' : undefined}
+                      className={
+                        isCurrent
+                          ? 'font-semibold text-ink'
+                          : 'text-ink/60 transition-colors hover:text-ink'
+                      }
+                    >
+                      {label}
+                    </a>
+                  </div>
+                ))}
+              </nav>
+            </div>
+
+            <nav
+              aria-label="Main navigation"
+              className="hidden md:flex min-w-0 flex-1 items-center justify-center gap-4 lg:gap-6 text-xs uppercase tracking-[0.2em]"
+            >
               {NAV_ITEMS.map(({ href, label }) => {
                 const active = pathname.startsWith(href);
                 return (
                   <Link
                     key={href}
                     href={href}
-                    className={`px-3 py-1.5 text-sm font-medium transition-colors ${
-                      active
-                        ? 'bg-stm-sepia-700/40 text-stm-sepia-100'
-                        : 'text-stm-warm-300 hover:text-stm-sepia-100 hover:bg-stm-warm-800/60'
+                    className={`font-medium transition-colors ${
+                      active ? 'text-ink' : 'text-ink/60 hover:text-ink'
                     }`}
                     aria-current={active ? 'page' : undefined}
                   >
@@ -81,55 +113,59 @@ export default function Navigation() {
                   </Link>
                 );
               })}
+            </nav>
 
-              {/* Auth section */}
-              <div className="ml-3 pl-3 border-l border-stm-warm-700/50 flex items-center gap-2">
-                {authLoading ? (
-                  <span className="text-xs text-stm-warm-500">...</span>
-                ) : user ? (
-                  <>
-                    <img
-                      src={user.avatar_url}
-                      alt={user.login}
-                      className="w-6 h-6 rounded-full"
-                    />
-                    <span className="text-xs text-stm-warm-300">
-                      {user.name || user.login}
+            <div className="hidden sm:flex shrink-0 items-center gap-2 border-l border-slate-200 pl-3">
+              <button
+                type="button"
+                aria-label="Language selector"
+                className="text-xs font-medium uppercase tracking-[0.25em] text-ink/40 transition-colors hover:text-ink border-none bg-transparent"
+              >
+                EN
+              </button>
+              {authLoading ? (
+                <span className="text-xs text-ink/40">…</span>
+              ) : user ? (
+                <>
+                  <img
+                    src={user.avatar_url}
+                    alt={user.login}
+                    className="h-5 w-5 rounded-full"
+                  />
+                  {canEdit && (
+                    <span className="bg-teal-soft px-1.5 py-0.5 text-[10px] uppercase tracking-[0.2em] text-teal-strong">
+                      Editor
                     </span>
-                    {canEdit && (
-                      <span className="text-[10px] bg-stm-teal-800/60 text-stm-teal-300 px-1.5 py-0.5 rounded">
-                        Editor
-                      </span>
-                    )}
-                    <button
-                      onClick={signOut}
-                      className="text-[10px] text-stm-warm-500 hover:text-stm-warm-300 underline"
-                    >
-                      Sign out
-                    </button>
-                  </>
-                ) : (
+                  )}
                   <button
-                    onClick={signIn}
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium bg-stm-warm-700/60 text-stm-warm-200 rounded hover:bg-stm-warm-700 transition-colors"
+                    onClick={signOut}
+                    className="border-none bg-transparent text-[10px] uppercase tracking-[0.2em] text-ink/40 transition-colors hover:text-teal-strong"
                   >
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 16 16"
-                      fill="currentColor"
-                    >
-                      <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
-                    </svg>
-                    Sign in
+                    Out
                   </button>
-                )}
-              </div>
+                </>
+              ) : (
+                <button
+                  onClick={signIn}
+                  className="inline-flex items-center gap-1.5 border border-slate-200 px-3 py-1.5 text-xs uppercase tracking-[0.2em] text-ink/70 transition-colors hover:border-teal-strong hover:text-teal-strong bg-transparent"
+                >
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 16 16"
+                    fill="currentColor"
+                    aria-hidden
+                  >
+                    <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
+                  </svg>
+                  Sign in
+                </button>
+              )}
             </div>
 
             {/* Mobile hamburger */}
             <button
-              className="sm:hidden flex items-center justify-center w-9 h-9 text-stm-warm-300 hover:text-stm-sepia-100 hover:bg-stm-warm-800/60"
+              className="sm:hidden flex items-center justify-center w-8 h-8 text-ink/60 hover:text-ink transition-colors border-none bg-transparent"
               onClick={() => setMobileOpen(!mobileOpen)}
               aria-expanded={mobileOpen}
               aria-controls="mobile-nav"
@@ -137,28 +173,30 @@ export default function Navigation() {
             >
               {mobileOpen ? (
                 <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 20 20"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 18 18"
                   fill="none"
                   stroke="currentColor"
-                  strokeWidth="2"
+                  strokeWidth="1.5"
+                  aria-hidden
                 >
-                  <line x1="4" y1="4" x2="16" y2="16" />
-                  <line x1="16" y1="4" x2="4" y2="16" />
+                  <line x1="3" y1="3" x2="15" y2="15" />
+                  <line x1="15" y1="3" x2="3" y2="15" />
                 </svg>
               ) : (
                 <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 20 20"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 18 18"
                   fill="none"
                   stroke="currentColor"
-                  strokeWidth="2"
+                  strokeWidth="1.5"
+                  aria-hidden
                 >
-                  <line x1="3" y1="5" x2="17" y2="5" />
-                  <line x1="3" y1="10" x2="17" y2="10" />
-                  <line x1="3" y1="15" x2="17" y2="15" />
+                  <line x1="2" y1="4.5" x2="16" y2="4.5" />
+                  <line x1="2" y1="9" x2="16" y2="9" />
+                  <line x1="2" y1="13.5" x2="16" y2="13.5" />
                 </svg>
               )}
             </button>
@@ -169,47 +207,67 @@ export default function Navigation() {
         {mobileOpen && (
           <div
             id="mobile-nav"
-            className="sm:hidden border-t border-stm-warm-800 bg-stm-warm-900/98 px-4 pb-3 pt-2 space-y-1"
+            className="sm:hidden border-t border-slate-200 bg-white px-4 pb-4 pt-2"
           >
-            {NAV_ITEMS.map(({ href, label }) => {
-              const active = pathname.startsWith(href);
-              return (
-                <Link
-                  key={href}
-                  href={href}
-                  className={`block px-3 py-2 text-sm font-medium ${
-                    active
-                      ? 'bg-stm-sepia-700/40 text-stm-sepia-100'
-                      : 'text-stm-warm-300 hover:text-stm-sepia-100 hover:bg-stm-warm-800/60'
-                  }`}
-                  onClick={() => setMobileOpen(false)}
-                  aria-current={active ? 'page' : undefined}
+            <div className="mb-3 flex items-center gap-2 text-xs">
+              {DOMAIN_LINKS.map(({ label, href, isCurrent }, index) => (
+                <div key={label} className="flex items-center gap-2">
+                  {index > 0 && <span className="text-ink/20">•</span>}
+                  <a
+                    href={href}
+                    aria-current={isCurrent ? 'page' : undefined}
+                    className={
+                      isCurrent ? 'font-semibold text-ink' : 'text-ink/60'
+                    }
+                  >
+                    {label}
+                  </a>
+                </div>
+              ))}
+            </div>
+            <nav aria-label="Mobile navigation" className="space-y-1 mb-3">
+              {NAV_ITEMS.map(({ href, label }) => {
+                const active = pathname.startsWith(href);
+                return (
+                  <Link
+                    key={href}
+                    href={href}
+                    className={`block px-2 py-2 text-xs uppercase tracking-[0.2em] transition-colors ${
+                      active
+                        ? 'text-teal-strong font-semibold'
+                        : 'text-ink/70 hover:text-teal-strong'
+                    }`}
+                    onClick={() => setMobileOpen(false)}
+                    aria-current={active ? 'page' : undefined}
+                  >
+                    {label}
+                  </Link>
+                );
+              })}
+            </nav>
+            <div className="mt-3 border-t border-slate-200 pt-3">
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <button
+                  type="button"
+                  aria-label="Language selector"
+                  className="text-xs font-medium uppercase tracking-[0.25em] text-ink/40 border-none bg-transparent"
                 >
-                  {label}
-                </Link>
-              );
-            })}
-
-            {/* Mobile auth */}
-            <div className="pt-2 mt-2 border-t border-stm-warm-800">
+                  EN
+                </button>
+              </div>
               {user ? (
-                <div className="flex items-center gap-2 px-3 py-2">
+                <div className="flex items-center gap-2">
                   <img
                     src={user.avatar_url}
                     alt={user.login}
-                    className="w-6 h-6 rounded-full"
+                    className="w-5 h-5 rounded-full"
                   />
-                  <span className="text-xs text-stm-warm-300 flex-1">
+                  <span className="text-xs text-ink/60 flex-1">
                     {user.name || user.login}
                   </span>
-                  {canEdit && (
-                    <span className="text-[10px] bg-stm-teal-800/60 text-stm-teal-300 px-1.5 py-0.5 rounded">
-                      Editor
-                    </span>
-                  )}
                   <button
                     onClick={signOut}
-                    className="text-[10px] text-stm-warm-500 hover:text-stm-warm-300 underline"
+                    className="text-xs uppercase tracking-[0.2em] text-ink/40 hover:text-teal-strong border-none bg-transparent"
                   >
                     Sign out
                   </button>
@@ -217,7 +275,7 @@ export default function Navigation() {
               ) : (
                 <button
                   onClick={signIn}
-                  className="block px-3 py-2 text-sm text-stm-warm-300 hover:text-stm-sepia-100 w-full text-left"
+                  className="text-xs uppercase tracking-[0.2em] text-ink/70 hover:text-teal-strong border-none bg-transparent"
                 >
                   Sign in with GitHub
                 </button>
@@ -225,7 +283,7 @@ export default function Navigation() {
             </div>
           </div>
         )}
-      </nav>
+      </header>
 
       {/* Auth error banner */}
       {authError && (
@@ -233,19 +291,18 @@ export default function Navigation() {
           <p className="text-xs text-red-700">{authError}</p>
           <button
             onClick={() => setAuthError(null)}
-            className="text-xs text-red-500 hover:text-red-700 underline"
+            className="text-xs text-red-500 hover:text-red-700 underline border-none bg-transparent"
           >
             Dismiss
           </button>
         </div>
       )}
 
-      {/* Read-only banner for logged-in users without edit rights */}
+      {/* Read-only banner */}
       {user && !canEdit && (
         <div className="bg-amber-50 border-b border-amber-200 px-4 py-1.5 text-center">
           <p className="text-xs text-amber-700">
-            You are signed in as <strong>{user.login}</strong> but do not have
-            edit permissions on this repository. Content is read-only.
+            Signed in as <strong>{user.login}</strong> — read-only access.
           </p>
         </div>
       )}

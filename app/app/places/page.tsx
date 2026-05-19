@@ -1132,23 +1132,39 @@ function PlacesPageInner() {
 
   if (loading) {
     return (
-      <div className="w-full h-full flex items-center justify-center bg-stm-warm-50">
-        <div className="text-center">
-          <div className="w-8 h-8 border-4 border-stm-sepia-400 border-t-transparent animate-spin mx-auto mb-3" />
-          <p className="text-stm-warm-500 text-sm">Loading places...</p>
-        </div>
+      <div className="w-full h-full flex items-center justify-center bg-background px-4">
+        <section
+          role="status"
+          aria-live="polite"
+          aria-busy="true"
+          className="w-full max-w-4xl border border-ink/10 bg-white p-5 shadow-[0_15px_35px_rgba(0,30,24,0.08)]"
+        >
+          <div className="mb-4 flex items-center gap-2 text-xs uppercase tracking-[0.28em] text-ink/60">
+            <span
+              className="h-2.5 w-2.5 -skew-x-12 bg-teal-strong animate-pulse"
+              aria-hidden
+            />
+            Loading places
+          </div>
+          <div className="grid gap-3 sm:grid-cols-4">
+            <div className="h-16 animate-pulse bg-ink/5" />
+            <div className="h-16 animate-pulse bg-ink/5" />
+            <div className="h-16 animate-pulse bg-ink/5" />
+            <div className="h-16 animate-pulse bg-ink/5" />
+          </div>
+        </section>
       </div>
     );
   }
 
   return (
-    <div className="h-full flex flex-col bg-stm-warm-50 overflow-hidden">
+    <div className="h-full flex flex-col bg-background overflow-hidden">
       {/* Top bar: auth + tabs */}
-      <div className="border-b border-stm-warm-200 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+      <div className="border-b border-slate-200 bg-white">
+        <div className="mx-auto max-w-6xl px-4 py-3 sm:px-6 lg:px-10">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <h1 className="text-xl font-serif font-bold text-stm-warm-800">
+              <h1 className="text-xl font-semibold text-ink">
                 Suriname Gazetteer
               </h1>
             </div>
@@ -1168,8 +1184,8 @@ function PlacesPageInner() {
       ) : (
         <>
           {/* Search + filters */}
-          <div className="border-b border-stm-warm-100 bg-white/50">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+          <div className="border-b border-slate-200 bg-white/70">
+            <div className="mx-auto max-w-6xl px-4 py-2 sm:px-6 lg:px-10">
               <div className="flex items-center gap-3 flex-wrap">
                 {/* Search */}
                 <div className="relative flex-1 min-w-48">
@@ -1178,10 +1194,10 @@ function PlacesPageInner() {
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     placeholder="Search by name, district, PSUR ID..."
-                    className="w-full pl-8 pr-8 py-1.5 text-sm border border-stm-warm-200 rounded bg-white focus:ring-2 focus:ring-stm-sepia-400 focus:border-stm-sepia-400 outline-none"
+                    className="w-full border border-slate-200 bg-white py-1.5 pl-8 pr-8 text-sm text-ink/80 outline-none transition focus:border-teal-strong focus:ring-1 focus:ring-teal-bright/20"
                   />
                   <svg
-                    className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stm-warm-400 pointer-events-none"
+                    className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-ink/35 pointer-events-none"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -1192,7 +1208,7 @@ function PlacesPageInner() {
                   {search && (
                     <button
                       onClick={() => setSearch('')}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-stm-warm-400 hover:text-stm-warm-600"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-ink/35 hover:text-teal-strong"
                       aria-label="Clear search"
                     >
                       <svg
@@ -1213,13 +1229,13 @@ function PlacesPageInner() {
 
                 {/* Type filter */}
                 <div className="flex items-center gap-1.5 shrink-0">
-                  <label className="text-xs text-stm-warm-500 whitespace-nowrap">
+                  <label className="text-xs text-ink/55 whitespace-nowrap uppercase tracking-[0.2em]">
                     Place type
                   </label>
                   <select
                     value={typeFilter}
                     onChange={(e) => setTypeFilter(e.target.value)}
-                    className="text-sm border border-stm-warm-200 rounded bg-white pl-2.5 pr-7 py-1.5 text-stm-warm-700 focus:ring-2 focus:ring-stm-sepia-400 focus:border-stm-sepia-400 outline-none cursor-pointer"
+                    className="cursor-pointer border border-slate-200 bg-white py-1.5 pl-2.5 pr-7 text-sm text-ink/75 outline-none transition focus:border-teal-strong focus:ring-1 focus:ring-teal-bright/20"
                   >
                     {typeFilters.map(({ value, label }) => (
                       <option key={value} value={value}>
@@ -1231,7 +1247,7 @@ function PlacesPageInner() {
 
                 {/* Source filter */}
                 {!registryLoading && (
-                  <div className="border-l border-stm-warm-200 pl-3">
+                  <div className="border-l border-slate-200 pl-3">
                     <SourceFilter
                       sources={activeRegistrySources}
                       categories={registryCategories}
@@ -1243,15 +1259,15 @@ function PlacesPageInner() {
 
                 {/* Columns toggle */}
                 <div
-                  className="relative border-l border-stm-warm-200 pl-3 shrink-0"
+                  className="relative border-l border-slate-200 pl-3 shrink-0"
                   ref={columnsRef}
                 >
                   <button
                     onClick={() => setColumnsOpen((o) => !o)}
                     className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs border transition-colors ${
                       columnsOpen
-                        ? 'border-stm-sepia-400 bg-stm-sepia-50 text-stm-sepia-700'
-                        : 'border-stm-warm-200 bg-white text-stm-warm-600 hover:border-stm-warm-300 hover:text-stm-warm-800'
+                        ? 'border-teal-strong bg-teal-soft/30 text-teal-strong'
+                        : 'border-slate-200 bg-white text-ink/60 hover:border-teal-strong/40 hover:text-ink'
                     }`}
                     aria-expanded={columnsOpen}
                     aria-haspopup="true"
@@ -1277,20 +1293,20 @@ function PlacesPageInner() {
                       />
                     </svg>
                     Columns
-                    <span className="text-stm-warm-400">
+                    <span className="text-ink/40">
                       ({visibleColumns.size}/{COLUMN_DEFS.length})
                     </span>
                   </button>
 
                   {columnsOpen && (
-                    <div className="absolute top-full left-0 mt-1 z-20 bg-white border border-stm-warm-200 shadow-md min-w-44 py-1">
+                    <div className="absolute left-0 top-full z-20 mt-1 min-w-44 border border-slate-200 bg-white py-1 shadow-[0_15px_35px_rgba(0,30,24,0.08)]">
                       {COLUMN_DEFS.map((col) => (
                         <label
                           key={col.key}
                           className={`flex items-center gap-2 px-3 py-1.5 text-xs cursor-pointer select-none ${
                             col.alwaysVisible
-                              ? 'text-stm-warm-400 cursor-not-allowed'
-                              : 'text-stm-warm-700 hover:bg-stm-warm-50'
+                              ? 'text-ink/40 cursor-not-allowed'
+                              : 'text-ink/70 hover:bg-background'
                           }`}
                         >
                           <input
@@ -1302,20 +1318,20 @@ function PlacesPageInner() {
                             onChange={() =>
                               !col.alwaysVisible && toggleColumn(col.key)
                             }
-                            className="accent-stm-sepia-500"
+                            className="accent-teal-strong"
                           />
                           {col.label}
                           {col.alwaysVisible && (
-                            <span className="ml-auto text-stm-warm-300 text-[10px]">
+                            <span className="ml-auto text-ink/30 text-[10px]">
                               always
                             </span>
                           )}
                         </label>
                       ))}
-                      <div className="border-t border-stm-warm-100 mt-1 pt-1 px-3 pb-1">
+                      <div className="mt-1 border-t border-slate-200 px-3 pb-1 pt-1">
                         <button
                           onClick={resetColumns}
-                          className="text-[11px] text-stm-warm-400 hover:text-stm-sepia-600 transition-colors"
+                          className="text-[11px] text-ink/45 hover:text-teal-strong transition-colors"
                         >
                           Reset to defaults
                         </button>
@@ -1326,8 +1342,8 @@ function PlacesPageInner() {
 
                 {/* Merge selection controls — only shown when logged in and 1+ entries are checked */}
                 {canEdit && mergeCheckIds.length > 0 && (
-                  <div className="flex items-center gap-2 border-l border-stm-warm-200 pl-3 shrink-0">
-                    <span className="text-xs text-stm-sepia-600 whitespace-nowrap">
+                  <div className="flex items-center gap-2 border-l border-slate-200 pl-3 shrink-0">
+                    <span className="text-xs text-teal-strong whitespace-nowrap uppercase tracking-[0.2em]">
                       {mergeCheckIds.length === 1
                         ? '1 of 2 selected'
                         : '2 selected, ready to merge'}
@@ -1335,14 +1351,14 @@ function PlacesPageInner() {
                     {mergeCheckIds.length === 2 && (
                       <button
                         onClick={handleOpenMergeView}
-                        className="px-3 py-1.5 text-sm font-medium bg-stm-sepia-600 text-white hover:bg-stm-sepia-700 transition-colors"
+                        className="border border-teal-strong bg-teal-strong px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-teal-strong/90"
                       >
                         Merge selected
                       </button>
                     )}
                     <button
                       onClick={() => setMergeCheckIds([])}
-                      className="text-xs text-stm-warm-400 hover:text-stm-warm-600 underline"
+                      className="text-xs text-ink/45 hover:text-teal-strong underline"
                     >
                       clear
                     </button>
@@ -1357,7 +1373,7 @@ function PlacesPageInner() {
                       setSelectedIds([]);
                       syncUrlToSelection([]);
                     }}
-                    className="px-3 py-1.5 text-sm font-medium bg-stm-teal-600 text-white rounded hover:bg-stm-teal-700 transition-colors shrink-0"
+                    className="shrink-0 border border-ink/20 px-3 py-1.5 text-sm font-medium text-ink/70 transition hover:border-teal-strong hover:text-teal-strong"
                   >
                     + Add Place
                   </button>
@@ -1370,7 +1386,7 @@ function PlacesPageInner() {
           <div className="flex-1 overflow-hidden flex">
             {/* Place table */}
             <div className="flex-1 overflow-auto">
-              <div className="text-xs text-stm-warm-400 px-4 sm:px-6 lg:px-8 pt-2 pb-1 max-w-350 mx-auto flex items-center gap-3">
+              <div className="mx-auto flex max-w-350 items-center gap-3 px-4 pb-1 pt-2 text-xs text-ink/45 sm:px-6 lg:px-8">
                 <span>
                   {filtered.length} of {places.length - deprecatedCount} places
                 </span>
@@ -1382,7 +1398,7 @@ function PlacesPageInner() {
                         {mergedCount} merged shown{' '}
                         <button
                           onClick={() => setShowMerged(false)}
-                          className="underline hover:text-stm-sepia-600"
+                          className="underline hover:text-teal-strong"
                         >
                           hide
                         </button>
@@ -1392,7 +1408,7 @@ function PlacesPageInner() {
                         {mergedCount} merged hidden{' '}
                         <button
                           onClick={() => setShowMerged(true)}
-                          className="underline hover:text-stm-sepia-600"
+                          className="underline hover:text-teal-strong"
                         >
                           show
                         </button>
@@ -1401,16 +1417,16 @@ function PlacesPageInner() {
                   </span>
                 )}
                 {deprecatedCount > 0 && (
-                  <span className="text-stm-warm-300">
+                  <span className="text-ink/30">
                     &middot; {deprecatedCount} deprecated
                   </span>
                 )}
               </div>
 
               <div className="px-4 sm:px-6 lg:px-8 pb-4 max-w-350 mx-auto">
-                <table className="w-full text-sm border-collapse">
+                <table className="w-full border-collapse border border-slate-200 bg-white text-sm shadow-[0_15px_35px_rgba(0,30,24,0.08)]">
                   <thead className="sticky top-0 z-10 bg-white">
-                    <tr className="text-left text-xs text-stm-warm-500 border-b border-stm-warm-200">
+                    <tr className="border-b border-slate-200 text-left text-xs text-ink/55 uppercase tracking-[0.2em]">
                       {canEdit && (
                         <th
                           className="py-2 px-2 w-8"
@@ -1423,7 +1439,7 @@ function PlacesPageInner() {
                       ).map((col) => (
                         <th
                           key={col.key}
-                          className="py-2 px-2 font-medium cursor-pointer hover:text-stm-warm-700 select-none whitespace-nowrap"
+                          className="cursor-pointer select-none whitespace-nowrap px-2 py-2 font-medium hover:text-ink"
                           onClick={() => toggleSort(col.key)}
                         >
                           {col.label}
@@ -1458,7 +1474,7 @@ function PlacesPageInner() {
                 </table>
 
                 {filtered.length === 0 && (
-                  <p className="text-sm text-stm-warm-400 text-center py-8">
+                  <p className="py-8 text-center text-sm text-ink/40">
                     No places match your search.
                   </p>
                 )}
@@ -1467,7 +1483,7 @@ function PlacesPageInner() {
 
             {/* Editor panel — future: map over selectedIds for dual-panel compare/merge */}
             {selectedPlace && (
-              <div className="w-[40%] min-w-105 max-w-160 shrink-0 border-l border-stm-warm-200 bg-stm-warm-50 overflow-hidden flex flex-col">
+              <div className="flex w-[40%] min-w-105 max-w-160 shrink-0 flex-col overflow-hidden border-l border-slate-200 bg-background">
                 <PlaceEditor
                   key={selectedPlace.id}
                   place={selectedPlace}

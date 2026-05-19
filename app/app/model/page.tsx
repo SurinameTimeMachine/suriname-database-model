@@ -927,7 +927,7 @@ function EntityDetail({
   count: number | null;
 }) {
   return (
-    <div className="bg-white border border-stm-warm-200 p-6">
+    <div className="border border-slate-200 bg-white p-6 shadow-[0_15px_35px_rgba(0,30,24,0.08)]">
       <div className="flex items-start gap-4 mb-4">
         <div
           className="w-12 h-12 flex items-center justify-center font-bold text-sm shrink-0"
@@ -942,43 +942,35 @@ function EntityDetail({
           {entity.type}
         </div>
         <div>
-          <h3 className="font-serif text-xl font-bold text-stm-warm-800">
-            {entity.label}
-          </h3>
-          <p className="text-sm text-stm-warm-400 font-mono">
-            {entity.crmClass}
-          </p>
+          <h3 className="text-xl font-semibold text-ink">{entity.label}</h3>
+          <p className="font-mono text-sm text-ink/45">{entity.crmClass}</p>
         </div>
       </div>
 
-      <p className="text-sm text-stm-warm-600 leading-relaxed mb-4">
-        {entity.desc}
-      </p>
+      <p className="mb-4 text-sm leading-relaxed text-ink/65">{entity.desc}</p>
 
       <div className="flex items-center gap-3 mb-5">
         {entity.structural ? (
-          <span className="bg-stm-warm-100 text-stm-warm-500 px-3 py-1 text-sm italic">
+          <span className="bg-background px-3 py-1 text-sm italic text-ink/55">
             Structural class (inferred from data)
           </span>
         ) : (
-          <span className="bg-stm-warm-100 text-stm-warm-700 px-3 py-1 text-sm font-semibold">
+          <span className="bg-background px-3 py-1 text-sm font-semibold text-ink/75">
             {(count ?? 0).toLocaleString()} entities
           </span>
         )}
       </div>
 
       <div>
-        <h4 className="text-sm font-semibold text-stm-warm-700 mb-2">
-          Properties
-        </h4>
-        <div className="border border-stm-warm-200 overflow-hidden">
+        <h4 className="mb-2 text-sm font-semibold text-ink/75">Properties</h4>
+        <div className="overflow-hidden border border-slate-200">
           <table className="w-full text-xs" role="table">
             <thead>
-              <tr className="bg-stm-warm-50 border-b border-stm-warm-200">
-                <th className="text-left px-3 py-2 text-stm-warm-500 font-medium">
+              <tr className="border-b border-slate-200 bg-background">
+                <th className="px-3 py-2 text-left font-medium uppercase tracking-[0.2em] text-ink/55">
                   Property
                 </th>
-                <th className="text-left px-3 py-2 text-stm-warm-500 font-medium">
+                <th className="px-3 py-2 text-left font-medium uppercase tracking-[0.2em] text-ink/55">
                   Range
                 </th>
               </tr>
@@ -987,14 +979,12 @@ function EntityDetail({
               {entity.properties.map((prop, i) => (
                 <tr
                   key={i}
-                  className={i % 2 === 0 ? 'bg-white' : 'bg-stm-warm-50/50'}
+                  className={i % 2 === 0 ? 'bg-white' : 'bg-background/60'}
                 >
-                  <td className="px-3 py-1.5 font-mono text-stm-sepia-700">
+                  <td className="px-3 py-1.5 font-mono text-teal-strong">
                     {prop.name}
                   </td>
-                  <td className="px-3 py-1.5 text-stm-warm-600">
-                    {prop.range}
-                  </td>
+                  <td className="px-3 py-1.5 text-ink/70">{prop.range}</td>
                 </tr>
               ))}
             </tbody>
@@ -1010,7 +1000,7 @@ function RelationDetail({ relation }: { relation: RelDef }) {
   const from = ENTITIES.find((e) => e.id === relation.from)!;
   const to = ENTITIES.find((e) => e.id === relation.to)!;
   return (
-    <div className="bg-stm-sepia-50 border border-stm-sepia-200 p-4 text-sm">
+    <div className="border border-slate-200 bg-white p-4 text-sm shadow-[0_10px_25px_rgba(0,30,24,0.05)]">
       <div className="flex items-center gap-2 mb-2">
         <span
           className="w-7 h-7 text-[10px] font-bold flex items-center justify-center"
@@ -1021,11 +1011,11 @@ function RelationDetail({ relation }: { relation: RelDef }) {
         >
           {from.type}
         </span>
-        <span className="text-stm-sepia-500 font-mono text-xs">
+        <span className="font-mono text-xs text-teal-strong">
           {relation.label}
         </span>
         <svg
-          className="w-4 h-4 text-stm-sepia-400"
+          className="h-4 w-4 text-ink/40"
           fill="none"
           stroke="currentColor"
           strokeWidth="2"
@@ -1047,7 +1037,7 @@ function RelationDetail({ relation }: { relation: RelDef }) {
           {to.type}
         </span>
       </div>
-      <p className="text-stm-warm-600">{relation.desc}</p>
+      <p className="text-ink/70">{relation.desc}</p>
     </div>
   );
 }
@@ -1055,20 +1045,18 @@ function RelationDetail({ relation }: { relation: RelDef }) {
 /* ─── Connection Chains Section ────────────────────────────────── */
 function SourcePatternSection() {
   return (
-    <div className="bg-white border border-stm-warm-200 p-6">
-      <h3 className="font-serif text-xl font-bold text-stm-warm-800 mb-3">
-        Connection Chains
-      </h3>
-      <p className="text-sm text-stm-warm-600 leading-relaxed mb-4">
+    <div className="border border-slate-200 bg-white p-6 shadow-[0_15px_35px_rgba(0,30,24,0.08)]">
+      <h3 className="mb-3 text-xl font-semibold text-ink">Connection Chains</h3>
+      <p className="mb-4 text-sm leading-relaxed text-ink/65">
         All information flows through sources. Maps, almanacs, and registers are
         modeled as E22 Human-Made Objects. Each source carries appellations
         (E41) that identify entities, and visual items (E36) that represent
         physical plantations (E25). The key principle:{' '}
         <strong>maps depict things; things have locations</strong>.
       </p>
-      <div className="bg-stm-warm-50 p-4 font-mono text-xs text-stm-warm-600 space-y-2.5">
+      <div className="space-y-2.5 bg-background p-4 font-mono text-xs text-ink/65">
         <div>
-          <span className="text-stm-warm-400">Source:</span>{' '}
+          <span className="text-ink/45">Source:</span>{' '}
           <span style={{ color: CRM_COLORS.E22 }}>E22 Map</span>
           {' -> P128 -> '}
           <span style={{ color: CRM_COLORS.E36 }}>E36 Visual Item</span>
@@ -1076,7 +1064,7 @@ function SourcePatternSection() {
           <span style={{ color: CRM_COLORS.E25 }}>E25 Plantation</span>
         </div>
         <div>
-          <span className="text-stm-warm-400">Name:</span>{' '}
+          <span className="text-ink/45">Name:</span>{' '}
           <span style={{ color: CRM_COLORS.E22 }}>E22 Almanac</span>
           {' -> P128 -> '}
           <span style={{ color: CRM_COLORS.E41 }}>E41 Name</span>
@@ -1084,21 +1072,21 @@ function SourcePatternSection() {
           <span style={{ color: CRM_COLORS.E74 }}>E74 Organization</span>
         </div>
         <div>
-          <span className="text-stm-warm-400">Location:</span>{' '}
+          <span className="text-ink/45">Location:</span>{' '}
           <span style={{ color: CRM_COLORS.E25 }}>E25 Plantation</span>
           {' -> P53 -> '}
           <span style={{ color: CRM_COLORS.E53 }}>E53 Place</span>
           {' -> geo:hasGeometry -> geo:asWKT -> POLYGON(...)'}
         </div>
         <div>
-          <span className="text-stm-warm-400">Ownership:</span>{' '}
+          <span className="text-ink/45">Ownership:</span>{' '}
           <span style={{ color: CRM_COLORS.E25 }}>E25 Plantation</span>
           {' -> P52 -> '}
           <span style={{ color: CRM_COLORS.E74 }}>E74 Organization</span>
           {' (wd:Q-ID)'}
         </div>
         <div>
-          <span className="text-stm-warm-400">Time:</span>{' '}
+          <span className="text-ink/45">Time:</span>{' '}
           <span style={{ color: CRM_COLORS.E13 }}>E13 Attr. Assign.</span>
           {' -> P4 -> '}
           <span style={{ color: CRM_COLORS.E52 }}>E52 Time-Span</span>
@@ -1107,42 +1095,42 @@ function SourcePatternSection() {
           {' = "what happened when"'}
         </div>
         <div>
-          <span className="text-stm-warm-400">People:</span>{' '}
+          <span className="text-ink/45">People:</span>{' '}
           <span style={{ color: CRM_COLORS.E13 }}>E13 Attr. Assign.</span>
           {' -> P14 -> '}
           <span style={{ color: CRM_COLORS.E39 }}>E39 Actor</span>
           {' + pico:hasRole -> picot:owner/admin/director'}
         </div>
         <div>
-          <span className="text-stm-warm-400">Measurement:</span>{' '}
+          <span className="text-ink/45">Measurement:</span>{' '}
           <span style={{ color: CRM_COLORS.E13 }}>E13 Attr. Assign.</span>
           {' -> P43 -> '}
           <span style={{ color: CRM_COLORS.E54 }}>E54 Dimension</span>
           {' (size in akkers)'}
         </div>
         <div>
-          <span className="text-stm-warm-400">Types:</span>{' '}
+          <span className="text-ink/45">Types:</span>{' '}
           <span style={{ color: CRM_COLORS.E13 }}>E13 Attr. Assign.</span>
           {' -> P141 -> '}
           <span style={{ color: CRM_COLORS.E55 }}>E55 Type</span>
           {' (product / deserted)'}
         </div>
         <div>
-          <span className="text-stm-warm-400">Production:</span>{' '}
+          <span className="text-ink/45">Production:</span>{' '}
           <span style={{ color: CRM_COLORS.E12 }}>E12 Production</span>
           {' -> P108 -> '}
           <span style={{ color: CRM_COLORS.E22 }}>E22 Map</span>
           {' (P14: maker, P7: Den Haag/Paramaribo, P4: year)'}
         </div>
         <div>
-          <span className="text-stm-warm-400">Digital:</span>{' '}
+          <span className="text-ink/45">Digital:</span>{' '}
           <span style={{ color: CRM_COLORS.E36 }}>E36 Visual Item</span>
           {' -> P138 -> '}
           <span style={{ color: CRM_COLORS.E22 }}>E22 Source</span>
           {' (IIIF scan of physical source)'}
         </div>
         <div>
-          <span className="text-stm-warm-400">Merger:</span>{' '}
+          <span className="text-ink/45">Merger:</span>{' '}
           <span style={{ color: CRM_COLORS.E25 }}>E25 Plantation</span>
           {' -> P124 -> '}
           <span style={{ color: CRM_COLORS.E81 }}>E81 Transformation</span>
@@ -1151,7 +1139,7 @@ function SourcePatternSection() {
           {' (merged)'}
         </div>
         <div>
-          <span className="text-stm-warm-400">Absorption:</span>{' '}
+          <span className="text-ink/45">Absorption:</span>{' '}
           <span style={{ color: CRM_COLORS.E74 }}>E74 Organization</span>
           {' -> P99i -> '}
           <span style={{ color: CRM_COLORS.E68 }}>E68 Dissolution</span>
@@ -1160,7 +1148,7 @@ function SourcePatternSection() {
           {' (successor)'}
         </div>
         <div>
-          <span className="text-stm-warm-400">Identifier:</span>{' '}
+          <span className="text-ink/45">Identifier:</span>{' '}
           <span style={{ color: CRM_COLORS.E74 }}>E74 Organization</span>
           {' -> P48 -> '}
           <span style={{ color: CRM_COLORS.E42 }}>E42 Identifier</span>
@@ -1174,11 +1162,9 @@ function SourcePatternSection() {
 /* ─── Spatial Model Section ───────────────────────────────────── */
 function SpatialModelSection() {
   return (
-    <div className="bg-white border border-stm-warm-200 p-6">
-      <h3 className="font-serif text-xl font-bold text-stm-warm-800 mb-3">
-        Spatial Model
-      </h3>
-      <p className="text-sm text-stm-warm-600 leading-relaxed mb-4">
+    <div className="border border-slate-200 bg-white p-6 shadow-[0_15px_35px_rgba(0,30,24,0.08)]">
+      <h3 className="mb-3 text-xl font-semibold text-ink">Spatial Model</h3>
+      <p className="mb-4 text-sm leading-relaxed text-ink/65">
         Plantation locations are digitized as polygons from the 1930 Bos &
         Weyerman map using QGIS. The source coordinate reference system is{' '}
         <strong>EPSG:31170</strong> (Suriname Old TM), which must be reprojected
@@ -1186,41 +1172,38 @@ function SpatialModelSection() {
       </p>
       <div className="grid md:grid-cols-2 gap-6">
         <div>
-          <h4 className="text-sm font-semibold text-stm-warm-700 mb-2">
+          <h4 className="mb-2 text-sm font-semibold text-ink/75">
             CRS Reprojection Pipeline
           </h4>
-          <div className="bg-stm-warm-50 p-4 font-mono text-xs text-stm-warm-600 space-y-1.5">
+          <div className="bg-background p-4 font-mono text-xs text-ink/65 space-y-1.5">
             <div>
-              <span className="text-stm-warm-400">Source CRS:</span> EPSG:31170
+              <span className="text-ink/45">Source CRS:</span> EPSG:31170
               (Suriname Old TM)
             </div>
             <div>
-              <span className="text-stm-warm-400">Datum shift:</span>{' '}
+              <span className="text-ink/45">Datum shift:</span>{' '}
               +towgs84=-265,120,-358,0,0,0,0
             </div>
             <div>
-              <span className="text-stm-warm-400">Target CRS:</span> EPSG:4326
-              (WGS84)
+              <span className="text-ink/45">Target CRS:</span> EPSG:4326 (WGS84)
             </div>
             <div>
-              <span className="text-stm-warm-400">Projection:</span> Transverse
+              <span className="text-ink/45">Projection:</span> Transverse
               Mercator
             </div>
             <div>
-              <span className="text-stm-warm-400">Central meridian:</span>{' '}
-              -55.68333
+              <span className="text-ink/45">Central meridian:</span> -55.68333
             </div>
             <div>
-              <span className="text-stm-warm-400">False easting:</span> 500,000
-              m
+              <span className="text-ink/45">False easting:</span> 500,000 m
             </div>
           </div>
         </div>
         <div>
-          <h4 className="text-sm font-semibold text-stm-warm-700 mb-2">
+          <h4 className="mb-2 text-sm font-semibold text-ink/75">
             GeoSPARQL Storage
           </h4>
-          <div className="bg-stm-warm-50 p-4 font-mono text-xs text-stm-warm-600 space-y-1.5">
+          <div className="bg-background p-4 font-mono text-xs text-ink/65 space-y-1.5">
             <div className="mb-2">
               <span style={{ color: CRM_COLORS['E25'] }}>E25</span>
               {' -> P53 -> '}
@@ -1238,15 +1221,15 @@ function SpatialModelSection() {
               <br />
               <span className="text-stm-sepia-600">^^geo:wktLiteral</span>
             </div>
-            <div className="mt-2 text-stm-warm-500">
+            <div className="mt-2 text-ink/55">
               Centroids computed for Leaflet map markers
             </div>
           </div>
           <div className="mt-3">
-            <h4 className="text-sm font-semibold text-stm-warm-700 mb-2">
+            <h4 className="mb-2 text-sm font-semibold text-ink/75">
               E13 Location (text only)
             </h4>
-            <p className="text-xs text-stm-warm-500">
+            <p className="text-xs text-ink/55">
               Almanac P7 &quot;took place at&quot; values are text strings (e.g.
               &quot;Boven-Commewijne&quot;, &quot;Beneden-Suriname&quot;). These
               are <strong>not yet linked</strong> to E53 polygon geometries.
@@ -1263,21 +1246,19 @@ function SpatialModelSection() {
 /* ─── Temporal Model Section ──────────────────────────────────── */
 function TemporalModelSection() {
   return (
-    <div className="bg-white border border-stm-warm-200 p-6">
-      <h3 className="font-serif text-xl font-bold text-stm-warm-800 mb-3">
-        Temporal Model
-      </h3>
-      <p className="text-sm text-stm-warm-600 leading-relaxed mb-4">
+    <div className="border border-slate-200 bg-white p-6 shadow-[0_15px_35px_rgba(0,30,24,0.08)]">
+      <h3 className="mb-3 text-xl font-semibold text-ink">Temporal Model</h3>
+      <p className="mb-4 text-sm leading-relaxed text-ink/65">
         Time is modeled through E52 Time-Span linked to E13 observations. Each
         almanac row is tied to a specific year. Map dates provide temporal scope
         for names.
       </p>
       <div className="grid md:grid-cols-2 gap-6">
         <div>
-          <h4 className="text-sm font-semibold text-stm-warm-700 mb-2">
+          <h4 className="mb-2 text-sm font-semibold text-ink/75">
             Observation Time
           </h4>
-          <div className="bg-stm-warm-50 p-4 font-mono text-xs text-stm-warm-600 space-y-1.5">
+          <div className="bg-background p-4 font-mono text-xs text-ink/65 space-y-1.5">
             <div>
               <span style={{ color: CRM_COLORS['E13'] }}>
                 E13 Attr. Assign.
@@ -1289,37 +1270,35 @@ function TemporalModelSection() {
               <span style={{ color: CRM_COLORS['E52'] }}>E52</span>
               {' -> P82 at some time within -> xsd:gYear'}
             </div>
-            <div className="mt-3 text-stm-warm-500">
-              Almanac coverage: ~1750-1863
-            </div>
-            <div className="text-stm-warm-500">
+            <div className="mt-3 text-ink/55">Almanac coverage: ~1750-1863</div>
+            <div className="text-ink/55">
               Each E13 records one year of observation
             </div>
           </div>
         </div>
         <div>
-          <h4 className="text-sm font-semibold text-stm-warm-700 mb-2">
+          <h4 className="mb-2 text-sm font-semibold text-ink/75">
             Name Dating
           </h4>
-          <div className="bg-stm-warm-50 p-4 font-mono text-xs text-stm-warm-600 space-y-1.5">
+          <div className="bg-background p-4 font-mono text-xs text-ink/65 space-y-1.5">
             <div>
               <span style={{ color: CRM_COLORS['E22'] }}>E22 Source</span>
               {' -> P108i was produced by -> E12 -> P4 has time-span -> E52'}
             </div>
-            <div className="mt-1 text-stm-warm-500">
+            <div className="mt-1 text-ink/55">
               The production date of the source provides temporal scope for the
               E41 names it carries.
             </div>
-            <div className="mt-3 font-sans text-stm-warm-500">
+            <div className="mt-3 font-sans text-ink/55">
               Map sources: 1930 (primary, QGIS polygons), 1860-79 (historical
               name labels)
             </div>
           </div>
           <div className="mt-3">
-            <h4 className="text-sm font-semibold text-stm-warm-700 mb-2">
+            <h4 className="mb-2 text-sm font-semibold text-ink/75">
               Plantation Mergers (E81)
             </h4>
-            <p className="text-xs text-stm-warm-500">
+            <p className="text-xs text-ink/55">
               When plantations merge, <strong>E81 Transformation</strong>{' '}
               simultaneously ends old E25 entities (P124 transformed) and
               produces the merged E25 (P123 resulted in). For example,
@@ -1327,10 +1306,10 @@ function TemporalModelSection() {
             </p>
           </div>
           <div className="mt-3">
-            <h4 className="text-sm font-semibold text-stm-warm-700 mb-2">
+            <h4 className="mb-2 text-sm font-semibold text-ink/75">
               Organization Absorption (E68)
             </h4>
-            <p className="text-xs text-stm-warm-500">
+            <p className="text-xs text-ink/55">
               When one organization absorbs another,{' '}
               <strong>E68 Dissolution</strong> (P99 dissolved) ends the old E74.
               The absorbing E74 acts as agent via P14 carried out by.
@@ -1344,11 +1323,11 @@ function TemporalModelSection() {
 
 function ProvenanceBoundarySection() {
   return (
-    <div className="bg-white border border-stm-warm-200 p-6">
-      <h3 className="font-serif text-xl font-bold text-stm-warm-800 mb-3">
+    <div className="border border-slate-200 bg-white p-6 shadow-[0_15px_35px_rgba(0,30,24,0.08)]">
+      <h3 className="mb-3 text-xl font-semibold text-ink">
         Provenance Boundary
       </h3>
-      <p className="text-sm text-stm-warm-600 leading-relaxed mb-4">
+      <p className="mb-4 text-sm leading-relaxed text-ink/65">
         Provenance starts at different levels depending on what is being
         modeled. Entity-level provenance tracks how a current record was
         derived, while assertion-level provenance tracks where each mutable
@@ -1356,17 +1335,17 @@ function ProvenanceBoundarySection() {
       </p>
       <div className="grid md:grid-cols-2 gap-6">
         <div>
-          <h4 className="text-sm font-semibold text-stm-warm-700 mb-2">
+          <h4 className="mb-2 text-sm font-semibold text-ink/75">
             Entity-level provenance
           </h4>
-          <div className="bg-stm-warm-50 p-4 font-mono text-xs text-stm-warm-600 space-y-1.5">
+          <div className="bg-background p-4 font-mono text-xs text-ink/65 space-y-1.5">
             <div>
               <span
                 className="inline-block px-1.5 py-0.5 text-[10px] font-bold mr-0.5"
                 style={{
                   backgroundColor: CRM_COLORS['E25'],
                   color: '#0f172a',
-                  borderRadius: '2px',
+                  borderRadius: '0px',
                 }}
               >
                 E25
@@ -1376,7 +1355,7 @@ function ProvenanceBoundarySection() {
                 style={{
                   backgroundColor: CRM_COLORS['E26'],
                   color: '#0f172a',
-                  borderRadius: '2px',
+                  borderRadius: '0px',
                 }}
               >
                 E26
@@ -1386,7 +1365,7 @@ function ProvenanceBoundarySection() {
                 style={{
                   backgroundColor: CRM_COLORS['E53'],
                   color: '#0f172a',
-                  borderRadius: '2px',
+                  borderRadius: '0px',
                 }}
               >
                 E53
@@ -1396,30 +1375,30 @@ function ProvenanceBoundarySection() {
                 style={{
                   backgroundColor: CRM_COLORS['E74'],
                   color: '#0f172a',
-                  borderRadius: '2px',
+                  borderRadius: '0px',
                 }}
               >
                 E74
               </span>
               {' -> prov:wasDerivedFrom -> PROV record'}
             </div>
-            <div className="text-stm-warm-500">
+            <div className="text-ink/55">
               Use for record lineage and transformation audit.
             </div>
           </div>
         </div>
         <div>
-          <h4 className="text-sm font-semibold text-stm-warm-700 mb-2">
+          <h4 className="mb-2 text-sm font-semibold text-ink/75">
             Assertion-level provenance
           </h4>
-          <div className="bg-stm-warm-50 p-4 font-mono text-xs text-stm-warm-600 space-y-1.5">
+          <div className="bg-background p-4 font-mono text-xs text-ink/65 space-y-1.5">
             <div>
               <span
                 className="inline-block px-1.5 py-0.5 text-[10px] font-bold mr-0.5"
                 style={{
                   backgroundColor: CRM_COLORS['E41'],
                   color: '#0f172a',
-                  borderRadius: '2px',
+                  borderRadius: '0px',
                 }}
               >
                 E41
@@ -1430,7 +1409,7 @@ function ProvenanceBoundarySection() {
                 style={{
                   backgroundColor: CRM_COLORS['E22'],
                   color: '#0f172a',
-                  borderRadius: '2px',
+                  borderRadius: '0px',
                 }}
               >
                 E22
@@ -1443,7 +1422,7 @@ function ProvenanceBoundarySection() {
                 style={{
                   backgroundColor: CRM_COLORS['E13'],
                   color: '#0f172a',
-                  borderRadius: '2px',
+                  borderRadius: '0px',
                 }}
               >
                 E13
@@ -1453,7 +1432,7 @@ function ProvenanceBoundarySection() {
                 style={{
                   backgroundColor: CRM_COLORS['E17'],
                   color: '#0f172a',
-                  borderRadius: '2px',
+                  borderRadius: '0px',
                 }}
               >
                 E17
@@ -1464,7 +1443,7 @@ function ProvenanceBoundarySection() {
                 style={{
                   backgroundColor: CRM_COLORS['E22'],
                   color: '#0f172a',
-                  borderRadius: '2px',
+                  borderRadius: '0px',
                 }}
               >
                 E22
@@ -1477,7 +1456,7 @@ function ProvenanceBoundarySection() {
                 style={{
                   backgroundColor: CRM_COLORS['E53'],
                   color: '#0f172a',
-                  borderRadius: '2px',
+                  borderRadius: '0px',
                 }}
               >
                 E53
@@ -1488,7 +1467,7 @@ function ProvenanceBoundarySection() {
                 style={{
                   backgroundColor: CRM_COLORS['E22'],
                   color: '#0f172a',
-                  borderRadius: '2px',
+                  borderRadius: '0px',
                 }}
               >
                 E22
@@ -1498,7 +1477,7 @@ function ProvenanceBoundarySection() {
           </div>
         </div>
       </div>
-      <div className="mt-4 bg-stm-sepia-50 border border-stm-sepia-200 p-3 text-xs text-stm-warm-600">
+      <div className="mt-4 border border-slate-200 bg-background p-3 text-xs text-ink/65">
         <p>
           Source references are authoritative only when they resolve to
           registered E22 entries in{' '}
@@ -1561,24 +1540,47 @@ function ModelPageInner() {
 
   if (!counts) {
     return (
-      <div className="h-full flex items-center justify-center bg-stm-warm-50">
-        <div className="text-center">
-          <div className="w-8 h-8 border-4 border-stm-sepia-400 border-t-transparent animate-spin mx-auto mb-3" />
-          <p className="text-stm-warm-500 text-sm">Loading data model...</p>
-        </div>
+      <div className="h-full flex items-center justify-center bg-background px-4">
+        <section
+          role="status"
+          aria-live="polite"
+          aria-busy="true"
+          className="w-full max-w-4xl border border-ink/10 bg-white p-5 shadow-[0_15px_35px_rgba(0,30,24,0.08)]"
+        >
+          <div className="mb-4 flex items-center gap-2 text-xs uppercase tracking-[0.28em] text-ink/60">
+            <span
+              className="h-2.5 w-2.5 -skew-x-12 bg-teal-strong animate-pulse"
+              aria-hidden
+            />
+            Loading data model
+          </div>
+          <div className="grid gap-3 sm:grid-cols-4">
+            <div className="h-16 animate-pulse bg-ink/5" />
+            <div className="h-16 animate-pulse bg-ink/5" />
+            <div className="h-16 animate-pulse bg-ink/5" />
+            <div className="h-16 animate-pulse bg-ink/5" />
+          </div>
+        </section>
       </div>
     );
   }
 
   return (
-    <div className="h-full overflow-y-auto bg-stm-warm-50">
-      <div className="max-w-6xl mx-auto px-6 py-10">
+    <div className="h-full overflow-y-auto bg-background">
+      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-10">
         {/* Header */}
         <div className="mb-10">
-          <h1 className="font-serif text-3xl sm:text-4xl font-bold text-stm-warm-800 mb-3">
+          <div className="mb-3 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.35em] text-ink/70">
+            <span
+              className="inline-flex h-3 w-3 -skew-x-12 bg-teal-strong"
+              aria-hidden
+            />
+            CIDOC-CRM Mapping
+          </div>
+          <h1 className="mb-3 text-3xl font-semibold text-ink sm:text-4xl">
             Data Model
           </h1>
-          <p className="text-stm-warm-500 max-w-3xl leading-relaxed">
+          <p className="max-w-3xl leading-relaxed text-ink/70">
             The Suriname Time Machine uses CIDOC-CRM to model cultural heritage
             entities. Click any node in the graph to see its properties and
             relationships. Hover over connections to highlight the CIDOC-CRM
@@ -1632,10 +1634,10 @@ function ModelPageInner() {
 
         {/* All entities quick reference */}
         <div className="mb-10">
-          <h2 className="font-serif text-2xl font-bold text-stm-warm-800 mb-2">
+          <h2 className="mb-2 text-2xl font-semibold text-ink">
             All Entity Types
           </h2>
-          <p className="text-sm text-stm-warm-500 mb-4">
+          <p className="mb-4 text-sm text-ink/65">
             6 data-backed classes with entity counts, 10 structural classes
             inferred from the model.
           </p>
@@ -1651,10 +1653,10 @@ function ModelPageInner() {
                     handleSelectEntity(ent.id);
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
-                  className={`text-left bg-white border p-4 transition-all hover:shadow-md ${
+                  className={`border bg-white p-4 text-left transition-all shadow-[0_10px_25px_rgba(0,30,24,0.05)] hover:ring-1 hover:ring-teal-strong/20 ${
                     selectedEntity === ent.id
-                      ? 'border-stm-sepia-400 shadow-md ring-1 ring-stm-sepia-200'
-                      : 'border-stm-warm-200'
+                      ? 'border-teal-strong ring-1 ring-teal-strong/30'
+                      : 'border-slate-200'
                   }`}
                 >
                   <div className="flex items-center gap-3 mb-2">
@@ -1671,23 +1673,21 @@ function ModelPageInner() {
                       {ent.type}
                     </span>
                     <div>
-                      <span className="font-semibold text-stm-warm-800 text-sm">
+                      <span className="text-sm font-semibold text-ink">
                         {ent.label}
                       </span>
                       {count !== null ? (
-                        <span className="text-stm-warm-400 text-xs ml-2">
+                        <span className="ml-2 text-xs text-ink/45">
                           {count.toLocaleString()}
                         </span>
                       ) : (
-                        <span className="text-stm-warm-400 text-xs ml-2 italic">
+                        <span className="ml-2 text-xs italic text-ink/45">
                           structural
                         </span>
                       )}
                     </div>
                   </div>
-                  <p className="text-xs text-stm-warm-500 line-clamp-2">
-                    {ent.desc}
-                  </p>
+                  <p className="line-clamp-2 text-xs text-ink/60">{ent.desc}</p>
                 </button>
               );
             })}
@@ -1695,11 +1695,11 @@ function ModelPageInner() {
         </div>
 
         {/* Research Questions */}
-        <div className="bg-white border border-stm-warm-200 p-6 mb-10">
-          <h3 className="font-serif text-xl font-bold text-stm-warm-800 mb-2">
+        <div className="mb-10 border border-slate-200 bg-white p-6 shadow-[0_15px_35px_rgba(0,30,24,0.08)]">
+          <h3 className="mb-2 text-xl font-semibold text-ink">
             Research Questions
           </h3>
-          <p className="text-sm text-stm-warm-500 mb-4">
+          <p className="mb-4 text-sm text-ink/65">
             Questions the data model can support. Status indicates whether the
             current data and connections are sufficient to answer each question.
           </p>
@@ -1776,15 +1776,15 @@ function ModelPageInner() {
                   }`}
                 />
                 <div className="min-w-0">
-                  <p className="text-stm-warm-700 font-medium">{q.question}</p>
-                  <p className="text-[11px] text-stm-warm-400 font-mono mt-0.5">
+                  <p className="font-medium text-ink/80">{q.question}</p>
+                  <p className="mt-0.5 font-mono text-[11px] text-ink/45">
                     {q.path}
                   </p>
                 </div>
               </div>
             ))}
           </div>
-          <div className="flex gap-4 mt-4 text-[11px] text-stm-warm-400">
+          <div className="mt-4 flex gap-4 text-[11px] text-ink/50">
             <span className="flex items-center gap-1.5">
               <span className="inline-block w-2 h-2 bg-green-500" /> Answerable
               now

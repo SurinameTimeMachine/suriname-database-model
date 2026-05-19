@@ -108,7 +108,7 @@ function SectionHeader({
     >
       <button
         onClick={onToggle}
-        className="w-full flex items-center justify-between py-2 px-3 text-left hover:bg-stm-warm-50/50 transition-colors"
+        className="w-full flex items-center justify-between py-2.5 px-3 text-left hover:bg-stm-warm-100/40 transition-colors border-b border-stm-warm-200/50"
         aria-expanded={open}
         aria-controls={`section-${id}`}
       >
@@ -116,13 +116,13 @@ function SectionHeader({
           <Badge type={badge} />
           {title}
           {count != null && (
-            <span className="ml-1.5 text-stm-warm-400 font-normal">
+            <span className="ml-2 text-stm-warm-400 font-normal text-xs">
               ({count})
             </span>
           )}
         </span>
         <svg
-          className={`w-3.5 h-3.5 text-stm-warm-400 transition-transform ${open ? 'rotate-180' : ''}`}
+          className={`w-4 h-4 text-stm-teal-600 transition-transform shrink-0 ${open ? 'rotate-180' : ''}`}
           fill="none"
           stroke="currentColor"
           strokeWidth="2"

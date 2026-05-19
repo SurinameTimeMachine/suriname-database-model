@@ -55,19 +55,35 @@ export default function VocabularyPage() {
 
   if (loading) {
     return (
-      <div className="h-full flex items-center justify-center bg-stm-warm-50">
-        <div className="text-center">
-          <div className="w-8 h-8 border-4 border-stm-sepia-400 border-t-transparent animate-spin mx-auto mb-3" />
-          <p className="text-stm-warm-500 text-sm">Loading thesaurus...</p>
-        </div>
+      <div className="h-full flex items-center justify-center bg-background px-4">
+        <section
+          role="status"
+          aria-live="polite"
+          aria-busy="true"
+          className="w-full max-w-3xl border border-ink/10 bg-white p-5 shadow-[0_15px_35px_rgba(0,30,24,0.08)]"
+        >
+          <div className="mb-4 flex items-center gap-2 text-xs uppercase tracking-[0.28em] text-ink/60">
+            <span
+              className="h-2.5 w-2.5 -skew-x-12 bg-teal-strong animate-pulse"
+              aria-hidden
+            />
+            Loading thesaurus
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="h-24 animate-pulse bg-ink/5" />
+            <div className="h-24 animate-pulse bg-ink/5" />
+          </div>
+        </section>
       </div>
     );
   }
 
   if (!scheme) {
     return (
-      <div className="h-full flex items-center justify-center bg-stm-warm-50">
-        <p className="text-stm-warm-500">Failed to load thesaurus data.</p>
+      <div className="h-full flex items-center justify-center bg-background px-4">
+        <div className="border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          Failed to load thesaurus data.
+        </div>
       </div>
     );
   }
@@ -112,21 +128,26 @@ export default function VocabularyPage() {
   }
 
   return (
-    <div className="h-full overflow-y-auto bg-stm-warm-50">
-      <div className="max-w-5xl mx-auto px-6 py-10">
+    <div className="h-full overflow-y-auto bg-background">
+      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-10">
         {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-serif font-bold text-stm-warm-900 mb-2">
-            Vocabulary
-          </h1>
-          <p className="text-stm-warm-600 text-sm">
+        <div className="mb-8">
+          <div className="mb-3 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.35em] text-ink/70">
+            <span
+              className="inline-flex h-3 w-3 -skew-x-12 bg-teal-strong"
+              aria-hidden
+            />
+            Controlled Vocabulary
+          </div>
+          <h1 className="mb-2 text-3xl font-semibold text-ink">Vocabulary</h1>
+          <p className="text-sm text-ink/70">
             SKOS thesaurus for controlled vocabulary terms used in the Suriname
             Time Machine. Concepts are dual-typed as both{' '}
-            <code className="text-xs bg-stm-warm-100 px-1 py-0.5 rounded">
+            <code className="border border-ink/10 bg-ink/5 px-1 py-0.5 text-xs">
               skos:Concept
             </code>{' '}
             and{' '}
-            <code className="text-xs bg-stm-warm-100 px-1 py-0.5 rounded">
+            <code className="border border-ink/10 bg-ink/5 px-1 py-0.5 text-xs">
               crm:E55_Type
             </code>{' '}
             for CIDOC-CRM compatibility.
@@ -134,13 +155,13 @@ export default function VocabularyPage() {
         </div>
 
         {/* View tabs */}
-        <div className="flex gap-1 mb-6 border-b border-stm-warm-200">
+        <div className="mb-6 flex gap-1 border-b border-slate-200">
           <button
             onClick={() => setActiveView('browser')}
             className={`px-4 py-2 text-sm font-medium transition-colors -mb-px ${
               activeView === 'browser'
-                ? 'border-b-2 border-stm-sepia-600 text-stm-sepia-700'
-                : 'text-stm-warm-400 hover:text-stm-warm-600'
+                ? 'border-b-2 border-teal-strong text-ink'
+                : 'text-ink/45 hover:text-ink/75'
             }`}
           >
             Browse Hierarchy
@@ -149,8 +170,8 @@ export default function VocabularyPage() {
             onClick={() => setActiveView('editor')}
             className={`px-4 py-2 text-sm font-medium transition-colors -mb-px ${
               activeView === 'editor'
-                ? 'border-b-2 border-stm-sepia-600 text-stm-sepia-700'
-                : 'text-stm-warm-400 hover:text-stm-warm-600'
+                ? 'border-b-2 border-teal-strong text-ink'
+                : 'text-ink/45 hover:text-ink/75'
             }`}
           >
             Edit Concepts

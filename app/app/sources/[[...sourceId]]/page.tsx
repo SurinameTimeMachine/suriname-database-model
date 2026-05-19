@@ -68,11 +68,26 @@ export default function SourcesPage() {
 
   if (loading) {
     return (
-      <div className="h-full flex items-center justify-center bg-stm-warm-50">
-        <div className="text-center">
-          <div className="w-8 h-8 border-4 border-stm-sepia-400 border-t-transparent animate-spin mx-auto mb-3" />
-          <p className="text-stm-warm-500 text-sm">Loading sources...</p>
-        </div>
+      <div className="h-full flex items-center justify-center bg-background px-4">
+        <section
+          role="status"
+          aria-live="polite"
+          aria-busy="true"
+          className="w-full max-w-3xl border border-ink/10 bg-white p-5 shadow-[0_15px_35px_rgba(0,30,24,0.08)]"
+        >
+          <div className="mb-4 flex items-center gap-2 text-xs uppercase tracking-[0.28em] text-ink/60">
+            <span
+              className="h-2.5 w-2.5 -skew-x-12 bg-teal-strong animate-pulse"
+              aria-hidden
+            />
+            Loading sources
+          </div>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div className="h-16 animate-pulse bg-ink/5" />
+            <div className="h-16 animate-pulse bg-ink/5" />
+            <div className="h-16 animate-pulse bg-ink/5" />
+          </div>
+        </section>
       </div>
     );
   }
@@ -84,17 +99,22 @@ export default function SourcesPage() {
   const orderedCategories = sortedCategories(categories);
 
   return (
-    <div className="h-full overflow-y-auto bg-stm-warm-50">
-      <div className="max-w-5xl mx-auto px-6 py-10">
+    <div className="h-full overflow-y-auto bg-background">
+      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-10">
         {/* Header */}
-        <div className="mb-6 flex items-start justify-between">
+        <div className="mb-8 flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-serif font-bold text-stm-warm-900 mb-2">
-              Sources
-            </h1>
-            <p className="text-stm-warm-600 text-sm max-w-3xl">
+            <div className="mb-3 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.35em] text-ink/70">
+              <span
+                className="inline-flex h-3 w-3 -skew-x-12 bg-teal-strong"
+                aria-hidden
+              />
+              Source Registry
+            </div>
+            <h1 className="mb-2 text-3xl font-semibold text-ink">Sources</h1>
+            <p className="max-w-3xl text-sm text-ink/70">
               Registry of historical sources (
-              <code className="text-xs bg-stm-warm-100 px-1 py-0.5 rounded">
+              <code className="border border-ink/10 bg-ink/5 px-1 py-0.5 text-xs">
                 E22 Human-Made Object
               </code>
               ) used in the Suriname Time Machine. Each source is a physical or
@@ -102,16 +122,16 @@ export default function SourcesPage() {
               and organizations.
             </p>
           </div>
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex shrink-0 items-center gap-3">
             {canEdit && (
               <button
                 onClick={() => {
                   setShowAddForm(true);
                   setEditingId(null);
                 }}
-                className="px-3 py-1.5 text-sm font-medium bg-stm-teal-600 text-white rounded hover:bg-stm-teal-700 transition-colors"
+                className="border border-ink/20 px-4 py-2 text-xs uppercase tracking-[0.25em] text-ink/70 transition hover:border-teal-strong hover:text-teal-strong"
               >
-                + Add Source
+                Add Source
               </button>
             )}
           </div>
@@ -139,39 +159,45 @@ export default function SourcesPage() {
         )}
 
         {/* Stats bar */}
-        <div className="flex gap-4 mb-8">
-          <div className="bg-white border border-stm-warm-200 rounded-lg px-4 py-3 shadow-sm">
-            <div className="text-2xl font-bold text-stm-warm-900">
-              {sources.length}
+        <div className="mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="border border-slate-200 bg-white px-4 py-4 ring-1 ring-ink/5 shadow-[0_15px_35px_rgba(0,30,24,0.08)]">
+            <div className="text-2xl font-bold text-ink">{sources.length}</div>
+            <div className="text-xs uppercase tracking-[0.25em] text-ink/50">
+              Total Sources
             </div>
-            <div className="text-xs text-stm-warm-500">Total Sources</div>
           </div>
-          <div className="bg-white border border-stm-teal-200 rounded-lg px-4 py-3 shadow-sm">
-            <div className="text-2xl font-bold text-stm-teal-700">
+          <div className="border border-teal-soft bg-white px-4 py-4 ring-1 ring-teal-soft/40 shadow-[0_15px_35px_rgba(0,30,24,0.08)]">
+            <div className="text-2xl font-bold text-teal-strong">
               {activeSources.length}
             </div>
-            <div className="text-xs text-stm-teal-600">Linked to Gazetteer</div>
+            <div className="text-xs uppercase tracking-[0.25em] text-ink/50">
+              Linked
+            </div>
           </div>
-          <div className="bg-white border border-stm-warm-200 rounded-lg px-4 py-3 shadow-sm">
-            <div className="text-2xl font-bold text-stm-warm-500">
+          <div className="border border-slate-200 bg-white px-4 py-4 ring-1 ring-ink/5 shadow-[0_15px_35px_rgba(0,30,24,0.08)]">
+            <div className="text-2xl font-bold text-ink/70">
               {futureSources.length}
             </div>
-            <div className="text-xs text-stm-warm-400">Available / Future</div>
+            <div className="text-xs uppercase tracking-[0.25em] text-ink/50">
+              Available
+            </div>
           </div>
-          <div className="bg-white border border-stm-warm-200 rounded-lg px-4 py-3 shadow-sm">
-            <div className="text-2xl font-bold text-stm-warm-900">
+          <div className="border border-slate-200 bg-white px-4 py-4 ring-1 ring-ink/5 shadow-[0_15px_35px_rgba(0,30,24,0.08)]">
+            <div className="text-2xl font-bold text-ink">
               {categories.length}
             </div>
-            <div className="text-xs text-stm-warm-500">Categories</div>
+            <div className="text-xs uppercase tracking-[0.25em] text-ink/50">
+              Categories
+            </div>
           </div>
         </div>
 
         {/* Active Sources */}
         <div className="mb-10">
-          <h2 className="text-lg font-serif font-semibold text-stm-warm-900 mb-1">
+          <h2 className="mb-1 text-xl font-semibold text-ink">
             Active Sources
           </h2>
-          <p className="text-sm text-stm-warm-500 mb-4">
+          <p className="mb-4 text-sm text-ink/65">
             Sources currently linked to places in the gazetteer.
           </p>
 
@@ -199,21 +225,21 @@ export default function SourcesPage() {
 
         {/* Future Sources */}
         <div>
-          <div className="flex items-center gap-3 mb-4">
-            <h2 className="text-lg font-serif font-semibold text-stm-warm-900">
+          <div className="mb-4 flex items-center gap-3">
+            <h2 className="text-xl font-semibold text-ink">
               Available Sources
             </h2>
-            <span className="text-xs text-stm-warm-400 bg-stm-warm-100 px-2 py-0.5 rounded">
+            <span className="border border-ink/10 bg-ink/5 px-2 py-0.5 text-xs text-ink/60">
               {futureSources.length} sources
             </span>
             <button
               onClick={() => setShowFuture(!showFuture)}
-              className="text-xs text-stm-sepia-600 hover:text-stm-sepia-800 underline"
+              className="text-xs uppercase tracking-[0.2em] text-teal-strong hover:text-ink"
             >
               {showFuture ? 'Collapse' : 'Expand'}
             </button>
           </div>
-          <p className="text-sm text-stm-warm-500 mb-4">
+          <p className="mb-4 text-sm text-ink/65">
             Known sources not yet linked to places in the gazetteer. These
             include 126 historic maps from the Nationaal Archief, UB Leiden, and
             UB Amsterdam collections.

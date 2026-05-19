@@ -86,7 +86,8 @@ function ExplorePageInner() {
         params.set('z', String(Math.round(zoom)));
       }
       const qs = params.toString();
-      const newUrl = qs ? `/explore?${qs}` : '/explore';
+      const basePath = window.location.pathname;
+      const newUrl = qs ? `${basePath}?${qs}` : basePath;
       window.history.replaceState(null, '', newUrl);
     },
     [],

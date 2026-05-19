@@ -1,20 +1,20 @@
 import './globals.css';
 import Navigation from '@/components/Navigation';
-import type { Metadata } from 'next';
-import { Inter, Libre_Baskerville } from 'next/font/google';
-import { Suspense } from 'react';
+import SiteFooter from '@/components/SiteFooter';
 import { Analytics } from '@vercel/analytics/next';
+import type { Metadata } from 'next';
+import { Geist, Geist_Mono } from 'next/font/google';
+import { Suspense } from 'react';
 
-const serif = Libre_Baskerville({
+const geistSans = Geist({
   subsets: ['latin'],
-  weight: ['400', '700'],
-  variable: '--font-serif',
+  variable: '--font-geist-sans',
   display: 'swap',
 });
 
-const sans = Inter({
+const geistMono = Geist_Mono({
   subsets: ['latin'],
-  variable: '--font-sans',
+  variable: '--font-geist-mono',
   display: 'swap',
 });
 
@@ -30,8 +30,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${serif.variable} ${sans.variable}`}>
-      <body className="antialiased font-sans bg-stm-warm-50 text-stm-warm-900 flex flex-col h-screen overflow-hidden">
+    <html
+      lang="en"
+      className={`${geistSans.variable} ${geistMono.variable} scroll-smooth`}
+    >
+      <body className="antialiased bg-background text-foreground flex flex-col h-screen overflow-hidden">
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>
@@ -41,6 +44,7 @@ export default function RootLayout({
         <main id="main-content" className="flex-1 overflow-hidden">
           {children}
         </main>
+        <SiteFooter />
         <Analytics />
       </body>
     </html>
