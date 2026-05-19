@@ -663,11 +663,8 @@
       "definition": {
         "en": "A road restricted to traffic in a single direction."
       },
+      "topConceptOf": "stm:vocabulary/road-attributes",
       "inScheme": "stm:vocabulary/road-attributes",
-      "broader": "stm:type/road-direction/bidirectional",
-      "closeMatch": [
-        "http://www.wikidata.org/entity/Q1364167"
-      ],
       "created": "2026-05-12",
       "modified": "2026-05-12"
     },
@@ -686,9 +683,6 @@
       },
       "topConceptOf": "stm:vocabulary/road-attributes",
       "inScheme": "stm:vocabulary/road-attributes",
-      "exactMatch": [
-        "http://www.wikidata.org/entity/Q1364167"
-      ],
       "created": "2026-05-12",
       "modified": "2026-05-12"
     },
@@ -726,9 +720,6 @@
       },
       "inScheme": "stm:vocabulary/road-attributes",
       "broader": "stm:type/road-class/secondary",
-      "exactMatch": [
-        "http://www.wikidata.org/entity/Q34442"
-      ],
       "created": "2026-05-12",
       "modified": "2026-05-12"
     }
