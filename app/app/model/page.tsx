@@ -61,7 +61,7 @@ const ENTITIES: EntityDef[] = [
     type: 'E25',
     label: 'Plantation',
     crmClass: 'E25 Human-Made Feature',
-    desc: 'The central entity -- the physical plantation as a human-made landscape feature. A subclass of both E24 Physical Human-Made Thing and E26 Physical Feature. Connected to locations via P53 and to operating organizations via P52. Classified via SKOS thesaurus concepts.',
+    desc: 'The central entity for all human-made landscape features: plantations, roads, streets, railroads, military posts, and other constructed features. A subclass of both E24 Physical Human-Made Thing and E26 Physical Feature. Plantations connect to organizations via P52; all E25 instances connect to geometry via P53 and are classified via SKOS thesaurus concepts.',
     color: CRM_COLORS.E25,
     cx: 380,
     cy: 330,
@@ -70,7 +70,10 @@ const ENTITIES: EntityDef[] = [
       { name: 'P1 is identified by', range: 'E41 Appellation' },
       { name: 'rdfs:label', range: 'string (@nl)' },
       { name: 'P2 has type', range: 'E55 Type (via SKOS thesaurus)' },
-      { name: 'P53 has location', range: 'E53 Place (polygon geometry)' },
+      {
+        name: 'P53 has location',
+        range: 'E53 Place (POLYGON for plantations, LINESTRING for roads)',
+      },
       { name: 'P52 has current owner', range: 'E74 Organization (via Q-ID)' },
       { name: 'P51 has former or current owner', range: 'E74 Organization' },
       {

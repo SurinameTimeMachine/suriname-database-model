@@ -637,8 +637,8 @@ export default function PlantationPanel({
                 plantation
                   ? 'Plantation'
                   : physicalFeature
-                    ? 'Physical Feature'
-                    : 'Feature'
+                    ? typeLabel
+                    : typeLabel || 'Feature'
               }
               badge={crmBadge}
               open={openSections.plantation}
@@ -721,7 +721,9 @@ export default function PlantationPanel({
                   <p className="text-[9px] text-stm-warm-300 font-mono mb-1">
                     {crmBadge === 'E26'
                       ? 'E26 Physical Feature'
-                      : `${crmBadge} Feature`}
+                      : crmBadge === 'E25'
+                        ? 'E25 Human-Made Feature'
+                        : `${crmBadge} Feature`}
                   </p>
                   <CrmField
                     label="Name"
