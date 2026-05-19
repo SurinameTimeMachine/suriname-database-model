@@ -608,6 +608,129 @@
       "sortOrder": 0,
       "created": "2026-04-07",
       "modified": "2026-04-07"
+    },
+    {
+      "@id": "stm:vocabulary/road-attributes",
+      "@type": "skos:ConceptScheme",
+      "prefLabel": {
+        "en": "Road Attribute Vocabulary",
+        "nl": "Wegattribuut Vocabulaire"
+      },
+      "scopeNote": {
+        "en": "CIDOC-CRM E55 Type values for road lifecycle events (E11 Modification, E17 Type Assignment). Used to record changes to road direction classification and functional class over time."
+      },
+      "hasTopConcept": [
+        "stm:type/road-direction/bidirectional",
+        "stm:type/road-direction/one-way",
+        "stm:type/road-class/primary",
+        "stm:type/road-class/secondary",
+        "stm:type/road-class/path"
+      ],
+      "created": "2026-05-12",
+      "modified": "2026-05-12"
+    },
+    {
+      "@id": "stm:type/road-direction/bidirectional",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "prefLabel": {
+        "en": "Bidirectional",
+        "nl": "Tweerichtingsverkeer"
+      },
+      "definition": {
+        "en": "A road passable in both directions."
+      },
+      "topConceptOf": "stm:vocabulary/road-attributes",
+      "inScheme": "stm:vocabulary/road-attributes",
+      "closeMatch": [
+        "http://www.wikidata.org/entity/Q1364167"
+      ],
+      "created": "2026-05-12",
+      "modified": "2026-05-12"
+    },
+    {
+      "@id": "stm:type/road-direction/one-way",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "prefLabel": {
+        "en": "One-way",
+        "nl": "Eenrichtingsverkeer"
+      },
+      "definition": {
+        "en": "A road restricted to traffic in a single direction."
+      },
+      "inScheme": "stm:vocabulary/road-attributes",
+      "broader": "stm:type/road-direction/bidirectional",
+      "closeMatch": [
+        "http://www.wikidata.org/entity/Q1364167"
+      ],
+      "created": "2026-05-12",
+      "modified": "2026-05-12"
+    },
+    {
+      "@id": "stm:type/road-class/primary",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "prefLabel": {
+        "en": "Primary road",
+        "nl": "Hoofdweg"
+      },
+      "definition": {
+        "en": "A major through-route connecting settlements or districts."
+      },
+      "topConceptOf": "stm:vocabulary/road-attributes",
+      "inScheme": "stm:vocabulary/road-attributes",
+      "exactMatch": [
+        "http://www.wikidata.org/entity/Q1364167"
+      ],
+      "created": "2026-05-12",
+      "modified": "2026-05-12"
+    },
+    {
+      "@id": "stm:type/road-class/secondary",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "prefLabel": {
+        "en": "Secondary road",
+        "nl": "Secundaire weg"
+      },
+      "definition": {
+        "en": "A connecting road of lesser importance than a primary road, typically linking local features or plantations."
+      },
+      "inScheme": "stm:vocabulary/road-attributes",
+      "broader": "stm:type/road-class/primary",
+      "created": "2026-05-12",
+      "modified": "2026-05-12"
+    },
+    {
+      "@id": "stm:type/road-class/path",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "prefLabel": {
+        "en": "Path",
+        "nl": "Pad",
+        "srn": "Pasi smol"
+      },
+      "definition": {
+        "en": "A narrow unpaved route, often connecting plantation fields or forest parcels."
+      },
+      "inScheme": "stm:vocabulary/road-attributes",
+      "broader": "stm:type/road-class/secondary",
+      "exactMatch": [
+        "http://www.wikidata.org/entity/Q34442"
+      ],
+      "created": "2026-05-12",
+      "modified": "2026-05-12"
     }
   ]
 }

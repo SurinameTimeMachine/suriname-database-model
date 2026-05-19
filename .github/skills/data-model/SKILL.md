@@ -360,6 +360,85 @@ flowchart LR
     D -->|P14 carried out by| G[E74 wd:Q4392658]
 ```
 
+### Road Lifecycle Changes
+
+Roads (E25 Human-Made Feature) can change in four ways. Each change type maps to a distinct CRM event class. The current dataset contains only 1916 snapshot data; these patterns are modelled for future temporal road records.
+
+| Change                     | CRM Class           | Key Properties                                                                    |
+| -------------------------- | ------------------- | --------------------------------------------------------------------------------- |
+| Re-routing / length change | E11 Modification    | P31 has modified (E25 Road); P4 time-span; E25 P53 → new E53 (resulting geometry) |
+| Merging two roads          | E81 Transformation  | P124 transformed (E25 A, E25 B); P123 resulted in (E25 merged)                    |
+| Road removal               | E6 Destruction      | P13 destroyed (E25 Road); P4 time-span                                            |
+| Direction / class change   | E17 Type Assignment | P41 classified (E25 Road); P42 assigned (E55 from road-attributes vocab)          |
+
+**Re-routing (E11 Modification)** — The road entity (E25) continues to exist; only its geometry changes. The E11 event provides provenance and timing. The resulting geometry is assigned to the road via `P53 has location` → new E53 Place. Note: `P7 took place at` is NOT used here — P7 means where the activity physically happened, not the resulting geometry.
+
+```mermaid
+flowchart LR
+    R[E25 Road]
+    M[E11 Modification]
+    E53_NEW[E53 Place<br/>new geometry]
+    E52[E52 Time-Span]
+    E22[E22 Source]
+    R -->|P31i was modified by| M
+    M -->|P4 has time-span| E52
+    M -->|prov:hadPrimarySource| E22
+    R -->|P53 has location| E53_NEW
+```
+
+**Merging (E81 Transformation)** — Two or more road segments merge into one. Input E25 entities cease; a new (or surviving) E25 is produced. Parallels the plantation merger pattern.
+
+```mermaid
+flowchart LR
+    subgraph "before"
+        A[E25 Road A]
+        B[E25 Road B]
+    end
+    T[E81 Transformation]
+    subgraph "after"
+        C[E25 Road merged]
+    end
+    A -->|P124 transformed| T
+    B -->|P124 transformed| T
+    T -->|P123 resulted in| C
+```
+
+**Removal (E6 Destruction)** — The road is permanently removed; no successor entity is produced. This distinguishes removal from merging.
+
+```mermaid
+flowchart LR
+    R[E25 Road] -->|P13i was destroyed by| D[E6 Destruction]
+    D -->|P4 has time-span| E52[E52 Time-Span]
+    D -->|prov:hadPrimarySource| E22[E22 Source]
+```
+
+**Direction / class change (E17 Type Assignment)** — A road attribute changes (e.g. becomes one-way, downgraded from primary to secondary). E17 is a subclass of E13 and targets the E25 Road. Parallels the plantation status classification pattern.
+
+```mermaid
+flowchart LR
+    T[E17 Type Assignment]
+    R[E25 Road]
+    V[E55 Type<br/>stm:type/road-direction/one-way]
+    E52[E52 Time-Span]
+    T -->|P41 classified| R
+    T -->|P42 assigned| V
+    T -->|P4 has time-span| E52
+```
+
+Road attribute E55 types are defined in `data/place-types-thesaurus.jsonld` under scheme `stm:vocabulary/road-attributes`:
+
+| URI                                 | Meaning                     |
+| ----------------------------------- | --------------------------- |
+| `type/road-direction/bidirectional` | Open in both directions     |
+| `type/road-direction/one-way`       | Restricted to one direction |
+| `type/road-class/primary`           | Major through-route         |
+| `type/road-class/secondary`         | Local connecting road       |
+| `type/road-class/path`              | Narrow unpaved path         |
+
+> **Editorial note**: Road direction types (one-way / bidirectional) are modelled as a capability for future data. The 1916 Paramaribo streets dataset contains no source evidence for traffic direction; do not assign direction E55 types without a documented archival source.
+
+TypeScript interfaces for these events are defined as `RoadEvent` discriminated union in `app/lib/types.ts`.
+
 ## People Connection (PICO-compatible)
 
 Almanac columns map to PICO PersonObservation roles:

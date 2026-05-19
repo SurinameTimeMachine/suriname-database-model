@@ -56,6 +56,7 @@ export default function PlaceMiniMap({
   const mapRef = useRef<L.Map | null>(null);
   const markerRef = useRef<L.Marker | null>(null);
   const polygonRef = useRef<L.Polygon | null>(null);
+  const polylineRef = useRef<L.Polyline | null>(null);
   const warpedLayerRef = useRef<L.Layer | null>(null);
   const [show1930Map, setShow1930Map] = useState(false);
 
@@ -134,19 +135,41 @@ export default function PlaceMiniMap({
       map.removeLayer(polygonRef.current);
       polygonRef.current = null;
     }
+    if (polylineRef.current) {
+      map.removeLayer(polylineRef.current);
+      polylineRef.current = null;
+    }
 
-    // Draw polygon from WKT if available
+    // Draw geometry from WKT if available
     if (wkt) {
-      const coords = parseWKTPolygon(wkt);
-      if (coords.length > 0) {
-        const poly = L.polygon(coords, {
-          color: '#a67830',
-          fillColor: '#d4b67e',
-          fillOpacity: 0.3,
-          weight: 2,
-        }).addTo(map);
-        polygonRef.current = poly;
-        map.fitBounds(poly.getBounds(), { padding: [20, 20] });
+      const upper = wkt.trim().toUpperCase();
+      if (
+        upper.startsWith('LINESTRING') ||
+        upper.startsWith('MULTILINESTRING')
+      ) {
+        const lines = parseWKTLineString(wkt);
+        if (lines.length > 0) {
+          const pl = L.polyline(lines, {
+            color: '#a0522d',
+            weight: 2.5,
+            dashArray: '6 4',
+            opacity: 0.9,
+          }).addTo(map);
+          polylineRef.current = pl;
+          map.fitBounds(pl.getBounds(), { padding: [20, 20] });
+        }
+      } else {
+        const coords = parseWKTPolygon(wkt);
+        if (coords.length > 0) {
+          const poly = L.polygon(coords, {
+            color: '#a67830',
+            fillColor: '#d4b67e',
+            fillOpacity: 0.3,
+            weight: 2,
+          }).addTo(map);
+          polygonRef.current = poly;
+          map.fitBounds(poly.getBounds(), { padding: [20, 20] });
+        }
       }
     }
 
@@ -213,4 +236,36 @@ function parseWKTPolygon(wkt: string): [number, number][] {
     const [lng, lat] = pair.trim().split(/\s+/).map(Number);
     return [lat, lng] as [number, number];
   });
+}
+
+/**
+ * Parse WKT LineString or MultiLineString into Leaflet LatLng arrays.
+ * Returns an array of coordinate rings (one ring per line segment).
+ */
+function parseWKTLineString(wkt: string): [number, number][][] {
+  const upper = wkt.trim().toUpperCase();
+  if (upper.startsWith('MULTILINESTRING')) {
+    // MULTILINESTRING ((lon lat, lon lat), (lon lat, lon lat))
+    const innerMatch = wkt.match(/\(([\s\S]+)\)\s*$/);
+    if (!innerMatch) return [];
+    return innerMatch[1].split(/\)\s*,\s*\(/).map((ring) => {
+      const clean = ring.replace(/^\(|\)$/g, '').trim();
+      return clean.split(',').map((pair) => {
+        const [lng, lat] = pair.trim().split(/\s+/).map(Number);
+        return [lat, lng] as [number, number];
+      });
+    });
+  }
+  if (upper.startsWith('LINESTRING')) {
+    // LineString (lon lat, lon lat, ...)
+    const innerMatch = wkt.match(/\((.+)\)/);
+    if (!innerMatch) return [];
+    return [
+      innerMatch[1].split(',').map((pair) => {
+        const [lng, lat] = pair.trim().split(/\s+/).map(Number);
+        return [lat, lng] as [number, number];
+      }),
+    ];
+  }
+  return [];
 }
