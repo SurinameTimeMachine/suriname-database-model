@@ -1,0 +1,49 @@
+---
+title: Road Lifecycle Changes (CIDOC-CRM)
+description: Four CRM event patterns for tracking changes to road entities (E25 Human-Made Feature) over time.
+---
+flowchart TB
+
+    %% -----------------------------------------------------------------------
+    %% 1. Re-routing / length change: E11 Modification
+    %% -----------------------------------------------------------------------
+    subgraph rerouting ["E11 Modification — Re-routing / Length Change"]
+        direction LR
+        R1[E25 Road] -->|"P31i was modified by"| M[E11 Modification]
+        R1 -->|"P53 has location"| E53_NEW["E53 Place\nnew WKT geometry"]
+        M -->|"P4 has time-span"| E52_M[E52 Time-Span]
+        M -->|"prov:hadPrimarySource"| E22_M[E22 Source]
+    end
+
+    %% -----------------------------------------------------------------------
+    %% 2. Merging two roads: E81 Transformation
+    %% -----------------------------------------------------------------------
+    subgraph merging ["E81 Transformation — Road Merge"]
+        direction LR
+        RA[E25 Road A] -->|"P124 transformed"| T[E81 Transformation]
+        RB[E25 Road B] -->|"P124 transformed"| T
+        T -->|"P123 resulted in"| RC["E25 Road\nmerged"]
+        T -->|"P4 has time-span"| E52_T[E52 Time-Span]
+        T -->|"prov:hadPrimarySource"| E22_T[E22 Source]
+    end
+
+    %% -----------------------------------------------------------------------
+    %% 3. Road removal: E6 Destruction
+    %% -----------------------------------------------------------------------
+    subgraph removal ["E6 Destruction — Road Removal"]
+        direction LR
+        R2[E25 Road] -->|"P13i was destroyed by"| D[E6 Destruction]
+        D -->|"P4 has time-span"| E52_D[E52 Time-Span]
+        D -->|"prov:hadPrimarySource"| E22_D[E22 Source]
+    end
+
+    %% -----------------------------------------------------------------------
+    %% 4. Direction / class change: E17 Type Assignment
+    %% -----------------------------------------------------------------------
+    subgraph classification ["E17 Type Assignment — Direction or Class Change"]
+        direction LR
+        TA[E17 Type Assignment] -->|"P41 classified"| R3[E25 Road]
+        TA -->|"P42 assigned"| V["E55 Type\nstm:type/road-direction/one-way\nor stm:type/road-class/secondary"]
+        TA -->|"P4 has time-span"| E52_A[E52 Time-Span]
+        TA -->|"prov:hadPrimarySource"| E22_A[E22 Source]
+    end

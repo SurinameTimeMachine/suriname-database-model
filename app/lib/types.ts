@@ -354,3 +354,89 @@ export type Entity =
 
 /** @deprecated Use E25Plantation instead */
 export type E24Plantation = E25Plantation;
+
+// ---------------------------------------------------------------------------
+// Road lifecycle event types (CIDOC-CRM)
+// ---------------------------------------------------------------------------
+
+/** CRM E55 Type URI for road direction attributes */
+export type RoadDirectionType =
+  | 'stm:type/road-direction/bidirectional'
+  | 'stm:type/road-direction/one-way';
+
+/** CRM E55 Type URI for road functional class attributes */
+export type RoadClassType =
+  | 'stm:type/road-class/primary'
+  | 'stm:type/road-class/secondary'
+  | 'stm:type/road-class/path';
+
+/** Base fields shared by all road lifecycle events */
+interface RoadEventBase {
+  /** URI of the road (E25 Human-Made Feature) that the event concerns */
+  roadUri: string;
+  /** URI of the CRM event entity */
+  eventUri: string;
+  /** Year or date-range the event took effect (E52 Time-Span) */
+  timeSpan: string;
+  /** URI of the E22 source that records this event */
+  sourceUri: string;
+}
+
+/**
+ * E11 Modification — records a change to the road's geometry (re-routing,
+ * extension, or shortening). The new geometry is stored as a WKT string
+ * on the resulting E53 Place entity.
+ * E11 carries timing/provenance context only (e.g., P4 time-span, source links).
+ * CRM chain: E11 -> P31 has modified -> E25; E25 -> P53 has location -> E53 (new geom)
+ */
+export interface RoadModification extends RoadEventBase {
+  crmClass: 'E11';
+  /** WKT geometry string of the road after modification (geo:asWKT on new E53) */
+  newGeometryWkt: string;
+  /** Human-readable note describing the physical change */
+  note?: string;
+}
+
+/**
+ * E81 Transformation — records the merging of two or more roads into one.
+ * Parallels the plantation merger pattern: input E25 entities are ended,
+ * a new E25 (or the surviving one) is produced.
+ * CRM chain: E25+ -> P124 transformed -> E81 -> P123 resulted in -> E25
+ */
+export interface RoadTransformation extends RoadEventBase {
+  crmClass: 'E81';
+  /** URIs of all input road entities (E25) that were merged */
+  inputRoadUris: string[];
+  /** URI of the resulting merged road entity (E25) */
+  outputRoadUri: string;
+}
+
+/**
+ * E6 Destruction — records the permanent removal of a road.
+ * Unlike E81 Transformation, no successor entity is produced.
+ * CRM chain: E6 -> P13 destroyed -> E25; E6 -> P4 -> E52
+ */
+export interface RoadDestruction extends RoadEventBase {
+  crmClass: 'E6';
+  /** Reason or cause of removal, if known */
+  note?: string;
+}
+
+/**
+ * E17 Type Assignment — records a change to the road's direction or
+ * functional class (e.g. becomes one-way, downgraded from primary to secondary).
+ * Parallels plantation status classification.
+ * CRM chain: E17 -> P41 classified -> E25; E17 -> P42 assigned -> E55
+ */
+export interface RoadAttributeAssignment extends RoadEventBase {
+  crmClass: 'E17';
+  /** The E55 Type assigned — either a RoadDirectionType or RoadClassType URI */
+  assignedType: RoadDirectionType | RoadClassType;
+}
+
+/** Discriminated union of all CIDOC-CRM road lifecycle event types */
+export type RoadEvent =
+  | RoadModification
+  | RoadTransformation
+  | RoadDestruction
+  | RoadAttributeAssignment;

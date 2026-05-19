@@ -120,6 +120,66 @@ E25 ──P52 has current owner──> E74
 
 Key insight: **Maps depict plantations (E25); plantations have locations (E53)**. The map does NOT depict the location directly. Each source type carries names (E41) that identify its own entity type: map labels identify E25, almanac names identify E74.
 
+## Map Source Pattern (Full Chain)
+
+A historical map source involves four CIDOC-CRM classes in sequence. This diagram shows the complete chain from production event to geometry, including the dual role of E36 (both as map content and as IIIF scan representation):
+
+```mermaid
+flowchart TB
+    subgraph production ["E12 Production — who made the map"]
+        E12[E12 Production]
+        E12 -->|"P14 carried out by"| MAKER["string: cartographer name\ne.g. Bos & Weyerman"]
+        E12 -->|"P7 took place at"| PLACE["string: Den Haag / Paramaribo"]
+        E12 -->|"P4 has time-span"| E52P[E52 Time-Span]
+    end
+
+    E22[E22 Human-Made Object\nphysical map artifact]
+    E12 -->|"P108 has produced"| E22
+
+    subgraph content ["E22 carries two things"]
+        E22 -->|"P128 carries"| E36C["E36 Visual Item\nmap content — what is depicted"]
+        E22 -->|"P128 carries"| E41["E41 Appellation\nplace label printed on map"]
+        E22 -->|"P2 has type"| E55T["E55 Type\ntype/source-type/map"]
+        E22 -->|"P48 has preferred identifier"| E42["E42 Identifier\nsourceId from registry"]
+    end
+
+    subgraph depiction ["E36 dual role"]
+        E36C -->|"P138 represents"| E25["E25 Human-Made Feature\nthe plantation or road"]
+        E36SCAN["E36 Visual Item\nIIIF scan of physical map"] -->|"P138 represents"| E22
+        E36SCAN -->|"sdo:contentUrl"| IIIF["IIIF info.json URL"]
+    end
+
+    E25 -->|"P53 has location"| E53["E53 Place\ngeometry — POLYGON / LINESTRING"]
+    E25 -->|"P1 is identified by"| E41
+```
+
+**Critical rule**: E36 (map content) represents E25 — NOT E53. The geometry lives on E53, reached via E25 P53. An E36 Visual Item never directly points to an E53 Place.
+
+**Two registered E22 map sources** used in transformations:
+
+| sourceId                     | Label                     | Role                                               |
+| ---------------------------- | ------------------------- | -------------------------------------------------- |
+| `map-1930`                   | Kaart van Suriname (1930) | Primary source for plantation polygon geometries   |
+| `paramaribo-street-map-1916` | Paramaribo 1916-17        | Source for Paramaribo street LineString geometries |
+
+Additional historic maps are catalogued in `data/10-historic-maps-metadata.tsv` (49 maps, 1688–1955, held at Nationaal Archief / UB Amsterdam / UB Leiden). These are reference maps not yet linked to gazetteer geometries; each would become a separate E22 entry in `data/sources-registry.jsonld` when used in a transformation.
+
+## Physical Entity Class Selection
+
+Not all physical entities are E25. Use this table to choose the right class:
+
+| Entity type                                   | CRM class                  | Rationale                                                                           |
+| --------------------------------------------- | -------------------------- | ----------------------------------------------------------------------------------- |
+| Plantation                                    | **E25** Human-Made Feature | Constructed landscape feature; explicitly listed in CRM def                         |
+| Road / street                                 | **E25** Human-Made Feature | CRM definition explicitly lists "roads"                                             |
+| Individual building / house                   | **E22** Human-Made Object  | Discrete crafted artifact; same class as sources but distinguished by `P2 has type` |
+| Address                                       | **E44** Place Appellation  | An appellation (identifier) on an E53 or E22 — not an entity                        |
+| District / neighborhood / administrative area | **E53** Place (typed)      | Administrative spatial extent, not a construction; typed with `P2 has type → E55`   |
+
+**E25 vs E22 — the key distinction**: E25 is a subclass of E26 Physical Feature — it is a _feature of the landscape_, something physically part of the terrain or built environment (road, canal, plantation clearing). E22 is a subclass of E19 Physical Object — it is a _discrete made artifact_ (building, book, ship). Both are subclasses of E24 Physical Human-Made Thing and share properties (P1, P2, P3, P53, P108i for provenance).
+
+**Districts**: Colonial districts like "Commewijne", "Saramacca", "Boven-Suriname" are administrative spatial extents. They are not constructed features — they have no maker, no production event. Model as **E53 Place** with `P2 has type → stm:type/place-type/colonial-district`. If a district boundary changes over time, the change is recorded as a new E53 with a different time-scope on associated assertions.
+
 ## Entity Properties
 
 ### Plantation (E25 Human-Made Feature)
@@ -359,6 +419,85 @@ flowchart LR
     S[E74 wd:Q131349015] -->|P99i was dissolved by| D[E68 Dissolution]
     D -->|P14 carried out by| G[E74 wd:Q4392658]
 ```
+
+### Road Lifecycle Changes
+
+Roads (E25 Human-Made Feature) can change in four ways. Each change type maps to a distinct CRM event class. The current dataset contains only 1916 snapshot data; these patterns are modelled for future temporal road records.
+
+| Change                     | CRM Class           | Key Properties                                                                    |
+| -------------------------- | ------------------- | --------------------------------------------------------------------------------- |
+| Re-routing / length change | E11 Modification    | P31 has modified (E25 Road); P4 time-span; E25 P53 → new E53 (resulting geometry) |
+| Merging two roads          | E81 Transformation  | P124 transformed (E25 A, E25 B); P123 resulted in (E25 merged)                    |
+| Road removal               | E6 Destruction      | P13 destroyed (E25 Road); P4 time-span                                            |
+| Direction / class change   | E17 Type Assignment | P41 classified (E25 Road); P42 assigned (E55 from road-attributes vocab)          |
+
+**Re-routing (E11 Modification)** — The road entity (E25) continues to exist; only its geometry changes. The E11 event provides provenance and timing. The resulting geometry is assigned to the road via `P53 has location` → new E53 Place. Note: `P7 took place at` is NOT used here — P7 means where the activity physically happened, not the resulting geometry.
+
+```mermaid
+flowchart LR
+    R[E25 Road]
+    M[E11 Modification]
+    E53_NEW[E53 Place<br/>new geometry]
+    E52[E52 Time-Span]
+    E22[E22 Source]
+    R -->|P31i was modified by| M
+    M -->|P4 has time-span| E52
+    M -->|prov:hadPrimarySource| E22
+    R -->|P53 has location| E53_NEW
+```
+
+**Merging (E81 Transformation)** — Two or more road segments merge into one. Input E25 entities cease; a new (or surviving) E25 is produced. Parallels the plantation merger pattern.
+
+```mermaid
+flowchart LR
+    subgraph "before"
+        A[E25 Road A]
+        B[E25 Road B]
+    end
+    T[E81 Transformation]
+    subgraph "after"
+        C[E25 Road merged]
+    end
+    A -->|P124 transformed| T
+    B -->|P124 transformed| T
+    T -->|P123 resulted in| C
+```
+
+**Removal (E6 Destruction)** — The road is permanently removed; no successor entity is produced. This distinguishes removal from merging.
+
+```mermaid
+flowchart LR
+    R[E25 Road] -->|P13i was destroyed by| D[E6 Destruction]
+    D -->|P4 has time-span| E52[E52 Time-Span]
+    D -->|prov:hadPrimarySource| E22[E22 Source]
+```
+
+**Direction / class change (E17 Type Assignment)** — A road attribute changes (e.g. becomes one-way, downgraded from primary to secondary). E17 is a subclass of E13 and targets the E25 Road. Parallels the plantation status classification pattern.
+
+```mermaid
+flowchart LR
+    T[E17 Type Assignment]
+    R[E25 Road]
+    V[E55 Type<br/>stm:type/road-direction/one-way]
+    E52[E52 Time-Span]
+    T -->|P41 classified| R
+    T -->|P42 assigned| V
+    T -->|P4 has time-span| E52
+```
+
+Road attribute E55 types are defined in `data/place-types-thesaurus.jsonld` under scheme `stm:vocabulary/road-attributes`:
+
+| URI                                 | Meaning                     |
+| ----------------------------------- | --------------------------- |
+| `type/road-direction/bidirectional` | Open in both directions     |
+| `type/road-direction/one-way`       | Restricted to one direction |
+| `type/road-class/primary`           | Major through-route         |
+| `type/road-class/secondary`         | Local connecting road       |
+| `type/road-class/path`              | Narrow unpaved path         |
+
+> **Editorial note**: Road direction types (one-way / bidirectional) are modelled as a capability for future data. The 1916 Paramaribo streets dataset contains no source evidence for traffic direction; do not assign direction E55 types without a documented archival source.
+
+TypeScript interfaces for these events are defined as `RoadEvent` discriminated union in `app/lib/types.ts`.
 
 ## People Connection (PICO-compatible)
 

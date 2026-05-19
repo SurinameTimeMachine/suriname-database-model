@@ -19,10 +19,38 @@ import type {
   ProvenanceRecord,
 } from '@/lib/types';
 import { extractPlaceId } from '@/lib/url';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useRef, useState } from 'react';
 import EntityGraph from './EntityGraph';
 import ProvenanceChain from './ProvenanceChain';
+
+const PlaceMiniMap = dynamic(() => import('./PlaceMiniMap'), { ssr: false });
+
+/** Convert a GeoJSON geometry to a WKT string for PlaceMiniMap. */
+function geojsonGeometryToWkt(geom: GeoJSONFeature['geometry']): string | null {
+  if (!geom) return null;
+  if (geom.type === 'LineString') {
+    const coords = (geom.coordinates as [number, number][]).map(
+      ([lon, lat]) => `${lon} ${lat}`,
+    );
+    return `LineString (${coords.join(', ')})`;
+  }
+  if (geom.type === 'MultiLineString') {
+    const rings = (geom.coordinates as [number, number][][]).map(
+      (ring) =>
+        '(' + ring.map(([lon, lat]) => `${lon} ${lat}`).join(', ') + ')',
+    );
+    return `MULTILINESTRING (${rings.join(', ')})`;
+  }
+  if (geom.type === 'Polygon') {
+    const ring = (geom.coordinates as [number, number][][])[0];
+    if (!ring) return null;
+    const coords = ring.map(([lon, lat]) => `${lon} ${lat}`);
+    return `POLYGON ((${coords.join(', ')}))`;
+  }
+  return null;
+}
 
 interface PlantationPanelProps {
   feature: GeoJSONFeature | null;
@@ -609,8 +637,8 @@ export default function PlantationPanel({
                 plantation
                   ? 'Plantation'
                   : physicalFeature
-                    ? 'Physical Feature'
-                    : 'Feature'
+                    ? typeLabel
+                    : typeLabel || 'Feature'
               }
               badge={crmBadge}
               open={openSections.plantation}
@@ -693,7 +721,9 @@ export default function PlantationPanel({
                   <p className="text-[9px] text-stm-warm-300 font-mono mb-1">
                     {crmBadge === 'E26'
                       ? 'E26 Physical Feature'
-                      : `${crmBadge} Feature`}
+                      : crmBadge === 'E25'
+                        ? 'E25 Human-Made Feature'
+                        : `${crmBadge} Feature`}
                   </p>
                   <CrmField
                     label="Name"
@@ -905,6 +935,14 @@ export default function PlantationPanel({
                           value={props.mapYear}
                         />
                       )}
+                      <div className="pt-2">
+                        <PlaceMiniMap
+                          lat={null}
+                          lng={null}
+                          wkt={geojsonGeometryToWkt(feature.geometry)}
+                          editable={false}
+                        />
+                      </div>
                     </>
                   ) : (
                     <NoDataPlaceholder />

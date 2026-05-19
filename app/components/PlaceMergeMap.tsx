@@ -60,6 +60,36 @@ function parseWKTPolygon(wkt: string): [number, number][] {
   });
 }
 
+/**
+ * Parse WKT LineString or MultiLineString into Leaflet LatLng arrays.
+ * Returns an array of coordinate rings (one ring per line segment).
+ */
+function parseWKTLineString(wkt: string): [number, number][][] {
+  const upper = wkt.trim().toUpperCase();
+  if (upper.startsWith('MULTILINESTRING')) {
+    const innerMatch = wkt.match(/\(([\s\S]+)\)\s*$/);
+    if (!innerMatch) return [];
+    return innerMatch[1].split(/\)\s*,\s*\(/).map((ring) => {
+      const clean = ring.replace(/^\(|\)$/g, '').trim();
+      return clean.split(',').map((pair) => {
+        const [lng, lat] = pair.trim().split(/\s+/).map(Number);
+        return [lat, lng] as [number, number];
+      });
+    });
+  }
+  if (upper.startsWith('LINESTRING')) {
+    const innerMatch = wkt.match(/\((.+)\)/);
+    if (!innerMatch) return [];
+    return [
+      innerMatch[1].split(',').map((pair) => {
+        const [lng, lat] = pair.trim().split(/\s+/).map(Number);
+        return [lat, lng] as [number, number];
+      }),
+    ];
+  }
+  return [];
+}
+
 function makeLabel(letter: string, colors: { stroke: string }) {
   return L.divIcon({
     className: '',
@@ -128,21 +158,44 @@ export default function PlaceMergeMap({
       const colors = COLORS[side];
 
       if (loc.wkt) {
-        const coords = parseWKTPolygon(loc.wkt);
-        if (coords.length > 0) {
-          const poly = L.polygon(coords, {
-            color: colors.stroke,
-            fillColor: colors.fill,
-            fillOpacity: 0.25,
-            weight: 2.5,
-          })
-            .bindTooltip(`${side.toUpperCase()}: ${name}`, {
-              sticky: true,
-              className: 'leaflet-tooltip-stm',
+        const upper = loc.wkt.trim().toUpperCase();
+        if (
+          upper.startsWith('LINESTRING') ||
+          upper.startsWith('MULTILINESTRING')
+        ) {
+          const lines = parseWKTLineString(loc.wkt);
+          if (lines.length > 0) {
+            const pl = L.polyline(lines, {
+              color: colors.stroke,
+              weight: 2.5,
+              dashArray: '6 4',
+              opacity: 0.85,
             })
-            .addTo(map);
-          layersRef.current.push(poly);
-          bounds.push(poly.getBounds());
+              .bindTooltip(`${side.toUpperCase()}: ${name}`, {
+                sticky: true,
+                className: 'leaflet-tooltip-stm',
+              })
+              .addTo(map);
+            layersRef.current.push(pl);
+            bounds.push(pl.getBounds());
+          }
+        } else {
+          const coords = parseWKTPolygon(loc.wkt);
+          if (coords.length > 0) {
+            const poly = L.polygon(coords, {
+              color: colors.stroke,
+              fillColor: colors.fill,
+              fillOpacity: 0.25,
+              weight: 2.5,
+            })
+              .bindTooltip(`${side.toUpperCase()}: ${name}`, {
+                sticky: true,
+                className: 'leaflet-tooltip-stm',
+              })
+              .addTo(map);
+            layersRef.current.push(poly);
+            bounds.push(poly.getBounds());
+          }
         }
       }
 

@@ -61,7 +61,7 @@ const ENTITIES: EntityDef[] = [
     type: 'E25',
     label: 'Plantation',
     crmClass: 'E25 Human-Made Feature',
-    desc: 'The central entity -- the physical plantation as a human-made landscape feature. A subclass of both E24 Physical Human-Made Thing and E26 Physical Feature. Connected to locations via P53 and to operating organizations via P52. Classified via SKOS thesaurus concepts.',
+    desc: 'The central entity for all human-made landscape features: plantations, roads, streets, railroads, military posts, and other constructed features. A subclass of both E24 Physical Human-Made Thing and E26 Physical Feature. Plantations connect to organizations via P52; all E25 instances connect to geometry via P53 and are classified via SKOS thesaurus concepts.',
     color: CRM_COLORS.E25,
     cx: 380,
     cy: 330,
@@ -70,7 +70,10 @@ const ENTITIES: EntityDef[] = [
       { name: 'P1 is identified by', range: 'E41 Appellation' },
       { name: 'rdfs:label', range: 'string (@nl)' },
       { name: 'P2 has type', range: 'E55 Type (via SKOS thesaurus)' },
-      { name: 'P53 has location', range: 'E53 Place (polygon geometry)' },
+      {
+        name: 'P53 has location',
+        range: 'E53 Place (POLYGON for plantations, LINESTRING for roads)',
+      },
       { name: 'P52 has current owner', range: 'E74 Organization (via Q-ID)' },
       { name: 'P51 has former or current owner', range: 'E74 Organization' },
       {
@@ -364,7 +367,7 @@ const ENTITIES: EntityDef[] = [
     type: 'E81',
     label: 'Transformation',
     crmClass: 'E81 Transformation',
-    desc: "Models plantation mergers. When plantations merge, E81 simultaneously ends old E25 entities and produces the merged E25. For example, Suzanna'sdal and Geijersvlijt merging into one plantation by 1930.",
+    desc: "Models plantation mergers and road merges. When plantations or roads merge, E81 simultaneously ends old E25 entities and produces the merged E25. For example, Suzanna'sdal and Geijersvlijt merging into one plantation by 1930.",
     color: CRM_COLORS.E81,
     cx: 180,
     cy: 380,
@@ -380,6 +383,40 @@ const ENTITIES: EntityDef[] = [
         range: 'E25 Human-Made Feature (merged)',
       },
       { name: 'P4 has time-span', range: 'E52 Time-Span' },
+    ],
+  },
+  {
+    id: 'e11',
+    type: 'E11',
+    label: 'Modification',
+    crmClass: 'E11 Modification',
+    desc: "Records a change to a road's physical geometry (re-routing, extension, or shortening). The road entity (E25) continues to exist; only its geometry changes. The E11 provides provenance and timing; the resulting geometry is assigned to the road via P53 has location on the E25.",
+    color: CRM_COLORS.E11,
+    cx: 180,
+    cy: 460,
+    dataKey: '',
+    structural: true,
+    properties: [
+      { name: 'P31 has modified', range: 'E25 Human-Made Feature (road)' },
+      { name: 'P4 has time-span', range: 'E52 Time-Span' },
+      { name: 'prov:hadPrimarySource', range: 'E22 Human-Made Object' },
+    ],
+  },
+  {
+    id: 'e6',
+    type: 'E6',
+    label: 'Destruction',
+    crmClass: 'E6 Destruction',
+    desc: 'Records the permanent removal of a road. Unlike E81 Transformation, no successor entity is produced. Used when a road disappears from the historical record without being merged into another.',
+    color: CRM_COLORS.E6,
+    cx: 180,
+    cy: 540,
+    dataKey: '',
+    structural: true,
+    properties: [
+      { name: 'P13 destroyed', range: 'E25 Human-Made Feature (road)' },
+      { name: 'P4 has time-span', range: 'E52 Time-Span' },
+      { name: 'prov:hadPrimarySource', range: 'E22 Human-Made Object' },
     ],
   },
   {
@@ -605,6 +642,18 @@ const RELATIONS: RelDef[] = [
     to: 'e22',
     label: 'prov:hadPrimarySource',
     desc: 'The source (almanac) that records the deserted status',
+  },
+  {
+    from: 'e11',
+    to: 'e25',
+    label: 'P31 has modified',
+    desc: 'E11 Modification: the road (E25) whose geometry was changed by re-routing or extension',
+  },
+  {
+    from: 'e6',
+    to: 'e25',
+    label: 'P13 destroyed',
+    desc: 'E6 Destruction: the road (E25) that was permanently removed from the landscape',
   },
 ];
 
@@ -1077,6 +1126,13 @@ function SourcePatternSection() {
           {' -> P141 -> '}
           <span style={{ color: CRM_COLORS.E55 }}>E55 Type</span>
           {' (product / deserted)'}
+        </div>
+        <div>
+          <span className="text-stm-warm-400">Production:</span>{' '}
+          <span style={{ color: CRM_COLORS.E12 }}>E12 Production</span>
+          {' -> P108 -> '}
+          <span style={{ color: CRM_COLORS.E22 }}>E22 Map</span>
+          {' (P14: maker, P7: Den Haag/Paramaribo, P4: year)'}
         </div>
         <div>
           <span className="text-stm-warm-400">Digital:</span>{' '}

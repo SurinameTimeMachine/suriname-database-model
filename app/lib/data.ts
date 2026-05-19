@@ -148,6 +148,8 @@ export const CRM_COLORS: Record<string, string> = {
   E17: '#f0a0a0', // E17 Type Assignment (muted red)
   E42: '#b8c9e0', // E42 Identifier (steel blue)
   E81: '#f0a0a0', // E81 Transformation (muted red)
+  E11: '#c8a86e', // E11 Modification (warm tan) -- road/feature re-routing
+  E6: '#b06060', // E6 Destruction (muted brick red) -- road removal
   E68: '#e0b0b0', // E68 Dissolution (dusty rose)
   PROV: '#d4c4fb', // Provenance (lavender)
   Provenance: '#d4c4fb',
