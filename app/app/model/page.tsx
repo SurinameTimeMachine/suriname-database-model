@@ -1125,6 +1125,13 @@ function SourcePatternSection() {
           {' (product / deserted)'}
         </div>
         <div>
+          <span className="text-stm-warm-400">Production:</span>{' '}
+          <span style={{ color: CRM_COLORS.E12 }}>E12 Production</span>
+          {' -> P108 -> '}
+          <span style={{ color: CRM_COLORS.E22 }}>E22 Map</span>
+          {' (P14: maker, P7: Den Haag/Paramaribo, P4: year)'}
+        </div>
+        <div>
           <span className="text-stm-warm-400">Digital:</span>{' '}
           <span style={{ color: CRM_COLORS.E36 }}>E36 Visual Item</span>
           {' -> P138 -> '}

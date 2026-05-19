@@ -120,6 +120,50 @@ E25 ──P52 has current owner──> E74
 
 Key insight: **Maps depict plantations (E25); plantations have locations (E53)**. The map does NOT depict the location directly. Each source type carries names (E41) that identify its own entity type: map labels identify E25, almanac names identify E74.
 
+## Map Source Pattern (Full Chain)
+
+A historical map source involves four CIDOC-CRM classes in sequence. This diagram shows the complete chain from production event to geometry, including the dual role of E36 (both as map content and as IIIF scan representation):
+
+```mermaid
+flowchart TB
+    subgraph production ["E12 Production — who made the map"]
+        E12[E12 Production]
+        E12 -->|"P14 carried out by"| MAKER["string: cartographer name\ne.g. Bos & Weyerman"]
+        E12 -->|"P7 took place at"| PLACE["string: Den Haag / Paramaribo"]
+        E12 -->|"P4 has time-span"| E52P[E52 Time-Span]
+    end
+
+    E22[E22 Human-Made Object\nphysical map artifact]
+    E12 -->|"P108 has produced"| E22
+
+    subgraph content ["E22 carries two things"]
+        E22 -->|"P128 carries"| E36C["E36 Visual Item\nmap content — what is depicted"]
+        E22 -->|"P128 carries"| E41["E41 Appellation\nplace label printed on map"]
+        E22 -->|"P2 has type"| E55T["E55 Type\ntype/source-type/map"]
+        E22 -->|"P48 has preferred identifier"| E42["E42 Identifier\nsourceId from registry"]
+    end
+
+    subgraph depiction ["E36 dual role"]
+        E36C -->|"P138 represents"| E25["E25 Human-Made Feature\nthe plantation or road"]
+        E36SCAN["E36 Visual Item\nIIIF scan of physical map"] -->|"P138 represents"| E22
+        E36SCAN -->|"sdo:contentUrl"| IIIF["IIIF info.json URL"]
+    end
+
+    E25 -->|"P53 has location"| E53["E53 Place\ngeometry — POLYGON / LINESTRING"]
+    E25 -->|"P1 is identified by"| E41
+```
+
+**Critical rule**: E36 (map content) represents E25 — NOT E53. The geometry lives on E53, reached via E25 P53. An E36 Visual Item never directly points to an E53 Place.
+
+**Two registered E22 map sources** used in transformations:
+
+| sourceId                    | Label                     | Role                                               |
+| --------------------------- | ------------------------- | -------------------------------------------------- |
+| `map-1930`                  | Kaart van Suriname (1930) | Primary source for plantation polygon geometries   |
+| `paramaribo-street-map-1916`| Paramaribo 1916-17        | Source for Paramaribo street LineString geometries |
+
+Additional historic maps are catalogued in `data/10-historic-maps-metadata.tsv` (49 maps, 1688–1955, held at Nationaal Archief / UB Amsterdam / UB Leiden). These are reference maps not yet linked to gazetteer geometries; each would become a separate E22 entry in `data/sources-registry.jsonld` when used in a transformation.
+
 ## Entity Properties
 
 ### Plantation (E25 Human-Made Feature)
