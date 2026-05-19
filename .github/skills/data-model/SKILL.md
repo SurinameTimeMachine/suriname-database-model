@@ -168,15 +168,15 @@ Additional historic maps are catalogued in `data/10-historic-maps-metadata.tsv` 
 
 Not all physical entities are E25. Use this table to choose the right class:
 
-| Entity type | CRM class | Rationale |
-| --- | --- | --- |
-| Plantation | **E25** Human-Made Feature | Constructed landscape feature; explicitly listed in CRM def |
-| Road / street | **E25** Human-Made Feature | CRM definition explicitly lists "roads" |
-| Individual building / house | **E22** Human-Made Object | Discrete crafted artifact; same class as sources but distinguished by `P2 has type` |
-| Address | **E44** Place Appellation | An appellation (identifier) on an E53 or E22 — not an entity |
-| District / neighborhood / administrative area | **E53** Place (typed) | Administrative spatial extent, not a construction; typed with `P2 has type → E55` |
+| Entity type                                   | CRM class                  | Rationale                                                                           |
+| --------------------------------------------- | -------------------------- | ----------------------------------------------------------------------------------- |
+| Plantation                                    | **E25** Human-Made Feature | Constructed landscape feature; explicitly listed in CRM def                         |
+| Road / street                                 | **E25** Human-Made Feature | CRM definition explicitly lists "roads"                                             |
+| Individual building / house                   | **E22** Human-Made Object  | Discrete crafted artifact; same class as sources but distinguished by `P2 has type` |
+| Address                                       | **E44** Place Appellation  | An appellation (identifier) on an E53 or E22 — not an entity                        |
+| District / neighborhood / administrative area | **E53** Place (typed)      | Administrative spatial extent, not a construction; typed with `P2 has type → E55`   |
 
-**E25 vs E22 — the key distinction**: E25 is a subclass of E26 Physical Feature — it is a *feature of the landscape*, something physically part of the terrain or built environment (road, canal, plantation clearing). E22 is a subclass of E19 Physical Object — it is a *discrete made artifact* (building, book, ship). Both are subclasses of E24 Physical Human-Made Thing and share properties (P1, P2, P3, P53, P108i for provenance).
+**E25 vs E22 — the key distinction**: E25 is a subclass of E26 Physical Feature — it is a _feature of the landscape_, something physically part of the terrain or built environment (road, canal, plantation clearing). E22 is a subclass of E19 Physical Object — it is a _discrete made artifact_ (building, book, ship). Both are subclasses of E24 Physical Human-Made Thing and share properties (P1, P2, P3, P53, P108i for provenance).
 
 **Districts**: Colonial districts like "Commewijne", "Saramacca", "Boven-Suriname" are administrative spatial extents. They are not constructed features — they have no maker, no production event. Model as **E53 Place** with `P2 has type → stm:type/place-type/colonial-district`. If a district boundary changes over time, the change is recorded as a new E53 with a different time-scope on associated assertions.
 
