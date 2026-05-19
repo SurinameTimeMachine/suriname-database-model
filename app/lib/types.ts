@@ -386,7 +386,8 @@ interface RoadEventBase {
  * E11 Modification — records a change to the road's geometry (re-routing,
  * extension, or shortening). The new geometry is stored as a WKT string
  * on the resulting E53 Place entity.
- * CRM chain: E11 -> P31 has modified -> E25; E11 -> P4 -> E52; E25 -> P53 has location -> E53 (new geom)
+ * E11 carries timing/provenance context only (e.g., P4 time-span, source links).
+ * CRM chain: E11 -> P31 has modified -> E25; E25 -> P53 has location -> E53 (new geom)
  */
 export interface RoadModification extends RoadEventBase {
   crmClass: 'E11';

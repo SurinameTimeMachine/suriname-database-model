@@ -699,10 +699,10 @@
       "definition": {
         "en": "A connecting road of lesser importance than a primary road, typically linking local features or plantations."
       },
+      "topConceptOf": "stm:vocabulary/road-attributes",
       "inScheme": "stm:vocabulary/road-attributes",
-      "broader": "stm:type/road-class/primary",
       "created": "2026-05-12",
-      "modified": "2026-05-12"
+      "modified": "2026-05-19"
     },
     {
       "@id": "stm:type/road-class/path",
@@ -718,10 +718,10 @@
       "definition": {
         "en": "A narrow unpaved route, often connecting plantation fields or forest parcels."
       },
+      "topConceptOf": "stm:vocabulary/road-attributes",
       "inScheme": "stm:vocabulary/road-attributes",
-      "broader": "stm:type/road-class/secondary",
       "created": "2026-05-12",
-      "modified": "2026-05-12"
+      "modified": "2026-05-19"
     }
   ]
 }
