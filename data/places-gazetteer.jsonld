@@ -7068,96 +7068,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01382",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01382",
-      "type": "plantation",
-      "prefLabel": "Beekhuizen",
-      "altLabels": [],
-      "broader": "stm-00010",
-      "description": "",
-      "location": {
-        "lat": 5.792310880416665,
-        "lng": -55.18540075333333,
-        "wkt": "Polygon ((-55.19997971 5.77191799, -55.19959764 5.77254197, -55.19823468 5.77486669, -55.19643451 5.77787245, -55.19496687 5.78064808, -55.19381968 5.78246387, -55.19202690 5.78591867, -55.18990712 5.78994036, -55.18801149 5.79395832, -55.18594584 5.79786680, -55.18395865 5.80143708, -55.18153884 5.80596904, -55.18039985 5.80998142, -55.17870878 5.81281685, -55.17673439 5.81589559, -55.17588531 5.81540434, -55.17112529 5.81233900, -55.16651700 5.81124328, -55.16511680 5.80241626, -55.16951690 5.79470528, -55.17326119 5.79571205, -55.18835329 5.76508578, -55.19959764 5.77254197, -55.19997971 5.77191799))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q59115202",
-      "fid": 2467,
-      "psurIds": [
-        "PSUR0021"
-      ],
-      "district": "Divisie Para",
-      "locationDescription": "Suriname",
-      "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59115202",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1818",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1818,
-          "note": null
-        },
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-suiker-1818",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1818,
-          "endYear": 1821,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1825",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1825,
-          "endYear": 1847,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-kost-en-kweek-1856",
-          "value": "kost en kweek",
-          "source": "almanakken",
-          "startYear": 1856,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-kweek-1859",
-          "value": "kweek",
-          "source": "almanakken",
-          "startYear": 1859,
-          "endYear": 1861,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02344",
       "@type": [
         "E25_Human-Made_Feature"
@@ -99145,6 +99055,137 @@
           "original": "Rivier Commewijne, (beneden) linkerhand in het afvaren",
           "source": "almanakken",
           "note": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01382",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01382",
+      "type": "plantation",
+      "broader": "stm-00010",
+      "description": "",
+      "location": {
+        "lat": 5.792310880416665,
+        "lng": -55.18540075333333,
+        "wkt": "Polygon ((-55.19997971 5.77191799, -55.19959764 5.77254197, -55.19823468 5.77486669, -55.19643451 5.77787245, -55.19496687 5.78064808, -55.19381968 5.78246387, -55.19202690 5.78591867, -55.18990712 5.78994036, -55.18801149 5.79395832, -55.18594584 5.79786680, -55.18395865 5.80143708, -55.18153884 5.80596904, -55.18039985 5.80998142, -55.17870878 5.81281685, -55.17673439 5.81589559, -55.17588531 5.81540434, -55.17112529 5.81233900, -55.16651700 5.81124328, -55.16511680 5.80241626, -55.16951690 5.79470528, -55.17326119 5.79571205, -55.18835329 5.76508578, -55.19959764 5.77254197, -55.19997971 5.77191799))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q59115202",
+      "fid": 2467,
+      "psurIds": [
+        "PSUR0021"
+      ],
+      "district": "Divisie Para",
+      "locationDescription": "Suriname",
+      "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-01",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59115202",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1818",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1818,
+          "note": null
+        },
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-suiker-1818",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1818,
+          "endYear": 1821,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1825",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1825,
+          "endYear": 1847,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-kost-en-kweek-1856",
+          "value": "kost en kweek",
+          "source": "almanakken",
+          "startYear": 1856,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-kweek-1859",
+          "value": "kweek",
+          "source": "almanakken",
+          "startYear": 1859,
+          "endYear": 1861,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "Beekhuizek",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        },
+        {
+          "text": "Beekoisi",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00010",
+          "districtLabel": "Divisie Para",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Suriname",
+          "original": "Rivier Suriname, linkerhand in het afvaren",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Beekhuizen 2001-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emZi1Rc2pvZ05SaVU/view?usp=sharing&resourcekey=0-9SgFW6WZ4iacvW5XIp7Bnw",
+          "author": "Philip Dikland",
+          "year": "2001, aangevuld 2009, 2010",
+          "notes": "De oude suikerplantage Beekhuizen aan de Domineekreek is reeds lang een wijk van\nParamaribo. Het emplacement was ter plaatse van de houtzagerij Bruynzeel, en bestaat niet\nmeer."
         }
       ]
     },
