@@ -6619,69 +6619,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00645",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-00645",
-      "type": "plantation",
-      "prefLabel": "Aurora",
-      "altLabels": [],
-      "broader": "stm-00007",
-      "description": "",
-      "location": {
-        "lat": 5.753507244285715,
-        "lng": -55.08285095761905,
-        "wkt": "Polygon ((-55.08805658 5.75979013, -55.08569167 5.78466940, -55.07307939 5.78372952, -55.07479589 5.75602383, -55.07688154 5.75272986, -55.07777150 5.75002898, -55.07820758 5.74721483, -55.07964075 5.74088309, -55.08107394 5.74007480, -55.08309038 5.73992093, -55.08496806 5.74049373, -55.08669338 5.74180619, -55.08755116 5.74343452, -55.08764347 5.74745216, -55.08670436 5.75060075, -55.08468151 5.75339802, -55.08325996 5.75579428, -55.08346417 5.75753115, -55.08369559 5.75847339, -55.08486265 5.75981244, -55.08805658 5.75979013))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken"
-      ],
-      "wikidataQid": "Q59115179",
-      "fid": 1728,
-      "psurIds": [],
-      "district": "Divisie Boven-Suriname en Thorarica",
-      "locationDescription": "Paulus Kreek",
-      "locationDescriptionOriginal": "Paulus-kreek, linkerhand in het opvaren",
-      "placeType": null,
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59115179",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-abandoned-1818",
-          "status": "abandoned",
-          "source": "almanakken",
-          "startYear": 1818,
-          "endYear": 1821,
-          "note": null
-        },
-        {
-          "id": "status-almanakken-abandoned-1825",
-          "status": "abandoned",
-          "source": "almanakken",
-          "startYear": 1825,
-          "endYear": 1847,
-          "note": null
-        },
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02440",
       "@type": [
         "E25_Human-Made_Feature"
@@ -98276,6 +98213,111 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emM1lUaTNZV1VKSEE/view?usp=sharing&resourcekey=0-4TmOlNi-EYuNe2qBLyuHgg",
           "author": "Philip Dikland",
           "year": "2004",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-00645",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-00645",
+      "type": "plantation",
+      "broader": "stm-00007",
+      "description": "",
+      "location": {
+        "lat": 5.753507244285715,
+        "lng": -55.08285095761905,
+        "wkt": "Polygon ((-55.08805658 5.75979013, -55.08569167 5.78466940, -55.07307939 5.78372952, -55.07479589 5.75602383, -55.07688154 5.75272986, -55.07777150 5.75002898, -55.07820758 5.74721483, -55.07964075 5.74088309, -55.08107394 5.74007480, -55.08309038 5.73992093, -55.08496806 5.74049373, -55.08669338 5.74180619, -55.08755116 5.74343452, -55.08764347 5.74745216, -55.08670436 5.75060075, -55.08468151 5.75339802, -55.08325996 5.75579428, -55.08346417 5.75753115, -55.08369559 5.75847339, -55.08486265 5.75981244, -55.08805658 5.75979013))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken"
+      ],
+      "wikidataQid": "Q59115179",
+      "fid": 1728,
+      "psurIds": [],
+      "district": "Divisie Boven-Suriname en Thorarica",
+      "locationDescription": "Paulus Kreek",
+      "locationDescriptionOriginal": "Paulus-kreek, linkerhand in het opvaren",
+      "placeType": null,
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-01",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59115179",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-abandoned-1818",
+          "status": "abandoned",
+          "source": "almanakken",
+          "startYear": 1818,
+          "endYear": 1821,
+          "note": null
+        },
+        {
+          "id": "status-almanakken-abandoned-1825",
+          "status": "abandoned",
+          "source": "almanakken",
+          "startYear": 1825,
+          "endYear": 1847,
+          "note": null
+        },
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "names": [
+        {
+          "text": "Aurora",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        },
+        {
+          "text": "Aurera",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "sourceYear": 1837
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00007",
+          "districtLabel": "Divisie Boven-Suriname en Thorarica",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "productAssertions": [],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Paulus Kreek",
+          "original": "Paulus-kreek, linkerhand in het opvaren",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Aurora 2005-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8ememVReFdfcE4wVGs/view?usp=sharing&resourcekey=0--_Fi6f21VAkIhIUyXGPCDw",
+          "author": "Philip Dikland",
+          "year": "2005",
           "notes": null
         }
       ]
