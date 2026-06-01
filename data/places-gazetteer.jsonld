@@ -166620,8 +166620,8 @@
       "locationDescription": null,
       "locationDescriptionOriginal": null,
       "placeType": null,
-      "modifiedBy": "Thunnisvanoort",
-      "modifiedAt": "2026-04-14",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-01",
       "externalLinks": [
         {
           "authority": "wikidata",
@@ -166641,6 +166641,19 @@
           "language": "nl",
           "type": "official",
           "isPreferred": true
+        }
+      ],
+      "districtAssertions": [],
+      "productAssertions": [],
+      "locationAssertions": [],
+      "statusAssertions": [],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\Jodensavanne\\Jodensavanne 2000-01 gschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emam93YmRKZzRlMWM/view?usp=sharing&resourcekey=0-dQfoSfCPBMf4xlGJPv2gnA",
+          "author": "Philip Dikland",
+          "year": "2001",
+          "notes": null
         }
       ]
     },
