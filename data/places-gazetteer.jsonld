@@ -6656,100 +6656,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01435",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01435",
-      "type": "plantation",
-      "prefLabel": "Ayo",
-      "altLabels": [],
-      "broader": "stm-00007",
-      "description": "",
-      "location": {
-        "lat": 5.445641909,
-        "lng": -55.01558722699999,
-        "wkt": "Polygon ((-55.01868473 5.44945796, -54.99652457 5.44803992, -54.99604211 5.44430518, -54.99500589 5.43985511, -55.00908345 5.44062080, -55.01324749 5.44109590, -55.01301480 5.44529509, -55.04792896 5.44719587, -55.04765554 5.45109530, -55.01868473 5.44945796))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken"
-      ],
-      "wikidataQid": "Q59115181",
-      "fid": 2520,
-      "psurIds": [],
-      "district": "Divisie Boven-Suriname en Thorarica",
-      "locationDescription": "Suriname",
-      "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
-      "placeType": "hout",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59115181",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1818",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1818,
-          "note": null
-        },
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-hout-1818",
-          "value": "hout",
-          "source": "almanakken",
-          "startYear": 1818,
-          "endYear": 1821,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-hout-1825",
-          "value": "hout",
-          "source": "almanakken",
-          "startYear": 1825,
-          "endYear": 1834,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-steen-en-hout-1835",
-          "value": "steen en hout",
-          "source": "almanakken",
-          "startYear": 1835,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-hout-1836",
-          "value": "hout",
-          "source": "almanakken",
-          "startYear": 1836,
-          "endYear": 1847,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-hout-1859",
-          "value": "hout",
-          "source": "almanakken",
-          "startYear": 1859,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-00532",
       "@type": [
         "E25_Human-Made_Feature"
@@ -98319,6 +98225,134 @@
           "author": "Philip Dikland",
           "year": "2005",
           "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01435",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01435",
+      "type": "plantation",
+      "broader": "stm-00007",
+      "description": "",
+      "location": {
+        "lat": 5.445641909,
+        "lng": -55.01558722699999,
+        "wkt": "Polygon ((-55.01868473 5.44945796, -54.99652457 5.44803992, -54.99604211 5.44430518, -54.99500589 5.43985511, -55.00908345 5.44062080, -55.01324749 5.44109590, -55.01301480 5.44529509, -55.04792896 5.44719587, -55.04765554 5.45109530, -55.01868473 5.44945796))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken"
+      ],
+      "wikidataQid": "Q59115181",
+      "fid": 2520,
+      "psurIds": [],
+      "district": "Divisie Boven-Suriname en Thorarica",
+      "locationDescription": "Suriname",
+      "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
+      "placeType": "hout",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-01",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59115181",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1818",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1818,
+          "note": null
+        },
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-hout-1818",
+          "value": "hout",
+          "source": "almanakken",
+          "startYear": 1818,
+          "endYear": 1821,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-hout-1825",
+          "value": "hout",
+          "source": "almanakken",
+          "startYear": 1825,
+          "endYear": 1834,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-steen-en-hout-1835",
+          "value": "steen en hout",
+          "source": "almanakken",
+          "startYear": 1835,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-hout-1836",
+          "value": "hout",
+          "source": "almanakken",
+          "startYear": 1836,
+          "endYear": 1847,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-hout-1859",
+          "value": "hout",
+          "source": "almanakken",
+          "startYear": 1859,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "Ayo",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00007",
+          "districtLabel": "Divisie Boven-Suriname en Thorarica",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Suriname",
+          "original": "Rivier Suriname, linkerhand in het afvaren",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Ayo 2005-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emM0ZvQVNlekt5a00/view?usp=sharing&resourcekey=0-j1JuuY01qKB-GXYrBcjNSA",
+          "author": "Philip Dikland",
+          "year": "2005",
+          "notes": "Het hebreeuwse woord “Ayo”, betekent zoveel als : “waarom”. Als plantagenaam lijkt het\nbetekenisloos, maar werd desondanks toch toegepast."
         }
       ]
     },
