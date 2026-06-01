@@ -4077,52 +4077,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01916",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01916",
-      "type": "plantation",
-      "prefLabel": "Abroea",
-      "altLabels": [],
-      "broader": null,
-      "description": "",
-      "location": {
-        "lat": 5.518956322499999,
-        "lng": -54.998563430000004,
-        "wkt": "Polygon ((-55.00375336 5.53175362, -54.99480890 5.52631598, -54.97740330 5.51549287, -54.98166374 5.51445756, -55.00511284 5.50794759, -55.00995458 5.51126613, -55.01205736 5.51266321, -55.00375336 5.53175362))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930"
-      ],
-      "wikidataQid": "Q59115125",
-      "fid": 3001,
-      "psurIds": [],
-      "district": null,
-      "locationDescription": null,
-      "locationDescriptionOriginal": null,
-      "placeType": null,
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59115125",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-01342",
       "@type": [
         "E25_Human-Made_Feature"
@@ -96348,6 +96302,69 @@
           "startYear": 1845,
           "endYear": 1847,
           "note": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01916",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01916",
+      "type": "plantation",
+      "broader": null,
+      "description": "",
+      "location": {
+        "lat": 5.518956322499999,
+        "lng": -54.998563430000004,
+        "wkt": "Polygon ((-55.00375336 5.53175362, -54.99480890 5.52631598, -54.97740330 5.51549287, -54.98166374 5.51445756, -55.00511284 5.50794759, -55.00995458 5.51126613, -55.01205736 5.51266321, -55.00375336 5.53175362))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930"
+      ],
+      "wikidataQid": "Q59115125",
+      "fid": 3001,
+      "psurIds": [],
+      "district": null,
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-01",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59115125",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "names": [
+        {
+          "text": "Abroea",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        }
+      ],
+      "districtAssertions": [],
+      "productAssertions": [],
+      "locationAssertions": [],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Abroea 2005-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emZWU2VElZeE5meUk/view?usp=sharing&resourcekey=0-DzHaqvg_JGgUBY2cznIHOg",
+          "author": "Philip Dikland",
+          "year": "2005, aangevuld 2007",
+          "notes": null
         }
       ]
     },
