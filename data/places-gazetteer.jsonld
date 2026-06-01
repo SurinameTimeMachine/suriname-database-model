@@ -4077,55 +4077,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01342",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01342",
-      "type": "plantation",
-      "prefLabel": "Accaribo",
-      "altLabels": [],
-      "broader": null,
-      "description": "",
-      "location": {
-        "lat": 5.645212619199999,
-        "lng": -55.0912197872,
-        "wkt": "Polygon ((-55.12559618 5.63311308, -55.12569946 5.63433350, -55.08967385 5.64553810, -55.09085271 5.64929730, -55.08889904 5.64985606, -55.09013496 5.65345103, -55.09503039 5.65207539, -55.09661269 5.65696456, -55.09333716 5.65773204, -55.09701586 5.66801260, -55.09050868 5.67023069, -55.09125708 5.65838599, -55.06664582 5.65559651, -55.06734398 5.65372107, -55.06864906 5.65062099, -55.06879855 5.64675681, -55.06881344 5.64225766, -55.07071180 5.63825661, -55.07418467 5.63540844, -55.07982653 5.63268178, -55.08398296 5.63029728, -55.08710737 5.62608061, -55.11680798 5.62786753, -55.12740828 5.62866677, -55.12559618 5.63311308))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q25703530",
-      "fid": 2427,
-      "psurIds": [
-        "PSUR0002"
-      ],
-      "district": null,
-      "locationDescription": null,
-      "locationDescriptionOriginal": null,
-      "placeType": null,
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q25703530",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-01856",
       "@type": [
         "E25_Human-Made_Feature"
@@ -96282,6 +96233,79 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emZWU2VElZeE5meUk/view?usp=sharing&resourcekey=0-DzHaqvg_JGgUBY2cznIHOg",
           "author": "Philip Dikland",
           "year": "2005, aangevuld 2007",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01342",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01342",
+      "type": "plantation",
+      "broader": null,
+      "description": "",
+      "location": {
+        "lat": 5.645212619199999,
+        "lng": -55.0912197872,
+        "wkt": "Polygon ((-55.12559618 5.63311308, -55.12569946 5.63433350, -55.08967385 5.64553810, -55.09085271 5.64929730, -55.08889904 5.64985606, -55.09013496 5.65345103, -55.09503039 5.65207539, -55.09661269 5.65696456, -55.09333716 5.65773204, -55.09701586 5.66801260, -55.09050868 5.67023069, -55.09125708 5.65838599, -55.06664582 5.65559651, -55.06734398 5.65372107, -55.06864906 5.65062099, -55.06879855 5.64675681, -55.06881344 5.64225766, -55.07071180 5.63825661, -55.07418467 5.63540844, -55.07982653 5.63268178, -55.08398296 5.63029728, -55.08710737 5.62608061, -55.11680798 5.62786753, -55.12740828 5.62866677, -55.12559618 5.63311308))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q25703530",
+      "fid": 2427,
+      "psurIds": [
+        "PSUR0002"
+      ],
+      "district": null,
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-01",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q25703530",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "names": [
+        {
+          "text": "Accaribo",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        },
+        {
+          "text": "Gran Pranassi",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        }
+      ],
+      "districtAssertions": [],
+      "productAssertions": [],
+      "locationAssertions": [],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Accaribo 2001-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emMkpqeExmTllhY2M/view?usp=sharing&resourcekey=0-fTVnULquGBG5HUJ9-3HppA",
+          "author": "Philip Dikland",
+          "year": "2001, aangevuld 2009, 2010",
           "notes": null
         }
       ]
