@@ -124594,6 +124594,13 @@
           "type": "historical",
           "isPreferred": false,
           "sourceYear": 1820
+        },
+        {
+          "text": "La Confianza",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "source": "dikland-collection"
         }
       ],
       "districtAssertions": [
