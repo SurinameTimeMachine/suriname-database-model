@@ -11964,52 +11964,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01874",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01874",
-      "type": "plantation",
-      "prefLabel": "Cabo Verde",
-      "altLabels": [],
-      "broader": null,
-      "description": "",
-      "location": {
-        "lat": 5.590209944285715,
-        "lng": -55.0152376,
-        "wkt": "Polygon ((-55.03967044 5.59420206, -54.97121727 5.58816681, -54.97142669 5.58436045, -55.00488207 5.58745371, -55.03985029 5.59045647, -55.03994600 5.59262805, -55.03967044 5.59420206))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930"
-      ],
-      "wikidataQid": "Q59115345",
-      "fid": 2959,
-      "psurIds": [],
-      "district": null,
-      "locationDescription": null,
-      "locationDescriptionOriginal": null,
-      "placeType": null,
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59115345",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-00525",
       "@type": [
         "E25_Human-Made_Feature"
@@ -103612,6 +103566,69 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emejMtc2ZYVFY3ckU/view?usp=sharing&resourcekey=0-Xrx6yAuevGzQk6wNV3eQ3Q",
           "author": "Philip Dikland",
           "year": "2004",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01874",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01874",
+      "type": "plantation",
+      "broader": null,
+      "description": "",
+      "location": {
+        "lat": 5.590209944285715,
+        "lng": -55.0152376,
+        "wkt": "Polygon ((-55.03967044 5.59420206, -54.97121727 5.58816681, -54.97142669 5.58436045, -55.00488207 5.58745371, -55.03985029 5.59045647, -55.03994600 5.59262805, -55.03967044 5.59420206))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930"
+      ],
+      "wikidataQid": "Q59115345",
+      "fid": 2959,
+      "psurIds": [],
+      "district": null,
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-02",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59115345",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "names": [
+        {
+          "text": "Cabo Verde",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        }
+      ],
+      "districtAssertions": [],
+      "productAssertions": [],
+      "locationAssertions": [],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Cabo Verde 2007-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emcEFTemo4ZUE5djQ/view?usp=sharing&resourcekey=0-khPTSLBDdvULN9z-XulVJQ",
+          "author": "Philip Dikland",
+          "year": "2007",
           "notes": null
         }
       ]
