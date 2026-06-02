@@ -20859,96 +20859,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01376",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01376",
-      "type": "plantation",
-      "prefLabel": "Dijkveld",
-      "altLabels": [],
-      "broader": "stm-00010",
-      "description": "",
-      "location": {
-        "lat": 5.772162354166667,
-        "lng": -55.16256511666666,
-        "wkt": "Polygon ((-55.17708475 5.75275899, -55.16607641 5.77540000, -55.16758993 5.77830282, -55.16186316 5.78998440, -55.16173950 5.79268152, -55.15919910 5.78312240, -55.15758792 5.77890996, -55.15414836 5.77430668, -55.15134899 5.77204448, -55.14714432 5.76771297, -55.16991421 5.74796504, -55.17708475 5.75275899))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q59115514",
-      "fid": 2461,
-      "psurIds": [
-        "PSUR0095"
-      ],
-      "district": "Divisie Para",
-      "locationDescription": "Suriname",
-      "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59115514",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1818",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1818,
-          "note": null
-        },
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-suiker-1818",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1818,
-          "endYear": 1821,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1825",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1825,
-          "endYear": 1847,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1856",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1856,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1859",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1859,
-          "endYear": 1861,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-01957",
       "@type": [
         "E25_Human-Made_Feature"
@@ -112325,6 +112235,130 @@
           "original": "Rivier Commewijne, (boven) regterhand in het afvaren",
           "source": "almanakken",
           "note": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01376",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01376",
+      "type": "plantation",
+      "broader": "stm-00010",
+      "description": "",
+      "location": {
+        "lat": 5.772162354166667,
+        "lng": -55.16256511666666,
+        "wkt": "Polygon ((-55.17708475 5.75275899, -55.16607641 5.77540000, -55.16758993 5.77830282, -55.16186316 5.78998440, -55.16173950 5.79268152, -55.15919910 5.78312240, -55.15758792 5.77890996, -55.15414836 5.77430668, -55.15134899 5.77204448, -55.14714432 5.76771297, -55.16991421 5.74796504, -55.17708475 5.75275899))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q59115514",
+      "fid": 2461,
+      "psurIds": [
+        "PSUR0095"
+      ],
+      "district": "Divisie Para",
+      "locationDescription": "Suriname",
+      "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-02",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59115514",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1818",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1818,
+          "note": null
+        },
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-suiker-1818",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1818,
+          "endYear": 1821,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1825",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1825,
+          "endYear": 1847,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1856",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1856,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1859",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1859,
+          "endYear": 1861,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "Dijkveld",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00010",
+          "districtLabel": "Divisie Para",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Suriname",
+          "original": "Rivier Suriname, linkerhand in het afvaren",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Dijkveld 2005-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emWnJ4X3E0MjRqdXc/view?usp=sharing&resourcekey=0-GMRu2Bw8snl45eL2EojlQw",
+          "author": "Philip Dikland",
+          "year": "2005, aangevuld 2008, 2012",
+          "notes": null
         }
       ]
     },
