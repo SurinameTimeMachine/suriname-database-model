@@ -20869,61 +20869,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-02206",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-02206",
-      "type": "plantation",
-      "prefLabel": "Drie Gebroeders",
-      "altLabels": [],
-      "broader": null,
-      "description": "Plantation from Surinaamse Almanakken (no QGIS geometry)",
-      "location": {
-        "lat": null,
-        "lng": null,
-        "wkt": null,
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "almanakken"
-      ],
-      "wikidataQid": "Q59115519",
-      "fid": null,
-      "psurIds": [],
-      "district": null,
-      "locationDescription": "Cassewinicakreek",
-      "locationDescriptionOriginal": "Casawinica-kreek, linkerhand",
-      "placeType": null,
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59115519",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-abandoned-1818",
-          "status": "abandoned",
-          "source": "almanakken",
-          "startYear": 1818,
-          "endYear": 1821,
-          "note": null
-        },
-        {
-          "id": "status-almanakken-abandoned-1825",
-          "status": "abandoned",
-          "source": "almanakken",
-          "startYear": 1825,
-          "endYear": 1827,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-01529",
       "@type": [
         "E25_Human-Made_Feature"
@@ -112408,6 +112353,85 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emNVNob1VWeUUxak0/view?usp=sharing&resourcekey=0-vLWMloiaB2_n_zFWvUK_SQ",
           "author": "Philip Dikland",
           "year": "2005,aangevuld 2008",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-02206",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-02206",
+      "type": "plantation",
+      "broader": null,
+      "description": "Plantation from Surinaamse Almanakken (no QGIS geometry)",
+      "location": {
+        "lat": null,
+        "lng": null,
+        "wkt": null,
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "almanakken"
+      ],
+      "wikidataQid": "Q59115519",
+      "fid": null,
+      "psurIds": [],
+      "district": null,
+      "locationDescription": "Cassewinicakreek",
+      "locationDescriptionOriginal": "Casawinica-kreek, linkerhand",
+      "placeType": null,
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-02",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59115519",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-abandoned-1818",
+          "status": "abandoned",
+          "source": "almanakken",
+          "startYear": 1818,
+          "endYear": 1821,
+          "note": null
+        },
+        {
+          "id": "status-almanakken-abandoned-1825",
+          "status": "abandoned",
+          "source": "almanakken",
+          "startYear": 1825,
+          "endYear": 1827,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "Drie Gebroeders",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        }
+      ],
+      "districtAssertions": [],
+      "productAssertions": [],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Cassewinicakreek",
+          "original": "Casawinica-kreek, linkerhand",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Drie Gebroeders 2005-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8ema1owOGd5WUZSeDQ/view?usp=sharing&resourcekey=0-i_oChUIZMBU6Z6wJopepJA",
+          "author": "Philip Dikland",
+          "year": "2005, aangevuld 2009",
           "notes": null
         }
       ]
