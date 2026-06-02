@@ -13117,52 +13117,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01434",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01434",
-      "type": "plantation",
-      "prefLabel": "Carolina's hoop",
-      "altLabels": [],
-      "broader": null,
-      "description": "",
-      "location": {
-        "lat": 5.458462765714285,
-        "lng": -55.006863564285716,
-        "wkt": "Polygon ((-55.01816278 5.46546331, -54.99973484 5.46392379, -54.99915468 5.46128387, -54.99762057 5.45560720, -54.99652457 5.44803992, -55.01868473 5.44945796, -55.01816278 5.46546331))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930"
-      ],
-      "wikidataQid": "Q135395223",
-      "fid": 2519,
-      "psurIds": [],
-      "district": null,
-      "locationDescription": null,
-      "locationDescriptionOriginal": null,
-      "placeType": null,
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q135395223",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-01409",
       "@type": [
         "E25_Human-Made_Feature"
@@ -104564,6 +104518,83 @@
           "author": "Philip Dikland",
           "year": "2010",
           "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01434",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01434",
+      "type": "plantation",
+      "broader": null,
+      "description": "",
+      "location": {
+        "lat": 5.458462765714285,
+        "lng": -55.006863564285716,
+        "wkt": "Polygon ((-55.01816278 5.46546331, -54.99973484 5.46392379, -54.99915468 5.46128387, -54.99762057 5.45560720, -54.99652457 5.44803992, -55.01868473 5.44945796, -55.01816278 5.46546331))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930"
+      ],
+      "wikidataQid": "Q135395223",
+      "fid": 2519,
+      "psurIds": [],
+      "district": null,
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-02",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q135395223",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "names": [
+        {
+          "text": "Carolina's hoop",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        },
+        {
+          "text": "Carolina's Hoop",
+          "language": "nl",
+          "type": "variant",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        },
+        {
+          "text": "Surimombo",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        }
+      ],
+      "districtAssertions": [],
+      "productAssertions": [],
+      "locationAssertions": [],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Carolina 2002-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/drive/u/0/folders/0B88mZFitv8embmZaYWFQNnZacDQ?tid=0B88mZFitv8emcjVfcG5hWFJOdWs&resourcekey=0-sImlF_DkEFu3ebWbDQ58Kg",
+          "author": "Philip Dikland",
+          "year": "2002, aangevuld 2010, 2012",
+          "notes": "Het dorpje Carolina was gebouwd op de oude suikerplantage Carolina’s Hoop / Surimombo."
         }
       ]
     },
