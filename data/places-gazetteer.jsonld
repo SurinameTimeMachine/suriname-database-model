@@ -37320,96 +37320,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01439",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01439",
-      "type": "plantation",
-      "prefLabel": "L'Esperance",
-      "altLabels": [],
-      "broader": "stm-00007",
-      "description": "",
-      "location": {
-        "lat": 5.483194526315789,
-        "lng": -55.02466511684211,
-        "wkt": "Polygon ((-55.04878948 5.46616948, -55.04517315 5.47057384, -55.04183813 5.47476366, -55.03835349 5.47901627, -55.03217540 5.48618040, -55.03340060 5.48742798, -55.01668489 5.50781863, -55.01254515 5.50609052, -55.00926588 5.50448414, -55.00698442 5.50126174, -55.00543382 5.49482804, -55.00419778 5.48736299, -55.00328476 5.48259162, -55.02390103 5.48449021, -55.02486441 5.47561560, -55.02402029 5.47556907, -55.02437655 5.46602550, -55.02455851 5.46425683, -55.04878948 5.46616948))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q124831244",
-      "fid": 2524,
-      "psurIds": [
-        "PSUR0171"
-      ],
-      "district": "Divisie Boven-Suriname en Thorarica",
-      "locationDescription": "Suriname",
-      "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q124831244",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1818",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1818,
-          "note": null
-        },
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-suiker-1818",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1818,
-          "endYear": 1821,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1825",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1825,
-          "endYear": 1847,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1856",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1856,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1859",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1859,
-          "endYear": 1861,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02307",
       "@type": [
         "E25_Human-Made_Feature"
@@ -124063,6 +123973,130 @@
           "author": "Philip Dikland",
           "year": "2012",
           "notes": "De oude plantage Corpinabo werd op een gegeven moment hernaamd in Kweekslust.\n\nDe oude plantage Bonaventura werd op een gegeven moment gesplitst ; het stroomafwaardse\ndeel behield de naam Bonaventura, en het stoomopwaartse deel ontving de naam Corpinabo."
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01439",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01439",
+      "type": "plantation",
+      "broader": "stm-00007",
+      "description": "",
+      "location": {
+        "lat": 5.483194526315789,
+        "lng": -55.02466511684211,
+        "wkt": "Polygon ((-55.04878948 5.46616948, -55.04517315 5.47057384, -55.04183813 5.47476366, -55.03835349 5.47901627, -55.03217540 5.48618040, -55.03340060 5.48742798, -55.01668489 5.50781863, -55.01254515 5.50609052, -55.00926588 5.50448414, -55.00698442 5.50126174, -55.00543382 5.49482804, -55.00419778 5.48736299, -55.00328476 5.48259162, -55.02390103 5.48449021, -55.02486441 5.47561560, -55.02402029 5.47556907, -55.02437655 5.46602550, -55.02455851 5.46425683, -55.04878948 5.46616948))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q124831244",
+      "fid": 2524,
+      "psurIds": [
+        "PSUR0171"
+      ],
+      "district": "Divisie Boven-Suriname en Thorarica",
+      "locationDescription": "Suriname",
+      "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-02",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q124831244",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1818",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1818,
+          "note": null
+        },
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-suiker-1818",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1818,
+          "endYear": 1821,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1825",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1825,
+          "endYear": 1847,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1856",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1856,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1859",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1859,
+          "endYear": 1861,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "L'Esperance",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00007",
+          "districtLabel": "Divisie Boven-Suriname en Thorarica",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Suriname",
+          "original": "Rivier Suriname, linkerhand in het afvaren",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Esperance 2003-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emaC1rUEsyR2VHMDg/view?usp=sharing&resourcekey=0-LzI3YWDP29coglT-EzVy_g",
+          "author": "Philip Dikland",
+          "year": "2003,aangevuld 2010",
+          "notes": null
         }
       ]
     },
