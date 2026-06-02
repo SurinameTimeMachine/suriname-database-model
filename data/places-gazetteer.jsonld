@@ -168174,6 +168174,13 @@
           "type": "official",
           "isPreferred": true,
           "source": "dikland-collection"
+        },
+        {
+          "text": "Thorarica",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "source": "dikland-collection"
         }
       ],
       "broader": null,
@@ -168210,6 +168217,13 @@
           "author": "Philip Dikland",
           "year": "2005",
           "notes": "De plantage Krommenie [...]  is de plaats van de oude hoofdstad  Torarica."
+        },
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Crommenie 2006-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emV2dSeWdfN0p3V2c/view?usp=sharing&resourcekey=0-bsOvFvjoYqEnK7KNs4jNJw",
+          "author": "Philip Dikland",
+          "year": "2006",
+          "notes": "De plantage Crommenie is - volgens de Surinaamse arts en onderzoeker John de Bije - de locatie van de oude hoofdplaats Thorarica."
         }
       ],
       "modifiedBy": "GerDijkstra",
