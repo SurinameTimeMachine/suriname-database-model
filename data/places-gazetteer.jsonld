@@ -119868,6 +119868,12 @@
           "language": "nl",
           "type": "official",
           "isPreferred": true
+        },
+        {
+          "text": "Jode Savanne",
+          "language": "nl",
+          "type": "variant",
+          "isPreferred": false
         }
       ],
       "districtAssertions": [
