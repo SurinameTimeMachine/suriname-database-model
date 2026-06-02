@@ -119874,6 +119874,12 @@
           "language": "nl",
           "type": "variant",
           "isPreferred": false
+        },
+        {
+          "text": "Joden Savanne",
+          "language": "nl",
+          "type": "variant",
+          "isPreferred": false
         }
       ],
       "districtAssertions": [
