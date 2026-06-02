@@ -82831,96 +82831,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00750",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-00750",
-      "type": "plantation",
-      "prefLabel": "t IJland",
-      "altLabels": [],
-      "broader": "stm-00007",
-      "description": "",
-      "location": {
-        "lat": 5.758801236956522,
-        "lng": -55.106590905217395,
-        "wkt": "Polygon ((-55.10440062 5.75400436, -55.10523218 5.75314250, -55.10611951 5.75318470, -55.10682778 5.75410871, -55.10819685 5.75490109, -55.11081588 5.75473721, -55.11165062 5.75602132, -55.11103215 5.75866070, -55.11085333 5.76052768, -55.11081275 5.76236053, -55.11020595 5.76347013, -55.10744664 5.76427015, -55.10607658 5.76390241, -55.10447835 5.76341066, -55.10285395 5.76353084, -55.10167872 5.76262414, -55.10185176 5.76122326, -55.10327488 5.76027770, -55.10539782 5.76062158, -55.10658556 5.75954562, -55.10674254 5.75809426, -55.10465578 5.75580454, -55.10440062 5.75400436))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q59115115",
-      "fid": 1833,
-      "psurIds": [
-        "PSUR0370"
-      ],
-      "district": "Divisie Boven-Suriname en Thorarica",
-      "locationDescription": "Paulus Kreek",
-      "locationDescriptionOriginal": "Paulus-kreek, linkerhand in het opvaren",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59115115",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1818",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1818,
-          "note": null
-        },
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-suiker-1818",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1818,
-          "endYear": 1821,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1825",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1825,
-          "endYear": 1847,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1856",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1856,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1859",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1859,
-          "endYear": 1861,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-01463",
       "@type": [
         "E25_Human-Made_Feature"
@@ -145070,6 +144980,165 @@
           "original": "Commetewane-kreek, linkerhand in het opvaren",
           "source": "almanakken",
           "note": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-00750",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-00750",
+      "type": "plantation",
+      "broader": "stm-00007",
+      "description": "",
+      "location": {
+        "lat": 5.758801236956522,
+        "lng": -55.106590905217395,
+        "wkt": "Polygon ((-55.10440062 5.75400436, -55.10523218 5.75314250, -55.10611951 5.75318470, -55.10682778 5.75410871, -55.10819685 5.75490109, -55.11081588 5.75473721, -55.11165062 5.75602132, -55.11103215 5.75866070, -55.11085333 5.76052768, -55.11081275 5.76236053, -55.11020595 5.76347013, -55.10744664 5.76427015, -55.10607658 5.76390241, -55.10447835 5.76341066, -55.10285395 5.76353084, -55.10167872 5.76262414, -55.10185176 5.76122326, -55.10327488 5.76027770, -55.10539782 5.76062158, -55.10658556 5.75954562, -55.10674254 5.75809426, -55.10465578 5.75580454, -55.10440062 5.75400436))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q59115115",
+      "fid": 1833,
+      "psurIds": [
+        "PSUR0370"
+      ],
+      "district": "Divisie Boven-Suriname en Thorarica",
+      "locationDescription": "Paulus Kreek",
+      "locationDescriptionOriginal": "Paulus-kreek, linkerhand in het opvaren",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-02",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59115115",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1818",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1818,
+          "note": null
+        },
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-suiker-1818",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1818,
+          "endYear": 1821,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1825",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1825,
+          "endYear": 1847,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1856",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1856,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1859",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1859,
+          "endYear": 1861,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "t IJland",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        },
+        {
+          "text": "t Yland",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "sourceYear": 1818
+        },
+        {
+          "text": "Het Yland",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "sourceYear": 1835
+        },
+        {
+          "text": "Het IJland",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "sourceYear": 1829
+        },
+        {
+          "text": "Het Eylant",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        },
+        {
+          "text": "’t Eyland",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00007",
+          "districtLabel": "Divisie Boven-Suriname en Thorarica",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Paulus Kreek",
+          "original": "Paulus-kreek, linkerhand in het opvaren",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Eylant en Puttenzorg 2005-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emWk8weGUxTGY5azQ/view?usp=sharing&resourcekey=0-JiHSoU-65UIViAn9SkQWCQ",
+          "author": "Philip Dikland",
+          "year": "2005, aangevuld 2009",
+          "notes": "De plantages het Eylant en Puttenzorg hebben vanaf het begin 1 geheel gevormd. Puttenzorg \nwordt in de 19e eeuw ook wel aangeduid als “Bittenzorg”. De plantages werden na de  afschaffing van de slavernij verlaten.\n\nDe herkomst van de naam “Puttenzorg” is nog duister. Rond 1700 woonde er een familie Van\nder Putten in de Pauluskreek, mogelijk is de naam van hen afkomstig."
         }
       ]
     },
