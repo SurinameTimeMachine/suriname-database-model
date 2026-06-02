@@ -93812,6 +93812,147 @@
       ]
     },
     {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02137",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02137",
+      "type": "plantation",
+      "prefLabel": "Joden Savanne",
+      "altLabels": [],
+      "broader": null,
+      "description": "Plantation from Surinaamse Almanakken (no QGIS geometry)",
+      "location": {
+        "lat": null,
+        "lng": null,
+        "wkt": null,
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "almanakken"
+      ],
+      "wikidataQid": "Q59115733",
+      "fid": null,
+      "psurIds": [],
+      "district": null,
+      "locationDescription": "Suriname",
+      "locationDescriptionOriginal": "Rivier Suriname, linkerhand",
+      "placeType": "hout",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-02",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59115733",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1820",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1820,
+          "note": null
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-hout-1820",
+          "value": "hout",
+          "source": "almanakken",
+          "startYear": 1820,
+          "note": null
+        }
+      ],
+      "mergedInto": "stm-02274"
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-02513",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-02513",
+      "type": "plantation",
+      "prefLabel": "Post Republiek",
+      "altLabels": [],
+      "broader": "stm-00010",
+      "description": "Plantation from Surinaamse Almanakken (no QGIS geometry)",
+      "location": {
+        "lat": null,
+        "lng": null,
+        "wkt": null,
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "almanakken"
+      ],
+      "wikidataQid": "Q131416319",
+      "fid": null,
+      "psurIds": [],
+      "district": "Divisie Para",
+      "locationDescription": "Coropina Kreek",
+      "locationDescriptionOriginal": "Coropina-kreek, {",
+      "placeType": null,
+      "modifiedBy": "Thunnisvanoort",
+      "modifiedAt": "2026-05-12",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q131416319",
+          "matchType": "closeMatch"
+        }
+      ],
+      "mergedInto": "stm-02697"
+    },
+    {
+      "@id": "https://data.suriname-timemachine.org/place/stm-01386",
+      "@type": [
+        "E25_Human-Made_Feature"
+      ],
+      "id": "stm-01386",
+      "type": "plantation",
+      "prefLabel": "De Vier Kinderen",
+      "altLabels": [],
+      "broader": null,
+      "description": "",
+      "location": {
+        "lat": 5.77870577,
+        "lng": -55.212977876000004,
+        "wkt": "Polygon ((-55.19643451 5.77787245, -55.19823468 5.77486669, -55.23766720 5.77998585, -55.23611848 5.78293141, -55.19643451 5.77787245))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930"
+      ],
+      "wikidataQid": "Q59115498",
+      "fid": 2471,
+      "psurIds": [],
+      "district": null,
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": "Thunnisvanoort",
+      "modifiedAt": "2026-05-12",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59115498",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "present",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "mergedInto": "stm-02334"
+    },
+    {
       "@id": "stm:place/stm-00711",
       "@type": "E25_Human-Made_Feature",
       "id": "stm-00711",
@@ -94564,6 +94705,52 @@
           "notes": null
         }
       ]
+    },
+    {
+      "id": "stm-new-1778764710013",
+      "type": "plantation",
+      "names": [
+        {
+          "text": "Agenoria",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "source": "dikland-collection"
+        }
+      ],
+      "broader": null,
+      "description": "",
+      "location": {
+        "lat": null,
+        "lng": null,
+        "wkt": null,
+        "crs": "EPSG:4326"
+      },
+      "sources": [],
+      "wikidataQid": "Q59115130",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59115130",
+          "matchType": "closeMatch"
+        }
+      ],
+      "fid": null,
+      "psurIds": [],
+      "district": null,
+      "districtAssertions": [],
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "productAssertions": [],
+      "locationAssertions": [],
+      "statusAssertions": [],
+      "diklandRefs": [],
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-05-14",
+      "@id": "stm:place/stm-new-1778764710013",
+      "@type": "E25_Human-Made_Feature",
+      "mergedInto": "stm-01076"
     },
     {
       "@id": "stm:place/stm-02057",
@@ -97394,6 +97581,49 @@
         }
       ],
       "statusAssertions": []
+    },
+    {
+      "id": "stm-new-1777372821293",
+      "type": "plantation",
+      "names": [
+        {
+          "text": "Beerenburg",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        }
+      ],
+      "broader": null,
+      "description": "",
+      "location": {
+        "lat": null,
+        "lng": null,
+        "wkt": null,
+        "crs": "EPSG:4326"
+      },
+      "sources": [],
+      "wikidataQid": null,
+      "externalLinks": [],
+      "fid": null,
+      "psurIds": [],
+      "district": null,
+      "locationDescription": "Tempati Kreek",
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\plantages Tempatie geschiedenis Dikland 2004.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emLWFkSXRpSWFkUG8/view?usp=sharing&resourcekey=0-Dkq3zQTx0BUqiU449CimrA",
+          "author": "Philip Dikland",
+          "year": "2004, aangevuld 2012",
+          "notes": null
+        }
+      ],
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-04-29",
+      "@id": "stm:place/stm-new-1777372821293",
+      "@type": "E25_Human-Made_Feature",
+      "mergedInto": "stm-new-1777376730983"
     },
     {
       "@id": "stm:place/stm-01654",
@@ -123962,6 +124192,68 @@
       "modifiedAt": "2026-05-13",
       "@id": "stm:place/stm-new-1778680984088",
       "@type": "E25_Human-Made_Feature"
+    },
+    {
+      "@id": "stm:place/stm-01482",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01482",
+      "type": "plantation",
+      "broader": null,
+      "description": "",
+      "location": {
+        "lat": 5.51921996375,
+        "lng": -55.183939081249996,
+        "wkt": "Polygon ((-55.19154724 5.53628629, -55.18608366 5.53797751, -55.18199305 5.52277334, -55.17621902 5.50191921, -55.17515256 5.49842770, -55.18069650 5.49705564, -55.18827338 5.52303373, -55.19154724 5.53628629))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930"
+      ],
+      "wikidataQid": "Q59116849",
+      "fid": 2567,
+      "psurIds": [],
+      "district": null,
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-05-13",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59116849",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "l’Esperance",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "source": "dikland-collection"
+        },
+        {
+          "text": "Place 2567",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": false
+        }
+      ],
+      "districtAssertions": [],
+      "productAssertions": [],
+      "locationAssertions": [],
+      "statusAssertions": [],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Para kreek\\plantages\\Esperance Coropina 2012-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emRXdYRXJNcVlyRmc/view?usp=sharing&resourcekey=0-aOjdtjjrvQU1Hhzq7rkNxw",
+          "author": "Philip Dikland",
+          "year": "2012",
+          "notes": "Feitelijk is plantage l’Esperance altijd een annex geweest van de plantage Vierkinderen aan de\nTawaycoere kreek."
+        }
+      ],
+      "mergedInto": "stm-new-1778680984088"
     },
     {
       "@id": "stm:place/stm-01395",
@@ -167487,7 +167779,7 @@
       "locationDescriptionOriginal": null,
       "placeType": null,
       "modifiedBy": "GerDijkstra",
-      "modifiedAt": "2026-06-01",
+      "modifiedAt": "2026-06-02",
       "externalLinks": [
         {
           "authority": "wikidata",
@@ -167520,6 +167812,13 @@
           "author": "Philip Dikland",
           "year": "2001",
           "notes": null
+        },
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Diligence 2005-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emSUFIM1dhbGZIbVU/view?usp=sharing&resourcekey=0-GXEEN3Cka4zMjfEfQfrs9Q",
+          "author": "Philip Dikland",
+          "year": "2005",
+          "notes": "De plantage [La Diligence] had ook een klein deel aan de overzijde, tussen de rivier en de Cassipore kreek. Aan de overzijde van deze kreek is thans nog de oude joodse begraafplaats “Cassipora”. Hier schijnt ooit een eenvoudige synagoge te hebben gestaan, nog voordat de grote synagoge te Jodensavanne werd gebouwd."
         }
       ]
     },
@@ -187514,298 +187813,6 @@
           "isPreferred": true
         }
       ]
-    },
-    {
-      "@id": "https://data.suriname-timemachine.org/place/stm-02137",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-02137",
-      "type": "plantation",
-      "prefLabel": "Joden Savanne",
-      "altLabels": [],
-      "broader": null,
-      "description": "Plantation from Surinaamse Almanakken (no QGIS geometry)",
-      "location": {
-        "lat": null,
-        "lng": null,
-        "wkt": null,
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "almanakken"
-      ],
-      "wikidataQid": "Q59115733",
-      "fid": null,
-      "psurIds": [],
-      "district": null,
-      "locationDescription": "Suriname",
-      "locationDescriptionOriginal": "Rivier Suriname, linkerhand",
-      "placeType": "hout",
-      "modifiedBy": "GerDijkstra",
-      "modifiedAt": "2026-06-02",
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59115733",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1820",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1820,
-          "note": null
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-hout-1820",
-          "value": "hout",
-          "source": "almanakken",
-          "startYear": 1820,
-          "note": null
-        }
-      ],
-      "mergedInto": "stm-02274"
-    },
-    {
-      "@id": "https://data.suriname-timemachine.org/place/stm-02513",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-02513",
-      "type": "plantation",
-      "prefLabel": "Post Republiek",
-      "altLabels": [],
-      "broader": "stm-00010",
-      "description": "Plantation from Surinaamse Almanakken (no QGIS geometry)",
-      "location": {
-        "lat": null,
-        "lng": null,
-        "wkt": null,
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "almanakken"
-      ],
-      "wikidataQid": "Q131416319",
-      "fid": null,
-      "psurIds": [],
-      "district": "Divisie Para",
-      "locationDescription": "Coropina Kreek",
-      "locationDescriptionOriginal": "Coropina-kreek, {",
-      "placeType": null,
-      "modifiedBy": "Thunnisvanoort",
-      "modifiedAt": "2026-05-12",
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q131416319",
-          "matchType": "closeMatch"
-        }
-      ],
-      "mergedInto": "stm-02697"
-    },
-    {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01386",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01386",
-      "type": "plantation",
-      "prefLabel": "De Vier Kinderen",
-      "altLabels": [],
-      "broader": null,
-      "description": "",
-      "location": {
-        "lat": 5.77870577,
-        "lng": -55.212977876000004,
-        "wkt": "Polygon ((-55.19643451 5.77787245, -55.19823468 5.77486669, -55.23766720 5.77998585, -55.23611848 5.78293141, -55.19643451 5.77787245))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930"
-      ],
-      "wikidataQid": "Q59115498",
-      "fid": 2471,
-      "psurIds": [],
-      "district": null,
-      "locationDescription": null,
-      "locationDescriptionOriginal": null,
-      "placeType": null,
-      "modifiedBy": "Thunnisvanoort",
-      "modifiedAt": "2026-05-12",
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59115498",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ],
-      "mergedInto": "stm-02334"
-    },
-    {
-      "id": "stm-new-1778764710013",
-      "type": "plantation",
-      "names": [
-        {
-          "text": "Agenoria",
-          "language": "nl",
-          "type": "official",
-          "isPreferred": true,
-          "source": "dikland-collection"
-        }
-      ],
-      "broader": null,
-      "description": "",
-      "location": {
-        "lat": null,
-        "lng": null,
-        "wkt": null,
-        "crs": "EPSG:4326"
-      },
-      "sources": [],
-      "wikidataQid": "Q59115130",
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59115130",
-          "matchType": "closeMatch"
-        }
-      ],
-      "fid": null,
-      "psurIds": [],
-      "district": null,
-      "districtAssertions": [],
-      "locationDescription": null,
-      "locationDescriptionOriginal": null,
-      "placeType": null,
-      "productAssertions": [],
-      "locationAssertions": [],
-      "statusAssertions": [],
-      "diklandRefs": [],
-      "modifiedBy": "GerDijkstra",
-      "modifiedAt": "2026-05-14",
-      "@id": "stm:place/stm-new-1778764710013",
-      "@type": "E25_Human-Made_Feature",
-      "mergedInto": "stm-01076"
-    },
-    {
-      "id": "stm-new-1777372821293",
-      "type": "plantation",
-      "names": [
-        {
-          "text": "Beerenburg",
-          "language": "nl",
-          "type": "official",
-          "isPreferred": true
-        }
-      ],
-      "broader": null,
-      "description": "",
-      "location": {
-        "lat": null,
-        "lng": null,
-        "wkt": null,
-        "crs": "EPSG:4326"
-      },
-      "sources": [],
-      "wikidataQid": null,
-      "externalLinks": [],
-      "fid": null,
-      "psurIds": [],
-      "district": null,
-      "locationDescription": "Tempati Kreek",
-      "locationDescriptionOriginal": null,
-      "placeType": null,
-      "diklandRefs": [
-        {
-          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\plantages Tempatie geschiedenis Dikland 2004.pdf",
-          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emLWFkSXRpSWFkUG8/view?usp=sharing&resourcekey=0-Dkq3zQTx0BUqiU449CimrA",
-          "author": "Philip Dikland",
-          "year": "2004, aangevuld 2012",
-          "notes": null
-        }
-      ],
-      "modifiedBy": "GerDijkstra",
-      "modifiedAt": "2026-04-29",
-      "@id": "stm:place/stm-new-1777372821293",
-      "@type": "E25_Human-Made_Feature",
-      "mergedInto": "stm-new-1777376730983"
-    },
-    {
-      "@id": "stm:place/stm-01482",
-      "@type": "E25_Human-Made_Feature",
-      "id": "stm-01482",
-      "type": "plantation",
-      "broader": null,
-      "description": "",
-      "location": {
-        "lat": 5.51921996375,
-        "lng": -55.183939081249996,
-        "wkt": "Polygon ((-55.19154724 5.53628629, -55.18608366 5.53797751, -55.18199305 5.52277334, -55.17621902 5.50191921, -55.17515256 5.49842770, -55.18069650 5.49705564, -55.18827338 5.52303373, -55.19154724 5.53628629))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930"
-      ],
-      "wikidataQid": "Q59116849",
-      "fid": 2567,
-      "psurIds": [],
-      "district": null,
-      "locationDescription": null,
-      "locationDescriptionOriginal": null,
-      "placeType": null,
-      "modifiedBy": "GerDijkstra",
-      "modifiedAt": "2026-05-13",
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59116849",
-          "matchType": "closeMatch"
-        }
-      ],
-      "names": [
-        {
-          "text": "l’Esperance",
-          "language": "nl",
-          "type": "official",
-          "isPreferred": true,
-          "source": "dikland-collection"
-        },
-        {
-          "text": "Place 2567",
-          "language": "nl",
-          "type": "official",
-          "isPreferred": false
-        }
-      ],
-      "districtAssertions": [],
-      "productAssertions": [],
-      "locationAssertions": [],
-      "statusAssertions": [],
-      "diklandRefs": [
-        {
-          "folderPath": "erfgoed-geschiedenis\\Para kreek\\plantages\\Esperance Coropina 2012-01 geschiedenis.pdf",
-          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emRXdYRXJNcVlyRmc/view?usp=sharing&resourcekey=0-aOjdtjjrvQU1Hhzq7rkNxw",
-          "author": "Philip Dikland",
-          "year": "2012",
-          "notes": "Feitelijk is plantage l’Esperance altijd een annex geweest van de plantage Vierkinderen aan de\nTawaycoere kreek."
-        }
-      ],
-      "mergedInto": "stm-new-1778680984088"
     }
   ]
 }
