@@ -16148,95 +16148,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00876",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-00876",
-      "type": "plantation",
-      "prefLabel": "De Drie Gebroeders",
-      "altLabels": [
-        "De drie gebroeders"
-      ],
-      "broader": "stm-00007",
-      "description": "",
-      "location": {
-        "lat": 5.610316987999999,
-        "lng": -55.05951752000001,
-        "wkt": "Polygon ((-55.05743592 5.60240707, -55.06355935 5.60287998, -55.06269532 5.62187914, -55.05646109 5.62201168, -55.05743592 5.60240707))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken"
-      ],
-      "wikidataQid": "Q124830445",
-      "fid": 1960,
-      "psurIds": [],
-      "district": "Divisie Boven-Suriname en Thorarica",
-      "locationDescription": "Suriname",
-      "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q124830445",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1818",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1818,
-          "note": null
-        },
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-suiker-1818",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1818,
-          "endYear": 1821,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1825",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1825,
-          "endYear": 1847,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1856",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1856,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1859",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1859,
-          "endYear": 1861,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-00877",
       "@type": [
         "E25_Human-Made_Feature"
@@ -108250,6 +108161,147 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emSzB5MkNUd05McDA/view?usp=sharing&resourcekey=0-1RVQDq0QRh4kti4612VmmQ",
           "author": "Philip Dikland",
           "year": "2012",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-00876",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-00876",
+      "type": "plantation",
+      "broader": "stm-00007",
+      "description": "",
+      "location": {
+        "lat": 5.610316987999999,
+        "lng": -55.05951752000001,
+        "wkt": "Polygon ((-55.05743592 5.60240707, -55.06355935 5.60287998, -55.06269532 5.62187914, -55.05646109 5.62201168, -55.05743592 5.60240707))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken"
+      ],
+      "wikidataQid": "Q124830445",
+      "fid": 1960,
+      "psurIds": [],
+      "district": "Divisie Boven-Suriname en Thorarica",
+      "locationDescription": "Suriname",
+      "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-02",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q124830445",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1818",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1818,
+          "note": null
+        },
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-suiker-1818",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1818,
+          "endYear": 1821,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1825",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1825,
+          "endYear": 1847,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1856",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1856,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1859",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1859,
+          "endYear": 1861,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "De drie Gebroeders",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        },
+        {
+          "text": "De drie gebroeders",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false
+        },
+        {
+          "text": "Drie Gebroeders",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "sourceYear": 1818
+        },
+        {
+          "text": "De drie Gebroeders ca",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "sourceYear": 1861
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00007",
+          "districtLabel": "Divisie Boven-Suriname en Thorarica",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Suriname",
+          "original": "Rivier Suriname, linkerhand in het afvaren",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Drie Gebroeders 2005-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8ema1owOGd5WUZSeDQ/view?usp=sharing&resourcekey=0-i_oChUIZMBU6Z6wJopepJA",
+          "author": "Philip Dikland",
+          "year": "2005, aangevuld 2009",
           "notes": null
         }
       ]
