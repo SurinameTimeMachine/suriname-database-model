@@ -84095,77 +84095,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01911",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01911",
-      "type": "plantation",
-      "prefLabel": "Surimombo",
-      "altLabels": [],
-      "broader": "stm-00007",
-      "description": "",
-      "location": {
-        "lat": 5.4639102033333335,
-        "lng": -54.984570213333335,
-        "wkt": "Polygon ((-54.99544693 5.47481431, -54.96299641 5.48337223, -54.95638982 5.45857948, -54.97914965 5.45241347, -54.99147791 5.44931462, -54.99243899 5.45456108, -54.99331806 5.46002807, -54.99446722 5.46729426, -54.99544693 5.47481431))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken"
-      ],
-      "wikidataQid": "Q59133905",
-      "fid": 2996,
-      "psurIds": [],
-      "district": "Divisie Boven-Suriname en Thorarica",
-      "locationDescription": "Suriname",
-      "locationDescriptionOriginal": "Rivier Suriname, regterhand in het afvaren",
-      "placeType": "hout",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59133905",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1828",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1828,
-          "note": null
-        },
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-hout-1828",
-          "value": "hout",
-          "source": "almanakken",
-          "startYear": 1828,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-hout-1832",
-          "value": "hout",
-          "source": "almanakken",
-          "startYear": 1832,
-          "endYear": 1847,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02468",
       "@type": [
         "E25_Human-Made_Feature"
@@ -144159,6 +144088,118 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emS3dpQ1JQUHhtMWs/view?usp=sharing&resourcekey=0-OdvacTmeDq_47m1kYpG09g",
           "author": "Philip Dikland",
           "year": "2004, aangevuld 2008",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01911",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01911",
+      "type": "plantation",
+      "broader": "stm-00007",
+      "description": "",
+      "location": {
+        "lat": 5.4639102033333335,
+        "lng": -54.984570213333335,
+        "wkt": "Polygon ((-54.99544693 5.47481431, -54.96299641 5.48337223, -54.95638982 5.45857948, -54.97914965 5.45241347, -54.99147791 5.44931462, -54.99243899 5.45456108, -54.99331806 5.46002807, -54.99446722 5.46729426, -54.99544693 5.47481431))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken"
+      ],
+      "wikidataQid": "Q59133905",
+      "fid": 2996,
+      "psurIds": [],
+      "district": "Divisie Boven-Suriname en Thorarica",
+      "locationDescription": "Suriname",
+      "locationDescriptionOriginal": "Rivier Suriname, regterhand in het afvaren",
+      "placeType": "hout",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-02",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59133905",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1828",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1828,
+          "note": null
+        },
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-hout-1828",
+          "value": "hout",
+          "source": "almanakken",
+          "startYear": 1828,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-hout-1832",
+          "value": "hout",
+          "source": "almanakken",
+          "startYear": 1832,
+          "endYear": 1847,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "Surimombo",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        },
+        {
+          "text": "Surimombo en",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "sourceYear": 1833
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00007",
+          "districtLabel": "Divisie Boven-Suriname en Thorarica",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Suriname",
+          "original": "Rivier Suriname, regterhand in het afvaren",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Carolina 2002-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emV0otVGJXcWc3MFE/view?usp=sharing&resourcekey=0-KcM-2aE6nHnXCM17UJWYdg",
+          "author": "Philip Dikland",
+          "year": "2002, aangevuld 2010, 2012",
           "notes": null
         }
       ]
