@@ -168144,6 +168144,59 @@
       "@type": "E25_Human-Made_Feature"
     },
     {
+      "id": "stm-new-1780401299100",
+      "type": "settlement",
+      "names": [
+        {
+          "text": "Torarica",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "source": "dikland-collection"
+        }
+      ],
+      "broader": null,
+      "description": "",
+      "location": {
+        "lat": 5.529722,
+        "lng": -55.050556,
+        "wkt": null,
+        "crs": "EPSG:4326"
+      },
+      "sources": [],
+      "wikidataQid": "Q2443691",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q2443691",
+          "matchType": "closeMatch"
+        }
+      ],
+      "fid": null,
+      "psurIds": [],
+      "district": null,
+      "districtAssertions": [],
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "productAssertions": [],
+      "locationAssertions": [],
+      "statusAssertions": [],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Confiance 2005-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emVkNvT1pkUDkxZVk/view?usp=sharing&resourcekey=0-_-GRx7GrjtbpIEEIryrK9g",
+          "author": "Philip Dikland",
+          "year": "2005",
+          "notes": "De plantage Krommenie [...]  is de plaats van de oude hoofdstad  Torarica."
+        }
+      ],
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-02",
+      "@id": "stm:place/stm-new-1780401299100",
+      "@type": "E25_Human-Made_Feature"
+    },
+    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02530",
       "@type": [
         "E53_Place"
