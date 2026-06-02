@@ -38602,85 +38602,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01915",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01915",
-      "type": "plantation",
-      "prefLabel": "La Confiance",
-      "altLabels": [],
-      "broader": "stm-00007",
-      "description": "",
-      "location": {
-        "lat": 5.5312698775,
-        "lng": -55.03721552,
-        "wkt": "Polygon ((-55.04309537 5.53462563, -55.02692360 5.53673191, -55.02223571 5.53373006, -55.03344511 5.52473307, -55.04015663 5.52622268, -55.04407839 5.52842203, -55.04469398 5.53106801, -55.04309537 5.53462563))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken"
-      ],
-      "wikidataQid": "Q59116862",
-      "fid": 3000,
-      "psurIds": [],
-      "district": "Divisie Boven-Suriname en Thorarica",
-      "locationDescription": "Suriname",
-      "locationDescriptionOriginal": "Rivier Suriname, regterhand",
-      "placeType": "hout",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59116862",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-abandoned-1820",
-          "status": "abandoned",
-          "source": "almanakken",
-          "startYear": 1820,
-          "note": null
-        },
-        {
-          "id": "status-almanakken-reactivated-1825",
-          "status": "reactivated",
-          "source": "almanakken",
-          "startYear": 1825,
-          "note": null
-        },
-        {
-          "id": "status-almanakken-abandoned-1842",
-          "status": "abandoned",
-          "source": "almanakken",
-          "startYear": 1842,
-          "endYear": 1843,
-          "note": null
-        },
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-hout-1825",
-          "value": "hout",
-          "source": "almanakken",
-          "startYear": 1825,
-          "endYear": 1827,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02133",
       "@type": [
         "E25_Human-Made_Feature"
@@ -124582,6 +124503,126 @@
           "author": "Philip Dikland",
           "year": "2012",
           "notes": "De oude plantage Bonaventura werd op een gegeven moment gesplitst ; het stroomafwaardse\ndeel behield de naam Bonaventura, en het stoomopwaartse deel ontving de naam Corpinabo."
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01915",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01915",
+      "type": "plantation",
+      "broader": "stm-00007",
+      "description": "",
+      "location": {
+        "lat": 5.5312698775,
+        "lng": -55.03721552,
+        "wkt": "Polygon ((-55.04309537 5.53462563, -55.02692360 5.53673191, -55.02223571 5.53373006, -55.03344511 5.52473307, -55.04015663 5.52622268, -55.04407839 5.52842203, -55.04469398 5.53106801, -55.04309537 5.53462563))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken"
+      ],
+      "wikidataQid": "Q59116862",
+      "fid": 3000,
+      "psurIds": [],
+      "district": "Divisie Boven-Suriname en Thorarica",
+      "locationDescription": "Suriname",
+      "locationDescriptionOriginal": "Rivier Suriname, regterhand",
+      "placeType": "hout",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-02",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59116862",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-abandoned-1820",
+          "status": "abandoned",
+          "source": "almanakken",
+          "startYear": 1820,
+          "note": null
+        },
+        {
+          "id": "status-almanakken-reactivated-1825",
+          "status": "reactivated",
+          "source": "almanakken",
+          "startYear": 1825,
+          "note": null
+        },
+        {
+          "id": "status-almanakken-abandoned-1842",
+          "status": "abandoned",
+          "source": "almanakken",
+          "startYear": 1842,
+          "endYear": 1843,
+          "note": null
+        },
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-hout-1825",
+          "value": "hout",
+          "source": "almanakken",
+          "startYear": 1825,
+          "endYear": 1827,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "La Confiance",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        },
+        {
+          "text": "en La Confiance",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "sourceYear": 1820
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00007",
+          "districtLabel": "Divisie Boven-Suriname en Thorarica",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Suriname",
+          "original": "Rivier Suriname, regterhand",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Confiance 2005-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emVkNvT1pkUDkxZVk/view?usp=sharing&resourcekey=0-_-GRx7GrjtbpIEEIryrK9g",
+          "author": "Philip Dikland",
+          "year": "2005",
+          "notes": "De vorm van de vier plantages Santo Domingo, La Confiance, Nieuw Hazard, en Boavista,\nwijst erop dat ze gevieren ooit één grote plantage hebben gevormd. Dit blijkt echter niet uit de\narchieven."
         }
       ]
     },
