@@ -76265,52 +76265,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00644",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-00644",
-      "type": "plantation",
-      "prefLabel": "Puttenzorg",
-      "altLabels": [],
-      "broader": null,
-      "description": "",
-      "location": {
-        "lat": 5.763685650857141,
-        "lng": -55.09808850628572,
-        "wkt": "Polygon ((-55.08805658 5.75979013, -55.09240159 5.75922117, -55.09601247 5.75796906, -55.09803880 5.75654243, -55.09916234 5.75526114, -55.09848421 5.75433663, -55.09739025 5.75378116, -55.09570062 5.75359495, -55.09318532 5.75199567, -55.09288404 5.75095774, -55.09339564 5.74907799, -55.09593311 5.74761765, -55.09792391 5.74773580, -55.10056229 5.75058993, -55.10217540 5.75342631, -55.10353903 5.75386104, -55.10440062 5.75400436, -55.10465578 5.75580454, -55.10674254 5.75809426, -55.10658556 5.75954562, -55.10539782 5.76062158, -55.10327488 5.76027770, -55.10185176 5.76122326, -55.10167872 5.76262414, -55.10285395 5.76353084, -55.10447835 5.76341066, -55.10607658 5.76390241, -55.10744664 5.76427015, -55.10555666 5.78865886, -55.09391697 5.79926342, -55.08847901 5.80397075, -55.08776973 5.80298637, -55.08333830 5.80659053, -55.08569167 5.78466940, -55.08805658 5.75979013))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930"
-      ],
-      "wikidataQid": "Q59133111",
-      "fid": 1727,
-      "psurIds": [],
-      "district": null,
-      "locationDescription": null,
-      "locationDescriptionOriginal": null,
-      "placeType": null,
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59133111",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-01431",
       "@type": [
         "E25_Human-Made_Feature"
@@ -140730,6 +140684,76 @@
           "original": "Rivier Commewijne, (boven) linkerhand in het afvaren",
           "source": "almanakken",
           "note": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-00644",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-00644",
+      "type": "plantation",
+      "broader": null,
+      "description": "",
+      "location": {
+        "lat": 5.763685650857141,
+        "lng": -55.09808850628572,
+        "wkt": "Polygon ((-55.08805658 5.75979013, -55.09240159 5.75922117, -55.09601247 5.75796906, -55.09803880 5.75654243, -55.09916234 5.75526114, -55.09848421 5.75433663, -55.09739025 5.75378116, -55.09570062 5.75359495, -55.09318532 5.75199567, -55.09288404 5.75095774, -55.09339564 5.74907799, -55.09593311 5.74761765, -55.09792391 5.74773580, -55.10056229 5.75058993, -55.10217540 5.75342631, -55.10353903 5.75386104, -55.10440062 5.75400436, -55.10465578 5.75580454, -55.10674254 5.75809426, -55.10658556 5.75954562, -55.10539782 5.76062158, -55.10327488 5.76027770, -55.10185176 5.76122326, -55.10167872 5.76262414, -55.10285395 5.76353084, -55.10447835 5.76341066, -55.10607658 5.76390241, -55.10744664 5.76427015, -55.10555666 5.78865886, -55.09391697 5.79926342, -55.08847901 5.80397075, -55.08776973 5.80298637, -55.08333830 5.80659053, -55.08569167 5.78466940, -55.08805658 5.75979013))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930"
+      ],
+      "wikidataQid": "Q59133111",
+      "fid": 1727,
+      "psurIds": [],
+      "district": null,
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-02",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59133111",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "names": [
+        {
+          "text": "Puttenzorg",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        },
+        {
+          "text": "Bittenzorg",
+          "language": "nl",
+          "type": "variant",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        }
+      ],
+      "districtAssertions": [],
+      "productAssertions": [],
+      "locationAssertions": [],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Eylant en Puttenzorg 2005-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emWk8weGUxTGY5azQ/view?usp=sharing&resourcekey=0-JiHSoU-65UIViAn9SkQWCQ",
+          "author": "Philip Dikland",
+          "year": "2005, aangevuld 2009",
+          "notes": "De plantages het Eylant en Puttenzorg hebben vanaf het begin 1 geheel gevormd. Puttenzorg \nwordt in de 19e eeuw ook wel aangeduid als “Bittenzorg”. De plantages werden na de  afschaffing van de slavernij verlaten.\n\nDe herkomst van de naam “Puttenzorg” is nog duister. Rond 1700 woonde er een familie Van\nder Putten in de Pauluskreek, mogelijk is de naam van hen afkomstig."
         }
       ]
     },
