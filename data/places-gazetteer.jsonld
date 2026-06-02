@@ -167082,6 +167082,59 @@
       ]
     },
     {
+      "id": "stm-new-1780397515565",
+      "type": "settlement",
+      "names": [
+        {
+          "text": "Carolina",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "source": "dikland-collection"
+        }
+      ],
+      "broader": null,
+      "description": "",
+      "location": {
+        "lat": 5.45,
+        "lng": -54.996944,
+        "wkt": null,
+        "crs": "EPSG:4326"
+      },
+      "sources": [],
+      "wikidataQid": "Q1757542",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q1757542",
+          "matchType": "closeMatch"
+        }
+      ],
+      "fid": null,
+      "psurIds": [],
+      "district": null,
+      "districtAssertions": [],
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "productAssertions": [],
+      "locationAssertions": [],
+      "statusAssertions": [],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Carolina 2002-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emV0otVGJXcWc3MFE/view?usp=sharing&resourcekey=0-KcM-2aE6nHnXCM17UJWYdg",
+          "author": "Philip Dikland",
+          "year": "2002, aangevuld 2010, 2012",
+          "notes": "Het dorpje Carolina was gebouwd op de oude suikerplantage Carolina’s Hoop / Surimombo.\nVan de oorspronkelijke plantagebebouwing is niets bewaard gebleven."
+        }
+      ],
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-02",
+      "@id": "stm:place/stm-new-1780397515565",
+      "@type": "E25_Human-Made_Feature"
+    },
+    {
       "id": "stm-new-1776183306173",
       "type": "settlement",
       "names": [
