@@ -14101,115 +14101,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00556",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-00556",
-      "type": "plantation",
-      "prefLabel": "Clevia",
-      "altLabels": [],
-      "broader": "stm-00007",
-      "description": "",
-      "location": {
-        "lat": 5.858801150000001,
-        "lng": -55.08151539666667,
-        "wkt": "Polygon ((-55.08874805 5.85720863, -55.08906073 5.85973884, -55.08944159 5.86275085, -55.06637967 5.86062387, -55.06671429 5.85527608, -55.08874805 5.85720863))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken"
-      ],
-      "wikidataQid": "Q15873942",
-      "fid": 1639,
-      "psurIds": [],
-      "district": "Divisie Boven-Suriname en Thorarica",
-      "locationDescription": "Suriname",
-      "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
-      "placeType": "koffie",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q15873942",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1818",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1818,
-          "note": null
-        },
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-koffie-1818",
-          "value": "koffie",
-          "source": "almanakken",
-          "startYear": 1818,
-          "endYear": 1821,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-koffie-1825",
-          "value": "koffie",
-          "source": "almanakken",
-          "startYear": 1825,
-          "endYear": 1833,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-kost-1834",
-          "value": "kost",
-          "source": "almanakken",
-          "startYear": 1834,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-koffie-1835",
-          "value": "koffie",
-          "source": "almanakken",
-          "startYear": 1835,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-kost-1836",
-          "value": "kost",
-          "source": "almanakken",
-          "startYear": 1836,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-koffie-en-kost-1837",
-          "value": "koffie en kost",
-          "source": "almanakken",
-          "startYear": 1837,
-          "endYear": 1847,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-kweek-1859",
-          "value": "kweek",
-          "source": "almanakken",
-          "startYear": 1859,
-          "endYear": 1861,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02113",
       "@type": [
         "E25_Human-Made_Feature"
@@ -105459,6 +105350,156 @@
           "author": "Philip Dikland",
           "year": "2004, aangevuld 2008, 2012, 2014",
           "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-00556",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-00556",
+      "type": "plantation",
+      "broader": "stm-00007",
+      "description": "",
+      "location": {
+        "lat": 5.858801150000001,
+        "lng": -55.08151539666667,
+        "wkt": "Polygon ((-55.08874805 5.85720863, -55.08906073 5.85973884, -55.08944159 5.86275085, -55.06637967 5.86062387, -55.06671429 5.85527608, -55.08874805 5.85720863))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken"
+      ],
+      "wikidataQid": "Q15873942",
+      "fid": 1639,
+      "psurIds": [],
+      "district": "Divisie Boven-Suriname en Thorarica",
+      "locationDescription": "Suriname",
+      "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
+      "placeType": "koffie",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-02",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q15873942",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1818",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1818,
+          "note": null
+        },
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-koffie-1818",
+          "value": "koffie",
+          "source": "almanakken",
+          "startYear": 1818,
+          "endYear": 1821,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-koffie-1825",
+          "value": "koffie",
+          "source": "almanakken",
+          "startYear": 1825,
+          "endYear": 1833,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-kost-1834",
+          "value": "kost",
+          "source": "almanakken",
+          "startYear": 1834,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-koffie-1835",
+          "value": "koffie",
+          "source": "almanakken",
+          "startYear": 1835,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-kost-1836",
+          "value": "kost",
+          "source": "almanakken",
+          "startYear": 1836,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-koffie-en-kost-1837",
+          "value": "koffie en kost",
+          "source": "almanakken",
+          "startYear": 1837,
+          "endYear": 1847,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-kweek-1859",
+          "value": "kweek",
+          "source": "almanakken",
+          "startYear": 1859,
+          "endYear": 1861,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "Clevia",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        },
+        {
+          "text": "Land van Clevia",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00007",
+          "districtLabel": "Divisie Boven-Suriname en Thorarica",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Suriname",
+          "original": "Rivier Suriname, linkerhand in het afvaren",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Clevia 2002-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emU0RaU25aRTlodHc/view?usp=sharing&resourcekey=0-HVEB0rQresVPCYifX3bo8g",
+          "author": "Philip Dikland",
+          "year": "2002, aangevuld 2009",
+          "notes": "De huidige stadwijk Clevia was oorspronkelijk een kostgrond genaamd \"Land van Clevia\", en\nbehoorde toe aan de plantage Clevia aan de overzijde van de Surinamerivier."
         }
       ]
     },
