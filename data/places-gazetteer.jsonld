@@ -101075,6 +101075,13 @@
           "type": "historical",
           "isPreferred": false,
           "sourceYear": 1818
+        },
+        {
+          "text": "Boa Vista",
+          "language": "nl",
+          "type": "variant",
+          "isPreferred": false,
+          "source": "dikland-collection"
         }
       ],
       "districtAssertions": [],
