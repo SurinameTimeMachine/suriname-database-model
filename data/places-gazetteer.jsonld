@@ -16148,54 +16148,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00877",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-00877",
-      "type": "plantation",
-      "prefLabel": "De Drie Gebroeders",
-      "altLabels": [
-        "De drie gebroeders"
-      ],
-      "broader": null,
-      "description": "",
-      "location": {
-        "lat": 5.59936834375,
-        "lng": -55.08311794749999,
-        "wkt": "Polygon ((-55.07845032 5.60523088, -55.07957295 5.59285251, -55.07957885 5.59229402, -55.08687757 5.59279261, -55.09542596 5.59325541, -55.08450994 5.60731941, -55.08207767 5.60597103, -55.07845032 5.60523088))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930"
-      ],
-      "wikidataQid": "Q135395229",
-      "fid": 1961,
-      "psurIds": [],
-      "district": null,
-      "locationDescription": null,
-      "locationDescriptionOriginal": null,
-      "placeType": null,
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q135395229",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-01332",
       "@type": [
         "E25_Human-Made_Feature"
@@ -108296,6 +108248,75 @@
           "note": null
         }
       ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Drie Gebroeders 2005-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8ema1owOGd5WUZSeDQ/view?usp=sharing&resourcekey=0-i_oChUIZMBU6Z6wJopepJA",
+          "author": "Philip Dikland",
+          "year": "2005, aangevuld 2009",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-00877",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-00877",
+      "type": "plantation",
+      "broader": null,
+      "description": "",
+      "location": {
+        "lat": 5.59936834375,
+        "lng": -55.08311794749999,
+        "wkt": "Polygon ((-55.07845032 5.60523088, -55.07957295 5.59285251, -55.07957885 5.59229402, -55.08687757 5.59279261, -55.09542596 5.59325541, -55.08450994 5.60731941, -55.08207767 5.60597103, -55.07845032 5.60523088))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930"
+      ],
+      "wikidataQid": "Q135395229",
+      "fid": 1961,
+      "psurIds": [],
+      "district": null,
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-02",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q135395229",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "names": [
+        {
+          "text": "De Drie Gebroeders",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        },
+        {
+          "text": "De drie gebroeders",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false
+        }
+      ],
+      "districtAssertions": [],
+      "productAssertions": [],
+      "locationAssertions": [],
       "diklandRefs": [
         {
           "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Drie Gebroeders 2005-01 geschiedenis.pdf",
