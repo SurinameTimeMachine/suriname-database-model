@@ -31840,103 +31840,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00879",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-00879",
-      "type": "plantation",
-      "prefLabel": "Jagtlust",
-      "altLabels": [],
-      "broader": "stm-00007",
-      "description": "",
-      "location": {
-        "lat": 5.81441052875,
-        "lng": -55.10130988125,
-        "wkt": "Polygon ((-55.10496866 5.82629144, -55.08847901 5.80397075, -55.09391697 5.79926342, -55.09721547 5.80376678, -55.10115614 5.80883305, -55.11144924 5.82266848, -55.10832490 5.82419887, -55.10496866 5.82629144))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q2121376",
-      "fid": 1963,
-      "psurIds": [
-        "PSUR0148"
-      ],
-      "district": "Divisie Boven-Suriname en Thorarica",
-      "locationDescription": "Suriname",
-      "locationDescriptionOriginal": "Rivier Suriname, regterhand in het afvaren",
-      "placeType": "koffie",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q2121376",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1818",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1818,
-          "note": null
-        },
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-koffie-1818",
-          "value": "koffie",
-          "source": "almanakken",
-          "startYear": 1818,
-          "endYear": 1821,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-koffie-1825",
-          "value": "koffie",
-          "source": "almanakken",
-          "startYear": 1825,
-          "endYear": 1847,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-koffie-1856",
-          "value": "koffie",
-          "source": "almanakken",
-          "startYear": 1856,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-koffie-1859",
-          "value": "koffie",
-          "source": "almanakken",
-          "startYear": 1859,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-kost-en-koffie-1860",
-          "value": "kost en koffie",
-          "source": "almanakken",
-          "startYear": 1860,
-          "endYear": 1861,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02452",
       "@type": [
         "E25_Human-Made_Feature"
@@ -120188,6 +120091,137 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emM3hJQVd4UGxCbTQ/view?usp=sharing&resourcekey=0-cUWEt3_p3YJ_XpZhiHlnEg",
           "author": "Philip Dikland",
           "year": "2005",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-00879",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-00879",
+      "type": "plantation",
+      "broader": "stm-00007",
+      "description": "",
+      "location": {
+        "lat": 5.81441052875,
+        "lng": -55.10130988125,
+        "wkt": "Polygon ((-55.10496866 5.82629144, -55.08847901 5.80397075, -55.09391697 5.79926342, -55.09721547 5.80376678, -55.10115614 5.80883305, -55.11144924 5.82266848, -55.10832490 5.82419887, -55.10496866 5.82629144))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q2121376",
+      "fid": 1963,
+      "psurIds": [
+        "PSUR0148"
+      ],
+      "district": "Divisie Boven-Suriname en Thorarica",
+      "locationDescription": "Suriname",
+      "locationDescriptionOriginal": "Rivier Suriname, regterhand in het afvaren",
+      "placeType": "koffie",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-04",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q2121376",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1818",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1818,
+          "note": null
+        },
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-koffie-1818",
+          "value": "koffie",
+          "source": "almanakken",
+          "startYear": 1818,
+          "endYear": 1821,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-koffie-1825",
+          "value": "koffie",
+          "source": "almanakken",
+          "startYear": 1825,
+          "endYear": 1847,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-koffie-1856",
+          "value": "koffie",
+          "source": "almanakken",
+          "startYear": 1856,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-koffie-1859",
+          "value": "koffie",
+          "source": "almanakken",
+          "startYear": 1859,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-kost-en-koffie-1860",
+          "value": "kost en koffie",
+          "source": "almanakken",
+          "startYear": 1860,
+          "endYear": 1861,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "Jagtlust",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00007",
+          "districtLabel": "Divisie Boven-Suriname en Thorarica",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Suriname",
+          "original": "Rivier Suriname, regterhand in het afvaren",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Jagtlust 2001-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/1YAmPz_ihdaViOnJSV6hq2CVqecoEIrOr/view?usp=sharing",
+          "author": "Philip Dikland",
+          "year": "2001, aangevuld 2008, 2011, 2012, 2018",
           "notes": null
         }
       ]
