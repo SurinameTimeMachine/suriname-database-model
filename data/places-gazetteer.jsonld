@@ -44813,96 +44813,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00564",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-00564",
-      "type": "plantation",
-      "prefLabel": "Meerzorg",
-      "altLabels": [],
-      "broader": "stm-00007",
-      "description": "",
-      "location": {
-        "lat": 5.805691079230769,
-        "lng": -55.13978113615386,
-        "wkt": "Polygon ((-55.14221462 5.78388893, -55.14833680 5.78964323, -55.15202336 5.79755060, -55.15779169 5.80741559, -55.15786837 5.81206253, -55.15597785 5.81638680, -55.14875906 5.81891386, -55.13193453 5.81846737, -55.12235118 5.81850471, -55.11432291 5.82147420, -55.11513720 5.80866324, -55.12822258 5.79712404, -55.14221462 5.78388893))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q1018882",
-      "fid": 1647,
-      "psurIds": [
-        "PSUR0231"
-      ],
-      "district": "Divisie Boven-Suriname en Thorarica",
-      "locationDescription": "Suriname",
-      "locationDescriptionOriginal": "Rivier Suriname, regterhand in het afvaren",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q1018882",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1818",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1818,
-          "note": null
-        },
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-suiker-1818",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1818,
-          "endYear": 1821,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1825",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1825,
-          "endYear": 1847,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1856",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1856,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1859",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1859,
-          "endYear": 1861,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02323",
       "@type": [
         "E25_Human-Made_Feature"
@@ -132356,6 +132266,144 @@
       "modifiedAt": "2026-05-14",
       "@id": "stm:place/stm-new-1778078039479",
       "@type": "E25_Human-Made_Feature"
+    },
+    {
+      "@id": "stm:place/stm-00564",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-00564",
+      "type": "plantation",
+      "broader": "stm-00007",
+      "description": "",
+      "location": {
+        "lat": 5.805691079230769,
+        "lng": -55.13978113615386,
+        "wkt": "Polygon ((-55.14221462 5.78388893, -55.14833680 5.78964323, -55.15202336 5.79755060, -55.15779169 5.80741559, -55.15786837 5.81206253, -55.15597785 5.81638680, -55.14875906 5.81891386, -55.13193453 5.81846737, -55.12235118 5.81850471, -55.11432291 5.82147420, -55.11513720 5.80866324, -55.12822258 5.79712404, -55.14221462 5.78388893))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q1018882",
+      "fid": 1647,
+      "psurIds": [
+        "PSUR0231"
+      ],
+      "district": "Divisie Boven-Suriname en Thorarica",
+      "locationDescription": "Suriname",
+      "locationDescriptionOriginal": "Rivier Suriname, regterhand in het afvaren",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-04",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q1018882",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1818",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1818,
+          "note": null
+        },
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-suiker-1818",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1818,
+          "endYear": 1821,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1825",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1825,
+          "endYear": 1847,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1856",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1856,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1859",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1859,
+          "endYear": 1861,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "Meerzorg",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        },
+        {
+          "text": "Anso",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        },
+        {
+          "text": "Amsincq",
+          "language": "nl",
+          "type": "vernacular",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00007",
+          "districtLabel": "Divisie Boven-Suriname en Thorarica",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Suriname",
+          "original": "Rivier Suriname, regterhand in het afvaren",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Meerzorg 2002-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emSF9JX25kRFF4N0k/view?usp=sharing&resourcekey=0-tDHnZqK9lKTe8uxZux7_1w",
+          "author": "Philip Dikland",
+          "year": "2002-2004, aangevuld 2008, 2012",
+          "notes": null
+        }
+      ]
     },
     {
       "@id": "stm:place/stm-00630",
