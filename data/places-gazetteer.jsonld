@@ -49706,61 +49706,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-02132",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-02132",
-      "type": "plantation",
-      "prefLabel": "Nieuw-Bergen op Zoom en Descanso",
-      "altLabels": [],
-      "broader": null,
-      "description": "Plantation from Surinaamse Almanakken (no QGIS geometry)",
-      "location": {
-        "lat": null,
-        "lng": null,
-        "wkt": null,
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "almanakken"
-      ],
-      "wikidataQid": "Q131415193",
-      "fid": null,
-      "psurIds": [],
-      "district": null,
-      "locationDescription": "Suriname",
-      "locationDescriptionOriginal": "Rivier Suriname, linkerhand",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q131415193",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1818",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1818,
-          "note": null
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-suiker-1818",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1818,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02224",
       "@type": [
         "E25_Human-Made_Feature"
@@ -137446,6 +137391,84 @@
           "author": "Philip Dikland",
           "year": "2005",
           "notes": "Vanaf 1821 vormden de plantages Nieuw-Timotibo, Wolff’s Capoerica en de baksteenfabriek\nWolff’s ijver 1 geheel, waarbij Wolff’s Capoerica de hoofdplantage was en de twee overige\nplantages nauwelijks in gebruik waren. Voor de verdere beschrijving zie bij plantage Capoerica."
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-02132",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-02132",
+      "type": "plantation",
+      "broader": null,
+      "description": "Plantation from Surinaamse Almanakken (no QGIS geometry)",
+      "location": {
+        "lat": null,
+        "lng": null,
+        "wkt": null,
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "almanakken"
+      ],
+      "wikidataQid": "Q131415193",
+      "fid": null,
+      "psurIds": [],
+      "district": null,
+      "locationDescription": "Suriname",
+      "locationDescriptionOriginal": "Rivier Suriname, linkerhand",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-04",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q131415193",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1818",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1818,
+          "note": null
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-suiker-1818",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1818,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "Nieuw-Bergen op Zoom en Descanso",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        }
+      ],
+      "districtAssertions": [],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Suriname",
+          "original": "Rivier Suriname, linkerhand",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Nieuw Bergen op Zoom 2004-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emZHp4VTJnTjVaUGM/view?usp=sharing&resourcekey=0-69U1GUqf2ZitqLYf0Du-zw",
+          "author": "Philip Dikland",
+          "year": "2004, aangevuld 2005, 2007",
+          "notes": null
         }
       ]
     },
