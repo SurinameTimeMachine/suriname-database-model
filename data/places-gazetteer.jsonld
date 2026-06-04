@@ -36494,86 +36494,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00647",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-00647",
-      "type": "plantation",
-      "prefLabel": "La Paix",
-      "altLabels": [],
-      "broader": "stm-00007",
-      "description": "",
-      "location": {
-        "lat": 5.750706560416667,
-        "lng": -55.04454038583332,
-        "wkt": "Polygon ((-55.04799710 5.79732372, -55.03034201 5.79507043, -55.03034721 5.79054368, -55.03059139 5.78782790, -55.03127895 5.76628132, -55.03305112 5.74255198, -55.03509945 5.73141135, -55.04018342 5.72719320, -55.04519516 5.72409293, -55.05081189 5.72352863, -55.05281405 5.72363918, -55.05407450 5.72533590, -55.05362995 5.72763706, -55.05145891 5.72939303, -55.04577357 5.73184037, -55.04313624 5.73497997, -55.04316074 5.73791964, -55.04543640 5.74017470, -55.05133007 5.73995905, -55.05326705 5.73862947, -55.05218593 5.75177659, -55.05065671 5.77624949, -55.04915034 5.77627414, -55.04799710 5.79732372))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken"
-      ],
-      "wikidataQid": "Q124831185",
-      "fid": 1730,
-      "psurIds": [],
-      "district": "Divisie Boven-Suriname en Thorarica",
-      "locationDescription": "Paulus Kreek",
-      "locationDescriptionOriginal": "Paulus-kreek, linkerhand in het opvaren",
-      "placeType": "kost",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q124831185",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-abandoned-1818",
-          "status": "abandoned",
-          "source": "almanakken",
-          "startYear": 1818,
-          "endYear": 1821,
-          "note": null
-        },
-        {
-          "id": "status-almanakken-abandoned-1825",
-          "status": "abandoned",
-          "source": "almanakken",
-          "startYear": 1825,
-          "endYear": 1827,
-          "note": null
-        },
-        {
-          "id": "status-almanakken-reactivated-1828",
-          "status": "reactivated",
-          "source": "almanakken",
-          "startYear": 1828,
-          "note": null
-        },
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-kost-1828",
-          "value": "kost",
-          "source": "almanakken",
-          "startYear": 1828,
-          "endYear": 1847,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02366",
       "@type": [
         "E25_Human-Made_Feature"
@@ -125186,6 +125106,127 @@
           "author": "Philip Dikland",
           "year": "2005",
           "notes": "Nouvelle Esperance is feitelijk het achterland van Va Comme Je Te Pousse ; vanwege de\nvreemde vorm van die plantage lag dit achterland deels aan de rivier en was het mogelijk er een zelfstandige plantage van te maken. De grens tussen Va Comme Je Te Pousse en Nouvelle\nEsperance werd gelegd bij de Cederkreek. Wanneer de afsplitsing precies is geschied, is niet bekend."
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-00647",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-00647",
+      "type": "plantation",
+      "broader": "stm-00007",
+      "description": "",
+      "location": {
+        "lat": 5.750706560416667,
+        "lng": -55.04454038583332,
+        "wkt": "Polygon ((-55.04799710 5.79732372, -55.03034201 5.79507043, -55.03034721 5.79054368, -55.03059139 5.78782790, -55.03127895 5.76628132, -55.03305112 5.74255198, -55.03509945 5.73141135, -55.04018342 5.72719320, -55.04519516 5.72409293, -55.05081189 5.72352863, -55.05281405 5.72363918, -55.05407450 5.72533590, -55.05362995 5.72763706, -55.05145891 5.72939303, -55.04577357 5.73184037, -55.04313624 5.73497997, -55.04316074 5.73791964, -55.04543640 5.74017470, -55.05133007 5.73995905, -55.05326705 5.73862947, -55.05218593 5.75177659, -55.05065671 5.77624949, -55.04915034 5.77627414, -55.04799710 5.79732372))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken"
+      ],
+      "wikidataQid": "Q124831185",
+      "fid": 1730,
+      "psurIds": [],
+      "district": "Divisie Boven-Suriname en Thorarica",
+      "locationDescription": "Paulus Kreek",
+      "locationDescriptionOriginal": "Paulus-kreek, linkerhand in het opvaren",
+      "placeType": "kost",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-04",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q124831185",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-abandoned-1818",
+          "status": "abandoned",
+          "source": "almanakken",
+          "startYear": 1818,
+          "endYear": 1821,
+          "note": null
+        },
+        {
+          "id": "status-almanakken-abandoned-1825",
+          "status": "abandoned",
+          "source": "almanakken",
+          "startYear": 1825,
+          "endYear": 1827,
+          "note": null
+        },
+        {
+          "id": "status-almanakken-reactivated-1828",
+          "status": "reactivated",
+          "source": "almanakken",
+          "startYear": 1828,
+          "note": null
+        },
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-kost-1828",
+          "value": "kost",
+          "source": "almanakken",
+          "startYear": 1828,
+          "endYear": 1847,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "La Paix",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        },
+        {
+          "text": "La Palix",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "sourceYear": 1870
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00007",
+          "districtLabel": "Divisie Boven-Suriname en Thorarica",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Paulus Kreek",
+          "original": "Paulus-kreek, linkerhand in het opvaren",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Paix Pauluskreek 2005-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emTjlzSkhYU1ZUMkU/view?usp=sharing&resourcekey=0-LnMAfRxMbzl79xBB4jSzVg",
+          "author": "Philip Dikland",
+          "year": "2005",
+          "notes": null
         }
       ]
     },
