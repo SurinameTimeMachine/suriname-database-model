@@ -28777,93 +28777,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00634",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-00634",
-      "type": "plantation",
-      "prefLabel": "Heijsvliet",
-      "altLabels": [],
-      "broader": "stm-00007",
-      "description": "",
-      "location": {
-        "lat": 5.707503738666667,
-        "lng": -55.016953486666665,
-        "wkt": "Polygon ((-55.02887870 5.72134155, -55.00736637 5.71776902, -55.00815079 5.71597547, -55.00840032 5.71464338, -55.00577387 5.71248290, -55.00601703 5.71075854, -55.00901146 5.70775184, -55.00932242 5.70463799, -55.01367956 5.70142628, -55.01759235 5.69955355, -55.02218392 5.69582908, -55.02676725 5.69345730, -55.03001588 5.69689143, -55.03226368 5.69869620, -55.02887870 5.72134155))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken"
-      ],
-      "wikidataQid": "Q59115689",
-      "fid": 1717,
-      "psurIds": [],
-      "district": "Divisie Boven-Suriname en Thorarica",
-      "locationDescription": "Surnaus Kreek",
-      "locationDescriptionOriginal": "Surnaus-kreek, linkerhand in het opvaren",
-      "placeType": "koffie",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59115689",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1820",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1820,
-          "note": null
-        },
-        {
-          "id": "status-almanakken-abandoned-1828",
-          "status": "abandoned",
-          "source": "almanakken",
-          "startYear": 1828,
-          "endYear": 1847,
-          "note": null
-        },
-        {
-          "id": "status-almanakken-abandoned-1856",
-          "status": "abandoned",
-          "source": "almanakken",
-          "startYear": 1856,
-          "note": null
-        },
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-koffie-1820",
-          "value": "koffie",
-          "source": "almanakken",
-          "startYear": 1820,
-          "endYear": 1821,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-koffie-1825",
-          "value": "koffie",
-          "source": "almanakken",
-          "startYear": 1825,
-          "endYear": 1827,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-01379",
       "@type": [
         "E25_Human-Made_Feature"
@@ -117579,6 +117492,148 @@
           "original": "Rivier Commewijne, (beneden) regterhand in het afvaren",
           "source": "almanakken",
           "note": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-00634",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-00634",
+      "type": "plantation",
+      "broader": "stm-00007",
+      "description": "",
+      "location": {
+        "lat": 5.707503738666667,
+        "lng": -55.016953486666665,
+        "wkt": "Polygon ((-55.02887870 5.72134155, -55.00736637 5.71776902, -55.00815079 5.71597547, -55.00840032 5.71464338, -55.00577387 5.71248290, -55.00601703 5.71075854, -55.00901146 5.70775184, -55.00932242 5.70463799, -55.01367956 5.70142628, -55.01759235 5.69955355, -55.02218392 5.69582908, -55.02676725 5.69345730, -55.03001588 5.69689143, -55.03226368 5.69869620, -55.02887870 5.72134155))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken"
+      ],
+      "wikidataQid": "Q59115689",
+      "fid": 1717,
+      "psurIds": [],
+      "district": "Divisie Boven-Suriname en Thorarica",
+      "locationDescription": "Surnaus Kreek",
+      "locationDescriptionOriginal": "Surnaus-kreek, linkerhand in het opvaren",
+      "placeType": "koffie",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-04",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59115689",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1820",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1820,
+          "note": null
+        },
+        {
+          "id": "status-almanakken-abandoned-1828",
+          "status": "abandoned",
+          "source": "almanakken",
+          "startYear": 1828,
+          "endYear": 1847,
+          "note": null
+        },
+        {
+          "id": "status-almanakken-abandoned-1856",
+          "status": "abandoned",
+          "source": "almanakken",
+          "startYear": 1856,
+          "note": null
+        },
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-koffie-1820",
+          "value": "koffie",
+          "source": "almanakken",
+          "startYear": 1820,
+          "endYear": 1821,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-koffie-1825",
+          "value": "koffie",
+          "source": "almanakken",
+          "startYear": 1825,
+          "endYear": 1827,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "Heijsvliet",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        },
+        {
+          "text": "Heystvliet }",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "sourceYear": 1820
+        },
+        {
+          "text": "Heesvliet",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "sourceYear": 1820
+        },
+        {
+          "text": "Heijstvliet",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "sourceYear": 1856
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00007",
+          "districtLabel": "Divisie Boven-Suriname en Thorarica",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Surnaus Kreek",
+          "original": "Surnaus-kreek, linkerhand in het opvaren",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Merveille 2001-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emZDJkeW8xcmRZZm8/view?usp=sharing&resourcekey=0-sNUCpcVwMqoCOLmXVYUmvw",
+          "author": "Philip Dikland",
+          "year": "2001, aangevuld 2008",
+          "notes": "De buurplantage Heijsvliet heeft vanaf het begin 1 geheel gevormd met Merveille."
         }
       ]
     },
