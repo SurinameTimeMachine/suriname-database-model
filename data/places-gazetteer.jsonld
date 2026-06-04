@@ -41255,89 +41255,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01383",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01383",
-      "type": "plantation",
-      "prefLabel": "Livorno",
-      "altLabels": [],
-      "broader": "stm-00010",
-      "description": "",
-      "location": {
-        "lat": 5.773209260000001,
-        "lng": -55.17506475846153,
-        "wkt": "Polygon ((-55.16951690 5.79470528, -55.16173950 5.79268152, -55.16186316 5.78998440, -55.16758993 5.77830282, -55.16607641 5.77540000, -55.17708475 5.75275899, -55.18022854 5.75472812, -55.18265546 5.75021708, -55.18525849 5.75168983, -55.19269734 5.75574923, -55.18835329 5.76508578, -55.17326119 5.79571205, -55.16951690 5.79470528))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q59116975",
-      "fid": 2468,
-      "psurIds": [
-        "PSUR0202"
-      ],
-      "district": "Divisie Para",
-      "locationDescription": "Suriname",
-      "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59116975",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1820",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1820,
-          "note": null
-        },
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-suiker-1820",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1820,
-          "endYear": 1821,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1825",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1825,
-          "endYear": 1847,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1859",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1859,
-          "endYear": 1861,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-00743",
       "@type": [
         "E25_Human-Made_Feature"
@@ -128673,6 +128590,136 @@
           "original": "Matappica-kreek, linkerhand in het opvaren",
           "source": "almanakken",
           "note": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01383",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01383",
+      "type": "plantation",
+      "broader": "stm-00010",
+      "description": "",
+      "location": {
+        "lat": 5.773209260000001,
+        "lng": -55.17506475846153,
+        "wkt": "Polygon ((-55.16951690 5.79470528, -55.16173950 5.79268152, -55.16186316 5.78998440, -55.16758993 5.77830282, -55.16607641 5.77540000, -55.17708475 5.75275899, -55.18022854 5.75472812, -55.18265546 5.75021708, -55.18525849 5.75168983, -55.19269734 5.75574923, -55.18835329 5.76508578, -55.17326119 5.79571205, -55.16951690 5.79470528))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q59116975",
+      "fid": 2468,
+      "psurIds": [
+        "PSUR0202"
+      ],
+      "district": "Divisie Para",
+      "locationDescription": "Suriname",
+      "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-04",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59116975",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1820",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1820,
+          "note": null
+        },
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-suiker-1820",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1820,
+          "endYear": 1821,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1825",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1825,
+          "endYear": 1847,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1859",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1859,
+          "endYear": 1861,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "Livorno.",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        },
+        {
+          "text": "Ofriti",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false
+        },
+        {
+          "text": "Woutvliet ?",
+          "language": "nl",
+          "type": "vernacular",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00010",
+          "districtLabel": "Divisie Para",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Suriname",
+          "original": "Rivier Suriname, linkerhand in het afvaren",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Livorno 2003-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emV0N0SVkyTGpWZkU/view?usp=sharing&resourcekey=0-5GYAiCCOraqKsKmRrldp1g",
+          "author": "Philip Dikland",
+          "year": "2003",
+          "notes": null
         }
       ]
     },
