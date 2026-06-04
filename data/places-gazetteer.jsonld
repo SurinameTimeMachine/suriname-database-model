@@ -53606,64 +53606,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-02442",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-02442",
-      "type": "plantation",
-      "prefLabel": "Overbrug en Crommenie",
-      "altLabels": [],
-      "broader": null,
-      "description": "Plantation from Surinaamse Almanakken (no QGIS geometry)",
-      "location": {
-        "lat": null,
-        "lng": null,
-        "wkt": null,
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q131415588",
-      "fid": null,
-      "psurIds": [
-        "PSUR0275"
-      ],
-      "district": null,
-      "locationDescription": "Suriname",
-      "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
-      "placeType": "hout",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q131415588",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1835",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1835,
-          "note": null
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-hout-1835",
-          "value": "hout",
-          "source": "almanakken",
-          "startYear": 1835,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02337",
       "@type": [
         "E25_Human-Made_Feature"
@@ -140714,6 +140656,87 @@
           "author": "Philip Dikland",
           "year": "2004",
           "notes": "De plantage Overbrug is een verbastering van Overbridge, hetgeen de naam van de eerste eigenaar schijnt te zijn geweest. \n\nDe naastgelegen plantage Crommenie is - volgens John de Bije - de locatie van de oude hoofdplaats Thorarica."
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-02442",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-02442",
+      "type": "plantation",
+      "broader": null,
+      "description": "Plantation from Surinaamse Almanakken (no QGIS geometry)",
+      "location": {
+        "lat": null,
+        "lng": null,
+        "wkt": null,
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q131415588",
+      "fid": null,
+      "psurIds": [
+        "PSUR0275"
+      ],
+      "district": null,
+      "locationDescription": "Suriname",
+      "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
+      "placeType": "hout",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-04",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q131415588",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1835",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1835,
+          "note": null
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-hout-1835",
+          "value": "hout",
+          "source": "almanakken",
+          "startYear": 1835,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "Overbrug en Crommenie",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        }
+      ],
+      "districtAssertions": [],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Suriname",
+          "original": "Rivier Suriname, linkerhand in het afvaren",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Overbrug 2004-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emdmxUVExqQXRyU2c/view?usp=sharing&resourcekey=0-_Tnh37HNZYpJNq4ZSoReaw",
+          "author": "Philip Dikland",
+          "year": "2004",
+          "notes": null
         }
       ]
     },
