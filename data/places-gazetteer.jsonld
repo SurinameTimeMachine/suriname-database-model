@@ -17961,104 +17961,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00632",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-00632",
-      "type": "plantation",
-      "prefLabel": "De Merveille",
-      "altLabels": [],
-      "broader": "stm-00007",
-      "description": "",
-      "location": {
-        "lat": 5.7226285518518525,
-        "lng": -55.01832154703703,
-        "wkt": "Polygon ((-55.04045541 5.70322383, -55.03866014 5.71508475, -55.03509945 5.73141135, -55.02572961 5.73705768, -55.02333187 5.73785140, -55.02170969 5.73630840, -55.02004106 5.73005771, -55.01772279 5.72647367, -55.01646854 5.72531702, -55.01521369 5.72533581, -55.01389599 5.72699122, -55.01303639 5.72920618, -55.01218976 5.73088002, -55.01114421 5.73144035, -55.00968302 5.73052853, -55.00806062 5.72711420, -55.00672506 5.72466103, -55.00370241 5.72169028, -55.00301481 5.72070727, -55.00329301 5.71928417, -55.00416073 5.71890784, -55.00630347 5.71911437, -55.00736637 5.71776902, -55.02887870 5.72134155, -55.03226368 5.69869620, -55.03607588 5.70129322, -55.04045541 5.70322383))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q59118005",
-      "fid": 1715,
-      "psurIds": [
-        "PSUR0084"
-      ],
-      "district": "Divisie Boven-Suriname en Thorarica",
-      "locationDescription": "Suriname",
-      "locationDescriptionOriginal": "Rivier Suriname, regterhand in het afvaren",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59118005",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1818",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1818,
-          "note": null
-        },
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-suiker-1818",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1818,
-          "endYear": 1821,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1825",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1825,
-          "endYear": 1828,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1834",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1834,
-          "endYear": 1847,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1856",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1856,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1859",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1859,
-          "endYear": 1861,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-00942",
       "@type": [
         "E25_Human-Made_Feature"
@@ -107264,6 +107166,152 @@
           "author": "Philip Dikland",
           "year": "2005",
           "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-00632",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-00632",
+      "type": "plantation",
+      "broader": "stm-00007",
+      "description": "",
+      "location": {
+        "lat": 5.7226285518518525,
+        "lng": -55.01832154703703,
+        "wkt": "Polygon ((-55.04045541 5.70322383, -55.03866014 5.71508475, -55.03509945 5.73141135, -55.02572961 5.73705768, -55.02333187 5.73785140, -55.02170969 5.73630840, -55.02004106 5.73005771, -55.01772279 5.72647367, -55.01646854 5.72531702, -55.01521369 5.72533581, -55.01389599 5.72699122, -55.01303639 5.72920618, -55.01218976 5.73088002, -55.01114421 5.73144035, -55.00968302 5.73052853, -55.00806062 5.72711420, -55.00672506 5.72466103, -55.00370241 5.72169028, -55.00301481 5.72070727, -55.00329301 5.71928417, -55.00416073 5.71890784, -55.00630347 5.71911437, -55.00736637 5.71776902, -55.02887870 5.72134155, -55.03226368 5.69869620, -55.03607588 5.70129322, -55.04045541 5.70322383))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q59118005",
+      "fid": 1715,
+      "psurIds": [
+        "PSUR0084"
+      ],
+      "district": "Divisie Boven-Suriname en Thorarica",
+      "locationDescription": "Suriname",
+      "locationDescriptionOriginal": "Rivier Suriname, regterhand in het afvaren",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-04",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59118005",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1818",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1818,
+          "note": null
+        },
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-suiker-1818",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1818,
+          "endYear": 1821,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1825",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1825,
+          "endYear": 1828,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1834",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1834,
+          "endYear": 1847,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1856",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1856,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1859",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1859,
+          "endYear": 1861,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "De Merveille",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        },
+        {
+          "text": "Merveille",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "sourceYear": 1859
+        },
+        {
+          "text": "Adjakka",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00007",
+          "districtLabel": "Divisie Boven-Suriname en Thorarica",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Suriname",
+          "original": "Rivier Suriname, regterhand in het afvaren",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Merveille 2001-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emZDJkeW8xcmRZZm8/view?usp=sharing&resourcekey=0-sNUCpcVwMqoCOLmXVYUmvw",
+          "author": "Philip Dikland",
+          "year": "2001, aangevuld 2008",
+          "notes": "De buurplantage Heijsvliet heeft vanaf het begin 1 geheel gevormd met Merveille."
         }
       ]
     },
