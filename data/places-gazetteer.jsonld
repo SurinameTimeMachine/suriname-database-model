@@ -27427,102 +27427,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01875",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01875",
-      "type": "plantation",
-      "prefLabel": "Groot Chatillon",
-      "altLabels": [],
-      "broader": "stm-00007",
-      "description": "",
-      "location": {
-        "lat": 5.6228256118518525,
-        "lng": -55.07322105888888,
-        "wkt": "Polygon ((-55.04928471 5.62947889, -55.05365957 5.62433644, -55.06342918 5.62484009, -55.06685096 5.62405950, -55.06950243 5.62039399, -55.07147345 5.61565307, -55.07282822 5.61007715, -55.07472765 5.60832550, -55.07658562 5.60772146, -55.07851569 5.60784062, -55.08265144 5.61018719, -55.08527929 5.61243784, -55.08660411 5.61422700, -55.08731764 5.61548294, -55.08749646 5.61720042, -55.08730847 5.62043309, -55.08717272 5.62134081, -55.08640199 5.62210807, -55.08506294 5.62312615, -55.07610468 5.62801226, -55.07177733 5.63052821, -55.06893423 5.63353285, -55.06646143 5.63707468, -55.06500579 5.64017723, -55.06396292 5.64272971, -55.06328496 5.64548747, -55.04928471 5.62947889))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q59115652",
-      "fid": 2960,
-      "psurIds": [
-        "PSUR0124"
-      ],
-      "district": "Divisie Boven-Suriname en Thorarica",
-      "locationDescription": "Suriname",
-      "locationDescriptionOriginal": "Rivier Suriname, regterhand in het afvaren",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59115652",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1818",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1818,
-          "note": null
-        },
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-suiker-1818",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1818,
-          "endYear": 1821,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1825",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1825,
-          "endYear": 1842,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1846",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1846,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1856",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1856,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1861",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1861,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02389",
       "@type": [
         "E25_Human-Made_Feature"
@@ -116688,6 +116592,143 @@
         }
       ],
       "statusAssertions": []
+    },
+    {
+      "@id": "stm:place/stm-01875",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01875",
+      "type": "plantation",
+      "broader": "stm-00007",
+      "description": "",
+      "location": {
+        "lat": 5.6228256118518525,
+        "lng": -55.07322105888888,
+        "wkt": "Polygon ((-55.04928471 5.62947889, -55.05365957 5.62433644, -55.06342918 5.62484009, -55.06685096 5.62405950, -55.06950243 5.62039399, -55.07147345 5.61565307, -55.07282822 5.61007715, -55.07472765 5.60832550, -55.07658562 5.60772146, -55.07851569 5.60784062, -55.08265144 5.61018719, -55.08527929 5.61243784, -55.08660411 5.61422700, -55.08731764 5.61548294, -55.08749646 5.61720042, -55.08730847 5.62043309, -55.08717272 5.62134081, -55.08640199 5.62210807, -55.08506294 5.62312615, -55.07610468 5.62801226, -55.07177733 5.63052821, -55.06893423 5.63353285, -55.06646143 5.63707468, -55.06500579 5.64017723, -55.06396292 5.64272971, -55.06328496 5.64548747, -55.04928471 5.62947889))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q59115652",
+      "fid": 2960,
+      "psurIds": [
+        "PSUR0124"
+      ],
+      "district": "Divisie Boven-Suriname en Thorarica",
+      "locationDescription": "Suriname",
+      "locationDescriptionOriginal": "Rivier Suriname, regterhand in het afvaren",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-04",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59115652",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1818",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1818,
+          "note": null
+        },
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-suiker-1818",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1818,
+          "endYear": 1821,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1825",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1825,
+          "endYear": 1842,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1846",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1846,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1856",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1856,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1861",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1861,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "Groot Chatillon",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        },
+        {
+          "text": "Groot Chatilton",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "sourceYear": 1836
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00007",
+          "districtLabel": "Divisie Boven-Suriname en Thorarica",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Suriname",
+          "original": "Rivier Suriname, regterhand in het afvaren",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Groot Chatillon 2003-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emT1lLZFZTSW53WE0/view?usp=sharing&resourcekey=0-szLX9bj5lEqtNqSshU5rFQ",
+          "author": "Philip Dikland",
+          "year": "2003, aangevuld 2004, 2009",
+          "notes": null
+        }
+      ]
     },
     {
       "@id": "stm:place/stm-01098",
