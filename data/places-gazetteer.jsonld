@@ -42673,72 +42673,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00562",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-00562",
-      "type": "plantation",
-      "prefLabel": "Lust en Rust",
-      "altLabels": [],
-      "broader": null,
-      "description": "",
-      "location": {
-        "lat": 5.828973535,
-        "lng": -55.080497105,
-        "wkt": "Polygon ((-55.07689249 5.81786391, -55.09508735 5.83867033, -55.09048380 5.84909116, -55.07346147 5.82736735, -55.07016503 5.82298455, -55.07689249 5.81786391))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q2689333",
-      "fid": 1645,
-      "psurIds": [
-        "PSUR0217"
-      ],
-      "district": null,
-      "locationDescription": "Suriname",
-      "locationDescriptionOriginal": "Rivier Suriname, regterhand",
-      "placeType": "koffie",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q2689333",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1820",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1820,
-          "note": null
-        },
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-koffie-1820",
-          "value": "koffie",
-          "source": "almanakken",
-          "startYear": 1820,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02126",
       "@type": [
         "E25_Human-Made_Feature"
@@ -129454,6 +129388,124 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emNHdpLXVPVFFVR2M/view?usp=sharing&resourcekey=0-g-9V_IqEgLVIptuEFotazQ",
           "author": "Philip Dikland",
           "year": "2005",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-00562",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-00562",
+      "type": "plantation",
+      "broader": null,
+      "description": "",
+      "location": {
+        "lat": 5.828973535,
+        "lng": -55.080497105,
+        "wkt": "Polygon ((-55.07689249 5.81786391, -55.09508735 5.83867033, -55.09048380 5.84909116, -55.07346147 5.82736735, -55.07016503 5.82298455, -55.07689249 5.81786391))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q2689333",
+      "fid": 1645,
+      "psurIds": [
+        "PSUR0217"
+      ],
+      "district": null,
+      "locationDescription": "Suriname",
+      "locationDescriptionOriginal": "Rivier Suriname, regterhand",
+      "placeType": "koffie",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-04",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q2689333",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1820",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1820,
+          "note": null
+        },
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-koffie-1820",
+          "value": "koffie",
+          "source": "almanakken",
+          "startYear": 1820,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "Lust en Rust",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        },
+        {
+          "text": "Rust en Lust",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "sourceYear": 1820
+        },
+        {
+          "text": "Lustrust",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "sourceYear": 1820
+        },
+        {
+          "text": "Skerpien",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        },
+        {
+          "text": "Scherping",
+          "language": "nl",
+          "type": "vernacular",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        }
+      ],
+      "districtAssertions": [],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Suriname",
+          "original": "Rivier Suriname, regterhand",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Lust en Rust 2001-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emWGRtVVNPalRhOVE/view?usp=sharing&resourcekey=0-RISzJxNFzA7fGfxZxqX05A",
+          "author": "Philip Dikland",
+          "year": "2001, aangevuld 2012",
           "notes": null
         }
       ]
