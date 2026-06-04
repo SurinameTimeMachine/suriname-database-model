@@ -13819,70 +13819,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-02476",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-02476",
-      "type": "plantation",
-      "prefLabel": "Chatillon",
-      "altLabels": [],
-      "broader": null,
-      "description": "Plantation from Surinaamse Almanakken (no QGIS geometry)",
-      "location": {
-        "lat": null,
-        "lng": null,
-        "wkt": null,
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "almanakken"
-      ],
-      "wikidataQid": "Q59115384",
-      "fid": null,
-      "psurIds": [],
-      "district": null,
-      "locationDescription": "Suriname",
-      "locationDescriptionOriginal": "Rivier Suriname, regterhand in het afvaren",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59115384",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1843",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1843,
-          "note": null
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-suiker-1843",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1843,
-          "endYear": 1847,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1859",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1859,
-          "endYear": 1860,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-01426",
       "@type": [
         "E25_Human-Made_Feature"
@@ -103416,6 +103352,93 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emaXNIeEhyeHp3dVE/view?usp=sharing&resourcekey=0-IhDuaXflV7Mk09Jww0P8YQ",
           "author": "Philip Dikland",
           "year": "2004, aangevuld 2008, 2012, 2014",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-02476",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-02476",
+      "type": "plantation",
+      "broader": null,
+      "description": "Plantation from Surinaamse Almanakken (no QGIS geometry)",
+      "location": {
+        "lat": null,
+        "lng": null,
+        "wkt": null,
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "almanakken"
+      ],
+      "wikidataQid": "Q59115384",
+      "fid": null,
+      "psurIds": [],
+      "district": null,
+      "locationDescription": "Suriname",
+      "locationDescriptionOriginal": "Rivier Suriname, regterhand in het afvaren",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-04",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59115384",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1843",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1843,
+          "note": null
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-suiker-1843",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1843,
+          "endYear": 1847,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1859",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1859,
+          "endYear": 1860,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "Chatillon",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        }
+      ],
+      "districtAssertions": [],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Suriname",
+          "original": "Rivier Suriname, regterhand in het afvaren",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Groot Chatillon 2003-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emT1lLZFZTSW53WE0/view?usp=sharing&resourcekey=0-szLX9bj5lEqtNqSshU5rFQ",
+          "author": "Philip Dikland",
+          "year": "2003, aangevuld 2004, 2009",
           "notes": null
         }
       ]
