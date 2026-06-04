@@ -54009,109 +54009,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00566",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-00566",
-      "type": "plantation",
-      "prefLabel": "Peperpot",
-      "altLabels": [],
-      "broader": "stm-00007",
-      "description": "",
-      "location": {
-        "lat": 5.788976904444445,
-        "lng": -55.12165372333333,
-        "wkt": "Polygon ((-55.13788503 5.77901045, -55.12277712 5.79308365, -55.11569242 5.79292880, -55.11576271 5.79537246, -55.10115614 5.80883305, -55.09721547 5.80376678, -55.13102015 5.77206100, -55.13548944 5.77672550, -55.13788503 5.77901045))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken"
-      ],
-      "wikidataQid": "Q12013270",
-      "fid": 1649,
-      "psurIds": [],
-      "district": "Divisie Boven-Suriname en Thorarica",
-      "locationDescription": "Suriname",
-      "locationDescriptionOriginal": "Rivier Suriname, regterhand in het afvaren",
-      "placeType": "koffie",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q12013270",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1818",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1818,
-          "note": null
-        },
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-koffie-1818",
-          "value": "koffie",
-          "source": "almanakken",
-          "startYear": 1818,
-          "endYear": 1821,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-koffie-1825",
-          "value": "koffie",
-          "source": "almanakken",
-          "startYear": 1825,
-          "endYear": 1835,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-koffie-en-kweek-1836",
-          "value": "koffie en kweek",
-          "source": "almanakken",
-          "startYear": 1836,
-          "endYear": 1842,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-koffie-en-kost-1843",
-          "value": "koffie en kost",
-          "source": "almanakken",
-          "startYear": 1843,
-          "endYear": 1847,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-kost-1859",
-          "value": "kost",
-          "source": "almanakken",
-          "startYear": 1859,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-kost-en-cacao-1860",
-          "value": "kost en cacao",
-          "source": "almanakken",
-          "startYear": 1860,
-          "endYear": 1861,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02492",
       "@type": [
         "E25_Human-Made_Feature"
@@ -141523,6 +141420,150 @@
           "original": "Rivier Commewijne, (boven) regterhand in het afvaren",
           "source": "almanakken",
           "note": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-00566",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-00566",
+      "type": "plantation",
+      "broader": "stm-00007",
+      "description": "",
+      "location": {
+        "lat": 5.788976904444445,
+        "lng": -55.12165372333333,
+        "wkt": "Polygon ((-55.13788503 5.77901045, -55.12277712 5.79308365, -55.11569242 5.79292880, -55.11576271 5.79537246, -55.10115614 5.80883305, -55.09721547 5.80376678, -55.13102015 5.77206100, -55.13548944 5.77672550, -55.13788503 5.77901045))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken"
+      ],
+      "wikidataQid": "Q12013270",
+      "fid": 1649,
+      "psurIds": [],
+      "district": "Divisie Boven-Suriname en Thorarica",
+      "locationDescription": "Suriname",
+      "locationDescriptionOriginal": "Rivier Suriname, regterhand in het afvaren",
+      "placeType": "koffie",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-04",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q12013270",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1818",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1818,
+          "note": null
+        },
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-koffie-1818",
+          "value": "koffie",
+          "source": "almanakken",
+          "startYear": 1818,
+          "endYear": 1821,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-koffie-1825",
+          "value": "koffie",
+          "source": "almanakken",
+          "startYear": 1825,
+          "endYear": 1835,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-koffie-en-kweek-1836",
+          "value": "koffie en kweek",
+          "source": "almanakken",
+          "startYear": 1836,
+          "endYear": 1842,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-koffie-en-kost-1843",
+          "value": "koffie en kost",
+          "source": "almanakken",
+          "startYear": 1843,
+          "endYear": 1847,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-kost-1859",
+          "value": "kost",
+          "source": "almanakken",
+          "startYear": 1859,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-kost-en-cacao-1860",
+          "value": "kost en cacao",
+          "source": "almanakken",
+          "startYear": 1860,
+          "endYear": 1861,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "Peperpot",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        },
+        {
+          "text": "Peprepatoe",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00007",
+          "districtLabel": "Divisie Boven-Suriname en Thorarica",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Suriname",
+          "original": "Rivier Suriname, regterhand in het afvaren",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Peperpot 2000-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emR0hIY2MxQnBxRXc/view?usp=sharing&resourcekey=0-q9k5ucnG0bNidiL4D68X7A",
+          "author": "Philip Dikland",
+          "year": "2000, aangevuld 2006, 2008, 2012",
+          "notes": null
         }
       ]
     },
