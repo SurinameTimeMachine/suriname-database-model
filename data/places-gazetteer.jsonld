@@ -42973,107 +42973,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-02144",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-02144",
-      "type": "plantation",
-      "prefLabel": "Ma Retraite",
-      "altLabels": [],
-      "broader": "stm-00010",
-      "description": "Plantation from Surinaamse Almanakken (no QGIS geometry)",
-      "location": {
-        "lat": null,
-        "lng": null,
-        "wkt": null,
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "almanakken"
-      ],
-      "wikidataQid": "Q59117017",
-      "fid": null,
-      "psurIds": [],
-      "district": "Divisie Para",
-      "locationDescription": "Booms Kreek",
-      "locationDescriptionOriginal": "Booms-kreek, in het opvaren",
-      "placeType": "koffie en cacao",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59117017",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1818",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1818,
-          "note": null
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-koffie-en-cacao-1818",
-          "value": "koffie en cacao",
-          "source": "almanakken",
-          "startYear": 1818,
-          "endYear": 1821,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-koffie-en-cacao-1825",
-          "value": "koffie en cacao",
-          "source": "almanakken",
-          "startYear": 1825,
-          "endYear": 1834,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-koffie-1835",
-          "value": "koffie",
-          "source": "almanakken",
-          "startYear": 1835,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-koffie-en-cacao-1836",
-          "value": "koffie en cacao",
-          "source": "almanakken",
-          "startYear": 1836,
-          "endYear": 1847,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-koffie-en-kost-1856",
-          "value": "koffie en kost",
-          "source": "almanakken",
-          "startYear": 1856,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-koffie-1859",
-          "value": "koffie",
-          "source": "almanakken",
-          "startYear": 1859,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-kost-en-kweek-1860",
-          "value": "kost en kweek",
-          "source": "almanakken",
-          "startYear": 1860,
-          "endYear": 1861,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02117",
       "@type": [
         "E25_Human-Made_Feature"
@@ -129600,6 +129499,140 @@
           "original": "Rivier Commewijne, (boven) regterhand in het afvaren",
           "source": "almanakken",
           "note": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-02144",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-02144",
+      "type": "plantation",
+      "broader": "stm-00010",
+      "description": "Plantation from Surinaamse Almanakken (no QGIS geometry)",
+      "location": {
+        "lat": null,
+        "lng": null,
+        "wkt": null,
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "almanakken"
+      ],
+      "wikidataQid": "Q59117017",
+      "fid": null,
+      "psurIds": [],
+      "district": "Divisie Para",
+      "locationDescription": "Booms Kreek",
+      "locationDescriptionOriginal": "Booms-kreek, in het opvaren",
+      "placeType": "koffie en cacao",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-04",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59117017",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1818",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1818,
+          "note": null
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-koffie-en-cacao-1818",
+          "value": "koffie en cacao",
+          "source": "almanakken",
+          "startYear": 1818,
+          "endYear": 1821,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-koffie-en-cacao-1825",
+          "value": "koffie en cacao",
+          "source": "almanakken",
+          "startYear": 1825,
+          "endYear": 1834,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-koffie-1835",
+          "value": "koffie",
+          "source": "almanakken",
+          "startYear": 1835,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-koffie-en-cacao-1836",
+          "value": "koffie en cacao",
+          "source": "almanakken",
+          "startYear": 1836,
+          "endYear": 1847,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-koffie-en-kost-1856",
+          "value": "koffie en kost",
+          "source": "almanakken",
+          "startYear": 1856,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-koffie-1859",
+          "value": "koffie",
+          "source": "almanakken",
+          "startYear": 1859,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-kost-en-kweek-1860",
+          "value": "kost en kweek",
+          "source": "almanakken",
+          "startYear": 1860,
+          "endYear": 1861,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "Ma Retraite",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00010",
+          "districtLabel": "Divisie Para",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Booms Kreek",
+          "original": "Booms-kreek, in het opvaren",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Ma Retraite Boomskreek 2002-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emd0ZtUUIxVk5tUkU/view?usp=sharing&resourcekey=0-GotsguirxBtG2b8wnNFw3g",
+          "author": "Philip Dikland",
+          "year": "2002-2004",
+          "notes": null
         }
       ]
     },
