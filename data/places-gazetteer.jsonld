@@ -27463,98 +27463,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01333",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01333",
-      "type": "plantation",
-      "prefLabel": "Guineesche Vriendschap",
-      "altLabels": [
-        "De drie gebroeders"
-      ],
-      "broader": "stm-00007",
-      "description": "",
-      "location": {
-        "lat": 5.606627593636364,
-        "lng": -55.05105107090908,
-        "wkt": "Polygon ((-55.05743592 5.60240707, -55.05646109 5.62201168, -55.05038800 5.61993758, -55.04360915 5.61724233, -55.04191170 5.61476499, -55.04170747 5.60963729, -55.04448812 5.59727717, -55.05501316 5.59794961, -55.05519809 5.59452084, -55.05791316 5.59474790, -55.05743592 5.60240707))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q33181177",
-      "fid": 2418,
-      "psurIds": [
-        "PSUR0128"
-      ],
-      "district": "Divisie Boven-Suriname en Thorarica",
-      "locationDescription": "Suriname",
-      "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q33181177",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1818",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1818,
-          "note": null
-        },
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-suiker-1818",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1818,
-          "endYear": 1821,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1825",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1825,
-          "endYear": 1847,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1856",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1856,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1859",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1859,
-          "endYear": 1861,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-01303",
       "@type": [
         "E25_Human-Made_Feature"
@@ -117640,6 +117548,200 @@
           "original": "Rivier Commewijne, (beneden) regterhand in het afvaren",
           "source": "almanakken",
           "note": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01333",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01333",
+      "type": "plantation",
+      "broader": "stm-00007",
+      "description": "",
+      "location": {
+        "lat": 5.606627593636364,
+        "lng": -55.05105107090908,
+        "wkt": "Polygon ((-55.05743592 5.60240707, -55.05646109 5.62201168, -55.05038800 5.61993758, -55.04360915 5.61724233, -55.04191170 5.61476499, -55.04170747 5.60963729, -55.04448812 5.59727717, -55.05501316 5.59794961, -55.05519809 5.59452084, -55.05791316 5.59474790, -55.05743592 5.60240707))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q33181177",
+      "fid": 2418,
+      "psurIds": [
+        "PSUR0128"
+      ],
+      "district": "Divisie Boven-Suriname en Thorarica",
+      "locationDescription": "Suriname",
+      "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-04",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q33181177",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1818",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1818,
+          "note": null
+        },
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-suiker-1818",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1818,
+          "endYear": 1821,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1825",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1825,
+          "endYear": 1847,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1856",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1856,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1859",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1859,
+          "endYear": 1861,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "Guineesche Vriendschap",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1856
+        },
+        {
+          "text": "De drie gebroeders",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "sourceYear": 1930
+        },
+        {
+          "text": "De Guinesche Vriendschap",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "sourceYear": 1870
+        },
+        {
+          "text": "Guinesche vriendschap.",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "sourceYear": 1818
+        },
+        {
+          "text": "Leyenhoop",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        },
+        {
+          "text": "Goede Buurt",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        },
+        {
+          "text": "La Convenance",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        },
+        {
+          "text": "Scherpenburg",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        },
+        {
+          "text": "Anna’s Lust",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        },
+        {
+          "text": "Corbejansi",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        },
+        {
+          "text": "Convenance",
+          "language": "nl",
+          "type": "vernacular",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00007",
+          "districtLabel": "Divisie Boven-Suriname en Thorarica",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Suriname",
+          "original": "Rivier Suriname, linkerhand in het afvaren",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Guineesche vriendschap 2002-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emTi1XdUZjZWp2OEk/view?usp=sharing&resourcekey=0-ueU-nOi1D-2RRaCFV1tXew",
+          "author": "Philip Dikland",
+          "year": "2002, aangevuld 2005, 2007, 2010",
+          "notes": "De oude suikerplantage is diverse malen van naam veranderd. Op een gegeven moment was\nde naam \"Leyenhoop\", in 1759 \"Goede Buurt\", in 1767 “La Convenance”, in 1768 “Scherpenburg”, in 1770 “Anna’s Lust”, daarna weer “Scherpenburg”, en tenslotte vanaf 1776 \"Guineesche Vriendschap\". De plantage was oorspronkelijk 1000 akkers groot. Omstreeks 1745 vond afsplitsing plaats van de 300 akkers grote koffieplantage Salem, later Zeldenrust."
         }
       ]
     },
