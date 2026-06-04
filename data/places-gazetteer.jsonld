@@ -122687,7 +122687,7 @@
       "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
       "placeType": "hout",
       "modifiedBy": "GerDijkstra",
-      "modifiedAt": "2026-06-02",
+      "modifiedAt": "2026-06-04",
       "externalLinks": [
         {
           "authority": "wikidata",
@@ -122745,7 +122745,7 @@
           "sourceYear": 1930
         },
         {
-          "text": "Crommenie",
+          "text": "Crommenie.",
           "language": "nl",
           "type": "historical",
           "isPreferred": false,
@@ -122807,6 +122807,13 @@
           "author": "Philip Dikland",
           "year": "2006",
           "notes": "De plantage Crommenie is - volgens de Surinaamse arts en onderzoeker John de Bije \n- de locatie van de oude hoofdplaats Thorarica."
+        },
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Overbrug 2004-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emdmxUVExqQXRyU2c/view?usp=sharing&resourcekey=0-_Tnh37HNZYpJNq4ZSoReaw",
+          "author": "Philip Dikland",
+          "year": "2004",
+          "notes": null
         }
       ]
     },
