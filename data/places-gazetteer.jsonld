@@ -33873,101 +33873,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01338",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01338",
-      "type": "plantation",
-      "prefLabel": "Klein Cura�ao",
-      "altLabels": [],
-      "broader": "stm-00007",
-      "description": "",
-      "location": {
-        "lat": 5.60768909,
-        "lng": -55.09972003666666,
-        "wkt": "Polygon ((-55.09032620 5.61476936, -55.08834164 5.61133101, -55.08677636 5.60957599, -55.09612931 5.59755998, -55.12007512 5.59909646, -55.11961396 5.60402393, -55.10362770 5.60286927, -55.10226384 5.61520645, -55.09032620 5.61476936))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken"
-      ],
-      "wikidataQid": "Q59116814",
-      "fid": 2423,
-      "psurIds": [],
-      "district": "Divisie Boven-Suriname en Thorarica",
-      "locationDescription": "Suriname",
-      "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
-      "placeType": "kost",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59116814",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1818",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1818,
-          "note": null
-        },
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-hout-1818",
-          "value": "hout",
-          "source": "almanakken",
-          "startYear": 1818,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-katoen-1820",
-          "value": "katoen",
-          "source": "almanakken",
-          "startYear": 1820,
-          "endYear": 1821,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-katoen-1825",
-          "value": "katoen",
-          "source": "almanakken",
-          "startYear": 1825,
-          "endYear": 1827,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-kost-1828",
-          "value": "kost",
-          "source": "almanakken",
-          "startYear": 1828,
-          "endYear": 1842,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-kost-1859",
-          "value": "kost",
-          "source": "almanakken",
-          "startYear": 1859,
-          "endYear": 1861,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-00611",
       "@type": [
         "E25_Human-Made_Feature"
@@ -123007,6 +122912,149 @@
           "author": "Philip Dikland",
           "year": "2006",
           "notes": "Plantage Groot Cuilenburg en het naastliggende Klein Cuilenburg hebben een \ngemeenschappelijke oorsprong. De plantages worden ook wel Oud en Nieuw Cuilenburg\ngenoemd."
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01338",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01338",
+      "type": "plantation",
+      "broader": "stm-00007",
+      "description": "",
+      "location": {
+        "lat": 5.60768909,
+        "lng": -55.09972003666666,
+        "wkt": "Polygon ((-55.09032620 5.61476936, -55.08834164 5.61133101, -55.08677636 5.60957599, -55.09612931 5.59755998, -55.12007512 5.59909646, -55.11961396 5.60402393, -55.10362770 5.60286927, -55.10226384 5.61520645, -55.09032620 5.61476936))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken"
+      ],
+      "wikidataQid": "Q59116814",
+      "fid": 2423,
+      "psurIds": [],
+      "district": "Divisie Boven-Suriname en Thorarica",
+      "locationDescription": "Suriname",
+      "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
+      "placeType": "kost",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-04",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59116814",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1818",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1818,
+          "note": null
+        },
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-hout-1818",
+          "value": "hout",
+          "source": "almanakken",
+          "startYear": 1818,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-katoen-1820",
+          "value": "katoen",
+          "source": "almanakken",
+          "startYear": 1820,
+          "endYear": 1821,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-katoen-1825",
+          "value": "katoen",
+          "source": "almanakken",
+          "startYear": 1825,
+          "endYear": 1827,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-kost-1828",
+          "value": "kost",
+          "source": "almanakken",
+          "startYear": 1828,
+          "endYear": 1842,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-kost-1859",
+          "value": "kost",
+          "source": "almanakken",
+          "startYear": 1859,
+          "endYear": 1861,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "Klein Curaçao",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1870
+        },
+        {
+          "text": "Klein Curaçao",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "sourceYear": 1825
+        },
+        {
+          "text": "Klein Curacao",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00007",
+          "districtLabel": "Divisie Boven-Suriname en Thorarica",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Suriname",
+          "original": "Rivier Suriname, linkerhand in het afvaren",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Klein Curacao 2006-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emUnhRd1dYZ1g2cVE/view?usp=sharing&resourcekey=0-2fY3d6q91e36EO5QR1JNCA",
+          "author": "Philip Dikland",
+          "year": "2006",
+          "notes": null
         }
       ]
     },
