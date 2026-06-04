@@ -154976,8 +154976,8 @@
       "locationDescription": null,
       "locationDescriptionOriginal": null,
       "placeType": null,
-      "modifiedBy": "Thunnisvanoort",
-      "modifiedAt": "2026-04-14",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-04",
       "externalLinks": [
         {
           "authority": "_custom",
@@ -154991,6 +154991,19 @@
           "language": "nl",
           "type": "official",
           "isPreferred": true
+        }
+      ],
+      "districtAssertions": [],
+      "productAssertions": [],
+      "locationAssertions": [],
+      "statusAssertions": [],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Gelderland post 2004-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8ema3h5UGdMbUJFTmM/view?usp=sharing&resourcekey=0-9o92paufLkOt79vhI5kYCg",
+          "author": "Philip Dikland",
+          "year": "2004",
+          "notes": null
         }
       ]
     },
