@@ -54009,61 +54009,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-02492",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-02492",
-      "type": "plantation",
-      "prefLabel": "Peperpot en Mopentibo",
-      "altLabels": [],
-      "broader": "stm-00007",
-      "description": "Plantation from Surinaamse Almanakken (no QGIS geometry)",
-      "location": {
-        "lat": null,
-        "lng": null,
-        "wkt": null,
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "almanakken"
-      ],
-      "wikidataQid": "Q131349068",
-      "fid": null,
-      "psurIds": [],
-      "district": "Divisie Boven-Suriname en Thorarica",
-      "locationDescription": "Suriname",
-      "locationDescriptionOriginal": "Rivier Suriname, regterhand in het afvaren",
-      "placeType": "kost",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q131349068",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1856",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1856,
-          "note": null
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-kost-1856",
-          "value": "kost",
-          "source": "almanakken",
-          "startYear": 1856,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-01551",
       "@type": [
         "E25_Human-Made_Feature"
@@ -141535,6 +141480,94 @@
           "type": "vernacular",
           "isPreferred": false,
           "source": "dikland-collection"
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00007",
+          "districtLabel": "Divisie Boven-Suriname en Thorarica",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Suriname",
+          "original": "Rivier Suriname, regterhand in het afvaren",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Peperpot 2000-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emR0hIY2MxQnBxRXc/view?usp=sharing&resourcekey=0-q9k5ucnG0bNidiL4D68X7A",
+          "author": "Philip Dikland",
+          "year": "2000, aangevuld 2006, 2008, 2012",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-02492",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-02492",
+      "type": "plantation",
+      "broader": "stm-00007",
+      "description": "Plantation from Surinaamse Almanakken (no QGIS geometry)",
+      "location": {
+        "lat": null,
+        "lng": null,
+        "wkt": null,
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "almanakken"
+      ],
+      "wikidataQid": "Q131349068",
+      "fid": null,
+      "psurIds": [],
+      "district": "Divisie Boven-Suriname en Thorarica",
+      "locationDescription": "Suriname",
+      "locationDescriptionOriginal": "Rivier Suriname, regterhand in het afvaren",
+      "placeType": "kost",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-04",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q131349068",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1856",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1856,
+          "note": null
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-kost-1856",
+          "value": "kost",
+          "source": "almanakken",
+          "startYear": 1856,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "Peperpot en Mopentibo",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
         }
       ],
       "districtAssertions": [
