@@ -80757,62 +80757,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-02512",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-02512",
-      "type": "plantation",
-      "prefLabel": "Toevlugt en Nahamoe",
-      "altLabels": [],
-      "broader": "stm-00007",
-      "description": "Plantation from Surinaamse Almanakken (no QGIS geometry)",
-      "location": {
-        "lat": null,
-        "lng": null,
-        "wkt": null,
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "almanakken"
-      ],
-      "wikidataQid": "Q131414468",
-      "fid": null,
-      "psurIds": [],
-      "district": "Divisie Boven-Suriname en Thorarica",
-      "locationDescription": "Suriname",
-      "locationDescriptionOriginal": "Rivier Suriname. links in 't afvaren. {",
-      "placeType": "kost",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q131414468",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1860",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1860,
-          "note": null
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-kost-1860",
-          "value": "kost",
-          "source": "almanakken",
-          "startYear": 1860,
-          "endYear": 1861,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-01896",
       "@type": [
         "E25_Human-Made_Feature"
@@ -147494,6 +147438,95 @@
           "original": "Rijweg naar Kwatta",
           "source": "almanakken",
           "note": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-02512",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-02512",
+      "type": "plantation",
+      "broader": "stm-00007",
+      "description": "Plantation from Surinaamse Almanakken (no QGIS geometry)",
+      "location": {
+        "lat": null,
+        "lng": null,
+        "wkt": null,
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "almanakken"
+      ],
+      "wikidataQid": "Q131414468",
+      "fid": null,
+      "psurIds": [],
+      "district": "Divisie Boven-Suriname en Thorarica",
+      "locationDescription": "Suriname",
+      "locationDescriptionOriginal": "Rivier Suriname. links in 't afvaren. {",
+      "placeType": "kost",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-04",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q131414468",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1860",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1860,
+          "note": null
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-kost-1860",
+          "value": "kost",
+          "source": "almanakken",
+          "startYear": 1860,
+          "endYear": 1861,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "Toevlugt en Nahamoe",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00007",
+          "districtLabel": "Divisie Boven-Suriname en Thorarica",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Suriname",
+          "original": "Rivier Suriname. links in 't afvaren. {",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Nahamoe 2004-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emaEcwZEdjRWUwOU0/view?usp=sharing&resourcekey=0-MQIc-rHmKuIBrT9103iyJQ",
+          "author": "Philip Dikland",
+          "year": "2004",
+          "notes": null
         }
       ]
     },
