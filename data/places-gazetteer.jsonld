@@ -17603,96 +17603,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00642",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-00642",
-      "type": "plantation",
-      "prefLabel": "De Hoop",
-      "altLabels": [],
-      "broader": "stm-00007",
-      "description": "",
-      "location": {
-        "lat": 5.749575211081082,
-        "lng": -55.09431372108109,
-        "wkt": "Polygon ((-55.10568073 5.73930779, -55.11061982 5.74647032, -55.10731446 5.74887905, -55.10575675 5.75113834, -55.10523218 5.75314250, -55.10440062 5.75400436, -55.10353903 5.75386104, -55.10217540 5.75342631, -55.10056229 5.75058993, -55.09792391 5.74773580, -55.09593311 5.74761765, -55.09339564 5.74907799, -55.09288404 5.75095774, -55.09318532 5.75199567, -55.09570062 5.75359495, -55.09739025 5.75378116, -55.09848421 5.75433663, -55.09916234 5.75526114, -55.09803880 5.75654243, -55.09601247 5.75796906, -55.09240159 5.75922117, -55.08805658 5.75979013, -55.08486265 5.75981244, -55.08369559 5.75847339, -55.08346417 5.75753115, -55.08325996 5.75579428, -55.08468151 5.75339802, -55.08670436 5.75060075, -55.08764347 5.74745216, -55.08755116 5.74343452, -55.08669338 5.74180619, -55.08496806 5.74049373, -55.08309038 5.73992093, -55.07776599 5.72944444, -55.08807410 5.72408358, -55.09762201 5.74402828, -55.10568073 5.73930779))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q124827980",
-      "fid": 1725,
-      "psurIds": [
-        "PSUR0080"
-      ],
-      "district": "Divisie Boven-Suriname en Thorarica",
-      "locationDescription": "Suriname",
-      "locationDescriptionOriginal": "Rivier Suriname, regterhand in het afvaren",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q124827980",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1818",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1818,
-          "note": null
-        },
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-suiker-1818",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1818,
-          "endYear": 1821,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1825",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1825,
-          "endYear": 1847,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1856",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1856,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1859",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1859,
-          "endYear": 1861,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02269",
       "@type": [
         "E25_Human-Made_Feature"
@@ -108669,6 +108579,130 @@
           "original": "Warrappa-kreek, linkerhand in het opvaren",
           "source": "almanakken",
           "note": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-00642",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-00642",
+      "type": "plantation",
+      "broader": "stm-00007",
+      "description": "",
+      "location": {
+        "lat": 5.749575211081082,
+        "lng": -55.09431372108109,
+        "wkt": "Polygon ((-55.10568073 5.73930779, -55.11061982 5.74647032, -55.10731446 5.74887905, -55.10575675 5.75113834, -55.10523218 5.75314250, -55.10440062 5.75400436, -55.10353903 5.75386104, -55.10217540 5.75342631, -55.10056229 5.75058993, -55.09792391 5.74773580, -55.09593311 5.74761765, -55.09339564 5.74907799, -55.09288404 5.75095774, -55.09318532 5.75199567, -55.09570062 5.75359495, -55.09739025 5.75378116, -55.09848421 5.75433663, -55.09916234 5.75526114, -55.09803880 5.75654243, -55.09601247 5.75796906, -55.09240159 5.75922117, -55.08805658 5.75979013, -55.08486265 5.75981244, -55.08369559 5.75847339, -55.08346417 5.75753115, -55.08325996 5.75579428, -55.08468151 5.75339802, -55.08670436 5.75060075, -55.08764347 5.74745216, -55.08755116 5.74343452, -55.08669338 5.74180619, -55.08496806 5.74049373, -55.08309038 5.73992093, -55.07776599 5.72944444, -55.08807410 5.72408358, -55.09762201 5.74402828, -55.10568073 5.73930779))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q124827980",
+      "fid": 1725,
+      "psurIds": [
+        "PSUR0080"
+      ],
+      "district": "Divisie Boven-Suriname en Thorarica",
+      "locationDescription": "Suriname",
+      "locationDescriptionOriginal": "Rivier Suriname, regterhand in het afvaren",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-04",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q124827980",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1818",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1818,
+          "note": null
+        },
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-suiker-1818",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1818,
+          "endYear": 1821,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1825",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1825,
+          "endYear": 1847,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1856",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1856,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1859",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1859,
+          "endYear": 1861,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "De Hoop",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00007",
+          "districtLabel": "Divisie Boven-Suriname en Thorarica",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Suriname",
+          "original": "Rivier Suriname, regterhand in het afvaren",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Hoop 2005-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emUmlaQ2RuWGdwYkU/view?usp=sharing&resourcekey=0-F87Zo16-5VyCF29BUXqKIw",
+          "author": "Philip Dikland",
+          "year": "2005",
+          "notes": null
         }
       ]
     },
