@@ -54283,61 +54283,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01448",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01448",
-      "type": "plantation",
-      "prefLabel": "Phedra",
-      "altLabels": [],
-      "broader": "stm-00007",
-      "description": "",
-      "location": {
-        "lat": 5.336475297142857,
-        "lng": -55.05651428428572,
-        "wkt": "Polygon ((-55.05862394 5.35770235, -55.04857274 5.32596444, -55.05052601 5.32387984, -55.05351850 5.31906163, -55.05689078 5.31628959, -55.06884408 5.35472688, -55.05862394 5.35770235))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken"
-      ],
-      "wikidataQid": "Q59133066",
-      "fid": 2533,
-      "psurIds": [],
-      "district": "Divisie Boven-Suriname en Thorarica",
-      "locationDescription": "Suriname",
-      "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
-      "placeType": null,
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59133066",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-abandoned-1836",
-          "status": "abandoned",
-          "source": "almanakken",
-          "startYear": 1836,
-          "endYear": 1847,
-          "note": null
-        },
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02392",
       "@type": [
         "E25_Human-Made_Feature"
@@ -141848,6 +141793,103 @@
           "author": "Philip Dikland",
           "year": "2022",
           "notes": "De drie plantages die in deze monografie worden behandeld – Petit Versailles, Estersrust en Libanon- kunnen het best worden omschreven als de “onduidelijke drie”. Hun geschiedenis blijft in nevelen gehuld, en zelfs hun oudere namen zijn moeilijk te achterhalen."
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01448",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01448",
+      "type": "plantation",
+      "broader": "stm-00007",
+      "description": "",
+      "location": {
+        "lat": 5.336475297142857,
+        "lng": -55.05651428428572,
+        "wkt": "Polygon ((-55.05862394 5.35770235, -55.04857274 5.32596444, -55.05052601 5.32387984, -55.05351850 5.31906163, -55.05689078 5.31628959, -55.06884408 5.35472688, -55.05862394 5.35770235))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken"
+      ],
+      "wikidataQid": "Q59133066",
+      "fid": 2533,
+      "psurIds": [],
+      "district": "Divisie Boven-Suriname en Thorarica",
+      "locationDescription": "Suriname",
+      "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
+      "placeType": null,
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-08",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59133066",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-abandoned-1836",
+          "status": "abandoned",
+          "source": "almanakken",
+          "startYear": 1836,
+          "endYear": 1847,
+          "note": null
+        },
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "names": [
+        {
+          "text": "Phedra",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        },
+        {
+          "text": "Phoedra",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "sourceYear": 1835
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00007",
+          "districtLabel": "Divisie Boven-Suriname en Thorarica",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "productAssertions": [],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Suriname",
+          "original": "Rivier Suriname, linkerhand in het afvaren",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Phedra 2005-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emR3g0ZGp6RVMycmM/view?usp=sharing&resourcekey=0-ZQagS9doZzho3qgXqoXPBA",
+          "author": "Philip Dikland",
+          "year": "2005",
+          "notes": null
         }
       ]
     },
