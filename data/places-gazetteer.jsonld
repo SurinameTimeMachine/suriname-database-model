@@ -72837,89 +72837,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01451",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01451",
-      "type": "plantation",
-      "prefLabel": "Rama",
-      "altLabels": [],
-      "broader": "stm-00007",
-      "description": "",
-      "location": {
-        "lat": 5.320201175714287,
-        "lng": -55.08819032,
-        "wkt": "Polygon ((-55.07621468 5.31578974, -55.08264804 5.31514018, -55.08505323 5.31307816, -55.10498929 5.32231650, -55.11027526 5.32512656, -55.08193706 5.33416735, -55.07621468 5.31578974))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q59133125",
-      "fid": 2536,
-      "psurIds": [
-        "PSUR0295"
-      ],
-      "district": "Divisie Boven-Suriname en Thorarica",
-      "locationDescription": "Suriname",
-      "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
-      "placeType": "hout",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59133125",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1818",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1818,
-          "note": null
-        },
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-hout-1818",
-          "value": "hout",
-          "source": "almanakken",
-          "startYear": 1818,
-          "endYear": 1821,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-hout-1825",
-          "value": "hout",
-          "source": "almanakken",
-          "startYear": 1825,
-          "endYear": 1847,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-kost-1860",
-          "value": "kost",
-          "source": "almanakken",
-          "startYear": 1860,
-          "endYear": 1861,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02321",
       "@type": [
         "E25_Human-Made_Feature"
@@ -142794,6 +142711,130 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emc2pGX0lPTlFZZ28/view?usp=sharing&resourcekey=0-oLeaoxFkjr5D7Gksmt43xw",
           "author": "Philip Dikland",
           "year": "2002, aangevuld 2005, 2009, 2013",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01451",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01451",
+      "type": "plantation",
+      "broader": "stm-00007",
+      "description": "",
+      "location": {
+        "lat": 5.320201175714287,
+        "lng": -55.08819032,
+        "wkt": "Polygon ((-55.07621468 5.31578974, -55.08264804 5.31514018, -55.08505323 5.31307816, -55.10498929 5.32231650, -55.11027526 5.32512656, -55.08193706 5.33416735, -55.07621468 5.31578974))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q59133125",
+      "fid": 2536,
+      "psurIds": [
+        "PSUR0295"
+      ],
+      "district": "Divisie Boven-Suriname en Thorarica",
+      "locationDescription": "Suriname",
+      "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
+      "placeType": "hout",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-08",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59133125",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1818",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1818,
+          "note": null
+        },
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-hout-1818",
+          "value": "hout",
+          "source": "almanakken",
+          "startYear": 1818,
+          "endYear": 1821,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-hout-1825",
+          "value": "hout",
+          "source": "almanakken",
+          "startYear": 1825,
+          "endYear": 1847,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-kost-1860",
+          "value": "kost",
+          "source": "almanakken",
+          "startYear": 1860,
+          "endYear": 1861,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "Rama",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        },
+        {
+          "text": "Param hill",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00007",
+          "districtLabel": "Divisie Boven-Suriname en Thorarica",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Suriname",
+          "original": "Rivier Suriname, linkerhand in het afvaren",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Rama 2005-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emdFdlNWRwbVVwTzA/view?usp=sharing&resourcekey=0-Re2C7za_NDKKqJixhvoNjQ",
+          "author": "Philip Dikland",
+          "year": "2005, aangevuld 2006",
           "notes": null
         }
       ]
