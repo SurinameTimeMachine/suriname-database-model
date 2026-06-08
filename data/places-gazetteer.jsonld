@@ -77935,95 +77935,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01408",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01408",
-      "type": "plantation",
-      "prefLabel": "Toevlugt",
-      "altLabels": [],
-      "broader": "stm-00007",
-      "description": "",
-      "location": {
-        "lat": 5.5033093299999996,
-        "lng": -55.035653960000005,
-        "wkt": "Polygon ((-55.04145557 5.49742211, -55.02865601 5.51322142, -55.02677517 5.51240713, -55.03992748 5.49607388, -55.04145557 5.49742211))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q124832081",
-      "fid": 2493,
-      "psurIds": [
-        "PSUR0324"
-      ],
-      "district": "Divisie Boven-Suriname en Thorarica",
-      "locationDescription": "Suriname",
-      "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
-      "placeType": "hout",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q124832081",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1818",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1818,
-          "note": null
-        },
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-hout-1818",
-          "value": "hout",
-          "source": "almanakken",
-          "startYear": 1818,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1820",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1820,
-          "endYear": 1821,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-hout-1825",
-          "value": "hout",
-          "source": "almanakken",
-          "startYear": 1825,
-          "endYear": 1847,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-kweek-1856",
-          "value": "kweek",
-          "source": "almanakken",
-          "startYear": 1856,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02386",
       "@type": [
         "E25_Human-Made_Feature"
@@ -148770,6 +148681,129 @@
       "modifiedAt": "2026-05-12",
       "@id": "stm:place/stm-new-1777547787775",
       "@type": "E25_Human-Made_Feature"
+    },
+    {
+      "@id": "stm:place/stm-01408",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01408",
+      "type": "plantation",
+      "broader": "stm-00007",
+      "description": "",
+      "location": {
+        "lat": 5.5033093299999996,
+        "lng": -55.035653960000005,
+        "wkt": "Polygon ((-55.04145557 5.49742211, -55.02865601 5.51322142, -55.02677517 5.51240713, -55.03992748 5.49607388, -55.04145557 5.49742211))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q124832081",
+      "fid": 2493,
+      "psurIds": [
+        "PSUR0324"
+      ],
+      "district": "Divisie Boven-Suriname en Thorarica",
+      "locationDescription": "Suriname",
+      "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
+      "placeType": "hout",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-08",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q124832081",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1818",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1818,
+          "note": null
+        },
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-hout-1818",
+          "value": "hout",
+          "source": "almanakken",
+          "startYear": 1818,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1820",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1820,
+          "endYear": 1821,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-hout-1825",
+          "value": "hout",
+          "source": "almanakken",
+          "startYear": 1825,
+          "endYear": 1847,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-kweek-1856",
+          "value": "kweek",
+          "source": "almanakken",
+          "startYear": 1856,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "Toevlugt",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00007",
+          "districtLabel": "Divisie Boven-Suriname en Thorarica",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Suriname",
+          "original": "Rivier Suriname, linkerhand in het afvaren",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Toevlught 2004-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emSlNFVkdSaEh1UWM/view?usp=sharing&resourcekey=0-gv4sJVooDqeu1SAm1lNcfg",
+          "author": "Philip Dikland",
+          "year": "2004",
+          "notes": "De plantage Pomibo waaruit Toevlugt later is afgesplitst, was circa 900 akkers groot."
+        }
+      ]
     },
     {
       "@id": "stm:place/stm-02110",
