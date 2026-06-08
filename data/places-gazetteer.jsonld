@@ -37114,89 +37114,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01418",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01418",
-      "type": "plantation",
-      "prefLabel": "La Simplicite",
-      "altLabels": [],
-      "broader": "stm-00007",
-      "description": "",
-      "location": {
-        "lat": 5.541697618750001,
-        "lng": -55.0549327275,
-        "wkt": "Polygon ((-55.04327796 5.54533750, -55.04382504 5.54194806, -55.04532987 5.53818070, -55.04797214 5.53397211, -55.07735133 5.53545095, -55.07662383 5.54711355, -55.06180369 5.54624058, -55.04327796 5.54533750))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q59116903",
-      "fid": 2503,
-      "psurIds": [
-        "PSUR0186"
-      ],
-      "district": "Divisie Boven-Suriname en Thorarica",
-      "locationDescription": "Suriname",
-      "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
-      "placeType": "kweek",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59116903",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1818",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1818,
-          "note": null
-        },
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-suiker-1818",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1818,
-          "endYear": 1821,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1825",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1825,
-          "endYear": 1832,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-kweek-1833",
-          "value": "kweek",
-          "source": "almanakken",
-          "startYear": 1833,
-          "endYear": 1847,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-00666",
       "@type": [
         "E25_Human-Made_Feature"
@@ -124544,6 +124461,144 @@
           "author": "Philip Dikland",
           "year": "2001, aangevuld 2004, 2005, 2008, 2009",
           "notes": "De plantage La Ressource is een afsplitsing van de plantage Vredenburg aan de Para"
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01418",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01418",
+      "type": "plantation",
+      "broader": "stm-00007",
+      "description": "",
+      "location": {
+        "lat": 5.541697618750001,
+        "lng": -55.0549327275,
+        "wkt": "Polygon ((-55.04327796 5.54533750, -55.04382504 5.54194806, -55.04532987 5.53818070, -55.04797214 5.53397211, -55.07735133 5.53545095, -55.07662383 5.54711355, -55.06180369 5.54624058, -55.04327796 5.54533750))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q59116903",
+      "fid": 2503,
+      "psurIds": [
+        "PSUR0186"
+      ],
+      "district": "Divisie Boven-Suriname en Thorarica",
+      "locationDescription": "Suriname",
+      "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
+      "placeType": "kweek",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-08",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59116903",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1818",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1818,
+          "note": null
+        },
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-suiker-1818",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1818,
+          "endYear": 1821,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1825",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1825,
+          "endYear": 1832,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-kweek-1833",
+          "value": "kweek",
+          "source": "almanakken",
+          "startYear": 1833,
+          "endYear": 1847,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "La Simplicité",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        },
+        {
+          "text": "Zandpunt",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        },
+        {
+          "text": "Varenhorsoe",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        },
+        {
+          "text": "Varenhorst",
+          "language": "nl",
+          "type": "vernacular",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00007",
+          "districtLabel": "Divisie Boven-Suriname en Thorarica",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Suriname",
+          "original": "Rivier Suriname, linkerhand in het afvaren",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Simplicité 2006-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emODBtanBHenR1OTQ/view?usp=sharing&resourcekey=0-HNulNtllWT627ValFMFWUg",
+          "author": "Philip Dikland",
+          "year": "2006, aangevuld 2007",
+          "notes": "De plantage la Simplicité of / en de buurplantage Krommenie is - volgens de Surinaamse arts en onderzoeker John de Bije - de locatie van de oude hoofdplaats Thorarica."
         }
       ]
     },
