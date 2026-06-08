@@ -59,23 +59,29 @@ const ENTITIES: EntityDef[] = [
   {
     id: 'e25',
     type: 'E25',
-    label: 'Plantation',
+    label: 'Human-Made Feature',
     crmClass: 'E25 Human-Made Feature',
-    desc: 'The central entity for all human-made landscape features: plantations, roads, streets, railroads, military posts, and other constructed features. A subclass of both E24 Physical Human-Made Thing and E26 Physical Feature. Plantations connect to organizations via P52; all E25 instances connect to geometry via P53 and are classified via SKOS thesaurus concepts.',
+    desc: 'The central entity for all human-made landscape features: plantation polygons, road and railroad lines, military posts, stations, settlements, towns, and named villages. Plantations are the ownership-bearing E25 subtype and connect to organizations via P52; all E25 instances connect to an E53 location via P53 and are classified through the geographical-feature thesaurus.',
     color: CRM_COLORS.E25,
     cx: 380,
     cy: 330,
-    dataKey: 'plantations',
+    dataKey: 'e25-features',
     properties: [
       { name: 'P1 is identified by', range: 'E41 Appellation' },
       { name: 'rdfs:label', range: 'string (@nl)' },
-      { name: 'P2 has type', range: 'E55 Type (via SKOS thesaurus)' },
+      { name: 'P2 has type', range: 'E55 Type / SKOS concept' },
       {
         name: 'P53 has location',
-        range: 'E53 Place (POLYGON for plantations, LINESTRING for roads)',
+        range: 'E53 Place (Polygon, LineString, or Point geometry)',
       },
-      { name: 'P52 has current owner', range: 'E74 Organization (via Q-ID)' },
-      { name: 'P51 has former or current owner', range: 'E74 Organization' },
+      {
+        name: 'P52 has current owner',
+        range: 'E74 Organization (plantations only)',
+      },
+      {
+        name: 'P51 has former or current owner',
+        range: 'E74 Organization (plantations only)',
+      },
       {
         name: 'P124i was transformed by',
         range: 'E81 Transformation (merger)',
@@ -89,13 +95,13 @@ const ENTITIES: EntityDef[] = [
   {
     id: 'e26',
     type: 'E26',
-    label: 'Physical Feature',
+    label: 'Natural Feature',
     crmClass: 'E26 Physical Feature',
-    desc: 'Natural geographical features such as rivers and creeks. E26 is the superclass of E25 (human-made features). Connected to locations via P53. Classified via SKOS thesaurus concepts (river, creek). No ownership relationship (rivers have no owners).',
+    desc: 'Natural geographical features such as rivers and creeks. E26 is the superclass of E25, but the data keeps natural waterways separate from human-made features because they do not have owners or plantation lifecycle events. Each E26 connects to an E53 LineString location via P53 and is typed through the thesaurus.',
     color: CRM_COLORS.E26,
     cx: 150,
     cy: 330,
-    dataKey: 'physical-features',
+    dataKey: 'e26-features',
     properties: [
       { name: 'P1 is identified by', range: 'E41 Appellation' },
       { name: 'rdfs:label', range: 'string (@nl)' },
@@ -136,7 +142,7 @@ const ENTITIES: EntityDef[] = [
     type: 'E53',
     label: 'Place',
     crmClass: 'E53 Place',
-    desc: 'Spatial location of the plantation. Polygons digitized from the 1930 Bos & Weyerman map in QGIS. Source CRS is EPSG:31170 (Suriname Old TM), reprojected to WGS84 (EPSG:4326) using datum shift +towgs84=-265,120,-358,0,0,0,0. Geometry stored as GeoSPARQL wktLiteral.',
+    desc: 'Spatial location entity for every mapped feature. Plantation locations use Polygon geometry, roads and waterways use LineString or MultiLineString geometry, and settlements, stations, military posts, towns, and villages use Point geometry. Source coordinates are normalized to WGS84 and stored as GeoSPARQL WKT literals.',
     color: CRM_COLORS.E53,
     cx: 150,
     cy: 530,
@@ -148,9 +154,8 @@ const ENTITIES: EntityDef[] = [
       },
       { name: 'P1 is identified by', range: 'E41 Appellation (map label)' },
       { name: 'dcterms:conformsTo', range: 'EPSG:31170 (Suriname Old TM)' },
-      { name: 'geo:hasCentroid', range: 'POINT (WGS84 lon/lat)' },
       { name: 'geo:hasGeometry', range: 'geo:Geometry' },
-      { name: 'geo:asWKT', range: 'wktLiteral (POLYGON)' },
+      { name: 'geo:asWKT', range: 'wktLiteral (Point/LineString/Polygon)' },
       { name: 'P70i is documented in', range: 'E22 Source (map)' },
     ],
   },
@@ -443,25 +448,25 @@ const RELATIONS: RelDef[] = [
     from: 'e25',
     to: 'e74',
     label: 'P52 has current owner',
-    desc: 'The plantation is owned by this organization',
+    desc: 'Plantation E25 instances can be owned or operated by an organization',
   },
   {
     from: 'e25',
     to: 'e53',
     label: 'P53 has location',
-    desc: 'The plantation is located at this place (polygon geometry from 1930 map)',
+    desc: 'The human-made feature is located at an E53 place with Polygon, LineString, MultiLineString, or Point geometry',
   },
   {
     from: 'e25',
     to: 'e41',
     label: 'P1 is identified by',
-    desc: 'The plantation is identified by this name (from map label)',
+    desc: 'The human-made feature is identified by this name from a map, gazetteer, or source label',
   },
   {
     from: 'e26',
     to: 'e53',
     label: 'P53 has location',
-    desc: 'The natural feature is located at this place (LineString geometry from 1930 map)',
+    desc: 'The natural feature is located at this place (usually LineString geometry from the map pipeline)',
   },
   {
     from: 'e26',
@@ -661,6 +666,8 @@ const RELATIONS: RelDef[] = [
 interface EntityCounts {
   plantations: number;
   'physical-features': number;
+  'e25-features': number;
+  'e26-features': number;
   organizations: number;
   places: number;
   sources: number;
@@ -691,9 +698,21 @@ async function fetchCounts(): Promise<EntityCounts> {
     fetch(`${DATA_BASE}/observations-by-org.json`).then((r) => r.json()),
   ]);
 
+  const physicalFeatureValues = Object.values(
+    physicalFeatures as Record<string, { '@type'?: string[] }>,
+  );
+  const e25GazetteerFeatures = physicalFeatureValues.filter((feature) =>
+    (feature['@type'] ?? []).some((type) => type.includes('E25')),
+  ).length;
+  const e26Features = physicalFeatureValues.filter((feature) =>
+    (feature['@type'] ?? []).some((type) => type.includes('E26')),
+  ).length;
+
   return {
     plantations: Object.keys(plantations).length,
     'physical-features': Object.keys(physicalFeatures).length,
+    'e25-features': Object.keys(plantations).length + e25GazetteerFeatures,
+    'e26-features': e26Features,
     organizations: Object.keys(organizations).length,
     places: Object.keys(places).length,
     sources: Object.keys(sources).length,
@@ -1165,10 +1184,13 @@ function SpatialModelSection() {
     <div className="site-surface p-6">
       <h3 className="mb-3 text-xl font-semibold text-ink">Spatial Model</h3>
       <p className="mb-4 text-sm leading-relaxed text-ink/65">
-        Plantation locations are digitized as polygons from the 1930 Bos &
-        Weyerman map using QGIS. The source coordinate reference system is{' '}
-        <strong>EPSG:31170</strong> (Suriname Old TM), which must be reprojected
-        to <strong>WGS84 (EPSG:4326)</strong> for web display.
+        Mapped features are separated from their geometry. Plantations,
+        roads, settlements, stations, military posts, towns, villages, rivers,
+        and creeks are modeled as E25 or E26 feature entities; each feature
+        points via <strong>P53 has location</strong> to an E53 Place carrying
+        the actual GeoSPARQL geometry. Source coordinates from the QGIS map
+        layers use <strong>EPSG:31170</strong> (Suriname Old TM) and are
+        reprojected to <strong>WGS84 (EPSG:4326)</strong> for web display.
       </p>
       <div className="grid md:grid-cols-2 gap-6">
         <div>
@@ -1206,6 +1228,8 @@ function SpatialModelSection() {
           <div className="bg-background p-4 font-mono text-xs text-ink/65 space-y-1.5">
             <div className="mb-2">
               <span style={{ color: CRM_COLORS['E25'] }}>E25</span>
+              {' / '}
+              <span style={{ color: CRM_COLORS['E26'] }}>E26</span>
               {' -> P53 -> '}
               <span style={{ color: CRM_COLORS['E53'] }}>E53 Place</span>
             </div>
@@ -1216,13 +1240,14 @@ function SpatialModelSection() {
             <div className="ml-8">{'-> geo:asWKT'}</div>
             <div className="ml-12">
               <span className="text-stm-sepia-600 break-all">
-                &quot;POLYGON((...))&quot;
+                &quot;POINT(...) / LINESTRING(...) / POLYGON(...)&quot;
               </span>
               <br />
               <span className="text-stm-sepia-600">^^geo:wktLiteral</span>
             </div>
             <div className="mt-2 text-ink/55">
-              Centroids computed for Leaflet map markers
+              Leaflet renders these as points, lines, and polygons from the
+              same E53 geometry model
             </div>
           </div>
           <div className="mt-3">

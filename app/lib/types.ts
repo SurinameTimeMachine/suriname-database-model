@@ -29,10 +29,14 @@ export interface E26PhysicalFeature {
   '@type': string[];
   featureType: string;
   prefLabel: string;
+  status?: string;
+  gazetteerId?: string;
   P2_has_type?: string;
   P53_has_location?: string;
+  P70i_is_documented_in?: string;
   P1_is_identified_by?: string | string[];
   mainBodyWater?: string;
+  description?: string;
   wasDerivedFrom?: string;
 }
 

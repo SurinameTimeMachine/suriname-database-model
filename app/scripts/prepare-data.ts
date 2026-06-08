@@ -13,8 +13,131 @@ import { join } from 'path';
 
 const LOD_DIR = join(__dirname, '../lod');
 const OUT_DIR = join(__dirname, '../public/data');
+const DATA_DIR = join(__dirname, '../../data');
+const DATA_BASE = 'https://data.suriname-timemachine.org/';
+const ONTOLOGY_BASE = 'https://suriname-timemachine.org/ontology/';
+const PIPELINE_TYPES = new Set(['plantation', 'river', 'creek']);
 
 mkdirSync(OUT_DIR, { recursive: true });
+
+const gazetteerSrc = join(DATA_DIR, 'places-gazetteer.jsonld');
+const thesaurusSrc = join(DATA_DIR, 'place-types-thesaurus.jsonld');
+const sourcesSrc = join(DATA_DIR, 'sources-registry.jsonld');
+
+type GazetteerLocation = {
+  lat?: number | null;
+  lng?: number | null;
+  wkt?: string | null;
+  crs?: string | null;
+};
+
+type GazetteerName = {
+  text?: string;
+  language?: string;
+  type?: string;
+  isPreferred?: boolean;
+  source?: string;
+  sourceYear?: number;
+};
+
+type GazetteerEntry = Record<string, unknown> & {
+  '@id'?: string;
+  id?: string;
+  type?: string;
+  prefLabel?: string;
+  altLabels?: string[];
+  names?: GazetteerName[];
+  location?: GazetteerLocation | null;
+  sources?: string[];
+  fid?: number | null;
+  description?: string;
+  deprecated?: true;
+  mergedInto?: string;
+};
+
+function toArray<T>(value: T | T[] | undefined | null): T[] {
+  if (value == null) return [];
+  return Array.isArray(value) ? value : [value];
+}
+
+function readJsonIfExists(path: string): Record<string, unknown> | null {
+  return existsSync(path)
+    ? (JSON.parse(readFileSync(path, 'utf-8')) as Record<string, unknown>)
+    : null;
+}
+
+function normalizeCrmClass(type: string | undefined): string {
+  if (!type) return 'E53_Place';
+  return type.replace('E25_Human-Made_Feature', 'E25_Human_Made_Feature');
+}
+
+function crmBadgeFromClass(type: string): 'E25' | 'E26' | 'E53' {
+  if (type.includes('E25')) return 'E25';
+  if (type.includes('E26')) return 'E26';
+  return 'E53';
+}
+
+function preferredName(entry: GazetteerEntry): string {
+  const names = Array.isArray(entry.names) ? entry.names : [];
+  const preferred = names.find((n) => n.isPreferred === true);
+  const first = names[0];
+  return (
+    preferred?.text ||
+    first?.text ||
+    (typeof entry.prefLabel === 'string' ? entry.prefLabel : '') ||
+    ''
+  );
+}
+
+function allNames(entry: GazetteerEntry): GazetteerName[] {
+  if (Array.isArray(entry.names) && entry.names.length > 0) {
+    return entry.names.filter((n) => typeof n.text === 'string' && n.text);
+  }
+
+  const names: GazetteerName[] = [];
+  const pref = typeof entry.prefLabel === 'string' ? entry.prefLabel.trim() : '';
+  if (pref) {
+    names.push({
+      text: pref,
+      language: 'nl',
+      type: 'official',
+      isPreferred: true,
+    });
+  }
+
+  for (const alt of Array.isArray(entry.altLabels) ? entry.altLabels : []) {
+    const text = typeof alt === 'string' ? alt.trim() : '';
+    if (text) {
+      names.push({
+        text,
+        language: 'nl',
+        type: 'historical',
+        isPreferred: false,
+      });
+    }
+  }
+
+  return names;
+}
+
+function pointWkt(location: GazetteerLocation): string | null {
+  if (location.lng == null || location.lat == null) return null;
+  return `Point (${location.lng} ${location.lat})`;
+}
+
+function mapYearFromSources(
+  sourceIds: string[],
+  sourceRegistryById: Map<string, Record<string, unknown>>,
+): string {
+  const years = sourceIds
+    .map((sourceId) => sourceRegistryById.get(sourceId)?.mapYear)
+    .filter((year): year is string | number => year != null)
+    .map(String);
+  if (years.length > 0) return years[0];
+  if (sourceIds.includes('paramaribo-street-map-1916')) return '1916';
+  if (sourceIds.includes('map-1882')) return '1882';
+  return '1930';
+}
 
 // Load the full database
 console.log('Loading database.jsonld...');
@@ -128,6 +251,203 @@ for (const p of provenance) {
   provenanceIndex[p['@id'] as string] = p;
 }
 
+// Gazetteer integration: points and gazetteer-only lines are first-class CRM
+// features too. The source transforms create plantation polygons and
+// river/creek lines; this pass adds the gazetteer-maintained E25/E26/E53
+// records to the same frontend indexes so Explore and the data panels resolve
+// them through the same CIDOC-CRM shape.
+const gazetteerRaw = readJsonIfExists(gazetteerSrc);
+const gazetteerEntries = (gazetteerRaw?.['@graph'] || []) as GazetteerEntry[];
+
+const thesaurusRaw = readJsonIfExists(thesaurusSrc);
+const placeTypeConcepts = ((thesaurusRaw?.['@graph'] || []) as Record<
+  string,
+  unknown
+>[]).filter((entry) => entry.typeId);
+const crmClassByType = new Map<string, string>(
+  placeTypeConcepts.map((entry) => [
+    entry.typeId as string,
+    normalizeCrmClass(entry.crmClass as string | undefined),
+  ]),
+);
+
+const sourcesRegistryRaw = readJsonIfExists(sourcesSrc);
+const sourceRegistryEntries = ((sourcesRegistryRaw?.['@graph'] || []) as Record<
+  string,
+  unknown
+>[]).filter((entry) => entry.sourceId);
+const sourceRegistryById = new Map<string, Record<string, unknown>>(
+  sourceRegistryEntries.map((entry) => [entry.sourceId as string, entry]),
+);
+
+function ensureSource(sourceId: string): string {
+  const ontologyUri = `${ONTOLOGY_BASE}source/${sourceId}`;
+  if (sourceIndex[ontologyUri]) return ontologyUri;
+
+  const registryEntry = sourceRegistryById.get(sourceId);
+  const uri =
+    (registryEntry?.['@id'] as string | undefined) ||
+    `${DATA_BASE}source/${sourceId}`;
+
+  if (!sourceIndex[uri]) {
+    sourceIndex[uri] = {
+      '@id': uri,
+      '@type': ['E22_Human_Made_Object'],
+      sourceId,
+      prefLabel: (registryEntry?.prefLabel as string | undefined) || sourceId,
+      P2_has_type: registryEntry?.P2_has_type,
+      mapYear:
+        registryEntry?.mapYear != null ? String(registryEntry.mapYear) : null,
+      sameAs:
+        (registryEntry?.handleUrl as string | undefined) ||
+        (registryEntry?.iiifManifest as string | undefined) ||
+        undefined,
+    };
+  }
+
+  return uri;
+}
+
+let indexedGazetteerFeatures = 0;
+let indexedGazetteerPlaces = 0;
+let indexedGazetteerAppellations = 0;
+
+for (const entry of gazetteerEntries) {
+  if (entry.deprecated || entry.mergedInto) continue;
+
+  const type = entry.type;
+  const id = entry.id;
+  const entryUri = entry['@id'];
+  if (!type || !id || !entryUri) continue;
+  if (PIPELINE_TYPES.has(type)) continue;
+
+  const location = entry.location || null;
+  const sourceIds = Array.isArray(entry.sources) ? entry.sources : [];
+  const sourceUris = sourceIds.map(ensureSource);
+  const primarySourceUri = sourceUris[0] ?? null;
+  const mapYear = mapYearFromSources(sourceIds, sourceRegistryById);
+  const crmClass = crmClassByType.get(type) ?? 'E53_Place';
+  const crmBadge = crmBadgeFromClass(crmClass);
+  const displayName = preferredName(entry);
+  const geometryWkt = location?.wkt || (location ? pointWkt(location) : null);
+  const hasLocation = !!geometryWkt;
+  const typeUri = `${DATA_BASE}vocabulary/place-type/${type}`;
+
+  const featureUri = crmBadge === 'E53' ? null : entryUri;
+  const placeUri = crmBadge === 'E53' ? entryUri : `${entryUri}/location`;
+
+  if (crmBadge !== 'E53') {
+    const targetFeatureUri = entryUri;
+    const featureEntity: Record<string, unknown> = {
+      '@id': targetFeatureUri,
+      '@type': [crmClass],
+      featureType: type,
+      P2_has_type: typeUri,
+      prefLabel: displayName,
+      status: type === 'road' || type === 'railroad' ? 'infrastructure' : 'named',
+      gazetteerId: id,
+      P53_has_location: hasLocation ? placeUri : undefined,
+    };
+    if (primarySourceUri) featureEntity.P70i_is_documented_in = primarySourceUri;
+    if (entry.description) featureEntity.description = entry.description;
+    if (entry.wikidataQid) {
+      featureEntity.sameAs = `http://www.wikidata.org/entity/${entry.wikidataQid}`;
+    }
+
+    const featureProvId = `${DATA_BASE}provenance/gazetteer-feature-${id}`;
+    featureEntity.wasDerivedFrom = featureProvId;
+    provenanceIndex[featureProvId] = {
+      '@id': featureProvId,
+      '@type': ['ProvenanceRecord'],
+      sourceFile: 'data/places-gazetteer.jsonld',
+      sourceColumn: 'type, names, sources, location',
+      sourceRow: `id=${id}`,
+      transformedBy: 'scripts/prepare-data.ts',
+      modelEntity:
+        crmBadge === 'E26' ? 'E26_Physical_Feature' : 'E25_Human_Made_Feature',
+      schemaTable: 'gazetteer_features',
+      linkedVia: `P2_has_type -> ${typeUri}`,
+    };
+
+    physicalFeatureIndex[targetFeatureUri] = featureEntity;
+    indexedGazetteerFeatures++;
+  }
+
+  if (crmBadge === 'E53' || hasLocation) {
+    const placeEntity: Record<string, unknown> = {
+      '@id': placeUri,
+      '@type': ['E53_Place'],
+      fid: entry.fid ?? null,
+      mapYear,
+      observedLabel: displayName,
+      featureType: type,
+      gazetteerId: id,
+    };
+    if (primarySourceUri) {
+      placeEntity.P70i_is_documented_in = primarySourceUri;
+    }
+    if (geometryWkt) {
+      placeEntity.hasGeometry = {
+        '@type': 'geo:Geometry',
+        asWKT: geometryWkt,
+        geometrySource: primarySourceUri,
+      };
+    }
+
+    const locationProvId = `${DATA_BASE}provenance/gazetteer-location-${id}`;
+    placeEntity.wasDerivedFrom = locationProvId;
+    provenanceIndex[locationProvId] = {
+      '@id': locationProvId,
+      '@type': ['ProvenanceRecord'],
+      sourceFile: 'data/places-gazetteer.jsonld',
+      sourceColumn: 'location',
+      sourceRow: `id=${id}`,
+      transformedBy: 'scripts/prepare-data.ts',
+      modelEntity: 'E53_Place',
+      schemaTable: 'gazetteer_places',
+      linkedVia:
+        crmBadge === 'E53'
+          ? `P2_has_type -> ${typeUri}`
+          : `P53i_is_location_of -> ${featureUri}`,
+    };
+
+    placeIndex[placeUri] = placeEntity;
+    indexedGazetteerPlaces++;
+  }
+
+  const appellationTarget = featureUri ?? placeUri;
+  const nameEntries = allNames(entry);
+  if (appellationTarget && nameEntries.length > 0) {
+    const existing = appellationsByEntity[appellationTarget] ?? [];
+    const created = nameEntries.map((name, index) => {
+      const appSourceUri = name.source
+        ? ensureSource(name.source)
+        : primarySourceUri ?? undefined;
+      return {
+        '@id': `${entryUri}/appellation/${index + 1}`,
+        '@type': ['E41_Appellation'],
+        P190_has_symbolic_content: name.text,
+        P72_has_language: name.language || 'nl',
+        P2_has_type: `${DATA_BASE}type/name-type/${name.type || 'historical'}`,
+        P128i_is_carried_by: appSourceUri,
+        P1i_identifies: appellationTarget,
+        mapYear:
+          name.sourceYear != null ? String(name.sourceYear) : mapYear,
+        isPreferred: name.isPreferred === true,
+      };
+    });
+    appellationsByEntity[appellationTarget] = [...existing, ...created];
+    indexedGazetteerAppellations += created.length;
+  }
+}
+
+if (gazetteerEntries.length > 0) {
+  console.log('\nIntegrated gazetteer entries into CRM indexes...');
+  console.log(`  Gazetteer features:     ${indexedGazetteerFeatures}`);
+  console.log(`  Gazetteer E53 places:   ${indexedGazetteerPlaces}`);
+  console.log(`  Gazetteer appellations: ${indexedGazetteerAppellations}`);
+}
+
 // Write output files
 function writeJSON(filename: string, data: unknown) {
   const path = join(OUT_DIR, filename);
@@ -156,16 +476,19 @@ if (existsSync(geojsonSrc)) {
   const geojson = JSON.parse(readFileSync(geojsonSrc, 'utf-8'));
 
   // Merge additional features from gazetteer (places.csv, military posts, roads, railroad)
-  const gazetteerPath = join(__dirname, '../../data/places-gazetteer.jsonld');
-  if (existsSync(gazetteerPath)) {
-    const gazetteerData = JSON.parse(readFileSync(gazetteerPath, 'utf-8'));
-    const entries = gazetteerData['@graph'] || [];
+  if (gazetteerEntries.length > 0) {
+    const entries = gazetteerEntries.filter(
+      (entry) => !entry.deprecated && !entry.mergedInto,
+    );
     let added = 0;
 
     // Build lookups: fid -> stmId, placeUri -> stmId
+    // Existing generated GeoJSON contains only these pipeline-backed types.
+    // Do not let gazetteer-only road/point FIDs collide with polygon/river FIDs.
     const fidToStmId = new Map<number, string>();
     const uriToStmId = new Map<string, string>();
-    for (const entry of entries as Record<string, unknown>[]) {
+    for (const entry of entries) {
+      if (!entry.type || !PIPELINE_TYPES.has(entry.type)) continue;
       const stmId = entry.id as string;
       if (entry.fid != null) fidToStmId.set(entry.fid as number, stmId);
       if (entry['@id']) uriToStmId.set(entry['@id'] as string, stmId);
@@ -188,37 +511,30 @@ if (existsSync(geojsonSrc)) {
 
     // Existing feature types in geojson are 'plantation', 'river', 'creek'
     // Add features for types NOT already in the pipeline
-    const pipelineTypes = new Set(['plantation', 'river', 'creek']);
-
-    for (const entry of entries as Record<string, unknown>[]) {
+    for (const entry of entries) {
       const type = entry.type as string;
-      if (pipelineTypes.has(type)) continue;
+      if (PIPELINE_TYPES.has(type)) continue;
 
-      const loc = entry.location as {
-        lat: number | null;
-        lng: number | null;
-        wkt: string | null;
-      } | null;
+      const loc = entry.location || null;
       if (!loc) continue;
 
-      const entryNames = Array.isArray(entry.names)
-        ? (entry.names as Record<string, unknown>[])
-        : [];
-      const preferredName = entryNames.find((n) => n.isPreferred === true);
-      const fallbackName = entryNames.length > 0 ? entryNames[0] : null;
-      const displayName =
-        (entry.prefLabel as string) ||
-        (preferredName?.text as string) ||
-        (fallbackName?.text as string) ||
-        '';
-      const entrySources = Array.isArray(entry.sources)
-        ? (entry.sources as string[])
-        : [];
-      const derivedMapYear = entrySources.includes('paramaribo-street-map-1916')
-        ? '1916'
-        : entrySources.includes('map-1882')
-          ? '1882'
-          : '1930';
+      const displayName = preferredName(entry);
+      const entryNames = allNames(entry);
+      const nameTexts = [
+        ...new Set(entryNames.map((name) => name.text).filter(Boolean)),
+      ];
+      const entrySources = Array.isArray(entry.sources) ? entry.sources : [];
+      const derivedMapYear = mapYearFromSources(
+        entrySources,
+        sourceRegistryById,
+      );
+      const crmClass = crmClassByType.get(type) ?? 'E53_Place';
+      const crmBadge = crmBadgeFromClass(crmClass);
+      const featureUri = crmBadge === 'E53' ? null : entry['@id'];
+      const placeUri =
+        crmBadge === 'E53' ? entry['@id'] : `${entry['@id']}/location`;
+      const status =
+        type === 'road' || type === 'railroad' ? 'infrastructure' : 'named';
 
       // LineString / MultiLineString features (road/railroad) — use WKT if available
       if (loc.wkt && (type === 'road' || type === 'railroad')) {
@@ -277,9 +593,11 @@ if (existsSync(geojsonSrc)) {
             properties: {
               fid: entry.fid ?? null,
               name: displayName,
+              allNames: nameTexts,
               stmId: entry.id as string,
-              placeUri: (entry['@id'] as string) || `stm:place/${entry.id}`,
-              status: 'infrastructure',
+              featureUri,
+              placeUri,
+              status,
               featureType: type,
               mapYear: derivedMapYear,
             },
@@ -301,9 +619,11 @@ if (existsSync(geojsonSrc)) {
           properties: {
             fid: entry.fid ?? null,
             name: displayName,
+            allNames: nameTexts,
             stmId: entry.id as string,
-            placeUri: (entry['@id'] as string) || `stm:place/${entry.id}`,
-            status: 'named',
+            featureUri,
+            placeUri,
+            status,
             featureType: type,
             mapYear: derivedMapYear,
           },
@@ -322,11 +642,9 @@ if (existsSync(geojsonSrc)) {
 
 // Copy places gazetteer (if it exists in data root)
 // Applies inline migration: entries still using prefLabel instead of names[] are converted.
-const gazetteerSrc = join(__dirname, '../../data/places-gazetteer.jsonld');
-if (existsSync(gazetteerSrc)) {
-  const gazetteerRaw = JSON.parse(readFileSync(gazetteerSrc, 'utf-8'));
+if (gazetteerRaw) {
   const gazetteerGraph: Record<string, unknown>[] =
-    gazetteerRaw['@graph'] || [];
+    (gazetteerRaw['@graph'] as Record<string, unknown>[] | undefined) || [];
   let migrated = 0;
   const migratedGraph = gazetteerGraph.map((entry) => {
     if (Array.isArray(entry.names) && !entry.prefLabel) return entry;
@@ -378,14 +696,12 @@ if (existsSync(gazetteerSrc)) {
 }
 
 // Copy place-types thesaurus
-const thesaurusSrc = join(__dirname, '../../data/place-types-thesaurus.jsonld');
 if (existsSync(thesaurusSrc)) {
   copyFileSync(thesaurusSrc, join(OUT_DIR, 'place-types-thesaurus.jsonld'));
   console.log('  Copied place-types-thesaurus.jsonld');
 }
 
 // Copy sources registry
-const sourcesSrc = join(__dirname, '../../data/sources-registry.jsonld');
 if (existsSync(sourcesSrc)) {
   copyFileSync(sourcesSrc, join(OUT_DIR, 'sources-registry.jsonld'));
   console.log('  Copied sources-registry.jsonld');

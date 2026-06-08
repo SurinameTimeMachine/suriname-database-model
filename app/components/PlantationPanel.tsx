@@ -423,7 +423,14 @@ export default function PlantationPanel({
     ? (data.places[placeUri] as E53Place | undefined)
     : undefined;
 
-  // Appellations for E25, E26 and E74
+  const featureCrmLabel =
+    crmBadge === 'E26'
+      ? 'E26 Physical Feature'
+      : crmBadge === 'E25'
+        ? 'E25 Human-Made Feature'
+        : `${crmBadge} Feature`;
+
+  // Appellations for E25/E26 features and E74 organizations
   const plantationApps = plantationUri
     ? ((data.appellations[plantationUri] || []) as E41Appellation[])
     : [];
@@ -498,7 +505,7 @@ export default function PlantationPanel({
     const p = data.provenance[physicalFeature.wasDerivedFrom] as
       | ProvenanceRecord
       | undefined;
-    if (p) provRecords.push({ label: 'Physical Feature (E26)', record: p });
+    if (p) provRecords.push({ label: featureCrmLabel, record: p });
   }
 
   // Coordinates (for display in the Location section)
@@ -719,11 +726,7 @@ export default function PlantationPanel({
               ) : (
                 <div className="px-4 pb-3 space-y-0">
                   <p className="text-[9px] text-stm-warm-300 font-mono mb-1">
-                    {crmBadge === 'E26'
-                      ? 'E26 Physical Feature'
-                      : crmBadge === 'E25'
-                        ? 'E25 Human-Made Feature'
-                        : `${crmBadge} Feature`}
+                    {featureCrmLabel}
                   </p>
                   <CrmField
                     label="Name"
