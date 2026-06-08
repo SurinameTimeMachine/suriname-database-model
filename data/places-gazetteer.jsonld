@@ -141141,6 +141141,58 @@
       ]
     },
     {
+      "id": "stm-new-1780921213237",
+      "type": "plantation",
+      "names": [
+        {
+          "text": "Pomibo",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        }
+      ],
+      "broader": null,
+      "description": "",
+      "location": {
+        "lat": null,
+        "lng": null,
+        "wkt": null,
+        "crs": "EPSG:4326"
+      },
+      "sources": [],
+      "wikidataQid": "Q59133086",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59133086",
+          "matchType": "closeMatch"
+        }
+      ],
+      "fid": null,
+      "psurIds": [],
+      "district": null,
+      "districtAssertions": [],
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "productAssertions": [],
+      "locationAssertions": [],
+      "statusAssertions": [],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Toevlught 2004-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emSlNFVkdSaEh1UWM/view?usp=sharing&resourcekey=0-gv4sJVooDqeu1SAm1lNcfg",
+          "author": "Philip Dikland",
+          "year": "2004",
+          "notes": "De plantage Pomibo waaruit Toevlugt later is afgesplitst, was circa 900 akkers groot. Er is weinig over bekend ; zonder twijfel was het een suikerplantage. Pomibo zou later worden gesplitst in : Klein Sarwa, Toevlugt, en Klein Perou."
+        }
+      ],
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-08",
+      "@id": "stm:place/stm-new-1780921213237",
+      "@type": "E25_Human-Made_Feature"
+    },
+    {
       "@id": "stm:place/stm-00675",
       "@type": "E25_Human-Made_Feature",
       "id": "stm-00675",
