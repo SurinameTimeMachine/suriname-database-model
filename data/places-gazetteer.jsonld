@@ -54283,52 +54283,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01889",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01889",
-      "type": "plantation",
-      "prefLabel": "Petite versailles",
-      "altLabels": [],
-      "broader": null,
-      "description": "",
-      "location": {
-        "lat": 5.52189685875,
-        "lng": -55.00693525,
-        "wkt": "Polygon ((-55.01629492 5.51392190, -55.00416598 5.53304472, -54.99263786 5.52988277, -54.99480890 5.52631598, -55.00375336 5.53175362, -55.01205736 5.51266321, -55.01546870 5.51367077, -55.01629492 5.51392190))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930"
-      ],
-      "wikidataQid": "Q124831789",
-      "fid": 2974,
-      "psurIds": [],
-      "district": null,
-      "locationDescription": null,
-      "locationDescriptionOriginal": null,
-      "placeType": null,
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q124831789",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02034",
       "@type": [
         "E25_Human-Made_Feature"
@@ -141741,6 +141695,76 @@
           "author": "Philip Dikland",
           "year": "2005",
           "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01889",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01889",
+      "type": "plantation",
+      "broader": null,
+      "description": "",
+      "location": {
+        "lat": 5.52189685875,
+        "lng": -55.00693525,
+        "wkt": "Polygon ((-55.01629492 5.51392190, -55.00416598 5.53304472, -54.99263786 5.52988277, -54.99480890 5.52631598, -55.00375336 5.53175362, -55.01205736 5.51266321, -55.01546870 5.51367077, -55.01629492 5.51392190))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930"
+      ],
+      "wikidataQid": "Q124831789",
+      "fid": 2974,
+      "psurIds": [],
+      "district": null,
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-08",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q124831789",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "names": [
+        {
+          "text": "Petite versailles",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        },
+        {
+          "text": "Petit Versailles",
+          "language": "nl",
+          "type": "variant",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        }
+      ],
+      "districtAssertions": [],
+      "productAssertions": [],
+      "locationAssertions": [],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Petit Versailles - Esterslust - Libanon geschiedenis Dikland 2022.pdf",
+          "driveUrl": "https://drive.google.com/file/d/1Kyoc_brx0wvJ26KinN9sfTvOWDATNvpu/view?usp=sharing",
+          "author": "Philip Dikland",
+          "year": "2022",
+          "notes": "De drie plantages die in deze monografie worden behandeld – Petit Versailles, Estersrust en Libanon- kunnen het best worden omschreven als de “onduidelijke drie”. Hun geschiedenis blijft in nevelen gehuld, en zelfs hun oudere namen zijn moeilijk te achterhalen."
         }
       ]
     },
