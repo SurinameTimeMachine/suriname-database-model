@@ -36953,70 +36953,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01398",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01398",
-      "type": "plantation",
-      "prefLabel": "La Ressource",
-      "altLabels": [],
-      "broader": "stm-00007",
-      "description": "",
-      "location": {
-        "lat": 5.723348342727273,
-        "lng": -55.12164229727273,
-        "wkt": "Polygon ((-55.12579725 5.71772285, -55.12370702 5.72057392, -55.12370205 5.72209910, -55.12468619 5.72381817, -55.12711773 5.72527506, -55.13073346 5.72547751, -55.12093216 5.72822545, -55.11974629 5.72428665, -55.10945460 5.72777606, -55.10639127 5.72385415, -55.12579725 5.71772285))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken"
-      ],
-      "wikidataQid": "Q59116901",
-      "fid": 2483,
-      "psurIds": [],
-      "district": "Divisie Boven-Suriname en Thorarica",
-      "locationDescription": "Suriname",
-      "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59116901",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1820",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1820,
-          "note": null
-        },
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-suiker-1820",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1820,
-          "endYear": 1821,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02329",
       "@type": [
         "E25_Human-Made_Feature"
@@ -124829,6 +124765,104 @@
           "author": "Philip Dikland",
           "year": "2001, aangevuld 2009, 2012",
           "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01398",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01398",
+      "type": "plantation",
+      "broader": "stm-00007",
+      "description": "",
+      "location": {
+        "lat": 5.723348342727273,
+        "lng": -55.12164229727273,
+        "wkt": "Polygon ((-55.12579725 5.71772285, -55.12370702 5.72057392, -55.12370205 5.72209910, -55.12468619 5.72381817, -55.12711773 5.72527506, -55.13073346 5.72547751, -55.12093216 5.72822545, -55.11974629 5.72428665, -55.10945460 5.72777606, -55.10639127 5.72385415, -55.12579725 5.71772285))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken"
+      ],
+      "wikidataQid": "Q59116901",
+      "fid": 2483,
+      "psurIds": [],
+      "district": "Divisie Boven-Suriname en Thorarica",
+      "locationDescription": "Suriname",
+      "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-08",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59116901",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1820",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1820,
+          "note": null
+        },
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-suiker-1820",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1820,
+          "endYear": 1821,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "La Ressource",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00007",
+          "districtLabel": "Divisie Boven-Suriname en Thorarica",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Suriname",
+          "original": "Rivier Suriname, linkerhand in het afvaren",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Ressource - Vredenburg 2001-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emM0YwdGwyZ1VuRFk/view?usp=sharing&resourcekey=0-dZNbXqvh3Cc4WdxrStfhoA",
+          "author": "Philip Dikland",
+          "year": "2001, aangevuld 2004, 2005, 2008, 2009",
+          "notes": "De plantage La Ressource is een afsplitsing van de plantage Vredenburg aan de Para"
         }
       ]
     },
