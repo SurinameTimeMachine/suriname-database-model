@@ -72357,111 +72357,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01431",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01431",
-      "type": "plantation",
-      "prefLabel": "Quamabo",
-      "altLabels": [],
-      "broader": "stm-00007",
-      "description": "",
-      "location": {
-        "lat": 5.403559679090908,
-        "lng": -55.00572005454544,
-        "wkt": "Polygon ((-54.99784059 5.41280293, -55.00025590 5.40993212, -55.00055148 5.40398486, -54.99792412 5.40020667, -54.99584922 5.39632657, -54.99597163 5.39056895, -54.99770454 5.38550502, -55.02257826 5.39831744, -55.03380085 5.40410942, -55.02260342 5.42459956, -54.99784059 5.41280293))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q59133113",
-      "fid": 2516,
-      "psurIds": [
-        "PSUR0292"
-      ],
-      "district": "Divisie Boven-Suriname en Thorarica",
-      "locationDescription": "Suriname",
-      "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
-      "placeType": "hout",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59133113",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1818",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1818,
-          "note": null
-        },
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-hout-1818",
-          "value": "hout",
-          "source": "almanakken",
-          "startYear": 1818,
-          "endYear": 1821,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-hout-1825",
-          "value": "hout",
-          "source": "almanakken",
-          "startYear": 1825,
-          "endYear": 1834,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-steen-en-hout-1835",
-          "value": "steen en hout",
-          "source": "almanakken",
-          "startYear": 1835,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-hout-1836",
-          "value": "hout",
-          "source": "almanakken",
-          "startYear": 1836,
-          "endYear": 1847,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-hout-1856",
-          "value": "hout",
-          "source": "almanakken",
-          "startYear": 1856,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-hout-1859",
-          "value": "hout",
-          "source": "almanakken",
-          "startYear": 1859,
-          "endYear": 1861,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02139",
       "@type": [
         "E25_Human-Made_Feature"
@@ -142708,6 +142603,145 @@
       "modifiedAt": "2026-04-30",
       "@id": "stm:place/stm-new-1777549135638",
       "@type": "E25_Human-Made_Feature"
+    },
+    {
+      "@id": "stm:place/stm-01431",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01431",
+      "type": "plantation",
+      "broader": "stm-00007",
+      "description": "",
+      "location": {
+        "lat": 5.403559679090908,
+        "lng": -55.00572005454544,
+        "wkt": "Polygon ((-54.99784059 5.41280293, -55.00025590 5.40993212, -55.00055148 5.40398486, -54.99792412 5.40020667, -54.99584922 5.39632657, -54.99597163 5.39056895, -54.99770454 5.38550502, -55.02257826 5.39831744, -55.03380085 5.40410942, -55.02260342 5.42459956, -54.99784059 5.41280293))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q59133113",
+      "fid": 2516,
+      "psurIds": [
+        "PSUR0292"
+      ],
+      "district": "Divisie Boven-Suriname en Thorarica",
+      "locationDescription": "Suriname",
+      "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
+      "placeType": "hout",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-08",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59133113",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1818",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1818,
+          "note": null
+        },
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-hout-1818",
+          "value": "hout",
+          "source": "almanakken",
+          "startYear": 1818,
+          "endYear": 1821,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-hout-1825",
+          "value": "hout",
+          "source": "almanakken",
+          "startYear": 1825,
+          "endYear": 1834,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-steen-en-hout-1835",
+          "value": "steen en hout",
+          "source": "almanakken",
+          "startYear": 1835,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-hout-1836",
+          "value": "hout",
+          "source": "almanakken",
+          "startYear": 1836,
+          "endYear": 1847,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-hout-1856",
+          "value": "hout",
+          "source": "almanakken",
+          "startYear": 1856,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-hout-1859",
+          "value": "hout",
+          "source": "almanakken",
+          "startYear": 1859,
+          "endYear": 1861,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "Quamabo",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00007",
+          "districtLabel": "Divisie Boven-Suriname en Thorarica",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Suriname",
+          "original": "Rivier Suriname, linkerhand in het afvaren",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Quamabo 2005-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emcFhucmVkN3dfNXM/view?usp=sharing&resourcekey=0-FJu0jZr4CbOKJMYULnmwrA",
+          "author": "Philip Dikland",
+          "year": "2005",
+          "notes": null
+        }
+      ]
     },
     {
       "@id": "stm:place/stm-00664",
