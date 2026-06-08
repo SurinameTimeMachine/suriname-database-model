@@ -73226,88 +73226,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01225",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01225",
-      "type": "plantation",
-      "prefLabel": "Remoncourt",
-      "altLabels": [],
-      "broader": "stm-00007",
-      "description": "",
-      "location": {
-        "lat": 5.184042651333333,
-        "lng": -55.034599574000005,
-        "wkt": "Polygon ((-55.03904439 5.17650701, -55.07006511 5.17743982, -55.07191025 5.18325564, -55.07224240 5.18747596, -55.06919373 5.19175512, -55.06821373 5.19638644, -55.06357219 5.19984228, -55.00371158 5.19318704, -55.00362679 5.18799720, -55.00341708 5.18228445, -55.00516484 5.18243073, -55.00519254 5.17700572, -55.00221670 5.17647132, -55.00237789 5.17209403, -55.03904439 5.17650701))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q29533971",
-      "fid": 2309,
-      "psurIds": [
-        "PSUR0298"
-      ],
-      "district": "Divisie Boven-Suriname en Thorarica",
-      "locationDescription": "Suriname",
-      "locationDescriptionOriginal": "Rivier Suriname, regterhand in het afvaren",
-      "placeType": "hout",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q29533971",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-abandoned-1818",
-          "status": "abandoned",
-          "source": "almanakken",
-          "startYear": 1818,
-          "endYear": 1821,
-          "note": null
-        },
-        {
-          "id": "status-almanakken-reactivated-1825",
-          "status": "reactivated",
-          "source": "almanakken",
-          "startYear": 1825,
-          "note": null
-        },
-        {
-          "id": "status-almanakken-abandoned-1856",
-          "status": "abandoned",
-          "source": "almanakken",
-          "startYear": 1856,
-          "note": null
-        },
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-hout-1825",
-          "value": "hout",
-          "source": "almanakken",
-          "startYear": 1825,
-          "endYear": 1847,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02465",
       "@type": [
         "E25_Human-Made_Feature"
@@ -143017,6 +142935,136 @@
           "original": "Warrappa-kreek, linkerhand in het opvaren",
           "source": "almanakken",
           "note": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01225",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01225",
+      "type": "plantation",
+      "broader": "stm-00007",
+      "description": "",
+      "location": {
+        "lat": 5.184042651333333,
+        "lng": -55.034599574000005,
+        "wkt": "Polygon ((-55.03904439 5.17650701, -55.07006511 5.17743982, -55.07191025 5.18325564, -55.07224240 5.18747596, -55.06919373 5.19175512, -55.06821373 5.19638644, -55.06357219 5.19984228, -55.00371158 5.19318704, -55.00362679 5.18799720, -55.00341708 5.18228445, -55.00516484 5.18243073, -55.00519254 5.17700572, -55.00221670 5.17647132, -55.00237789 5.17209403, -55.03904439 5.17650701))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q29533971",
+      "fid": 2309,
+      "psurIds": [
+        "PSUR0298"
+      ],
+      "district": "Divisie Boven-Suriname en Thorarica",
+      "locationDescription": "Suriname",
+      "locationDescriptionOriginal": "Rivier Suriname, regterhand in het afvaren",
+      "placeType": "hout",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-08",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q29533971",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-abandoned-1818",
+          "status": "abandoned",
+          "source": "almanakken",
+          "startYear": 1818,
+          "endYear": 1821,
+          "note": null
+        },
+        {
+          "id": "status-almanakken-reactivated-1825",
+          "status": "reactivated",
+          "source": "almanakken",
+          "startYear": 1825,
+          "note": null
+        },
+        {
+          "id": "status-almanakken-abandoned-1856",
+          "status": "abandoned",
+          "source": "almanakken",
+          "startYear": 1856,
+          "note": null
+        },
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-hout-1825",
+          "value": "hout",
+          "source": "almanakken",
+          "startYear": 1825,
+          "endYear": 1847,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "Remoncourt",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1870
+        },
+        {
+          "text": "Remoncour.",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "sourceYear": 1835
+        },
+        {
+          "text": "Land van Remoncour",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "sourceYear": 1827
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00007",
+          "districtLabel": "Divisie Boven-Suriname en Thorarica",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Suriname",
+          "original": "Rivier Suriname, regterhand in het afvaren",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Remoncourt 2005-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emaVB4SERWeFBMOUk/view?usp=sharing&resourcekey=0-BmHbtgsG0DIIGdj2F7Anzg",
+          "author": "Philip Dikland",
+          "year": "2005",
+          "notes": "Remoncourt ligt op de rechteroever van de Surinamerivier, tegenover een tabbetje. Op de  voormalige plantagegrond ligt nu het dorpje Njun-Lombé [Nieuw-Lombe]."
         }
       ]
     },
