@@ -18469,70 +18469,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-02316",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-02316",
-      "type": "plantation",
-      "prefLabel": "De Resolutie",
-      "altLabels": [],
-      "broader": "stm-00007",
-      "description": "Plantation from Surinaamse Almanakken (no QGIS geometry)",
-      "location": {
-        "lat": null,
-        "lng": null,
-        "wkt": null,
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "almanakken"
-      ],
-      "wikidataQid": "Q59115483",
-      "fid": null,
-      "psurIds": [],
-      "district": "Divisie Boven-Suriname en Thorarica",
-      "locationDescription": "Suriname",
-      "locationDescriptionOriginal": "Rivier Suriname, regterhand in het afvaren",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59115483",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1828",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1828,
-          "note": null
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-suiker-1828",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1828,
-          "endYear": 1847,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-kost-en-kweek-1860",
-          "value": "suiker, kost en kweek",
-          "source": "almanakken",
-          "startYear": 1860,
-          "endYear": 1861,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-00791",
       "@type": [
         "E25_Human-Made_Feature"
@@ -106196,6 +106132,103 @@
           "author": "Philip Dikland",
           "year": "2005, aangevuld 2009",
           "notes": "(almanak 1843)\nDe drie plantages Bijenkorf, Molhoop, en de Gekroonde Pauw vormden samen 1 bedrijf."
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-02316",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-02316",
+      "type": "plantation",
+      "broader": "stm-00007",
+      "description": "Plantation from Surinaamse Almanakken (no QGIS geometry)",
+      "location": {
+        "lat": null,
+        "lng": null,
+        "wkt": null,
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "almanakken"
+      ],
+      "wikidataQid": "Q59115483",
+      "fid": null,
+      "psurIds": [],
+      "district": "Divisie Boven-Suriname en Thorarica",
+      "locationDescription": "Suriname",
+      "locationDescriptionOriginal": "Rivier Suriname, regterhand in het afvaren",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-08",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59115483",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1828",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1828,
+          "note": null
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-suiker-1828",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1828,
+          "endYear": 1847,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-kost-en-kweek-1860",
+          "value": "suiker, kost en kweek",
+          "source": "almanakken",
+          "startYear": 1860,
+          "endYear": 1861,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "De Resolutie",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00007",
+          "districtLabel": "Divisie Boven-Suriname en Thorarica",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Suriname",
+          "original": "Rivier Suriname, regterhand in het afvaren",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Resolutie 2004-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/1YXtv5xttSPpgVRB_2EIsWhVqo3yxnM8j/view?usp=sharing",
+          "author": "Philip Dikland",
+          "year": "2004, aangevuld 2009, 2021",
+          "notes": null
         }
       ]
     },
