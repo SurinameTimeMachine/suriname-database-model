@@ -76420,126 +76420,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01862",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01862",
-      "type": "plantation",
-      "prefLabel": "St. Barbara",
-      "altLabels": [],
-      "broader": "stm-00007",
-      "description": "",
-      "location": {
-        "lat": 5.697695693636365,
-        "lng": -55.00622804818181,
-        "wkt": "Polygon ((-55.02290258 5.68187004, -55.02409805 5.68867173, -55.02676725 5.69345730, -55.02218392 5.69582908, -55.01759235 5.69955355, -55.01367956 5.70142628, -55.00932242 5.70463799, -55.00751403 5.70460712, -55.00696319 5.70223171, -55.00581703 5.70215985, -55.00283901 5.70432116, -55.00100246 5.70441146, -54.99930572 5.70012305, -54.99815614 5.69983996, -54.99324752 5.70372288, -54.99126820 5.70429839, -54.98966209 5.70559219, -54.98744818 5.70285146, -54.98740609 5.70025648, -54.99133977 5.69385418, -55.01559892 5.67371936, -55.02290258 5.68187004))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q59133868",
-      "fid": 2947,
-      "psurIds": [
-        "PSUR0319"
-      ],
-      "district": "Divisie Boven-Suriname en Thorarica",
-      "locationDescription": "Suriname",
-      "locationDescriptionOriginal": "Rivier Suriname, regterhand in het afvaren",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59133868",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1818",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1818,
-          "note": null
-        },
-        {
-          "id": "status-almanakken-abandoned-1831",
-          "status": "abandoned",
-          "source": "almanakken",
-          "startYear": 1831,
-          "endYear": 1832,
-          "note": null
-        },
-        {
-          "id": "status-almanakken-reactivated-1833",
-          "status": "reactivated",
-          "source": "almanakken",
-          "startYear": 1833,
-          "note": null
-        },
-        {
-          "id": "status-almanakken-abandoned-1847",
-          "status": "abandoned",
-          "source": "almanakken",
-          "startYear": 1847,
-          "note": null
-        },
-        {
-          "id": "status-almanakken-reactivated-1859",
-          "status": "reactivated",
-          "source": "almanakken",
-          "startYear": 1859,
-          "note": null
-        },
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-suiker-1818",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1818,
-          "endYear": 1821,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1825",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1825,
-          "endYear": 1830,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1833",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1833,
-          "endYear": 1846,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1859",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1859,
-          "endYear": 1861,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02322",
       "@type": [
         "E25_Human-Made_Feature"
@@ -146847,6 +146727,188 @@
           "author": "Philip Dikland",
           "year": "2008",
           "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01862",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01862",
+      "type": "plantation",
+      "broader": "stm-00007",
+      "description": "",
+      "location": {
+        "lat": 5.697695693636365,
+        "lng": -55.00622804818181,
+        "wkt": "Polygon ((-55.02290258 5.68187004, -55.02409805 5.68867173, -55.02676725 5.69345730, -55.02218392 5.69582908, -55.01759235 5.69955355, -55.01367956 5.70142628, -55.00932242 5.70463799, -55.00751403 5.70460712, -55.00696319 5.70223171, -55.00581703 5.70215985, -55.00283901 5.70432116, -55.00100246 5.70441146, -54.99930572 5.70012305, -54.99815614 5.69983996, -54.99324752 5.70372288, -54.99126820 5.70429839, -54.98966209 5.70559219, -54.98744818 5.70285146, -54.98740609 5.70025648, -54.99133977 5.69385418, -55.01559892 5.67371936, -55.02290258 5.68187004))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q59133868",
+      "fid": 2947,
+      "psurIds": [
+        "PSUR0319"
+      ],
+      "district": "Divisie Boven-Suriname en Thorarica",
+      "locationDescription": "Suriname",
+      "locationDescriptionOriginal": "Rivier Suriname, regterhand in het afvaren",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-08",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59133868",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1818",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1818,
+          "note": null
+        },
+        {
+          "id": "status-almanakken-abandoned-1831",
+          "status": "abandoned",
+          "source": "almanakken",
+          "startYear": 1831,
+          "endYear": 1832,
+          "note": null
+        },
+        {
+          "id": "status-almanakken-reactivated-1833",
+          "status": "reactivated",
+          "source": "almanakken",
+          "startYear": 1833,
+          "note": null
+        },
+        {
+          "id": "status-almanakken-abandoned-1847",
+          "status": "abandoned",
+          "source": "almanakken",
+          "startYear": 1847,
+          "note": null
+        },
+        {
+          "id": "status-almanakken-reactivated-1859",
+          "status": "reactivated",
+          "source": "almanakken",
+          "startYear": 1859,
+          "note": null
+        },
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-suiker-1818",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1818,
+          "endYear": 1821,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1825",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1825,
+          "endYear": 1830,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1833",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1833,
+          "endYear": 1846,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1859",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1859,
+          "endYear": 1861,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "St. Barbara",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        },
+        {
+          "text": "St. Barbera",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "sourceYear": 1821
+        },
+        {
+          "text": "Santa Barbara",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        },
+        {
+          "text": "Baroeba komissi",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        },
+        {
+          "text": "Barbara Santa ?",
+          "language": "nl",
+          "type": "vernacular",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00007",
+          "districtLabel": "Divisie Boven-Suriname en Thorarica",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Suriname",
+          "original": "Rivier Suriname, regterhand in het afvaren",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Santa Barbara 2002-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emSFF3WU1XTnVmMWM/view?usp=sharing&resourcekey=0-kObYeZfooUonW_ITDBWB3A",
+          "author": "Philip Dikland",
+          "year": "2002, aangevuld 2007, 2008, 2010",
+          "notes": "De plantagenaam is afkomstig van plantage Santa Barbara op Curacao. Jan Doncker, vanaf \n1673 t/m 1679 directeur (gouverneur) op dat eiland, was deeleigenaar ervan."
         }
       ]
     },
