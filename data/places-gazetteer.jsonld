@@ -18469,95 +18469,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-02106",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-02106",
-      "type": "plantation",
-      "prefLabel": "De Resolutie",
-      "altLabels": [],
-      "broader": "stm-00004",
-      "description": "",
-      "location": {
-        "lat": 5.931244867499999,
-        "lng": -55.121828394375,
-        "wkt": "Polygon ((-55.13173544 5.93421783, -55.12872913 5.94009352, -55.12428729 5.94287783, -55.12011977 5.94691152, -55.10828715 5.92819126, -55.10492724 5.92287165, -55.10768557 5.92078294, -55.10945642 5.91970993, -55.11582866 5.92991298, -55.12193979 5.92578290, -55.12485532 5.92789981, -55.12733540 5.93001572, -55.12914352 5.93119241, -55.13103971 5.93233999, -55.13214846 5.93289976, -55.13173544 5.93421783))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q59133129",
-      "fid": 3191,
-      "psurIds": [
-        "PSUR0087"
-      ],
-      "district": "Divisie Beneden-Cottica",
-      "locationDescription": "Jonkermans Kreek",
-      "locationDescriptionOriginal": "Jonkermans-kreek, linkerhand",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59133129",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1818",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1818,
-          "note": null
-        },
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-suiker-1818",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1818,
-          "endYear": 1821,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1825",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1825,
-          "endYear": 1827,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-kost-en-kweek-1856",
-          "value": "suiker, kost en kweek",
-          "source": "almanakken",
-          "startYear": 1856,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1859",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1859,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02316",
       "@type": [
         "E25_Human-Made_Feature"
@@ -106285,6 +106196,136 @@
           "author": "Philip Dikland",
           "year": "2005, aangevuld 2009",
           "notes": "(almanak 1843)\nDe drie plantages Bijenkorf, Molhoop, en de Gekroonde Pauw vormden samen 1 bedrijf."
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-02106",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-02106",
+      "type": "plantation",
+      "broader": "stm-00004",
+      "description": "",
+      "location": {
+        "lat": 5.931244867499999,
+        "lng": -55.121828394375,
+        "wkt": "Polygon ((-55.13173544 5.93421783, -55.12872913 5.94009352, -55.12428729 5.94287783, -55.12011977 5.94691152, -55.10828715 5.92819126, -55.10492724 5.92287165, -55.10768557 5.92078294, -55.10945642 5.91970993, -55.11582866 5.92991298, -55.12193979 5.92578290, -55.12485532 5.92789981, -55.12733540 5.93001572, -55.12914352 5.93119241, -55.13103971 5.93233999, -55.13214846 5.93289976, -55.13173544 5.93421783))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q59133129",
+      "fid": 3191,
+      "psurIds": [
+        "PSUR0087"
+      ],
+      "district": "Divisie Beneden-Cottica",
+      "locationDescription": "Jonkermans Kreek",
+      "locationDescriptionOriginal": "Jonkermans-kreek, linkerhand",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-08",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59133129",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1818",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1818,
+          "note": null
+        },
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-suiker-1818",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1818,
+          "endYear": 1821,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1825",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1825,
+          "endYear": 1827,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-kost-en-kweek-1856",
+          "value": "suiker, kost en kweek",
+          "source": "almanakken",
+          "startYear": 1856,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1859",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1859,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "De Resolutie",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        },
+        {
+          "text": "Resolutie",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "sourceYear": 1818
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00004",
+          "districtLabel": "Divisie Beneden-Cottica",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Jonkermans Kreek",
+          "original": "Jonkermans-kreek, linkerhand",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Resolutie 2004-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/1YXtv5xttSPpgVRB_2EIsWhVqo3yxnM8j/view?usp=sharing",
+          "author": "Philip Dikland",
+          "year": "2004, aangevuld 2009, 2021",
+          "notes": null
         }
       ]
     },
