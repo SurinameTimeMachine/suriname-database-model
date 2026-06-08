@@ -40,7 +40,7 @@ const OVERLAY_CONFIGS: OverlayConfig[] = [
       // sheet 10 (1d7e4a0bd68f039c) excluded — smaller size, fewer GCPs, causes overlap
       'https://annotations.allmaps.org/maps/ddd8d3ca24e1916a', // sheet 11
     ],
-    defaultEnabled: true,
+    defaultEnabled: false,
     transformation: 'thinPlateSpline',
     gcpCount: '10-80/sheet',
   },
@@ -178,6 +178,11 @@ const OVERLAY_CONFIGS: OverlayConfig[] = [
 const DEFAULT_ENABLED = new Set(
   OVERLAY_CONFIGS.filter((c) => c.defaultEnabled).map((c) => c.id),
 );
+const ENABLE_WARPED_OVERLAYS = true;
+
+function nextFrame(): Promise<void> {
+  return new Promise((resolve) => requestAnimationFrame(() => resolve()));
+}
 
 // Monkey-patch L.DomUtil.getPosition so that _leaflet_pos is never
 // undefined.  Allmaps' WebGL renderer continuously reads _leaflet_pos
@@ -273,6 +278,12 @@ export default function MapView({
 
     mapRef.current = map;
 
+    // Leaflet and Allmaps both need one frame after mount to observe the
+    // final container size before warped overlays start reading pane positions.
+    requestAnimationFrame(() => {
+      map.invalidateSize();
+    });
+
     return () => {
       // Remove all warped layers
       warpedLayersRef.current.forEach((layers) => {
@@ -307,6 +318,7 @@ export default function MapView({
 
   // Toggle overlay callback — creates/destroys WarpedMapLayer lazily
   const toggleOverlay = useCallback((id: string, config: OverlayConfig) => {
+    if (!ENABLE_WARPED_OVERLAYS) return;
     setEnabledOverlays((prev) => {
       const next = new Set(prev);
       if (next.has(id)) {
@@ -325,6 +337,7 @@ export default function MapView({
           import('@allmaps/leaflet')
             .then(async ({ WarpedMapLayer }) => {
               if (!mapRef.current || !next.has(id)) return;
+              await nextFrame();
               // Create a single WarpedMapLayer and add all annotations to it
               // (matches reference site pattern: one layer, multiple sheets)
               const urls =
@@ -362,6 +375,7 @@ export default function MapView({
 
   // Initialize default-enabled overlays once map is ready
   useEffect(() => {
+    if (!ENABLE_WARPED_OVERLAYS) return;
     const map = mapRef.current;
     if (!map) return;
 
@@ -371,6 +385,7 @@ export default function MapView({
           import('@allmaps/leaflet')
             .then(async ({ WarpedMapLayer }) => {
               if (!mapRef.current) return;
+              await nextFrame();
               const urls =
                 config.annotationUrls ??
                 (config.annotationUrl ? [config.annotationUrl] : []);
@@ -916,101 +931,105 @@ export default function MapView({
                 </div>
               )}
             </div>
-            {/* Divider */}
-            <div className="w-px h-6 bg-stm-warm-200" />
+            {ENABLE_WARPED_OVERLAYS && (
+              <>
+                {/* Divider */}
+                <div className="w-px h-6 bg-stm-warm-200" />
 
-            {/* Overlay layers dropdown */}
-            <div className="relative" ref={layersDropdownRef}>
-              <button
-                onClick={() => setLayersOpen((v) => !v)}
-                className={`flex items-center gap-1.5 text-xs font-medium px-2 py-1 transition-colors ${
-                  layersOpen
-                    ? 'bg-stm-sepia-100 text-stm-sepia-800'
-                    : 'text-stm-warm-700 hover:bg-stm-warm-100'
-                }`}
-                aria-label="Toggle map layers panel"
-                aria-expanded={layersOpen}
-              >
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 14 14"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                >
-                  <path
-                    d="M7 2L1 5l6 3 6-3-6-3zM1 9l6 3 6-3M1 7l6 3 6-3"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-                Layers
-                {enabledOverlays.size > 0 && (
-                  <span className="ml-0.5 bg-stm-sepia-600 text-white text-[10px] leading-none px-1 py-0.5 rounded-full">
-                    {enabledOverlays.size}
-                  </span>
-                )}
-              </button>
+                {/* Overlay layers dropdown */}
+                <div className="relative" ref={layersDropdownRef}>
+                  <button
+                    onClick={() => setLayersOpen((v) => !v)}
+                    className={`flex items-center gap-1.5 text-xs font-medium px-2 py-1 transition-colors ${
+                      layersOpen
+                        ? 'bg-stm-sepia-100 text-stm-sepia-800'
+                        : 'text-stm-warm-700 hover:bg-stm-warm-100'
+                    }`}
+                    aria-label="Toggle map layers panel"
+                    aria-expanded={layersOpen}
+                  >
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 14 14"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                    >
+                      <path
+                        d="M7 2L1 5l6 3 6-3-6-3zM1 9l6 3 6-3M1 7l6 3 6-3"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                    Layers
+                    {enabledOverlays.size > 0 && (
+                      <span className="ml-0.5 bg-stm-sepia-600 text-white text-[10px] leading-none px-1 py-0.5 rounded-full">
+                        {enabledOverlays.size}
+                      </span>
+                    )}
+                  </button>
 
-              {layersOpen && (
-                <div className="absolute top-full left-0 mt-1 w-80 bg-white border border-stm-warm-200 shadow-lg z-10">
-                  {/* Shared opacity slider */}
-                  <div className="px-3 py-2 border-b border-stm-warm-100 flex items-center gap-2">
-                    <span className="text-xs text-stm-warm-600 whitespace-nowrap">
-                      Opacity
-                    </span>
-                    <input
-                      type="range"
-                      min={0}
-                      max={1}
-                      step={0.05}
-                      value={opacity}
-                      onChange={(e) => setOpacity(parseFloat(e.target.value))}
-                      className="flex-1 accent-stm-sepia-600"
-                      aria-label="Map overlay opacity"
-                    />
-                    <span className="text-[10px] text-stm-warm-400 w-7 text-right">
-                      {Math.round(opacity * 100)}%
-                    </span>
-                  </div>
+                  {layersOpen && (
+                    <div className="absolute top-full left-0 mt-1 w-80 bg-white border border-stm-warm-200 shadow-lg z-10">
+                      {/* Shared opacity slider */}
+                      <div className="px-3 py-2 border-b border-stm-warm-100 flex items-center gap-2">
+                        <span className="text-xs text-stm-warm-600 whitespace-nowrap">
+                          Opacity
+                        </span>
+                        <input
+                          type="range"
+                          min={0}
+                          max={1}
+                          step={0.05}
+                          value={opacity}
+                          onChange={(e) => setOpacity(parseFloat(e.target.value))}
+                          className="flex-1 accent-stm-sepia-600"
+                          aria-label="Map overlay opacity"
+                        />
+                        <span className="text-[10px] text-stm-warm-400 w-7 text-right">
+                          {Math.round(opacity * 100)}%
+                        </span>
+                      </div>
 
-                  {/* Map checkboxes with info */}
-                  <ul className="max-h-80 overflow-y-auto py-1">
-                    {OVERLAY_CONFIGS.map((config) => {
-                      const isEnabled = enabledOverlays.has(config.id);
-                      return (
-                        <li key={config.id}>
-                          <label className="flex items-center gap-2 px-3 py-1.5 hover:bg-stm-warm-50 cursor-pointer text-xs">
-                            <input
-                              type="checkbox"
-                              checked={isEnabled}
-                              onChange={() => toggleOverlay(config.id, config)}
-                              className="accent-stm-sepia-600"
-                            />
-                            <span className="text-stm-warm-800 truncate flex-1">
-                              {config.label}
-                            </span>
-                          </label>
-                          {isEnabled && (
-                            <div className="flex items-center gap-2 px-3 pb-1 pl-8 text-[10px] text-stm-warm-400">
-                              <span title="Transformation type">
-                                {TRANSFORMATION_LABELS[config.transformation] ??
-                                  config.transformation}
-                              </span>
-                              <span>·</span>
-                              <span title="Ground control points">
-                                {config.gcpCount} GCPs
-                              </span>
-                            </div>
-                          )}
-                        </li>
-                      );
-                    })}
-                  </ul>
+                      {/* Map checkboxes with info */}
+                      <ul className="max-h-80 overflow-y-auto py-1">
+                        {OVERLAY_CONFIGS.map((config) => {
+                          const isEnabled = enabledOverlays.has(config.id);
+                          return (
+                            <li key={config.id}>
+                              <label className="flex items-center gap-2 px-3 py-1.5 hover:bg-stm-warm-50 cursor-pointer text-xs">
+                                <input
+                                  type="checkbox"
+                                  checked={isEnabled}
+                                  onChange={() => toggleOverlay(config.id, config)}
+                                  className="accent-stm-sepia-600"
+                                />
+                                <span className="text-stm-warm-800 truncate flex-1">
+                                  {config.label}
+                                </span>
+                              </label>
+                              {isEnabled && (
+                                <div className="flex items-center gap-2 px-3 pb-1 pl-8 text-[10px] text-stm-warm-400">
+                                  <span title="Transformation type">
+                                    {TRANSFORMATION_LABELS[config.transformation] ??
+                                      config.transformation}
+                                  </span>
+                                  <span>·</span>
+                                  <span title="Ground control points">
+                                    {config.gcpCount} GCPs
+                                  </span>
+                                </div>
+                              )}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
+              </>
+            )}
 
             {/* Collapse button */}
             <button

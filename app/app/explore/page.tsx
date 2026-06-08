@@ -145,36 +145,53 @@ function ExplorePageInner() {
 
   if (loading) {
     return (
-      <div className="w-full h-full flex items-center justify-center bg-stm-warm-50">
-        <div className="text-center">
-          <div className="w-8 h-8 border-4 border-stm-sepia-400 border-t-transparent animate-spin mx-auto mb-3" />
-          <p className="text-stm-warm-500 text-sm">
-            Loading plantation data...
-          </p>
-        </div>
+      <div className="flex min-h-[calc(100dvh-8rem)] flex-1 items-center justify-center bg-background px-4">
+        <section
+          role="status"
+          aria-live="polite"
+          aria-busy="true"
+          className="w-full max-w-4xl site-surface p-5"
+        >
+          <div className="mb-4 flex items-center gap-2 text-xs uppercase tracking-[0.28em] text-ink/60">
+            <span
+              className="h-2.5 w-2.5 -skew-x-12 bg-teal-strong animate-pulse"
+              aria-hidden
+            />
+            Loading plantation data
+          </div>
+          <div className="grid gap-3 sm:grid-cols-4">
+            <div className="h-20 animate-pulse bg-ink/5" />
+            <div className="h-20 animate-pulse bg-ink/5" />
+            <div className="h-20 animate-pulse bg-ink/5" />
+            <div className="h-20 animate-pulse bg-ink/5" />
+          </div>
+          <div className="mt-4 h-56 animate-pulse bg-ink/5" />
+        </section>
       </div>
     );
   }
 
   return (
-    <div className="w-full h-full relative">
+    <div className="relative min-h-[calc(100dvh-8rem)] w-full flex-1">
       {/* Map fills all available space — never resizes */}
-      <MapView
-        geojson={data?.geojson || null}
-        selectedPlantationUri={
-          selectedFeature?.properties.plantationUri ??
-          selectedFeature?.properties.featureUri ??
-          selectedFeature?.properties.placeUri ??
-          null
-        }
-        highlightedName={highlightedName}
-        panelOpen={!!selectedFeature}
-        onSelectPlantation={handleSelectPlantation}
-        onHighlightName={handleHighlightName}
-        initialCenter={initialCenter}
-        initialZoom={initialZoom}
-        onViewportChange={handleViewportChange}
-      />
+      <div className="absolute inset-0">
+        <MapView
+          geojson={data?.geojson || null}
+          selectedPlantationUri={
+            selectedFeature?.properties.plantationUri ??
+            selectedFeature?.properties.featureUri ??
+            selectedFeature?.properties.placeUri ??
+            null
+          }
+          highlightedName={highlightedName}
+          panelOpen={!!selectedFeature}
+          onSelectPlantation={handleSelectPlantation}
+          onHighlightName={handleHighlightName}
+          initialCenter={initialCenter}
+          initialZoom={initialZoom}
+          onViewportChange={handleViewportChange}
+        />
+      </div>
 
       {/* Detail panel overlays the map from the right */}
       <PlantationPanel

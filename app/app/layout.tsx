@@ -32,16 +32,17 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      data-scroll-behavior="smooth"
       className={`${geistSans.variable} ${geistMono.variable} scroll-smooth`}
     >
-      <body className="antialiased bg-background text-foreground flex flex-col h-screen overflow-hidden">
+      <body className="flex min-h-screen flex-col bg-background text-foreground antialiased overflow-x-hidden">
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>
         <Suspense>
           <Navigation />
         </Suspense>
-        <main id="main-content" className="flex-1 overflow-hidden">
+        <main id="main-content" className="flex min-h-0 flex-1 flex-col">
           {children}
         </main>
         <SiteFooter />

@@ -927,7 +927,7 @@ function EntityDetail({
   count: number | null;
 }) {
   return (
-    <div className="border border-slate-200 bg-white p-6 shadow-[0_15px_35px_rgba(0,30,24,0.08)]">
+    <div className="site-surface p-6">
       <div className="flex items-start gap-4 mb-4">
         <div
           className="w-12 h-12 flex items-center justify-center font-bold text-sm shrink-0"
@@ -963,7 +963,7 @@ function EntityDetail({
 
       <div>
         <h4 className="mb-2 text-sm font-semibold text-ink/75">Properties</h4>
-        <div className="overflow-hidden border border-slate-200">
+        <div className="overflow-hidden site-surface">
           <table className="w-full text-xs" role="table">
             <thead>
               <tr className="border-b border-slate-200 bg-background">
@@ -1000,7 +1000,7 @@ function RelationDetail({ relation }: { relation: RelDef }) {
   const from = ENTITIES.find((e) => e.id === relation.from)!;
   const to = ENTITIES.find((e) => e.id === relation.to)!;
   return (
-    <div className="border border-slate-200 bg-white p-4 text-sm shadow-[0_10px_25px_rgba(0,30,24,0.05)]">
+    <div className="site-surface p-4 text-sm">
       <div className="flex items-center gap-2 mb-2">
         <span
           className="w-7 h-7 text-[10px] font-bold flex items-center justify-center"
@@ -1045,7 +1045,7 @@ function RelationDetail({ relation }: { relation: RelDef }) {
 /* ─── Connection Chains Section ────────────────────────────────── */
 function SourcePatternSection() {
   return (
-    <div className="border border-slate-200 bg-white p-6 shadow-[0_15px_35px_rgba(0,30,24,0.08)]">
+    <div className="site-surface p-6">
       <h3 className="mb-3 text-xl font-semibold text-ink">Connection Chains</h3>
       <p className="mb-4 text-sm leading-relaxed text-ink/65">
         All information flows through sources. Maps, almanacs, and registers are
@@ -1162,7 +1162,7 @@ function SourcePatternSection() {
 /* ─── Spatial Model Section ───────────────────────────────────── */
 function SpatialModelSection() {
   return (
-    <div className="border border-slate-200 bg-white p-6 shadow-[0_15px_35px_rgba(0,30,24,0.08)]">
+    <div className="site-surface p-6">
       <h3 className="mb-3 text-xl font-semibold text-ink">Spatial Model</h3>
       <p className="mb-4 text-sm leading-relaxed text-ink/65">
         Plantation locations are digitized as polygons from the 1930 Bos &
@@ -1246,7 +1246,7 @@ function SpatialModelSection() {
 /* ─── Temporal Model Section ──────────────────────────────────── */
 function TemporalModelSection() {
   return (
-    <div className="border border-slate-200 bg-white p-6 shadow-[0_15px_35px_rgba(0,30,24,0.08)]">
+    <div className="site-surface p-6">
       <h3 className="mb-3 text-xl font-semibold text-ink">Temporal Model</h3>
       <p className="mb-4 text-sm leading-relaxed text-ink/65">
         Time is modeled through E52 Time-Span linked to E13 observations. Each
@@ -1323,7 +1323,7 @@ function TemporalModelSection() {
 
 function ProvenanceBoundarySection() {
   return (
-    <div className="border border-slate-200 bg-white p-6 shadow-[0_15px_35px_rgba(0,30,24,0.08)]">
+    <div className="site-surface p-6">
       <h3 className="mb-3 text-xl font-semibold text-ink">
         Provenance Boundary
       </h3>
@@ -1477,7 +1477,7 @@ function ProvenanceBoundarySection() {
           </div>
         </div>
       </div>
-      <div className="mt-4 border border-slate-200 bg-background p-3 text-xs text-ink/65">
+      <div className="mt-4 site-surface site-surface-background p-3 text-xs text-ink/65">
         <p>
           Source references are authoritative only when they resolve to
           registered E22 entries in{' '}
@@ -1695,7 +1695,7 @@ function ModelPageInner() {
         </div>
 
         {/* Research Questions */}
-        <div className="mb-10 border border-slate-200 bg-white p-6 shadow-[0_15px_35px_rgba(0,30,24,0.08)]">
+        <div className="mb-10 site-surface p-6">
           <h3 className="mb-2 text-xl font-semibold text-ink">
             Research Questions
           </h3>

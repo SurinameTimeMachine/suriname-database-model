@@ -11,6 +11,14 @@ export default function SiteFooter() {
           <span className="text-ink/25">•</span>
           <span>Funder: Stichting Pica</span>
         </div>
+
+        <div className="mt-1.5 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[11px] text-ink/55">
+          <a href="/#partners" className="transition hover:text-teal-strong">
+            Partners
+          </a>
+          <span className="text-ink/25">•</span>
+          <span>Data sources (coming soon)</span>
+        </div>
       </div>
     </footer>
   );

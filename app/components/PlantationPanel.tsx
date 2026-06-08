@@ -526,9 +526,9 @@ export default function PlantationPanel({
   }
 
   return (
-    <div className="absolute top-0 right-0 w-105 h-full bg-stm-warm-50 shadow-xl z-1001 flex flex-col border-l border-stm-warm-300">
+    <div className="absolute top-0 right-0 w-105 h-full site-surface site-surface-background z-1001 flex flex-col border-l border-slate-200">
       {/* Header */}
-      <div className="px-4 py-3 border-b border-stm-warm-300 bg-white">
+      <div className="px-4 py-3 border-b border-slate-200 bg-white">
         <div className="flex items-start justify-between">
           <div className="min-w-0 pr-2">
             <h2 className="text-base font-bold text-stm-warm-900 font-serif leading-tight flex items-center gap-2">

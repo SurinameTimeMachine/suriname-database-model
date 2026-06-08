@@ -183,7 +183,7 @@ export default function VocabularyPage() {
         ) : (
           <>
             {/* Concept Scheme */}
-            <div className="bg-white border border-stm-warm-200 rounded-lg p-5 mb-6 shadow-sm">
+            <div className="site-surface p-5 mb-6">
               <div className="flex items-center gap-2 mb-2">
                 <span className="inline-block px-2 py-0.5 text-xs font-medium bg-stm-sepia-100 text-stm-sepia-700 rounded">
                   ConceptScheme
@@ -209,7 +209,7 @@ export default function VocabularyPage() {
                 <h3 className="text-sm font-medium text-stm-warm-500 uppercase tracking-wider mb-3">
                   Hierarchy
                 </h3>
-                <div className="bg-white border border-stm-warm-200 rounded-lg shadow-sm">
+                <div className="site-surface">
                   {hierarchyGroups.map((group) => {
                     const children = getDirectChildren(group.broader);
                     return (
@@ -287,7 +287,7 @@ export default function VocabularyPage() {
                   {selected ? 'Concept Details' : 'Select a concept'}
                 </h3>
                 {selected ? (
-                  <div className="bg-white border border-stm-warm-200 rounded-lg p-5 shadow-sm">
+                  <div className="site-surface p-5">
                     <div className="flex items-center gap-2 mb-3">
                       <span
                         className="inline-block w-4 h-4 rounded-sm"
@@ -454,7 +454,7 @@ export default function VocabularyPage() {
                     </dl>
                   </div>
                 ) : (
-                  <div className="bg-white border border-stm-warm-200 rounded-lg p-8 shadow-sm text-center">
+                  <div className="site-surface p-8 text-center">
                     <p className="text-stm-warm-400 text-sm">
                       Click a concept in the hierarchy to view its details.
                     </p>

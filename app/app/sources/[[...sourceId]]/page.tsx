@@ -380,10 +380,8 @@ function SourceCard({
   return (
     <div
       id={`source-${source.sourceId}`}
-      className={`border rounded-lg transition-colors ${
-        isFuture
-          ? 'border-stm-warm-150 bg-stm-warm-50/50'
-          : 'border-stm-warm-200 bg-white shadow-sm'
+      className={`site-surface transition-colors ${
+        isFuture ? 'site-surface-muted' : ''
       }`}
     >
       <button
@@ -778,7 +776,7 @@ function SourceForm({
   };
 
   return (
-    <div className="mb-8 border border-stm-teal-200 bg-white rounded-lg shadow-sm p-5 space-y-3">
+    <div className="mb-8 site-surface p-5 space-y-3">
       <h3 className="text-sm font-semibold text-stm-warm-800">
         Add New Source
       </h3>

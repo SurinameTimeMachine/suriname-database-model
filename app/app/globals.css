@@ -109,15 +109,30 @@ html,
 body {
   margin: 0;
   padding: 0;
-  height: 100%;
+  min-height: 100%;
 }
 
 body {
   background: var(--background);
-  color: var(--ink);
+  color: var(--foreground);
   font-family: var(--font-sans);
   font-size: 1rem;
   line-height: 1.6;
+  overflow-x: hidden;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  border-radius: 0;
+}
+
+input,
+textarea,
+select,
+button {
+  border-radius: 0;
 }
 
 /* ──────────────────────────────────────────────────────────
@@ -143,6 +158,44 @@ body {
   transform: translateY(-50%) skewX(-20deg);
 }
 
+/* .expand-icon — CSS-only expand/collapse marker */
+.expand-icon {
+  position: relative;
+  width: 1rem;
+  height: 1rem;
+}
+
+.expand-icon::before,
+.expand-icon::after {
+  content: '';
+  position: absolute;
+  background: currentColor;
+  transition:
+    transform 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.expand-icon::before {
+  width: 0.75rem;
+  height: 1px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.expand-icon::after {
+  width: 1px;
+  height: 0.75rem;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+button:hover .expand-icon::before,
+button:hover .expand-icon::after {
+  background: var(--teal-strong);
+}
+
 /* .hero-surface — deep-teal gradient hero background */
 .hero-surface {
   position: relative;
@@ -160,22 +213,23 @@ body {
   position: absolute;
   inset: 0;
   background: linear-gradient(
-    140deg,
-    rgba(255, 255, 255, 0.06) 0%,
-    transparent 50%
+    120deg,
+    rgba(255, 255, 255, 0.12),
+    transparent 60%
   );
   pointer-events: none;
 }
 .hero-surface::after {
   content: '';
   position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 40%;
-  height: 60%;
-  background: var(--teal-bright);
-  opacity: 0.07;
-  clip-path: polygon(40% 0, 100% 30%, 100% 100%, 0 100%);
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    transparent,
+    rgba(52, 209, 179, 0.2) 45%,
+    rgba(255, 247, 230, 0.18) 70%
+  );
+  clip-path: polygon(55% 0, 100% 0, 100% 55%, 35% 100%, 0 100%, 0 35%);
   pointer-events: none;
 }
 
@@ -183,6 +237,7 @@ body {
 .angled-card {
   position: relative;
   background: white;
+  box-shadow: 0 30px 60px rgba(0, 30, 24, 0.08);
   clip-path: polygon(
     0 0,
     100% 0,
@@ -196,10 +251,10 @@ body {
   position: absolute;
   bottom: 0;
   right: 0;
-  width: 30px;
+  width: 60px;
   height: 30px;
   background: var(--cream);
-  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
   pointer-events: none;
 }
 
@@ -207,21 +262,19 @@ body {
 .cut-corner {
   position: relative;
   clip-path: polygon(2.25rem 0, 100% 0, 100% 100%, 0 100%, 0 2.25rem);
+  box-shadow: 0 28px 60px rgba(0, 30, 24, 0.09);
+  overflow: hidden;
 }
 .cut-corner::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
-  width: 4rem;
-  height: 4rem;
-  background: radial-gradient(
-    circle at top left,
-    var(--teal-soft),
-    transparent 70%
-  );
+  width: 3.25rem;
+  height: 3.25rem;
+  background: linear-gradient(135deg, var(--teal-soft), rgba(255, 255, 255, 0));
   pointer-events: none;
-  opacity: 0.6;
+  opacity: 0.85;
 }
 
 /* .angled-panel — subtle 120deg teal-bright gradient overlay */
@@ -260,6 +313,21 @@ body {
   pointer-events: none;
 }
 
+.site-surface {
+  background: white;
+  border: 1px solid rgba(11, 60, 52, 0.12);
+  box-shadow: 0 15px 35px rgba(0, 30, 24, 0.08);
+}
+
+.site-surface-muted {
+  background: rgba(244, 248, 247, 0.5);
+  border-color: rgba(11, 60, 52, 0.08);
+}
+
+.site-surface-background {
+  background: var(--background);
+}
+
 /* ──────────────────────────────────────────────────────────
    Link & Button Styling
    ────────────────────────────────────────────────────────── */
@@ -267,7 +335,10 @@ body {
 a {
   color: var(--ink);
   text-decoration: none;
-  transition: color 0.15s ease;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease,
+    background-color 0.15s ease;
 }
 
 a:hover {
@@ -288,7 +359,11 @@ a.rich-text-link:hover {
 
 button {
   font-family: var(--font-sans);
-  transition: all 0.15s ease;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease,
+    background-color 0.15s ease,
+    box-shadow 0.15s ease;
   cursor: pointer;
 }
 
@@ -315,7 +390,7 @@ button {
   left: 0;
   z-index: 9999;
   padding: 0.5rem 1rem;
-  background: var(--color-stm-teal-600);
+  background: var(--deep-teal);
   color: white;
   font-weight: 600;
   text-decoration: none;
