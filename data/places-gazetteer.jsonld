@@ -82540,76 +82540,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-02318",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-02318",
-      "type": "plantation",
-      "prefLabel": "Waterland en Adrichem",
-      "altLabels": [],
-      "broader": null,
-      "description": "Plantation from Surinaamse Almanakken (no QGIS geometry)",
-      "location": {
-        "lat": null,
-        "lng": null,
-        "wkt": null,
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "almanakken"
-      ],
-      "wikidataQid": "Q59134062",
-      "fid": null,
-      "psurIds": [],
-      "district": null,
-      "locationDescription": "Suriname",
-      "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
-      "placeType": "suiker en koffie",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59134062",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1828",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1828,
-          "note": null
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-suiker-en-koffie-1828",
-          "value": "suiker en koffie",
-          "source": "almanakken",
-          "startYear": 1828,
-          "endYear": 1831,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-koffie-1833",
-          "value": "koffie",
-          "source": "almanakken",
-          "startYear": 1833,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1838",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1838,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-00706",
       "@type": [
         "E25_Human-Made_Feature"
@@ -151917,6 +151847,99 @@
           "isCurrent": true
         }
       ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Suriname",
+          "original": "Rivier Suriname, linkerhand in het afvaren",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Waterland 2003-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/1wBy0EDTJQwiN1Wt4N-pf1WRr9BjzzggO/view?usp=sharing",
+          "author": "Philip Dikland",
+          "year": "2003, aangevuld 2007, 2026",
+          "notes": "Ten tijde van de emancipatie was Wilhelm Eduard Ruhmann (1816-1872) de eigenaar van de plantage. Waterland was verenigd met Adrichem."
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-02318",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-02318",
+      "type": "plantation",
+      "broader": null,
+      "description": "Plantation from Surinaamse Almanakken (no QGIS geometry)",
+      "location": {
+        "lat": null,
+        "lng": null,
+        "wkt": null,
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "almanakken"
+      ],
+      "wikidataQid": "Q59134062",
+      "fid": null,
+      "psurIds": [],
+      "district": null,
+      "locationDescription": "Suriname",
+      "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
+      "placeType": "suiker en koffie",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-08",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59134062",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1828",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1828,
+          "note": null
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-suiker-en-koffie-1828",
+          "value": "suiker en koffie",
+          "source": "almanakken",
+          "startYear": 1828,
+          "endYear": 1831,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-koffie-1833",
+          "value": "koffie",
+          "source": "almanakken",
+          "startYear": 1833,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1838",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1838,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "Waterland en Adrichem",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        }
+      ],
+      "districtAssertions": [],
       "locationAssertions": [
         {
           "id": "location-assertion-1",
