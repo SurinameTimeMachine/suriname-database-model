@@ -147507,6 +147507,20 @@
           "type": "historical",
           "isPreferred": false,
           "source": "dikland-collection"
+        },
+        {
+          "text": "Moeserisi",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        },
+        {
+          "text": "Muzelius",
+          "language": "nl",
+          "type": "vernacular",
+          "isPreferred": false,
+          "source": "dikland-collection"
         }
       ],
       "districtAssertions": [
