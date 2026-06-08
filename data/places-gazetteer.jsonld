@@ -158068,37 +158068,6 @@
       "externalLinks": []
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-02829",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-02829",
-      "type": "military-post",
-      "prefLabel": "Victoria",
-      "altLabels": [],
-      "broader": null,
-      "description": "Military post from 1882 map",
-      "location": {
-        "lat": 5.090306322994435,
-        "lng": -54.98279500819568,
-        "wkt": null,
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1882"
-      ],
-      "wikidataQid": null,
-      "fid": 54,
-      "psurIds": [],
-      "district": null,
-      "locationDescription": null,
-      "locationDescriptionOriginal": null,
-      "placeType": null,
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": []
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02839",
       "@type": [
         "E25_Human-Made_Feature"
@@ -158785,6 +158754,54 @@
           "author": "Philip Dikland",
           "year": null,
           "notes": "Bewerkt door K. KOOPMANS\nMajoor der infanterie\n(niet gedateerd, mogelijk omstreeks 1960)"
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-02829",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-02829",
+      "type": "military-post",
+      "broader": null,
+      "description": "Military post from 1882 map",
+      "location": {
+        "lat": 5.090306322994435,
+        "lng": -54.98279500819568,
+        "wkt": null,
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1882"
+      ],
+      "wikidataQid": null,
+      "fid": 54,
+      "psurIds": [],
+      "district": null,
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-08",
+      "externalLinks": [],
+      "names": [
+        {
+          "text": "Victoria",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        }
+      ],
+      "districtAssertions": [],
+      "productAssertions": [],
+      "locationAssertions": [],
+      "statusAssertions": [],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Victora 2009-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emYmNFYlFoQ1RoYUk/view?usp=sharing&resourcekey=0-jL9VWoCETCuf195uQsqpzw",
+          "author": "Philip Dikland",
+          "year": "2009",
+          "notes": "De grond die later Victoria zou heten, was 2000 akkers groot en eigendom van Stephanus Laurentius Neale. Het was de meest stroomopwaarts gelegen plantage aan de Surinamerivier, en was dientengevolge onbeschermd tegen aanvallen van indianen of marrons.\n\n[...]\n\nOm de dreiging van de marrons te weren, werd op een gegeven moment (wanneer precies is schrijver dezes niet bekend) een militaire post gevestigd te Victoria."
         }
       ]
     },
