@@ -146990,6 +146990,20 @@
           "type": "vernacular",
           "isPreferred": false,
           "source": "dikland-collection"
+        },
+        {
+          "text": "Sint-Eustatius",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        },
+        {
+          "text": "Sint Eustatius",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "source": "dikland-collection"
         }
       ],
       "districtAssertions": [
