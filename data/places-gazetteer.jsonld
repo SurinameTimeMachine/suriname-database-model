@@ -170815,6 +170815,83 @@
       ]
     },
     {
+      "id": "stm-new-1780915484262",
+      "type": "settlement",
+      "names": [
+        {
+          "text": "Nieuw Lombe",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "Nieuw-Lombe",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": false
+        },
+        {
+          "text": "Nieuw-Lombé",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": false
+        },
+        {
+          "text": "Njun-Lombe",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": false
+        },
+        {
+          "text": "Njun-Lombé",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        }
+      ],
+      "broader": null,
+      "description": "",
+      "location": {
+        "lat": 5.175556,
+        "lng": -55.0675,
+        "wkt": null,
+        "crs": "EPSG:4326"
+      },
+      "sources": [],
+      "wikidataQid": "Q111665357",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q111665357",
+          "matchType": "closeMatch"
+        }
+      ],
+      "fid": null,
+      "psurIds": [],
+      "district": null,
+      "districtAssertions": [],
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "productAssertions": [],
+      "locationAssertions": [],
+      "statusAssertions": [],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Remoncourt 2005-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emaVB4SERWeFBMOUk/view?usp=sharing&resourcekey=0-BmHbtgsG0DIIGdj2F7Anzg",
+          "author": "Philip Dikland",
+          "year": "2005",
+          "notes": "Remoncourt ligt op de rechteroever van de Surinamerivier, tegenover een tabbetje. Op de \nvoormalige plantagegrond ligt nu het dorpje Njun-Lombé."
+        }
+      ],
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-08",
+      "@id": "stm:place/stm-new-1780915484262",
+      "@type": "E25_Human-Made_Feature"
+    },
+    {
       "@id": "stm:place/stm-02716",
       "@type": "E25_Human-Made_Feature",
       "id": "stm-02716",
