@@ -21,6 +21,7 @@ export interface E25Plantation {
   P53_has_location?: string;
   P1_is_identified_by?: string | string[];
   depictedOnMap?: MapDepiction[]; // CRM: P138i has representation (via E36 Visual Item)
+  lifecycleEvents?: string[]; // Event URIs: E12/E11/E6/E17/E81 etc.
   wasDerivedFrom?: string; // prov:wasDerivedFrom
 }
 
@@ -37,6 +38,7 @@ export interface E26PhysicalFeature {
   P1_is_identified_by?: string | string[];
   mainBodyWater?: string;
   description?: string;
+  lifecycleEvents?: string[]; // Event URIs: E12/E11/E6/E17/E81 etc.
   wasDerivedFrom?: string;
 }
 
@@ -65,6 +67,7 @@ export interface E53Place {
   observedLabel?: string; // CRM: P1 is identified by -> E41 Appellation (map label)
   hasGeometry?: Geometry; // geo:hasGeometry
   P70i_is_documented_in?: string;
+  lifecycleEvents?: string[]; // Event URIs when this E53 is itself the modeled feature
   wasDerivedFrom?: string; // prov:wasDerivedFrom
 }
 
@@ -118,6 +121,39 @@ export interface ProvenanceRecord {
   modelEntity?: string;
   schemaTable?: string;
   linkedVia?: string;
+}
+
+export type FeatureLifecycleEventClass = 'E12' | 'E11' | 'E6' | 'E17' | 'E81';
+
+export type FeatureLifecycleEventType =
+  | 'production'
+  | 'presence'
+  | 'status-assignment'
+  | 'function-assignment'
+  | 'modification'
+  | 'destruction'
+  | 'transformation';
+
+export interface FeatureLifecycleEvent {
+  '@id': string;
+  '@type': string[];
+  crmClass: FeatureLifecycleEventClass;
+  eventType: FeatureLifecycleEventType;
+  prefLabel: string;
+  featureUri: string;
+  P4_has_time_span?: string;
+  startYear?: number;
+  endYear?: number;
+  hadPrimarySource?: string;
+  P41_classified?: string;
+  P42_assigned?: string;
+  P31_has_modified?: string;
+  P13_destroyed?: string;
+  P123_resulted_in?: string;
+  P124_transformed?: string | string[];
+  assignedType?: string;
+  status?: PlantationStatusType | 'present' | string;
+  note?: string | null;
 }
 
 export interface GeoJSONFeatureProperties {
@@ -337,6 +373,7 @@ export interface GazetteerPlace extends TombstoneFields {
   productAssertions?: ProductAssertion[];
   locationAssertions?: LocationAssertion[];
   statusAssertions?: StatusAssertion[];
+  lifecycleEvents?: FeatureLifecycleEvent[];
   diklandRefs: DiklandRef[];
   modifiedBy: string | null;
   modifiedAt: string | null;
@@ -354,6 +391,7 @@ export type Entity =
   | E41Appellation
   | E22Source
   | OrganizationObservation
+  | FeatureLifecycleEvent
   | ProvenanceRecord;
 
 /** @deprecated Use E25Plantation instead */

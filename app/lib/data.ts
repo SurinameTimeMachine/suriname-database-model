@@ -5,6 +5,7 @@ import type {
   E41Appellation,
   E53Place,
   E74Organization,
+  FeatureLifecycleEvent,
   GeoJSONCollection,
   OrganizationObservation,
   ProvenanceRecord,
@@ -24,6 +25,7 @@ let _places: Record<string, E53Place> | null = null;
 let _sources: Record<string, E22Source> | null = null;
 let _appellationsByEntity: Record<string, E41Appellation[]> | null = null;
 let _observationsByOrg: Record<string, OrganizationObservation[]> | null = null;
+let _lifecycleEvents: Record<string, FeatureLifecycleEvent[]> | null = null;
 let _provenance: Record<string, ProvenanceRecord> | null = null;
 let _geojson: GeoJSONCollection | null = null;
 
@@ -65,6 +67,12 @@ export async function getObservationsByOrg() {
   return _observationsByOrg!;
 }
 
+export async function getLifecycleEvents() {
+  if (!_lifecycleEvents)
+    _lifecycleEvents = await fetchJSON('lifecycle-events.json');
+  return _lifecycleEvents!;
+}
+
 export async function getProvenance() {
   if (!_provenance) _provenance = await fetchJSON('provenance.json');
   return _provenance!;
@@ -85,6 +93,7 @@ export async function loadAllData() {
     sources,
     appellations,
     observations,
+    lifecycleEvents,
     provenance,
     geojson,
   ] = await Promise.all([
@@ -95,6 +104,7 @@ export async function loadAllData() {
     getSources(),
     getAppellationsByEntity(),
     getObservationsByOrg(),
+    getLifecycleEvents(),
     getProvenance(),
     getGeoJSON(),
   ]);
@@ -106,6 +116,7 @@ export async function loadAllData() {
     sources,
     appellations,
     observations,
+    lifecycleEvents,
     provenance,
     geojson,
   };

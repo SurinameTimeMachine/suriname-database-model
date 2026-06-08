@@ -51,6 +51,9 @@ type GazetteerEntry = Record<string, unknown> & {
   sources?: string[];
   fid?: number | null;
   description?: string;
+  statusAssertions?: Array<Record<string, unknown>>;
+  productAssertions?: Array<Record<string, unknown>>;
+  lifecycleEvents?: Array<Record<string, unknown>>;
   deprecated?: true;
   mergedInto?: string;
 };
@@ -87,6 +90,13 @@ function preferredName(entry: GazetteerEntry): string {
     (typeof entry.prefLabel === 'string' ? entry.prefLabel : '') ||
     ''
   );
+}
+
+function canonicalPlaceUri(entry: GazetteerEntry): string | null {
+  if (!entry.id) return null;
+  const raw = typeof entry['@id'] === 'string' ? entry['@id'] : '';
+  if (raw.startsWith('http')) return raw;
+  return `${DATA_BASE}place/${entry.id}`;
 }
 
 function allNames(entry: GazetteerEntry): GazetteerName[] {
@@ -137,6 +147,38 @@ function mapYearFromSources(
   if (sourceIds.includes('paramaribo-street-map-1916')) return '1916';
   if (sourceIds.includes('map-1882')) return '1882';
   return '1930';
+}
+
+function eventTypeToCrmType(crmClass: string): string {
+  switch (crmClass) {
+    case 'E12':
+      return 'E12_Production';
+    case 'E11':
+      return 'E11_Modification';
+    case 'E6':
+      return 'E6_Destruction';
+    case 'E81':
+      return 'E81_Transformation';
+    case 'E17':
+    default:
+      return 'E17_Type_Assignment';
+  }
+}
+
+function eventTimeSpan(
+  startYear: unknown,
+  endYear: unknown,
+): string | undefined {
+  const start =
+    typeof startYear === 'number' && Number.isFinite(startYear)
+      ? startYear
+      : undefined;
+  const end =
+    typeof endYear === 'number' && Number.isFinite(endYear)
+      ? endYear
+      : undefined;
+  if (start == null) return undefined;
+  return end != null && end !== start ? `${start}/${end}` : String(start);
 }
 
 // Load the full database
@@ -317,7 +359,7 @@ for (const entry of gazetteerEntries) {
 
   const type = entry.type;
   const id = entry.id;
-  const entryUri = entry['@id'];
+  const entryUri = canonicalPlaceUri(entry);
   if (!type || !id || !entryUri) continue;
   if (PIPELINE_TYPES.has(type)) continue;
 
@@ -448,6 +490,364 @@ if (gazetteerEntries.length > 0) {
   console.log(`  Gazetteer appellations: ${indexedGazetteerAppellations}`);
 }
 
+const lifecycleEventsByEntity: Record<string, Record<string, unknown>[]> = {};
+
+function addLifecycleEvent(
+  featureUri: string,
+  event: Record<string, unknown>,
+) {
+  const list = lifecycleEventsByEntity[featureUri] ?? [];
+  if (!list.some((existing) => existing['@id'] === event['@id'])) {
+    list.push(event);
+  }
+  lifecycleEventsByEntity[featureUri] = list;
+}
+
+function attachLifecycleEventsToEntity(featureUri: string) {
+  const eventUris = (lifecycleEventsByEntity[featureUri] ?? []).map(
+    (event) => event['@id'] as string,
+  );
+  if (eventUris.length === 0) return;
+
+  const entity =
+    (plantationIndex[featureUri] as Record<string, unknown> | undefined) ??
+    (physicalFeatureIndex[featureUri] as Record<string, unknown> | undefined) ??
+    (placeIndex[featureUri] as Record<string, unknown> | undefined);
+  if (!entity) return;
+  entity.lifecycleEvents = eventUris;
+}
+
+function slugify(value: string): string {
+  return value
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/['\u2019]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+const pipelineFeatureByTypeAndFid = new Map<string, string>();
+for (const entity of Object.values(
+  plantationIndex as Record<string, Record<string, unknown>>,
+)) {
+  const placeUri = entity.P53_has_location as string | undefined;
+  const place = placeUri
+    ? (placeIndex[placeUri] as Record<string, unknown> | undefined)
+    : undefined;
+  if (place?.fid != null) {
+    pipelineFeatureByTypeAndFid.set(
+      `plantation:${place.fid}`,
+      entity['@id'] as string,
+    );
+  }
+}
+for (const entity of Object.values(
+  physicalFeatureIndex as Record<string, Record<string, unknown>>,
+)) {
+  const featureType = entity.featureType as string | undefined;
+  if (!featureType || !PIPELINE_TYPES.has(featureType)) continue;
+  const placeUri = entity.P53_has_location as string | undefined;
+  const place = placeUri
+    ? (placeIndex[placeUri] as Record<string, unknown> | undefined)
+    : undefined;
+  if (place?.fid != null) {
+    pipelineFeatureByTypeAndFid.set(
+      `${featureType}:${place.fid}`,
+      entity['@id'] as string,
+    );
+  }
+}
+
+function featureUriForGazetteerEntry(entry: GazetteerEntry): string | null {
+  const type = entry.type;
+  const entryUri = canonicalPlaceUri(entry);
+  if (!type || !entryUri) return null;
+  if (PIPELINE_TYPES.has(type) && entry.fid != null) {
+    return pipelineFeatureByTypeAndFid.get(`${type}:${entry.fid}`) ?? null;
+  }
+  const crmClass = crmClassByType.get(type) ?? 'E53_Place';
+  return crmBadgeFromClass(crmClass) === 'E53' ? entryUri : entryUri;
+}
+
+let lifecycleEventCount = 0;
+
+function addPresenceLifecycleEvent(params: {
+  featureUri: string;
+  localId: string;
+  label: string;
+  mapYear?: string;
+  sourceId?: string;
+  sourceUri?: string;
+  note?: string;
+}) {
+  const startYear = params.mapYear
+    ? Number.parseInt(params.mapYear, 10)
+    : NaN;
+  const dated = Number.isFinite(startYear);
+  const eventSuffix = dated
+    ? `source-presence-${params.mapYear}`
+    : 'mapped-presence-undated';
+  addLifecycleEvent(params.featureUri, {
+    '@id': `${DATA_BASE}event/${params.localId}/${eventSuffix}`,
+    '@type': [eventTypeToCrmType('E17')],
+    crmClass: 'E17',
+    eventType: 'presence',
+    prefLabel: dated
+      ? `${params.label}: present in ${params.mapYear}`
+      : `${params.label}: mapped presence`,
+    featureUri: params.featureUri,
+    P41_classified: params.featureUri,
+    P42_assigned: `${DATA_BASE}type/feature-status/present`,
+    P4_has_time_span: dated ? params.mapYear : undefined,
+    startYear: dated ? startYear : undefined,
+    hadPrimarySource: params.sourceUri,
+    status: 'present',
+    note:
+      params.note ??
+      (params.sourceId ? `Attested by ${params.sourceId}` : 'Mapped record'),
+  });
+  lifecycleEventCount++;
+}
+
+for (const entry of gazetteerEntries) {
+  if (entry.deprecated || entry.mergedInto) continue;
+
+  const id = entry.id;
+  const type = entry.type;
+  if (!id || !type) continue;
+
+  const featureUri = featureUriForGazetteerEntry(entry);
+  if (!featureUri) continue;
+
+  const entrySourceIds = Array.isArray(entry.sources) ? entry.sources : [];
+  const nameSourceIds = (Array.isArray(entry.names) ? entry.names : [])
+    .map((name) => name.source)
+    .filter((source): source is string => Boolean(source));
+  const sourceIds = [...new Set([...entrySourceIds, ...nameSourceIds])];
+  const sourceUris = sourceIds.map(ensureSource);
+  const primarySourceUri = sourceUris[0] ?? undefined;
+  const mapYear = mapYearFromSources(sourceIds, sourceRegistryById);
+  const statusAssertions = Array.isArray(entry.statusAssertions)
+    ? entry.statusAssertions
+    : [];
+  const productAssertions = Array.isArray(entry.productAssertions)
+    ? entry.productAssertions
+    : [];
+  const genericEvents = Array.isArray(entry.lifecycleEvents)
+    ? entry.lifecycleEvents
+    : [];
+
+  for (const assertion of statusAssertions) {
+    const assertionId =
+      typeof assertion.id === 'string' && assertion.id
+        ? assertion.id
+        : `status-${lifecycleEventCount + 1}`;
+    const status =
+      typeof assertion.status === 'string' ? assertion.status : 'present';
+    const sourceId =
+      typeof assertion.source === 'string' && assertion.source
+        ? assertion.source
+        : sourceIds[0];
+    const sourceUri = sourceId ? ensureSource(sourceId) : primarySourceUri;
+    const startYear = assertion.startYear as number | undefined;
+    const endYear = assertion.endYear as number | undefined;
+    const eventUri = `${DATA_BASE}event/${id}/${assertionId}`;
+
+    addLifecycleEvent(featureUri, {
+      '@id': eventUri,
+      '@type': [eventTypeToCrmType('E17')],
+      crmClass: 'E17',
+      eventType: status === 'present' ? 'presence' : 'status-assignment',
+      prefLabel: `${preferredName(entry) || id}: ${status}`,
+      featureUri,
+      P41_classified: featureUri,
+      P42_assigned: `${DATA_BASE}type/feature-status/${slugify(status)}`,
+      P4_has_time_span: eventTimeSpan(startYear, endYear),
+      startYear,
+      endYear,
+      hadPrimarySource: sourceUri,
+      status,
+      note: assertion.note ?? null,
+    });
+    lifecycleEventCount++;
+  }
+
+  for (const assertion of productAssertions) {
+    const value =
+      typeof assertion.value === 'string' && assertion.value
+        ? assertion.value
+        : null;
+    if (!value) continue;
+    const assertionId =
+      typeof assertion.id === 'string' && assertion.id
+        ? assertion.id
+        : `function-${slugify(value)}-${lifecycleEventCount + 1}`;
+    const sourceId =
+      typeof assertion.source === 'string' && assertion.source
+        ? assertion.source
+        : sourceIds[0];
+    const sourceUri = sourceId ? ensureSource(sourceId) : primarySourceUri;
+    const startYear = assertion.startYear as number | undefined;
+    const endYear = assertion.endYear as number | undefined;
+    const assignedType = `${DATA_BASE}type/feature-function/${slugify(value)}`;
+
+    addLifecycleEvent(featureUri, {
+      '@id': `${DATA_BASE}event/${id}/${assertionId}`,
+      '@type': [eventTypeToCrmType('E17')],
+      crmClass: 'E17',
+      eventType: 'function-assignment',
+      prefLabel: `${preferredName(entry) || id}: function ${value}`,
+      featureUri,
+      P41_classified: featureUri,
+      P42_assigned: assignedType,
+      P4_has_time_span: eventTimeSpan(startYear, endYear),
+      startYear,
+      endYear,
+      hadPrimarySource: sourceUri,
+      assignedType,
+      note: assertion.note ?? null,
+    });
+    lifecycleEventCount++;
+  }
+
+  for (const event of genericEvents) {
+    const crmClass =
+      typeof event.crmClass === 'string' ? event.crmClass : 'E17';
+    const eventType =
+      typeof event.eventType === 'string'
+        ? event.eventType
+        : 'status-assignment';
+    const eventId =
+      typeof event.id === 'string' && event.id
+        ? event.id
+        : `${eventType}-${lifecycleEventCount + 1}`;
+    const sourceId =
+      typeof event.source === 'string' && event.source
+        ? event.source
+        : sourceIds[0];
+    const sourceUri = sourceId ? ensureSource(sourceId) : primarySourceUri;
+    const startYear = event.startYear as number | undefined;
+    const endYear = event.endYear as number | undefined;
+    const assignedType =
+      typeof event.assignedType === 'string'
+        ? event.assignedType
+        : typeof event.status === 'string'
+          ? `${DATA_BASE}type/feature-status/${slugify(event.status)}`
+          : undefined;
+
+    addLifecycleEvent(featureUri, {
+      '@id': `${DATA_BASE}event/${id}/${eventId}`,
+      '@type': [eventTypeToCrmType(crmClass)],
+      crmClass,
+      eventType,
+      prefLabel:
+        (event.prefLabel as string | undefined) ||
+        `${preferredName(entry) || id}: ${eventType}`,
+      featureUri,
+      P4_has_time_span: eventTimeSpan(startYear, endYear),
+      startYear,
+      endYear,
+      hadPrimarySource: sourceUri,
+      P41_classified: crmClass === 'E17' ? featureUri : undefined,
+      P42_assigned: crmClass === 'E17' ? assignedType : undefined,
+      P31_has_modified: crmClass === 'E11' ? featureUri : undefined,
+      P13_destroyed: crmClass === 'E6' ? featureUri : undefined,
+      P124_transformed: crmClass === 'E81' ? featureUri : undefined,
+      P123_resulted_in: event.resultedIn,
+      assignedType,
+      status: event.status,
+      note: event.note ?? null,
+    });
+    lifecycleEventCount++;
+  }
+
+  const hasPresenceForMapYear = (lifecycleEventsByEntity[featureUri] ?? []).some(
+    (event) =>
+      event.eventType === 'presence' &&
+      event.startYear != null &&
+      String(event.startYear) === mapYear,
+  );
+  if (!hasPresenceForMapYear) {
+    const sourceId = sourceIds.includes('map-1930')
+      ? 'map-1930'
+      : sourceIds[0];
+    addPresenceLifecycleEvent({
+      featureUri,
+      localId: id,
+      label: preferredName(entry) || id,
+      mapYear,
+      sourceId,
+      sourceUri: sourceId ? ensureSource(sourceId) : undefined,
+    });
+  }
+}
+
+function sourceIdFromUri(sourceUri: string | undefined): string | undefined {
+  if (!sourceUri) return undefined;
+  const last = sourceUri.split('/').filter(Boolean).pop();
+  return last || undefined;
+}
+
+function ensureIndexedFeaturePresence(
+  entity: Record<string, unknown>,
+  fallbackType: string,
+) {
+  const featureUri = entity['@id'] as string | undefined;
+  if (!featureUri || (lifecycleEventsByEntity[featureUri] ?? []).length > 0) {
+    return;
+  }
+  const depictions = Array.isArray(entity.depictedOnMap)
+    ? (entity.depictedOnMap as Record<string, unknown>[])
+    : [];
+  const depiction =
+    depictions.find((item) => item.P70i_is_documented_in) ?? depictions[0];
+  const sourceUri = depiction?.P70i_is_documented_in as string | undefined;
+  const sourceId = sourceIdFromUri(sourceUri);
+  const label =
+    (entity.prefLabel as string | undefined) ||
+    `${fallbackType} ${featureUri.split('/').filter(Boolean).pop()}`;
+
+  addPresenceLifecycleEvent({
+    featureUri,
+    localId: slugify(featureUri),
+    label,
+    mapYear: mapYearFromSources(sourceId ? [sourceId] : [], sourceRegistryById),
+    sourceId,
+    sourceUri,
+    note: sourceId ? undefined : 'Mapped pipeline feature',
+  });
+}
+
+for (const entity of Object.values(
+  plantationIndex as Record<string, Record<string, unknown>>,
+)) {
+  ensureIndexedFeaturePresence(entity, 'plantation');
+}
+for (const entity of Object.values(
+  physicalFeatureIndex as Record<string, Record<string, unknown>>,
+)) {
+  ensureIndexedFeaturePresence(entity, 'feature');
+}
+
+for (const featureUri of Object.keys(lifecycleEventsByEntity)) {
+  lifecycleEventsByEntity[featureUri].sort((a, b) => {
+    const ay = typeof a.startYear === 'number' ? a.startYear : 9999;
+    const by = typeof b.startYear === 'number' ? b.startYear : 9999;
+    return ay - by;
+  });
+  attachLifecycleEventsToEntity(featureUri);
+}
+
+console.log('\nBuilt lifecycle event index...');
+console.log(`  Features with events: ${Object.keys(lifecycleEventsByEntity).length}`);
+console.log(
+  `  Lifecycle events:     ${Object.values(lifecycleEventsByEntity).reduce(
+    (sum, events) => sum + events.length,
+    0,
+  )}`,
+);
+
 // Write output files
 function writeJSON(filename: string, data: unknown) {
   const path = join(OUT_DIR, filename);
@@ -468,6 +868,7 @@ writeJSON('places.json', placeIndex);
 writeJSON('sources.json', sourceIndex);
 writeJSON('appellations-by-entity.json', appellationsByEntity);
 writeJSON('observations-by-org.json', observationsByOrg);
+writeJSON('lifecycle-events.json', lifecycleEventsByEntity);
 writeJSON('provenance.json', provenanceIndex);
 
 // Copy GeoJSON and merge gazetteer features
@@ -498,8 +899,19 @@ if (existsSync(geojsonSrc)) {
     let enriched = 0;
     for (const feature of geojson.features) {
       const props = feature.properties;
+      const pipelineFeatureUri =
+        props.featureType && props.fid != null
+          ? pipelineFeatureByTypeAndFid.get(`${props.featureType}:${props.fid}`)
+          : null;
+      if (pipelineFeatureUri) {
+        props.featureUri = pipelineFeatureUri;
+      } else if (props.plantationUri && !props.featureUri) {
+        props.featureUri = props.plantationUri;
+      }
       const stmId =
         fidToStmId.get(props.fid) ??
+        uriToStmId.get(props.featureUri ?? '') ??
+        uriToStmId.get(props.plantationUri ?? '') ??
         uriToStmId.get(props.placeUri ?? '') ??
         null;
       if (stmId) {
@@ -530,9 +942,11 @@ if (existsSync(geojsonSrc)) {
       );
       const crmClass = crmClassByType.get(type) ?? 'E53_Place';
       const crmBadge = crmBadgeFromClass(crmClass);
-      const featureUri = crmBadge === 'E53' ? null : entry['@id'];
+      const entryUri = canonicalPlaceUri(entry);
+      if (!entryUri) continue;
+      const featureUri = crmBadge === 'E53' ? null : entryUri;
       const placeUri =
-        crmBadge === 'E53' ? entry['@id'] : `${entry['@id']}/location`;
+        crmBadge === 'E53' ? entryUri : `${entryUri}/location`;
       const status =
         type === 'road' || type === 'railroad' ? 'infrastructure' : 'named';
 

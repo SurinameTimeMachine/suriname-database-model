@@ -90,6 +90,10 @@ const ENTITIES: EntityDef[] = [
         name: 'P138i has representation',
         range: 'E36 Visual Item (via source)',
       },
+      {
+        name: 'lifecycleEvents',
+        range: 'E17/E11/E6/E12/E81 event index',
+      },
     ],
   },
   {
@@ -229,17 +233,16 @@ const ENTITIES: EntityDef[] = [
     type: 'E17',
     label: 'Type Assignment',
     crmClass: 'E17 Type Assignment',
-    desc: 'Classifies a plantation as abandoned (verlaten) when an almanac row marks it as deserted. A subclass of E13 Attribute Assignment with specific properties P41 classified (targeting E25 Plantation) and P42 assigned (targeting E55 Type). Inherits P4 has time-span and prov:hadPrimarySource from E13.',
+    desc: 'Time-scoped classification for any mapped feature. E17 records source presence, lifecycle status (built, present, abandoned, reactivated), and functional or use assignments. It targets the feature with P41 classified and assigns an E55 type with P42 assigned.',
     color: CRM_COLORS.E17,
     cx: 400,
     cy: 490,
-    dataKey: '',
-    structural: true,
+    dataKey: 'e17-events',
     properties: [
-      { name: 'P41 classified', range: 'E25 Plantation' },
-      { name: 'P42 assigned', range: 'E55 Type (plantation-status/abandoned)' },
+      { name: 'P41 classified', range: 'E25 / E26 / E53 feature' },
+      { name: 'P42 assigned', range: 'E55 Type (status, presence, function)' },
       { name: 'P4 has time-span', range: 'E52 Time-Span (year)' },
-      { name: 'prov:hadPrimarySource', range: 'E22 Source (almanac)' },
+      { name: 'prov:hadPrimarySource', range: 'E22 Source' },
     ],
   },
   {
@@ -337,7 +340,7 @@ const ENTITIES: EntityDef[] = [
     type: 'E12',
     label: 'Production',
     crmClass: 'E12 Production',
-    desc: 'The production event of a physical source (E22). Records who made the source (P14), where it was produced (P7), and when (P4). For maps, makers are Dutch colonial cartographers and publishers like Departement van Kolonien in Den Haag. For almanacs, the Koloniaal Bestuur van Suriname in Paramaribo. This makes colonial provenance explicit in the data graph.',
+    desc: 'The production event of a physical source (E22), and the lifecycle event used when a building or other human-made feature is newly erected. Records who made something (P14), where (P7), and when (P4).',
     color: CRM_COLORS.E12,
     cx: 60,
     cy: 30,
@@ -395,14 +398,14 @@ const ENTITIES: EntityDef[] = [
     type: 'E11',
     label: 'Modification',
     crmClass: 'E11 Modification',
-    desc: "Records a change to a road's physical geometry (re-routing, extension, or shortening). The road entity (E25) continues to exist; only its geometry changes. The E11 provides provenance and timing; the resulting geometry is assigned to the road via P53 has location on the E25.",
+    desc: "Records a change to an existing feature while the same feature continues: re-routing a road, changing a building layout, extending a footprint, or altering a point feature's documented form. The E11 provides provenance and timing; changed geometry is represented by a new or updated E53 location.",
     color: CRM_COLORS.E11,
     cx: 180,
     cy: 460,
     dataKey: '',
     structural: true,
     properties: [
-      { name: 'P31 has modified', range: 'E25 Human-Made Feature (road)' },
+      { name: 'P31 has modified', range: 'E25 / E26 feature' },
       { name: 'P4 has time-span', range: 'E52 Time-Span' },
       { name: 'prov:hadPrimarySource', range: 'E22 Human-Made Object' },
     ],
@@ -412,14 +415,14 @@ const ENTITIES: EntityDef[] = [
     type: 'E6',
     label: 'Destruction',
     crmClass: 'E6 Destruction',
-    desc: 'Records the permanent removal of a road. Unlike E81 Transformation, no successor entity is produced. Used when a road disappears from the historical record without being merged into another.',
+    desc: 'Records the end or loss of a physical feature: a road removed, a building burned down, or a structure demolished. Unlike E81 Transformation, no successor entity is required; if something new is erected, that is modeled as a new E25 with its own production event.',
     color: CRM_COLORS.E6,
     cx: 180,
     cy: 540,
     dataKey: '',
     structural: true,
     properties: [
-      { name: 'P13 destroyed', range: 'E25 Human-Made Feature (road)' },
+      { name: 'P13 destroyed', range: 'E25 / E26 feature' },
       { name: 'P4 has time-span', range: 'E52 Time-Span' },
       { name: 'prov:hadPrimarySource', range: 'E22 Human-Made Object' },
     ],
@@ -668,6 +671,7 @@ interface EntityCounts {
   'physical-features': number;
   'e25-features': number;
   'e26-features': number;
+  'e17-events': number;
   organizations: number;
   places: number;
   sources: number;
@@ -686,6 +690,7 @@ async function fetchCounts(): Promise<EntityCounts> {
     sources,
     appellations,
     observations,
+    lifecycleEvents,
   ] = await Promise.all([
     fetch(`${DATA_BASE}/plantations.json`).then((r) => r.json()),
     fetch(`${DATA_BASE}/physical-features.json`)
@@ -696,6 +701,9 @@ async function fetchCounts(): Promise<EntityCounts> {
     fetch(`${DATA_BASE}/sources.json`).then((r) => r.json()),
     fetch(`${DATA_BASE}/appellations-by-entity.json`).then((r) => r.json()),
     fetch(`${DATA_BASE}/observations-by-org.json`).then((r) => r.json()),
+    fetch(`${DATA_BASE}/lifecycle-events.json`)
+      .then((r) => r.json())
+      .catch(() => ({})),
   ]);
 
   const physicalFeatureValues = Object.values(
@@ -707,12 +715,18 @@ async function fetchCounts(): Promise<EntityCounts> {
   const e26Features = physicalFeatureValues.filter((feature) =>
     (feature['@type'] ?? []).some((type) => type.includes('E26')),
   ).length;
+  const lifecycleEventValues = Object.values(
+    lifecycleEvents as Record<string, Array<{ crmClass?: string }>>,
+  ).flat();
 
   return {
     plantations: Object.keys(plantations).length,
     'physical-features': Object.keys(physicalFeatures).length,
     'e25-features': Object.keys(plantations).length + e25GazetteerFeatures,
     'e26-features': e26Features,
+    'e17-events': lifecycleEventValues.filter(
+      (event) => event.crmClass === 'E17',
+    ).length,
     organizations: Object.keys(organizations).length,
     places: Object.keys(places).length,
     sources: Object.keys(sources).length,
@@ -1274,9 +1288,12 @@ function TemporalModelSection() {
     <div className="site-surface p-6">
       <h3 className="mb-3 text-xl font-semibold text-ink">Temporal Model</h3>
       <p className="mb-4 text-sm leading-relaxed text-ink/65">
-        Time is modeled through E52 Time-Span linked to E13 observations. Each
-        almanac row is tied to a specific year. Map dates provide temporal scope
-        for names.
+        Time is modeled through E52 Time-Span linked to observations and
+        lifecycle events. Each mapped feature can carry source-presence,
+        status, function, modification, destruction, production, or
+        transformation events, so a point address, line road, or polygon
+        plantation can all change through time without losing their shared
+        E53 location basis.
       </p>
       <div className="grid md:grid-cols-2 gap-6">
         <div>
@@ -1338,6 +1355,21 @@ function TemporalModelSection() {
               When one organization absorbs another,{' '}
               <strong>E68 Dissolution</strong> (P99 dissolved) ends the old E74.
               The absorbing E74 acts as agent via P14 carried out by.
+            </p>
+          </div>
+          <div className="mt-3">
+            <h4 className="mb-2 text-sm font-semibold text-ink/75">
+              Feature Lifecycle
+            </h4>
+            <p className="text-xs text-ink/55">
+              Source presence and status/function changes are recorded as{' '}
+              <strong>E17 Type Assignment</strong>. Physical changes to an
+              existing feature use <strong>E11 Modification</strong>;
+              destruction uses <strong>E6 Destruction</strong>; reconstruction
+              or a newly erected building uses a new E25 feature with an{' '}
+              <strong>E12 Production</strong> event. This lets a Paramaribo
+              address point keep its E53 location while buildings, layouts,
+              names, and uses change over time.
             </p>
           </div>
         </div>

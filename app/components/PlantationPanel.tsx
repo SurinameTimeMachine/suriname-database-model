@@ -14,6 +14,7 @@ import type {
   E41Appellation,
   E53Place,
   E74Organization,
+  FeatureLifecycleEvent,
   GeoJSONFeature,
   OrganizationObservation,
   ProvenanceRecord,
@@ -370,6 +371,91 @@ function TimelineEntry({
   );
 }
 
+function LifecycleEntry({
+  event,
+  sourceLabel,
+}: {
+  event: FeatureLifecycleEvent;
+  sourceLabel?: string;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const year =
+    event.startYear != null
+      ? event.endYear != null && event.endYear !== event.startYear
+        ? `${event.startYear}-${event.endYear}`
+        : String(event.startYear)
+      : event.P4_has_time_span || 'undated';
+
+  return (
+    <div className="border-l-2 border-stm-warm-200 hover:border-stm-teal-400 transition-colors">
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="w-full text-left pl-3 pr-2 py-1 flex items-center gap-2 text-xs"
+      >
+        <span className="font-semibold text-stm-teal-700 tabular-nums shrink-0 w-16">
+          {year}
+        </span>
+        <span className="text-stm-warm-700 truncate min-w-0">
+          {event.prefLabel}
+        </span>
+        <span className="ml-auto text-[10px] font-mono text-stm-warm-400 shrink-0">
+          {event.crmClass}
+        </span>
+      </button>
+
+      {expanded && (
+        <div className="pl-3 pr-2 pb-2 pt-1 space-y-0">
+          <p className="text-[9px] text-stm-warm-300 font-mono mb-1">
+            {event.crmClass} lifecycle event &mdash; {event.eventType}
+          </p>
+          <CrmField
+            label="Feature"
+            crmClass="E25"
+            property={
+              event.P41_classified
+                ? 'P41 classified'
+                : event.P31_has_modified
+                  ? 'P31 has modified'
+                  : event.P13_destroyed
+                    ? 'P13 destroyed'
+                    : 'event target'
+            }
+            value={uriLabel(event.featureUri)}
+            mono
+          />
+          <CrmField
+            label="Assigned"
+            crmClass="E55"
+            property="P42 assigned"
+            value={event.assignedType || event.status || null}
+          />
+          <CrmField
+            label="Time"
+            crmClass="E52"
+            property="P4 has time-span"
+            value={event.P4_has_time_span}
+          />
+          <CrmField
+            label="Source"
+            crmClass="E22"
+            property="prov:hadPrimarySource"
+            value={
+              sourceLabel ||
+              (event.hadPrimarySource && uriLabel(event.hadPrimarySource))
+            }
+          />
+          <CrmField
+            label="Note"
+            crmClass="E13"
+            property="P3 has note"
+            value={event.note}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function PlantationPanel({
   feature,
   data,
@@ -386,6 +472,7 @@ export default function PlantationPanel({
     plantation: true,
     organization: true,
     place: true,
+    lifecycle: true,
     sources: true,
     provenance: false,
   });
@@ -462,6 +549,10 @@ export default function PlantationPanel({
   const observations = orgUri
     ? ((data.observations[orgUri] || []) as OrganizationObservation[])
     : [];
+  const lifecycleTargetUri = plantationUri || featureUri || placeUri || '';
+  const lifecycleEvents = lifecycleTargetUri
+    ? ([...(data.lifecycleEvents[lifecycleTargetUri] || [])] as FeatureLifecycleEvent[])
+    : [];
 
   // Sources used
   const sourceUris = new Set<string>();
@@ -470,6 +561,9 @@ export default function PlantationPanel({
   }
   for (const obs of observations) {
     if (obs.hadPrimarySource) sourceUris.add(obs.hadPrimarySource);
+  }
+  for (const event of lifecycleEvents) {
+    if (event.hadPrimarySource) sourceUris.add(event.hadPrimarySource);
   }
   if (place?.P70i_is_documented_in) sourceUris.add(place.P70i_is_documented_in);
   const sources = Array.from(sourceUris)
@@ -951,6 +1045,44 @@ export default function PlantationPanel({
                     <NoDataPlaceholder />
                   )}
                 </div>
+              ))}
+          </div>
+
+          {/* Lifecycle events — generalized for polygons, lines, and points */}
+          <div>
+            <SectionHeader
+              id="lifecycle"
+              title="Lifecycle"
+              badge="E17"
+              open={openSections.lifecycle}
+              onToggle={() => toggle('lifecycle')}
+              refs={sectionRefs}
+              count={lifecycleEvents.length || undefined}
+            />
+            {openSections.lifecycle &&
+              (lifecycleEvents.length > 0 ? (
+                <div className="px-3 pb-3">
+                  <p className="text-[10px] text-stm-warm-400 mb-2">
+                    Event hooks for source presence, status, function,
+                    modification, destruction, or transformation.
+                  </p>
+                  <div className="space-y-0.5 max-h-96 overflow-y-auto">
+                    {lifecycleEvents.map((event) => (
+                      <LifecycleEntry
+                        key={event['@id']}
+                        event={event}
+                        sourceLabel={
+                          event.hadPrimarySource
+                            ? data.sources[event.hadPrimarySource]?.prefLabel ||
+                              uriLabel(event.hadPrimarySource)
+                            : undefined
+                        }
+                      />
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <NoDataPlaceholder />
               ))}
           </div>
 
