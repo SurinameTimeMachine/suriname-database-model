@@ -82695,119 +82695,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01857",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01857",
-      "type": "plantation",
-      "prefLabel": "Waterland",
-      "altLabels": [],
-      "broader": "stm-00010",
-      "description": "",
-      "location": {
-        "lat": 5.677307257857143,
-        "lng": -55.047697262857135,
-        "wkt": "Polygon ((-55.06372024 5.67336523, -55.06242768 5.68927395, -55.05692725 5.68864201, -55.05103694 5.68790532, -55.04386518 5.68680070, -55.02632992 5.68279495, -55.02696732 5.67753278, -55.02996055 5.67408501, -55.03572278 5.67037997, -55.04322565 5.66870677, -55.04897635 5.66769672, -55.05367068 5.66695421, -55.06121090 5.67479876, -55.06372024 5.67336523))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q59134059",
-      "fid": 2942,
-      "psurIds": [
-        "PSUR0347"
-      ],
-      "district": "Divisie Para",
-      "locationDescription": "Suriname",
-      "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59134059",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1818",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1818,
-          "note": null
-        },
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-suiker-1818",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1818,
-          "endYear": 1821,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1825",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1825,
-          "endYear": 1827,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1832",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1832,
-          "endYear": 1841,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-en-koffie-1842",
-          "value": "suiker en koffie",
-          "source": "almanakken",
-          "startYear": 1842,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1843",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1843,
-          "endYear": 1847,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1856",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1856,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1859",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1859,
-          "endYear": 1861,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02318",
       "@type": [
         "E25_Human-Made_Feature"
@@ -151742,6 +151629,160 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emektZVlhPQXAtUUk/view?usp=sharing&resourcekey=0-7D7HOitecVBd5hirkI6kKg",
           "author": "Philip Dikland",
           "year": "2006",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01857",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01857",
+      "type": "plantation",
+      "broader": "stm-00010",
+      "description": "",
+      "location": {
+        "lat": 5.677307257857143,
+        "lng": -55.047697262857135,
+        "wkt": "Polygon ((-55.06372024 5.67336523, -55.06242768 5.68927395, -55.05692725 5.68864201, -55.05103694 5.68790532, -55.04386518 5.68680070, -55.02632992 5.68279495, -55.02696732 5.67753278, -55.02996055 5.67408501, -55.03572278 5.67037997, -55.04322565 5.66870677, -55.04897635 5.66769672, -55.05367068 5.66695421, -55.06121090 5.67479876, -55.06372024 5.67336523))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q59134059",
+      "fid": 2942,
+      "psurIds": [
+        "PSUR0347"
+      ],
+      "district": "Divisie Para",
+      "locationDescription": "Suriname",
+      "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-08",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59134059",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1818",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1818,
+          "note": null
+        },
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-suiker-1818",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1818,
+          "endYear": 1821,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1825",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1825,
+          "endYear": 1827,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1832",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1832,
+          "endYear": 1841,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-en-koffie-1842",
+          "value": "suiker en koffie",
+          "source": "almanakken",
+          "startYear": 1842,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1843",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1843,
+          "endYear": 1847,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1856",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1856,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1859",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1859,
+          "endYear": 1861,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "Waterland.",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        },
+        {
+          "text": "Waterland en",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "sourceYear": 1832
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00010",
+          "districtLabel": "Divisie Para",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Suriname",
+          "original": "Rivier Suriname, linkerhand in het afvaren",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Waterland 2003-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/1wBy0EDTJQwiN1Wt4N-pf1WRr9BjzzggO/view?usp=sharing",
+          "author": "Philip Dikland",
+          "year": "2003, aangevuld 2007, 2026",
           "notes": null
         }
       ]
