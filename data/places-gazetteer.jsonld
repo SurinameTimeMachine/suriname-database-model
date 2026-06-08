@@ -133092,7 +133092,7 @@
       "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
       "placeType": "koffie",
       "modifiedBy": "GerDijkstra",
-      "modifiedAt": "2026-06-04",
+      "modifiedAt": "2026-06-08",
       "externalLinks": [
         {
           "authority": "wikidata",
@@ -133205,6 +133205,13 @@
           "type": "vernacular",
           "isPreferred": false,
           "source": "dikland-collection"
+        },
+        {
+          "text": "Land van Susannasdaal",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "source": "dikland-collection"
         }
       ],
       "districtAssertions": [
@@ -133234,6 +133241,13 @@
           "author": "Philip Dikland",
           "year": "2001, aangevuld 2003, 2004",
           "notes": null
+        },
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Susannasdaal linkeroever 2002-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emeXA4SFIwM3lYNmM/view?usp=sharing&resourcekey=0-AjGMgPy2qFTsfkwhClltng",
+          "author": "Philip Dikland",
+          "year": "2002",
+          "notes": "De plantage Land van Susannaasdaal is later opgegaan in plantage De Morgenstond."
         }
       ]
     },
