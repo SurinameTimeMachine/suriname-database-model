@@ -37691,77 +37691,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01337",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01337",
-      "type": "plantation",
-      "prefLabel": "La Vigilantie",
-      "altLabels": [],
-      "broader": "stm-00007",
-      "description": "",
-      "location": {
-        "lat": 5.61242612625,
-        "lng": -55.10772767499999,
-        "wkt": "Polygon ((-55.11786103 5.61832952, -55.09135530 5.61689540, -55.09032620 5.61476936, -55.10226384 5.61520645, -55.10362770 5.60286927, -55.11961396 5.60402393, -55.11891234 5.60898556, -55.11786103 5.61832952))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken"
-      ],
-      "wikidataQid": "Q59116912",
-      "fid": 2422,
-      "psurIds": [],
-      "district": "Divisie Boven-Suriname en Thorarica",
-      "locationDescription": "Suriname",
-      "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
-      "placeType": "kost",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59116912",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1843",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1843,
-          "note": null
-        },
-        {
-          "id": "status-almanakken-abandoned-1856",
-          "status": "abandoned",
-          "source": "almanakken",
-          "startYear": 1856,
-          "note": null
-        },
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-kost-1843",
-          "value": "kost",
-          "source": "almanakken",
-          "startYear": 1843,
-          "endYear": 1847,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-01017",
       "@type": [
         "E25_Human-Made_Feature"
@@ -124115,6 +124044,132 @@
           "original": "Commetewana-kreek, regterhand",
           "source": "almanakken",
           "note": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01337",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01337",
+      "type": "plantation",
+      "broader": "stm-00007",
+      "description": "",
+      "location": {
+        "lat": 5.61242612625,
+        "lng": -55.10772767499999,
+        "wkt": "Polygon ((-55.11786103 5.61832952, -55.09135530 5.61689540, -55.09032620 5.61476936, -55.10226384 5.61520645, -55.10362770 5.60286927, -55.11961396 5.60402393, -55.11891234 5.60898556, -55.11786103 5.61832952))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken"
+      ],
+      "wikidataQid": "Q59116912",
+      "fid": 2422,
+      "psurIds": [],
+      "district": "Divisie Boven-Suriname en Thorarica",
+      "locationDescription": "Suriname",
+      "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
+      "placeType": "kost",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-08",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59116912",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1843",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1843,
+          "note": null
+        },
+        {
+          "id": "status-almanakken-abandoned-1856",
+          "status": "abandoned",
+          "source": "almanakken",
+          "startYear": 1856,
+          "note": null
+        },
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-kost-1843",
+          "value": "kost",
+          "source": "almanakken",
+          "startYear": 1843,
+          "endYear": 1847,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "La Vigilantie",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        },
+        {
+          "text": "La Vigilance",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "sourceYear": 1843
+        },
+        {
+          "text": "Vigilantie",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "sourceYear": 1843
+        },
+        {
+          "text": "La Vigilantia",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00007",
+          "districtLabel": "Divisie Boven-Suriname en Thorarica",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Suriname",
+          "original": "Rivier Suriname, linkerhand in het afvaren",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Vigilantia 2006-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emQTBkSlNlLWNSWTQ/view?usp=sharing&resourcekey=0-glbfaRExBGA7iMzUHAVIBw",
+          "author": "Philip Dikland",
+          "year": "2006",
+          "notes": null
         }
       ]
     },
