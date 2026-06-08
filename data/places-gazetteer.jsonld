@@ -119770,7 +119770,7 @@
       "locationDescriptionOriginal": "Rivier Suriname, regterhand in het afvaren",
       "placeType": "suiker",
       "modifiedBy": "GerDijkstra",
-      "modifiedAt": "2026-06-04",
+      "modifiedAt": "2026-06-08",
       "externalLinks": [
         {
           "authority": "wikidata",
@@ -119910,6 +119910,13 @@
           "type": "vernacular",
           "isPreferred": false,
           "source": "dikland-collection"
+        },
+        {
+          "text": "Anna du Four",
+          "language": "nl",
+          "type": "vernacular",
+          "isPreferred": false,
+          "source": "dikland-collection"
         }
       ],
       "districtAssertions": [],
@@ -119929,6 +119936,13 @@
           "author": "Philip Dikland",
           "year": "2004",
           "notes": null
+        },
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Rorac 2001-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emRmg1dDFHUFVuZFU/view?usp=sharing&resourcekey=0-6RWD85zFcp55wk_5gFC9bg",
+          "author": "Philip Dikland",
+          "year": "2001-2004, aangevuld 2005, 2010",
+          "notes": "De volksnaam “Friti” herinnert aan de eigenaar Laurens Wriedt. De naastgelegen plantage \nClaverblad werd “Di Foeroe” genoemd, een herinnering aan eigenaresse Anna du Four, de \nechtgenote van Laurens Wriedt."
         }
       ]
     },
