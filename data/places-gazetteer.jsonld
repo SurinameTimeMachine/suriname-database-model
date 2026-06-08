@@ -72589,96 +72589,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01876",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01876",
-      "type": "plantation",
-      "prefLabel": "Rac � Rac",
-      "altLabels": [],
-      "broader": "stm-00007",
-      "description": "",
-      "location": {
-        "lat": 5.6236941007692325,
-        "lng": -55.03938724076924,
-        "wkt": "Polygon ((-55.05365957 5.62433644, -55.04928471 5.62947889, -55.04590231 5.63267335, -55.03280370 5.63125805, -55.02435147 5.63024941, -55.01686214 5.62916456, -55.01813741 5.61127569, -55.03702128 5.61277761, -55.03924797 5.61630268, -55.04219359 5.61957450, -55.04827561 5.62299438, -55.05063480 5.62360131, -55.05365957 5.62433644))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q59133118",
-      "fid": 2961,
-      "psurIds": [
-        "PSUR0294"
-      ],
-      "district": "Divisie Boven-Suriname en Thorarica",
-      "locationDescription": "Suriname",
-      "locationDescriptionOriginal": "Rivier Suriname, regterhand in het afvaren",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59133118",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1818",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1818,
-          "note": null
-        },
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-suiker-1818",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1818,
-          "endYear": 1821,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1825",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1825,
-          "endYear": 1847,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1856",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1856,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1859",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1859,
-          "endYear": 1861,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-00953",
       "@type": [
         "E25_Human-Made_Feature"
@@ -142739,6 +142649,151 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emcFhucmVkN3dfNXM/view?usp=sharing&resourcekey=0-FJu0jZr4CbOKJMYULnmwrA",
           "author": "Philip Dikland",
           "year": "2005",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01876",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01876",
+      "type": "plantation",
+      "broader": "stm-00007",
+      "description": "",
+      "location": {
+        "lat": 5.6236941007692325,
+        "lng": -55.03938724076924,
+        "wkt": "Polygon ((-55.05365957 5.62433644, -55.04928471 5.62947889, -55.04590231 5.63267335, -55.03280370 5.63125805, -55.02435147 5.63024941, -55.01686214 5.62916456, -55.01813741 5.61127569, -55.03702128 5.61277761, -55.03924797 5.61630268, -55.04219359 5.61957450, -55.04827561 5.62299438, -55.05063480 5.62360131, -55.05365957 5.62433644))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q59133118",
+      "fid": 2961,
+      "psurIds": [
+        "PSUR0294"
+      ],
+      "district": "Divisie Boven-Suriname en Thorarica",
+      "locationDescription": "Suriname",
+      "locationDescriptionOriginal": "Rivier Suriname, regterhand in het afvaren",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-08",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59133118",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1818",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1818,
+          "note": null
+        },
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-suiker-1818",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1818,
+          "endYear": 1821,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1825",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1825,
+          "endYear": 1847,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1856",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1856,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1859",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1859,
+          "endYear": 1861,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "Rac á Rac",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        },
+        {
+          "text": "Rac à  Rac",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "sourceYear": 1818
+        },
+        {
+          "text": "Rac-a-Rac",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        },
+        {
+          "text": "Bigi Rakraki",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00007",
+          "districtLabel": "Divisie Boven-Suriname en Thorarica",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Suriname",
+          "original": "Rivier Suriname, regterhand in het afvaren",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Rac-a-Rac 2002-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emc2pGX0lPTlFZZ28/view?usp=sharing&resourcekey=0-oLeaoxFkjr5D7Gksmt43xw",
+          "author": "Philip Dikland",
+          "year": "2002, aangevuld 2005, 2009, 2013",
           "notes": null
         }
       ]
