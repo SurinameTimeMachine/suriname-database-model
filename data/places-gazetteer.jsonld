@@ -80319,96 +80319,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00551",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-00551",
-      "type": "plantation",
-      "prefLabel": "Victoria",
-      "altLabels": [],
-      "broader": "stm-00007",
-      "description": "",
-      "location": {
-        "lat": 5.136710659999999,
-        "lng": -54.99832596142857,
-        "wkt": "Polygon ((-55.03693663 5.12995875, -55.03627666 5.14294837, -55.02909572 5.14563227, -55.02404055 5.14824822, -55.01696260 5.15047414, -55.01403253 5.15361755, -55.01092140 5.15534847, -55.00719293 5.15562104, -55.00314971 5.15551466, -54.99876404 5.15563879, -54.99330478 5.15684519, -54.98924329 5.15700239, -54.98688052 5.15610549, -54.98576112 5.15392052, -54.98547758 5.14945812, -54.98580235 5.14537812, -54.98616317 5.13981858, -54.98518644 5.13530719, -54.98256731 5.13160750, -54.97959741 5.12854739, -54.97796997 5.12474087, -54.97873928 5.12023103, -54.98113415 5.11572470, -54.98307614 5.10929410, -54.98244088 5.10356980, -54.98048063 5.09412457, -54.99499250 5.08326191, -55.03693663 5.12995875))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q14514754",
-      "fid": 1634,
-      "psurIds": [
-        "PSUR0334"
-      ],
-      "district": "Divisie Boven-Suriname en Thorarica",
-      "locationDescription": "Suriname",
-      "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
-      "placeType": "hout",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q14514754",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1818",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1818,
-          "note": null
-        },
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-hout-1818",
-          "value": "hout",
-          "source": "almanakken",
-          "startYear": 1818,
-          "endYear": 1821,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-hout-1825",
-          "value": "hout",
-          "source": "almanakken",
-          "startYear": 1825,
-          "endYear": 1847,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-hout-1856",
-          "value": "hout",
-          "source": "almanakken",
-          "startYear": 1856,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-hout-1859",
-          "value": "hout",
-          "source": "almanakken",
-          "startYear": 1859,
-          "endYear": 1861,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02084",
       "@type": [
         "E25_Human-Made_Feature"
@@ -149638,6 +149548,144 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emRkgwaG10UEprUDA/view?usp=sharing&resourcekey=0-Dn-ZMFn_UtoZGjFTnTdQvg",
           "author": "Philip Dikland",
           "year": "2006",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-00551",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-00551",
+      "type": "plantation",
+      "broader": "stm-00007",
+      "description": "",
+      "location": {
+        "lat": 5.136710659999999,
+        "lng": -54.99832596142857,
+        "wkt": "Polygon ((-55.03693663 5.12995875, -55.03627666 5.14294837, -55.02909572 5.14563227, -55.02404055 5.14824822, -55.01696260 5.15047414, -55.01403253 5.15361755, -55.01092140 5.15534847, -55.00719293 5.15562104, -55.00314971 5.15551466, -54.99876404 5.15563879, -54.99330478 5.15684519, -54.98924329 5.15700239, -54.98688052 5.15610549, -54.98576112 5.15392052, -54.98547758 5.14945812, -54.98580235 5.14537812, -54.98616317 5.13981858, -54.98518644 5.13530719, -54.98256731 5.13160750, -54.97959741 5.12854739, -54.97796997 5.12474087, -54.97873928 5.12023103, -54.98113415 5.11572470, -54.98307614 5.10929410, -54.98244088 5.10356980, -54.98048063 5.09412457, -54.99499250 5.08326191, -55.03693663 5.12995875))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q14514754",
+      "fid": 1634,
+      "psurIds": [
+        "PSUR0334"
+      ],
+      "district": "Divisie Boven-Suriname en Thorarica",
+      "locationDescription": "Suriname",
+      "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
+      "placeType": "hout",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-08",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q14514754",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1818",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1818,
+          "note": null
+        },
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-hout-1818",
+          "value": "hout",
+          "source": "almanakken",
+          "startYear": 1818,
+          "endYear": 1821,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-hout-1825",
+          "value": "hout",
+          "source": "almanakken",
+          "startYear": 1825,
+          "endYear": 1847,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-hout-1856",
+          "value": "hout",
+          "source": "almanakken",
+          "startYear": 1856,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-hout-1859",
+          "value": "hout",
+          "source": "almanakken",
+          "startYear": 1859,
+          "endYear": 1861,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "Victoria",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        },
+        {
+          "text": "Asi Gron",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        },
+        {
+          "text": "Ezels grond",
+          "language": "nl",
+          "type": "vernacular",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00007",
+          "districtLabel": "Divisie Boven-Suriname en Thorarica",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Suriname",
+          "original": "Rivier Suriname, linkerhand in het afvaren",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Victoria 2009-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emYmNFYlFoQ1RoYUk/view?usp=sharing&resourcekey=0-jL9VWoCETCuf195uQsqpzw",
+          "author": "Philip Dikland",
+          "year": "2009",
           "notes": null
         }
       ]
