@@ -741,7 +741,7 @@ export default function MapView({
         {!toolbarOpen && (
           <button
             onClick={() => setToolbarOpen(true)}
-            className="bg-white/95 backdrop-blur-sm shadow-md p-2 border border-stm-warm-200 hover:bg-stm-warm-50 transition-colors"
+            className="site-panel p-2 text-ink/75 hover:text-teal-strong transition-colors"
             aria-label="Open map toolbar"
           >
             <svg
@@ -759,12 +759,12 @@ export default function MapView({
 
         {/* Toolbar panel */}
         {toolbarOpen && (
-          <div className="bg-white/95 backdrop-blur-sm shadow-md border border-stm-warm-200 flex items-center gap-3 px-3 py-2 flex-wrap">
+          <div className="site-panel flex items-center gap-3 px-3 py-2 flex-wrap backdrop-blur-sm">
             {/* Zoom controls */}
             <div className="flex items-center">
               <button
                 onClick={handleZoomIn}
-                className="w-7 h-7 flex items-center justify-center text-stm-warm-700 hover:bg-stm-warm-100 transition-colors border-r border-stm-warm-200"
+                className="w-7 h-7 flex items-center justify-center text-ink/75 hover:bg-teal-soft/25 hover:text-teal-strong transition-colors border-r border-ink/10"
                 aria-label="Zoom in"
               >
                 <svg
@@ -780,7 +780,7 @@ export default function MapView({
               </button>
               <button
                 onClick={handleZoomOut}
-                className="w-7 h-7 flex items-center justify-center text-stm-warm-700 hover:bg-stm-warm-100 transition-colors"
+                className="w-7 h-7 flex items-center justify-center text-ink/75 hover:bg-teal-soft/25 hover:text-teal-strong transition-colors"
                 aria-label="Zoom out"
               >
                 <svg
@@ -797,7 +797,7 @@ export default function MapView({
             </div>
 
             {/* Divider */}
-            <div className="w-px h-6 bg-stm-warm-200" />
+            <div className="w-px h-6 bg-ink/10" />
 
             {/* Search */}
             <SearchInput
@@ -807,22 +807,22 @@ export default function MapView({
             />
 
             {/* Divider */}
-            <div className="w-px h-6 bg-stm-warm-200" />
+            <div className="w-px h-6 bg-ink/10" />
 
             {/* Legend (compact) */}
             <div className="flex items-center gap-3 text-xs">
               <div className="flex items-center gap-1.5">
                 <span className="w-3.5 h-2.5 border-2 border-stm-sepia-600 bg-stm-sepia-300 opacity-80 inline-block" />
-                <span className="text-stm-warm-600">Selected</span>
+                <span className="text-ink/65">Selected</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <span className="w-3.5 h-2.5 border border-dashed border-[#a04020] bg-[#e07850] opacity-70 inline-block" />
-                <span className="text-stm-warm-600">Highlighted</span>
+                <span className="text-ink/65">Highlighted</span>
               </div>
             </div>
 
             {/* Divider */}
-            <div className="w-px h-6 bg-stm-warm-200" />
+            <div className="w-px h-6 bg-ink/10" />
 
             {/* Feature layers dropdown */}
             <div className="relative" ref={featuresDropdownRef}>
@@ -830,8 +830,8 @@ export default function MapView({
                 onClick={() => setFeaturesOpen((v) => !v)}
                 className={`flex items-center gap-1.5 text-xs font-medium px-2 py-1 transition-colors ${
                   featuresOpen
-                    ? 'bg-stm-sepia-100 text-stm-sepia-800'
-                    : 'text-stm-warm-700 hover:bg-stm-warm-100'
+                    ? 'bg-teal-soft/35 text-ink'
+                    : 'text-ink/75 hover:bg-teal-soft/25 hover:text-teal-strong'
                 }`}
                 aria-label="Toggle feature layers"
                 aria-expanded={featuresOpen}
@@ -857,9 +857,9 @@ export default function MapView({
               </button>
 
               {featuresOpen && (
-                <div className="absolute top-full left-0 mt-1 w-56 bg-white border border-stm-warm-200 shadow-lg z-10">
-                  <div className="px-3 py-1.5 border-b border-stm-warm-100 flex items-center justify-between">
-                    <span className="text-[10px] font-medium text-stm-warm-500 uppercase tracking-wide">
+                <div className="site-panel absolute top-full left-0 mt-1 w-56 z-10">
+                  <div className="px-3 py-1.5 border-b border-ink/10 flex items-center justify-between">
+                    <span className="text-[10px] font-medium text-ink/55 uppercase tracking-wide">
                       Feature Layers
                     </span>
                     <button
@@ -890,7 +890,7 @@ export default function MapView({
                       const isPoly = ft === 'plantation';
                       return (
                         <li key={ft}>
-                          <label className="flex items-center gap-2 px-3 py-1 hover:bg-stm-warm-50 cursor-pointer text-xs">
+                          <label className="flex items-center gap-2 px-3 py-1 hover:bg-teal-soft/20 cursor-pointer text-xs">
                             <input
                               type="checkbox"
                               checked={isOn}
@@ -920,7 +920,7 @@ export default function MapView({
                                 style={{ backgroundColor: color, opacity: 0.7 }}
                               />
                             )}
-                            <span className="text-stm-warm-800 flex-1">
+                            <span className="text-ink/80 flex-1">
                               {label}
                             </span>
                           </label>
@@ -934,7 +934,7 @@ export default function MapView({
             {ENABLE_WARPED_OVERLAYS && (
               <>
                 {/* Divider */}
-                <div className="w-px h-6 bg-stm-warm-200" />
+                <div className="w-px h-6 bg-ink/10" />
 
                 {/* Overlay layers dropdown */}
                 <div className="relative" ref={layersDropdownRef}>
@@ -942,8 +942,8 @@ export default function MapView({
                     onClick={() => setLayersOpen((v) => !v)}
                     className={`flex items-center gap-1.5 text-xs font-medium px-2 py-1 transition-colors ${
                       layersOpen
-                        ? 'bg-stm-sepia-100 text-stm-sepia-800'
-                        : 'text-stm-warm-700 hover:bg-stm-warm-100'
+                        ? 'bg-teal-soft/35 text-ink'
+                        : 'text-ink/75 hover:bg-teal-soft/25 hover:text-teal-strong'
                     }`}
                     aria-label="Toggle map layers panel"
                     aria-expanded={layersOpen}
@@ -971,10 +971,10 @@ export default function MapView({
                   </button>
 
                   {layersOpen && (
-                    <div className="absolute top-full left-0 mt-1 w-80 bg-white border border-stm-warm-200 shadow-lg z-10">
+                    <div className="site-panel absolute top-full left-0 mt-1 w-80 z-10">
                       {/* Shared opacity slider */}
-                      <div className="px-3 py-2 border-b border-stm-warm-100 flex items-center gap-2">
-                        <span className="text-xs text-stm-warm-600 whitespace-nowrap">
+                      <div className="px-3 py-2 border-b border-ink/10 flex items-center gap-2">
+                        <span className="text-xs text-ink/65 whitespace-nowrap">
                           Opacity
                         </span>
                         <input
@@ -998,7 +998,7 @@ export default function MapView({
                           const isEnabled = enabledOverlays.has(config.id);
                           return (
                             <li key={config.id}>
-                              <label className="flex items-center gap-2 px-3 py-1.5 hover:bg-stm-warm-50 cursor-pointer text-xs">
+                              <label className="flex items-center gap-2 px-3 py-1.5 hover:bg-teal-soft/20 cursor-pointer text-xs">
                                 <input
                                   type="checkbox"
                                   checked={isEnabled}
@@ -1098,17 +1098,17 @@ function SearchInput({
         aria-autocomplete="list"
         role="combobox"
         aria-expanded={open && results.length > 0}
-        className="w-48 px-2.5 py-1 border border-stm-warm-300 bg-white text-sm text-stm-warm-900 placeholder:text-stm-warm-400 focus:outline-none focus:ring-2 focus:ring-stm-sepia-400"
+        className="w-48 px-2.5 py-1 border border-ink/15 bg-cream/95 text-sm text-ink placeholder:text-ink/35 focus:outline-none focus:ring-2 focus:ring-teal-bright/40"
       />
       {open && results.length > 0 && (
         <ul
-          className="absolute top-full left-0 mt-1 w-64 bg-white border border-stm-warm-200 shadow-lg max-h-64 overflow-y-auto z-10"
+          className="site-panel absolute top-full left-0 mt-1 w-64 max-h-64 overflow-y-auto z-10"
           role="listbox"
         >
           {results.map((f) => (
             <li key={f.id} role="option">
               <button
-                className="w-full text-left px-3 py-2 text-sm text-stm-warm-800 hover:bg-stm-sepia-50 transition-colors"
+                className="w-full text-left px-3 py-2 text-sm text-ink/80 hover:bg-teal-soft/20 transition-colors"
                 onMouseDown={() => {
                   onSelect(f);
                   setQuery(f.properties.name);

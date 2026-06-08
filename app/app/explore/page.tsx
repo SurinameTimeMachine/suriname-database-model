@@ -145,18 +145,14 @@ function ExplorePageInner() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[calc(100dvh-8rem)] flex-1 items-center justify-center bg-background px-4">
+      <div className="flex min-h-[calc(100dvh-8rem)] flex-1 items-center justify-center px-4">
         <section
           role="status"
           aria-live="polite"
           aria-busy="true"
-          className="w-full max-w-4xl site-surface p-5"
+          className="w-full max-w-4xl site-panel p-5"
         >
-          <div className="mb-4 flex items-center gap-2 text-xs uppercase tracking-[0.28em] text-ink/60">
-            <span
-              className="h-2.5 w-2.5 -skew-x-12 bg-teal-strong animate-pulse"
-              aria-hidden
-            />
+          <div className="site-kicker mb-4">
             Loading plantation data
           </div>
           <div className="grid gap-3 sm:grid-cols-4">

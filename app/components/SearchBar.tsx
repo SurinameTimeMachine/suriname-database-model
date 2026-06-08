@@ -52,17 +52,17 @@ export default function SearchBar({
         aria-autocomplete="list"
         role="combobox"
         aria-expanded={open && results.length > 0}
-        className="w-full px-3 py-2 border border-stm-warm-300 bg-white/95 backdrop-blur-sm shadow-md text-sm text-stm-warm-900 placeholder:text-stm-warm-400 focus:outline-none focus:ring-2 focus:ring-stm-sepia-400"
+        className="w-full px-3 py-2 border border-ink/15 bg-cream/95 backdrop-blur-sm shadow-md text-sm text-ink placeholder:text-ink/35 focus:outline-none focus:ring-2 focus:ring-teal-bright/40"
       />
       {open && results.length > 0 && (
         <ul
-          className="mt-1 bg-white/98 backdrop-blur-sm border border-stm-warm-200 shadow-lg max-h-64 overflow-y-auto"
+          className="site-panel mt-1 max-h-64 overflow-y-auto"
           role="listbox"
         >
           {results.map((f) => (
             <li key={f.id} role="option">
               <button
-                className="w-full text-left px-3 py-2 text-sm text-stm-warm-800 hover:bg-stm-sepia-50 transition-colors"
+                className="w-full text-left px-3 py-2 text-sm text-ink/80 hover:bg-teal-soft/20 transition-colors"
                 onClick={() => {
                   onSelect(f);
                   setQuery(f.properties.name);

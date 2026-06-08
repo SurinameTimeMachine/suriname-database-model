@@ -57,7 +57,7 @@ export default function Navigation() {
     <>
       <header
         id="site-header"
-        className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 font-sans shadow-[0_10px_28px_rgba(0,30,24,0.04)] backdrop-blur-sm"
+        className="sticky top-0 z-50 border-b border-ink/10 bg-cream/95 font-sans shadow-[0_10px_28px_rgba(0,30,24,0.05)] backdrop-blur-sm"
         role="banner"
       >
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-10">
@@ -122,7 +122,7 @@ export default function Navigation() {
             </nav>
 
             <div className="flex shrink-0 items-center gap-3">
-              <div className="hidden items-center gap-3 border-l border-slate-200 pl-3 sm:flex">
+              <div className="hidden items-center gap-3 border-l border-ink/10 pl-3 sm:flex">
                 <button
                   type="button"
                   aria-label="Language selector"
@@ -146,7 +146,7 @@ export default function Navigation() {
                     )}
                     <button
                       onClick={signOut}
-                      className="border-none bg-transparent text-[10px] uppercase tracking-[0.2em] text-ink/40 transition-colors hover:text-teal-strong"
+                      className="border-none bg-transparent text-[10px] uppercase tracking-[0.2em] text-ink/45 transition-colors hover:text-teal-strong"
                     >
                       Out
                     </button>
@@ -154,7 +154,7 @@ export default function Navigation() {
                 ) : (
                   <button
                     onClick={signIn}
-                    className="inline-flex items-center gap-1.5 border border-slate-200 px-3 py-1.5 text-xs uppercase tracking-[0.2em] text-ink/70 transition-colors hover:border-teal-strong hover:text-teal-strong bg-transparent"
+                    className="site-action-secondary px-3 py-1.5 text-xs bg-transparent"
                   >
                     <svg
                       width="12"
@@ -213,7 +213,7 @@ export default function Navigation() {
         {mobileOpen && (
           <div
             id="mobile-nav"
-            className="border-t border-slate-200 bg-white px-4 pb-4 pt-3 sm:hidden"
+            className="border-t border-ink/10 bg-cream px-4 pb-4 pt-3 sm:hidden"
           >
             <div className="mb-3 flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-[0.25em] text-ink/60">
               {DOMAIN_LINKS.map(({ label, href, isCurrent }, index) => (
@@ -255,7 +255,7 @@ export default function Navigation() {
               })}
             </nav>
 
-            <div className="mt-4 border-t border-slate-200 pt-3">
+            <div className="mt-4 border-t border-ink/10 pt-3">
               <div className="flex items-center justify-between gap-3">
                 <button
                   type="button"
@@ -303,11 +303,11 @@ export default function Navigation() {
       </header>
 
       {authError && (
-        <div className="flex items-center justify-center gap-2 border-b border-red-200 bg-red-50 px-4 py-1.5 text-center">
-          <p className="text-xs text-red-700">{authError}</p>
+        <div className="flex items-center justify-center gap-2 border-b border-entity-e17/35 bg-entity-e17/15 px-4 py-1.5 text-center">
+          <p className="text-xs text-ink/80">{authError}</p>
           <button
             onClick={() => setAuthError(null)}
-            className="border-none bg-transparent text-xs text-red-500 underline transition-colors hover:text-red-700"
+            className="border-none bg-transparent text-xs text-teal-strong underline transition-colors hover:text-ink"
           >
             Dismiss
           </button>

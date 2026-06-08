@@ -35,7 +35,7 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
       className={`${geistSans.variable} ${geistMono.variable} scroll-smooth`}
     >
-      <body className="flex min-h-screen flex-col bg-background text-foreground antialiased overflow-x-hidden">
+      <body className="site-shell flex min-h-screen flex-col bg-background text-foreground antialiased overflow-x-hidden">
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>

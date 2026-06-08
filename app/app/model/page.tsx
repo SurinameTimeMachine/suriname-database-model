@@ -999,7 +999,7 @@ function EntityDetail({
         <div className="overflow-hidden site-surface">
           <table className="w-full text-xs" role="table">
             <thead>
-              <tr className="border-b border-slate-200 bg-background">
+              <tr className="border-b border-ink/10 bg-background">
                 <th className="px-3 py-2 text-left font-medium uppercase tracking-[0.2em] text-ink/55">
                   Property
                 </th>
@@ -1012,7 +1012,7 @@ function EntityDetail({
               {entity.properties.map((prop, i) => (
                 <tr
                   key={i}
-                  className={i % 2 === 0 ? 'bg-white' : 'bg-background/60'}
+                  className={i % 2 === 0 ? 'bg-cream/70' : 'bg-background/60'}
                 >
                   <td className="px-3 py-1.5 font-mono text-teal-strong">
                     {prop.name}
@@ -1597,20 +1597,14 @@ function ModelPageInner() {
 
   if (!counts) {
     return (
-      <div className="h-full flex items-center justify-center bg-background px-4">
+      <div className="h-full flex items-center justify-center px-4">
         <section
           role="status"
           aria-live="polite"
           aria-busy="true"
-          className="w-full max-w-4xl border border-ink/10 bg-white p-5 shadow-[0_15px_35px_rgba(0,30,24,0.08)]"
+          className="w-full max-w-4xl site-panel p-5"
         >
-          <div className="mb-4 flex items-center gap-2 text-xs uppercase tracking-[0.28em] text-ink/60">
-            <span
-              className="h-2.5 w-2.5 -skew-x-12 bg-teal-strong animate-pulse"
-              aria-hidden
-            />
-            Loading data model
-          </div>
+          <div className="site-kicker mb-4">Loading data model</div>
           <div className="grid gap-3 sm:grid-cols-4">
             <div className="h-16 animate-pulse bg-ink/5" />
             <div className="h-16 animate-pulse bg-ink/5" />
@@ -1623,15 +1617,11 @@ function ModelPageInner() {
   }
 
   return (
-    <div className="h-full overflow-y-auto bg-background">
+    <div className="h-full overflow-y-auto">
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-10">
         {/* Header */}
         <div className="mb-10">
-          <div className="mb-3 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.35em] text-ink/70">
-            <span
-              className="inline-flex h-3 w-3 -skew-x-12 bg-teal-strong"
-              aria-hidden
-            />
+          <div className="site-kicker mb-3">
             CIDOC-CRM Mapping
           </div>
           <h1 className="mb-3 text-3xl font-semibold text-ink sm:text-4xl">
@@ -1710,10 +1700,10 @@ function ModelPageInner() {
                     handleSelectEntity(ent.id);
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
-                  className={`border bg-white p-4 text-left transition-all shadow-[0_10px_25px_rgba(0,30,24,0.05)] hover:ring-1 hover:ring-teal-strong/20 ${
+                  className={`site-panel p-4 text-left transition-all hover:ring-1 hover:ring-teal-strong/20 ${
                     selectedEntity === ent.id
                       ? 'border-teal-strong ring-1 ring-teal-strong/30'
-                      : 'border-slate-200'
+                      : ''
                   }`}
                 >
                   <div className="flex items-center gap-3 mb-2">
@@ -1826,10 +1816,10 @@ function ModelPageInner() {
                 <span
                   className={`inline-block w-2 h-2 mt-1.5 shrink-0 ${
                     q.status === 'green'
-                      ? 'bg-green-500'
+                      ? 'bg-teal-strong'
                       : q.status === 'amber'
-                        ? 'bg-amber-500'
-                        : 'bg-red-500'
+                        ? 'bg-entity-e12'
+                        : 'bg-entity-e17'
                   }`}
                 />
                 <div className="min-w-0">
@@ -1843,15 +1833,15 @@ function ModelPageInner() {
           </div>
           <div className="mt-4 flex gap-4 text-[11px] text-ink/50">
             <span className="flex items-center gap-1.5">
-              <span className="inline-block w-2 h-2 bg-green-500" /> Answerable
+              <span className="inline-block w-2 h-2 bg-teal-strong" /> Answerable
               now
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="inline-block w-2 h-2 bg-amber-500" /> Needs
+              <span className="inline-block w-2 h-2 bg-entity-e12" /> Needs
               entity resolution
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="inline-block w-2 h-2 bg-red-500" /> Needs new
+              <span className="inline-block w-2 h-2 bg-entity-e17" /> Needs new
               data sources
             </span>
           </div>

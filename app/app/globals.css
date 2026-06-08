@@ -14,6 +14,12 @@
   --sand: #fff7e6;
   --deep-teal: #003c34;
   --cream: #fdf8f2;
+  --surface: #ffffff;
+  --surface-muted: #edf3f1;
+  --line-soft: rgba(11, 60, 52, 0.12);
+  --line-strong: rgba(0, 109, 91, 0.28);
+  --shadow-soft: 0 18px 44px rgba(0, 30, 24, 0.08);
+  --focus-ring: rgba(52, 209, 179, 0.38);
 }
 
 ::selection {
@@ -33,17 +39,19 @@
   --radius-4xl: 0px;
   --radius: 0px;
 
-  /* Legacy aliases mapped to STM 2026 palette for backward compatibility */
+  /* Legacy aliases mapped to the STM palette for backward compatibility.
+     Sepia is now sand/teal so old utility classes do not drift into a
+     separate brown/orange app theme. CIDOC entity colors remain below. */
   --color-stm-sepia-50: #fff7e6;
-  --color-stm-sepia-100: #fff1da;
-  --color-stm-sepia-200: #fbe4b8;
-  --color-stm-sepia-300: #f2c98a;
-  --color-stm-sepia-400: #e3ac5d;
-  --color-stm-sepia-500: #c78930;
-  --color-stm-sepia-600: #a96d23;
-  --color-stm-sepia-700: #83531b;
-  --color-stm-sepia-800: #603b14;
-  --color-stm-sepia-900: #3f270d;
+  --color-stm-sepia-100: #fdf8f2;
+  --color-stm-sepia-200: #d6f8ef;
+  --color-stm-sepia-300: #b9f4e6;
+  --color-stm-sepia-400: #34d1b3;
+  --color-stm-sepia-500: #14aa8f;
+  --color-stm-sepia-600: #006d5b;
+  --color-stm-sepia-700: #005449;
+  --color-stm-sepia-800: #003c34;
+  --color-stm-sepia-900: #002a25;
 
   --color-stm-teal-50: #ecfbf7;
   --color-stm-teal-100: #d6f8ef;
@@ -113,7 +121,10 @@ body {
 }
 
 body {
-  background: var(--background);
+  background:
+    linear-gradient(140deg, rgba(0, 109, 91, 0.06), transparent 36rem),
+    linear-gradient(320deg, rgba(52, 209, 179, 0.08), transparent 30rem),
+    var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
   font-size: 1rem;
@@ -314,18 +325,102 @@ button:hover .expand-icon::after {
 }
 
 .site-surface {
-  background: white;
-  border: 1px solid rgba(11, 60, 52, 0.12);
-  box-shadow: 0 15px 35px rgba(0, 30, 24, 0.08);
+  background: color-mix(in srgb, var(--surface) 94%, var(--cream));
+  border: 1px solid var(--line-soft);
+  box-shadow: var(--shadow-soft);
 }
 
 .site-surface-muted {
-  background: rgba(244, 248, 247, 0.5);
+  background: color-mix(in srgb, var(--surface-muted) 72%, white);
   border-color: rgba(11, 60, 52, 0.08);
 }
 
 .site-surface-background {
   background: var(--background);
+}
+
+.site-shell {
+  background:
+    linear-gradient(135deg, rgba(0, 109, 91, 0.05), transparent 42%),
+    linear-gradient(315deg, rgba(52, 209, 179, 0.08), transparent 38%),
+    var(--background);
+}
+
+.site-panel {
+  background: color-mix(in srgb, var(--surface) 92%, var(--cream));
+  border: 1px solid var(--line-soft);
+  box-shadow: var(--shadow-soft);
+}
+
+.site-panel-quiet {
+  background: color-mix(in srgb, var(--surface-muted) 76%, white);
+  border: 1px solid rgba(11, 60, 52, 0.08);
+}
+
+.site-kicker {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: color-mix(in srgb, var(--ink) 68%, transparent);
+  font-size: 0.75rem;
+  font-weight: 650;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+}
+
+.site-kicker::before {
+  content: '';
+  width: 0.75rem;
+  height: 0.75rem;
+  background: var(--teal-bright);
+  transform: skewX(-18deg);
+  flex: none;
+}
+
+.site-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border: 1px solid var(--teal-strong);
+  background: var(--teal-strong);
+  color: white;
+  font-weight: 650;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.site-action:hover {
+  background: var(--deep-teal);
+  border-color: var(--deep-teal);
+  color: white;
+}
+
+.site-action-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border: 1px solid var(--line-soft);
+  background: color-mix(in srgb, var(--surface) 82%, var(--cream));
+  color: color-mix(in srgb, var(--ink) 78%, transparent);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.site-action-secondary:hover {
+  border-color: var(--line-strong);
+  color: var(--teal-strong);
+}
+
+.crm-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.2rem;
+  border: 1px solid rgba(11, 60, 52, 0.14);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28);
 }
 
 /* ──────────────────────────────────────────────────────────
@@ -343,6 +438,11 @@ a {
 
 a:hover {
   color: var(--teal-strong);
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 a.rich-text-link {
@@ -373,8 +473,8 @@ button {
   font-weight: 500;
   padding: 2px 6px;
   border-radius: 0;
-  border-color: var(--color-stm-sepia-300) !important;
-  background: var(--color-stm-sepia-50) !important;
+  border-color: var(--teal-soft) !important;
+  background: var(--cream) !important;
   color: var(--color-stm-warm-800) !important;
 }
 

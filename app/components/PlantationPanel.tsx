@@ -72,10 +72,10 @@ function Badge({ type }: { type: string }) {
   ];
   return (
     <span
-      className="inline-block px-1.5 py-0.5 text-[10px] font-bold mr-1.5 uppercase tracking-wide"
+      className="crm-badge px-1.5 py-0.5 text-[10px] font-bold mr-1.5 uppercase tracking-wide"
       style={{
         backgroundColor: CRM_COLORS[type] || entityTypeColor(type),
-        color: lightBgTypes.includes(type) ? '#78716c' : '#fff',
+        color: lightBgTypes.includes(type) ? '#0b3c34' : '#fff',
       }}
       title={fullName}
     >
@@ -109,11 +109,11 @@ function SectionHeader({
     >
       <button
         onClick={onToggle}
-        className="w-full flex items-center justify-between py-2.5 px-3 text-left hover:bg-stm-warm-100/40 transition-colors border-b border-stm-warm-200/50"
+        className="w-full flex items-center justify-between py-2.5 px-3 text-left hover:bg-teal-soft/20 transition-colors border-b border-ink/10"
         aria-expanded={open}
         aria-controls={`section-${id}`}
       >
-        <span className="text-xs font-semibold text-stm-warm-700 flex items-center">
+        <span className="text-xs font-semibold text-ink/80 flex items-center">
           <Badge type={badge} />
           {title}
           {count != null && (
@@ -406,7 +406,7 @@ function LifecycleEntry({
       {expanded && (
         <div className="pl-3 pr-2 pb-2 pt-1 space-y-0">
           <p className="text-[9px] text-stm-warm-300 font-mono mb-1">
-            {event.crmClass} lifecycle event &mdash; {event.eventType}
+            {event.crmClass} lifecycle event - {event.eventType}
           </p>
           <CrmField
             label="Feature"
@@ -627,9 +627,9 @@ export default function PlantationPanel({
   }
 
   return (
-    <div className="absolute top-0 right-0 w-105 h-full site-surface site-surface-background z-1001 flex flex-col border-l border-slate-200">
+    <div className="absolute top-0 right-0 w-105 h-full site-panel site-surface-background z-1001 flex flex-col border-l border-ink/10">
       {/* Header */}
-      <div className="px-4 py-3 border-b border-slate-200 bg-white">
+      <div className="px-4 py-3 border-b border-ink/10 bg-cream">
         <div className="flex items-start justify-between">
           <div className="min-w-0 pr-2">
             <h2 className="text-base font-bold text-stm-warm-900 font-serif leading-tight flex items-center gap-2">
@@ -676,7 +676,7 @@ export default function PlantationPanel({
           </div>
           <button
             onClick={onClose}
-            className="w-7 h-7 flex items-center justify-center hover:bg-stm-warm-100 text-stm-warm-400 hover:text-stm-warm-600 transition-colors shrink-0"
+            className="w-7 h-7 flex items-center justify-center hover:bg-teal-soft/25 text-ink/45 hover:text-teal-strong transition-colors shrink-0"
             aria-label="Close detail panel"
           >
             <svg
@@ -697,11 +697,11 @@ export default function PlantationPanel({
       <div className="flex-1 overflow-y-auto">
         {/* Colonial terminology note */}
         {biasInfo && (
-          <div className="mx-4 mt-3 mb-1 px-2 py-1.5 bg-amber-50 border border-amber-200 text-xs text-amber-800">
+          <div className="mx-4 mt-3 mb-1 px-2 py-1.5 bg-entity-e12/20 border border-entity-e12/45 text-xs text-ink/80">
             <span className="font-medium">Colonial terminology note:</span>{' '}
             {biasInfo.editorialNote}
             {biasInfo.altTerms.length > 0 && (
-              <span className="block mt-0.5 text-amber-600 text-[10px]">
+              <span className="block mt-0.5 text-ink/55 text-[10px]">
                 Historical terms: {biasInfo.altTerms.join(', ')}
               </span>
             )}
@@ -709,8 +709,8 @@ export default function PlantationPanel({
         )}
 
         {/* Entity Graph */}
-        <div className="px-4 py-3 bg-white border-b border-stm-warm-200">
-          <p className="text-[10px] font-semibold text-stm-warm-400 uppercase tracking-wider mb-1.5">
+        <div className="px-4 py-3 bg-cream border-b border-ink/10">
+          <p className="text-[10px] font-semibold text-ink/45 uppercase tracking-wider mb-1.5">
             Entity Connections
           </p>
           <EntityGraph
