@@ -143524,6 +143524,12 @@
           "type": "vernacular",
           "isPreferred": false,
           "source": "dikland-collection"
+        },
+        {
+          "text": "Klaverblad",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false
         }
       ],
       "districtAssertions": [
