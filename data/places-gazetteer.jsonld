@@ -78339,96 +78339,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01401",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01401",
-      "type": "plantation",
-      "prefLabel": "Tout lui faut",
-      "altLabels": [],
-      "broader": "stm-00010",
-      "description": "",
-      "location": {
-        "lat": 5.739131247692309,
-        "lng": -55.173637494615384,
-        "wkt": "Polygon ((-55.19350392 5.72408255, -55.19682215 5.72812615, -55.19427129 5.72979686, -55.18744505 5.73452513, -55.16991421 5.74796504, -55.14714432 5.76771297, -55.14305500 5.76452486, -55.13818478 5.75980398, -55.16078648 5.74005919, -55.17228173 5.73689279, -55.17093597 5.73220575, -55.18943861 5.71892840, -55.19350392 5.72408255))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q59133948",
-      "fid": 2486,
-      "psurIds": [
-        "PSUR0327"
-      ],
-      "district": "Divisie Para",
-      "locationDescription": "Suriname",
-      "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
-      "placeType": "suiker",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59133948",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1818",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1818,
-          "note": null
-        },
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-suiker-1818",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1818,
-          "endYear": 1821,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1825",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1825,
-          "endYear": 1847,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1856",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1856,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-suiker-1859",
-          "value": "suiker",
-          "source": "almanakken",
-          "startYear": 1859,
-          "endYear": 1861,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02346",
       "@type": [
         "E25_Human-Made_Feature"
@@ -149215,6 +149125,150 @@
           "driveUrl": "https://drive.google.com/drive/u/0/folders/0B88mZFitv8embmZaYWFQNnZacDQ?tid=0B88mZFitv8emcjVfcG5hWFJOdWs&resourcekey=0-sImlF_DkEFu3ebWbDQ58Kg",
           "author": "Philip Dikland",
           "year": "2002, aangevuld 2005, 2008",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01401",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01401",
+      "type": "plantation",
+      "broader": "stm-00010",
+      "description": "",
+      "location": {
+        "lat": 5.739131247692309,
+        "lng": -55.173637494615384,
+        "wkt": "Polygon ((-55.19350392 5.72408255, -55.19682215 5.72812615, -55.19427129 5.72979686, -55.18744505 5.73452513, -55.16991421 5.74796504, -55.14714432 5.76771297, -55.14305500 5.76452486, -55.13818478 5.75980398, -55.16078648 5.74005919, -55.17228173 5.73689279, -55.17093597 5.73220575, -55.18943861 5.71892840, -55.19350392 5.72408255))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q59133948",
+      "fid": 2486,
+      "psurIds": [
+        "PSUR0327"
+      ],
+      "district": "Divisie Para",
+      "locationDescription": "Suriname",
+      "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
+      "placeType": "suiker",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-08",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59133948",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1818",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1818,
+          "note": null
+        },
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-suiker-1818",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1818,
+          "endYear": 1821,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1825",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1825,
+          "endYear": 1847,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1856",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1856,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-suiker-1859",
+          "value": "suiker",
+          "source": "almanakken",
+          "startYear": 1859,
+          "endYear": 1861,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "Tout Lui Faut",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        },
+        {
+          "text": "Tout lui fait",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "sourceYear": 1856
+        },
+        {
+          "text": "Tout-luifaut.",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "sourceYear": 1860
+        },
+        {
+          "text": "Tout-Lui-Faut",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": false
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00010",
+          "districtLabel": "Divisie Para",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Suriname",
+          "original": "Rivier Suriname, linkerhand in het afvaren",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Tout-Lui-Faut geschiedenis dikland 2005.pdf",
+          "driveUrl": "https://drive.google.com/file/d/1swm4asV0t4kRTYhjifQ31yFfELu1eRWx/view?usp=sharing",
+          "author": "Philip Dikland",
+          "year": "2005, aangevuld 2008, 2018",
           "notes": null
         }
       ]
