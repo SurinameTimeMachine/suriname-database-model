@@ -124078,6 +124078,11 @@
           "authority": "wikidata",
           "identifier": "Q59116912",
           "matchType": "closeMatch"
+        },
+        {
+          "authority": "wikidata",
+          "identifier": "Q59115676",
+          "matchType": "closeMatch"
         }
       ],
       "statusAssertions": [
@@ -124141,6 +124146,13 @@
           "type": "historical",
           "isPreferred": false,
           "source": "dikland-collection"
+        },
+        {
+          "text": "Haran",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "source": "dikland-collection"
         }
       ],
       "districtAssertions": [
@@ -124169,7 +124181,7 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emQTBkSlNlLWNSWTQ/view?usp=sharing&resourcekey=0-glbfaRExBGA7iMzUHAVIBw",
           "author": "Philip Dikland",
           "year": "2006",
-          "notes": null
+          "notes": "De plantage lijkt te zijn ontstaan uit een “oer”plantage die op een gegeven moment is gesplitst in zeven delen. Het latere La Vigilantia werd in die tijd “Haran” genoemd."
         }
       ]
     },
