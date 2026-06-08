@@ -22709,78 +22709,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01888",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01888",
-      "type": "plantation",
-      "prefLabel": "Esther's Lust",
-      "altLabels": [],
-      "broader": null,
-      "description": "",
-      "location": {
-        "lat": 5.524363156,
-        "lng": -55.00810001799999,
-        "wkt": "Polygon ((-55.02072843 5.51611301, -55.00613571 5.53376709, -54.99215135 5.53701376, -54.98938903 5.53385951, -54.99263786 5.52988277, -55.00416598 5.53304472, -55.01629492 5.51392190, -55.01877704 5.51466601, -55.01999143 5.51524978, -55.02072843 5.51611301))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken"
-      ],
-      "wikidataQid": "Q59115565",
-      "fid": 2973,
-      "psurIds": [],
-      "district": null,
-      "locationDescription": "Suriname",
-      "locationDescriptionOriginal": "Rivier Suriname, regterhand in het afvaren",
-      "placeType": "hout",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59115565",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-abandoned-1818",
-          "status": "abandoned",
-          "source": "almanakken",
-          "startYear": 1818,
-          "endYear": 1821,
-          "note": null
-        },
-        {
-          "id": "status-almanakken-reactivated-1825",
-          "status": "reactivated",
-          "source": "almanakken",
-          "startYear": 1825,
-          "note": null
-        },
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-hout-1825",
-          "value": "hout",
-          "source": "almanakken",
-          "startYear": 1825,
-          "endYear": 1834,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02467",
       "@type": [
         "E25_Human-Made_Feature"
@@ -110758,6 +110686,116 @@
           "author": "Philip Dikland",
           "year": "2004, aangevuld 2009, 2010",
           "notes": "(almanak 1843)\nNog steeds waren de erven Lemmers de eigenaar ; Ephrata was samengevoegd met  Lemmerskamp tot 1 grote plantage van 2400 akkers."
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01888",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01888",
+      "type": "plantation",
+      "broader": null,
+      "description": "",
+      "location": {
+        "lat": 5.524363156,
+        "lng": -55.00810001799999,
+        "wkt": "Polygon ((-55.02072843 5.51611301, -55.00613571 5.53376709, -54.99215135 5.53701376, -54.98938903 5.53385951, -54.99263786 5.52988277, -55.00416598 5.53304472, -55.01629492 5.51392190, -55.01877704 5.51466601, -55.01999143 5.51524978, -55.02072843 5.51611301))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken"
+      ],
+      "wikidataQid": "Q59115565",
+      "fid": 2973,
+      "psurIds": [],
+      "district": null,
+      "locationDescription": "Suriname",
+      "locationDescriptionOriginal": "Rivier Suriname, regterhand in het afvaren",
+      "placeType": "hout",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-08",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59115565",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-abandoned-1818",
+          "status": "abandoned",
+          "source": "almanakken",
+          "startYear": 1818,
+          "endYear": 1821,
+          "note": null
+        },
+        {
+          "id": "status-almanakken-reactivated-1825",
+          "status": "reactivated",
+          "source": "almanakken",
+          "startYear": 1825,
+          "note": null
+        },
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-hout-1825",
+          "value": "hout",
+          "source": "almanakken",
+          "startYear": 1825,
+          "endYear": 1834,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "Esther's Lust",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        },
+        {
+          "text": "Esterslust",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "sourceYear": 1818
+        },
+        {
+          "text": "Hesterslust",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        }
+      ],
+      "districtAssertions": [],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Suriname",
+          "original": "Rivier Suriname, regterhand in het afvaren",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Petit Versailles - Esterslust - Libanon geschiedenis Dikland 2022.pdf",
+          "driveUrl": "https://drive.google.com/file/d/1Kyoc_brx0wvJ26KinN9sfTvOWDATNvpu/view?usp=sharing",
+          "author": "Philip Dikland",
+          "year": "2022",
+          "notes": null
         }
       ]
     },
