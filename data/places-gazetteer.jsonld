@@ -67458,37 +67458,6 @@
       "externalLinks": []
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01883",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01883",
-      "type": "plantation",
-      "prefLabel": "Place 2968",
-      "altLabels": [],
-      "broader": null,
-      "description": "",
-      "location": {
-        "lat": 5.692524595999999,
-        "lng": -55.04791548200001,
-        "wkt": "Polygon ((-55.05103694 5.68790532, -55.05040394 5.70008125, -55.04323441 5.69993039, -55.04386518 5.68680070, -55.05103694 5.68790532))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930"
-      ],
-      "wikidataQid": null,
-      "fid": 2968,
-      "psurIds": [],
-      "district": null,
-      "locationDescription": null,
-      "locationDescriptionOriginal": null,
-      "placeType": null,
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": []
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-01884",
       "@type": [
         "E25_Human-Made_Feature"
@@ -151599,6 +151568,67 @@
           "author": "Philip Dikland",
           "year": "2006",
           "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01883",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01883",
+      "type": "plantation",
+      "broader": null,
+      "description": "",
+      "location": {
+        "lat": 5.692524595999999,
+        "lng": -55.04791548200001,
+        "wkt": "Polygon ((-55.05103694 5.68790532, -55.05040394 5.70008125, -55.04323441 5.69993039, -55.04386518 5.68680070, -55.05103694 5.68790532))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930"
+      ],
+      "wikidataQid": "Q59134059",
+      "fid": 2968,
+      "psurIds": [],
+      "district": null,
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-08",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59134059",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Waterland",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "source": "dikland-collection"
+        },
+        {
+          "text": "Place 2968",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": false
+        }
+      ],
+      "districtAssertions": [],
+      "productAssertions": [],
+      "locationAssertions": [],
+      "statusAssertions": [],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Waterland 2003-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/1wBy0EDTJQwiN1Wt4N-pf1WRr9BjzzggO/view?usp=sharing",
+          "author": "Philip Dikland",
+          "year": "2003, aangevuld 2007, 2026",
+          "notes": "Ten tijde van de emancipatie was Wilhelm Eduard Ruhmann (1816-1872) de eigenaar van de plantage. Waterland was verenigd met Adrichem."
         }
       ]
     },
