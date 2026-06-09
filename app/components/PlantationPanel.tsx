@@ -1037,6 +1037,7 @@ export default function PlantationPanel({
                           lat={null}
                           lng={null}
                           wkt={geojsonGeometryToWkt(feature.geometry)}
+                          featureType={ft}
                           editable={false}
                         />
                       </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import 'leaflet/dist/leaflet.css';
+import { usePlaceTypes } from '@/lib/thesaurus';
 import L from 'leaflet';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -37,6 +38,7 @@ interface PlaceMiniMapProps {
   lat: number | null;
   lng: number | null;
   wkt: string | null;
+  featureType?: string | null;
   editable?: boolean;
   onLocationChange?: (lat: number, lng: number) => void;
 }
@@ -49,9 +51,11 @@ export default function PlaceMiniMap({
   lat,
   lng,
   wkt,
+  featureType,
   editable = false,
   onLocationChange,
 }: PlaceMiniMapProps) {
+  const { colors: placeTypeColors } = usePlaceTypes();
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const markerRef = useRef<L.Marker | null>(null);
@@ -143,6 +147,12 @@ export default function PlaceMiniMap({
     // Draw geometry from WKT if available
     if (wkt) {
       const upper = wkt.trim().toUpperCase();
+      const fallbackType =
+        featureType ||
+        (upper.startsWith('LINESTRING') || upper.startsWith('MULTILINESTRING')
+          ? 'river'
+          : 'plantation');
+      const color = placeTypeColors[fallbackType] || '#94cc7d';
       if (
         upper.startsWith('LINESTRING') ||
         upper.startsWith('MULTILINESTRING')
@@ -150,10 +160,15 @@ export default function PlaceMiniMap({
         const lines = parseWKTLineString(wkt);
         if (lines.length > 0) {
           const pl = L.polyline(lines, {
-            color: '#a0522d',
-            weight: 2.5,
-            dashArray: '6 4',
-            opacity: 0.9,
+            color,
+            weight: fallbackType === 'creek' ? 2 : 2.8,
+            dashArray:
+              fallbackType === 'road'
+                ? '5 4'
+                : fallbackType === 'railroad'
+                  ? '8 4 2 4'
+                  : undefined,
+            opacity: 0.82,
           }).addTo(map);
           polylineRef.current = pl;
           map.fitBounds(pl.getBounds(), { padding: [20, 20] });
@@ -162,10 +177,11 @@ export default function PlaceMiniMap({
         const coords = parseWKTPolygon(wkt);
         if (coords.length > 0) {
           const poly = L.polygon(coords, {
-            color: '#a67830',
-            fillColor: '#d4b67e',
-            fillOpacity: 0.3,
-            weight: 2,
+            color,
+            fillColor: color,
+            fillOpacity: 0.26,
+            opacity: 0.72,
+            weight: 1.6,
           }).addTo(map);
           polygonRef.current = poly;
           map.fitBounds(poly.getBounds(), { padding: [20, 20] });
@@ -175,12 +191,13 @@ export default function PlaceMiniMap({
 
     // Place marker at centroid
     if (lat != null && lng != null) {
+      const color = placeTypeColors[featureType || ''] || '#94cc7d';
       const marker = L.marker([lat, lng], {
         icon: L.divIcon({
           className: 'place-marker',
-          html: '<div style="width:12px;height:12px;background:#a67830;border:2px solid #503818;border-radius:50%;"></div>',
-          iconSize: [12, 12],
-          iconAnchor: [6, 6],
+          html: `<div style="width:14px;height:14px;background:${color};border:2px solid #006d5b;border-radius:50%;box-shadow:0 0 0 2px rgba(253,248,242,.95),0 2px 8px rgba(0,60,52,.22);"></div>`,
+          iconSize: [14, 14],
+          iconAnchor: [7, 7],
         }),
       }).addTo(map);
       markerRef.current = marker;
@@ -203,7 +220,7 @@ export default function PlaceMiniMap({
         map.off('click', handleClick);
       };
     }
-  }, [lat, lng, wkt, editable, onLocationChange]);
+  }, [lat, lng, wkt, featureType, editable, onLocationChange, placeTypeColors]);
 
   return (
     <div

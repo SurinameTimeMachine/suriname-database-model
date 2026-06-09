@@ -1437,6 +1437,7 @@ export default function PlaceEditor({
             lat={draft.location.lat}
             lng={draft.location.lng}
             wkt={draft.location.wkt}
+            featureType={draft.placeType}
             editable={canEdit}
             onLocationChange={handleLocationChange}
           />

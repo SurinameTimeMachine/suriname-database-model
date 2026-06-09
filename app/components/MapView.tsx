@@ -179,6 +179,33 @@ const DEFAULT_ENABLED = new Set(
   OVERLAY_CONFIGS.filter((c) => c.defaultEnabled).map((c) => c.id),
 );
 const ENABLE_WARPED_OVERLAYS = true;
+const MAP_DESIGN = {
+  cream: '#fdf8f2',
+  tealStrong: '#006d5b',
+  tealBright: '#34d1b3',
+  mutedPlace: '#94cc7d',
+};
+
+function featureColor(
+  featureType: string | undefined,
+  colors: Record<string, string>,
+) {
+  return colors[featureType || ''] || MAP_DESIGN.mutedPlace;
+}
+
+function lineDash(featureType: string | undefined) {
+  if (featureType === 'road') return '5 4';
+  if (featureType === 'railroad') return '8 4 2 4';
+  return undefined;
+}
+
+function lineWeight(featureType: string | undefined) {
+  if (featureType === 'river') return 2.6;
+  if (featureType === 'creek') return 1.8;
+  if (featureType === 'railroad') return 3;
+  if (featureType === 'road') return 2.2;
+  return 2;
+}
 
 function nextFrame(): Promise<void> {
   return new Promise((resolve) => requestAnimationFrame(() => resolve()));
@@ -432,12 +459,13 @@ export default function MapView({
         return !ft || enabledFeaturesRef.current.has(ft);
       },
       pointToLayer: (_feature, latlng) => {
-        return L.circleMarker(latlng, { radius: 6 });
+        return L.circleMarker(latlng, { radius: 5.5 });
       },
       style: (feature) => {
         const props = feature?.properties;
         const geomType = feature?.geometry?.type;
         const ft = props?.featureType || 'plantation';
+        const color = featureColor(ft, placeTypeColorsRef.current);
         const featureIdentifier =
           props?.plantationUri ?? props?.featureUri ?? props?.placeUri;
         const isSelected = featureIdentifier === selectedUriRef.current;
@@ -450,90 +478,58 @@ export default function MapView({
 
         // Point features (settlements, military posts, stations, villages, towns)
         if (geomType === 'Point') {
-          const color = placeTypeColorsRef.current[ft] || '#888';
           if (isSelected) {
             return {
               fillColor: color,
-              fillOpacity: 0.9,
-              color: '#333',
-              weight: 2.5,
+              fillOpacity: 0.95,
+              color: MAP_DESIGN.tealStrong,
+              opacity: 1,
+              weight: 3,
             };
           }
           if (isHighlighted) {
             return {
-              fillColor: '#e07850',
-              fillOpacity: 0.8,
-              color: '#a04020',
-              weight: 2,
+              fillColor: color,
+              fillOpacity: 0.9,
+              color: MAP_DESIGN.tealBright,
+              opacity: 1,
+              weight: 2.5,
             };
           }
           return {
             fillColor: color,
-            fillOpacity: 0.7,
-            color: '#fff',
-            weight: 1.5,
+            fillOpacity: 0.74,
+            color: MAP_DESIGN.cream,
+            opacity: 1,
+            weight: 1.4,
           };
         }
 
         // LineString / MultiLineString features
         if (geomType === 'LineString' || geomType === 'MultiLineString') {
-          // Roads
-          if (ft === 'road') {
-            if (isSelected)
-              return { color: '#8B4513', weight: 3, opacity: 0.9 };
-            if (isHighlighted)
-              return {
-                color: '#e07850',
-                weight: 2.5,
-                opacity: 0.8,
-                dashArray: '6 3',
-              };
-            return {
-              color: '#a0522d',
-              weight: 2,
-              opacity: 0.6,
-              dashArray: '5 4',
-            };
-          }
-          // Railroad
-          if (ft === 'railroad') {
-            if (isSelected)
-              return { color: '#1a1a1a', weight: 4, opacity: 0.9 };
-            if (isHighlighted)
-              return {
-                color: '#e07850',
-                weight: 3.5,
-                opacity: 0.8,
-                dashArray: '6 3',
-              };
-            return {
-              color: '#2c2c2c',
-              weight: 3,
-              opacity: 0.7,
-              dashArray: '8 4 2 4',
-            };
-          }
-          // Rivers and creeks
-          const isCreek = ft === 'creek';
+          const baseWeight = lineWeight(ft);
+          const dash = isHighlighted ? '6 3' : lineDash(ft);
           if (isSelected) {
             return {
-              color: '#1a6fa0',
-              weight: isCreek ? 3 : 4,
-              opacity: 0.9,
+              color,
+              weight: baseWeight + 1.4,
+              opacity: 0.95,
+              dashArray: dash,
             };
           }
           if (isHighlighted) {
             return {
-              color: '#e07850',
-              weight: isCreek ? 2.5 : 3.5,
-              opacity: 0.8,
-              dashArray: '6 3',
+              color: MAP_DESIGN.tealBright,
+              weight: baseWeight + 1,
+              opacity: 0.92,
+              dashArray: dash,
             };
           }
           return {
-            color: isCreek ? '#6baed6' : '#3182bd',
-            weight: isCreek ? 1.5 : 2.5,
-            opacity: 0.7,
+            color,
+            weight: baseWeight,
+            opacity: 0.72,
+            dashArray: dash,
           };
         }
 
@@ -541,26 +537,28 @@ export default function MapView({
         const isBuilt = props?.status === 'built';
         if (isSelected) {
           return {
-            fillColor: '#c0944e',
-            fillOpacity: 0.55,
-            color: '#8c6228',
+            fillColor: color,
+            fillOpacity: 0.48,
+            color: MAP_DESIGN.tealStrong,
             weight: 3,
           };
         }
         if (isHighlighted) {
           return {
-            fillColor: '#e07850',
-            fillOpacity: 0.45,
-            color: '#a04020',
+            fillColor: color,
+            fillOpacity: 0.42,
+            color: MAP_DESIGN.tealBright,
             weight: 2,
             dashArray: '6 3',
           };
         }
         return {
-          fillColor: isBuilt ? '#a67830' : '#a39b8e',
-          fillOpacity: 0.25,
-          color: isBuilt ? '#6e4d20' : '#6e6658',
-          weight: 1,
+          fillColor: color,
+          fillOpacity: isBuilt ? 0.24 : 0.14,
+          color,
+          opacity: isBuilt ? 0.68 : 0.45,
+          weight: isBuilt ? 1.2 : 1,
+          dashArray: isBuilt ? undefined : '4 3',
         };
       },
       onEachFeature: (feature, featureLayer) => {
@@ -583,14 +581,26 @@ export default function MapView({
           const target = e.target as L.Path;
           if (featureIdentifier !== selectedUriRef.current) {
             if (feature.geometry?.type === 'Point') {
-              target.setStyle({ fillOpacity: 0.9, weight: 2.5 });
+              target.setStyle({
+                color: MAP_DESIGN.tealBright,
+                fillOpacity: 0.9,
+                weight: 2.5,
+              });
             } else if (
               feature.geometry?.type === 'LineString' ||
               feature.geometry?.type === 'MultiLineString'
             ) {
-              target.setStyle({ opacity: 0.9, weight: 3.5 });
+              target.setStyle({
+                color: MAP_DESIGN.tealBright,
+                opacity: 0.9,
+                weight: lineWeight(ft) + 1,
+              });
             } else {
-              target.setStyle({ fillOpacity: 0.5, weight: 2 });
+              target.setStyle({
+                color: MAP_DESIGN.tealBright,
+                fillOpacity: 0.44,
+                weight: 2,
+              });
             }
           }
         });
@@ -812,11 +822,11 @@ export default function MapView({
             {/* Legend (compact) */}
             <div className="flex items-center gap-3 text-xs">
               <div className="flex items-center gap-1.5">
-                <span className="w-3.5 h-2.5 border-2 border-stm-sepia-600 bg-stm-sepia-300 opacity-80 inline-block" />
+                <span className="w-3.5 h-2.5 border-2 border-teal-strong bg-teal-soft/80 inline-block" />
                 <span className="text-ink/65">Selected</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="w-3.5 h-2.5 border border-dashed border-[#a04020] bg-[#e07850] opacity-70 inline-block" />
+                <span className="w-3.5 h-2.5 border border-dashed border-teal-bright bg-teal-soft/60 inline-block" />
                 <span className="text-ink/65">Highlighted</span>
               </div>
             </div>
@@ -906,18 +916,27 @@ export default function MapView({
                             />
                             {isPoly ? (
                               <span
-                                className="w-3.5 h-2.5 inline-block opacity-60"
-                                style={{ backgroundColor: color }}
+                                className="w-3.5 h-2.5 inline-block border opacity-70"
+                                style={{
+                                  backgroundColor: color,
+                                  borderColor: color,
+                                }}
                               />
                             ) : isLine ? (
                               <span
                                 className="w-3.5 h-0.5 inline-block"
-                                style={{ backgroundColor: color }}
+                                style={{
+                                  backgroundColor: color,
+                                  opacity: 0.75,
+                                }}
                               />
                             ) : (
                               <span
-                                className="w-2.5 h-2.5 rounded-full inline-block"
-                                style={{ backgroundColor: color, opacity: 0.7 }}
+                                className="w-2.5 h-2.5 rounded-full inline-block border border-cream"
+                                style={{
+                                  backgroundColor: color,
+                                  opacity: 0.8,
+                                }}
                               />
                             )}
                             <span className="text-ink/80 flex-1">

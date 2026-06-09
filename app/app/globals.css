@@ -468,7 +468,8 @@ button {
 }
 
 /* Leaflet tooltip */
-.plantation-tooltip {
+.plantation-tooltip,
+.leaflet-tooltip-stm {
   font-size: 12px;
   font-weight: 500;
   padding: 2px 6px;
