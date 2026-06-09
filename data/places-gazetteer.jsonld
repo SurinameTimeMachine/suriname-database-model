@@ -85216,107 +85216,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01453",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01453",
-      "type": "plantation",
-      "prefLabel": "Worsteling Jacobs",
-      "altLabels": [],
-      "broader": "stm-00007",
-      "description": "",
-      "location": {
-        "lat": 5.355135437692307,
-        "lng": -55.04042558307692,
-        "wkt": "Polygon ((-55.05554502 5.37287475, -55.01786243 5.35296977, -55.02002071 5.35051973, -55.02173281 5.34840902, -55.02287931 5.34669996, -55.02419362 5.34420339, -55.02558195 5.34070956, -55.04900340 5.35224673, -55.05144912 5.35999368, -55.05862394 5.35770235, -55.05955946 5.35782277, -55.06353579 5.35973423, -55.05554502 5.37287475))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken"
-      ],
-      "wikidataQid": "Q59134173",
-      "fid": 2538,
-      "psurIds": [],
-      "district": "Divisie Boven-Suriname en Thorarica",
-      "locationDescription": "Suriname",
-      "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
-      "placeType": "steen",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59134173",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1821",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1821,
-          "note": null
-        },
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-steen-1821",
-          "value": "steen",
-          "source": "almanakken",
-          "startYear": 1821,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-steen-1825",
-          "value": "steen",
-          "source": "almanakken",
-          "startYear": 1825,
-          "endYear": 1834,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-steen-en-hout-1835",
-          "value": "steen en hout",
-          "source": "almanakken",
-          "startYear": 1835,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-steen-1836",
-          "value": "steen",
-          "source": "almanakken",
-          "startYear": 1836,
-          "endYear": 1842,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-kweek-en-kost-1856",
-          "value": "kweek en kost",
-          "source": "almanakken",
-          "startYear": 1856,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-hout-1859",
-          "value": "hout",
-          "source": "almanakken",
-          "startYear": 1859,
-          "endYear": 1861,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02119",
       "@type": [
         "E25_Human-Made_Feature"
@@ -154951,6 +154850,148 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emNHdpLXVPVFFVR2M/view?usp=sharing&resourcekey=0-g-9V_IqEgLVIptuEFotazQ",
           "author": "Philip Dikland",
           "year": "2005",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01453",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01453",
+      "type": "plantation",
+      "broader": "stm-00007",
+      "description": "",
+      "location": {
+        "lat": 5.355135437692307,
+        "lng": -55.04042558307692,
+        "wkt": "Polygon ((-55.05554502 5.37287475, -55.01786243 5.35296977, -55.02002071 5.35051973, -55.02173281 5.34840902, -55.02287931 5.34669996, -55.02419362 5.34420339, -55.02558195 5.34070956, -55.04900340 5.35224673, -55.05144912 5.35999368, -55.05862394 5.35770235, -55.05955946 5.35782277, -55.06353579 5.35973423, -55.05554502 5.37287475))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken"
+      ],
+      "wikidataQid": "Q59134173",
+      "fid": 2538,
+      "psurIds": [],
+      "district": "Divisie Boven-Suriname en Thorarica",
+      "locationDescription": "Suriname",
+      "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
+      "placeType": "steen",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-09",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59134173",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1821",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1821,
+          "note": null
+        },
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-steen-1821",
+          "value": "steen",
+          "source": "almanakken",
+          "startYear": 1821,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-steen-1825",
+          "value": "steen",
+          "source": "almanakken",
+          "startYear": 1825,
+          "endYear": 1834,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-steen-en-hout-1835",
+          "value": "steen en hout",
+          "source": "almanakken",
+          "startYear": 1835,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-steen-1836",
+          "value": "steen",
+          "source": "almanakken",
+          "startYear": 1836,
+          "endYear": 1842,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-kweek-en-kost-1856",
+          "value": "kweek en kost",
+          "source": "almanakken",
+          "startYear": 1856,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-hout-1859",
+          "value": "hout",
+          "source": "almanakken",
+          "startYear": 1859,
+          "endYear": 1861,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "Worsteling Jacobs",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        },
+        {
+          "text": "Wors Jacopoe Anberi",
+          "language": "srn",
+          "type": "vernacular",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00007",
+          "districtLabel": "Divisie Boven-Suriname en Thorarica",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Suriname",
+          "original": "Rivier Suriname, linkerhand in het afvaren",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Worsteling Jacobs 2005-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emQV9RUUR4cGNCRFE/view?usp=sharing&resourcekey=0-5pu0u-DWmCmWISQNt0MlTw",
+          "author": "Philip Dikland",
+          "year": "2005, aangevuld 2007, 2009",
           "notes": null
         }
       ]
