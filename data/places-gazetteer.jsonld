@@ -82800,85 +82800,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01455",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01455",
-      "type": "plantation",
-      "prefLabel": "Wayamoe",
-      "altLabels": [],
-      "broader": "stm-00006",
-      "description": "",
-      "location": {
-        "lat": 5.344028938571428,
-        "lng": -55.049228045714294,
-        "wkt": "Polygon ((-55.05144912 5.35999368, -55.04900340 5.35224673, -55.04068338 5.32597355, -55.04481462 5.32632814, -55.04857274 5.32596444, -55.05862394 5.35770235, -55.05144912 5.35999368))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken"
-      ],
-      "wikidataQid": "Q59134072",
-      "fid": 2540,
-      "psurIds": [],
-      "district": "Divisie Boven-Cottica en Perica",
-      "locationDescription": "Wayamoe Kreek",
-      "locationDescriptionOriginal": "Wayamoe-kreek, linkerhand in het opvaren",
-      "placeType": "koffie",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59134072",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1818",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1818,
-          "note": null
-        },
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-koffie-1818",
-          "value": "koffie",
-          "source": "almanakken",
-          "startYear": 1818,
-          "endYear": 1821,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-koffie-1827",
-          "value": "koffie",
-          "source": "almanakken",
-          "startYear": 1827,
-          "endYear": 1847,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-koffie-kost-en-kweek-1856",
-          "value": "koffie, kost en kweek",
-          "source": "almanakken",
-          "startYear": 1856,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02381",
       "@type": [
         "E25_Human-Made_Feature"
@@ -152626,6 +152547,126 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emVXZ4YjktS0xaQWc/view?usp=sharing&resourcekey=0-am3DP7XWL9qTi2a4ebU-Eg",
           "author": "Philip Dikland",
           "year": "2006, aangevuld 2009",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01455",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01455",
+      "type": "plantation",
+      "broader": "stm-00006",
+      "description": "",
+      "location": {
+        "lat": 5.344028938571428,
+        "lng": -55.049228045714294,
+        "wkt": "Polygon ((-55.05144912 5.35999368, -55.04900340 5.35224673, -55.04068338 5.32597355, -55.04481462 5.32632814, -55.04857274 5.32596444, -55.05862394 5.35770235, -55.05144912 5.35999368))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken"
+      ],
+      "wikidataQid": "Q59134072",
+      "fid": 2540,
+      "psurIds": [],
+      "district": "Divisie Boven-Cottica en Perica",
+      "locationDescription": "Wayamoe Kreek",
+      "locationDescriptionOriginal": "Wayamoe-kreek, linkerhand in het opvaren",
+      "placeType": "koffie",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-09",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59134072",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1818",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1818,
+          "note": null
+        },
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-koffie-1818",
+          "value": "koffie",
+          "source": "almanakken",
+          "startYear": 1818,
+          "endYear": 1821,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-koffie-1827",
+          "value": "koffie",
+          "source": "almanakken",
+          "startYear": 1827,
+          "endYear": 1847,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-koffie-kost-en-kweek-1856",
+          "value": "koffie, kost en kweek",
+          "source": "almanakken",
+          "startYear": 1856,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "Wayamoe",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        },
+        {
+          "text": "Waijamoe",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "sourceYear": 1856
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00006",
+          "districtLabel": "Divisie Boven-Cottica en Perica",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Wayamoe Kreek",
+          "original": "Wayamoe-kreek, linkerhand in het opvaren",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Wayamoe 2005-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emVmpvUnEtWHJmZ0k/view?usp=sharing&resourcekey=0-2U5uZmSDcD-vFOYrc8g1rQ",
+          "author": "Philip Dikland",
+          "year": "2005",
           "notes": null
         }
       ]
