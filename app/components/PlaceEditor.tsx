@@ -1114,7 +1114,7 @@ export default function PlaceEditor({
   };
 
   return (
-    <div className="bg-white border border-stm-warm-200 shadow-sm h-full flex flex-col">
+    <div className="h-full min-h-0 flex flex-col border border-stm-warm-200 bg-white shadow-sm">
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-3 border-b border-stm-warm-100">
         <div className="min-w-0">
@@ -1159,7 +1159,7 @@ export default function PlaceEditor({
         </button>
       </div>
 
-      <div className="p-5 space-y-4 flex-1 overflow-y-auto">
+      <div className="min-h-0 flex-1 overflow-y-auto p-4 space-y-4">
         {/* Names */}
         <div>
           <div className="flex items-center justify-between mb-1">
@@ -2517,36 +2517,34 @@ export default function PlaceEditor({
         )}
       </div>
 
-      {/* Footer — sticky: IDs + actions */}
-      <div className="border-t border-stm-warm-100 px-5 py-3 bg-white space-y-3 shrink-0">
+      {/* Footer: IDs, modification metadata, and actions stay visible in the card. */}
+      <div className="shrink-0 border-t border-stm-warm-100 bg-white px-4 py-2">
         {/* IDs (read-only) */}
-        <div className="space-y-1 text-xs text-stm-warm-400">
-          <div>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-stm-warm-400">
+          <span>
             Gazetteer ID: <span className="font-mono">{draft.id}</span>
-          </div>
-          {draft.fid != null && <div>QGIS Feature ID: {draft.fid}</div>}
+          </span>
+          {draft.fid != null && <span>QGIS Feature ID: {draft.fid}</span>}
           {draft.district && (
-            <div>District (auto-linked): {draft.district}</div>
+            <span>District (auto-linked): {draft.district}</span>
+          )}
+          {draft.modifiedBy && (
+            <span>
+              Modified by {draft.modifiedBy} on {draft.modifiedAt}
+            </span>
           )}
         </div>
 
-        {/* Metadata */}
-        {draft.modifiedBy && (
-          <div className="text-xs text-stm-warm-400">
-            Last modified by {draft.modifiedBy} on {draft.modifiedAt}
-          </div>
-        )}
-
         {/* Error */}
         {error && (
-          <div className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded">
+          <div className="mt-2 bg-red-50 px-3 py-2 text-sm text-red-600">
             {error}
           </div>
         )}
 
         {/* Actions */}
         {canEdit && (
-          <div className="flex gap-2">
+          <div className="mt-2 flex gap-2">
             <button
               onClick={handleSave}
               disabled={

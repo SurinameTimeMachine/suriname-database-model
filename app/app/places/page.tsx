@@ -736,6 +736,7 @@ function SelectedPlaceSummary({
           lat={place.location.lat}
           lng={place.location.lng}
           wkt={place.location.wkt}
+          compact
         />
       </div>
     </div>
