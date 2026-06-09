@@ -656,80 +656,6 @@ const PlaceRow = memo(function PlaceRow({
   );
 });
 
-function SelectedPlaceSummary({
-  place,
-  typeLabel,
-  typeColor,
-}: {
-  place: GazetteerPlace | null;
-  typeLabel?: string;
-  typeColor?: string;
-}) {
-  if (!place) {
-    return (
-      <div className="flex h-full min-h-0 flex-col items-center justify-center px-6 text-center">
-        <div className="site-kicker mb-3 justify-center">Gazetteer</div>
-        <h2 className="text-lg font-semibold text-ink">Select a place</h2>
-        <p className="mt-2 max-w-xs text-sm leading-relaxed text-ink/60">
-          Pick a row in the table to inspect names, sources, assertions, and
-          the mapped location without leaving the workspace.
-        </p>
-      </div>
-    );
-  }
-
-  const hasPoint = place.location.lat != null && place.location.lng != null;
-  const coords = hasPoint
-    ? `${place.location.lat?.toFixed(5)}, ${place.location.lng?.toFixed(5)}`
-    : null;
-
-  return (
-    <div className="border-b border-ink/10 bg-cream">
-      <div className="px-4 py-3">
-        <div className="mb-2 flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <div className="mb-1 flex items-center gap-2">
-              <span
-                className="h-2.5 w-2.5 shrink-0"
-                style={{ backgroundColor: typeColor || 'var(--teal-strong)' }}
-                aria-hidden
-              />
-              <span className="text-[10px] font-semibold uppercase tracking-[0.24em] text-ink/45">
-                Selected location
-              </span>
-            </div>
-            <h2 className="truncate text-base font-semibold text-ink">
-              {getPreferredName(place)}
-            </h2>
-            <p className="mt-0.5 truncate text-[11px] font-mono text-ink/45">
-              {place.id}
-            </p>
-          </div>
-          <span
-            className="shrink-0 border border-ink/10 px-1.5 py-0.5 text-[10px] font-medium"
-            style={{
-              backgroundColor: `${typeColor || '#006d5b'}20`,
-              color: typeColor || 'var(--teal-strong)',
-            }}
-          >
-            {typeLabel || place.type}
-          </span>
-        </div>
-        <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
-          <dt className="text-ink/40">District</dt>
-          <dd className="truncate text-ink/75">
-            {getCurrentDistrictLabel(place) || 'No district'}
-          </dd>
-          <dt className="text-ink/40">Coordinates</dt>
-          <dd className="truncate font-mono text-ink/75">
-            {coords || 'No point location'}
-          </dd>
-        </dl>
-      </div>
-    </div>
-  );
-}
-
 export default function PlacesPage() {
   return (
     <Suspense>
@@ -1573,11 +1499,6 @@ function PlacesPageInner() {
             {/* Detail panel */}
             {selectedPlace && (
               <aside className="hidden w-[42%] min-w-96 max-w-160 shrink-0 flex-col overflow-hidden border-l border-ink/10 bg-background lg:flex">
-                <SelectedPlaceSummary
-                  place={selectedPlace}
-                  typeLabel={labels[selectedPlace.type] || selectedPlace.type}
-                  typeColor={colors[selectedPlace.type]}
-                />
                 <div className="min-h-0 flex-1 overflow-hidden">
                   <PlaceEditor
                     key={selectedPlace.id}
@@ -1595,11 +1516,6 @@ function PlacesPageInner() {
 
             {selectedPlace && (
               <div className="absolute inset-x-0 bottom-0 z-40 flex max-h-[78dvh] flex-col overflow-hidden border-t border-ink/10 bg-background shadow-[0_-20px_50px_rgba(0,30,24,0.16)] lg:hidden">
-                <SelectedPlaceSummary
-                  place={selectedPlace}
-                  typeLabel={labels[selectedPlace.type] || selectedPlace.type}
-                  typeColor={colors[selectedPlace.type]}
-                />
                 <div className="min-h-0 flex-1 overflow-hidden">
                   <PlaceEditor
                     key={selectedPlace.id}
