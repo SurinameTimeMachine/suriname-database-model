@@ -1396,51 +1396,53 @@ function PlacesPageInner() {
               ref={tableScrollRef}
               className="min-w-0 flex-1 overflow-auto"
             >
-              <div className="sticky top-0 z-20 flex items-center gap-3 border-b border-ink/10 bg-background/95 px-4 pb-1 pt-2 text-xs text-ink/45 backdrop-blur-sm sm:px-6 lg:px-8">
-                <span>
-                  {filtered.length} of {places.length - deprecatedCount} places
-                </span>
-                {selectedPlace && !isCreating && (
-                  <span className="hidden min-w-0 truncate text-teal-strong md:inline">
-                    &middot; selected: {getPreferredName(selectedPlace)}
-                  </span>
-                )}
-                {mergedCount > 0 && (
-                  <span>
-                    &middot;{' '}
-                    {showMerged ? (
-                      <>
-                        {mergedCount} merged shown{' '}
-                        <button
-                          onClick={() => setShowMerged(false)}
-                          className="underline hover:text-teal-strong"
-                        >
-                          hide
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        {mergedCount} merged hidden{' '}
-                        <button
-                          onClick={() => setShowMerged(true)}
-                          className="underline hover:text-teal-strong"
-                        >
-                          show
-                        </button>
-                      </>
-                    )}
-                  </span>
-                )}
-                {deprecatedCount > 0 && (
-                  <span className="text-ink/30">
-                    &middot; {deprecatedCount} deprecated
-                  </span>
-                )}
-              </div>
-
               <div className="px-4 pb-4 sm:px-6 lg:px-8">
                 <table className="w-full min-w-max border-collapse border border-ink/10 bg-cream/70 text-sm shadow-[0_15px_35px_rgba(0,30,24,0.08)]">
-                  <thead className="sticky top-8 z-10 bg-cream">
+                  <caption className="caption-top border-x border-t border-ink/10 bg-background/95 px-3 py-1.5 text-left text-xs text-ink/45">
+                    <span className="inline-flex min-w-max items-center gap-3">
+                      <span>
+                        {filtered.length} of {places.length - deprecatedCount}{' '}
+                        places
+                      </span>
+                      {selectedPlace && !isCreating && (
+                        <span className="hidden max-w-80 truncate text-teal-strong md:inline">
+                          &middot; selected: {getPreferredName(selectedPlace)}
+                        </span>
+                      )}
+                      {mergedCount > 0 && (
+                        <span>
+                          &middot;{' '}
+                          {showMerged ? (
+                            <>
+                              {mergedCount} merged shown{' '}
+                              <button
+                                onClick={() => setShowMerged(false)}
+                                className="underline hover:text-teal-strong"
+                              >
+                                hide
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              {mergedCount} merged hidden{' '}
+                              <button
+                                onClick={() => setShowMerged(true)}
+                                className="underline hover:text-teal-strong"
+                              >
+                                show
+                              </button>
+                            </>
+                          )}
+                        </span>
+                      )}
+                      {deprecatedCount > 0 && (
+                        <span className="text-ink/30">
+                          &middot; {deprecatedCount} deprecated
+                        </span>
+                      )}
+                    </span>
+                  </caption>
+                  <thead className="sticky top-0 z-10 bg-cream">
                     <tr className="border-b border-ink/10 text-left text-xs text-ink/55 uppercase tracking-[0.2em]">
                       {canEdit && (
                         <th
