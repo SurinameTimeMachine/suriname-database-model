@@ -39,7 +39,6 @@ interface PlaceMiniMapProps {
   wkt: string | null;
   editable?: boolean;
   onLocationChange?: (lat: number, lng: number) => void;
-  compact?: boolean;
 }
 
 /**
@@ -52,7 +51,6 @@ export default function PlaceMiniMap({
   wkt,
   editable = false,
   onLocationChange,
-  compact = false,
 }: PlaceMiniMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
@@ -210,10 +208,8 @@ export default function PlaceMiniMap({
   return (
     <div
       ref={containerRef}
-      className={`relative w-full border border-stm-warm-200 ${
-        compact ? 'h-28' : 'h-48'
-      }`}
-      style={{ minHeight: compact ? '112px' : '192px' }}
+      className="relative w-full h-48 border border-stm-warm-200"
+      style={{ minHeight: '192px' }}
     >
       <button
         type="button"

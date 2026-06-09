@@ -21,7 +21,6 @@ import type {
 } from '@/lib/types';
 import { getPreferredName } from '@/lib/types';
 import { extractPlaceId } from '@/lib/url';
-import dynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
 import {
   memo,
@@ -32,10 +31,6 @@ import {
   useRef,
   useState,
 } from 'react';
-
-const PlaceMiniMap = dynamic(() => import('@/components/PlaceMiniMap'), {
-  ssr: false,
-});
 
 type SortKey =
   | 'name'
@@ -730,14 +725,6 @@ function SelectedPlaceSummary({
             {coords || 'No point location'}
           </dd>
         </dl>
-      </div>
-      <div className="px-4 pb-3">
-        <PlaceMiniMap
-          lat={place.location.lat}
-          lng={place.location.lng}
-          wkt={place.location.wkt}
-          compact
-        />
       </div>
     </div>
   );
