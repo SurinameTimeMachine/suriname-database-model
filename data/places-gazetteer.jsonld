@@ -85126,61 +85126,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-02445",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-02445",
-      "type": "plantation",
-      "prefLabel": "Wolffenbuttel",
-      "altLabels": [],
-      "broader": null,
-      "description": "Plantation from Surinaamse Almanakken (no QGIS geometry)",
-      "location": {
-        "lat": null,
-        "lng": null,
-        "wkt": null,
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "almanakken"
-      ],
-      "wikidataQid": "Q59134147",
-      "fid": null,
-      "psurIds": [],
-      "district": null,
-      "locationDescription": "Rijweg naar Kwatta",
-      "locationDescriptionOriginal": "Rijweg naar Kwatta",
-      "placeType": "kost",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59134147",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1835",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1835,
-          "note": null
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-kost-1835",
-          "value": "kost",
-          "source": "almanakken",
-          "startYear": 1835,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-01191",
       "@type": [
         "E25_Human-Made_Feature"
@@ -154715,6 +154660,91 @@
           "author": "Philip Dikland",
           "year": "2012",
           "notes": "De plantage heette vroeger “Leeuwendaal”, daarna “Tortona”, vervolgens “Willemslust” en\ntenslotte “Willemsburg”."
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-02445",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-02445",
+      "type": "plantation",
+      "broader": null,
+      "description": "Plantation from Surinaamse Almanakken (no QGIS geometry)",
+      "location": {
+        "lat": null,
+        "lng": null,
+        "wkt": null,
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "almanakken"
+      ],
+      "wikidataQid": "Q59134147",
+      "fid": null,
+      "psurIds": [],
+      "district": null,
+      "locationDescription": "Rijweg naar Kwatta",
+      "locationDescriptionOriginal": "Rijweg naar Kwatta",
+      "placeType": "kost",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-09",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59134147",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1835",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1835,
+          "note": null
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-kost-1835",
+          "value": "kost",
+          "source": "almanakken",
+          "startYear": 1835,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "Wolffenbuttel",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "Wolfenbuttel",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        }
+      ],
+      "districtAssertions": [],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Rijweg naar Kwatta",
+          "original": "Rijweg naar Kwatta",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Suriname rivier\\plantages\\Wolfenbuttel 2005-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emRWdXdDdhQ2FBRDA/view?usp=sharing&resourcekey=0-vleJRkwSZIxNMGkm1z5mQw",
+          "author": "Philip Dikland",
+          "year": "2005",
+          "notes": null
         }
       ]
     },
