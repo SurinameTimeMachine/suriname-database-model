@@ -21,6 +21,7 @@ import type {
 } from '@/lib/types';
 import { getPreferredName } from '@/lib/types';
 import { extractPlaceId } from '@/lib/url';
+import dynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
 import {
   memo,
@@ -31,6 +32,10 @@ import {
   useRef,
   useState,
 } from 'react';
+
+const PlaceMiniMap = dynamic(() => import('@/components/PlaceMiniMap'), {
+  ssr: false,
+});
 
 type SortKey =
   | 'name'
@@ -460,9 +465,12 @@ const PlaceRow = memo(function PlaceRow({
 
   return (
     <tr
+      data-place-id={place.id}
       onClick={handleClick}
-      className={`cursor-pointer border-b border-stm-warm-50 transition-colors ${
-        isSelected ? 'bg-stm-sepia-50' : 'bg-white hover:bg-stm-warm-50'
+      className={`cursor-pointer border-b border-ink/5 transition-colors ${
+        isSelected
+          ? 'bg-teal-soft/30 shadow-[inset_4px_0_0_var(--teal-strong)]'
+          : 'bg-cream/70 hover:bg-teal-soft/15'
       }`}
     >
       {/* Merge checkbox */}
@@ -653,6 +661,87 @@ const PlaceRow = memo(function PlaceRow({
   );
 });
 
+function SelectedPlaceSummary({
+  place,
+  typeLabel,
+  typeColor,
+}: {
+  place: GazetteerPlace | null;
+  typeLabel?: string;
+  typeColor?: string;
+}) {
+  if (!place) {
+    return (
+      <div className="flex h-full min-h-0 flex-col items-center justify-center px-6 text-center">
+        <div className="site-kicker mb-3 justify-center">Gazetteer</div>
+        <h2 className="text-lg font-semibold text-ink">Select a place</h2>
+        <p className="mt-2 max-w-xs text-sm leading-relaxed text-ink/60">
+          Pick a row in the table to inspect names, sources, assertions, and
+          the mapped location without leaving the workspace.
+        </p>
+      </div>
+    );
+  }
+
+  const hasPoint = place.location.lat != null && place.location.lng != null;
+  const coords = hasPoint
+    ? `${place.location.lat?.toFixed(5)}, ${place.location.lng?.toFixed(5)}`
+    : null;
+
+  return (
+    <div className="border-b border-ink/10 bg-cream">
+      <div className="px-4 py-3">
+        <div className="mb-2 flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <div className="mb-1 flex items-center gap-2">
+              <span
+                className="h-2.5 w-2.5 shrink-0"
+                style={{ backgroundColor: typeColor || 'var(--teal-strong)' }}
+                aria-hidden
+              />
+              <span className="text-[10px] font-semibold uppercase tracking-[0.24em] text-ink/45">
+                Selected location
+              </span>
+            </div>
+            <h2 className="truncate text-base font-semibold text-ink">
+              {getPreferredName(place)}
+            </h2>
+            <p className="mt-0.5 truncate text-[11px] font-mono text-ink/45">
+              {place.id}
+            </p>
+          </div>
+          <span
+            className="shrink-0 border border-ink/10 px-1.5 py-0.5 text-[10px] font-medium"
+            style={{
+              backgroundColor: `${typeColor || '#006d5b'}20`,
+              color: typeColor || 'var(--teal-strong)',
+            }}
+          >
+            {typeLabel || place.type}
+          </span>
+        </div>
+        <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
+          <dt className="text-ink/40">District</dt>
+          <dd className="truncate text-ink/75">
+            {getCurrentDistrictLabel(place) || 'No district'}
+          </dd>
+          <dt className="text-ink/40">Coordinates</dt>
+          <dd className="truncate font-mono text-ink/75">
+            {coords || 'No point location'}
+          </dd>
+        </dl>
+      </div>
+      <div className="px-4 pb-3">
+        <PlaceMiniMap
+          lat={place.location.lat}
+          lng={place.location.lng}
+          wkt={place.location.wkt}
+        />
+      </div>
+    </div>
+  );
+}
+
 export default function PlacesPage() {
   return (
     <Suspense>
@@ -697,6 +786,7 @@ function PlacesPageInner() {
     placeB: GazetteerPlace;
   } | null>(null);
   const columnsRef = useRef<HTMLDivElement>(null);
+  const tableScrollRef = useRef<HTMLDivElement>(null);
 
   // URL sync: read ?place= query param
   const searchParams = useSearchParams();
@@ -970,6 +1060,14 @@ function PlacesPageInner() {
     return places.find((p) => p.id === selectedId) || null;
   }, [places, selectedId, isCreating]);
 
+  useEffect(() => {
+    if (!selectedId || isCreating) return;
+    const row = tableScrollRef.current?.querySelector<HTMLElement>(
+      `[data-place-id="${CSS.escape(selectedId)}"]`,
+    );
+    row?.scrollIntoView({ block: 'nearest' });
+  }, [selectedId, isCreating, filtered]);
+
   const selectedSourceAppellations = useMemo(() => {
     if (!allData?.geojson || !selectedId || isCreating) return [];
 
@@ -1132,20 +1230,14 @@ function PlacesPageInner() {
 
   if (loading) {
     return (
-      <div className="w-full h-full flex items-center justify-center bg-background px-4">
+      <div className="w-full h-full flex items-center justify-center px-4">
         <section
           role="status"
           aria-live="polite"
           aria-busy="true"
-          className="w-full max-w-4xl border border-ink/10 bg-white p-5 shadow-[0_15px_35px_rgba(0,30,24,0.08)]"
+          className="w-full max-w-4xl site-panel p-5"
         >
-          <div className="mb-4 flex items-center gap-2 text-xs uppercase tracking-[0.28em] text-ink/60">
-            <span
-              className="h-2.5 w-2.5 -skew-x-12 bg-teal-strong animate-pulse"
-              aria-hidden
-            />
-            Loading places
-          </div>
+          <div className="site-kicker mb-4">Loading places</div>
           <div className="grid gap-3 sm:grid-cols-4">
             <div className="h-16 animate-pulse bg-ink/5" />
             <div className="h-16 animate-pulse bg-ink/5" />
@@ -1158,12 +1250,13 @@ function PlacesPageInner() {
   }
 
   return (
-    <div className="h-full flex flex-col bg-background overflow-hidden">
+    <div className="h-full flex flex-col overflow-hidden">
       {/* Top bar: auth + tabs */}
-      <div className="border-b border-slate-200 bg-white">
-        <div className="mx-auto max-w-6xl px-4 py-3 sm:px-6 lg:px-10">
+      <div className="border-b border-ink/10 bg-cream">
+        <div className="px-4 py-3 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between gap-4">
             <div>
+              <div className="site-kicker mb-1">Gazetteer</div>
               <h1 className="text-xl font-semibold text-ink">
                 Suriname Gazetteer
               </h1>
@@ -1184,8 +1277,8 @@ function PlacesPageInner() {
       ) : (
         <>
           {/* Search + filters */}
-          <div className="border-b border-slate-200 bg-white/70">
-            <div className="mx-auto max-w-6xl px-4 py-2 sm:px-6 lg:px-10">
+          <div className="border-b border-ink/10 bg-cream/80">
+            <div className="px-4 py-2 sm:px-6 lg:px-8">
               <div className="flex items-center gap-3 flex-wrap">
                 {/* Search */}
                 <div className="relative flex-1 min-w-48">
@@ -1194,7 +1287,7 @@ function PlacesPageInner() {
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     placeholder="Search by name, district, PSUR ID..."
-                    className="w-full border border-slate-200 bg-white py-1.5 pl-8 pr-8 text-sm text-ink/80 outline-none transition focus:border-teal-strong focus:ring-1 focus:ring-teal-bright/20"
+                    className="w-full border border-ink/15 bg-cream/95 py-1.5 pl-8 pr-8 text-sm text-ink/80 outline-none transition focus:border-teal-strong focus:ring-1 focus:ring-teal-bright/20"
                   />
                   <svg
                     className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-ink/35 pointer-events-none"
@@ -1235,7 +1328,7 @@ function PlacesPageInner() {
                   <select
                     value={typeFilter}
                     onChange={(e) => setTypeFilter(e.target.value)}
-                    className="cursor-pointer border border-slate-200 bg-white py-1.5 pl-2.5 pr-7 text-sm text-ink/75 outline-none transition focus:border-teal-strong focus:ring-1 focus:ring-teal-bright/20"
+                    className="cursor-pointer border border-ink/15 bg-cream/95 py-1.5 pl-2.5 pr-7 text-sm text-ink/75 outline-none transition focus:border-teal-strong focus:ring-1 focus:ring-teal-bright/20"
                   >
                     {typeFilters.map(({ value, label }) => (
                       <option key={value} value={value}>
@@ -1247,7 +1340,7 @@ function PlacesPageInner() {
 
                 {/* Source filter */}
                 {!registryLoading && (
-                  <div className="border-l border-slate-200 pl-3">
+                  <div className="border-l border-ink/10 pl-3">
                     <SourceFilter
                       sources={activeRegistrySources}
                       categories={registryCategories}
@@ -1259,7 +1352,7 @@ function PlacesPageInner() {
 
                 {/* Columns toggle */}
                 <div
-                  className="relative border-l border-slate-200 pl-3 shrink-0"
+                  className="relative border-l border-ink/10 pl-3 shrink-0"
                   ref={columnsRef}
                 >
                   <button
@@ -1267,7 +1360,7 @@ function PlacesPageInner() {
                     className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs border transition-colors ${
                       columnsOpen
                         ? 'border-teal-strong bg-teal-soft/30 text-teal-strong'
-                        : 'border-slate-200 bg-white text-ink/60 hover:border-teal-strong/40 hover:text-ink'
+                        : 'border-ink/15 bg-cream/95 text-ink/60 hover:border-teal-strong/40 hover:text-ink'
                     }`}
                     aria-expanded={columnsOpen}
                     aria-haspopup="true"
@@ -1299,7 +1392,7 @@ function PlacesPageInner() {
                   </button>
 
                   {columnsOpen && (
-                    <div className="absolute left-0 top-full z-20 mt-1 min-w-44 border border-slate-200 bg-white py-1 shadow-[0_15px_35px_rgba(0,30,24,0.08)]">
+                    <div className="site-panel absolute left-0 top-full z-20 mt-1 min-w-44 py-1">
                       {COLUMN_DEFS.map((col) => (
                         <label
                           key={col.key}
@@ -1328,7 +1421,7 @@ function PlacesPageInner() {
                           )}
                         </label>
                       ))}
-                      <div className="mt-1 border-t border-slate-200 px-3 pb-1 pt-1">
+                      <div className="mt-1 border-t border-ink/10 px-3 pb-1 pt-1">
                         <button
                           onClick={resetColumns}
                           className="text-[11px] text-ink/45 hover:text-teal-strong transition-colors"
@@ -1342,7 +1435,7 @@ function PlacesPageInner() {
 
                 {/* Merge selection controls — only shown when logged in and 1+ entries are checked */}
                 {canEdit && mergeCheckIds.length > 0 && (
-                  <div className="flex items-center gap-2 border-l border-slate-200 pl-3 shrink-0">
+                  <div className="flex items-center gap-2 border-l border-ink/10 pl-3 shrink-0">
                     <span className="text-xs text-teal-strong whitespace-nowrap uppercase tracking-[0.2em]">
                       {mergeCheckIds.length === 1
                         ? '1 of 2 selected'
@@ -1383,13 +1476,21 @@ function PlacesPageInner() {
           </div>
 
           {/* Main content: table + editor */}
-          <div className="flex-1 overflow-hidden flex">
+          <div className="flex min-h-0 flex-1 overflow-hidden">
             {/* Place table */}
-            <div className="flex-1 overflow-auto">
-              <div className="mx-auto flex max-w-350 items-center gap-3 px-4 pb-1 pt-2 text-xs text-ink/45 sm:px-6 lg:px-8">
+            <div
+              ref={tableScrollRef}
+              className="min-w-0 flex-1 overflow-auto"
+            >
+              <div className="sticky top-0 z-20 flex items-center gap-3 border-b border-ink/10 bg-background/95 px-4 pb-1 pt-2 text-xs text-ink/45 backdrop-blur-sm sm:px-6 lg:px-8">
                 <span>
                   {filtered.length} of {places.length - deprecatedCount} places
                 </span>
+                {selectedPlace && !isCreating && (
+                  <span className="hidden min-w-0 truncate text-teal-strong md:inline">
+                    &middot; selected: {getPreferredName(selectedPlace)}
+                  </span>
+                )}
                 {mergedCount > 0 && (
                   <span>
                     &middot;{' '}
@@ -1423,10 +1524,10 @@ function PlacesPageInner() {
                 )}
               </div>
 
-              <div className="px-4 sm:px-6 lg:px-8 pb-4 max-w-350 mx-auto">
-                <table className="w-full border-collapse border border-slate-200 bg-white text-sm shadow-[0_15px_35px_rgba(0,30,24,0.08)]">
-                  <thead className="sticky top-0 z-10 bg-white">
-                    <tr className="border-b border-slate-200 text-left text-xs text-ink/55 uppercase tracking-[0.2em]">
+              <div className="px-4 pb-4 sm:px-6 lg:px-8">
+                <table className="w-full min-w-max border-collapse border border-ink/10 bg-cream/70 text-sm shadow-[0_15px_35px_rgba(0,30,24,0.08)]">
+                  <thead className="sticky top-8 z-10 bg-cream">
+                    <tr className="border-b border-ink/10 text-left text-xs text-ink/55 uppercase tracking-[0.2em]">
                       {canEdit && (
                         <th
                           className="py-2 px-2 w-8"
@@ -1481,21 +1582,33 @@ function PlacesPageInner() {
               </div>
             </div>
 
-            {/* Editor panel — future: map over selectedIds for dual-panel compare/merge */}
-            {selectedPlace && (
-              <div className="flex w-[40%] min-w-105 max-w-160 shrink-0 flex-col overflow-hidden border-l border-slate-200 bg-background">
-                <PlaceEditor
-                  key={selectedPlace.id}
-                  place={selectedPlace}
-                  districts={districts}
-                  sourceAppellations={selectedSourceAppellations}
-                  canEdit={canEdit}
-                  onSave={handleSave}
-                  onCancel={handleCancel}
-                  onDelete={canEdit ? handleDelete : undefined}
-                />
-              </div>
-            )}
+            {/* Detail panel */}
+            <aside className="hidden w-[42%] min-w-96 max-w-160 shrink-0 flex-col overflow-hidden border-l border-ink/10 bg-background lg:flex">
+              {selectedPlace ? (
+                <>
+                  <SelectedPlaceSummary
+                    place={selectedPlace}
+                    typeLabel={labels[selectedPlace.type] || selectedPlace.type}
+                    typeColor={colors[selectedPlace.type]}
+                  />
+                  <div className="min-h-0 flex-1 overflow-hidden">
+                    <PlaceEditor
+                      key={selectedPlace.id}
+                      place={selectedPlace}
+                      districts={districts}
+                      sourceAppellations={selectedSourceAppellations}
+                      canEdit={canEdit}
+                      onSave={handleSave}
+                      onCancel={handleCancel}
+                      onDelete={canEdit ? handleDelete : undefined}
+                    />
+                  </div>
+                </>
+              ) : (
+                <SelectedPlaceSummary place={null} />
+              )}
+            </aside>
+
           </div>
         </>
       )}
