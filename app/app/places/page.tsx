@@ -1250,7 +1250,7 @@ function PlacesPageInner() {
   }
 
   return (
-    <div className="h-full flex flex-col overflow-hidden">
+    <div className="relative h-full min-h-0 flex flex-col overflow-hidden">
       {/* Top bar: auth + tabs */}
       <div className="border-b border-ink/10 bg-cream">
         <div className="px-4 py-3 sm:px-6 lg:px-8">
@@ -1583,31 +1583,49 @@ function PlacesPageInner() {
             </div>
 
             {/* Detail panel */}
-            <aside className="hidden w-[42%] min-w-96 max-w-160 shrink-0 flex-col overflow-hidden border-l border-ink/10 bg-background lg:flex">
-              {selectedPlace ? (
-                <>
-                  <SelectedPlaceSummary
+            {selectedPlace && (
+              <aside className="hidden w-[42%] min-w-96 max-w-160 shrink-0 flex-col overflow-hidden border-l border-ink/10 bg-background lg:flex">
+                <SelectedPlaceSummary
+                  place={selectedPlace}
+                  typeLabel={labels[selectedPlace.type] || selectedPlace.type}
+                  typeColor={colors[selectedPlace.type]}
+                />
+                <div className="min-h-0 flex-1 overflow-hidden">
+                  <PlaceEditor
+                    key={selectedPlace.id}
                     place={selectedPlace}
-                    typeLabel={labels[selectedPlace.type] || selectedPlace.type}
-                    typeColor={colors[selectedPlace.type]}
+                    districts={districts}
+                    sourceAppellations={selectedSourceAppellations}
+                    canEdit={canEdit}
+                    onSave={handleSave}
+                    onCancel={handleCancel}
+                    onDelete={canEdit ? handleDelete : undefined}
                   />
-                  <div className="min-h-0 flex-1 overflow-hidden">
-                    <PlaceEditor
-                      key={selectedPlace.id}
-                      place={selectedPlace}
-                      districts={districts}
-                      sourceAppellations={selectedSourceAppellations}
-                      canEdit={canEdit}
-                      onSave={handleSave}
-                      onCancel={handleCancel}
-                      onDelete={canEdit ? handleDelete : undefined}
-                    />
-                  </div>
-                </>
-              ) : (
-                <SelectedPlaceSummary place={null} />
-              )}
-            </aside>
+                </div>
+              </aside>
+            )}
+
+            {selectedPlace && (
+              <div className="absolute inset-x-0 bottom-0 z-40 flex max-h-[78dvh] flex-col overflow-hidden border-t border-ink/10 bg-background shadow-[0_-20px_50px_rgba(0,30,24,0.16)] lg:hidden">
+                <SelectedPlaceSummary
+                  place={selectedPlace}
+                  typeLabel={labels[selectedPlace.type] || selectedPlace.type}
+                  typeColor={colors[selectedPlace.type]}
+                />
+                <div className="min-h-0 flex-1 overflow-hidden">
+                  <PlaceEditor
+                    key={selectedPlace.id}
+                    place={selectedPlace}
+                    districts={districts}
+                    sourceAppellations={selectedSourceAppellations}
+                    canEdit={canEdit}
+                    onSave={handleSave}
+                    onCancel={handleCancel}
+                    onDelete={canEdit ? handleDelete : undefined}
+                  />
+                </div>
+              </div>
+            )}
 
           </div>
         </>
