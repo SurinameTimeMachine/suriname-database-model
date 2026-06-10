@@ -79348,55 +79348,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01369",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01369",
-      "type": "plantation",
-      "prefLabel": "Vaderszorg",
-      "altLabels": [],
-      "broader": null,
-      "description": "",
-      "location": {
-        "lat": 5.853455636,
-        "lng": -55.183512696,
-        "wkt": "Polygon ((-55.18460651 5.86134967, -55.18106540 5.86131912, -55.18180481 5.84111291, -55.18548025 5.84214681, -55.18460651 5.86134967))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q59133979",
-      "fid": 2454,
-      "psurIds": [
-        "PSUR0332"
-      ],
-      "district": null,
-      "locationDescription": null,
-      "locationDescriptionOriginal": null,
-      "placeType": null,
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59133979",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-01950",
       "@type": [
         "E25_Human-Made_Feature"
@@ -148735,6 +148686,86 @@
           "author": "Philip Dikland",
           "year": "2005",
           "notes": "Nouvelle Esperance is feitelijk het achterland van Va Comme Je Te Pousse ; vanwege de\nvreemde vorm van die plantage lag dit achterland deels aan de rivier en was het mogelijk er een zelfstandige plantage van te maken. De grens tussen Va Comme Je Te Pousse en Nouvelle\nEsperance werd gelegd bij de Cederkreek. Wanneer de afsplitsing precies is geschied, is niet\nbekend."
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01369",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01369",
+      "type": "plantation",
+      "broader": null,
+      "description": "",
+      "location": {
+        "lat": 5.853455636,
+        "lng": -55.183512696,
+        "wkt": "Polygon ((-55.18460651 5.86134967, -55.18106540 5.86131912, -55.18180481 5.84111291, -55.18548025 5.84214681, -55.18460651 5.86134967))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q59133979",
+      "fid": 2454,
+      "psurIds": [
+        "PSUR0332"
+      ],
+      "district": null,
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-10",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59133979",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "names": [
+        {
+          "text": "Vaderszorg",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        },
+        {
+          "text": "Munderbuiten",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        },
+        {
+          "text": "La Solitude",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        }
+      ],
+      "districtAssertions": [],
+      "productAssertions": [],
+      "locationAssertions": [],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Kwatta\\Munderbuiten 2012-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emdjVORUZKUGZ0bkE/view?usp=sharing&resourcekey=0-djJsPPGz77nRj65VUSIdoQ",
+          "author": "Philip Dikland",
+          "year": "2012",
+          "notes": "De eerstbekende naam was “la Solitude”, daarna “Vaderszorg”, en tenslotte “Munderbuiten”."
         }
       ]
     },
