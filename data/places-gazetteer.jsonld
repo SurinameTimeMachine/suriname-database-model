@@ -34429,77 +34429,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-02281",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-02281",
-      "type": "plantation",
-      "prefLabel": "Kwatta",
-      "altLabels": [],
-      "broader": "stm-00010",
-      "description": "Plantation from Surinaamse Almanakken (no QGIS geometry)",
-      "location": {
-        "lat": null,
-        "lng": null,
-        "wkt": null,
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "almanakken"
-      ],
-      "wikidataQid": "Q59116840",
-      "fid": null,
-      "psurIds": [],
-      "district": "Divisie Para",
-      "locationDescription": "Rijweg naar Kwatta",
-      "locationDescriptionOriginal": "Rijweg naar Kwatta",
-      "placeType": "kost",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59116840",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1828",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1828,
-          "note": null
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-kost-1828",
-          "value": "kost",
-          "source": "almanakken",
-          "startYear": 1828,
-          "endYear": 1835,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-kost-1859",
-          "value": "kost",
-          "source": "almanakken",
-          "startYear": 1859,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-kweek-en-kost-1860",
-          "value": "kweek en kost",
-          "source": "almanakken",
-          "startYear": 1860,
-          "endYear": 1861,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-00796",
       "@type": [
         "E25_Human-Made_Feature"
@@ -119717,6 +119646,110 @@
           "original": "Rivier Commewijne, (beneden) regterhand in het afvaren",
           "source": "almanakken",
           "note": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-02281",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-02281",
+      "type": "plantation",
+      "broader": "stm-00010",
+      "description": "Plantation from Surinaamse Almanakken (no QGIS geometry)",
+      "location": {
+        "lat": null,
+        "lng": null,
+        "wkt": null,
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "almanakken"
+      ],
+      "wikidataQid": "Q59116840",
+      "fid": null,
+      "psurIds": [],
+      "district": "Divisie Para",
+      "locationDescription": "Rijweg naar Kwatta",
+      "locationDescriptionOriginal": "Rijweg naar Kwatta",
+      "placeType": "kost",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-10",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59116840",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1828",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1828,
+          "note": null
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-kost-1828",
+          "value": "kost",
+          "source": "almanakken",
+          "startYear": 1828,
+          "endYear": 1835,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-kost-1859",
+          "value": "kost",
+          "source": "almanakken",
+          "startYear": 1859,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-kweek-en-kost-1860",
+          "value": "kweek en kost",
+          "source": "almanakken",
+          "startYear": 1860,
+          "endYear": 1861,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "Kwatta",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00010",
+          "districtLabel": "Divisie Para",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Rijweg naar Kwatta",
+          "original": "Rijweg naar Kwatta",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Kwatta\\plantage Kwatta 2012-01 geschiedenis dikland.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emUFFHZjVzQXl5aDQ/view?usp=sharing&resourcekey=0-fa-iH0btfEhXtyOmXS3vOA",
+          "author": "Philip Dikland",
+          "year": "2012, aangevuld 2015",
+          "notes": null
         }
       ]
     },
