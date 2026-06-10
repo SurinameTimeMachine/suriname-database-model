@@ -140105,6 +140105,87 @@
       ]
     },
     {
+      "id": "stm-new-1781089485828",
+      "type": "plantation",
+      "names": [
+        {
+          "text": "Picorna",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "source": "dikland-collection"
+        },
+        {
+          "text": "Grond van Picorna",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        },
+        {
+          "text": "Fortvlied",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        },
+        {
+          "text": "Erven Pickorna",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false
+        },
+        {
+          "text": "Pickorna (Erven)",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": false
+        }
+      ],
+      "broader": null,
+      "description": "",
+      "location": {
+        "lat": null,
+        "lng": null,
+        "wkt": null,
+        "crs": "EPSG:4326"
+      },
+      "sources": [],
+      "wikidataQid": null,
+      "externalLinks": [],
+      "fid": null,
+      "psurIds": [],
+      "district": null,
+      "districtAssertions": [],
+      "locationDescription": null,
+      "locationDescriptionOriginal": "Links van de Kwattaweg",
+      "placeType": null,
+      "productAssertions": [],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1781089622448",
+          "standardized": null,
+          "original": "Links van de Kwattaweg",
+          "source": "dikland-collection",
+          "note": null
+        }
+      ],
+      "statusAssertions": [],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Kwatta\\Picorna 2012-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emTTRPRC1LMmt0LUU/view?usp=sharing&resourcekey=0-_9tphyXtq0Wkbo5BAh7tEw",
+          "author": "Philip Dikland",
+          "year": "2012",
+          "notes": "De grond heeft de naam “Fortvlied” gedragen, maar was meer bekend als de “grond van Picorna”. De Picorne-kreek loopt dwars door het terrein heen. Deze kreek wordt op alle oudere kaarten de Drambranderskreek genoemd.\nDe grond begon ten westen van de oude askenazische begraafplaats (ofwel : zo’n 300 meter  westelijk van de Van Idsingastraat), en liep door tot zo’n 750 meter voorbij de Kernkampweg. \nDe grond was ruim 200 hectaren groot. ; de moderne Johannes Mungrastraat loopt ongeveer in \nhet midden van de oude grond."
+        }
+      ],
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-10",
+      "@id": "stm:place/stm-new-1781089485828",
+      "@type": "E25_Human-Made_Feature"
+    },
+    {
       "@id": "stm:place/stm-01215",
       "@type": "E25_Human-Made_Feature",
       "id": "stm-01215",
