@@ -13240,43 +13240,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-02282",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-02282",
-      "type": "plantation",
-      "prefLabel": "Charlesburg",
-      "altLabels": [],
-      "broader": null,
-      "description": "Plantation from Surinaamse Almanakken (no QGIS geometry)",
-      "location": {
-        "lat": null,
-        "lng": null,
-        "wkt": null,
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "almanakken"
-      ],
-      "wikidataQid": "Q59115379",
-      "fid": null,
-      "psurIds": [],
-      "district": null,
-      "locationDescription": "Rijweg naar Kwatta",
-      "locationDescriptionOriginal": "Rijweg naar Kwatta",
-      "placeType": null,
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59115379",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-00825",
       "@type": [
         "E25_Human-Made_Feature"
@@ -97092,6 +97055,89 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emNHdpLXVPVFFVR2M/view?usp=sharing&resourcekey=0-g-9V_IqEgLVIptuEFotazQ",
           "author": "Philip Dikland",
           "year": "2005",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-02282",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-02282",
+      "type": "plantation",
+      "broader": null,
+      "description": "Plantation from Surinaamse Almanakken (no QGIS geometry)",
+      "location": {
+        "lat": null,
+        "lng": null,
+        "wkt": null,
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "almanakken"
+      ],
+      "wikidataQid": "Q59115379",
+      "fid": null,
+      "psurIds": [],
+      "district": null,
+      "locationDescription": "Rijweg naar Kwatta",
+      "locationDescriptionOriginal": "Rijweg naar Kwatta",
+      "placeType": null,
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-10",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59115379",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Charlesburg",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        },
+        {
+          "text": "Bennelle",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        },
+        {
+          "text": "Carelsburg",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        },
+        {
+          "text": "Carlsbourg",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        }
+      ],
+      "districtAssertions": [],
+      "productAssertions": [],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Rijweg naar Kwatta",
+          "original": "Rijweg naar Kwatta",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "statusAssertions": [],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Kwatta\\Charlesburg 2012-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emNmRIbkk0XzQtTW8/view?usp=sharing&resourcekey=0-6csiT4uwCLkUboxfbzgUMw",
+          "author": "Philip Dikland",
+          "year": "2012",
           "notes": null
         }
       ]
