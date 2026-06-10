@@ -192988,28 +192988,64 @@
       "sources": [
         "map-1930"
       ],
-      "wikidataQid": null,
+      "wikidataQid": "Q19905206",
       "fid": 609,
       "psurIds": [],
       "district": null,
       "locationDescription": "Commewijne",
       "locationDescriptionOriginal": null,
       "placeType": "creek",
-      "modifiedBy": "Thunnisvanoort",
-      "modifiedAt": "2026-04-21",
-      "externalLinks": [],
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-10",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q19905206",
+          "matchType": "closeMatch"
+        }
+      ],
       "names": [
         {
           "text": "Warappa Kreek",
           "language": "nl",
           "type": "official",
-          "isPreferred": true
+          "isPreferred": true,
+          "sourceYear": 1930
         },
         {
           "text": "Warapperkreek",
           "language": "nl",
           "type": "variant",
-          "isPreferred": false
+          "isPreferred": false,
+          "source": "dikland-collection"
+        }
+      ],
+      "districtAssertions": [],
+      "productAssertions": [
+        {
+          "id": "product-assertion-1",
+          "value": "creek",
+          "source": "map-1930",
+          "note": null
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Commewijne",
+          "original": null,
+          "source": "map-1930",
+          "note": null
+        }
+      ],
+      "statusAssertions": [],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Warapperkreek algemeen 2006.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emd2VlQWppQ3J4WTQ/view?usp=sharing&resourcekey=0-50LdcdeSETRamyWoj022AA",
+          "author": "Philip Dikland",
+          "year": "2006",
+          "notes": null
         }
       ]
     },
