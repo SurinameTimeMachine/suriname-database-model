@@ -50413,70 +50413,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01365",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01365",
-      "type": "plantation",
-      "prefLabel": "Oldenburg",
-      "altLabels": [],
-      "broader": "stm-00010",
-      "description": "",
-      "location": {
-        "lat": 5.863169578571429,
-        "lng": -55.17437803,
-        "wkt": "Polygon ((-55.17564583 5.87639131, -55.17286834 5.87626888, -55.17296376 5.87525665, -55.17334137 5.85653933, -55.17388700 5.84035987, -55.17629408 5.84097970, -55.17564583 5.87639131))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken"
-      ],
-      "wikidataQid": "Q59132944",
-      "fid": 2450,
-      "psurIds": [],
-      "district": "Divisie Para",
-      "locationDescription": "Rijweg naar Kwatta",
-      "locationDescriptionOriginal": "Rijweg naar Kwatta",
-      "placeType": "kost",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59132944",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1828",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1828,
-          "note": null
-        },
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-kost-1828",
-          "value": "kost",
-          "source": "almanakken",
-          "startYear": 1828,
-          "endYear": 1847,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-01204",
       "@type": [
         "E25_Human-Made_Feature"
@@ -136140,6 +136076,111 @@
           "author": "Philip Dikland",
           "year": "2004",
           "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01365",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01365",
+      "type": "plantation",
+      "broader": "stm-00010",
+      "description": "",
+      "location": {
+        "lat": 5.863169578571429,
+        "lng": -55.17437803,
+        "wkt": "Polygon ((-55.17564583 5.87639131, -55.17286834 5.87626888, -55.17296376 5.87525665, -55.17334137 5.85653933, -55.17388700 5.84035987, -55.17629408 5.84097970, -55.17564583 5.87639131))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken"
+      ],
+      "wikidataQid": "Q59132944",
+      "fid": 2450,
+      "psurIds": [],
+      "district": "Divisie Para",
+      "locationDescription": "Rijweg naar Kwatta",
+      "locationDescriptionOriginal": "Rijweg naar Kwatta",
+      "placeType": "kost",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-10",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59132944",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1828",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1828,
+          "note": null
+        },
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-kost-1828",
+          "value": "kost",
+          "source": "almanakken",
+          "startYear": 1828,
+          "endYear": 1847,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "Oldenburg.",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        },
+        {
+          "text": "Nooitgedagt",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00010",
+          "districtLabel": "Divisie Para",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Rijweg naar Kwatta",
+          "original": "Rijweg naar Kwatta",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Kwatta\\Oldenburg1 (industrie) 2012-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emcERhQjZJUlNDV28/view?usp=sharing&resourcekey=0-Ux7gQiPOXs9QPoHQQX-8Lg",
+          "author": "Philip Dikland",
+          "year": "2012",
+          "notes": "Het huidige Oldenburg is een samenvoeging van drie oudere buitenplaatsen: \n\n1. Industrie (deze grond droeg voorheen de naam “Maria’s Rust” of Maria’s Lust”.  In 1898 heette de grond “ambtsrust” (kaart Par’bo Loth 1898)\n2. Cayenne\n3. Oldenburg (waarvan de oudere naam “Nooitgedagt” is)."
         }
       ]
     },
