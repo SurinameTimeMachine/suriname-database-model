@@ -159423,6 +159423,71 @@
       ]
     },
     {
+      "id": "stm-new-1781100505391",
+      "type": "military-post",
+      "names": [
+        {
+          "text": "Cordonpad",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "source": "dikland-collection"
+        },
+        {
+          "text": "Kordonpad",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": false
+        },
+        {
+          "text": "Cordon van Defensie",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false
+        }
+      ],
+      "broader": null,
+      "description": "",
+      "location": {
+        "lat": null,
+        "lng": null,
+        "wkt": null,
+        "crs": "EPSG:4326"
+      },
+      "sources": [],
+      "wikidataQid": "Q90374179",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q90374179",
+          "matchType": "closeMatch"
+        }
+      ],
+      "fid": null,
+      "psurIds": [],
+      "district": null,
+      "districtAssertions": [],
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "productAssertions": [],
+      "locationAssertions": [],
+      "statusAssertions": [],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\forten\\cordonpad 1970-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8ema1VwYzlzTXRHWVk/view?usp=sharing&resourcekey=0-HjjX-PuZBlBoHpWhyWZp7g",
+          "author": "K. Koopmans",
+          "year": "1960 ca.",
+          "notes": null
+        }
+      ],
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-10",
+      "@id": "stm:place/stm-new-1781100505391",
+      "@type": "E25_Human-Made_Feature"
+    },
+    {
       "@id": "stm:place/stm-02782",
       "@type": "E25_Human-Made_Feature",
       "id": "stm-02782",
