@@ -182879,37 +182879,6 @@
       "externalLinks": []
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00054",
-      "@type": [
-        "E26_Physical_Feature"
-      ],
-      "id": "stm-00054",
-      "type": "river",
-      "prefLabel": "Warappa Kreek",
-      "altLabels": [],
-      "broader": null,
-      "description": "River, creek, or waterway from Surinaamse Almanakken",
-      "location": {
-        "lat": null,
-        "lng": null,
-        "wkt": null,
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "almanakken"
-      ],
-      "wikidataQid": null,
-      "fid": null,
-      "psurIds": [],
-      "district": null,
-      "locationDescription": null,
-      "locationDescriptionOriginal": null,
-      "placeType": null,
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": []
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-00055",
       "@type": [
         "E26_Physical_Feature"
@@ -183272,6 +183241,54 @@
           "note": null
         }
       ],
+      "statusAssertions": [],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Warapperkreek algemeen 2006.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emd2VlQWppQ3J4WTQ/view?usp=sharing&resourcekey=0-50LdcdeSETRamyWoj022AA",
+          "author": "Philip Dikland",
+          "year": "2006",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-00054",
+      "@type": "E26_Physical_Feature",
+      "id": "stm-00054",
+      "type": "river",
+      "broader": null,
+      "description": "River, creek, or waterway from Surinaamse Almanakken",
+      "location": {
+        "lat": null,
+        "lng": null,
+        "wkt": null,
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "almanakken"
+      ],
+      "wikidataQid": null,
+      "fid": null,
+      "psurIds": [],
+      "district": null,
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-10",
+      "externalLinks": [],
+      "names": [
+        {
+          "text": "Warappa Kreek",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        }
+      ],
+      "districtAssertions": [],
+      "productAssertions": [],
+      "locationAssertions": [],
       "statusAssertions": [],
       "diklandRefs": [
         {
