@@ -167922,38 +167922,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-02683",
-      "@type": [
-        "E53_Place"
-      ],
-      "id": "stm-02683",
-      "type": "station",
-      "prefLabel": "Albina",
-      "altLabels": [],
-      "broader": null,
-      "description": "",
-      "location": {
-        "lat": 5.498000720747468,
-        "lng": -54.057944391121175,
-        "wkt": null,
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "map-1882"
-      ],
-      "wikidataQid": null,
-      "fid": 215,
-      "psurIds": [],
-      "district": null,
-      "locationDescription": null,
-      "locationDescriptionOriginal": null,
-      "placeType": null,
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": []
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02537",
       "@type": [
         "E53_Place"
@@ -172377,6 +172345,62 @@
       "modifiedBy": null,
       "modifiedAt": null,
       "externalLinks": []
+    },
+    {
+      "@id": "stm:place/stm-02683",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-02683",
+      "type": "settlement",
+      "broader": null,
+      "description": "",
+      "location": {
+        "lat": 5.498000720747468,
+        "lng": -54.057944391121175,
+        "wkt": null,
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "map-1882"
+      ],
+      "wikidataQid": "Q580016",
+      "fid": 215,
+      "psurIds": [],
+      "district": null,
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-10",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q580016",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Albina",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        }
+      ],
+      "districtAssertions": [],
+      "productAssertions": [],
+      "locationAssertions": [],
+      "statusAssertions": [],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Marowijne rivier\\Albina geschiedenis Dikland 2004.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emZTRDeFRqTzRCbjg/view?usp=sharing&resourcekey=0-maKMXUleMj6NK8xn929x6w",
+          "author": "Philip Dikland",
+          "year": "2004-2009",
+          "notes": null
+        }
+      ]
     },
     {
       "@id": "stm:place/stm-02714",
