@@ -30423,52 +30423,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-00858",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-00858",
-      "type": "plantation",
-      "prefLabel": "Industrie",
-      "altLabels": [],
-      "broader": null,
-      "description": "",
-      "location": {
-        "lat": 5.845048165714286,
-        "lng": -55.16892445714285,
-        "wkt": "Polygon ((-55.17083919 5.83786269, -55.17087257 5.83988344, -55.17075375 5.85644885, -55.16631772 5.85604506, -55.16635238 5.85092807, -55.16649640 5.83630636, -55.17083919 5.83786269))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930"
-      ],
-      "wikidataQid": "Q135395272",
-      "fid": 1942,
-      "psurIds": [],
-      "district": null,
-      "locationDescription": null,
-      "locationDescriptionOriginal": null,
-      "placeType": null,
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q135395272",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-01428",
       "@type": [
         "E25_Human-Made_Feature"
@@ -114539,6 +114493,90 @@
       "districtAssertions": [],
       "productAssertions": [],
       "locationAssertions": []
+    },
+    {
+      "@id": "stm:place/stm-00858",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-00858",
+      "type": "plantation",
+      "broader": null,
+      "description": "",
+      "location": {
+        "lat": 5.845048165714286,
+        "lng": -55.16892445714285,
+        "wkt": "Polygon ((-55.17083919 5.83786269, -55.17087257 5.83988344, -55.17075375 5.85644885, -55.16631772 5.85604506, -55.16635238 5.85092807, -55.16649640 5.83630636, -55.17083919 5.83786269))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930"
+      ],
+      "wikidataQid": "Q135395272",
+      "fid": 1942,
+      "psurIds": [],
+      "district": null,
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-10",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q135395272",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "names": [
+        {
+          "text": "Industrie",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1870
+        },
+        {
+          "text": "Maria’s Rust",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        },
+        {
+          "text": "Maria’s Lust",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        },
+        {
+          "text": "Ambtsrust",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        }
+      ],
+      "districtAssertions": [],
+      "productAssertions": [],
+      "locationAssertions": [],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Kwatta\\Oldenburg1 (industrie) 2012-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emcERhQjZJUlNDV28/view?usp=sharing&resourcekey=0-Ux7gQiPOXs9QPoHQQX-8Lg",
+          "author": "Philip Dikland",
+          "year": "2012",
+          "notes": "Het huidige Oldenburg is een samenvoeging van drie oudere buitenplaatsen: \n\n1. Industrie (deze grond droeg voorheen de naam “Maria’s Rust” of Maria’s Lust”.  In 1898 heette de grond “ambtsrust” (kaart Par’bo Loth 1898)\n2. Cayenne\n3. Oldenburg (waarvan de oudere naam “Nooitgedagt” is)."
+        }
+      ]
     },
     {
       "@id": "stm:place/stm-01540",
