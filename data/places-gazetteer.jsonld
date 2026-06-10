@@ -72785,70 +72785,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01368",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01368",
-      "type": "plantation",
-      "prefLabel": "Rosina",
-      "altLabels": [],
-      "broader": "stm-00010",
-      "description": "",
-      "location": {
-        "lat": 5.850243315999999,
-        "lng": -55.187139228,
-        "wkt": "Polygon ((-55.18869283 5.84316029, -55.18822372 5.86139952, -55.18460651 5.86134967, -55.18548025 5.84214681, -55.18869283 5.84316029))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken"
-      ],
-      "wikidataQid": "Q59133200",
-      "fid": 2453,
-      "psurIds": [],
-      "district": "Divisie Para",
-      "locationDescription": "Rijweg naar Kwatta",
-      "locationDescriptionOriginal": "Rijweg naar Kwatta",
-      "placeType": "kost",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59133200",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1828",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1828,
-          "note": null
-        },
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-kost-1828",
-          "value": "kost",
-          "source": "almanakken",
-          "startYear": 1828,
-          "endYear": 1847,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-01570",
       "@type": [
         "E25_Human-Made_Feature"
@@ -142537,6 +142473,139 @@
           "author": "Philip Dikland",
           "year": "2001-2004, aangevuld 2005, 2010",
           "notes": "De volksnaam “Friti” herinnert aan de eigenaar Laurens Wriedt. De naastgelegen plantage \nClaverblad werd “Di Foeroe” genoemd, een herinnering aan eigenaresse Anna du Four, de \nechtgenote van Laurens Wriedt."
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01368",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01368",
+      "type": "plantation",
+      "broader": "stm-00010",
+      "description": "",
+      "location": {
+        "lat": 5.850243315999999,
+        "lng": -55.187139228,
+        "wkt": "Polygon ((-55.18869283 5.84316029, -55.18822372 5.86139952, -55.18460651 5.86134967, -55.18548025 5.84214681, -55.18869283 5.84316029))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken"
+      ],
+      "wikidataQid": "Q59133200",
+      "fid": 2453,
+      "psurIds": [],
+      "district": "Divisie Para",
+      "locationDescription": "Rijweg naar Kwatta",
+      "locationDescriptionOriginal": "Rijweg naar Kwatta",
+      "placeType": "kost",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-10",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59133200",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1828",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1828,
+          "note": null
+        },
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-kost-1828",
+          "value": "kost",
+          "source": "almanakken",
+          "startYear": 1828,
+          "endYear": 1847,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "Rosina",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        },
+        {
+          "text": "Rosjna",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "sourceYear": 1832
+        },
+        {
+          "text": "Resina",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "sourceYear": 1856
+        },
+        {
+          "text": "Rossignol",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        },
+        {
+          "text": "La Rosinga",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        },
+        {
+          "text": "Rosingo",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00010",
+          "districtLabel": "Divisie Para",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Rijweg naar Kwatta",
+          "original": "Rijweg naar Kwatta",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Kwatta\\Rossignol 2012-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emNWVfTm13dlFuLUk/view?usp=sharing&resourcekey=0-wDoonBEnYFxIN0U4s9iXIA",
+          "author": "Philip Dikland",
+          "year": "2012",
+          "notes": null
         }
       ]
     },
