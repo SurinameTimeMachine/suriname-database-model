@@ -34429,52 +34429,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01347",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01347",
-      "type": "plantation",
-      "prefLabel": "Kwatta",
-      "altLabels": [],
-      "broader": null,
-      "description": "",
-      "location": {
-        "lat": 5.846638741666666,
-        "lng": -55.22653475750001,
-        "wkt": "Polygon ((-55.26404817 5.85919099, -55.22262105 5.85543988, -55.22302995 5.84967792, -55.20158116 5.84950143, -55.20170872 5.84390743, -55.20049198 5.84336970, -55.20172613 5.83668334, -55.21792468 5.83728112, -55.21936291 5.84003117, -55.23700639 5.84092447, -55.26486778 5.84446646, -55.26404817 5.85919099))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930"
-      ],
-      "wikidataQid": "Q1757289",
-      "fid": 2432,
-      "psurIds": [],
-      "district": null,
-      "locationDescription": null,
-      "locationDescriptionOriginal": null,
-      "placeType": null,
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q1757289",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02281",
       "@type": [
         "E25_Human-Made_Feature"
@@ -119763,6 +119717,69 @@
           "original": "Rivier Commewijne, (beneden) regterhand in het afvaren",
           "source": "almanakken",
           "note": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01347",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01347",
+      "type": "plantation",
+      "broader": null,
+      "description": "",
+      "location": {
+        "lat": 5.846638741666666,
+        "lng": -55.22653475750001,
+        "wkt": "Polygon ((-55.26404817 5.85919099, -55.22262105 5.85543988, -55.22302995 5.84967792, -55.20158116 5.84950143, -55.20170872 5.84390743, -55.20049198 5.84336970, -55.20172613 5.83668334, -55.21792468 5.83728112, -55.21936291 5.84003117, -55.23700639 5.84092447, -55.26486778 5.84446646, -55.26404817 5.85919099))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930"
+      ],
+      "wikidataQid": "Q1757289",
+      "fid": 2432,
+      "psurIds": [],
+      "district": null,
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-10",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q1757289",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "names": [
+        {
+          "text": "Kwatta",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        }
+      ],
+      "districtAssertions": [],
+      "productAssertions": [],
+      "locationAssertions": [],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Kwatta\\plantage Kwatta 2012-01 geschiedenis dikland.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emUFFHZjVzQXl5aDQ/view?usp=sharing&resourcekey=0-fa-iH0btfEhXtyOmXS3vOA",
+          "author": "Philip Dikland",
+          "year": "2012, aangevuld 2015",
+          "notes": null
         }
       ]
     },
