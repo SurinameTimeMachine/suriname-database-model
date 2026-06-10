@@ -7360,80 +7360,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01549",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01549",
-      "type": "plantation",
-      "prefLabel": "Bellevue",
-      "altLabels": [],
-      "broader": null,
-      "description": "",
-      "location": {
-        "lat": 5.8736337700000005,
-        "lng": -56.31167972666666,
-        "wkt": "Polygon ((-56.31393287 5.85360419, -56.31393045 5.85591244, -56.31286795 5.91261955, -56.30694960 5.91261171, -56.30846462 5.85345054, -56.31393287 5.85360419))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken",
-        "slave-registers"
-      ],
-      "wikidataQid": "Q59115217",
-      "fid": 2634,
-      "psurIds": [
-        "PSUR0024"
-      ],
-      "district": null,
-      "locationDescription": "Atlantische kust",
-      "locationDescriptionOriginal": "Opper-district Nickerie",
-      "placeType": "katoen",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59115217",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1831",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1831,
-          "note": null
-        },
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-katoen-1831",
-          "value": "katoen",
-          "source": "almanakken",
-          "startYear": 1831,
-          "endYear": 1847,
-          "note": null
-        },
-        {
-          "id": "product-almanakken-katoen-1859",
-          "value": "katoen",
-          "source": "almanakken",
-          "startYear": 1859,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02408",
       "@type": [
         "E25_Human-Made_Feature"
@@ -89443,6 +89369,111 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emWGxhRGdtVERwTnM/view?usp=sharing&resourcekey=0-HyooyudanZZ90-IryQhqhg",
           "author": "Philip Dikland",
           "year": "2004",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01549",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01549",
+      "type": "plantation",
+      "broader": null,
+      "description": "",
+      "location": {
+        "lat": 5.8736337700000005,
+        "lng": -56.31167972666666,
+        "wkt": "Polygon ((-56.31393287 5.85360419, -56.31393045 5.85591244, -56.31286795 5.91261955, -56.30694960 5.91261171, -56.30846462 5.85345054, -56.31393287 5.85360419))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken",
+        "slave-registers"
+      ],
+      "wikidataQid": "Q59115217",
+      "fid": 2634,
+      "psurIds": [
+        "PSUR0024"
+      ],
+      "district": null,
+      "locationDescription": "Atlantische kust",
+      "locationDescriptionOriginal": "Opper-district Nickerie",
+      "placeType": "katoen",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-10",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59115217",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1831",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1831,
+          "note": null
+        },
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-katoen-1831",
+          "value": "katoen",
+          "source": "almanakken",
+          "startYear": 1831,
+          "endYear": 1847,
+          "note": null
+        },
+        {
+          "id": "product-almanakken-katoen-1859",
+          "value": "katoen",
+          "source": "almanakken",
+          "startYear": 1859,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "Bellevue",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        },
+        {
+          "text": "en Bellevue",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "sourceYear": 1831
+        }
+      ],
+      "districtAssertions": [],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Atlantische kust",
+          "original": "Opper-district Nickerie",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Coronie district\\plantages\\Clyde en Bellevue, grafplaatsen te 2022-05-23.pdf",
+          "driveUrl": "https://drive.google.com/file/d/1Gsgzos9gUgRp-mbk5_Comlh14ibvpU5n/view?usp=sharing",
+          "author": "Philip Dikland",
+          "year": "2022",
           "notes": null
         }
       ]
