@@ -23215,43 +23215,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-02508",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-02508",
-      "type": "plantation",
-      "prefLabel": "Fort Sommelsdijk",
-      "altLabels": [],
-      "broader": "stm-00003",
-      "description": "Plantation from Surinaamse Almanakken (no QGIS geometry)",
-      "location": {
-        "lat": null,
-        "lng": null,
-        "wkt": null,
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "almanakken"
-      ],
-      "wikidataQid": "Q2485319",
-      "fid": null,
-      "psurIds": [],
-      "district": "Divisie Beneden-Commewijne",
-      "locationDescription": "Orelana Kreek",
-      "locationDescriptionOriginal": "Orelanakreek.{",
-      "placeType": null,
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q2485319",
-          "matchType": "closeMatch"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02357",
       "@type": [
         "E25_Human-Made_Feature"
@@ -108486,6 +108449,78 @@
           "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emQnVmWVlFNmhGTHM/view?usp=sharing&resourcekey=0-U79PD2LslDNrBXymPYsXzQ",
           "author": "Philip Dikland",
           "year": "2007",
+          "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-02508",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-02508",
+      "type": "plantation",
+      "broader": "stm-00003",
+      "description": "Plantation from Surinaamse Almanakken (no QGIS geometry)",
+      "location": {
+        "lat": null,
+        "lng": null,
+        "wkt": null,
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "almanakken"
+      ],
+      "wikidataQid": "Q2485319",
+      "fid": null,
+      "psurIds": [],
+      "district": "Divisie Beneden-Commewijne",
+      "locationDescription": "Orelana Kreek",
+      "locationDescriptionOriginal": "Orelanakreek.{",
+      "placeType": null,
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-10",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q2485319",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Fort Sommelsdijk",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00003",
+          "districtLabel": "Divisie Beneden-Commewijne",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "productAssertions": [],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Orelana Kreek",
+          "original": "Orelanakreek.{",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "statusAssertions": [],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\forten\\fort Sommelsdijk 2004-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8embDFIN0owYkxydjA/view?usp=sharing&resourcekey=0-XNDa8SpB5pwmmqqmiYBcRg",
+          "author": "Philip Dikland",
+          "year": "2004",
           "notes": null
         }
       ]
