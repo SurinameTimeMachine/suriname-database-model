@@ -89014,7 +89014,7 @@
       "locationDescriptionOriginal": "Rivier Suriname, linkerhand in het afvaren",
       "placeType": "suiker",
       "modifiedBy": "GerDijkstra",
-      "modifiedAt": "2026-06-01",
+      "modifiedAt": "2026-06-10",
       "externalLinks": [
         {
           "authority": "wikidata",
@@ -89073,7 +89073,7 @@
       ],
       "names": [
         {
-          "text": "Beekhuizek",
+          "text": "Beekhuizen",
           "language": "nl",
           "type": "official",
           "isPreferred": true,
@@ -89085,6 +89085,13 @@
           "type": "vernacular",
           "isPreferred": false,
           "source": "dikland-collection"
+        },
+        {
+          "text": "Beekhuizen (+)",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "sourceYear": 1930
         }
       ],
       "districtAssertions": [
