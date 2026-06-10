@@ -13146,54 +13146,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01366",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01366",
-      "type": "plantation",
-      "prefLabel": "Cayenne",
-      "altLabels": [
-        "Cayenne Industrie"
-      ],
-      "broader": null,
-      "description": "",
-      "location": {
-        "lat": 5.844476784285715,
-        "lng": -55.17206477857143,
-        "wkt": "Polygon ((-55.17388700 5.84035987, -55.17334137 5.85653933, -55.17075375 5.85644885, -55.17087257 5.83988344, -55.17083919 5.83786269, -55.17087257 5.83988344, -55.17388700 5.84035987))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930"
-      ],
-      "wikidataQid": "Q124824456",
-      "fid": 2451,
-      "psurIds": [],
-      "district": null,
-      "locationDescription": null,
-      "locationDescriptionOriginal": null,
-      "placeType": null,
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q124824456",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-01490",
       "@type": [
         "E25_Human-Made_Feature"
@@ -96642,6 +96594,76 @@
           "author": "Philip Dikland",
           "year": "2004",
           "notes": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01366",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01366",
+      "type": "plantation",
+      "broader": null,
+      "description": "",
+      "location": {
+        "lat": 5.844476784285715,
+        "lng": -55.17206477857143,
+        "wkt": "Polygon ((-55.17388700 5.84035987, -55.17334137 5.85653933, -55.17075375 5.85644885, -55.17087257 5.83988344, -55.17083919 5.83786269, -55.17087257 5.83988344, -55.17388700 5.84035987))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930"
+      ],
+      "wikidataQid": "Q124824456",
+      "fid": 2451,
+      "psurIds": [],
+      "district": null,
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-10",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q124824456",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "names": [
+        {
+          "text": "Cayenne",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1870
+        },
+        {
+          "text": "Cayenne Industrie",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "sourceYear": 1930
+        }
+      ],
+      "districtAssertions": [],
+      "productAssertions": [],
+      "locationAssertions": [],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Kwatta\\Oldenburg1 (industrie) 2012-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emcERhQjZJUlNDV28/view?usp=sharing&resourcekey=0-Ux7gQiPOXs9QPoHQQX-8Lg",
+          "author": "Philip Dikland",
+          "year": "2012",
+          "notes": "Het huidige Oldenburg is een samenvoeging van drie oudere buitenplaatsen: \n\n1. Industrie (deze grond droeg voorheen de naam “Maria’s Rust” of Maria’s Lust”.  In 1898 heette de grond “ambtsrust” (kaart Par’bo Loth 1898)\n2. Cayenne\n3. Oldenburg (waarvan de oudere naam “Nooitgedagt” is)."
         }
       ]
     },
