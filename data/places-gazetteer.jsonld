@@ -146565,6 +146565,59 @@
       ]
     },
     {
+      "id": "stm-new-1781099264586",
+      "type": "plantation",
+      "names": [
+        {
+          "text": "Stolkert",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "source": "dikland-collection"
+        },
+        {
+          "text": "Grond van Stolkert",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": false
+        }
+      ],
+      "broader": null,
+      "description": "",
+      "location": {
+        "lat": null,
+        "lng": null,
+        "wkt": null,
+        "crs": "EPSG:4326"
+      },
+      "sources": [],
+      "wikidataQid": null,
+      "externalLinks": [],
+      "fid": null,
+      "psurIds": [],
+      "district": null,
+      "districtAssertions": [],
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "productAssertions": [],
+      "locationAssertions": [],
+      "statusAssertions": [],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Kwatta\\Stolkert 2012-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emN05PVlg3bWpFSFU/view?usp=sharing&resourcekey=0-ZCj4QnCh-JivQ-gb9DB9Cg",
+          "author": "Philip Dikland",
+          "year": "2005, aangevuld 2009, 2011",
+          "notes": null
+        }
+      ],
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-10",
+      "@id": "stm:place/stm-new-1781099264586",
+      "@type": "E25_Human-Made_Feature"
+    },
+    {
       "@id": "stm:place/stm-01182",
       "@type": "E25_Human-Made_Feature",
       "id": "stm-01182",
