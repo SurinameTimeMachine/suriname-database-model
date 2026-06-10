@@ -167985,38 +167985,6 @@
       "externalLinks": []
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-02660",
-      "@type": [
-        "E53_Place"
-      ],
-      "id": "stm-02660",
-      "type": "station",
-      "prefLabel": "Galibi",
-      "altLabels": [],
-      "broader": null,
-      "description": "1882: Lichttoren",
-      "location": {
-        "lat": 5.755066452571391,
-        "lng": -53.9829089558342,
-        "wkt": null,
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "map-1882"
-      ],
-      "wikidataQid": null,
-      "fid": 192,
-      "psurIds": [],
-      "district": null,
-      "locationDescription": null,
-      "locationDescriptionOriginal": null,
-      "placeType": null,
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": []
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02627",
       "@type": [
         "E53_Place"
@@ -172709,6 +172677,62 @@
       "modifiedAt": "2026-04-20",
       "@id": "stm:place/stm-new-1776701050288",
       "@type": "E25_Human-Made_Feature"
+    },
+    {
+      "@id": "stm:place/stm-02660",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-02660",
+      "type": "settlement",
+      "broader": null,
+      "description": "1882: Lichttoren",
+      "location": {
+        "lat": 5.755066452571391,
+        "lng": -53.9829089558342,
+        "wkt": null,
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "map-1882"
+      ],
+      "wikidataQid": "Q2554506",
+      "fid": 192,
+      "psurIds": [],
+      "district": null,
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-10",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q2554506",
+          "matchType": "closeMatch"
+        }
+      ],
+      "names": [
+        {
+          "text": "Galibi",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        }
+      ],
+      "districtAssertions": [],
+      "productAssertions": [],
+      "locationAssertions": [],
+      "statusAssertions": [],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Marowijne rivier\\Galibi geschiedenis Dikland 2009.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emdmIteTR3emk1RFk/view?usp=sharing&resourcekey=0-eQUFqt912kwSl7kVPQFo7g",
+          "author": "Philip Dikland",
+          "year": "2009",
+          "notes": "Het Karaibische woord “Galibi” betekent wachter, of vuurtoren. De naam duidt op de locatie van het oude dorp Galibi (het moderne dorp ligt daar enkele kilometers vandaan). Dit oude dorp lag n.l. ter plaatse van de vroegere vuurtoren."
+        }
+      ]
     },
     {
       "@id": "stm:place/stm-02618",
