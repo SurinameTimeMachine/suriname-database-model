@@ -183260,8 +183260,8 @@
       "broader": null,
       "description": "River, creek, or waterway from Surinaamse Almanakken",
       "location": {
-        "lat": null,
-        "lng": null,
+        "lat": 5.929093393589741,
+        "lng": -54.89843583820511,
         "wkt": null,
         "crs": "EPSG:4326"
       },
