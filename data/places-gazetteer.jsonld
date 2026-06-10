@@ -159625,7 +159625,7 @@
       "sources": [
         "map-1882"
       ],
-      "wikidataQid": null,
+      "wikidataQid": "Q656587",
       "fid": 4,
       "psurIds": [],
       "district": null,
@@ -159634,7 +159634,13 @@
       "placeType": null,
       "modifiedBy": "GerDijkstra",
       "modifiedAt": "2026-06-10",
-      "externalLinks": [],
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q656587",
+          "matchType": "closeMatch"
+        }
+      ],
       "names": [
         {
           "text": "Fort Zeelandia",
@@ -159648,7 +159654,9 @@
           "text": "Fort Willoughby",
           "language": "en",
           "type": "historical",
-          "isPreferred": false
+          "isPreferred": false,
+          "source": "map-1882",
+          "sourceYear": 1882
         }
       ],
       "districtAssertions": [],
