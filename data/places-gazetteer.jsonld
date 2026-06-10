@@ -183230,7 +183230,7 @@
       "locationDescriptionOriginal": null,
       "placeType": "river",
       "modifiedBy": "GerDijkstra",
-      "modifiedAt": "2026-04-29",
+      "modifiedAt": "2026-06-10",
       "externalLinks": [],
       "names": [
         {
@@ -183272,7 +183272,16 @@
           "note": null
         }
       ],
-      "statusAssertions": []
+      "statusAssertions": [],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Commewijne rivier\\plantages\\Warapperkreek algemeen 2006.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emd2VlQWppQ3J4WTQ/view?usp=sharing&resourcekey=0-50LdcdeSETRamyWoj022AA",
+          "author": "Philip Dikland",
+          "year": "2006",
+          "notes": null
+        }
+      ]
     },
     {
       "@id": "https://data.suriname-timemachine.org/place/stm-00409",
