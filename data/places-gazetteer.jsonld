@@ -146598,10 +146598,18 @@
       "district": null,
       "districtAssertions": [],
       "locationDescription": null,
-      "locationDescriptionOriginal": null,
+      "locationDescriptionOriginal": "Gravenstraat noordzijde, Wijk letter B no. 013",
       "placeType": null,
       "productAssertions": [],
-      "locationAssertions": [],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1781099469358",
+          "standardized": null,
+          "original": "Gravenstraat noordzijde, Wijk letter B no. 013",
+          "source": "dikland-collection",
+          "note": null
+        }
+      ],
       "statusAssertions": [],
       "diklandRefs": [
         {
