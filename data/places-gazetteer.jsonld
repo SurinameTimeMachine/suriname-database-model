@@ -53281,70 +53281,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01375",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01375",
-      "type": "plantation",
-      "prefLabel": "Peu et Content",
-      "altLabels": [],
-      "broader": "stm-00010",
-      "description": "",
-      "location": {
-        "lat": 5.85282408125,
-        "lng": -55.192027175,
-        "wkt": "Polygon ((-55.19012574 5.86197763, -55.18822372 5.86139952, -55.18869283 5.84316029, -55.19058634 5.84408336, -55.19288352 5.84398907, -55.19795339 5.84373641, -55.19762612 5.86226874, -55.19012574 5.86197763))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken"
-      ],
-      "wikidataQid": "Q59133065",
-      "fid": 2460,
-      "psurIds": [],
-      "district": "Divisie Para",
-      "locationDescription": "Rijweg naar Kwatta",
-      "locationDescriptionOriginal": "Rijweg naar Kwatta",
-      "placeType": "kost",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59133065",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1828",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1828,
-          "note": null
-        },
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-kost-1828",
-          "value": "kost",
-          "source": "almanakken",
-          "startYear": 1828,
-          "endYear": 1847,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-02392",
       "@type": [
         "E25_Human-Made_Feature"
@@ -139942,6 +139878,132 @@
           "author": "Philip Dikland",
           "year": "2022",
           "notes": "De drie plantages die in deze monografie worden behandeld – Petit Versailles, Estersrust en Libanon- kunnen het best worden omschreven als de “onduidelijke drie”. Hun geschiedenis blijft in nevelen gehuld, en zelfs hun oudere namen zijn moeilijk te achterhalen."
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01375",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01375",
+      "type": "plantation",
+      "broader": "stm-00010",
+      "description": "",
+      "location": {
+        "lat": 5.85282408125,
+        "lng": -55.192027175,
+        "wkt": "Polygon ((-55.19012574 5.86197763, -55.18822372 5.86139952, -55.18869283 5.84316029, -55.19058634 5.84408336, -55.19288352 5.84398907, -55.19795339 5.84373641, -55.19762612 5.86226874, -55.19012574 5.86197763))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken"
+      ],
+      "wikidataQid": "Q59133065",
+      "fid": 2460,
+      "psurIds": [],
+      "district": "Divisie Para",
+      "locationDescription": "Rijweg naar Kwatta",
+      "locationDescriptionOriginal": "Rijweg naar Kwatta",
+      "placeType": "kost",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-10",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59133065",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1828",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1828,
+          "note": null
+        },
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-kost-1828",
+          "value": "kost",
+          "source": "almanakken",
+          "startYear": 1828,
+          "endYear": 1847,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "Peu et Content",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        },
+        {
+          "text": "Peuetcontent",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "sourceYear": 1828
+        },
+        {
+          "text": "Peu et Gontent",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "sourceYear": 1832
+        },
+        {
+          "text": "Pen et Content",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "sourceYear": 1834
+        },
+        {
+          "text": "Peuet Content.",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "sourceYear": 1836
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00010",
+          "districtLabel": "Divisie Para",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Rijweg naar Kwatta",
+          "original": "Rijweg naar Kwatta",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Kwatta\\Peu et Content 2012-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emVGd3Ql9tUHRMbmM/view?usp=sharing&resourcekey=0-QVuTdRcy9C70364HI51C5g",
+          "author": "Philip Dikland",
+          "year": "2012",
+          "notes": null
         }
       ]
     },
