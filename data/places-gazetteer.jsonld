@@ -45544,70 +45544,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01370",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01370",
-      "type": "plantation",
-      "prefLabel": "Mon Divertissement",
-      "altLabels": [],
-      "broader": "stm-00010",
-      "description": "",
-      "location": {
-        "lat": 5.867351670000001,
-        "lng": -55.18006206555556,
-        "wkt": "Polygon ((-55.18180481 5.84111291, -55.18106540 5.86131912, -55.18066475 5.88321424, -55.18029162 5.91019007, -55.17800543 5.91060202, -55.17811594 5.87657496, -55.17934575 5.84158884, -55.17946008 5.84044996, -55.18180481 5.84111291))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930",
-        "almanakken"
-      ],
-      "wikidataQid": "Q59132805",
-      "fid": 2455,
-      "psurIds": [],
-      "district": "Divisie Para",
-      "locationDescription": "Rijweg naar Kwatta",
-      "locationDescriptionOriginal": "Rijweg naar Kwatta",
-      "placeType": "kost",
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q59132805",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-almanakken-built-1828",
-          "status": "built",
-          "source": "almanakken",
-          "startYear": 1828,
-          "note": null
-        },
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ],
-      "productAssertions": [
-        {
-          "id": "product-almanakken-kost-1828",
-          "value": "kost",
-          "source": "almanakken",
-          "startYear": 1828,
-          "endYear": 1847,
-          "note": null
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-00542",
       "@type": [
         "E25_Human-Made_Feature"
@@ -130992,6 +130928,124 @@
           "original": "Hoer-Helena-kreek, regterhand in het opvaren",
           "source": "almanakken",
           "note": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01370",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01370",
+      "type": "plantation",
+      "broader": "stm-00010",
+      "description": "",
+      "location": {
+        "lat": 5.867351670000001,
+        "lng": -55.18006206555556,
+        "wkt": "Polygon ((-55.18180481 5.84111291, -55.18106540 5.86131912, -55.18066475 5.88321424, -55.18029162 5.91019007, -55.17800543 5.91060202, -55.17811594 5.87657496, -55.17934575 5.84158884, -55.17946008 5.84044996, -55.18180481 5.84111291))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930",
+        "almanakken"
+      ],
+      "wikidataQid": "Q59132805",
+      "fid": 2455,
+      "psurIds": [],
+      "district": "Divisie Para",
+      "locationDescription": "Rijweg naar Kwatta",
+      "locationDescriptionOriginal": "Rijweg naar Kwatta",
+      "placeType": "kost",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-10",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q59132805",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-almanakken-built-1828",
+          "status": "built",
+          "source": "almanakken",
+          "startYear": 1828,
+          "note": null
+        },
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "productAssertions": [
+        {
+          "id": "product-almanakken-kost-1828",
+          "value": "kost",
+          "source": "almanakken",
+          "startYear": 1828,
+          "endYear": 1847,
+          "note": null
+        }
+      ],
+      "names": [
+        {
+          "text": "Mon Divertissement.",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        },
+        {
+          "text": "Mou Divertissement",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "sourceYear": 1821
+        },
+        {
+          "text": "Men Divertissement",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "sourceYear": 1829
+        },
+        {
+          "text": "DeBoerbuiten",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": false
+        }
+      ],
+      "districtAssertions": [
+        {
+          "id": "district-assertion-1",
+          "districtId": "stm-00010",
+          "districtLabel": "Divisie Para",
+          "source": "almanakken",
+          "certainty": "certain",
+          "note": null,
+          "isCurrent": true
+        }
+      ],
+      "locationAssertions": [
+        {
+          "id": "location-assertion-1",
+          "standardized": "Rijweg naar Kwatta",
+          "original": "Rijweg naar Kwatta",
+          "source": "almanakken",
+          "note": null
+        }
+      ],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Kwatta\\DeBoerbuiten 2012-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emMUx0bUwyNHBMbWs/view?usp=sharing&resourcekey=0-Kzb_-Vm3F90bFEHJ7ugg5w",
+          "author": "Philip Dikland",
+          "year": "2012",
+          "notes": null
         }
       ]
     },
