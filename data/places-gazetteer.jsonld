@@ -159632,15 +159632,23 @@
       "locationDescription": null,
       "locationDescriptionOriginal": null,
       "placeType": null,
-      "modifiedBy": "Thunnisvanoort",
-      "modifiedAt": "2026-05-12",
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-10",
       "externalLinks": [],
       "names": [
         {
           "text": "Fort Zeelandia",
           "language": "nl",
           "type": "official",
-          "isPreferred": true
+          "isPreferred": true,
+          "source": "map-1882",
+          "sourceYear": 1882
+        },
+        {
+          "text": "Fort Willoughby",
+          "language": "en",
+          "type": "historical",
+          "isPreferred": false
         }
       ],
       "districtAssertions": [],
