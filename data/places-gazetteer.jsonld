@@ -183268,7 +183268,7 @@
       "sources": [
         "almanakken"
       ],
-      "wikidataQid": null,
+      "wikidataQid": "Q19905206",
       "fid": null,
       "psurIds": [],
       "district": null,
@@ -183277,7 +183277,13 @@
       "placeType": null,
       "modifiedBy": "GerDijkstra",
       "modifiedAt": "2026-06-10",
-      "externalLinks": [],
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q19905206",
+          "matchType": "closeMatch"
+        }
+      ],
       "names": [
         {
           "text": "Warappa Kreek",
