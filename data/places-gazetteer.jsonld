@@ -42689,54 +42689,6 @@
       ]
     },
     {
-      "@id": "https://data.suriname-timemachine.org/place/stm-01364",
-      "@type": [
-        "E25_Human-Made_Feature"
-      ],
-      "id": "stm-01364",
-      "type": "plantation",
-      "prefLabel": "Maria's lust en Toevlugt",
-      "altLabels": [
-        "Maria's lust en toevlugt"
-      ],
-      "broader": null,
-      "description": "",
-      "location": {
-        "lat": 5.85542473,
-        "lng": -55.17774947,
-        "wkt": "Polygon ((-55.17934575 5.84158884, -55.17811594 5.87657496, -55.17564583 5.87639131, -55.17629408 5.84097970, -55.17934575 5.84158884))",
-        "crs": "EPSG:4326"
-      },
-      "sources": [
-        "map-1930"
-      ],
-      "wikidataQid": "Q135395250",
-      "fid": 2449,
-      "psurIds": [],
-      "district": null,
-      "locationDescription": null,
-      "locationDescriptionOriginal": null,
-      "placeType": null,
-      "modifiedBy": null,
-      "modifiedAt": null,
-      "externalLinks": [
-        {
-          "authority": "wikidata",
-          "identifier": "Q135395250",
-          "matchType": "closeMatch"
-        }
-      ],
-      "statusAssertions": [
-        {
-          "id": "status-map-1930-present-1930",
-          "status": "present",
-          "source": "map-1930",
-          "startYear": 1930,
-          "note": "Depicted on Kaart van Suriname (1930)"
-        }
-      ]
-    },
-    {
       "@id": "https://data.suriname-timemachine.org/place/stm-01118",
       "@type": [
         "E25_Human-Made_Feature"
@@ -128094,6 +128046,89 @@
           "original": "Warrappa-kreek, linkerhand in het opvaren",
           "source": "almanakken",
           "note": null
+        }
+      ]
+    },
+    {
+      "@id": "stm:place/stm-01364",
+      "@type": "E25_Human-Made_Feature",
+      "id": "stm-01364",
+      "type": "plantation",
+      "broader": null,
+      "description": "",
+      "location": {
+        "lat": 5.85542473,
+        "lng": -55.17774947,
+        "wkt": "Polygon ((-55.17934575 5.84158884, -55.17811594 5.87657496, -55.17564583 5.87639131, -55.17629408 5.84097970, -55.17934575 5.84158884))",
+        "crs": "EPSG:4326"
+      },
+      "sources": [
+        "map-1930"
+      ],
+      "wikidataQid": "Q135395250",
+      "fid": 2449,
+      "psurIds": [],
+      "district": null,
+      "locationDescription": null,
+      "locationDescriptionOriginal": null,
+      "placeType": null,
+      "modifiedBy": "GerDijkstra",
+      "modifiedAt": "2026-06-10",
+      "externalLinks": [
+        {
+          "authority": "wikidata",
+          "identifier": "Q135395250",
+          "matchType": "closeMatch"
+        }
+      ],
+      "statusAssertions": [
+        {
+          "id": "status-map-1930-present-1930",
+          "status": "unknown",
+          "source": "map-1930",
+          "startYear": 1930,
+          "note": "Depicted on Kaart van Suriname (1930)"
+        }
+      ],
+      "names": [
+        {
+          "text": "Maria's lust en Toevlugt",
+          "language": "nl",
+          "type": "official",
+          "isPreferred": true,
+          "sourceYear": 1930
+        },
+        {
+          "text": "Maria's lust en toevlugt",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false
+        },
+        {
+          "text": "Stolkbuiten",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        },
+        {
+          "text": "Comvaliushoop",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": false,
+          "source": "dikland-collection"
+        }
+      ],
+      "districtAssertions": [],
+      "productAssertions": [],
+      "locationAssertions": [],
+      "diklandRefs": [
+        {
+          "folderPath": "erfgoed-geschiedenis\\Kwatta\\Stolkbuiten 2012-01 geschiedenis.pdf",
+          "driveUrl": "https://drive.google.com/file/d/0B88mZFitv8emRkJ5S3JPbGtTM1E/view?usp=sharing&resourcekey=0-qC3g83sIIkrCJGI8RgpMvQ",
+          "author": "Philip Dikland",
+          "year": "2012",
+          "notes": "Het huidige Stolkbuiten is een samenvoeging van twee oudere buitenplaatsen : Maria’s lust, en  Toevlugt.\nDe grond Maria’s Lust was 10 ketting breed. NB : De grond dient niet te worden verward met een andere grond genaamd Maria’s Rust (maar ook wel genoemd Maria’s Lust), die daarna werd hernaamd in Industrie. Dat is een andere grond. Verwarrend is het wel.\nDe grond Toevlugt heette eerst Comvaliushoop."
         }
       ]
     },
