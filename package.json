@@ -8,8 +8,5 @@
     "pipeline": "pnpm --dir app pipeline",
     "seed-gazetteer": "pnpm --dir app seed-gazetteer",
     "import-streets-1916": "pnpm --dir app import-streets-1916"
-  },
-  "dependencies": {
-    "@vercel/analytics": "^2.0.1"
   }
 }

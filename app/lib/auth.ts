@@ -46,13 +46,19 @@ export function useAuth(): AuthState {
   });
 
   useEffect(() => {
+    let active = true;
     if (cachedAuth) {
       setState({ ...cachedAuth, loading: false });
       return;
     }
     fetchAuth().then((data) => {
+      if (!active) return;
       setState({ ...data, loading: false });
     });
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   return state;

@@ -4,7 +4,7 @@ import 'leaflet/dist/leaflet.css';
 import { usePlaceTypes } from '@/lib/thesaurus';
 import type { GeoJSONCollection, GeoJSONFeature } from '@/lib/types';
 import L from 'leaflet';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 const TRANSFORMATION_LABELS: Record<string, string> = {
   helmert: 'Helmert',
@@ -1087,13 +1087,18 @@ function SearchInput({
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
 
-  const results = (() => {
+  const results = useMemo(() => {
     if (!geojson || query.length < 2) return [];
     const q = query.toLowerCase();
     return geojson.features
-      .filter((f) => f.properties.name?.toLowerCase().includes(q))
+      .filter((f) => {
+        if (f.properties.name?.toLowerCase().includes(q)) return true;
+        return (f.properties.allNames ?? []).some((name) =>
+          name.toLowerCase().includes(q),
+        );
+      })
       .slice(0, 20);
-  })();
+  }, [geojson, query]);
 
   return (
     <div className="relative">

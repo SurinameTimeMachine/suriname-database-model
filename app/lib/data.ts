@@ -15,73 +15,62 @@ const DATA_BASE = '/data';
 
 async function fetchJSON<T>(path: string): Promise<T> {
   const res = await fetch(`${DATA_BASE}/${path}`);
+  if (!res.ok) {
+    throw new Error(`Failed to fetch ${path}: ${res.status}`);
+  }
   return res.json();
 }
 
-let _plantations: Record<string, E25Plantation> | null = null;
-let _physicalFeatures: Record<string, E26PhysicalFeature> | null = null;
-let _organizations: Record<string, E74Organization> | null = null;
-let _places: Record<string, E53Place> | null = null;
-let _sources: Record<string, E22Source> | null = null;
-let _appellationsByEntity: Record<string, E41Appellation[]> | null = null;
-let _observationsByOrg: Record<string, OrganizationObservation[]> | null = null;
-let _lifecycleEvents: Record<string, FeatureLifecycleEvent[]> | null = null;
-let _provenance: Record<string, ProvenanceRecord> | null = null;
-let _geojson: GeoJSONCollection | null = null;
+function createDataLoader<T>(path: string) {
+  let value: T | null = null;
+  let promise: Promise<T> | null = null;
 
-export async function getPlantations() {
-  if (!_plantations) _plantations = await fetchJSON('plantations.json');
-  return _plantations!;
+  return async () => {
+    if (value) return value;
+    if (!promise) {
+      promise = fetchJSON<T>(path)
+        .then((data) => {
+          value = data;
+          return data;
+        })
+        .catch((error) => {
+          promise = null;
+          throw error;
+        });
+    }
+    return promise;
+  };
 }
 
-export async function getPhysicalFeatures() {
-  if (!_physicalFeatures)
-    _physicalFeatures = await fetchJSON('physical-features.json');
-  return _physicalFeatures!;
-}
-
-export async function getOrganizations() {
-  if (!_organizations) _organizations = await fetchJSON('organizations.json');
-  return _organizations!;
-}
-
-export async function getPlaces() {
-  if (!_places) _places = await fetchJSON('places.json');
-  return _places!;
-}
-
-export async function getSources() {
-  if (!_sources) _sources = await fetchJSON('sources.json');
-  return _sources!;
-}
-
-export async function getAppellationsByEntity() {
-  if (!_appellationsByEntity)
-    _appellationsByEntity = await fetchJSON('appellations-by-entity.json');
-  return _appellationsByEntity!;
-}
-
-export async function getObservationsByOrg() {
-  if (!_observationsByOrg)
-    _observationsByOrg = await fetchJSON('observations-by-org.json');
-  return _observationsByOrg!;
-}
-
-export async function getLifecycleEvents() {
-  if (!_lifecycleEvents)
-    _lifecycleEvents = await fetchJSON('lifecycle-events.json');
-  return _lifecycleEvents!;
-}
-
-export async function getProvenance() {
-  if (!_provenance) _provenance = await fetchJSON('provenance.json');
-  return _provenance!;
-}
-
-export async function getGeoJSON() {
-  if (!_geojson) _geojson = await fetchJSON('map-features.geojson');
-  return _geojson!;
-}
+export const getPlantations = createDataLoader<Record<string, E25Plantation>>(
+  'plantations.json',
+);
+export const getPhysicalFeatures = createDataLoader<
+  Record<string, E26PhysicalFeature>
+>('physical-features.json');
+export const getOrganizations = createDataLoader<Record<string, E74Organization>>(
+  'organizations.json',
+);
+export const getPlaces = createDataLoader<Record<string, E53Place>>(
+  'places.json',
+);
+export const getSources = createDataLoader<Record<string, E22Source>>(
+  'sources.json',
+);
+export const getAppellationsByEntity = createDataLoader<
+  Record<string, E41Appellation[]>
+>('appellations-by-entity.json');
+export const getObservationsByOrg = createDataLoader<
+  Record<string, OrganizationObservation[]>
+>('observations-by-org.json');
+export const getLifecycleEvents = createDataLoader<
+  Record<string, FeatureLifecycleEvent[]>
+>('lifecycle-events.json');
+export const getProvenance = createDataLoader<Record<string, ProvenanceRecord>>(
+  'provenance.json',
+);
+export const getGeoJSON =
+  createDataLoader<GeoJSONCollection>('map-features.geojson');
 
 /** Load all data stores in parallel */
 export async function loadAllData() {
