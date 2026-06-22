@@ -9,7 +9,7 @@ Quick reference for Suriname Time Machine data modeling. For rationale, see [ARC
 
 ## Keeping Sources of Truth in Sync
 
-The data model is defined in **four places** that must stay consistent. When changing any entity, property, or relation, update the relevant files together:
+The data model is defined in **five places** that must stay consistent. When changing any entity, property, or relation, update the relevant files together:
 
 | Source                                 | What to update                                                                                                      |
 | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
@@ -21,11 +21,11 @@ The data model is defined in **four places** that must stay consistent. When cha
 
 `app/lod/context.jsonld` is generated output. Do not hand-edit it; update `app/scripts/lod-context.ts`, run the pipeline, and commit the regenerated context file.
 
-Validation commands for LOD/schema changes:
+Validation commands for LOD/schema changes. Run the pipeline first when the generated database is absent or stale; it generates the database before validating its context:
 
 ```bash
-pnpm --dir app validate-lod
 pnpm --dir app pipeline
+pnpm --dir app validate-lod
 pnpm --dir app build
 ```
 
