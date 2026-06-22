@@ -152,7 +152,7 @@ export interface FeatureLifecycleEvent {
   P123_resulted_in?: string;
   P124_transformed?: string | string[];
   assignedType?: string;
-  status?: PlantationStatusType | 'present' | string;
+  status?: PlantationStatusType | string;
   note?: string | null;
 }
 

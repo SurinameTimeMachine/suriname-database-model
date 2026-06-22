@@ -1220,6 +1220,7 @@ export default function ThesaurusEditor({ canEdit }: ThesaurusEditorProps) {
                         <button
                           onClick={async () => {
                             if (!draft || !rawJsonLd) return;
+                            // eslint-disable-next-line no-restricted-globals
                             if (
                               !confirm(
                                 `Deprecate "${langEn(draft.prefLabel)}"? The entry will be archived but kept in the file so its ID is never reused.`,

@@ -13,6 +13,8 @@ import { buildSourceUrl } from '@/lib/url';
 import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+const CATEGORY_ORDER = ['map', 'register', 'almanac', 'dataset', 'external'];
+
 function sortedCategories(categories: SourceCategory[]): SourceCategory[] {
   return [...categories].sort((a, b) => {
     const ai = CATEGORY_ORDER.indexOf(a.categoryId);
@@ -20,8 +22,6 @@ function sortedCategories(categories: SourceCategory[]): SourceCategory[] {
     return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
   });
 }
-
-const CATEGORY_ORDER = ['map', 'register', 'almanac', 'dataset', 'external'];
 
 export default function SourcesPage() {
   const { categories, sources, loading, prefLabel, description } =
@@ -562,6 +562,7 @@ function SourceCard({
                     <button
                       type="button"
                       onClick={() => {
+                        // eslint-disable-next-line no-restricted-globals
                         if (
                           confirm(
                             `Delete "${source.prefLabel}"? This cannot be undone.`,

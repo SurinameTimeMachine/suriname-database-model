@@ -811,10 +811,10 @@ function SchemaGraph({
       </g>
 
       {/* Relations */}
-      {RELATIONS.map((rel, i) => {
+      {RELATIONS.map((rel) => {
         const from = ENTITIES.find((e) => e.id === rel.from)!;
         const to = ENTITIES.find((e) => e.id === rel.to)!;
-        const isHighlighted = hoveredRelation === i;
+        const isHighlighted = hoveredRelation === `${rel.from}-${rel.to}`;
         const mx = (from.cx + to.cx) / 2;
         const my = (from.cy + to.cy) / 2;
 
@@ -831,8 +831,8 @@ function SchemaGraph({
 
         return (
           <g
-            key={i}
-            onMouseEnter={() => onHoverRelation(i)}
+            key={`${rel.from}-${rel.to}`}
+            onMouseEnter={() => onHoverRelation(`${rel.from}-${rel.to}`)}
             onMouseLeave={() => onHoverRelation(null)}
             className="cursor-pointer"
           >
@@ -1009,10 +1009,14 @@ function EntityDetail({
               </tr>
             </thead>
             <tbody>
-              {entity.properties.map((prop, i) => (
+              {entity.properties.map((prop) => (
                 <tr
-                  key={i}
-                  className={i % 2 === 0 ? 'bg-cream/70' : 'bg-background/60'}
+                  key={prop.name}
+                  className={
+                    entity.properties.indexOf(prop) % 2 === 0
+                      ? 'bg-cream/70'
+                      : 'bg-background/60'
+                  }
                 >
                   <td className="px-3 py-1.5 font-mono text-teal-strong">
                     {prop.name}
@@ -1198,13 +1202,13 @@ function SpatialModelSection() {
     <div className="site-surface p-6">
       <h3 className="mb-3 text-xl font-semibold text-ink">Spatial Model</h3>
       <p className="mb-4 text-sm leading-relaxed text-ink/65">
-        Mapped features are separated from their geometry. Plantations,
-        roads, settlements, stations, military posts, towns, villages, rivers,
-        and creeks are modeled as E25 or E26 feature entities; each feature
-        points via <strong>P53 has location</strong> to an E53 Place carrying
-        the actual GeoSPARQL geometry. Source coordinates from the QGIS map
-        layers use <strong>EPSG:31170</strong> (Suriname Old TM) and are
-        reprojected to <strong>WGS84 (EPSG:4326)</strong> for web display.
+        Mapped features are separated from their geometry. Plantations, roads,
+        settlements, stations, military posts, towns, villages, rivers, and
+        creeks are modeled as E25 or E26 feature entities; each feature points
+        via <strong>P53 has location</strong> to an E53 Place carrying the
+        actual GeoSPARQL geometry. Source coordinates from the QGIS map layers
+        use <strong>EPSG:31170</strong> (Suriname Old TM) and are reprojected to{' '}
+        <strong>WGS84 (EPSG:4326)</strong> for web display.
       </p>
       <div className="grid md:grid-cols-2 gap-6">
         <div>
@@ -1260,8 +1264,8 @@ function SpatialModelSection() {
               <span className="text-stm-sepia-600">^^geo:wktLiteral</span>
             </div>
             <div className="mt-2 text-ink/55">
-              Leaflet renders these as points, lines, and polygons from the
-              same E53 geometry model
+              Leaflet renders these as points, lines, and polygons from the same
+              E53 geometry model
             </div>
           </div>
           <div className="mt-3">
@@ -1289,11 +1293,10 @@ function TemporalModelSection() {
       <h3 className="mb-3 text-xl font-semibold text-ink">Temporal Model</h3>
       <p className="mb-4 text-sm leading-relaxed text-ink/65">
         Time is modeled through E52 Time-Span linked to observations and
-        lifecycle events. Each mapped feature can carry source-presence,
-        status, function, modification, destruction, production, or
-        transformation events, so a point address, line road, or polygon
-        plantation can all change through time without losing their shared
-        E53 location basis.
+        lifecycle events. Each mapped feature can carry source-presence, status,
+        function, modification, destruction, production, or transformation
+        events, so a point address, line road, or polygon plantation can all
+        change through time without losing their shared E53 location basis.
       </p>
       <div className="grid md:grid-cols-2 gap-6">
         <div>
@@ -1621,9 +1624,7 @@ function ModelPageInner() {
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-10">
         {/* Header */}
         <div className="mb-10">
-          <div className="site-kicker mb-3">
-            CIDOC-CRM Mapping
-          </div>
+          <div className="site-kicker mb-3">CIDOC-CRM Mapping</div>
           <h1 className="mb-3 text-3xl font-semibold text-ink sm:text-4xl">
             Data Model
           </h1>
@@ -1833,8 +1834,8 @@ function ModelPageInner() {
           </div>
           <div className="mt-4 flex gap-4 text-[11px] text-ink/50">
             <span className="flex items-center gap-1.5">
-              <span className="inline-block w-2 h-2 bg-teal-strong" /> Answerable
-              now
+              <span className="inline-block w-2 h-2 bg-teal-strong" />{' '}
+              Answerable now
             </span>
             <span className="flex items-center gap-1.5">
               <span className="inline-block w-2 h-2 bg-entity-e12" /> Needs

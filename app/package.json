@@ -13,6 +13,7 @@
     "dev": "next dev",
     "generate": "tsx scripts/generate-database.ts",
     "import-streets-1916": "tsx scripts/import-streets-paramaribo-1916.ts",
+    "lint": "eslint .",
     "pipeline": "tsx scripts/generate-database.ts && tsx scripts/prepare-data.ts",
     "prepare-data": "tsx scripts/prepare-data.ts",
     "seed-gazetteer": "tsx scripts/seed-gazetteer.ts",
@@ -39,10 +40,13 @@
     "@types/node": "^26.0.0",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
+    "eslint": "^9.39.4",
+    "eslint-config-upleveled": "^10.0.0",
+    "globals": "^17.6.0",
     "postcss": "^8.5.15",
     "tailwindcss": "^4.3.1",
     "tsx": "^4.22.4",
-    "typescript": "^6.0.3"
+    "typescript": "^5.9.3"
   },
   "packageManager": "pnpm@10.19.0"
 }

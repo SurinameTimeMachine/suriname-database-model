@@ -2567,6 +2567,7 @@ export default function PlaceEditor({
             {onDelete && !place.id.startsWith('stm-new-') && (
               <button
                 onClick={() => {
+                  // eslint-disable-next-line no-restricted-globals
                   if (
                     confirm(
                       `Delete "${getPreferredName(draft)}"? This cannot be undone.`,

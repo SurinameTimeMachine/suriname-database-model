@@ -1,6 +1,11 @@
+import Link from 'next/link';
+
 export default function SiteFooter() {
   return (
-    <footer id="site-footer" className="shrink-0 border-t border-ink/10 bg-cream">
+    <footer
+      id="site-footer"
+      className="shrink-0 border-t border-ink/10 bg-cream"
+    >
       <div className="mx-auto max-w-6xl px-4 py-3 sm:px-6 lg:px-10">
         <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[11px] text-ink/65">
           <span className="font-medium text-ink/85">Suriname Time Machine</span>
@@ -13,9 +18,9 @@ export default function SiteFooter() {
         </div>
 
         <div className="mt-1.5 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[11px] text-ink/55">
-          <a href="/#partners" className="transition hover:text-teal-strong">
+          <Link href="/#partners" className="transition hover:text-teal-strong">
             Partners
-          </a>
+          </Link>
           <span className="text-ink/25">•</span>
           <span>Data sources (coming soon)</span>
         </div>

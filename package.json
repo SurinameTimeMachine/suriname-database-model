@@ -3,6 +3,7 @@
     "dev": "pnpm --dir app dev",
     "build": "pnpm --dir app build",
     "start": "pnpm --dir app start",
+    "lint": "pnpm --dir app lint",
     "generate": "pnpm --dir app generate",
     "prepare-data": "pnpm --dir app prepare-data",
     "pipeline": "pnpm --dir app pipeline",
