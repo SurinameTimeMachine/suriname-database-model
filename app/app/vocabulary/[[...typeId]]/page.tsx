@@ -94,7 +94,7 @@ export default function VocabularyPage() {
 
   function shortUri(uri: string): string {
     return uri
-      .replace('https://data.suriname-timemachine.org/', 'stm:')
+      .replace('https://data.surinametijdmachine.org/', 'stm:')
       .replace('stm:vocabulary/place-type/', 'stm:.../');
   }
 

@@ -14,7 +14,7 @@ import { join } from 'path';
 const LOD_DIR = join(__dirname, '../lod');
 const OUT_DIR = join(__dirname, '../public/data');
 const DATA_DIR = join(__dirname, '../../data');
-const DATA_BASE = 'https://data.suriname-timemachine.org/';
+const DATA_BASE = 'https://data.surinametijdmachine.org/';
 const ONTOLOGY_BASE = 'https://suriname-timemachine.org/ontology/';
 const PIPELINE_TYPES = new Set(['plantation', 'river', 'creek']);
 

@@ -1,4 +1,4 @@
-export const BASE = 'https://data.suriname-timemachine.org/';
+export const BASE = 'https://data.surinametijdmachine.org/';
 export const WD = 'http://www.wikidata.org/entity/';
 
 export function buildContext(): Record<string, unknown> {

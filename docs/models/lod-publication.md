@@ -20,9 +20,9 @@ These checks establish JSON-LD publication hygiene. They do not by themselves pr
 
 ## Deployment requirements
 
-The canonical identifier base is `https://data.suriname-timemachine.org/`. Before describing the service as published Linked Open Data, deployment must provide:
+The canonical identifier base is `https://data.surinametijdmachine.org/`. Before describing the service as published Linked Open Data, deployment must provide:
 
-1. DNS and TLS for `data.suriname-timemachine.org`;
+1. DNS and TLS for `data.surinametijdmachine.org`;
 2. a stable route from the canonical dataset URI to `/data/database.jsonld`;
 3. stable routes for individual entity identifiers, with HTML for browsers and JSON-LD for machine clients; and
 4. redirects or persistent aliases if URI patterns change.

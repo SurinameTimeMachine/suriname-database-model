@@ -1,7 +1,7 @@
 {
   "@context": {
     "@vocab": "https://schema.org/",
-    "base": "https://data.suriname-timemachine.org/",
+    "base": "https://data.surinametijdmachine.org/",
     "wd": "http://www.wikidata.org/entity/",
     "wdt": "http://www.wikidata.org/prop/direct/",
     "crm": "http://www.cidoc-crm.org/cidoc-crm/",

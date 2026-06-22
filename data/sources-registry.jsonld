@@ -6,7 +6,7 @@
     "prov": "http://www.w3.org/ns/prov#",
     "xsd": "http://www.w3.org/2001/XMLSchema#",
     "sdo": "https://schema.org/",
-    "stm": "https://data.suriname-timemachine.org/",
+    "stm": "https://data.surinametijdmachine.org/",
     "prefLabel": "crm:P1_is_identified_by",
     "P2_has_type": {
       "@id": "crm:P2_has_type",
@@ -41,14 +41,14 @@
     },
     "deprecationNote": "stm:deprecationNote"
   },
-  "@id": "https://data.suriname-timemachine.org/registry/sources",
+  "@id": "https://data.surinametijdmachine.org/registry/sources",
   "@type": "dct:Dataset",
   "prefLabel": "Suriname Time Machine Source Registry",
   "description": "Registry of all known historical sources (E22 Human-Made Objects) used in the Suriname Time Machine project. Sources are physical or digital artifacts that carry information about places, persons, and organizations.",
   "dct:created": "2026-04-08",
   "@graph": [
     {
-      "@id": "https://data.suriname-timemachine.org/type/source-type/map",
+      "@id": "https://data.surinametijdmachine.org/type/source-type/map",
       "@type": [
         "crm:E55_Type"
       ],
@@ -56,7 +56,7 @@
       "description": "Cartographic sources depicting Suriname's landscape, settlements, and plantations across different periods."
     },
     {
-      "@id": "https://data.suriname-timemachine.org/type/source-type/register",
+      "@id": "https://data.surinametijdmachine.org/type/source-type/register",
       "@type": [
         "crm:E55_Type"
       ],
@@ -64,7 +64,7 @@
       "description": "Administrative records including slave registers, emancipation records, birth and death certificates, and ward registers."
     },
     {
-      "@id": "https://data.suriname-timemachine.org/type/source-type/almanac",
+      "@id": "https://data.surinametijdmachine.org/type/source-type/almanac",
       "@type": [
         "crm:E55_Type"
       ],
@@ -72,7 +72,7 @@
       "description": "Annual plantation observation records from the Surinaamse Almanakken (1818-1861)."
     },
     {
-      "@id": "https://data.suriname-timemachine.org/type/source-type/dataset",
+      "@id": "https://data.surinametijdmachine.org/type/source-type/dataset",
       "@type": [
         "crm:E55_Type"
       ],
@@ -80,7 +80,7 @@
       "description": "Modern research datasets derived from primary sources, including the Plantagen Dataset."
     },
     {
-      "@id": "https://data.suriname-timemachine.org/type/source-type/external",
+      "@id": "https://data.surinametijdmachine.org/type/source-type/external",
       "@type": [
         "crm:E55_Type"
       ],
@@ -88,7 +88,7 @@
       "description": "External linked data sources used for reconciliation and enrichment."
     },
     {
-      "@id": "https://data.suriname-timemachine.org/type/source-type/research-collection",
+      "@id": "https://data.surinametijdmachine.org/type/source-type/research-collection",
       "@type": [
         "crm:E55_Type"
       ],
@@ -96,24 +96,24 @@
       "description": "Community and researcher-compiled document collections containing historical descriptions of Surinamese plantations, places, and persons."
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/rijksmuseum-collection",
+      "@id": "https://data.surinametijdmachine.org/source/rijksmuseum-collection",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "rijksmuseum-collection",
       "prefLabel": "Rijksmuseum collection",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/research-collection",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/research-collection",
       "linkedToGazetteer": false,
       "description": "Online image collection of Rijksmuseum at https://www.rijksmuseum.nl/nl/collectie"
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/map-1930",
+      "@id": "https://data.surinametijdmachine.org/source/map-1930",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "map-1930",
       "prefLabel": "Kaart van Suriname (1930)",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1930,
       "maker": "Louis August Bakhuis, W. de Quant, Johan François Adriaan Cateau van Rosevelt, Jan Felix Adriaan Eugène van Lansberge, Ministerie van Koloniën (Den Haag)",
       "publisher": "Departement van Koloniën",
@@ -124,25 +124,25 @@
       "description": "Large-scale map of Suriname compiled around 1930. Primary source for plantation polygon geometries and labels in the QGIS dataset."
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/map-1882",
+      "@id": "https://data.surinametijdmachine.org/source/map-1882",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "map-1882",
       "prefLabel": "Kaart van Suriname (1882)",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1882,
       "linkedToGazetteer": true,
       "description": "Map of Suriname from 1882 period, used for military post locations and secondary plantation label verification."
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/paramaribo-street-map-1916",
+      "@id": "https://data.surinametijdmachine.org/source/paramaribo-street-map-1916",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "paramaribo-street-map-1916",
       "prefLabel": "Paramaribo 1916-17 (street overlay source)",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1916,
       "timeSpan": "1916-1917",
       "maker": "Opnemingsdienst van Suriname",
@@ -153,85 +153,85 @@
       "linkedToGazetteer": true
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/almanakken",
+      "@id": "https://data.surinametijdmachine.org/source/almanakken",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "almanakken",
       "prefLabel": "Surinaamse Almanakken (1818-1861)",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/almanac",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/almanac",
       "timeSpan": "1818-1861",
       "publicationPlace": "Paramaribo",
       "linkedToGazetteer": true,
       "description": "Annual plantation observation records from the Surinaamse Almanakken. Contains ownership, production, enslaved counts, and plantation names for each year. Modeled as a single E22 source with individual E13 observations per row."
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/slave-registers",
+      "@id": "https://data.surinametijdmachine.org/source/slave-registers",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "slave-registers",
       "prefLabel": "Suriname Slave and Emancipation Registers (1830-1863)",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/register",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/register",
       "timeSpan": "1830-1863",
       "linkedToGazetteer": true,
       "description": "Individual-level records of enslaved persons in Suriname including birth, transfer, death, and emancipation events. 95,388 records with PSUR plantation IDs."
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/ward-registers",
+      "@id": "https://data.surinametijdmachine.org/source/ward-registers",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "ward-registers",
       "prefLabel": "Paramaribo Ward Registers (1828-1847)",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/register",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/register",
       "timeSpan": "1828-1847",
       "linkedToGazetteer": false,
       "description": "Census-like registration of free persons in Paramaribo. 102,260 records including demographics, household enslaved counts, and addresses."
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/death-certificates",
+      "@id": "https://data.surinametijdmachine.org/source/death-certificates",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "death-certificates",
       "prefLabel": "Suriname Death Certificates (1845-1915)",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/register",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/register",
       "timeSpan": "1845-1915",
       "linkedToGazetteer": false,
       "description": "192,335 death certificate records from Suriname districts and Paramaribo. Contains deceased, informant, parents, spouses, and witnesses."
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/birth-certificates",
+      "@id": "https://data.surinametijdmachine.org/source/birth-certificates",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "birth-certificates",
       "prefLabel": "Paramaribo Birth Certificates (1828-1921)",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/register",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/register",
       "timeSpan": "1828-1921",
       "linkedToGazetteer": false,
       "description": "63,200 birth certificate records from Paramaribo. Contains child, mother, father, informant, and witnesses."
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/plantagen-dataset",
+      "@id": "https://data.surinametijdmachine.org/source/plantagen-dataset",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "plantagen-dataset",
       "prefLabel": "Suriname Plantation Dataset v1.0",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/dataset",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/dataset",
       "linkedToGazetteer": false,
       "description": "Master plantation list with approximately 375 plantations including PSUR IDs, names, enslaved population series, districts, and product types."
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-1",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-1",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-1",
       "prefLabel": "Nieuwe Kaart van Suriname, Comowini, Cottica & Marawini",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1750,
       "maker": "Josua Ottens",
       "holdingArchive": "Nationaal Archief",
@@ -240,13 +240,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-2",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-2",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-2",
       "prefLabel": "Algemeene Kaart van de Colonie of Provintie van Suriname",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1758,
       "maker": "Alexander de Lavaux",
       "holdingArchive": "Nationaal Archief",
@@ -255,13 +255,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-3",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-3",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-3",
       "prefLabel": "Carte de la Colonie de Surinam",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1769,
       "maker": "anonymous, etched after a map by Alexander de Lavaux",
       "holdingArchive": "Nationaal Archief",
@@ -270,13 +270,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-4",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-4",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-4",
       "prefLabel": "Naadere kaart en rapport, specterende de nieuw te begeeven landeryen in de Marchals kreek en of dezelve tot nadeel konde strekken voor de Houtgrond Weltevreden C.A.",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1785,
       "maker": "A.H. Helleday",
       "holdingArchive": "Nationaal Archief",
@@ -285,13 +285,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-5",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-5",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-5",
       "prefLabel": "Plaan van het hospitaal à Paramaribo in Surinamen",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1793,
       "maker": "J. H. Rothe",
       "holdingArchive": "Nationaal Archief",
@@ -300,13 +300,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-6",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-6",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-6",
       "prefLabel": "Generale kaart der kolonie Suriname in Zuid-Amerika [...]",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1840,
       "maker": "J.H. Pohl",
       "holdingArchive": "Nationaal Archief",
@@ -315,13 +315,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-7",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-7",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-7",
       "prefLabel": "Kaart van Suriname met naamlijst der in ontginning zijnde plantages",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "maker": "J. Kuyper, D. Heyse",
       "holdingArchive": "Nationaal Archief",
       "handleUrl": "https://www.nationaalarchief.nl/onderzoeken/archief/4.MIKO/invnr/1160/file/NL-HaNA_4.MIKO_1160",
@@ -329,13 +329,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-8",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-8",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-8",
       "prefLabel": "Kaart van Nw. Rotterdam met een gedeelte der Nickeriekust",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1872,
       "maker": "Jurriaanse en J.F.A. Cateau van Rosevelt",
       "holdingArchive": "Nationaal Archief",
@@ -344,13 +344,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-9",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-9",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-9",
       "prefLabel": "Paramaribo en omstreken",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1907,
       "maker": "Luit. Boumeester",
       "holdingArchive": "Nationaal Archief",
@@ -359,26 +359,26 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-10",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-10",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-10",
       "prefLabel": "Kaart van Suriname. Met inzet van Plantagen der Commewijne",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "holdingArchive": "Nationaal Archief",
       "handleUrl": "https://www.nationaalarchief.nl/onderzoeken/archief/4.MIKO/invnr/2030/file/NL-HaNA_4.MIKO_2030",
       "iiifInfoUrl": "https://service.archief.nl/iip/75/45/30/ce/54/d1/4f/0f/98/40/d4/1d/22/48/85/34/41278280-bba8-4113-8637-782bfbe4bfed.jp2/info.json",
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-11",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-11",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-11",
       "prefLabel": "Kaart van Suriname",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1849,
       "maker": "Jhr. C.A. van Sijpesteijn",
       "holdingArchive": "Nationaal Archief",
@@ -387,13 +387,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-12",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-12",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-12",
       "prefLabel": "Kaart van Suriname",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "maker": "H. N. Dahlberg",
       "holdingArchive": "Nationaal Archief",
       "handleUrl": "https://www.nationaalarchief.nl/onderzoeken/archief/4.MIKO/invnr/6050/file/NL-HaNA_4.MIKO_6050",
@@ -401,52 +401,52 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-13",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-13",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-13",
       "prefLabel": "Plattegrond van Paramaribo",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "holdingArchive": "Nationaal Archief",
       "handleUrl": "https://www.nationaalarchief.nl/onderzoeken/archief/4.MIKO/invnr/6009/file/NL-HaNA_4.MIKO_6009",
       "iiifInfoUrl": "https://service.archief.nl/iip/bf/d8/10/95/41/d2/4b/56/8c/ca/0b/d2/04/4e/28/24/2fb075e6-3247-4f26-acf4-b91b1a6220f8.jp2/info.json",
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-14",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-14",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-14",
       "prefLabel": "Le Plantage Voorborg à l'Est de la Riviere Surinam etc.",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "holdingArchive": "Nationaal Archief",
       "handleUrl": "https://www.nationaalarchief.nl/onderzoeken/archief/4.VEL/invnr/1793/file/NL-HaNA_4.VEL_1793",
       "iiifInfoUrl": "https://service.archief.nl/iip/3e/9e/e2/3f/1b/a7/40/e5/b3/e1/6e/13/1e/7e/96/6f/a9d059e0-4ed0-4d4e-933c-971b94e01cb7.jp2/info.json",
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-15",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-15",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-15",
       "prefLabel": "6108 - Surinaamse Waterleiding Mij. Met kavelnummers getekend op de plattegrond van Paramaribo",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "holdingArchive": "Nationaal Archief",
       "handleUrl": "https://www.nationaalarchief.nl/onderzoeken/archief/4.MIKO/invnr/6108/file/NL-HaNA_4.MIKO_6108",
       "iiifInfoUrl": "https://service.archief.nl/iip/6f/1c/2c/92/a8/89/40/4c/9a/a0/89/97/e3/50/a3/4f/68dd39df-05dc-4bbc-9946-38f495a0fbf4.jp2/info.json",
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-16",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-16",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-16",
       "prefLabel": "Generale caart van de provintie Suriname",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1737,
       "maker": "Alexander de Lavaux",
       "holdingArchive": "UB Amsterdam",
@@ -456,13 +456,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-17",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-17",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-17",
       "prefLabel": "A chart of the coast of Guyana",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1767,
       "holdingArchive": "UB Amsterdam",
       "handleUrl": "https://hdl.handle.net/11245/3.38566",
@@ -471,13 +471,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-18",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-18",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-18",
       "prefLabel": "Kaart van geheel Guajana of de Wilden-kust",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1767,
       "holdingArchive": "UB Amsterdam",
       "handleUrl": "https://hdl.handle.net/11245/3.38584",
@@ -486,13 +486,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-19",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-19",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-19",
       "prefLabel": "Algemeene kaart van de Colonie of Provintie van Suriname",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1770,
       "maker": "Alexander de Lavaux, Hendrik de Leth",
       "holdingArchive": "UB Amsterdam",
@@ -502,13 +502,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-20",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-20",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-20",
       "prefLabel": "Plattegrond der Plantage Adrichem",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "holdingArchive": "UB Amsterdam",
       "handleUrl": "https://hdl.handle.net/11245/3.38568",
       "iiifManifest": "https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_38568/manifest/",
@@ -516,13 +516,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-21",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-21",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-21",
       "prefLabel": "Nieuwe specialkaart van de colonie Suriname [...]",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1801,
       "maker": "J. H. Moseberg",
       "holdingArchive": "UB Amsterdam",
@@ -532,13 +532,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-22",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-22",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-22",
       "prefLabel": "Platte grond van de stad Paramaribo",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1804,
       "maker": "A. H. Hiemcke, J. G. Visser",
       "holdingArchive": "UB Amsterdam",
@@ -548,13 +548,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-23",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-23",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-23",
       "prefLabel": "Carte de la Guiane Française & Hollandaise",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1805,
       "holdingArchive": "UB Amsterdam",
       "handleUrl": "https://hdl.handle.net/11245/3.38589",
@@ -563,13 +563,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-24",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-24",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-24",
       "prefLabel": "Kaart van het bebouwde gedeelte van Surinamen [...]",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1817,
       "maker": "J. van den Bosch, C. van Baarsel en Zoon",
       "holdingArchive": "UB Amsterdam",
@@ -579,13 +579,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-25",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-25",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-25",
       "prefLabel": "Generale kaart der kolonie Suriname",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1835,
       "maker": "Mabé. Teenstra, Dl. Veelwaard en Zoon. Eekhoff Hz., Harmannus.",
       "holdingArchive": "UB Amsterdam",
@@ -595,13 +595,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-26",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-26",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-26",
       "prefLabel": "Plan of Paramaribo",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1845,
       "maker": "J. Junr. Bartholomew",
       "holdingArchive": "UB Amsterdam",
@@ -611,13 +611,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-27",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-27",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-27",
       "prefLabel": "Figuratieve plattegrond der stad Paramaribo",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1885,
       "maker": "A.J. Meyer",
       "holdingArchive": "UB Amsterdam",
@@ -627,13 +627,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-28",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-28",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-28",
       "prefLabel": "Suriname",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1900,
       "maker": "Evert de Geest",
       "holdingArchive": "UB Amsterdam",
@@ -643,13 +643,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-29",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-29",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-29",
       "prefLabel": "Schetskaart aangevende de in verschillende tractaten en uitspraken vastgestelde grenzen der 3 Guyana's",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1908,
       "maker": "J. Smulders & Co.",
       "holdingArchive": "UB Amsterdam",
@@ -659,13 +659,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-30",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-30",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-30",
       "prefLabel": "Nieuwe Kaart van Suriname",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1718,
       "maker": "Joachim Ottens",
       "holdingArchive": "UB Amsterdam",
@@ -675,13 +675,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-31",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-31",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-31",
       "prefLabel": "Algemeene kaart van de Colonie of Provintie van Suriname",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1758,
       "maker": "Alexander de Lavaux, Johannes (I). Covens, Cornelis Mortier",
       "holdingArchive": "UB Amsterdam",
@@ -691,13 +691,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-33",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-33",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-33",
       "prefLabel": "Paskaert van de rivieren van Suriname en Commewyne",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1688,
       "maker": "Hendrik Doncker",
       "holdingArchive": "UB Leiden",
@@ -707,13 +707,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-34",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-34",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-34",
       "prefLabel": "Paskaert van de rivieren van Suriname en Commewyne",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1688,
       "maker": "Hendrik Doncker",
       "holdingArchive": "UB Leiden",
@@ -723,13 +723,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-35",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-35",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-35",
       "prefLabel": "Caerte van de rivieren van Suriname en Commowine",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1688,
       "maker": "Frederick de Wit",
       "holdingArchive": "UB Leiden",
@@ -739,13 +739,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-36",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-36",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-36",
       "prefLabel": "De kusten van Suraname van Marawini tot de Barbice",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1717,
       "maker": "Gerard van Keulen",
       "holdingArchive": "UB Leiden",
@@ -755,13 +755,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-37",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-37",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-37",
       "prefLabel": "Land kaart van de land streeken Cottica Comowini en Suriname",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1718,
       "maker": "A. Maars",
       "holdingArchive": "UB Leiden",
@@ -771,13 +771,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-38",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-38",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-38",
       "prefLabel": "Pas-kaart vande rivieren Commewini, Suriname, Suramaca, Cupanama en Courantin",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1728,
       "maker": "Gerard van Keulen",
       "holdingArchive": "UB Leiden",
@@ -787,13 +787,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-39",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-39",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-39",
       "prefLabel": "Pas-kaart vande rivieren Commewini, Suriname, Suramaca, Cupanama en Courantin",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1728,
       "maker": "Gerard van Keulen",
       "holdingArchive": "UB Leiden",
@@ -803,13 +803,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-40",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-40",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-40",
       "prefLabel": "Afteekening van de Rivier Courantin",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1734,
       "maker": "Gerard van Keulen",
       "holdingArchive": "UB Leiden",
@@ -819,13 +819,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-41",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-41",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-41",
       "prefLabel": "Algemeene kaart van de Colonie of Provintie van Suriname",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1758,
       "maker": "Alexander de Lavaux. Hendrik de Leth",
       "holdingArchive": "UB Leiden",
@@ -835,13 +835,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-42",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-42",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-42",
       "prefLabel": "Algemeene kaart van de Colonie of Provintie van Suriname",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1758,
       "maker": "Alexander de Lavaux, Johannes (I). Covens, Cornelis Mortier",
       "holdingArchive": "UB Leiden",
@@ -851,13 +851,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-43",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-43",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-43",
       "prefLabel": "Landkaart van de Volkplantingen Suriname en Berbice",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "holdingArchive": "UB Leiden",
       "handleUrl": "http://hdl.handle.net/1887.1/item:52940",
       "iiifManifest": "https://digitalcollections.universiteitleiden.nl/iiif_manifest/item%3A53021/manifest",
@@ -865,13 +865,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-44",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-44",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-44",
       "prefLabel": "Carte de la colonie de Surinam",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1769,
       "maker": "Alexander de Lavaux",
       "holdingArchive": "UB Leiden",
@@ -881,13 +881,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-45",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-45",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-45",
       "prefLabel": "Caart van Suriname",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1770,
       "holdingArchive": "UB Leiden",
       "handleUrl": "http://hdl.handle.net/1887.1/item:2013765",
@@ -896,13 +896,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-46",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-46",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-46",
       "prefLabel": "Plan de la ville de Paramaribo et de ses environs",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1772,
       "maker": "J. van der Schley, Marc Michel Rey",
       "holdingArchive": "UB Leiden",
@@ -912,13 +912,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-47",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-47",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-47",
       "prefLabel": "Kaart van de kolonie Suriname",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1784,
       "maker": "Ministerie van Oorlog ('s-Gravenhage), Topographisch Bureau, J. C. Heneman",
       "holdingArchive": "UB Leiden",
@@ -928,13 +928,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-48",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-48",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-48",
       "prefLabel": "Kaart van de kust van Guayana",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1785,
       "maker": "Gerard Hulst van Keulen",
       "holdingArchive": "UB Leiden",
@@ -944,13 +944,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-49",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-49",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-49",
       "prefLabel": "Nieuwe special kaart van de colonie Suriname met de tot culture gebragt zijnde landen en plantagien",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "maker": "J. H. Moseberg",
       "holdingArchive": "UB Leiden",
       "handleUrl": "http://hdl.handle.net/1887.1/item:3633336",
@@ -959,13 +959,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-50",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-50",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-50",
       "prefLabel": "Kaart van Surinamen",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1800,
       "maker": "John Gabriel Stedman",
       "holdingArchive": "UB Leiden",
@@ -975,13 +975,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-51",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-51",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-51",
       "prefLabel": "A chart of the colony of Surinam",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1800,
       "maker": "Robert Wilkinson",
       "holdingArchive": "UB Leiden",
@@ -991,13 +991,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-52",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-52",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-52",
       "prefLabel": "Nieuwe specialkaart van de colonie Suriname",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1801,
       "maker": "J. H. Moseberg",
       "holdingArchive": "UB Leiden",
@@ -1006,13 +1006,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-53",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-53",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-53",
       "prefLabel": "Platte grond van de stad Paramaribo",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1804,
       "maker": "A. H. Hiemcke",
       "holdingArchive": "UB Leiden",
@@ -1022,13 +1022,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-54",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-54",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-54",
       "prefLabel": "Colonie Surinaame",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1830,
       "maker": "Helmuth Hendrik Hiemcke",
       "holdingArchive": "UB Leiden",
@@ -1038,13 +1038,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-55",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-55",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-55",
       "prefLabel": "Colonie Surinaame",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1830,
       "holdingArchive": "UB Leiden",
       "handleUrl": "http://hdl.handle.net/1887.1/item:3753541",
@@ -1053,13 +1053,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-56",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-56",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-56",
       "prefLabel": "Generale kaart der kolonie Suriname (oost)",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1832,
       "maker": "Mabé Teenstra",
       "holdingArchive": "UB Leiden",
@@ -1069,13 +1069,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-57",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-57",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-57",
       "prefLabel": "Generale kaart der kolonie Suriname (west)",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1832,
       "maker": "Mabé Teenstra",
       "holdingArchive": "UB Leiden",
@@ -1085,13 +1085,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-58",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-58",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-58",
       "prefLabel": "Kaart van het westelijke gedeelte der kolonie Suriname",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1840,
       "maker": "A. M. Abrahams",
       "holdingArchive": "UB Leiden",
@@ -1101,13 +1101,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-59",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-59",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-59",
       "prefLabel": "De kolonie Surinamen of Hollandsch Guyana",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1845,
       "holdingArchive": "UB Leiden",
       "handleUrl": "http://hdl.handle.net/1887.1/item:2013939",
@@ -1116,13 +1116,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-60",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-60",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-60",
       "prefLabel": "La Guyane néerlandaise",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1846,
       "maker": "P. Melvill van Carnbée, Désiré Heyse",
       "holdingArchive": "UB Leiden",
@@ -1132,13 +1132,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-61",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-61",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-61",
       "prefLabel": "Kaart van de kolonie Suriname",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1850,
       "maker": "Ministerie van Oorlog ('s-Gravenhage), Topographisch Bureau, J. C. Heneman, Cornelius Ascanius van Sypesteyn",
       "holdingArchive": "UB Leiden",
@@ -1148,13 +1148,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-62",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-62",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-62",
       "prefLabel": "Kaart van de kolonie Suriname, een gedeelte van Guijana [...]",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1850,
       "maker": "Ministerie van Oorlog ('s-Gravenhage), Topographisch Bureau, J. C. Heneman, Cornelius Ascanius van Sypesteyn",
       "holdingArchive": "UB Leiden",
@@ -1164,13 +1164,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-63",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-63",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-63",
       "prefLabel": "Plan van Paramaribo, hoofdstad van Suriname",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1850,
       "maker": "C. A. van Sijpesteijn",
       "holdingArchive": "UB Leiden",
@@ -1180,13 +1180,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-64",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-64",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-64",
       "prefLabel": "Plattegrond van de stad Paramaribo",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1850,
       "maker": "A. G. Hiemcke",
       "holdingArchive": "UB Leiden",
@@ -1196,13 +1196,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-65",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-65",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-65",
       "prefLabel": "Kaart van de kolonie Suriname",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1850,
       "maker": "Ministerie van Oorlog ('s-Gravenhage), Topographisch Bureau, J. C. Heneman, Cornelius Ascanius van Sypesteyn",
       "holdingArchive": "UB Leiden",
@@ -1212,13 +1212,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-66",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-66",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-66",
       "prefLabel": "Schets kaart van de kolonie Suriname of Nederlandsch Guiana",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1855,
       "maker": "E. Spanier",
       "holdingArchive": "UB Leiden",
@@ -1228,13 +1228,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-67",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-67",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-67",
       "prefLabel": "Dutch possessions in South America and the West Indies",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1861,
       "maker": "J. Dunlop",
       "holdingArchive": "UB Leiden",
@@ -1243,13 +1243,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-68",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-68",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-68",
       "prefLabel": "Kaart van de colonie Suriname",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1862,
       "maker": "E. de Geest",
       "holdingArchive": "UB Leiden",
@@ -1259,13 +1259,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-69",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-69",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-69",
       "prefLabel": "Kaart van de stad Paramaribo",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1870,
       "holdingArchive": "UB Leiden",
       "handleUrl": "http://hdl.handle.net/1887.1/item:2010998",
@@ -1274,13 +1274,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-70",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-70",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-70",
       "prefLabel": "Kaart van de rivier de Suriname",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1877,
       "maker": "G. P. H. Zimmermann",
       "holdingArchive": "UB Leiden",
@@ -1290,13 +1290,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-71",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-71",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-71",
       "prefLabel": "Plattegrond van de stad Paramaribo",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1881,
       "maker": "F. P. G. Arons, Faddegon en Co.",
       "holdingArchive": "UB Leiden",
@@ -1306,13 +1306,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-72",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-72",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-72",
       "prefLabel": "Kaart van Suriname [meerbladig]",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1882,
       "maker": "Johan François Adriaan Cateau van Rosevelt, Jan Felix Adriaan Eugeen van Lansberge",
       "holdingArchive": "UB Leiden",
@@ -1322,13 +1322,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-73",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-73",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-73",
       "prefLabel": "Kaart van Suriname [enkelbladig]",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1882,
       "maker": "Johan François Adriaan Cateau van Rosevelt, Jan Felix Adriaan Eugeen van Lansberge",
       "holdingArchive": "UB Leiden",
@@ -1338,13 +1338,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-74",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-74",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-74",
       "prefLabel": "Kaart van Paramaribo met aanduiding der verschillende grondlagen",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1888,
       "maker": "W. L. Loth",
       "holdingArchive": "UB Leiden",
@@ -1354,13 +1354,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-75",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-75",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-75",
       "prefLabel": "Drooglegging der terreinen rond Paramaribo",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1890,
       "holdingArchive": "UB Leiden",
       "handleUrl": "http://hdl.handle.net/1887.1/item:814814",
@@ -1369,13 +1369,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-76",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-76",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-76",
       "prefLabel": "Kaart van de Beneden-Marowijne",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1896,
       "maker": "Louis Constant van  Panhuys,  Johan François Adriaan Cateau van Rosevelt,   Jan Felix Adriaan Eugeen van  Lansberge",
       "holdingArchive": "UB Leiden",
@@ -1385,13 +1385,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-77",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-77",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-77",
       "prefLabel": "Plan van Paramaribo",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1898,
       "maker": "W. L. Loth.",
       "holdingArchive": "UB Leiden",
@@ -1401,13 +1401,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-78",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-78",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-78",
       "prefLabel": "Kaart van het tot Suriname behoorende stroomgebied van Lawa, Litanie en Goninie",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1905,
       "maker": "A. Franssen-Herderschee",
       "holdingArchive": "UB Leiden",
@@ -1417,13 +1417,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-79",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-79",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-79",
       "prefLabel": "D A 56,7",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1905,
       "holdingArchive": "UB Leiden",
       "handleUrl": "http://hdl.handle.net/1887.1/item:815460",
@@ -1432,13 +1432,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-80",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-80",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-80",
       "prefLabel": "Geologische kaart van het gebied tusschen Lawa en Tapanahoni",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1907,
       "holdingArchive": "UB Leiden",
       "handleUrl": "http://hdl.handle.net/1887.1/item:815995",
@@ -1447,13 +1447,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-81",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-81",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-81",
       "prefLabel": "D A 58,5",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1908,
       "maker": "H. Bisschop van Tuinen",
       "holdingArchive": "UB Leiden",
@@ -1462,13 +1462,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-82",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-82",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-82",
       "prefLabel": "Kaart van het terrein tusschen de rivieren Suriname en Saramaca",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1910,
       "maker": "W. L. van Loth",
       "holdingArchive": "UB Leiden",
@@ -1478,13 +1478,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-83",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-83",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-83",
       "prefLabel": "Overzichtskaart van Suriname",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1913,
       "maker": "F. E. Spirlet, Opnemingsbrigade van Suriname (Paramaribo)",
       "holdingArchive": "UB Leiden",
@@ -1494,13 +1494,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-84",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-84",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-84",
       "prefLabel": "Kaart van de Marowijne",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1915,
       "maker": "Johan François Adriaan Cateau van Rosevelt",
       "holdingArchive": "UB Leiden",
@@ -1510,13 +1510,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-85",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-85",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-85",
       "prefLabel": "D A 53,2",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1916,
       "holdingArchive": "UB Leiden",
       "handleUrl": "http://hdl.handle.net/1887.1/item:814159",
@@ -1525,13 +1525,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-86",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-86",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-86",
       "prefLabel": "Moengo",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1920,
       "holdingArchive": "UB Leiden",
       "handleUrl": "http://hdl.handle.net/1887.1/item:2011245",
@@ -1540,13 +1540,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-87",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-87",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-87",
       "prefLabel": "Paramaribo. Hoofdstad van Hollandsch Guyana of Suriname",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1926,
       "holdingArchive": "UB Leiden",
       "handleUrl": "http://hdl.handle.net/1887.1/item:2011373",
@@ -1555,13 +1555,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-88",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-88",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-88",
       "prefLabel": "Overzichts-kaart van het district Nickerie",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1926,
       "holdingArchive": "UB Leiden",
       "handleUrl": "http://hdl.handle.net/1887.1/item:2011482",
@@ -1570,13 +1570,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-89",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-89",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-89",
       "prefLabel": "Telephoonnet in Suriname",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1928,
       "holdingArchive": "UB Leiden",
       "handleUrl": "http://hdl.handle.net/1887.1/item:2012118",
@@ -1585,13 +1585,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-90",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-90",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-90",
       "prefLabel": "Kaart van Suriname, aangevende de ligging der scholen",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1928,
       "holdingArchive": "UB Leiden",
       "handleUrl": "http://hdl.handle.net/1887.1/item:2012573",
@@ -1600,13 +1600,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-91",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-91",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-91",
       "prefLabel": "Overzichtskaart van Suriname, aangevende de ligging der op 1 april 1927 uitgegeven houtconcessies en houtvergunningen",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1929,
       "maker": "J. Ph. Pfeiffer",
       "holdingArchive": "UB Leiden",
@@ -1616,13 +1616,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-93",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-93",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-93",
       "prefLabel": "Groote kaart van de Surinaamsche Ondernemersraad",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1930,
       "maker": "Ondernemersraad voor Suriname",
       "holdingArchive": "UB Leiden",
@@ -1631,13 +1631,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-94",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-94",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-94",
       "prefLabel": "Kaart van de kust van Suriname, aangevende de ligging der plantages",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1935,
       "holdingArchive": "UB Leiden",
       "handleUrl": "http://hdl.handle.net/1887.1/item:2011103",
@@ -1646,13 +1646,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-95",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-95",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-95",
       "prefLabel": "Overzichtskaart van Paramaribo",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1935,
       "maker": "Charles Douglas",
       "holdingArchive": "UB Leiden",
@@ -1662,13 +1662,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-96",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-96",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-96",
       "prefLabel": "Schets van Paramaribo",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1936,
       "maker": "Charles Douglas",
       "holdingArchive": "UB Leiden",
@@ -1678,13 +1678,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-97",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-97",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-97",
       "prefLabel": "Religions 1936",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1936,
       "holdingArchive": "UB Leiden",
       "handleUrl": "http://hdl.handle.net/1887.1/item:2012438",
@@ -1693,13 +1693,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-98",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-98",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-98",
       "prefLabel": "Overzichtskaart van Suriname",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1938,
       "maker": "F. E. Spirlet",
       "holdingArchive": "UB Leiden",
@@ -1709,13 +1709,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-99",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-99",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-99",
       "prefLabel": "Nederlandsch-Guyana",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1938,
       "maker": "Ministerie van defensie Nederland",
       "holdingArchive": "UB Leiden",
@@ -1725,13 +1725,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-100",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-100",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-100",
       "prefLabel": "[Kaart van het noordelijk deel van Suriname]",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1947,
       "holdingArchive": "UB Leiden",
       "handleUrl": "http://hdl.handle.net/1887.1/item:2012032",
@@ -1740,13 +1740,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-101",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-101",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-101",
       "prefLabel": "Nickerie",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1947,
       "holdingArchive": "UB Leiden",
       "handleUrl": "http://hdl.handle.net/1887.1/item:2011216",
@@ -1755,13 +1755,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-102",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-102",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-102",
       "prefLabel": "Kaart van Suriname",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1953,
       "maker": "Centraal bureau luchtkartering",
       "holdingArchive": "UB Leiden",
@@ -1771,13 +1771,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-103",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-103",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-103",
       "prefLabel": "Kaart van Suriname",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "maker": "Centraal bureau luchtkartering",
       "holdingArchive": "UB Leiden",
       "handleUrl": "http://hdl.handle.net/1887.1/item:2014463",
@@ -1786,13 +1786,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-104",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-104",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-104",
       "prefLabel": "D A 56,9",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1954,
       "maker": "Jaap Nefkens",
       "holdingArchive": "UB Leiden",
@@ -1801,13 +1801,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-105",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-105",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-105",
       "prefLabel": "Woongebieden der Boslandcreolen aan de Suriname rivier",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1958,
       "maker": "S. Lekidjah",
       "holdingArchive": "UB Leiden",
@@ -1817,13 +1817,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-106",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-106",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-106",
       "prefLabel": "Overzichtskaart van Suriname",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1938,
       "maker": "F. E. Spirlet",
       "holdingArchive": "UB Leiden",
@@ -1833,13 +1833,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-107",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-107",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-107",
       "prefLabel": "Kaart van het westelijke gedeelte der kolonie Suriname",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "maker": "A. M. Abrahams",
       "holdingArchive": "UB Leiden",
       "handleUrl": "http://hdl.handle.net/1887.1/item:2014032",
@@ -1848,13 +1848,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-108",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-108",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-108",
       "prefLabel": "Kaart van een gedeelte van de Suriname-rivier en de Para-kreek",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "holdingArchive": "UB Leiden",
       "handleUrl": "http://hdl.handle.net/1887.1/item:3509926",
       "iiifManifest": "https://digitalcollections.universiteitleiden.nl/iiif_manifest/item%3A3509926/manifest",
@@ -1862,13 +1862,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-109",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-109",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-109",
       "prefLabel": "Overzichtskaart van het zendings- en kerkewerk der Evangelische Broedergemeente (Hernhutters) in Suriname",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "maker": "Het Zeister Zendingsgenootschap",
       "holdingArchive": "UB Leiden",
       "handleUrl": "http://hdl.handle.net/1887.1/item:812614",
@@ -1877,13 +1877,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-110",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-110",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-110",
       "prefLabel": "Getekende kaart van het noordoostelijk gedeelte van Suriname, met grenzen van districten en zetels van het districtsbestuur",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1930,
       "maker": "F. Oudschans Dentz",
       "holdingArchive": "UB Leiden",
@@ -1893,26 +1893,26 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-111",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-111",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-111",
       "prefLabel": "Platte grond van de hoofd-legerplaats tusschen de rivieren Cottica en Maroni",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "holdingArchive": "UB Leiden",
       "handleUrl": "http://hdl.handle.net/1887.1/item:3509931",
       "iiifManifest": "https://digitalcollections.universiteitleiden.nl/iiif_manifest/item%3A3509931/manifest",
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-112",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-112",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-112",
       "prefLabel": "Kaart van de Noordelijke helft van Suriname",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "holdingArchive": "UB Leiden",
       "handleUrl": "http://hdl.handle.net/1887.1/item:3509936",
       "iiifManifest": "https://digitalcollections.universiteitleiden.nl/iiif_manifest/item%3A3509936/manifest",
@@ -1920,13 +1920,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-113",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-113",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-113",
       "prefLabel": "Kaart van de rivier de Suriname door G.P.H. Zimmermann",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1877,
       "maker": "G. P. H. Zimmermann, Tresling & Co.",
       "holdingArchive": "UB Amsterdam",
@@ -1936,13 +1936,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-114",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-114",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-114",
       "prefLabel": "Kaart van Suriname (handgetekend)",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "maker": "Johan François Adriaan Cateau van Rosevelt, Jan Felix Adriaan Eugeen van Lansberge",
       "holdingArchive": "UB Leiden",
       "handleUrl": "http://hdl.handle.net/1887.1/item:2016077",
@@ -1951,13 +1951,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-117",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-117",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-117",
       "prefLabel": "Paramaribo 1916-17",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1916,
       "timeSpan": "1916-1917",
       "maker": "Centraal bureau luchtkartering",
@@ -1968,13 +1968,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-118",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-118",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-118",
       "prefLabel": "Carte de la colonie de Demerari en 1784 COLLBN 002-10-017",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1784,
       "holdingArchive": "UB Leiden",
       "handleUrl": "http://hdl.handle.net/1887.1/item:3254319",
@@ -1983,13 +1983,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-119",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-119",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-119",
       "prefLabel": "Colonie Surinaame  Deze Denerale kaart der voormelde colonie COLLBN 053-51",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1830,
       "maker": "Helmuth Hendrik Hiemcke",
       "holdingArchive": "UB Leiden",
@@ -1999,13 +1999,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-120",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-120",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-120",
       "prefLabel": "Kaart van Suriname opgenomen en getekend in de jaren 1860-1879 door J.F.A. Cateau van Rosevelt en J.F.A.E. van Lansberge",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "maker": "Johan François Adriaan Cateau van Rosevelt, J.F.A.E. van Lansberge",
       "holdingArchive": "UB Leiden",
       "handleUrl": "http://hdl.handle.net/1887.1/item:2014978",
@@ -2014,13 +2014,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-121",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-121",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-121",
       "prefLabel": "Kaart van Suriname opgenomen en getekend in de jaren 1860-1879 door J.F.A. Cateau van Rosevelt en J.F.A.E. van Lansberge",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "maker": "Johan François Adriaan Cateau van Rosevelt, J.F.A.E. van Lansberge",
       "holdingArchive": "UB Leiden",
       "handleUrl": "http://hdl.handle.net/1887.1/item:2016457",
@@ -2029,13 +2029,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-122",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-122",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-122",
       "prefLabel": "Kaart van Suriname opgenomen en getekend in de jaren 1860-1879 door J.F.A. Cateau van Rosevelt en J.F.A.E. van Lansberge",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "maker": "Johan François Adriaan Cateau van Rosevelt, J.F.A.E. van Lansberge",
       "holdingArchive": "UB Leiden",
       "handleUrl": "http://hdl.handle.net/1887.1/item:2014626",
@@ -2044,13 +2044,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-123",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-123",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-123",
       "prefLabel": "Kaart van Suriname opgenomen en getekend in de jaren 1860-1879 door J.F.A. Cateau van Rosevelt en J.F.A.E. van Lansberge",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "maker": "Johan François Adriaan Cateau van Rosevelt, J.F.A.E. van Lansberge",
       "holdingArchive": "UB Leiden",
       "handleUrl": "http://hdl.handle.net/1887.1/item:2015392",
@@ -2059,13 +2059,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-124",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-124",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-124",
       "prefLabel": "Plan du plantage Maria Elizabeth a J. Ryan sur lisle Leguwaan 1783. Was gete: Pechor COLLBN 006-12-009",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1787,
       "maker": "Jacobus Johannes Klenee",
       "holdingArchive": "UB Leiden",
@@ -2075,13 +2075,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-125",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-125",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-125",
       "prefLabel": "Plan der geprojecteerde Nieuwe Brandwagt of Speelbattery",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "mapYear": 1757,
       "maker": "D. W. C. Hattinga",
       "holdingArchive": "UB Leiden",
@@ -2091,13 +2091,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/historic-map-126",
+      "@id": "https://data.surinametijdmachine.org/source/historic-map-126",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "historic-map-126",
       "prefLabel": "Kaart van Suriname opgenomen en getekend in de jaren 1860-1879 door J.F.A. Cateau van Rosevelt en J.F.A.E. van Lansberge",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/map",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/map",
       "maker": "Johan François Adriaan Cateau van Rosevelt, J.F.A.E. van Lansberge",
       "holdingArchive": "UB Leiden",
       "handleUrl": "http://hdl.handle.net/1887.1/item:2016722",
@@ -2106,13 +2106,13 @@
       "linkedToGazetteer": false
     },
     {
-      "@id": "https://data.suriname-timemachine.org/source/dikland-collection",
+      "@id": "https://data.surinametijdmachine.org/source/dikland-collection",
       "@type": [
         "crm:E22_Human-Made_Object"
       ],
       "sourceId": "dikland-collection",
       "prefLabel": "Suriname Heritage Guide -- Dikland Collection",
-      "P2_has_type": "https://data.suriname-timemachine.org/type/source-type/research-collection",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/research-collection",
       "maker": "Philip Dikland",
       "sameAs": "https://www.suriname-heritage-guide.com/",
       "collectionUrl": "https://drive.google.com/drive/u/0/folders/0B88mZFitv8embmZaYWFQNnZacDQ?tid=0B88mZFitv8emcjVfcG5hWFJOdWs&resourcekey=0-sImlF_DkEFu3ebWbDQ58Kg",

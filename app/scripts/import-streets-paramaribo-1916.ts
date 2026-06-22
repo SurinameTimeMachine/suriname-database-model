@@ -481,7 +481,7 @@ function main() {
 
     const id = nextStmId(gazetteer['@graph']);
     const entry: GazetteerEntry = {
-      '@id': `https://data.suriname-timemachine.org/place/${id}`,
+      '@id': `https://data.surinametijdmachine.org/place/${id}`,
       '@type': determineCrmType('road', gazetteer['@context']),
       id,
       type: 'road',

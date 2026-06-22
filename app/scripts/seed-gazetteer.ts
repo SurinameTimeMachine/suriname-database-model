@@ -891,7 +891,7 @@ for (const [type, count] of Array.from(typeCounts).sort(
   console.log(`  ${type}: ${count}`);
 }
 
-const STM_BASE = 'https://data.suriname-timemachine.org/';
+const STM_BASE = 'https://data.surinametijdmachine.org/';
 
 // Build JSON-LD graph entries
 const graph = gazetteer.map((entry) => {

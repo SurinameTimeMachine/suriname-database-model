@@ -24,7 +24,7 @@ const RIVERS_CSV = join(BASE_DIR, 'data/07-gis-plantation-map-1930/rivers.csv');
 
 const STM = 'https://suriname-timemachine.org/ontology/';
 const VOCAB_BASE =
-  'https://data.suriname-timemachine.org/vocabulary/geographical-feature/natural';
+  'https://data.surinametijdmachine.org/vocabulary/geographical-feature/natural';
 
 // --- Types ---
 
