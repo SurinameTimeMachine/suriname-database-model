@@ -13,11 +13,12 @@
     "dev": "next dev",
     "generate": "tsx scripts/generate-database.ts",
     "import-streets-1916": "tsx scripts/import-streets-paramaribo-1916.ts",
-    "pipeline": "tsx scripts/generate-database.ts && tsx scripts/validate-lod-context.ts && tsx scripts/prepare-data.ts",
+    "pipeline": "tsx scripts/generate-database.ts && tsx scripts/validate-lod-context.ts && tsx scripts/prepare-data.ts && tsx scripts/validate-lod-publication.ts",
     "prepare-data": "tsx scripts/prepare-data.ts",
     "seed-gazetteer": "tsx scripts/seed-gazetteer.ts",
     "start": "next start",
-    "validate-lod": "tsx scripts/validate-lod-context.ts"
+    "validate-lod": "tsx scripts/validate-lod-context.ts",
+    "validate-lod-publication": "tsx scripts/validate-lod-publication.ts"
   },
   "dependencies": {
     "@allmaps/leaflet": "1.0.0-beta.54",

@@ -243,7 +243,9 @@ export function transformPlantations(): PlantationTransformResult {
     // E41 Appellations
     let e41_1930_uri = '';
     if (label1930) {
-      e41_1930_uri = `${STM}appellation/${slugify(label1930)}-map1930`;
+      // `slug` is unique per mapped feature. A label alone may occur on
+      // multiple plantations, so it cannot identify an E41 assertion.
+      e41_1930_uri = `${STM}appellation/${slug}-map1930`;
       e41.push({
         uri: e41_1930_uri,
         symbolic_content: label1930,
@@ -256,7 +258,7 @@ export function transformPlantations(): PlantationTransformResult {
     }
 
     if (label1860) {
-      const e41_1860_uri = `${STM}appellation/${slugify(label1860)}-map1860`;
+      const e41_1860_uri = `${STM}appellation/${slug}-map1860`;
       e41.push({
         uri: e41_1860_uri,
         symbolic_content: label1860,
@@ -271,7 +273,7 @@ export function transformPlantations(): PlantationTransformResult {
 
     if (label && label !== label1930 && label !== label1860) {
       e41.push({
-        uri: `${STM}appellation/${slugify(label)}-canonical`,
+        uri: `${STM}appellation/${slug}-canonical`,
         symbolic_content: label,
         language: 'nl',
         carried_by: '',

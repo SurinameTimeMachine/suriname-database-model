@@ -8,6 +8,19 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: appRoot,
   },
+  async headers() {
+    return [
+      {
+        source: '/data/:path*.jsonld',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'application/ld+json; charset=utf-8',
+          },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

@@ -47,6 +47,13 @@ app/                             # Next.js application
 
 Run the full pipeline: `pnpm pipeline`
 
+## JSON-LD publication
+
+The pipeline publishes the complete generated graph and its context as
+`/data/database.jsonld` and `/data/context.jsonld` in the deployed app. See
+[the LOD publication contract](docs/models/lod-publication.md) for validation
+coverage and the remaining canonical-domain and CIDOC-CRM conformance work.
+
 ## Data Sources
 
 | Dataset                                                                      | Records            | Period    | Primary Entity   |
