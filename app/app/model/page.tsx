@@ -750,8 +750,8 @@ function SchemaGraph({
   counts: EntityCounts;
   selectedEntity: string | null;
   onSelect: (id: string) => void;
-  hoveredRelation: number | null;
-  onHoverRelation: (idx: number | null) => void;
+  hoveredRelation: string | null;
+  onHoverRelation: (id: string | null) => void;
 }) {
   const width = 1020;
   const height = 720;
@@ -1562,7 +1562,7 @@ function ModelPageInner() {
   const searchParams = useSearchParams();
   const [counts, setCounts] = useState<EntityCounts | null>(null);
   const [selectedEntity, setSelectedEntity] = useState<string | null>('e25');
-  const [hoveredRelation, setHoveredRelation] = useState<number | null>(null);
+  const [hoveredRelation, setHoveredRelation] = useState<string | null>(null);
   const initializedFromUrl = useRef(false);
 
   useEffect(() => {
@@ -1651,7 +1651,12 @@ function ModelPageInner() {
         {/* Relation detail (when hovering) */}
         {hoveredRelation !== null && (
           <div className="mb-6">
-            <RelationDetail relation={RELATIONS[hoveredRelation]} />
+            {(() => {
+              const [from, to] = hoveredRelation.split('-');
+              const rel = RELATIONS.find((r) => r.from === from && r.to === to);
+              if (!rel) return null;
+              return <RelationDetail relation={rel} />;
+            })()}
           </div>
         )}
 
