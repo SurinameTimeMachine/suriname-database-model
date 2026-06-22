@@ -1679,6 +1679,99 @@ function ModelPageInner() {
           <ProvenanceBoundarySection />
         </div>
 
+        {/* Interoperability */}
+        <section className="mb-10 site-surface p-6">
+          <div className="mb-5">
+            <div className="site-kicker mb-2">Interoperability</div>
+            <h2 className="mb-2 text-2xl font-semibold text-ink">
+              CIDOC-CRM, JSON-LD, and Linked Art
+            </h2>
+            <p className="max-w-3xl text-sm leading-relaxed text-ink/65">
+              CIDOC-CRM is the data model. The project generates JSON-LD from
+              that model using a shared context. Linked Art is a CIDOC-CRM
+              application profile; it is not yet an output format or API here.
+            </p>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="site-panel p-4">
+              <h3 className="mb-2 text-sm font-semibold text-ink">
+                Current implementation
+              </h3>
+              <p className="text-sm leading-relaxed text-ink/65">
+                The generated database and standalone context use CIDOC-CRM
+                terms in JSON-LD. The context source and its validation are
+                part of the data pipeline.
+              </p>
+              <p className="mt-3 text-xs text-ink/60">
+                <a
+                  className="underline decoration-ink/30 underline-offset-2 hover:text-ink"
+                  href="https://cidoc-crm.org/versions-of-the-cidoc-crm"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  CIDOC-CRM
+                </a>
+                {' · '}
+                <a
+                  className="underline decoration-ink/30 underline-offset-2 hover:text-ink"
+                  href="https://www.w3.org/TR/json-ld/"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  JSON-LD 1.1
+                </a>
+                {' · '}
+                <a
+                  className="underline decoration-ink/30 underline-offset-2 hover:text-ink"
+                  href="https://github.com/SurinameTimeMachine/suriname-database-model/blob/main/app/scripts/lod-context.ts"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  project context source
+                </a>
+              </p>
+            </div>
+
+            <div className="site-panel p-4">
+              <h3 className="mb-2 text-sm font-semibold text-ink">
+                Planned alignment
+              </h3>
+              <p className="text-sm leading-relaxed text-ink/65">
+                Linked Art alignment would add profile-specific documents and
+                an API. It should be introduced only when those outputs are
+                defined and tested.
+              </p>
+              <p className="mt-3 text-xs text-ink/60">
+                <a
+                  className="underline decoration-ink/30 underline-offset-2 hover:text-ink"
+                  href="https://linked.art/api/1.0/json-ld/"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Linked Art JSON-LD specification
+                </a>
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-5 flex flex-wrap items-center gap-2 text-xs text-ink/65">
+            <span className="site-surface-background px-2 py-1">
+              CIDOC-CRM model
+            </span>
+            <span aria-hidden="true">→</span>
+            <span className="site-surface-background px-2 py-1">
+              JSON-LD context
+            </span>
+            <span className="border-b border-dashed border-ink/40 px-1 text-ink/50">
+              planned
+            </span>
+            <span className="site-surface-background px-2 py-1">
+              Linked Art profile / API
+            </span>
+          </div>
+        </section>
+
         {/* All entities quick reference */}
         <div className="mb-10">
           <h2 className="mb-2 text-2xl font-semibold text-ink">
