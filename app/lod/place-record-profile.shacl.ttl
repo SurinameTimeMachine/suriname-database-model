@@ -1,0 +1,34 @@
+@prefix crm: <http://www.cidoc-crm.org/cidoc-crm/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix geo: <http://www.opengis.net/ont/geosparql#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix stm: <https://data.surinametijdmachine.org/> .
+
+stm:AuthorityRecordShape
+  a sh:NodeShape ;
+  sh:targetClass stm:AuthorityRecord ;
+  sh:property [ sh:path dcterms:identifier ; sh:minCount 1 ; sh:maxCount 1 ] ;
+  sh:property [ sh:path stm:describes ; sh:minCount 1 ] .
+
+stm:FeatureShape
+  a sh:NodeShape ;
+  sh:targetClass crm:E25_Human-Made_Feature ;
+  sh:property [ sh:path crm:P53_has_former_or_current_location ; sh:minCount 1 ] .
+
+stm:LocationShape
+  a sh:NodeShape ;
+  sh:targetClass crm:E53_Place ;
+  sh:property [ sh:path geo:hasGeometry ; sh:nodeKind sh:IRI ] .
+
+stm:StatusAssertionShape
+  a sh:NodeShape ;
+  sh:targetClass crm:E17_Type_Assignment ;
+  sh:property [ sh:path crm:P41_classified ; sh:minCount 1 ] ;
+  sh:property [ sh:path crm:P42_assigned ; sh:minCount 1 ] ;
+  sh:property [ sh:path prov:hadPrimarySource ; sh:minCount 1 ] .
+
+stm:CultivationEvidenceShape
+  a sh:NodeShape ;
+  sh:targetClass crm:E13_Attribute_Assignment ;
+  sh:property [ sh:path prov:hadPrimarySource ; sh:minCount 1 ] .

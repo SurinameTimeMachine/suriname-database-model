@@ -1,6 +1,61 @@
 export const BASE = 'https://data.surinametijdmachine.org/';
 export const WD = 'http://www.wikidata.org/entity/';
 
+/** Context used by compact, self-contained authority-record JSON-LD documents. */
+export function buildPlaceRecordContext(): Record<string, unknown> {
+  return {
+    ...buildContext(),
+    stm: BASE,
+    AuthorityRecord: 'stm:AuthorityRecord',
+    E31_Document: 'crm:E31_Document',
+    E42_Identifier: 'crm:E42_Identifier',
+    E99_Product_Type: 'crm:E99_Product_Type',
+    E17_Type_Assignment: 'crm:E17_Type_Assignment',
+    describes: { '@id': 'stm:describes', '@type': '@id' },
+    hasEvidence: { '@id': 'stm:hasEvidence', '@type': '@id' },
+    hasOperationalSummary: {
+      '@id': 'stm:hasOperationalSummary',
+      '@type': '@id',
+    },
+    hasOrganizationalAssociation: {
+      '@id': 'stm:hasOrganizationalAssociation',
+      '@type': '@id',
+    },
+    certainty: { '@id': 'stm:certainty', '@type': '@id' },
+    reportedOperationalStatus: {
+      '@id': 'stm:reportedOperationalStatus',
+      '@type': '@id',
+    },
+    sourcePath: { '@id': 'stm:sourcePath', '@type': 'xsd:string' },
+    sourceUrl: { '@id': 'sdo:url', '@type': '@id' },
+    P3_has_note: { '@id': 'crm:P3_has_note', '@type': 'xsd:string' },
+    P41_classified: { '@id': 'crm:P41_classified', '@type': '@id' },
+    P42_assigned: { '@id': 'crm:P42_assigned', '@type': '@id' },
+    P48_has_preferred_identifier: {
+      '@id': 'crm:P48_has_preferred_identifier',
+      '@type': '@id',
+    },
+    P81a_end_of_the_begin: {
+      '@id': 'crm:P81a_end_of_the_begin',
+      '@type': 'xsd:gYear',
+    },
+    P81b_begin_of_the_end: {
+      '@id': 'crm:P81b_begin_of_the_end',
+      '@type': 'xsd:gYear',
+    },
+    P82a_begin_of_the_begin: {
+      '@id': 'crm:P82a_begin_of_the_begin',
+      '@type': 'xsd:gYear',
+    },
+    P82b_end_of_the_end: {
+      '@id': 'crm:P82b_end_of_the_end',
+      '@type': 'xsd:gYear',
+    },
+    P89_falls_within: { '@id': 'crm:P89_falls_within', '@type': '@id' },
+    rdfs: 'http://www.w3.org/2000/01/rdf-schema#',
+  };
+}
+
 export function buildContext(): Record<string, unknown> {
   return {
     '@vocab': 'https://schema.org/',

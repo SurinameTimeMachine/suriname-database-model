@@ -26,7 +26,7 @@ const GIS_CSV = join(
   'data/07-gis-plantation-map-1930/plantation_polygons_1930.csv',
 );
 
-const STM = 'https://suriname-timemachine.org/ontology/';
+const STM = 'https://data.surinametijdmachine.org/';
 const WD = 'http://www.wikidata.org/entity/';
 
 // --- Types ---

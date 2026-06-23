@@ -17,7 +17,7 @@ const ALMANAC_CSV = join(
   'data/06-almanakken - Plantations Surinaamse Almanakken/Plantations Surinaamse Almanakken v1.0.csv',
 );
 
-const STM = 'https://suriname-timemachine.org/ontology/';
+const STM = 'https://data.surinametijdmachine.org/';
 const WD = 'http://www.wikidata.org/entity/';
 
 // --- Types ---

@@ -15,7 +15,7 @@ const LOD_DIR = join(__dirname, '../lod');
 const OUT_DIR = join(__dirname, '../public/data');
 const DATA_DIR = join(__dirname, '../../data');
 const DATA_BASE = 'https://data.surinametijdmachine.org/';
-const ONTOLOGY_BASE = 'https://suriname-timemachine.org/ontology/';
+const ONTOLOGY_BASE = 'https://data.surinametijdmachine.org/';
 const PIPELINE_TYPES = new Set(['plantation', 'river', 'creek']);
 
 mkdirSync(OUT_DIR, { recursive: true });

@@ -9,7 +9,9 @@ import { join } from 'path';
 const LOD_DIR = join(__dirname, '../lod');
 const PUBLIC_DATA_DIR = join(__dirname, '../public/data');
 const DATA_DIR = join(__dirname, '../../data');
+const PLACE_RECORDS_DIR = join(PUBLIC_DATA_DIR, 'place-records');
 const ABSOLUTE_HTTP_IRI = /^https?:\/\//;
+const CANONICAL_BASE = 'https://data.surinametijdmachine.org/';
 const WIKIDATA_QID = /^Q\d+$/;
 const SKOS_MATCH_TYPES = new Set([
   'exactMatch',
@@ -28,6 +30,10 @@ interface JsonLdDocument {
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
+}
+
+function toArray<T>(value: T | T[] | undefined | null): T[] {
+  return value == null ? [] : Array.isArray(value) ? value : [value];
 }
 
 function readArtifact(directory: string, name: string): Buffer {
@@ -102,6 +108,10 @@ function main() {
     hosts.has('www.wikidata.org'),
     'Generated graph has no outbound Wikidata links',
   );
+  assert(
+    !hosts.has('suriname-timemachine.org'),
+    'Generated graph still references the retired ontology host',
+  );
 
   assert(Array.isArray(gazetteer['@graph']), 'Gazetteer has no @graph');
   let externalLinkCount = 0;
@@ -151,8 +161,99 @@ function main() {
     }
   }
 
+  const recordIndex = JSON.parse(
+    readArtifact(PLACE_RECORDS_DIR, 'index.json').toString('utf-8'),
+  ) as Array<Record<string, unknown>>;
+  assert(
+    recordIndex.length > 0,
+    'No generated public authority records were found',
+  );
+  const recordIds = new Set<string>();
+  for (const record of recordIndex) {
+    const id = record.id;
+    assert(typeof id === 'string', 'Authority-record index contains an invalid id');
+    assert(!recordIds.has(id), `Authority-record index contains duplicate id ${id}`);
+    recordIds.add(id);
+  }
+  const recordSamples = [
+    recordIndex[0],
+    recordIndex[Math.floor(recordIndex.length / 2)],
+    recordIndex[recordIndex.length - 1],
+  ].filter((record, index, values) => values.indexOf(record) === index);
+  for (const record of recordSamples) {
+    const id = record.id as string;
+    const jsonld = JSON.parse(
+      readArtifact(PLACE_RECORDS_DIR, `${id}.jsonld`).toString('utf-8'),
+    ) as JsonLdDocument;
+    assert(
+      jsonld['@id'] === `${CANONICAL_BASE}place/${id}`,
+      `Authority record ${id} has a non-canonical @id`,
+    );
+    assert(
+      jsonld['@context'] && typeof jsonld['@context'] === 'object',
+      `Authority record ${id} has no JSON-LD context`,
+    );
+    assert(
+      Array.isArray(jsonld['@graph']) && jsonld['@graph'].length > 0,
+      `Authority record ${id} has no graph`,
+    );
+    const recordNode = jsonld['@graph'].find(
+      (entity) => entity['@id'] === jsonld['@id'],
+    );
+    assert(recordNode, `Authority record ${id} has no record node`);
+    assert(
+      toArray(recordNode['@type'] as string | string[]).includes(
+        'stm:AuthorityRecord',
+      ),
+      `Authority record ${id} does not have the AuthorityRecord type`,
+    );
+    assert(
+      recordNode['dcterms:identifier'] === id,
+      `Authority record ${id} has no stable dcterms:identifier`,
+    );
+    assert(
+      toArray(recordNode.describes as string | string[]).length > 0,
+      `Authority record ${id} does not describe an entity`,
+    );
+    const graphIds = new Set<string>();
+    for (const entity of jsonld['@graph']) {
+      const entityId = entity['@id'];
+      assert(
+        typeof entityId === 'string' && entityId.startsWith(CANONICAL_BASE),
+        `Authority record ${id} has a non-canonical entity @id`,
+      );
+      assert(!graphIds.has(entityId), `Authority record ${id} has duplicate @id ${entityId}`);
+      graphIds.add(entityId);
+      const types = toArray(entity['@type'] as string | string[]);
+      if (types.includes('crm:E25_Human_Made_Feature')) {
+        assert(
+          typeof entity.P53_has_location === 'string',
+          `Feature ${entityId} has no E53 location`,
+        );
+      }
+      if (types.includes('crm:E17_Type_Assignment')) {
+        assert(
+          typeof entity.P41_classified === 'string' &&
+            typeof entity.P42_assigned === 'string' &&
+            typeof entity['prov:hadPrimarySource'] === 'string',
+          `Status assertion ${entityId} does not meet the supported profile`,
+        );
+      }
+      if (types.includes('crm:E13_Attribute_Assignment')) {
+        assert(
+          typeof entity['prov:hadPrimarySource'] === 'string',
+          `Evidence assertion ${entityId} has no primary source`,
+        );
+      }
+    }
+    assert(
+      existsSync(join(PLACE_RECORDS_DIR, `${id}.json`)),
+      `Authority record ${id} has no JSON projection`,
+    );
+  }
+
   console.log(
-    `LOD publication OK: ${ids.size} entities and the shared context are published unchanged; ${hosts.size} linked-data hosts and ${externalLinkCount} canonical authority links are validated.`,
+    `LOD publication OK: ${ids.size} entities, ${recordIndex.length} authority records, and the shared context are published unchanged; ${hosts.size} linked-data hosts and ${externalLinkCount} canonical authority links are validated.`,
   );
 }
 
