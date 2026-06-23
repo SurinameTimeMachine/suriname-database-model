@@ -101,7 +101,10 @@ export async function POST(request: NextRequest) {
   if (auth.error) return auth.error;
   const { token } = auth;
 
-  const place: GazetteerPlace = await request.json();
+  const rawPlace = (await request.json()) as GazetteerPlace & {
+    wikidataQid?: unknown;
+  };
+  const { wikidataQid: _legacyWikidataQid, ...place } = rawPlace;
 
   // Validate required fields
   if (
@@ -136,12 +139,6 @@ export async function POST(request: NextRequest) {
 
     // Ensure externalLinks exists
     if (!place.externalLinks) place.externalLinks = [];
-
-    // Derive wikidataQid from externalLinks for backward compatibility
-    const wdLink = place.externalLinks.find(
-      (l: { authority: string }) => l.authority === 'wikidata',
-    );
-    place.wikidataQid = wdLink ? wdLink.identifier : null;
 
     // Set JSON-LD properties from thesaurus
     const crmMap = loadCrmMapping();
@@ -196,7 +193,10 @@ export async function PUT(request: NextRequest) {
   if (auth.error) return auth.error;
   const { token } = auth;
 
-  const partial = await request.json();
+  const rawPartial = (await request.json()) as Partial<GazetteerPlace> & {
+    wikidataQid?: unknown;
+  };
+  const { wikidataQid: _legacyWikidataQid, ...partial } = rawPartial;
 
   if (!partial.id) {
     return NextResponse.json(
@@ -226,16 +226,18 @@ export async function PUT(request: NextRequest) {
     ).json();
 
     // Merge provided fields onto existing entry
-    const merged = { ...gazetteer[idx], ...partial };
+    const merged = {
+      ...gazetteer[idx],
+      ...partial,
+    } as GazetteerPlace & {
+      '@id'?: string;
+      '@type'?: string | string[];
+    };
     merged.modifiedBy = login;
     merged.modifiedAt = now;
 
     // Recalculate derived fields
     if (!merged.externalLinks) merged.externalLinks = [];
-    const wdLink = merged.externalLinks.find(
-      (l: { authority: string }) => l.authority === 'wikidata',
-    );
-    merged.wikidataQid = wdLink ? wdLink.identifier : null;
 
     const crmMap = loadCrmMapping();
     const crmClass = crmMap[merged.type] || 'E53_Place';

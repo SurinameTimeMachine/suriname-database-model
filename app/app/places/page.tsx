@@ -358,7 +358,6 @@ function emptyPlace(): GazetteerPlace {
     description: '',
     location: { lat: null, lng: null, wkt: null, crs: 'EPSG:4326' },
     sources: [],
-    wikidataQid: null,
     externalLinks: [],
     fid: null,
     psurIds: [],

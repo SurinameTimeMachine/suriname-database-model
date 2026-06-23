@@ -104,14 +104,15 @@ export async function POST(request: NextRequest) {
   const {
     primaryId,
     retiredId,
-    mergedPlace,
+    mergedPlace: rawMergedPlace,
   }: {
     primaryId: string;
     retiredId: string;
-    mergedPlace: GazetteerPlace;
+    mergedPlace: GazetteerPlace & { wikidataQid?: unknown };
   } = body;
+  const { wikidataQid: _legacyWikidataQid, ...mergedPlace } = rawMergedPlace || {};
 
-  if (!primaryId || !retiredId || !mergedPlace || primaryId === retiredId) {
+  if (!primaryId || !retiredId || !rawMergedPlace || primaryId === retiredId) {
     return NextResponse.json(
       {
         error:
@@ -161,12 +162,8 @@ export async function POST(request: NextRequest) {
       })
     ).json();
 
-    // Ensure externalLinks and derive wikidataQid
+    // Ensure externalLinks
     if (!mergedPlace.externalLinks) mergedPlace.externalLinks = [];
-    const wdLink = mergedPlace.externalLinks.find(
-      (l: { authority: string }) => l.authority === 'wikidata',
-    );
-    mergedPlace.wikidataQid = wdLink ? wdLink.identifier : null;
     mergedPlace.modifiedBy = login;
     mergedPlace.modifiedAt = now;
 

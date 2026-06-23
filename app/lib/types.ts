@@ -361,7 +361,6 @@ export interface GazetteerPlace extends TombstoneFields {
     crs: string;
   };
   sources: string[];
-  wikidataQid: string | null; // backward compat — derived from externalLinks
   externalLinks: ExternalLink[];
   fid: number | null;
   psurIds: string[];
@@ -380,6 +379,25 @@ export interface GazetteerPlace extends TombstoneFields {
   /** Set when this entry has been merged into another place. The value is the surviving place ID. */
   mergedInto?: string;
   // TombstoneFields inherited: deprecated, deprecatedAt, deprecatedBy, replacedBy, deprecationNote
+}
+
+/** Return all authority links for an authority without flattening match semantics. */
+export function getAuthorityLinks(
+  place: Pick<GazetteerPlace, 'externalLinks'>,
+  authority: string,
+): ExternalLink[] {
+  return place.externalLinks.filter((link) => link.authority === authority);
+}
+
+/**
+ * Return the first authority link for integrations that can accept one identifier only.
+ * New data should retain the complete externalLinks array.
+ */
+export function getPrimaryAuthorityLink(
+  place: Pick<GazetteerPlace, 'externalLinks'>,
+  authority: string,
+): ExternalLink | null {
+  return getAuthorityLinks(place, authority)[0] ?? null;
 }
 
 // Union type for entity lookups

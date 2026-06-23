@@ -42,6 +42,12 @@ type GazetteerName = {
   sourceYear?: number;
 };
 
+type GazetteerExternalLink = {
+  authority?: string;
+  identifier?: string;
+  matchType?: string;
+};
+
 type GazetteerEntry = Record<string, unknown> & {
   '@id'?: string;
   id?: string;
@@ -49,6 +55,7 @@ type GazetteerEntry = Record<string, unknown> & {
   prefLabel?: string;
   altLabels?: string[];
   names?: GazetteerName[];
+  externalLinks?: GazetteerExternalLink[];
   location?: GazetteerLocation | null;
   sources?: string[];
   fid?: number | null;
@@ -63,6 +70,35 @@ type GazetteerEntry = Record<string, unknown> & {
 function toArray<T>(value: T | T[] | undefined | null): T[] {
   if (value == null) return [];
   return Array.isArray(value) ? value : [value];
+}
+
+function appendValue(
+  entity: Record<string, unknown>,
+  property: string,
+  value: string,
+) {
+  const current = entity[property];
+  entity[property] = current == null ? value : [...toArray(current as string | string[]), value];
+}
+
+function addExternalAuthorityLinks(
+  entity: Record<string, unknown>,
+  links: GazetteerExternalLink[] | undefined,
+) {
+  for (const link of links ?? []) {
+    if (link.authority !== 'wikidata' || !link.identifier) continue;
+
+    const uri = `http://www.wikidata.org/entity/${link.identifier}`;
+    switch (link.matchType) {
+      case 'exactMatch':
+      case 'closeMatch':
+      case 'broadMatch':
+      case 'narrowMatch':
+      case 'relatedMatch':
+        appendValue(entity, link.matchType, uri);
+        break;
+    }
+  }
 }
 
 function readJsonIfExists(path: string): Record<string, unknown> | null {
@@ -394,9 +430,7 @@ for (const entry of gazetteerEntries) {
     };
     if (primarySourceUri) featureEntity.P70i_is_documented_in = primarySourceUri;
     if (entry.description) featureEntity.description = entry.description;
-    if (entry.wikidataQid) {
-      featureEntity.sameAs = `http://www.wikidata.org/entity/${entry.wikidataQid}`;
-    }
+    addExternalAuthorityLinks(featureEntity, entry.externalLinks);
 
     const featureProvId = `${DATA_BASE}provenance/gazetteer-feature-${id}`;
     featureEntity.wasDerivedFrom = featureProvId;
