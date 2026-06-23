@@ -19,6 +19,15 @@ before changing the public record model.
    places. Use E81 only for evidenced physical transformation.
 6. Run the full pipeline and production build before publishing changes.
 
+## Editing rules
+
+- Edit Gazetteer values and source-bound statements only; generated JSON-LD is
+  rebuilt during deployment.
+- Every statement needs a stable ID and a registered source. Add a time span
+  when the source supplies one; never invent dates to satisfy a field.
+- A record source and a statement source have different scopes. Do not add a
+  second field merely to repeat the same identifier.
+
 ## Public contract
 
 - `/place/{id}` is the authority-record URL and HTML representation.

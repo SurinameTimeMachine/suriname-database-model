@@ -1160,6 +1160,12 @@ export default function PlaceEditor({
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto p-4 space-y-4">
+        {canEdit && (
+          <p className="border-l-2 border-stm-teal-500 bg-stm-teal-50 px-3 py-2 text-xs text-stm-warm-700">
+            Edit the Gazetteer record, not JSON-LD. Add a source to each
+            statement; add a date or span when the source provides one.
+          </p>
+        )}
         {/* Names */}
         <div>
           <div className="flex items-center justify-between mb-1">

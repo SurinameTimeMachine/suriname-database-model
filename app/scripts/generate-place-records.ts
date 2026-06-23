@@ -43,9 +43,15 @@ type Assertion = {
   id?: string;
   status?: string;
   value?: string;
+  districtId?: string | null;
+  districtLabel?: string | null;
+  standardized?: string | null;
+  original?: string | null;
   source?: string;
+  sourceYear?: number;
   startYear?: number;
   endYear?: number;
+  certainty?: string;
   note?: string | null;
 };
 
@@ -87,6 +93,8 @@ type GazetteerEntry = JsonObject & {
   locationDescriptionOriginal?: string | null;
   statusAssertions?: Assertion[];
   productAssertions?: Assertion[];
+  districtAssertions?: Assertion[];
+  locationAssertions?: Assertion[];
   diklandRefs?: DiklandRef[];
   deprecated?: boolean;
   mergedInto?: string;
@@ -256,7 +264,17 @@ export function generatePlaceRecords() {
     const graph: JsonObject[] = [];
     const productTypeUris = new Set<string>();
     const organizationUris = new Set<string>();
-    const sourceUris = (entry.sources ?? []).map((id) => sourceUri(id, sourceIds));
+    const referencedSourceIds = new Set<string>(entry.sources ?? []);
+    for (const name of names) if (name.source) referencedSourceIds.add(name.source);
+    for (const assertion of [
+      ...asArray(entry.districtAssertions),
+      ...asArray(entry.locationAssertions),
+      ...asArray(entry.statusAssertions),
+      ...asArray(entry.productAssertions),
+    ]) {
+      if (assertion.source) referencedSourceIds.add(assertion.source);
+    }
+    const sourceUris = [...referencedSourceIds].map((id) => sourceUri(id, sourceIds));
 
     const record: JsonObject = {
       '@id': recordUri,
@@ -297,7 +315,14 @@ export function generatePlaceRecords() {
     if (entry.broader) {
       location.P89_falls_within = `${BASE}place/${entry.broader}/location`;
     }
-    const notes = [entry.locationDescription, entry.locationDescriptionOriginal].filter(
+    const locationObservations = asArray(entry.locationAssertions);
+    const notes = (locationObservations.length > 0
+      ? locationObservations.flatMap((assertion) => [
+          assertion.standardized,
+          assertion.original,
+        ])
+      : [entry.locationDescription, entry.locationDescriptionOriginal]
+    ).filter(
       (note): note is string => Boolean(note),
     );
     if (notes.length > 0) location.P3_has_note = notes;
@@ -365,6 +390,54 @@ export function generatePlaceRecords() {
     const evidenceUris: string[] = [];
     const statusUris: string[] = [];
     const organizationalAssociationUris: string[] = [];
+    for (const assertion of asArray(entry.districtAssertions)) {
+      if (!assertion.id || !assertion.districtId) continue;
+      const assertionUri = `${recordUri}/assertion/${assertion.id}`;
+      const spanUri = `${assertionUri}/time-span`;
+      const span = timeSpan(
+        spanUri,
+        assertion.sourceYear ?? assertion.startYear,
+        assertion.endYear,
+      );
+      if (span) graph.push(span);
+      graph.push({
+        '@id': assertionUri,
+        '@type': ['crm:E13_Attribute_Assignment'],
+        P140_assigned_attribute_to: targetUri,
+        P141_assigned: `${BASE}place/${assertion.districtId}/location`,
+        P2_has_type: `${BASE}type/relationship/district-membership`,
+        ...(span ? { P4_has_time_span: spanUri } : {}),
+        ...(assertion.source
+          ? { 'prov:hadPrimarySource': sourceUri(assertion.source, sourceIds) }
+          : {}),
+        certainty: `${BASE}type/certainty/${assertion.certainty ?? 'certain'}`,
+        ...(assertion.note ? { P3_has_note: assertion.note } : {}),
+      });
+      evidenceUris.push(assertionUri);
+    }
+
+    for (const assertion of locationObservations) {
+      if (!assertion.id || (!assertion.standardized && !assertion.original)) continue;
+      const assertionUri = `${recordUri}/assertion/${assertion.id}`;
+      const spanUri = `${assertionUri}/time-span`;
+      const span = timeSpan(spanUri, assertion.startYear, assertion.endYear);
+      if (span) graph.push(span);
+      graph.push({
+        '@id': assertionUri,
+        '@type': ['crm:E13_Attribute_Assignment'],
+        P140_assigned_attribute_to: locationUri,
+        P2_has_type: `${BASE}type/relationship/location-description`,
+        ...(span ? { P4_has_time_span: spanUri } : {}),
+        ...(assertion.source
+          ? { 'prov:hadPrimarySource': sourceUri(assertion.source, sourceIds) }
+          : {}),
+        ...(assertion.standardized ? { standardizedContent: assertion.standardized } : {}),
+        ...(assertion.original ? { sourceContent: assertion.original } : {}),
+        ...(assertion.note ? { P3_has_note: assertion.note } : {}),
+      });
+      evidenceUris.push(assertionUri);
+    }
+
     for (const assertion of entry.statusAssertions ?? []) {
       if (!assertion.id || !assertion.status) continue;
       const assertionUri = `${recordUri}/assertion/${assertion.id}`;
@@ -553,6 +626,8 @@ export function generatePlaceRecords() {
       sources: asArray(entry.sources),
       statusAssertions: asArray(entry.statusAssertions),
       productAssertions: asArray(entry.productAssertions),
+      districtAssertions: asArray(entry.districtAssertions),
+      locationAssertions: asArray(entry.locationAssertions),
       diklandRefs: asArray(entry.diklandRefs),
     };
     writeFileSync(join(OUT_DIR, `${entry.id}.jsonld`), `${JSON.stringify(document, null, 2)}\n`);

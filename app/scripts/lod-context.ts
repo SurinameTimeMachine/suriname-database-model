@@ -28,6 +28,11 @@ export function buildPlaceRecordContext(): Record<string, unknown> {
     },
     sourcePath: { '@id': 'stm:sourcePath', '@type': 'xsd:string' },
     sourceUrl: { '@id': 'sdo:url', '@type': '@id' },
+    standardizedContent: {
+      '@id': 'stm:standardizedContent',
+      '@type': 'xsd:string',
+    },
+    sourceContent: { '@id': 'stm:sourceContent', '@type': 'xsd:string' },
     P3_has_note: { '@id': 'crm:P3_has_note', '@type': 'xsd:string' },
     P41_classified: { '@id': 'crm:P41_classified', '@type': '@id' },
     P42_assigned: { '@id': 'crm:P42_assigned', '@type': '@id' },

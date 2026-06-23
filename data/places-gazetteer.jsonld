@@ -89308,14 +89308,7 @@
           "isCurrent": true
         }
       ],
-      "productAssertions": [
-        {
-          "id": "product-assertion-1",
-          "value": "suiker",
-          "source": "almanakken",
-          "note": null
-        }
-      ],
+      "productAssertions": [],
       "locationAssertions": [
         {
           "id": "location-assertion-1",
@@ -155025,7 +155018,7 @@
           "note": null
         },
         {
-          "id": "location-assertion-1",
+          "id": "location-assertion-2",
           "standardized": "Beneden-Commewijne",
           "original": "Rivier Commewijne, (beneden) linkerhand in het afvaren",
           "source": "almanakken",
@@ -180460,14 +180453,7 @@
         }
       ],
       "districtAssertions": [],
-      "productAssertions": [
-        {
-          "id": "product-assertion-1",
-          "value": "river",
-          "source": "map-1930",
-          "note": null
-        }
-      ],
+      "productAssertions": [],
       "locationAssertions": [
         {
           "id": "location-assertion-1",
@@ -189688,14 +189674,7 @@
         }
       ],
       "districtAssertions": [],
-      "productAssertions": [
-        {
-          "id": "product-assertion-1",
-          "value": "creek",
-          "source": "map-1930",
-          "note": null
-        }
-      ],
+      "productAssertions": [],
       "locationAssertions": [
         {
           "id": "location-assertion-1",
@@ -189807,14 +189786,7 @@
         }
       ],
       "districtAssertions": [],
-      "productAssertions": [
-        {
-          "id": "product-assertion-1",
-          "value": "creek",
-          "source": "map-1930",
-          "note": null
-        }
-      ],
+      "productAssertions": [],
       "locationAssertions": [
         {
           "id": "location-assertion-1",
@@ -189913,14 +189885,7 @@
         }
       ],
       "districtAssertions": [],
-      "productAssertions": [
-        {
-          "id": "product-assertion-1",
-          "value": "creek",
-          "source": "map-1930",
-          "note": null
-        }
-      ],
+      "productAssertions": [],
       "locationAssertions": [
         {
           "id": "location-assertion-1",
@@ -189980,14 +189945,7 @@
         }
       ],
       "districtAssertions": [],
-      "productAssertions": [
-        {
-          "id": "product-assertion-1",
-          "value": "creek",
-          "source": "map-1930",
-          "note": null
-        }
-      ],
+      "productAssertions": [],
       "locationAssertions": [
         {
           "id": "location-assertion-1",

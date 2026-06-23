@@ -70,6 +70,9 @@ function main() {
   const gazetteer = JSON.parse(
     readArtifact(DATA_DIR, 'places-gazetteer.jsonld').toString('utf-8'),
   ) as JsonLdDocument;
+  const sourceRegistry = JSON.parse(
+    readArtifact(DATA_DIR, 'sources-registry.jsonld').toString('utf-8'),
+  ) as JsonLdDocument;
   const mapFeatures = JSON.parse(
     readArtifact(PUBLIC_DATA_DIR, 'map-features.geojson').toString('utf-8'),
   ) as GeoJsonDocument;
@@ -121,6 +124,12 @@ function main() {
   );
 
   assert(Array.isArray(gazetteer['@graph']), 'Gazetteer has no @graph');
+  assert(Array.isArray(sourceRegistry['@graph']), 'Source registry has no @graph');
+  const knownSourceIds = new Set(
+    sourceRegistry['@graph']
+      .map((source) => source.sourceId)
+      .filter((sourceId): sourceId is string => typeof sourceId === 'string'),
+  );
   let externalLinkCount = 0;
   for (const entry of gazetteer['@graph']) {
     assert(
@@ -158,13 +167,61 @@ function main() {
         );
       }
 
-      const key = `${authority}:${identifier}:${matchType}`;
+      const key = `${authority}:${identifier}`;
       assert(
         !linkKeys.has(key),
         `Duplicate external link ${key} on gazetteer entry ${String(entry.id)}`,
       );
       linkKeys.add(key);
       externalLinkCount++;
+    }
+
+    const assertionIds = new Set<string>();
+    for (const [kind, assertions] of [
+      ['district', entry.districtAssertions],
+      ['location', entry.locationAssertions],
+      ['status', entry.statusAssertions],
+      ['product', entry.productAssertions],
+    ] as const) {
+      if (assertions == null) continue;
+      assert(
+        Array.isArray(assertions),
+        `${kind} assertions on ${String(entry.id)} must be an array`,
+      );
+      for (const assertion of assertions) {
+        assert(
+          assertion && typeof assertion === 'object' && !Array.isArray(assertion),
+          `Invalid ${kind} assertion on ${String(entry.id)}`,
+        );
+        const value = assertion as Record<string, unknown>;
+        assert(
+          typeof value.id === 'string' && value.id.trim().length > 0,
+          `${kind} assertion on ${String(entry.id)} has no stable ID`,
+        );
+        assert(
+          !assertionIds.has(value.id),
+          `Duplicate assertion ID ${value.id} on ${String(entry.id)}`,
+        );
+        assertionIds.add(value.id);
+        assert(
+          typeof value.source === 'string' && knownSourceIds.has(value.source),
+          `${kind} assertion ${value.id} on ${String(entry.id)} has an unknown source`,
+        );
+        const start = value.startYear ?? value.sourceYear;
+        const end = value.endYear;
+        assert(
+          start == null || (typeof start === 'number' && Number.isInteger(start)),
+          `${kind} assertion ${value.id} on ${String(entry.id)} has an invalid start year`,
+        );
+        assert(
+          end == null || (typeof end === 'number' && Number.isInteger(end)),
+          `${kind} assertion ${value.id} on ${String(entry.id)} has an invalid end year`,
+        );
+        assert(
+          !(typeof start === 'number' && typeof end === 'number' && end < start),
+          `${kind} assertion ${value.id} on ${String(entry.id)} ends before it starts`,
+        );
+      }
     }
   }
 

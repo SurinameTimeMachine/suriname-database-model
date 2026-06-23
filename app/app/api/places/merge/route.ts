@@ -1,62 +1,23 @@
 import { hasRepoAccess, readRepoFile, writeRepoFile } from '@/lib/github';
+import {
+  prepareEditorialPlace,
+  sortGazetteer,
+} from '@/lib/gazetteer-editorial';
 import { getSessionToken } from '@/lib/session';
 import type { GazetteerPlace } from '@/lib/types';
 import { getPreferredName } from '@/lib/types';
-import { readFileSync, writeFileSync } from 'fs';
 import { NextRequest, NextResponse } from 'next/server';
-import { join } from 'path';
-
-const PUBLIC_GAZETTEER = join(
-  process.cwd(),
-  'public',
-  'data',
-  'places-gazetteer.jsonld',
-);
-
-const THESAURUS_FILE = join(
-  process.cwd(),
-  '..',
-  'data',
-  'place-types-thesaurus.jsonld',
-);
 
 const GAZETTEER_PATH = 'data/places-gazetteer.jsonld';
 
-function syncPublicCopy(jsonldStr: string) {
-  try {
-    writeFileSync(PUBLIC_GAZETTEER, jsonldStr, 'utf-8');
-  } catch (err) {
-    console.error(
-      'Failed to sync public gazetteer copy',
-      PUBLIC_GAZETTEER,
-      err,
-    );
-  }
-}
-
-function readThesaurusGraph(): Record<string, unknown>[] {
-  try {
-    const data = JSON.parse(readFileSync(THESAURUS_FILE, 'utf-8'));
-    return (data['@graph'] || []) as Record<string, unknown>[];
-  } catch {
-    return [];
-  }
-}
-
-function loadCrmMapping(): Record<string, string> {
-  return Object.fromEntries(
-    readThesaurusGraph()
-      .filter((e) => e.typeId)
-      .map((e) => [e.typeId as string, e.crmClass as string]),
-  );
-}
-
-function loadTypeOrder(): Record<string, number> {
-  return Object.fromEntries(
-    readThesaurusGraph()
-      .filter((e) => e.typeId && typeof e.sortOrder === 'number')
-      .map((e) => [e.typeId as string, e.sortOrder as number]),
-  );
+function publication(commit: string, id: string) {
+  return {
+    state: 'pending-deployment' as const,
+    commit,
+    recordUrl: `/place/${id}`,
+    jsonldUrl: `/place/${id}.jsonld`,
+    jsonUrl: `/place/${id}.json`,
+  };
 }
 
 async function authorize(): Promise<
@@ -162,21 +123,19 @@ export async function POST(request: NextRequest) {
       })
     ).json();
 
-    // Ensure externalLinks
-    if (!mergedPlace.externalLinks) mergedPlace.externalLinks = [];
     mergedPlace.modifiedBy = login;
     mergedPlace.modifiedAt = now;
 
-    // Set JSON-LD properties from thesaurus
-    const crmMap = loadCrmMapping();
-    const crmClass = crmMap[mergedPlace.type] || 'E53_Place';
+    const prepared = prepareEditorialPlace(mergedPlace);
+    if (!prepared.place) {
+      return NextResponse.json(
+        { error: prepared.errors.join('. ') },
+        { status: 400 },
+      );
+    }
 
     // Update the primary entry
-    gazetteer[primaryIdx] = {
-      ...mergedPlace,
-      '@id': `stm:place/${primaryId}`,
-      '@type': crmClass,
-    } as GazetteerPlace;
+    gazetteer[primaryIdx] = prepared.place;
 
     // Mark the retired entry
     gazetteer[retiredIdx] = {
@@ -186,31 +145,27 @@ export async function POST(request: NextRequest) {
       modifiedAt: now,
     };
 
-    // Sort: merged entries sink to the bottom, then by type order + name
-    const typeOrder = loadTypeOrder();
-    gazetteer.sort((a, b) => {
-      const aRetired = a.mergedInto ? 1 : 0;
-      const bRetired = b.mergedInto ? 1 : 0;
-      if (aRetired !== bRetired) return aRetired - bRetired;
-      const diff = (typeOrder[a.type] ?? 99) - (typeOrder[b.type] ?? 99);
-      return diff !== 0
-        ? diff
-        : getPreferredName(a).localeCompare(getPreferredName(b));
-    });
+    sortGazetteer(gazetteer, getPreferredName);
 
     jsonld['@graph'] = gazetteer;
 
     const jsonStr = JSON.stringify(jsonld, null, 2);
-    await writeRepoFile(
+    const commit = await writeRepoFile(
       token,
       GAZETTEER_PATH,
       jsonStr,
       sha,
       `Merge place ${retiredId} into ${primaryId}`,
     );
-    syncPublicCopy(jsonStr);
 
-    return NextResponse.json({ ok: true, primaryId, retiredId });
+    return NextResponse.json({
+      ok: true,
+      primaryId,
+      retiredId,
+      place: prepared.place,
+      retiredPlace: gazetteer.find((place) => place.id === retiredId),
+      publication: publication(commit, primaryId),
+    });
   } catch (err) {
     console.error('Merge places error:', err);
     return NextResponse.json(

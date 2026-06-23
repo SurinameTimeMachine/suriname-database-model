@@ -7,6 +7,12 @@ from it as one authority-record document per place. The authority record is a
 stable STM document which describes, but is not identical to, the CRM entities
 within it.
 
+Editors change the concise Gazetteer fields and source-bound statements; they
+do not edit generated JSON-LD. A GitHub save is the canonical change. The next
+deployment runs the publication pipeline and updates the HTML, `.json`, and
+`.jsonld` representations together. The editor shows this as pending until the
+deployment has completed.
+
 ## Stable identifiers and representations
 
 For `stm-00705` the public contract is:
@@ -46,6 +52,13 @@ Almanakken record ID remains on each observation so summaries are reproducible.
 Names are E41 Appellations, identifiers are E42 Identifiers, source documents
 are E22/E31 nodes, and Dikland PDF references become structured E22/E31 nodes
 linked to the Dikland collection. Geometries use GeoSPARQL WKT in CRS84.
+
+Each editorial statement has a stable ID and a registry source. Product and
+operational-status statements also require a date or time span. District and
+location statements carry a time span when the source supplies one; an unknown
+date is left unknown rather than invented. Record-level `sources` describe
+evidence for the overall record or geometry, while statement sources describe
+the individual claim. They are different scopes, not duplicate claims.
 
 ## Deferred domains
 
