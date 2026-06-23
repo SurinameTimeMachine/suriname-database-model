@@ -933,6 +933,7 @@ if (existsSync(geojsonSrc)) {
 
     // Inject stmId into existing features
     let enriched = 0;
+    const mappedGazetteerIds = new Set<string>();
     for (const feature of geojson.features) {
       const props = feature.properties;
       const pipelineFeatureUri =
@@ -952,16 +953,18 @@ if (existsSync(geojsonSrc)) {
         null;
       if (stmId) {
         props.stmId = stmId;
+        mappedGazetteerIds.add(stmId);
         enriched++;
       }
     }
     console.log(`  Enriched ${enriched} existing features with stmId`);
 
-    // Existing feature types in geojson are 'plantation', 'river', 'creek'
-    // Add features for types NOT already in the pipeline
+    // Existing feature types in geojson are 'plantation', 'river', 'creek'.
+    // Add any Gazetteer entry that was not matched to one of those pipeline
+    // features, including manually added points and unmatched natural features.
     for (const entry of entries) {
       const type = entry.type as string;
-      if (PIPELINE_TYPES.has(type)) continue;
+      if (mappedGazetteerIds.has(entry.id as string)) continue;
 
       const loc = entry.location || null;
       if (!loc) continue;
@@ -986,8 +989,14 @@ if (existsSync(geojsonSrc)) {
       const status =
         type === 'road' || type === 'railroad' ? 'infrastructure' : 'named';
 
-      // LineString / MultiLineString features (road/railroad) — use WKT if available
-      if (loc.wkt && (type === 'road' || type === 'railroad')) {
+      // LineString / MultiLineString features — use WKT if available.
+      if (
+        loc.wkt &&
+        (type === 'road' ||
+          type === 'railroad' ||
+          type === 'river' ||
+          type === 'creek')
+      ) {
         const isMulti = /^MultiLineString\s*\(/i.test(loc.wkt);
         let geometry:
           | { type: 'LineString'; coordinates: number[][] }
@@ -1055,6 +1064,41 @@ if (existsSync(geojsonSrc)) {
           added++;
         }
         continue;
+      }
+
+      // Polygon features not already present in the source GeoJSON.
+      if (loc.wkt && type === 'plantation') {
+        const match = loc.wkt.match(/Polygon\s*\(\(([^)]+)\)\)/i);
+        if (match) {
+          const coordinates: number[][] = [];
+          for (const pair of match[1].split(',')) {
+            const points = pair.trim().split(/\s+/);
+            if (points.length < 2) continue;
+            const lon = parseFloat(points[0]);
+            const lat = parseFloat(points[1]);
+            if (!isNaN(lon) && !isNaN(lat)) coordinates.push([lon, lat]);
+          }
+          if (coordinates.length >= 3) {
+            geojson.features.push({
+              type: 'Feature',
+              id: `${type}-${entry.fid || entry.id}`,
+              geometry: { type: 'Polygon', coordinates: [coordinates] },
+              properties: {
+                fid: entry.fid ?? null,
+                name: displayName,
+                allNames: nameTexts,
+                stmId: entry.id as string,
+                featureUri,
+                placeUri,
+                status,
+                featureType: type,
+                mapYear: derivedMapYear,
+              },
+            });
+            added++;
+            continue;
+          }
+        }
       }
 
       // Point features — use lat/lng

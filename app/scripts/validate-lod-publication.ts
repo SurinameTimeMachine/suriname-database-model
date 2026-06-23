@@ -28,6 +28,10 @@ interface JsonLdDocument {
   '@type'?: string | string[];
 }
 
+interface GeoJsonDocument {
+  features?: Array<{ properties?: Record<string, unknown> }>;
+}
+
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
 }
@@ -66,6 +70,9 @@ function main() {
   const gazetteer = JSON.parse(
     readArtifact(DATA_DIR, 'places-gazetteer.jsonld').toString('utf-8'),
   ) as JsonLdDocument;
+  const mapFeatures = JSON.parse(
+    readArtifact(PUBLIC_DATA_DIR, 'map-features.geojson').toString('utf-8'),
+  ) as GeoJsonDocument;
 
   assert(
     database.equals(publishedDatabase),
@@ -175,6 +182,39 @@ function main() {
     assert(!recordIds.has(id), `Authority-record index contains duplicate id ${id}`);
     recordIds.add(id);
   }
+  const activeGazetteer = gazetteer['@graph'].filter(
+    (entry) => !entry.deprecated && !entry.mergedInto,
+  );
+  assert(
+    recordIds.size === activeGazetteer.length,
+    'Authority-record index does not cover every active Gazetteer entry',
+  );
+  for (const entry of activeGazetteer) {
+    assert(
+      typeof entry.id === 'string' && recordIds.has(entry.id),
+      `Gazetteer entry ${String(entry.id)} has no authority record`,
+    );
+  }
+
+  assert(Array.isArray(mapFeatures.features), 'Map features has no features array');
+  const mappedGazetteerIds = new Set(
+    mapFeatures.features
+      .map((feature) => feature.properties?.stmId)
+      .filter((id): id is string => typeof id === 'string'),
+  );
+  let geometricGazetteerEntries = 0;
+  for (const entry of activeGazetteer) {
+    const location = entry.location as Record<string, unknown> | undefined;
+    const hasGeometry =
+      typeof location?.wkt === 'string' ||
+      (typeof location?.lat === 'number' && typeof location?.lng === 'number');
+    if (!hasGeometry) continue;
+    geometricGazetteerEntries++;
+    assert(
+      mappedGazetteerIds.has(entry.id as string),
+      `Geometry-bearing Gazetteer entry ${String(entry.id)} is missing from map-features.geojson`,
+    );
+  }
   const recordSamples = [
     recordIndex[0],
     recordIndex[Math.floor(recordIndex.length / 2)],
@@ -253,7 +293,7 @@ function main() {
   }
 
   console.log(
-    `LOD publication OK: ${ids.size} entities, ${recordIndex.length} authority records, and the shared context are published unchanged; ${hosts.size} linked-data hosts and ${externalLinkCount} canonical authority links are validated.`,
+    `LOD publication OK: ${ids.size} entities, ${recordIndex.length} authority records, and ${geometricGazetteerEntries} map-covered Gazetteer entries are published unchanged; ${hosts.size} linked-data hosts and ${externalLinkCount} canonical authority links are validated.`,
   );
 }
 
