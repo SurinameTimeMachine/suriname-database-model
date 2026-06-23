@@ -681,8 +681,8 @@
         "srn": "Kriki"
       },
       "definition": {
-        "en": "A small to medium natural watercourse, often a tributary of a river.",
-        "nl": "Een kleine tot middelgrote natuurlijke waterloop, vaak een zijrivier."
+        "en": "A natural, meandering watercourse that is smaller than a river and often acts as a tributary or feeder to a larger hydrographic network. Within the historical context of Suriname, creeks formed a dense network of transport routes.",
+        "nl": "Een natuurlijke, stromende waterweg die kleiner is dan een rivier en dikwijls fungeert als zijtak of toevoerader van een groter hydrografisch netwerk. Binnen de Surinaamse historische context vormden kreken de fijnmazige transportroutes."
       },
       "inScheme": "stm:vocabulary/place-type",
       "broader": "stm:vocabulary/place-type/natural",
@@ -695,7 +695,24 @@
       "crmBadge": "E26",
       "sortOrder": 12,
       "created": "2026-04-07",
-      "modified": "2026-04-07"
+      "modified": "2026-06-23",
+      "altLabel": {
+        "nl": [
+          "zijtak",
+          "spruit"
+        ],
+        "en": [
+          "stream",
+          "brook"
+        ]
+      },
+      "related": [
+        "stm:vocabulary/place-type/river"
+      ],
+      "exactMatch": [
+        "https://www.wikidata.org/wiki/Q2043393",
+        "https://vocab.getty.edu/aat/300008706"
+      ]
     },
     {
       "@id": "stm:vocabulary/place-type/district",
