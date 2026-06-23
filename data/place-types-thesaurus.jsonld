@@ -855,6 +855,45 @@
       "inScheme": "stm:vocabulary/road-attributes",
       "created": "2026-05-12",
       "modified": "2026-05-19"
+    },
+    {
+      "@id": "stm:vocabulary/place-type/Division",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "typeId": "Division",
+      "prefLabel": {
+        "en": "Division",
+        "nl": "Divisie"
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/administrative",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "color": "#55fd62",
+      "sortOrder": 99,
+      "created": "2026-06-23",
+      "modified": "2026-06-23",
+      "altLabel": {
+        "en": [
+          "district"
+        ],
+        "nl": [
+          "district"
+        ]
+      },
+      "definition": {
+        "en": "A historical, geographically and administratively defined area which, until 1863, constituted the secondary administrative level of the colony of Suriname (outside the city of Paramaribo). These divisions were usually named after and situated around the main rivers and creeks (such as the Para, Thorarica and Matapica divisions).",
+        "nl": "Een historisch, afgebakend geografisch en bestuurlijk gebied dat tot 1863 de secundaire administratieve laag vormde van de kolonie Suriname (buiten de stad Paramaribo). Deze divisies, werden veelal vernoemd naar en gesitueerd rondom de belangrijkste rivieren en kreken (zoals de divisies Para, Thorarica en Matapica)."
+      },
+      "related": [
+        "stm:vocabulary/place-type/district"
+      ],
+      "closeMatch": [
+        "https://www.wikidata.org/wiki/Q19832712",
+        "https://schema.org/AdministrativeArea"
+      ]
     }
   ]
 }
