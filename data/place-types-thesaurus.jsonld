@@ -629,17 +629,19 @@
       ],
       "prefLabel": {
         "en": "River",
-        "nl": "Rivier",
-        "srn": "Liba"
+        "srn": "Liba",
+        "nl": "Rivier"
       },
       "definition": {
-        "en": "A large natural flowing watercourse, typically emptying into the sea or a larger body of water.",
-        "nl": "Een grote natuurlijke waterloop die doorgaans uitmondt in de zee of een groter waterlichaam."
+        "nl": "Een natuurlijke, permanente stroom van zoet of brak water die via een bedding naar een andere rivier, een meer of de oceaan vloeit. Binnen de Surinaamse historische context vormen de grote rivieren en hun vertakkingen de primaire infrastructurele en economische assen van het land; zij faciliteerden de transport- en exportlijnen van de kustplantages en dienden tevens als de belangrijkste navigatieroutes en leefgebieden voor Inheemse en Marrongemeenschappen in het binnenland.",
+        "en": "A natural, permanent flow of fresh or brackish water that flows through a riverbed into another river, a lake or the ocean. Within the historical context of Suriname, the major rivers and their tributaries form the country’s primary infrastructural and economic arteries; they facilitated the transport and export routes of the coastal plantations and also served as the main navigation routes and habitats for Indigenous and Maroon communities in the interior."
       },
       "inScheme": "stm:vocabulary/place-type",
       "broader": "stm:vocabulary/place-type/natural",
       "exactMatch": [
-        "http://www.wikidata.org/entity/Q4022"
+        "http://www.wikidata.org/entity/Q4022",
+        "https://schema.org/RiverBodyOfWater",
+        "https://vocab.getty.edu/aat/300008707"
       ],
       "typeId": "river",
       "color": "#4a88bf",
@@ -647,7 +649,25 @@
       "crmBadge": "E26",
       "sortOrder": 11,
       "created": "2026-04-07",
-      "modified": "2026-04-07"
+      "modified": "2026-06-23",
+      "altLabel": {
+        "en": [
+          "Stream",
+          "Upper Course",
+          "Lower Course"
+        ],
+        "nl": [
+          "Stroom",
+          "Bovenloop",
+          "Benedenloop"
+        ]
+      },
+      "related": [
+        "stm:vocabulary/place-type/creek"
+      ],
+      "closeMatch": [
+        "https://www.wikidata.org/wiki/Q355304"
+      ]
     },
     {
       "@id": "stm:vocabulary/place-type/creek",
