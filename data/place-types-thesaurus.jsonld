@@ -933,7 +933,13 @@
       ],
       "exactMatch": [
         "https://www.wikidata.org/wiki/Q134127647"
-      ]
+      ],
+      "altLabel": {
+        "nl": [
+          "Verdedigingswerken",
+          "defensiestelsel"
+        ]
+      }
     }
   ]
 }
