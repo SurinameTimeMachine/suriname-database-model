@@ -349,13 +349,11 @@
         "nl": "Spoorweg"
       },
       "definition": {
-        "en": "A track or system of tracks for rail transport between locations."
+        "nl": "Een transportroute over land die is uitgerust met vaste metalen spoorstaven (rails) ten behoeve van de geleide voortbeweging van treinen of lorries. Binnen de Surinaamse historische context omvat dit zowel de door de overheid aangelegde infrastructuur voor personen- en vrachtvervoer naar het binnenland (zoals de Lawaspoorweg) als de private (smal)spoorlijnen op plantages en mijnbouwterreinen voor het transport van landbouwproducten en ertsen.",
+        "en": "An overland transport route equipped with permanent metal rails designed to guide and support the movement of trains or locotractors/lorries. Within the historical context of Suriname, this encompasses both state-built infrastructure for passenger and freight transit into the interior (such as the Lawa Railway) and private (narrow-gauge) rail lines used on plantations and mining sites to transport agricultural products and ores."
       },
       "inScheme": "stm:vocabulary/place-type",
       "broader": "stm:vocabulary/place-type/transport-infrastructure",
-      "related": [
-        "stm:vocabulary/place-type/station"
-      ],
       "closeMatch": [
         "http://www.wikidata.org/entity/Q22667"
       ],
@@ -365,7 +363,7 @@
       "crmBadge": "E25",
       "sortOrder": 5,
       "created": "2026-04-07",
-      "modified": "2026-04-07"
+      "modified": "2026-06-23"
     },
     {
       "@id": "stm:vocabulary/place-type/station",
