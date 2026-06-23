@@ -982,6 +982,30 @@
       "closeMatch": [
         "https://vocab.getty.edu/aat/300006887"
       ]
+    },
+    {
+      "@id": "stm:vocabulary/place-type/water infrastructure",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "typeId": "water infrastructure",
+      "prefLabel": {
+        "en": "water management infrastructure",
+        "nl": "Waterbouwkundige infrastructuur"
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/human-made",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "color": "#5583fd",
+      "sortOrder": 99,
+      "created": "2026-06-23",
+      "modified": "2026-06-23",
+      "definition": {
+        "nl": "Het geheel van door mensen aangelegde kunstwerken en infrastructurele elementen bedoeld om de waterhuishouding te reguleren, waterwegen bevaarbaar te houden, of gronden te beschermen tegen overstroming en verdroging.",
+        "en": "The totality of man-made structures and infrastructure elements designed to regulate water management, maintain the navigability of waterways, or protect land from flooding and drought."
+      }
     }
   ]
 }
