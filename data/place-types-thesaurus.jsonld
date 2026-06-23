@@ -535,19 +535,22 @@
       "altLabel": {
         "nl": [
           "Indiaansch dorp",
-          "Indianen (1882 map)"
+          "Indianen (kaart 1882)",
+          "I (kaart 1930)"
         ],
         "en": [
-          "I (1930 map code)"
+          "Native American village",
+          "Native Americans (map 1882)",
+          "I (map 1930)"
         ]
       },
       "definition": {
-        "en": "A settlement of Indigenous peoples of Suriname.",
-        "nl": "Een nederzetting van Inheemse volkeren van Suriname."
+        "nl": "Een permanente of semi-permanente menselijke nederzetting gesticht en bewoond door de oorspronkelijke, inheemse bevolking van Suriname (zoals de Lokono, Kaliña, Trio of Wayana). ",
+        "en": "A permanent or semi-permanent human settlement founded and inhabited by the original, indigenous peoples of Suriname (such as the Lokono, Kaliña, Trio or Wayana)."
       },
       "editorialNote": {
-        "en": "Colonial data bias: \"I\" and \"Indiaansch dorp\" are colonial Dutch terms from the 1930 and 1882 plantation maps. Indigenous communities were reduced to single-letter codes. The preferred term recognizes the self-determination of these communities.",
-        "nl": "Koloniaal vooroordeel: \"I\" en \"Indiaansch dorp\" zijn koloniale Nederlandse termen uit de plantagekaarten van 1930 en 1882. Inheemse gemeenschappen werden gereduceerd tot codes van een enkele letter."
+        "en": "Colonial prejudice: ‘Indian village’ (abbreviated to ‘I’ on the map) are colonial terms. Indigenous communities were reduced to single-letter codes.",
+        "nl": "Koloniaal vooroordeel: \"Indiaansch dorp\" (afgekort tot “I” op de kaart) zijn koloniale termen. Inheemse gemeenschappen werden gereduceerd tot codes van een enkele letter."
       },
       "inScheme": "stm:vocabulary/place-type",
       "broader": "stm:vocabulary/place-type/settlement",
@@ -557,7 +560,15 @@
       "crmBadge": "E25",
       "sortOrder": 9,
       "created": "2026-04-07",
-      "modified": "2026-04-07"
+      "modified": "2026-06-23",
+      "related": [
+        "stm:vocabulary/place-type/town",
+        "stm:vocabulary/place-type/settlement",
+        "stm:vocabulary/place-type/maroon-village"
+      ],
+      "exactMatch": [
+        "https://www.wikidata.org/wiki/Q121777466"
+      ]
     },
     {
       "@id": "stm:vocabulary/place-type/maroon-village",
