@@ -940,6 +940,48 @@
           "defensiestelsel"
         ]
       }
+    },
+    {
+      "@id": "stm:vocabulary/place-type/Fort",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "typeId": "Fort",
+      "prefLabel": {
+        "nl": "Fort",
+        "en": "Fort"
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/MilitaryInfrastructure",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "color": "#9eba98",
+      "sortOrder": 99,
+      "created": "2026-06-23",
+      "modified": "2026-06-23",
+      "altLabel": {
+        "nl": [
+          "Vestingwerk"
+        ],
+        "en": [
+          "Fortress"
+        ]
+      },
+      "definition": {
+        "nl": "Een permanent en zwaar versterkt militair bouwwerk of complex, strategisch gepositioneerd voor de verdediging van territorium, vitale infrastructuur, steden of vaarwegen.",
+        "en": "A permanent and heavily fortified military structure or complex, strategically positioned to defend territory, vital infrastructure, towns or waterways."
+      },
+      "related": [
+        "stm:vocabulary/place-type/military-post",
+        "stm:vocabulary/place-type/MilitaryInfrastructure"
+      ],
+      "exactMatch": [
+        "https://www.wikidata.org/wiki/Q1785071"
+      ],
+      "closeMatch": [
+        "https://vocab.getty.edu/aat/300006887"
+      ]
     }
   ]
 }
