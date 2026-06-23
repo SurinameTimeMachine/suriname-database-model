@@ -377,14 +377,14 @@
         "srn": "Stasi"
       },
       "definition": {
-        "nl": "Geodetisch meetpunt",
-        "en": "Geodetic control point used as referencing point for map making",
-        "srn": "Lanti-marki [?]"
+        "srn": "Lanti-marki [?]",
+        "nl": "Een specifiek, fysiek vastgelegd meetpunt in het terrein dat door landmeters en cartografen is gebruikt voor astronomische plaatsbepaling (het bepalen van de exacte geografische coördinaten aan de hand van hemellichamen). Binnen de context van de historische cartografie van Suriname—in het bijzonder de topografische kaart van 1930—dienden deze astronomische stations als de primaire, hoogst nauwkeurige referentiepunten (ankerpunten) om het omringende rivier- en boslandschap cartografisch te positioneren.",
+        "en": "A specific, physically established geodetic control point used by surveyors and cartographers for astronomical positioning (determining precise geographic coordinates by observing celestial bodies). Within the context of historical Surinamese cartography—specifically the 1930 topographical map—these astronomical stations served as the primary, highly accurate reference anchors used to mathematically align and map the surrounding river networks and dense interior terrain."
       },
       "inScheme": "stm:vocabulary/place-type",
       "broader": "stm:vocabulary/place-type/human-made",
       "closeMatch": [
-        "https://www.wikidata.org/wiki/Q1408783"
+        "https://www.wikidata.org/wiki/Q131862"
       ],
       "typeId": "station",
       "color": "#d4a882",
@@ -392,7 +392,22 @@
       "crmBadge": "E25",
       "sortOrder": 6,
       "created": "2026-04-07",
-      "modified": "2026-04-09"
+      "modified": "2026-06-23",
+      "altLabel": {
+        "nl": [
+          "Astronomisch meetpunt",
+          "Geodetisch referentiepunt",
+          "Observatiestation"
+        ],
+        "en": [
+          "Astronomical observation point",
+          "Geodetic control point",
+          "Surveying station"
+        ]
+      },
+      "exactMatch": [
+        "https://www.wikidata.org/wiki/Q111340425"
+      ]
     },
     {
       "@id": "stm:vocabulary/place-type/settlement",
