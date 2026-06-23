@@ -300,18 +300,23 @@
       },
       "altLabel": {
         "en": [
-          "Street"
+          "Street",
+          "Path",
+          "Trail"
         ],
         "nl": [
-          "Straat"
+          "Straat",
+          "Pad",
+          "Spoor"
         ]
       },
       "definition": {
-        "en": "A constructed path or route for transportation between settlements."
+        "en": "A constructed path or route for transportation between settlements.",
+        "nl": "Een herkenbare of functionele landroute (verhard, onverhard of overgroeid) die is aangelegd of ontstaan ten behoeve van de verplaatsing van personen, dieren of goederen. Binnen de Surinaamse historische context omvat dit zowel de formele koloniale infrastructuur (stedelijke straten, interdistrictswegen, militaire paden en plantagedammen) als de informele, dikwijls niet-gekaarte paden en vluchtroutes die door Inheemsen, Marrons en tot slaaf gemaakten werden gebruikt voor navigatie, handel en verzet in het binnenland."
       },
       "editorialNote": {
-        "en": "Urban streets are currently normalized under road because the available source data does not support a stable distinction between road and street.",
-        "nl": "Stedelijke straten worden momenteel onder weg genormaliseerd omdat de beschikbare brondata geen stabiel onderscheid tussen weg en straat ondersteunen."
+        "nl": "Stedelijke straten worden momenteel onder weg genormaliseerd omdat de beschikbare brondata geen stabiel onderscheid tussen weg en straat ondersteunen.",
+        "en": "A distinct or functional overland route (paved, unpaved, or overgrown) constructed or naturally formed for the movement of people, animals, or goods. Within the historical context of Suriname, this encompasses both formal colonial infrastructure (urban streets, inter-district roads, military trails, and plantation dikes) as well as the informal, often unmapped paths and escape routes utilized by Indigenous peoples, Maroons, and enslaved individuals for navigation, trade, and resistance in the interior."
       },
       "inScheme": "stm:vocabulary/place-type",
       "broader": "stm:vocabulary/place-type/transport-infrastructure",
@@ -324,7 +329,14 @@
       "crmBadge": "E25",
       "sortOrder": 4,
       "created": "2026-04-07",
-      "modified": "2026-04-07"
+      "modified": "2026-06-23",
+      "related": [
+        "stm:vocabulary/place-type/railroad"
+      ],
+      "closeMatch": [
+        "https://vocab.getty.edu/aat/300008321",
+        "https://wiki.openstreetmap.org/wiki/Key:highway"
+      ]
     },
     {
       "@id": "stm:vocabulary/place-type/railroad",
