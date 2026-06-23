@@ -427,12 +427,22 @@
           "nederzetting",
           "dorp",
           "woonplaats",
-          "kamp"
+          "kamp",
+          "plantage"
+        ],
+        "en": [
+          "Leper colony",
+          "penal colony",
+          "settlement",
+          "village",
+          "place of residence",
+          "camp",
+          "plantation"
         ]
       },
       "definition": {
         "nl": "Een plaats of geografisch afgebakend gebied waar menselijke bewoning plaatsvindt of heeft plaatsgevonden, variërend van tijdelijke kampementen tot permanente dorpen en steden. Binnen de Surinaamse historische context omvat dit een diverse typologie van gemeenschappen, waaronder inheemse dorpen, marrondorpen (of weglopersnederzettingen in het binnenland), plantagewoningen, militaire posten, goudzoekers- of balatablederskampen, en de formele koloniale vestigingen in de kustvlakte en districten.",
-        "en": "Leper colony, penal colony, settlement, village, place of residence, camp"
+        "en": "A locality or geographically defined area of past or present human habitation, ranging from temporary encampments to permanent villages and urban centers. Within the historical context of Suriname, this encompasses a highly diverse typology of communities, including indigenous villages, Maroon settlements (historically established in the interior as sites of resistance), plantation villages, military outposts, gold-mining or balata-bleeding camps, and formal colonial towns across the coastal plains and districts."
       },
       "editorialNote": {
         "en": "Colonial data bias: Several settlements have colonial institutional origins (leper colonies, penal establishments, government provisions grounds) reflecting colonial governance structures.",
