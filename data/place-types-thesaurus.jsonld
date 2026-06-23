@@ -596,8 +596,8 @@
         "nl": "Een nederzetting opgericht door Marrongemeenschappen -- zelfbevrijde voorheen tot slaaf gemaakte mensen en hun nakomelingen."
       },
       "editorialNote": {
-        "en": "Colonial data bias: \"Boschnegers\" (lit. \"bush negroes\") was a derogatory Dutch colonial designation for Maroon communities. The preferred term \"Maroon\" respects their agency and self-identification.",
-        "nl": "Koloniaal vooroordeel: \"Boschnegers\" was een denigrerende Nederlandse koloniale aanduiding voor Marrongemeenschappen. De voorkeursterm \"Marron\" respecteert hun eigen identiteit en zelfbeschikking."
+        "en": "Colonial data bias: \"Boschnegers\" (lit. \"bush negroes\") was a derogatory Dutch colonial designation for Maroon communities.",
+        "nl": "Koloniaal vooroordeel: \"Boschnegers\" was een denigrerende Nederlandse koloniale aanduiding voor Marrongemeenschappen."
       },
       "inScheme": "stm:vocabulary/place-type",
       "broader": "stm:vocabulary/place-type/settlement",
@@ -611,7 +611,12 @@
       "crmBadge": "E25",
       "sortOrder": 10,
       "created": "2026-04-07",
-      "modified": "2026-06-23"
+      "modified": "2026-06-23",
+      "related": [
+        "stm:vocabulary/place-type/indigenous-village",
+        "stm:vocabulary/place-type/settlement",
+        "stm:vocabulary/place-type/town"
+      ]
     },
     {
       "@id": "stm:vocabulary/place-type/river",
