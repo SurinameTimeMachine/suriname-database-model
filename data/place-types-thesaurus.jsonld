@@ -904,6 +904,36 @@
         "https://www.wikidata.org/wiki/Q19832712",
         "https://schema.org/AdministrativeArea"
       ]
+    },
+    {
+      "@id": "stm:vocabulary/place-type/MilitaryInfrastructure",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "typeId": "MilitaryInfrastructure",
+      "prefLabel": {
+        "en": "Military Infrastructure",
+        "nl": "Militaire infrastructuur"
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/human-made",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "color": "#a8c88a",
+      "sortOrder": 99,
+      "created": "2026-06-23",
+      "modified": "2026-06-23",
+      "definition": {
+        "nl": "Het geheel van door mensen aangelegde of ingerichte bouwwerken, verdedigingswerken en logistieke netwerken ten behoeve van defensie, bewaking en militaire operaties.",
+        "en": "The totality of man-made structures, defences and logistical networks designed for defence, surveillance and military operations."
+      },
+      "related": [
+        "stm:vocabulary/place-type/military-post"
+      ],
+      "exactMatch": [
+        "https://www.wikidata.org/wiki/Q134127647"
+      ]
     }
   ]
 }
