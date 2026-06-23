@@ -726,8 +726,8 @@
         "srn": "Distrikt"
       },
       "definition": {
-        "en": "An administrative subdivision of Suriname used for governance and census purposes.",
-        "nl": "Een bestuurlijke onderverdeling van Suriname voor bestuur en volkstelling."
+        "en": "A defined geographical and administrative area that constituted the lowest level of the national administration in Suriname (outside the city of Paramaribo). Led by a district commissioner, the districts functioned as local units for administration, policing and the administration of justice. ",
+        "nl": "Een afgebakend geografisch en bestuurlijk gebied dat de bestuurlijk laag vormde van het landsbestuur in Suriname (buiten de stad Paramaribo). Geleid door een districtscommissaris fungeerden de districten als lokale eenheden voor bestuur, politie en rechtspraak. "
       },
       "inScheme": "stm:vocabulary/place-type",
       "broader": "stm:vocabulary/place-type/administrative",
@@ -740,7 +740,13 @@
       "crmBadge": "E53",
       "sortOrder": 0,
       "created": "2026-04-07",
-      "modified": "2026-04-07"
+      "modified": "2026-06-23",
+      "related": [
+        "stm:vocabulary/place-type/Division"
+      ],
+      "closeMatch": [
+        "https://www.wikidata.org/wiki/Q1649296"
+      ]
     },
     {
       "@id": "stm:vocabulary/road-attributes",
