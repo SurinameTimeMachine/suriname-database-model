@@ -220,7 +220,11 @@
       },
       "altLabel": {
         "nl": [
-          "voormalige militaire post (1882 map)"
+          "voormalige militaire post (1882 map)",
+          "redoute"
+        ],
+        "en": [
+          "redoubt"
         ]
       },
       "definition": {
