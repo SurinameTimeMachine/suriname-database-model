@@ -1005,6 +1005,9 @@
       "definition": {
         "nl": "Het geheel van door mensen aangelegde kunstwerken en infrastructurele elementen bedoeld om de waterhuishouding te reguleren, waterwegen bevaarbaar te houden, of gronden te beschermen tegen overstroming en verdroging.",
         "en": "The totality of man-made structures and infrastructure elements designed to regulate water management, maintain the navigability of waterways, or protect land from flooding and drought."
+      },
+      "editorialNote": {
+        "nl": "[toevoegen: sluis, kanaal, werf, steiger, haven]"
       }
     }
   ]
