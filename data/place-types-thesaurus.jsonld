@@ -417,19 +417,22 @@
       ],
       "prefLabel": {
         "en": "Settlement",
-        "nl": "Nederzetting"
+        "nl": "Nederzetting",
+        "srn": "Kondre"
       },
       "altLabel": {
         "nl": [
           "Leprozen etablissement",
           "strafetablissement",
-          "voormalige Gouvernements kostgrond",
-          "Posto (1882 map)"
+          "nederzetting",
+          "dorp",
+          "woonplaats",
+          "kamp"
         ]
       },
       "definition": {
-        "en": "A place where people have established a community and live together.",
-        "nl": "Een plaats waar mensen een gemeenschap hebben gevestigd en samenleven."
+        "nl": "Een plaats of geografisch afgebakend gebied waar menselijke bewoning plaatsvindt of heeft plaatsgevonden, variërend van tijdelijke kampementen tot permanente dorpen en steden. Binnen de Surinaamse historische context omvat dit een diverse typologie van gemeenschappen, waaronder inheemse dorpen, marrondorpen (of weglopersnederzettingen in het binnenland), plantagewoningen, militaire posten, goudzoekers- of balatablederskampen, en de formele koloniale vestigingen in de kustvlakte en districten.",
+        "en": "Leper colony, penal colony, settlement, village, place of residence, camp"
       },
       "editorialNote": {
         "en": "Colonial data bias: Several settlements have colonial institutional origins (leper colonies, penal establishments, government provisions grounds) reflecting colonial governance structures.",
@@ -438,7 +441,11 @@
       "inScheme": "stm:vocabulary/place-type",
       "broader": "stm:vocabulary/place-type/human-made",
       "related": [
-        "stm:vocabulary/place-type/plantation"
+        "stm:vocabulary/place-type/plantation",
+        "stm:vocabulary/place-type/military-post",
+        "stm:vocabulary/place-type/indigenous-village",
+        "stm:vocabulary/place-type/town",
+        "stm:vocabulary/place-type/maroon-village"
       ],
       "exactMatch": [
         "http://www.wikidata.org/entity/Q486972"
@@ -454,7 +461,11 @@
       "crmBadge": "E25",
       "sortOrder": 7,
       "created": "2026-04-07",
-      "modified": "2026-04-07"
+      "modified": "2026-06-23",
+      "closeMatch": [
+        "https://www.wikidata.org/wiki/Q22674925",
+        "https://vocab.getty.edu/aat/300008347"
+      ]
     },
     {
       "@id": "stm:vocabulary/place-type/town",
