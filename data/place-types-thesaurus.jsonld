@@ -186,11 +186,12 @@
         "srn": "Plantasi"
       },
       "definition": {
-        "en": "A large agricultural estate, typically established during the colonial period for the production of export crops using enslaved labor.",
-        "nl": "Een groot landbouwbedrijf, doorgaans opgericht tijdens de koloniale periode voor de productie van exportgewassen met gebruik van tot slaaf gemaakte arbeid."
+        "en": "A large agricultural estate, typically established during the colonial period to produce export crops, often as a monoculture, using labour provided by enslaved people or indentured workers. The plantation also includes the physical structures and infrastructure necessary for operations, housing, and crop processing.",
+        "nl": "Een groot landbouwbedrijf, doorgaans opgericht tijdens de koloniale periode voor de productie van exportgewassen, vaak in monocultuur, met gebruik van arbeid door tot slaaf gemaakten of contractarbeiders. De plantage omvat ook de fysieke bouwwerken en infrastructuren die nodig zijn voor de bedrijfsvoering, huisvesting en verwerking van de gewassen."
       },
       "editorialNote": {
-        "en": "Colonial data bias: Plantations were the primary sites of enslaved labor in Suriname. The term itself carries the weight of colonial exploitation."
+        "en": "Colonial data bias: Plantations were the primary sites of enslaved labor in Suriname. The term itself carries the weight of colonial exploitation.",
+        "nl": "Koloniaal taalgebruik: Plantages waren de belangrijkste locaties waar slavenarbeid plaatsvond in Suriname. De term zelf draagt de last van koloniale uitbuiting in zich."
       },
       "inScheme": "stm:vocabulary/place-type",
       "broader": "stm:vocabulary/place-type/human-made",
@@ -206,7 +207,15 @@
       "crmBadge": "E25",
       "sortOrder": 1,
       "created": "2026-04-07",
-      "modified": "2026-04-07"
+      "modified": "2026-06-23",
+      "altLabel": {
+        "nl": [
+          "Plantagie; Plantaadje"
+        ]
+      },
+      "closeMatch": [
+        "https://lod.enslaved.org/wiki/Q347"
+      ]
     },
     {
       "@id": "stm:vocabulary/place-type/military-post",
