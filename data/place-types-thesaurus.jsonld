@@ -490,13 +490,14 @@
         "srn": "Foto"
       },
       "definition": {
-        "en": "A densely populated settlement with defined boundaries and local governance.",
-        "nl": "Een dichtbevolkte nederzetting met vaste grenzen en lokaal bestuur."
+        "nl": "Een grotere, permanente en compact gebouwde menselijke nederzetting met een zekere mate van centrale administratieve, economische en maatschappelijke infrastructuur. Binnen de Surinaamse historische context verwijst dit primair naar de hoofdstad Paramaribo en de secundaire districtskernen zoals Nieuw-Nickerie, Albina en Totness die fungeerden als de lokale knooppunten van het koloniale bestuur, de handel en de rechtspraak.",
+        "en": "A larger, permanent and compactly built human settlement with a certain degree of central administrative, economic and social infrastructure. Within the historical context of Suriname, this refers primarily to the capital, Paramaribo, and the secondary district centres such as Nieuw-Nickerie, Albina and Totness, which served as local hubs for colonial administration, trade and the administration of justice."
       },
       "inScheme": "stm:vocabulary/place-type",
       "broader": "stm:vocabulary/place-type/settlement",
       "exactMatch": [
-        "http://www.wikidata.org/entity/Q3957"
+        "http://www.wikidata.org/entity/Q3957",
+        "https://vocab.getty.edu/aat/300008375"
       ],
       "typeId": "town",
       "color": "#d4a074",
@@ -504,7 +505,22 @@
       "crmBadge": "E25",
       "sortOrder": 8,
       "created": "2026-04-07",
-      "modified": "2026-06-23"
+      "modified": "2026-06-23",
+      "altLabel": {
+        "nl": [
+          "vlek",
+          "hoofdplaats",
+          "districtskern"
+        ],
+        "en": [
+          "urban area"
+        ]
+      },
+      "related": [
+        "stm:vocabulary/place-type/settlement",
+        "stm:vocabulary/place-type/maroon-village",
+        "stm:vocabulary/place-type/indigenous-village"
+      ]
     },
     {
       "@id": "stm:vocabulary/place-type/indigenous-village",
