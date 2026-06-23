@@ -584,16 +584,19 @@
       "altLabel": {
         "nl": [
           "Boschdorp",
-          "Boschnegers dorp",
-          "Boschneger"
+          "Boschnegerdorp",
+          "Boschnegers",
+          "“B” (afkorting kaart 1930)"
         ],
         "en": [
-          "B (1930 map code)"
+          "Forest village",
+          "Bush negro village",
+          "“B”  (1930 map code)"
         ]
       },
       "definition": {
-        "en": "A settlement established by Maroon communities -- self-liberated formerly enslaved people and their descendants.",
-        "nl": "Een nederzetting opgericht door Marrongemeenschappen -- zelfbevrijde voorheen tot slaaf gemaakte mensen en hun nakomelingen."
+        "en": "A permanent or semi-permanent human settlement in the interior of Suriname, founded and inhabited by Maroons (escaped enslaved people and their descendants).",
+        "nl": "Een permanente of semi-permanente menselijke nederzetting in het binnenland van Suriname, gesticht en bewoond door Marrons (gevluchte tot slaaf gemaakten en hun nakomelingen)."
       },
       "editorialNote": {
         "en": "Colonial data bias: \"Boschnegers\" (lit. \"bush negroes\") was a derogatory Dutch colonial designation for Maroon communities.",
