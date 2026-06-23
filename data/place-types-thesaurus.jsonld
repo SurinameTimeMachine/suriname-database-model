@@ -261,7 +261,8 @@
         "nl": "Transportinfrastructuur"
       },
       "definition": {
-        "en": "Human-made linear infrastructure used for overland movement and connection between places."
+        "nl": "Het geheel van permanente fysieke netwerken dat transport en verplaatsing van personen en goederen faciliteert binnen Suriname. Dit omvat zowel de natuurlijke en infrastructureel aangepaste waterwegen (rivieren, kanalen, kreken, sluizen) als landinfrastructuur (spoorwegen, (koloniale) paden, wegen, bruggen en overslagpunten).",
+        "en": "The network of permanent physical infrastructure that facilitates the transport and movement of people and goods within Suriname. This includes both natural and infrastructure-enhanced waterways (rivers, canals, creeks, locks) and land-based infrastructure (railways, (colonial) tracks, roads, bridges and transhipment points)."
       },
       "inScheme": "stm:vocabulary/place-type",
       "broader": "stm:vocabulary/place-type/human-made",
@@ -275,7 +276,16 @@
       "crmBadge": "E25",
       "sortOrder": 3,
       "created": "2026-04-21",
-      "modified": "2026-04-21"
+      "modified": "2026-06-23",
+      "related": [
+        "stm:vocabulary/place-type/road",
+        "stm:vocabulary/place-type/railroad",
+        "stm:vocabulary/place-type/river",
+        "stm:vocabulary/place-type/creek"
+      ],
+      "exactMatch": [
+        "https://www.wikidata.org/wiki/Q376799"
+      ]
     },
     {
       "@id": "stm:vocabulary/place-type/road",
