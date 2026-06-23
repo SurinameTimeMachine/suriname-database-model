@@ -236,7 +236,7 @@
         "en": "Colonial data bias: Military posts were instruments of colonial territorial control and surveillance of enslaved, Maroon and Indigenous communities."
       },
       "inScheme": "stm:vocabulary/place-type",
-      "broader": "stm:vocabulary/place-type/human-made",
+      "broader": "stm:vocabulary/place-type/MilitaryInfrastructure",
       "related": [
         "stm:vocabulary/place-type/settlement",
         "stm:vocabulary/place-type/plantation"
@@ -247,7 +247,7 @@
         "https://schema.org/DefenceEstablishment"
       ],
       "typeId": "military-post",
-      "color": "#c47a55",
+      "color": "#8e9a7e",
       "crmClass": "E25_Human-Made_Feature",
       "crmBadge": "E25",
       "sortOrder": 2,
