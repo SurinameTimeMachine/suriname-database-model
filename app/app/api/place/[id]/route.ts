@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-const PLACE_ID = /^stm-\d{5}$/;
+const PLACE_ID = /^stm-[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 export async function GET(
   request: NextRequest,

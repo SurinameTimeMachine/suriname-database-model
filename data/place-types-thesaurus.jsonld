@@ -749,6 +749,30 @@
       ]
     },
     {
+      "@id": "stm:vocabulary/place-type/historical-address",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "prefLabel": {
+        "en": "Historical Address Point",
+        "nl": "Historisch Adrespunt"
+      },
+      "definition": {
+        "en": "A source-specific georeferenced address observation. It records an address and map position at a stated time, without asserting that the address or building remained unchanged outside that source.",
+        "nl": "Een bronspecifieke gegeorefereerde adreswaarneming. Deze registreert een adres en kaartpositie op een bepaald moment, zonder te stellen dat het adres of gebouw buiten die bronperiode onveranderd bleef."
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/administrative",
+      "typeId": "historical-address",
+      "color": "#b56f9b",
+      "crmClass": "E53_Place",
+      "crmBadge": "E53",
+      "sortOrder": 13,
+      "created": "2026-06-24",
+      "modified": "2026-06-24"
+    },
+    {
       "@id": "stm:vocabulary/road-attributes",
       "@type": "skos:ConceptScheme",
       "prefLabel": {

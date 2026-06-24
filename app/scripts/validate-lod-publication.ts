@@ -9,6 +9,12 @@ import { join } from 'path';
 const LOD_DIR = join(__dirname, '../lod');
 const PUBLIC_DATA_DIR = join(__dirname, '../public/data');
 const DATA_DIR = join(__dirname, '../../data');
+const ADDRESS_POINTS_PATH = join(
+  DATA_DIR,
+  '08-place-points-qgis',
+  'export20260619',
+  'locatiepunten1885.geojson',
+);
 const PLACE_RECORDS_DIR = join(PUBLIC_DATA_DIR, 'place-records');
 const ABSOLUTE_HTTP_IRI = /^https?:\/\//;
 const CANONICAL_BASE = 'https://data.surinametijdmachine.org/';
@@ -30,6 +36,12 @@ interface JsonLdDocument {
 
 interface GeoJsonDocument {
   features?: Array<{ properties?: Record<string, unknown> }>;
+}
+
+interface AddressPointSource {
+  features?: Array<{
+    geometry?: { type?: string; coordinates?: unknown } | null;
+  }>;
 }
 
 function assert(condition: unknown, message: string): asserts condition {
@@ -73,6 +85,9 @@ function main() {
   const sourceRegistry = JSON.parse(
     readArtifact(DATA_DIR, 'sources-registry.jsonld').toString('utf-8'),
   ) as JsonLdDocument;
+  const addressPointSource = JSON.parse(
+    readFileSync(ADDRESS_POINTS_PATH, 'utf-8'),
+  ) as AddressPointSource;
   const mapFeatures = JSON.parse(
     readArtifact(PUBLIC_DATA_DIR, 'map-features.geojson').toString('utf-8'),
   ) as GeoJsonDocument;
@@ -242,6 +257,46 @@ function main() {
   const activeGazetteer = gazetteer['@graph'].filter(
     (entry) => !entry.deprecated && !entry.mergedInto,
   );
+  const sourceAddressFeatures = (addressPointSource.features ?? []).filter(
+    (feature) =>
+      feature.geometry?.type === 'Point' &&
+      Array.isArray(feature.geometry.coordinates) &&
+      feature.geometry.coordinates.length >= 2 &&
+      Number.isFinite(Number(feature.geometry.coordinates[0])) &&
+      Number.isFinite(Number(feature.geometry.coordinates[1])),
+  );
+  const historicalAddresses = activeGazetteer.filter(
+    (entry) => entry.type === 'historical-address',
+  );
+  assert(
+    historicalAddresses.length === sourceAddressFeatures.length,
+    'Historical-address Gazetteer records do not cover every valid 1885 source point',
+  );
+  for (const entry of historicalAddresses) {
+    const sourceRecord = entry.sourceRecord as Record<string, unknown> | undefined;
+    const locationAssertions = entry.locationAssertions as
+      | Array<Record<string, unknown>>
+      | undefined;
+    assert(
+      Array.isArray(entry.sources) && entry.sources.includes('historic-map-27'),
+      `Historical address ${String(entry.id)} has no 1885 map source`,
+    );
+    assert(
+      sourceRecord?.dataset === '08-place-points-qgis' &&
+        sourceRecord.layer === 'locatiepunten1885' &&
+        typeof sourceRecord.featureIndex === 'number',
+      `Historical address ${String(entry.id)} has no stable source feature locator`,
+    );
+    assert(
+      locationAssertions?.some(
+        (assertion) =>
+          assertion.source === 'historic-map-27' &&
+          assertion.startYear === 1885 &&
+          typeof assertion.sourceRow === 'string',
+      ),
+      `Historical address ${String(entry.id)} has no source-bound 1885 location assertion`,
+    );
+  }
   assert(
     recordIds.size === activeGazetteer.length,
     'Authority-record index does not cover every active Gazetteer entry',

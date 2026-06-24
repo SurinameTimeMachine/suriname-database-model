@@ -624,7 +624,8 @@
       "handleUrl": "https://hdl.handle.net/11245/3.39624",
       "iiifManifest": "https://uvaerfgoed.nl/viewer/api/v1/records/11245_3_39624/manifest/",
       "iiifInfoUrl": "https://images.uba.uva.nl/iiif/2/default!1!3!1!990006520920205131!hb-kzl-108-03-21-1.jpg/info.json",
-      "linkedToGazetteer": false
+      "linkedToGazetteer": true,
+      "description": "Source for the 1885 Paramaribo historical address-point layer. The editable Gazetteer records are derived from georeferenced QGIS points and retain their source feature index."
     },
     {
       "@id": "https://data.surinametijdmachine.org/source/historic-map-28",

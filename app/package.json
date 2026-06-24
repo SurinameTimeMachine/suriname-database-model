@@ -14,6 +14,7 @@
     "generate": "tsx scripts/generate-database.ts",
     "generate-place-records": "tsx scripts/generate-place-records.ts",
     "import-streets-1916": "tsx scripts/import-streets-paramaribo-1916.ts",
+    "import-address-points-1885": "tsx scripts/import-paramaribo-address-points-1885.ts --write",
     "pipeline": "tsx scripts/generate-database.ts && tsx scripts/validate-lod-context.ts && tsx scripts/prepare-data.ts && tsx scripts/generate-place-records.ts && tsx scripts/validate-lod-publication.ts",
     "prepare-data": "tsx scripts/prepare-data.ts",
     "seed-gazetteer": "tsx scripts/seed-gazetteer.ts",

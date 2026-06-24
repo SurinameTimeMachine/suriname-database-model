@@ -260,6 +260,10 @@ function normalizeLocationAssertionsFromLegacy(
             ? a.endYear
             : undefined,
         note: typeof a.note === 'string' && a.note.trim() ? a.note : null,
+        sourceRow:
+          typeof a.sourceRow === 'string' && a.sourceRow.trim()
+            ? a.sourceRow
+            : undefined,
       }))
       .filter((a) => Boolean(a.standardized || a.original));
   }

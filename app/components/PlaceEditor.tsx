@@ -145,6 +145,7 @@ function normalizeLocationAssertions(
         startYear: a.startYear,
         endYear: a.endYear,
         note: a.note ?? null,
+        sourceRow: a.sourceRow,
       }))
       .filter((a) => Boolean(a.standardized || a.original));
   }

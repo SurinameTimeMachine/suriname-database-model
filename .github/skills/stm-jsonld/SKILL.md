@@ -27,6 +27,9 @@ before changing the public record model.
   when the source supplies one; never invent dates to satisfy a field.
 - A record source and a statement source have different scopes. Do not add a
   second field merely to repeat the same identifier.
+- Treat historical address points as source-specific E53 observations. Preserve
+  their source feature index and do not turn their labels into timeless
+  building or organisation claims.
 
 ## Public contract
 

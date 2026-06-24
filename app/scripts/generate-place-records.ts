@@ -53,6 +53,7 @@ type Assertion = {
   endYear?: number;
   certainty?: string;
   note?: string | null;
+  sourceRow?: string;
 };
 
 type DiklandRef = {
@@ -433,6 +434,7 @@ export function generatePlaceRecords() {
           : {}),
         ...(assertion.standardized ? { standardizedContent: assertion.standardized } : {}),
         ...(assertion.original ? { sourceContent: assertion.original } : {}),
+        ...(assertion.sourceRow ? { sourceRow: assertion.sourceRow } : {}),
         ...(assertion.note ? { P3_has_note: assertion.note } : {}),
       });
       evidenceUris.push(assertionUri);

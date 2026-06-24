@@ -273,6 +273,8 @@ export interface LocationAssertion {
   startYear?: number;
   endYear?: number;
   note?: string | null;
+  /** Stable feature/row locator in the original source dataset. */
+  sourceRow?: string;
 }
 
 /**
@@ -318,7 +320,8 @@ export type PlaceType =
   | 'town'
   | 'transport-infrastructure'
   | 'road'
-  | 'railroad';
+  | 'railroad'
+  | 'historical-address';
 
 // PLACE_TYPE_CRM and COLONIAL_BIAS_TYPES are now sourced from the
 // Geographical Features Thesaurus: data/place-types-thesaurus.jsonld
@@ -372,6 +375,12 @@ export interface GazetteerPlace extends TombstoneFields {
   productAssertions?: ProductAssertion[];
   locationAssertions?: LocationAssertion[];
   statusAssertions?: StatusAssertion[];
+  /** Immutable locator for a source-derived entry, preserved across edits. */
+  sourceRecord?: {
+    dataset: string;
+    layer: string;
+    featureIndex: number;
+  };
   lifecycleEvents?: FeatureLifecycleEvent[];
   diklandRefs: DiklandRef[];
   modifiedBy: string | null;

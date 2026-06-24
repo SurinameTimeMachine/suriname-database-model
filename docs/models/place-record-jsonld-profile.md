@@ -60,6 +60,14 @@ date is left unknown rather than invented. Record-level `sources` describe
 evidence for the overall record or geometry, while statement sources describe
 the individual claim. They are different scopes, not duplicate claims.
 
+## Historical address points
+
+The 1885 Paramaribo point layer is imported as editable `historical-address`
+E53 Place records. Each record cites `historic-map-27`, has an 1885
+source-bound location assertion, and retains its original QGIS feature index.
+It is an observation of an address on that map, not a claim that the address,
+building, or function persisted at another time.
+
 ## Deferred domains
 
 Rijksmuseum, births, deaths, ward registers, and emancipation data require

@@ -9,7 +9,7 @@ const RECORD_DIR = join(
   'data',
   'place-records',
 );
-const PLACE_ID = /^stm-\d{5}$/;
+const PLACE_ID = /^stm-[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 type PlaceProjection = {
   id: string;

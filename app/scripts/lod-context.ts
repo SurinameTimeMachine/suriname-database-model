@@ -27,6 +27,7 @@ export function buildPlaceRecordContext(): Record<string, unknown> {
       '@type': '@id',
     },
     sourcePath: { '@id': 'stm:sourcePath', '@type': 'xsd:string' },
+    sourceRow: { '@id': 'stm:sourceRow', '@type': 'xsd:string' },
     sourceUrl: { '@id': 'sdo:url', '@type': '@id' },
     standardizedContent: {
       '@id': 'stm:standardizedContent',
