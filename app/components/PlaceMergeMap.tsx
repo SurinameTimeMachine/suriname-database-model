@@ -2,6 +2,7 @@
 
 import 'leaflet/dist/leaflet.css';
 import { loadAllmapsAnnotation } from '@/lib/allmaps';
+import { HISTORIC_MAP_URLS } from '@/lib/historic-maps';
 import L from 'leaflet';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -22,16 +23,7 @@ if (typeof window !== 'undefined' && !_domUtilPatched) {
   _domUtilPatched = true;
 }
 
-const MAP_1930_URLS = [
-  'https://annotations.allmaps.org/maps/d9191cafde1831f0',
-  'https://annotations.allmaps.org/maps/dc967c11ce9e86b3',
-  'https://annotations.allmaps.org/maps/edaf1bbc8b86f0bf',
-  'https://annotations.allmaps.org/maps/9eac27facff8687f',
-  'https://annotations.allmaps.org/maps/5e0b6889ed3816d9',
-  'https://annotations.allmaps.org/maps/aacef031cb456d2a',
-  'https://annotations.allmaps.org/maps/4d07f0d3bf9fc347',
-  'https://annotations.allmaps.org/maps/ddd8d3ca24e1916a',
-];
+const HISTORIC_MAP_OVERLAY_URLS = HISTORIC_MAP_URLS;
 
 function safelyRemove(target: { remove: () => unknown } | null) {
   if (!target) return;
@@ -254,8 +246,15 @@ export default function PlaceMergeMap({
 
     let cancelled = false;
     let layer: L.Layer | null = null;
-    Promise.all(MAP_1930_URLS.map(loadAllmapsAnnotation))
-      .then(async (annotations) => {
+    Promise.allSettled(HISTORIC_MAP_OVERLAY_URLS.map(loadAllmapsAnnotation))
+      .then(async (results) => {
+        const annotations: unknown[] = [];
+        for (const result of results) {
+          if (result.status === 'fulfilled') annotations.push(result.value);
+        }
+        if (annotations.length === 0) {
+          throw new Error('No historic map image service is available.');
+        }
         const { WarpedMapLayer } = await import('@allmaps/leaflet');
         if (cancelled || !mapRef.current) return;
         layer = new WarpedMapLayer(annotations[0]);
@@ -276,7 +275,7 @@ export default function PlaceMergeMap({
       })
       .catch(() => {
         if (!cancelled) {
-          setMapError('The 1930 map image service is currently unavailable.');
+          setMapError('Historic map image services are currently unavailable.');
           setShow1930Map(false);
         }
       });
@@ -322,7 +321,7 @@ export default function PlaceMergeMap({
       <button
         type="button"
         onClick={toggle1930Map}
-        title={mapError ?? 'Toggle 1930 plantation map'}
+        title={mapError ?? 'Toggle historic maps'}
         className={[
           'absolute bottom-2 right-2 z-1000 px-2 py-0.5 text-[11px] font-medium border leading-tight',
           show1930Map
@@ -330,7 +329,7 @@ export default function PlaceMergeMap({
             : 'bg-white/90 text-stm-warm-600 border-stm-warm-300 hover:bg-stm-warm-50',
         ].join(' ')}
       >
-        {mapError ? '1930 unavailable' : '1930'}
+        {mapError ? 'Historic maps unavailable' : 'Historic maps'}
       </button>
     </div>
   );

@@ -2,6 +2,7 @@
 
 import 'leaflet/dist/leaflet.css';
 import { loadAllmapsAnnotation } from '@/lib/allmaps';
+import { HISTORIC_MAPS } from '@/lib/historic-maps';
 import { usePlaceTypes } from '@/lib/thesaurus';
 import type { GeoJSONCollection, GeoJSONFeature } from '@/lib/types';
 import L from 'leaflet';
@@ -27,41 +28,7 @@ interface OverlayConfig {
 }
 
 const OVERLAY_CONFIGS: OverlayConfig[] = [
-  {
-    id: '1930-plantation',
-    label: '1930 Plantation Map',
-    annotationUrls: [
-      'https://annotations.allmaps.org/maps/d9191cafde1831f0', // sheet 3
-      'https://annotations.allmaps.org/maps/dc967c11ce9e86b3', // sheet 4
-      'https://annotations.allmaps.org/maps/edaf1bbc8b86f0bf', // sheet 5
-      'https://annotations.allmaps.org/maps/9eac27facff8687f', // sheet 6
-      'https://annotations.allmaps.org/maps/5e0b6889ed3816d9', // sheet 7
-      'https://annotations.allmaps.org/maps/aacef031cb456d2a', // sheet 8
-      'https://annotations.allmaps.org/maps/4d07f0d3bf9fc347', // sheet 9
-      // sheet 10 (1d7e4a0bd68f039c) excluded — smaller size, fewer GCPs, causes overlap
-      'https://annotations.allmaps.org/maps/ddd8d3ca24e1916a', // sheet 11
-    ],
-    defaultEnabled: false,
-    transformation: 'thinPlateSpline',
-    gcpCount: '10-80/sheet',
-  },
-  {
-    id: '1930-plantation-onemanifest',
-    label: '1930 Plantation Map (One Manifest)',
-    annotationUrl: 'https://annotations.allmaps.org/manifests/5178b46e14dc211e',
-    defaultEnabled: false,
-    transformation: 'thinPlateSpline',
-    gcpCount: 'unknown',
-  },
-  {
-    id: '1930-plantation-neat',
-    label: '1930 Plantation Map (Neat)',
-    annotationUrl:
-      'https://surinametijdmachine.org/iiif/mapathon/kaart-van-suriname-1930.json',
-    defaultEnabled: false,
-    transformation: 'thinPlateSpline',
-    gcpCount: '2-4/sheet',
-  },
+  ...HISTORIC_MAPS.map((map) => ({ ...map, defaultEnabled: false })),
   {
     id: 'moseberg-sheet2-1801',
     label: 'Moseberg Specialkaart Sheet 2 (1801)',
@@ -1098,6 +1065,18 @@ export default function MapView({
                               {error && (
                                 <p className="px-3 pb-1 pl-8 text-[10px] text-stm-warm-500">
                                   {error}
+                                </p>
+                              )}
+                              {config.annotationUrl && (
+                                <p className="px-3 pb-1 pl-8 text-[10px]">
+                                  <a
+                                    href={config.annotationUrl}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="text-stm-sepia-600 underline hover:text-stm-sepia-800"
+                                  >
+                                    Allmaps source
+                                  </a>
                                 </p>
                               )}
                               {isEnabled && (
