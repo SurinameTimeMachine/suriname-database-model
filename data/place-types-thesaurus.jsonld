@@ -220,7 +220,11 @@
       },
       "altLabel": {
         "nl": [
-          "voormalige militaire post (1882 map)"
+          "voormalige militaire post (1882 map)",
+          "redoute"
+        ],
+        "en": [
+          "redoubt"
         ]
       },
       "definition": {
@@ -232,7 +236,7 @@
         "en": "Colonial data bias: Military posts were instruments of colonial territorial control and surveillance of enslaved, Maroon and Indigenous communities."
       },
       "inScheme": "stm:vocabulary/place-type",
-      "broader": "stm:vocabulary/place-type/human-made",
+      "broader": "stm:vocabulary/place-type/MilitaryInfrastructure",
       "related": [
         "stm:vocabulary/place-type/settlement",
         "stm:vocabulary/place-type/plantation"
@@ -243,7 +247,7 @@
         "https://schema.org/DefenceEstablishment"
       ],
       "typeId": "military-post",
-      "color": "#c47a55",
+      "color": "#8e9a7e",
       "crmClass": "E25_Human-Made_Feature",
       "crmBadge": "E25",
       "sortOrder": 2,
@@ -924,6 +928,111 @@
         "https://www.wikidata.org/wiki/Q19832712",
         "https://schema.org/AdministrativeArea"
       ]
+    },
+    {
+      "@id": "stm:vocabulary/place-type/MilitaryInfrastructure",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "typeId": "MilitaryInfrastructure",
+      "prefLabel": {
+        "en": "Military Infrastructure",
+        "nl": "Militaire infrastructuur"
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/human-made",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "color": "#a8c88a",
+      "sortOrder": 99,
+      "created": "2026-06-23",
+      "modified": "2026-06-23",
+      "definition": {
+        "nl": "Het geheel van door mensen aangelegde of ingerichte bouwwerken, verdedigingswerken en logistieke netwerken ten behoeve van defensie, bewaking en militaire operaties.",
+        "en": "The totality of man-made structures, defences and logistical networks designed for defence, surveillance and military operations."
+      },
+      "related": [
+        "stm:vocabulary/place-type/military-post"
+      ],
+      "exactMatch": [
+        "https://www.wikidata.org/wiki/Q134127647"
+      ],
+      "altLabel": {
+        "nl": [
+          "Verdedigingswerken",
+          "defensiestelsel"
+        ]
+      }
+    },
+    {
+      "@id": "stm:vocabulary/place-type/Fort",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "typeId": "Fort",
+      "prefLabel": {
+        "nl": "Fort",
+        "en": "Fort"
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/MilitaryInfrastructure",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "color": "#9eba98",
+      "sortOrder": 99,
+      "created": "2026-06-23",
+      "modified": "2026-06-23",
+      "altLabel": {
+        "nl": [
+          "Vestingwerk"
+        ],
+        "en": [
+          "Fortress"
+        ]
+      },
+      "definition": {
+        "nl": "Een permanent en zwaar versterkt militair bouwwerk of complex, strategisch gepositioneerd voor de verdediging van territorium, vitale infrastructuur, steden of vaarwegen.",
+        "en": "A permanent and heavily fortified military structure or complex, strategically positioned to defend territory, vital infrastructure, towns or waterways."
+      },
+      "related": [
+        "stm:vocabulary/place-type/military-post",
+        "stm:vocabulary/place-type/MilitaryInfrastructure"
+      ],
+      "exactMatch": [
+        "https://www.wikidata.org/wiki/Q1785071"
+      ],
+      "closeMatch": [
+        "https://vocab.getty.edu/aat/300006887"
+      ]
+    },
+    {
+      "@id": "stm:vocabulary/place-type/water infrastructure",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "typeId": "water infrastructure",
+      "prefLabel": {
+        "en": "water management infrastructure",
+        "nl": "Waterbouwkundige infrastructuur"
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/human-made",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "color": "#5583fd",
+      "sortOrder": 99,
+      "created": "2026-06-23",
+      "modified": "2026-06-23",
+      "definition": {
+        "nl": "Het geheel van door mensen aangelegde kunstwerken en infrastructurele elementen bedoeld om de waterhuishouding te reguleren, waterwegen bevaarbaar te houden, of gronden te beschermen tegen overstroming en verdroging.",
+        "en": "The totality of man-made structures and infrastructure elements designed to regulate water management, maintain the navigability of waterways, or protect land from flooding and drought."
+      },
+      "editorialNote": {
+        "nl": "[toevoegen: sluis, kanaal, werf, steiger, haven]"
+      }
     }
   ]
 }
