@@ -1,6 +1,7 @@
 'use client';
 
 import 'leaflet/dist/leaflet.css';
+import { loadAllmapsAnnotation } from '@/lib/allmaps';
 import L from 'leaflet';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -128,6 +129,7 @@ export default function PlaceMergeMap({
   const layersRef = useRef<L.Layer[]>([]);
   const warpedLayerRef = useRef<L.Layer | null>(null);
   const [show1930Map, setShow1930Map] = useState(false);
+  const [mapError, setMapError] = useState<string | null>(null);
 
   // Init map once
   useEffect(() => {
@@ -252,18 +254,19 @@ export default function PlaceMergeMap({
 
     let cancelled = false;
     let layer: L.Layer | null = null;
-    import('@allmaps/leaflet')
-      .then(async ({ WarpedMapLayer }) => {
+    Promise.all(MAP_1930_URLS.map(loadAllmapsAnnotation))
+      .then(async (annotations) => {
+        const { WarpedMapLayer } = await import('@allmaps/leaflet');
         if (cancelled || !mapRef.current) return;
-        layer = new WarpedMapLayer(MAP_1930_URLS[0]);
+        layer = new WarpedMapLayer(annotations[0]);
         layer.addTo(mapRef.current);
-        for (const url of MAP_1930_URLS.slice(1)) {
+        for (const annotation of annotations.slice(1)) {
           if (cancelled) break;
-          await (
+          (
             layer as unknown as {
-              addGeoreferenceAnnotationByUrl: (u: string) => Promise<unknown>;
+              addGeoreferenceAnnotation: (value: unknown) => unknown;
             }
-          ).addGeoreferenceAnnotationByUrl(url);
+          ).addGeoreferenceAnnotation(annotation);
         }
         if (!cancelled) {
           warpedLayerRef.current = layer;
@@ -271,7 +274,12 @@ export default function PlaceMergeMap({
           safelyRemove(layer);
         }
       })
-      .catch(() => {});
+      .catch(() => {
+        if (!cancelled) {
+          setMapError('The 1930 map image service is currently unavailable.');
+          setShow1930Map(false);
+        }
+      });
 
     return () => {
       cancelled = true;
@@ -280,7 +288,10 @@ export default function PlaceMergeMap({
     };
   }, [show1930Map]);
 
-  const toggle1930Map = useCallback(() => setShow1930Map((v) => !v), []);
+  const toggle1930Map = useCallback(() => {
+    setMapError(null);
+    setShow1930Map((v) => !v);
+  }, []);
 
   return (
     <div
@@ -311,7 +322,7 @@ export default function PlaceMergeMap({
       <button
         type="button"
         onClick={toggle1930Map}
-        title="Toggle 1930 plantation map"
+        title={mapError ?? 'Toggle 1930 plantation map'}
         className={[
           'absolute bottom-2 right-2 z-1000 px-2 py-0.5 text-[11px] font-medium border leading-tight',
           show1930Map
@@ -319,7 +330,7 @@ export default function PlaceMergeMap({
             : 'bg-white/90 text-stm-warm-600 border-stm-warm-300 hover:bg-stm-warm-50',
         ].join(' ')}
       >
-        1930
+        {mapError ? '1930 unavailable' : '1930'}
       </button>
     </div>
   );

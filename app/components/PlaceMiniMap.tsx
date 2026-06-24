@@ -1,6 +1,7 @@
 'use client';
 
 import 'leaflet/dist/leaflet.css';
+import { loadAllmapsAnnotation } from '@/lib/allmaps';
 import { usePlaceTypes } from '@/lib/thesaurus';
 import L from 'leaflet';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -75,6 +76,7 @@ export default function PlaceMiniMap({
   const polylineRef = useRef<L.Polyline | null>(null);
   const warpedLayerRef = useRef<L.Layer | null>(null);
   const [show1930Map, setShow1930Map] = useState(false);
+  const [mapError, setMapError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
@@ -112,18 +114,19 @@ export default function PlaceMiniMap({
 
     let cancelled = false;
     let layer: L.Layer | null = null;
-    import('@allmaps/leaflet')
-      .then(async ({ WarpedMapLayer }) => {
+    Promise.all(MAP_1930_URLS.map(loadAllmapsAnnotation))
+      .then(async (annotations) => {
+        const { WarpedMapLayer } = await import('@allmaps/leaflet');
         if (cancelled || !mapRef.current) return;
-        layer = new WarpedMapLayer(MAP_1930_URLS[0]);
+        layer = new WarpedMapLayer(annotations[0]);
         layer.addTo(mapRef.current);
-        for (const url of MAP_1930_URLS.slice(1)) {
+        for (const annotation of annotations.slice(1)) {
           if (cancelled) break;
-          await (
+          (
             layer as unknown as {
-              addGeoreferenceAnnotationByUrl: (u: string) => Promise<unknown>;
+              addGeoreferenceAnnotation: (value: unknown) => unknown;
             }
-          ).addGeoreferenceAnnotationByUrl(url);
+          ).addGeoreferenceAnnotation(annotation);
         }
         if (!cancelled) {
           warpedLayerRef.current = layer;
@@ -132,7 +135,10 @@ export default function PlaceMiniMap({
         }
       })
       .catch(() => {
-        // Allmaps failed to load — mini map still usable without overlay
+        if (!cancelled) {
+          setMapError('The 1930 map image service is currently unavailable.');
+          setShow1930Map(false);
+        }
       });
 
     return () => {
@@ -142,7 +148,10 @@ export default function PlaceMiniMap({
     };
   }, [show1930Map]);
 
-  const toggle1930Map = useCallback(() => setShow1930Map((v) => !v), []);
+  const toggle1930Map = useCallback(() => {
+    setMapError(null);
+    setShow1930Map((v) => !v);
+  }, []);
 
   // Update map content when props change
   useEffect(() => {
@@ -250,7 +259,7 @@ export default function PlaceMiniMap({
       <button
         type="button"
         onClick={toggle1930Map}
-        title="Toggle 1930 plantation map"
+        title={mapError ?? 'Toggle 1930 plantation map'}
         className={[
           'absolute bottom-2 right-2 z-1000 px-2 py-0.5 text-[11px] font-medium border leading-tight',
           show1930Map
@@ -258,7 +267,7 @@ export default function PlaceMiniMap({
             : 'bg-white/90 text-stm-warm-600 border-stm-warm-300 hover:bg-stm-warm-50',
         ].join(' ')}
       >
-        1930
+        {mapError ? '1930 unavailable' : '1930'}
       </button>
     </div>
   );

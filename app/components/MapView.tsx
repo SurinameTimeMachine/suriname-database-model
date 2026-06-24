@@ -1,6 +1,7 @@
 'use client';
 
 import 'leaflet/dist/leaflet.css';
+import { loadAllmapsAnnotation } from '@/lib/allmaps';
 import { usePlaceTypes } from '@/lib/thesaurus';
 import type { GeoJSONCollection, GeoJSONFeature } from '@/lib/types';
 import L from 'leaflet';
@@ -282,6 +283,7 @@ export default function MapView({
   const [enabledOverlays, setEnabledOverlays] = useState<Set<string>>(
     () => new Set(DEFAULT_ENABLED),
   );
+  const [overlayErrors, setOverlayErrors] = useState<Record<string, string>>({});
   const enabledOverlaysRef = useRef(enabledOverlays);
   enabledOverlaysRef.current = enabledOverlays;
   const [layersOpen, setLayersOpen] = useState(false);
@@ -390,35 +392,38 @@ export default function MapView({
       } else {
         // Create new layers lazily
         next.add(id);
+        setOverlayErrors((previous) => {
+          const { [id]: _removed, ...remaining } = previous;
+          return remaining;
+        });
         const map = mapRef.current;
         if (map) {
-          import('@allmaps/leaflet')
-            .then(async ({ WarpedMapLayer }) => {
+          const urls =
+            config.annotationUrls ??
+            (config.annotationUrl ? [config.annotationUrl] : []);
+          Promise.all(urls.map(loadAllmapsAnnotation))
+            .then(async (annotations) => {
+              const { WarpedMapLayer } = await import('@allmaps/leaflet');
               if (mapRef.current !== map || !enabledOverlaysRef.current.has(id)) return;
               await nextFrame();
               if (mapRef.current !== map || !enabledOverlaysRef.current.has(id)) return;
               // Create a single WarpedMapLayer and add all annotations to it
               // (matches reference site pattern: one layer, multiple sheets)
-              const urls =
-                config.annotationUrls ??
-                (config.annotationUrl ? [config.annotationUrl] : []);
               if (urls.length === 0) return;
-              const warpedMapLayer = new WarpedMapLayer(urls[0]);
+              const warpedMapLayer = new WarpedMapLayer(annotations[0]);
               warpedMapLayer.addTo(map);
               warpedLayersRef.current.set(id, [warpedMapLayer]);
-              for (const url of urls.slice(1)) {
+              for (const annotation of annotations.slice(1)) {
                 if (mapRef.current !== map || !enabledOverlaysRef.current.has(id)) {
                   safelyRemove(warpedMapLayer);
                   warpedLayersRef.current.delete(id);
                   return;
                 }
-                await (
+                (
                   warpedMapLayer as unknown as {
-                    addGeoreferenceAnnotationByUrl: (
-                      u: string,
-                    ) => Promise<unknown>;
+                    addGeoreferenceAnnotation: (value: unknown) => unknown;
                   }
-                ).addGeoreferenceAnnotationByUrl(url);
+                ).addGeoreferenceAnnotation(annotation);
               }
               if ('setOpacity' in warpedMapLayer) {
                 (
@@ -429,7 +434,17 @@ export default function MapView({
               }
             })
             .catch(() => {
-              // Allmaps module failed to load
+              if (mapRef.current !== map) return;
+              setOverlayErrors((previous) => ({
+                ...previous,
+                [id]: 'Image service unavailable',
+              }));
+              setEnabledOverlays((previous) => {
+                const disabled = new Set(previous);
+                disabled.delete(id);
+                enabledOverlaysRef.current = disabled;
+                return disabled;
+              });
             });
         }
       }
@@ -447,31 +462,30 @@ export default function MapView({
     map.whenReady(() => {
       OVERLAY_CONFIGS.forEach((config) => {
         if (config.defaultEnabled && !warpedLayersRef.current.has(config.id)) {
-          import('@allmaps/leaflet')
-            .then(async ({ WarpedMapLayer }) => {
+          const urls =
+            config.annotationUrls ??
+            (config.annotationUrl ? [config.annotationUrl] : []);
+          Promise.all(urls.map(loadAllmapsAnnotation))
+            .then(async (annotations) => {
+              const { WarpedMapLayer } = await import('@allmaps/leaflet');
               if (cancelled || mapRef.current !== map) return;
               await nextFrame();
               if (cancelled || mapRef.current !== map) return;
-              const urls =
-                config.annotationUrls ??
-                (config.annotationUrl ? [config.annotationUrl] : []);
               if (urls.length === 0) return;
-              const warpedMapLayer = new WarpedMapLayer(urls[0]);
+              const warpedMapLayer = new WarpedMapLayer(annotations[0]);
               warpedMapLayer.addTo(map);
               warpedLayersRef.current.set(config.id, [warpedMapLayer]);
-              for (const url of urls.slice(1)) {
+              for (const annotation of annotations.slice(1)) {
                 if (cancelled || mapRef.current !== map) {
                   safelyRemove(warpedMapLayer);
                   warpedLayersRef.current.delete(config.id);
                   return;
                 }
-                await (
+                (
                   warpedMapLayer as unknown as {
-                    addGeoreferenceAnnotationByUrl: (
-                      u: string,
-                    ) => Promise<unknown>;
+                    addGeoreferenceAnnotation: (value: unknown) => unknown;
                   }
-                ).addGeoreferenceAnnotationByUrl(url);
+                ).addGeoreferenceAnnotation(annotation);
               }
               if ('setOpacity' in warpedMapLayer) {
                 (
@@ -1067,6 +1081,7 @@ export default function MapView({
                       <ul className="max-h-80 overflow-y-auto py-1">
                         {OVERLAY_CONFIGS.map((config) => {
                           const isEnabled = enabledOverlays.has(config.id);
+                          const error = overlayErrors[config.id];
                           return (
                             <li key={config.id}>
                               <label className="flex items-center gap-2 px-3 py-1.5 hover:bg-teal-soft/20 cursor-pointer text-xs">
@@ -1080,6 +1095,11 @@ export default function MapView({
                                   {config.label}
                                 </span>
                               </label>
+                              {error && (
+                                <p className="px-3 pb-1 pl-8 text-[10px] text-stm-warm-500">
+                                  {error}
+                                </p>
+                              )}
                               {isEnabled && (
                                 <div className="flex items-center gap-2 px-3 pb-1 pl-8 text-[10px] text-stm-warm-400">
                                   <span title="Transformation type">
