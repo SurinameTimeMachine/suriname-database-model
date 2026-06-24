@@ -281,6 +281,22 @@ export default function MapView({
   const [featuresOpen, setFeaturesOpen] = useState(false);
   const featuresDropdownRef = useRef<HTMLDivElement>(null);
 
+  // The thesaurus loads after the map mounts. Enable newly published place
+  // types by default without re-enabling types a visitor has turned off.
+  useEffect(() => {
+    setEnabledFeatures((previous) => {
+      const next = new Set(previous);
+      let changed = false;
+      for (const type of allTypes) {
+        if (!next.has(type)) {
+          next.add(type);
+          changed = true;
+        }
+      }
+      return changed ? next : previous;
+    });
+  }, [allTypes]);
+
   // Keep callback ref in sync
   useEffect(() => {
     onSelectRef.current = onSelectPlantation;
@@ -458,8 +474,12 @@ export default function MapView({
         const ft = feature?.properties?.featureType;
         return !ft || enabledFeaturesRef.current.has(ft);
       },
-      pointToLayer: (_feature, latlng) => {
-        return L.circleMarker(latlng, { radius: 5.5 });
+      pointToLayer: (feature, latlng) => {
+        const isHistoricalAddress =
+          feature.properties?.featureType === 'historical-address';
+        return L.circleMarker(latlng, {
+          radius: isHistoricalAddress ? 3.25 : 5.5,
+        });
       },
       style: (feature) => {
         const props = feature?.properties;
