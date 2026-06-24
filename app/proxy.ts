@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const RECORD_PATH = /^\/place\/(stm-\d{5})\.(jsonld|json)$/;
-const HTML_RECORD_PATH = /^\/place\/(stm-\d{5})$/;
+const PLACE_ID = 'stm-[a-z0-9]+(?:-[a-z0-9]+)*';
+const RECORD_PATH = new RegExp(`^/place/(${PLACE_ID})\\.(jsonld|json)$`);
+const HTML_RECORD_PATH = new RegExp(`^/place/(${PLACE_ID})$`);
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;

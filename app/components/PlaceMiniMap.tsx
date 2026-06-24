@@ -34,6 +34,18 @@ const MAP_1930_URLS = [
   'https://annotations.allmaps.org/maps/ddd8d3ca24e1916a', // sheet 11
 ];
 
+function safelyRemove(target: { remove: () => unknown } | null) {
+  if (!target) return;
+  try {
+    target.remove();
+  } catch (error) {
+    // Allmaps aborts in-flight annotation requests during Leaflet teardown.
+    // That is expected when React remounts this client component in dev mode.
+    if (error instanceof Error && error.name === 'AbortError') return;
+    console.error('Unable to remove the place mini-map layer.', error);
+  }
+}
+
 interface PlaceMiniMapProps {
   lat: number | null;
   lng: number | null;
@@ -80,9 +92,9 @@ export default function PlaceMiniMap({
     mapRef.current = map;
 
     return () => {
-      warpedLayerRef.current?.remove();
+      safelyRemove(warpedLayerRef.current);
       warpedLayerRef.current = null;
-      map.remove();
+      safelyRemove(map);
       mapRef.current = null;
     };
   }, []);
@@ -93,16 +105,17 @@ export default function PlaceMiniMap({
     if (!map) return;
 
     if (!show1930Map) {
-      warpedLayerRef.current?.remove();
+      safelyRemove(warpedLayerRef.current);
       warpedLayerRef.current = null;
       return;
     }
 
     let cancelled = false;
+    let layer: L.Layer | null = null;
     import('@allmaps/leaflet')
       .then(async ({ WarpedMapLayer }) => {
         if (cancelled || !mapRef.current) return;
-        const layer = new WarpedMapLayer(MAP_1930_URLS[0]);
+        layer = new WarpedMapLayer(MAP_1930_URLS[0]);
         layer.addTo(mapRef.current);
         for (const url of MAP_1930_URLS.slice(1)) {
           if (cancelled) break;
@@ -112,7 +125,11 @@ export default function PlaceMiniMap({
             }
           ).addGeoreferenceAnnotationByUrl(url);
         }
-        if (!cancelled) warpedLayerRef.current = layer;
+        if (!cancelled) {
+          warpedLayerRef.current = layer;
+        } else {
+          safelyRemove(layer);
+        }
       })
       .catch(() => {
         // Allmaps failed to load — mini map still usable without overlay
@@ -120,6 +137,8 @@ export default function PlaceMiniMap({
 
     return () => {
       cancelled = true;
+      safelyRemove(layer);
+      if (warpedLayerRef.current === layer) warpedLayerRef.current = null;
     };
   }, [show1930Map]);
 

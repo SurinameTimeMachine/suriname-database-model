@@ -211,6 +211,18 @@ function nextFrame(): Promise<void> {
   return new Promise((resolve) => requestAnimationFrame(() => resolve()));
 }
 
+function safelyRemove(target: { remove: () => unknown } | null) {
+  if (!target) return;
+  try {
+    target.remove();
+  } catch (error) {
+    // Allmaps uses AbortController for annotation fetches. Removing a warped
+    // layer or map aborts those requests as part of normal cleanup.
+    if (error instanceof Error && error.name === 'AbortError') return;
+    console.error('Unable to remove a map layer.', error);
+  }
+}
+
 // Monkey-patch L.DomUtil.getPosition so that _leaflet_pos is never
 // undefined.  Allmaps' WebGL renderer continuously reads _leaflet_pos
 // from map pane elements; if a pane hasn't been positioned yet the
@@ -270,6 +282,8 @@ export default function MapView({
   const [enabledOverlays, setEnabledOverlays] = useState<Set<string>>(
     () => new Set(DEFAULT_ENABLED),
   );
+  const enabledOverlaysRef = useRef(enabledOverlays);
+  enabledOverlaysRef.current = enabledOverlays;
   const [layersOpen, setLayersOpen] = useState(false);
   const [toolbarOpen, setToolbarOpen] = useState(true);
   const layersDropdownRef = useRef<HTMLDivElement>(null);
@@ -330,10 +344,10 @@ export default function MapView({
     return () => {
       // Remove all warped layers
       warpedLayersRef.current.forEach((layers) => {
-        layers.forEach((l) => l.remove());
+        layers.forEach(safelyRemove);
       });
       warpedLayersRef.current.clear();
-      map.remove();
+      safelyRemove(map);
       mapRef.current = null;
     };
   }, []);
@@ -364,11 +378,12 @@ export default function MapView({
     if (!ENABLE_WARPED_OVERLAYS) return;
     setEnabledOverlays((prev) => {
       const next = new Set(prev);
+      enabledOverlaysRef.current = next;
       if (next.has(id)) {
         // Remove existing layers
         const layers = warpedLayersRef.current.get(id);
         if (layers) {
-          layers.forEach((l) => l.remove());
+          layers.forEach(safelyRemove);
           warpedLayersRef.current.delete(id);
         }
         next.delete(id);
@@ -379,8 +394,9 @@ export default function MapView({
         if (map) {
           import('@allmaps/leaflet')
             .then(async ({ WarpedMapLayer }) => {
-              if (!mapRef.current || !next.has(id)) return;
+              if (mapRef.current !== map || !enabledOverlaysRef.current.has(id)) return;
               await nextFrame();
+              if (mapRef.current !== map || !enabledOverlaysRef.current.has(id)) return;
               // Create a single WarpedMapLayer and add all annotations to it
               // (matches reference site pattern: one layer, multiple sheets)
               const urls =
@@ -389,7 +405,13 @@ export default function MapView({
               if (urls.length === 0) return;
               const warpedMapLayer = new WarpedMapLayer(urls[0]);
               warpedMapLayer.addTo(map);
+              warpedLayersRef.current.set(id, [warpedMapLayer]);
               for (const url of urls.slice(1)) {
+                if (mapRef.current !== map || !enabledOverlaysRef.current.has(id)) {
+                  safelyRemove(warpedMapLayer);
+                  warpedLayersRef.current.delete(id);
+                  return;
+                }
                 await (
                   warpedMapLayer as unknown as {
                     addGeoreferenceAnnotationByUrl: (
@@ -405,7 +427,6 @@ export default function MapView({
                   }
                 ).setOpacity(opacityRef.current);
               }
-              warpedLayersRef.current.set(id, [warpedMapLayer]);
             })
             .catch(() => {
               // Allmaps module failed to load
@@ -422,20 +443,28 @@ export default function MapView({
     const map = mapRef.current;
     if (!map) return;
 
+    let cancelled = false;
     map.whenReady(() => {
       OVERLAY_CONFIGS.forEach((config) => {
         if (config.defaultEnabled && !warpedLayersRef.current.has(config.id)) {
           import('@allmaps/leaflet')
             .then(async ({ WarpedMapLayer }) => {
-              if (!mapRef.current) return;
+              if (cancelled || mapRef.current !== map) return;
               await nextFrame();
+              if (cancelled || mapRef.current !== map) return;
               const urls =
                 config.annotationUrls ??
                 (config.annotationUrl ? [config.annotationUrl] : []);
               if (urls.length === 0) return;
               const warpedMapLayer = new WarpedMapLayer(urls[0]);
               warpedMapLayer.addTo(map);
+              warpedLayersRef.current.set(config.id, [warpedMapLayer]);
               for (const url of urls.slice(1)) {
+                if (cancelled || mapRef.current !== map) {
+                  safelyRemove(warpedMapLayer);
+                  warpedLayersRef.current.delete(config.id);
+                  return;
+                }
                 await (
                   warpedMapLayer as unknown as {
                     addGeoreferenceAnnotationByUrl: (
@@ -451,7 +480,6 @@ export default function MapView({
                   }
                 ).setOpacity(opacityRef.current);
               }
-              warpedLayersRef.current.set(config.id, [warpedMapLayer]);
             })
             .catch(() => {
               // Allmaps module failed to load — map still usable
@@ -459,6 +487,10 @@ export default function MapView({
         }
       });
     });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // Add/update GeoJSON layer — recreate only when data changes

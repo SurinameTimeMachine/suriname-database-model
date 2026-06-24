@@ -29,6 +29,53 @@ const GIS_CSV = join(
 const STM = 'https://data.surinametijdmachine.org/';
 const WD = 'http://www.wikidata.org/entity/';
 
+/**
+ * The supplied 1930 QGIS CSV contains U+FFFD replacement characters in a
+ * small number of name fields. Keep that source file unchanged, but repair
+ * only transcriptions that are verified by the record's existing closeMatch
+ * or by the surrounding source spelling. The map FID remains the provenance
+ * key for every correction.
+ */
+const VERIFIED_NAME_TRANSCRIPTIONS: Record<
+  string,
+  Partial<Record<'plantation_label' | 'label_1930' | 'label_1860-79', string>>
+> = {
+  '1660': {
+    plantation_label: 'Mon Trésor',
+    label_1930: 'Mon trésor',
+    'label_1860-79': 'Mon trésor',
+  },
+  '1702': {
+    plantation_label: 'La Liberté',
+    label_1930: 'La Liberté',
+    'label_1860-79': 'La Liberté',
+  },
+  '1749': {
+    plantation_label: 'La Singularité',
+    label_1930: 'La Singularité',
+    'label_1860-79': 'La Singularité',
+  },
+  '2423': {
+    plantation_label: 'Klein Curaçao',
+    'label_1860-79': 'Klein Curaçao',
+  },
+  '2585': {
+    plantation_label: 'La Prospérité',
+    label_1930: 'La Prospérité',
+    'label_1860-79': 'La Prospérité',
+  },
+  '2961': {
+    plantation_label: 'Rac à Rac',
+    label_1930: 'Rac à Rac',
+    'label_1860-79': 'Rac à Rac',
+  },
+  '3002': { 'label_1860-79': 'Maltanaïm' },
+  '3032': {
+    plantation_label: 'Sühlen',
+    'label_1860-79': 'Sühlen',
+  },
+};
+
 // --- Types ---
 
 export interface E25Row {
@@ -164,11 +211,12 @@ export function transformPlantations(): PlantationTransformResult {
 
   for (const p of rows) {
     const fid = (p.fid ?? '').trim();
+    const corrected = VERIFIED_NAME_TRANSCRIPTIONS[fid];
     const qid = (p.qid ?? '').trim();
     const qidAlt = (p.qid_alt ?? '').trim();
-    const label = (p.plantation_label ?? '').trim();
-    const label1930 = (p.label_1930 ?? '').trim();
-    const label1860 = (p['label_1860-79'] ?? '').trim();
+    const label = (corrected?.plantation_label ?? p.plantation_label ?? '').trim();
+    const label1930 = (corrected?.label_1930 ?? p.label_1930 ?? '').trim();
+    const label1860 = (corrected?.['label_1860-79'] ?? p['label_1860-79'] ?? '').trim();
     const coordsUtm = (p.coords ?? '').trim();
     const psurId = (p.psur_id ?? '').trim();
     const psurId2 = (p.psur_id2 ?? '').trim();

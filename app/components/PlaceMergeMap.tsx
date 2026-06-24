@@ -32,6 +32,16 @@ const MAP_1930_URLS = [
   'https://annotations.allmaps.org/maps/ddd8d3ca24e1916a',
 ];
 
+function safelyRemove(target: { remove: () => unknown } | null) {
+  if (!target) return;
+  try {
+    target.remove();
+  } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError') return;
+    console.error('Unable to remove the place merge-map layer.', error);
+  }
+}
+
 // A = teal, B = sepia/brown
 const COLORS = {
   a: { stroke: '#2a7abf', fill: '#4a88bf', label: '#1a5a9a' },
@@ -136,9 +146,9 @@ export default function PlaceMergeMap({
     mapRef.current = map;
 
     return () => {
-      warpedLayerRef.current?.remove();
+      safelyRemove(warpedLayerRef.current);
       warpedLayerRef.current = null;
-      map.remove();
+      safelyRemove(map);
       mapRef.current = null;
     };
   }, []);
@@ -235,16 +245,17 @@ export default function PlaceMergeMap({
     if (!map) return;
 
     if (!show1930Map) {
-      warpedLayerRef.current?.remove();
+      safelyRemove(warpedLayerRef.current);
       warpedLayerRef.current = null;
       return;
     }
 
     let cancelled = false;
+    let layer: L.Layer | null = null;
     import('@allmaps/leaflet')
       .then(async ({ WarpedMapLayer }) => {
         if (cancelled || !mapRef.current) return;
-        const layer = new WarpedMapLayer(MAP_1930_URLS[0]);
+        layer = new WarpedMapLayer(MAP_1930_URLS[0]);
         layer.addTo(mapRef.current);
         for (const url of MAP_1930_URLS.slice(1)) {
           if (cancelled) break;
@@ -254,12 +265,18 @@ export default function PlaceMergeMap({
             }
           ).addGeoreferenceAnnotationByUrl(url);
         }
-        if (!cancelled) warpedLayerRef.current = layer;
+        if (!cancelled) {
+          warpedLayerRef.current = layer;
+        } else {
+          safelyRemove(layer);
+        }
       })
       .catch(() => {});
 
     return () => {
       cancelled = true;
+      safelyRemove(layer);
+      if (warpedLayerRef.current === layer) warpedLayerRef.current = null;
     };
   }, [show1930Map]);
 

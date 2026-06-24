@@ -1,6 +1,6 @@
 import { readFile } from 'fs/promises';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { join } from 'path';
 
 const GAZETTEER_PATH = join(
@@ -62,34 +62,35 @@ export default async function PlaceRecordPage({
   const { id } = await params;
   if (!PLACE_ID.test(id)) notFound();
 
-  let place: PlaceProjection;
+  let entry: PlaceProjection | undefined;
   try {
     const gazetteer = JSON.parse(
       await readFile(GAZETTEER_PATH, 'utf-8'),
     ) as GazetteerDocument;
-    const entry = gazetteer['@graph']?.find(
+    entry = gazetteer['@graph']?.find(
       (candidate) => candidate.id === id,
     );
-    if (
-      !entry ||
-      (entry as Record<string, unknown>).deprecated ||
-      (entry as Record<string, unknown>).mergedInto
-    )
-      notFound();
-    place = {
-      ...entry,
-      jsonldUrl: `/place/${id}.jsonld`,
-      jsonUrl: `/place/${id}.json`,
-      names: entry.names ?? [],
-      sources: entry.sources ?? [],
-      statusAssertions: entry.statusAssertions ?? [],
-      productAssertions: entry.productAssertions ?? [],
-      locationAssertions: entry.locationAssertions ?? [],
-      diklandRefs: entry.diklandRefs ?? [],
-    };
   } catch {
     notFound();
   }
+
+  if (!entry || (entry as Record<string, unknown>).deprecated) notFound();
+  const mergedInto = (entry as Record<string, unknown>).mergedInto;
+  if (typeof mergedInto === 'string' && PLACE_ID.test(mergedInto)) {
+    redirect(`/place/${mergedInto}`);
+  }
+
+  const place: PlaceProjection = {
+    ...entry,
+    jsonldUrl: `/place/${id}.jsonld`,
+    jsonUrl: `/place/${id}.json`,
+    names: entry.names ?? [],
+    sources: entry.sources ?? [],
+    statusAssertions: entry.statusAssertions ?? [],
+    productAssertions: entry.productAssertions ?? [],
+    locationAssertions: entry.locationAssertions ?? [],
+    diklandRefs: entry.diklandRefs ?? [],
+  };
 
   return (
     <main className="min-h-screen bg-background px-4 py-10 text-ink sm:px-6 lg:px-10">

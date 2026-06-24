@@ -36184,7 +36184,7 @@
       ],
       "id": "stm-00666",
       "type": "plantation",
-      "prefLabel": "La Singularit�",
+      "prefLabel": "La Singularité",
       "altLabels": [],
       "broader": "stm-00004",
       "description": "",
@@ -75044,7 +75044,7 @@
       ],
       "id": "stm-01947",
       "type": "plantation",
-      "prefLabel": "S�hlen",
+      "prefLabel": "Sühlen",
       "altLabels": [],
       "broader": null,
       "description": "",
@@ -118597,9 +118597,9 @@
       "broader": null,
       "description": "",
       "location": {
-        "lat": null,
-        "lng": null,
-        "wkt": null,
+        "lat": 5.51921996375,
+        "lng": -55.183939081249996,
+        "wkt": "Polygon ((-55.19154724 5.53628629, -55.18608366 5.53797751, -55.18199305 5.52277334, -55.17621902 5.50191921, -55.17515256 5.49842770, -55.18069650 5.49705564, -55.18827338 5.52303373, -55.19154724 5.53628629))",
         "crs": "EPSG:4326"
       },
       "sources": [
@@ -118612,7 +118612,7 @@
           "matchType": "closeMatch"
         }
       ],
-      "fid": null,
+      "fid": 2567,
       "psurIds": [],
       "district": null,
       "districtAssertions": [],
@@ -125547,7 +125547,7 @@
           "sourceYear": 1930
         },
         {
-          "text": "Maltana�m",
+          "text": "Maltanaïm",
           "language": "nl",
           "type": "historical",
           "isPreferred": false,
@@ -129473,14 +129473,14 @@
       ],
       "names": [
         {
-          "text": "Mon Tr�sor",
+          "text": "Mon Trésor",
           "language": "nl",
           "type": "official",
           "isPreferred": true,
           "sourceYear": 1930
         },
         {
-          "text": "Mon tr�sor",
+          "text": "Mon trésor",
           "language": "nl",
           "type": "historical",
           "isPreferred": false
