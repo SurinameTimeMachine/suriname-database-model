@@ -3,11 +3,11 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { join } from 'path';
 
-const RECORD_DIR = join(
+const GAZETTEER_PATH = join(
   process.cwd(),
-  'public',
+  '..',
   'data',
-  'place-records',
+  'places-gazetteer.jsonld',
 );
 const PLACE_ID = /^stm-[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
@@ -34,6 +34,16 @@ type PlaceProjection = {
     startYear?: number;
     endYear?: number;
   }>;
+  locationAssertions: Array<{
+    id?: string;
+    standardized?: string | null;
+    original?: string | null;
+    source?: string;
+    startYear?: number;
+    endYear?: number;
+    note?: string | null;
+    sourceRow?: string;
+  }>;
   diklandRefs: Array<{
     folderPath?: string;
     driveUrl?: string;
@@ -41,6 +51,8 @@ type PlaceProjection = {
     year?: string | null;
   }>;
 };
+
+type GazetteerDocument = { '@graph'?: PlaceProjection[] };
 
 export default async function PlaceRecordPage({
   params,
@@ -52,9 +64,29 @@ export default async function PlaceRecordPage({
 
   let place: PlaceProjection;
   try {
-    place = JSON.parse(
-      await readFile(join(RECORD_DIR, `${id}.json`), 'utf-8'),
-    ) as PlaceProjection;
+    const gazetteer = JSON.parse(
+      await readFile(GAZETTEER_PATH, 'utf-8'),
+    ) as GazetteerDocument;
+    const entry = gazetteer['@graph']?.find(
+      (candidate) => candidate.id === id,
+    );
+    if (
+      !entry ||
+      (entry as Record<string, unknown>).deprecated ||
+      (entry as Record<string, unknown>).mergedInto
+    )
+      notFound();
+    place = {
+      ...entry,
+      jsonldUrl: `/place/${id}.jsonld`,
+      jsonUrl: `/place/${id}.json`,
+      names: entry.names ?? [],
+      sources: entry.sources ?? [],
+      statusAssertions: entry.statusAssertions ?? [],
+      productAssertions: entry.productAssertions ?? [],
+      locationAssertions: entry.locationAssertions ?? [],
+      diklandRefs: entry.diklandRefs ?? [],
+    };
   } catch {
     notFound();
   }
@@ -89,6 +121,30 @@ export default async function PlaceRecordPage({
             ))}
           </ul>
         </section>
+
+        {place.locationAssertions.length > 0 && (
+          <section className="mt-10 border-t border-ink/10 pt-6">
+            <h2 className="text-xl font-semibold">Location evidence</h2>
+            <ul className="mt-3 space-y-3 text-sm">
+              {place.locationAssertions.map((assertion, index) => (
+                <li key={assertion.id ?? index} className="border-l-2 border-teal-strong pl-3">
+                  <strong>{assertion.standardized ?? assertion.original}</strong>
+                  <span className="text-ink/65">
+                    {' '}
+                    {assertion.startYear}
+                    {assertion.endYear && assertion.endYear !== assertion.startYear ? `–${assertion.endYear}` : ''}
+                    {assertion.source ? ` · ${assertion.source}` : ''}
+                  </span>
+                  {assertion.original && assertion.original !== assertion.standardized && (
+                    <p className="mt-1 text-ink/65">Source address: {assertion.original}</p>
+                  )}
+                  {assertion.note && <p className="mt-1 text-ink/65">{assertion.note}</p>}
+                  {assertion.sourceRow && <p className="mt-1 font-mono text-xs text-ink/45">{assertion.sourceRow}</p>}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         <section className="mt-10 border-t border-ink/10 pt-6">
           <h2 className="text-xl font-semibold">Operational evidence</h2>

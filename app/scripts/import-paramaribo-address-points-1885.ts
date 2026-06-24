@@ -75,6 +75,13 @@ function main() {
       .map((entry) => entry.id)
       .filter((id): id is string => typeof id === 'string'),
   );
+  const entriesById = new Map(
+    graph
+      .filter((entry): entry is Record<string, unknown> & { id: string } =>
+        typeof entry.id === 'string',
+      )
+      .map((entry) => [entry.id, entry]),
+  );
 
   let imported = 0;
   let skippedExisting = 0;
@@ -95,7 +102,11 @@ function main() {
     }
 
     const id = `stm-1885-address-${String(sourceIndex).padStart(4, '0')}`;
-    if (existingIds.has(id)) {
+    const existing = entriesById.get(id);
+    if (existing) {
+      // The record ID is the persistent location-point anchor. Retain all
+      // editorial changes and only add this structural marker on re-runs.
+      if (existing.locationPoint !== true) existing.locationPoint = true;
       skippedExisting++;
       continue;
     }
@@ -141,6 +152,7 @@ function main() {
       placeType: null,
       productAssertions: [],
       statusAssertions: [],
+      locationPoint: true,
       districtAssertions: [],
       locationAssertions: [
         {

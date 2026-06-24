@@ -63,10 +63,13 @@ the individual claim. They are different scopes, not duplicate claims.
 ## Historical address points
 
 The 1885 Paramaribo point layer is imported as editable `historical-address`
-E53 Place records. Each record cites `historic-map-27`, has an 1885
-source-bound location assertion, and retains its original QGIS feature index.
-It is an observation of an address on that map, not a claim that the address,
-building, or function persisted at another time.
+records whose E53 location is explicitly a `stm:LocationPoint`: a persistent
+coordinate anchor for future source observations. Each address observation
+cites `historic-map-27`, has an 1885 time span, and retains its original QGIS
+feature index. It is not a claim that the address, building, or function
+persisted at another time. The 1854 and 1916 descriptive fields in this source
+remain source content until independently georeferenced address datasets are
+available.
 
 ## Deferred domains
 

@@ -375,6 +375,8 @@ export interface GazetteerPlace extends TombstoneFields {
   productAssertions?: ProductAssertion[];
   locationAssertions?: LocationAssertion[];
   statusAssertions?: StatusAssertion[];
+  /** The E53 location is a persistent coordinate anchor for source observations. */
+  locationPoint?: boolean;
   /** Immutable locator for a source-derived entry, preserved across edits. */
   sourceRecord?: {
     dataset: string;

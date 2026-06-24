@@ -2214,7 +2214,7 @@ export default function PlaceEditor({
           <div>
             <div className="flex items-center justify-between mb-1">
               <label className="block text-sm font-medium text-stm-warm-700">
-                Location Observations (Almanakken)
+                Location observations (source and time)
               </label>
               {canEdit && (
                 <button

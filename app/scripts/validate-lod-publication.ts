@@ -297,6 +297,35 @@ function main() {
       `Historical address ${String(entry.id)} has no source-bound 1885 location assertion`,
     );
   }
+  const historicalAddressId = historicalAddresses[0]?.id as string | undefined;
+  if (historicalAddressId) {
+    const addressRecord = JSON.parse(
+      readArtifact(PLACE_RECORDS_DIR, `${historicalAddressId}.jsonld`).toString(
+        'utf-8',
+      ),
+    ) as JsonLdDocument;
+    const graph = addressRecord['@graph'] ?? [];
+    const location = graph.find(
+      (entity) =>
+        entity['@id'] === `${CANONICAL_BASE}place/${historicalAddressId}/location`,
+    );
+    const observation = graph.find(
+      (entity) =>
+        entity['@id'] ===
+        `${CANONICAL_BASE}place/${historicalAddressId}/assertion/address-observation-1885`,
+    );
+    assert(
+      toArray(location?.['@type'] as string | string[]).includes(
+        'stm:LocationPoint',
+      ),
+      `Historical address ${historicalAddressId} has no LocationPoint anchor`,
+    );
+    assert(
+      observation?.P2_has_type ===
+        `${CANONICAL_BASE}type/relationship/address-observation`,
+      `Historical address ${historicalAddressId} has no address-observation relation`,
+    );
+  }
   assert(
     recordIds.size === activeGazetteer.length,
     'Authority-record index does not cover every active Gazetteer entry',

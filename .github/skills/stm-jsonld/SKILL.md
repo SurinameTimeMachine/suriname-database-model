@@ -30,6 +30,10 @@ before changing the public record model.
 - Treat historical address points as source-specific E53 observations. Preserve
   their source feature index and do not turn their labels into timeless
   building or organisation claims.
+- Use the E53 location as the persistent `stm:LocationPoint` anchor. Attach
+  each dated address statement to that anchor; only create a cross-map address
+  concordance when both source systems and their spatial correspondence are
+  evidenced.
 
 ## Public contract
 

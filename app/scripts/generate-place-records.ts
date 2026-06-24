@@ -96,6 +96,7 @@ type GazetteerEntry = JsonObject & {
   productAssertions?: Assertion[];
   districtAssertions?: Assertion[];
   locationAssertions?: Assertion[];
+  locationPoint?: boolean;
   diklandRefs?: DiklandRef[];
   deprecated?: boolean;
   mergedInto?: string;
@@ -309,7 +310,10 @@ export function generatePlaceRecords() {
 
     const location: JsonObject = {
       '@id': locationUri,
-      '@type': ['crm:E53_Place'],
+      '@type': [
+        'crm:E53_Place',
+        ...(entry.locationPoint ? ['stm:LocationPoint'] : []),
+      ],
       'rdfs:label': entry.locationDescription ?? label,
       'prov:wasDerivedFrom': sourceUris,
     };
@@ -427,7 +431,10 @@ export function generatePlaceRecords() {
         '@id': assertionUri,
         '@type': ['crm:E13_Attribute_Assignment'],
         P140_assigned_attribute_to: locationUri,
-        P2_has_type: `${BASE}type/relationship/location-description`,
+        P2_has_type:
+          entry.type === 'historical-address'
+            ? `${BASE}type/relationship/address-observation`
+            : `${BASE}type/relationship/location-description`,
         ...(span ? { P4_has_time_span: spanUri } : {}),
         ...(assertion.source
           ? { 'prov:hadPrimarySource': sourceUri(assertion.source, sourceIds) }
