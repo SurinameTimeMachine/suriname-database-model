@@ -63,20 +63,20 @@ the individual claim. They are different scopes, not duplicate claims.
 ## Historical address points
 
 The 1885 Paramaribo point layer is imported as editable `historical-address`
-records whose E53 location is explicitly a `stm:LocationPoint`: a persistent
-coordinate anchor for future source observations. This follows the HisGIS /
-Amsterdam Time Machine space-time-prism pattern at profile level: the point is
-the fixed control point, while each dated address statement is a source-bound
-observation attached to that point.
+records whose location node is typed as `crm:E53_Place` and `geo:Feature`: a
+persistent coordinate anchor for future source observations. This follows the
+HisGIS / Amsterdam Time Machine space-time-prism pattern at profile level: the
+point is the fixed control point, while each dated address statement is a
+source-bound observation attached to that point.
 
 Each address observation cites `historic-map-27`, has an 1885 time span, points
-back to the `stm:LocationPoint` with `crm:P140_assigned_attribute_to`, assigns
-the dated address appellation with `crm:P141_assigned`, and retains its original
-QGIS feature index. Its geometry is serialized as GeoSPARQL `POINT` WKT under a
-`/geometry/point` URI. It is not a claim that the address, building, parcel, or
-function persisted at another time. The 1854 and 1916 descriptive fields in
-this source remain source content until independently georeferenced address
-datasets are available.
+back to the E53/GeoSPARQL point anchor with
+`crm:P140_assigned_attribute_to`, assigns the dated address appellation with
+`crm:P141_assigned`, and retains its original QGIS feature index. Its geometry
+is serialized as GeoSPARQL `POINT` WKT under a `/geometry/point` URI. It is not
+a claim that the address, building, parcel, or function persisted at another
+time. The 1854 and 1916 descriptive fields in this source remain source content
+until independently georeferenced address datasets are available.
 
 ## Deferred domains
 

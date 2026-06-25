@@ -322,10 +322,9 @@ function main() {
       ),
     );
     assert(
-      toArray(location?.['@type'] as string | string[]).includes(
-        'stm:LocationPoint',
-      ),
-      `Historical address ${historicalAddressId} has no LocationPoint anchor`,
+      toArray(location?.['@type'] as string | string[]).includes('crm:E53_Place') &&
+        toArray(location?.['@type'] as string | string[]).includes('geo:Feature'),
+      `Historical address ${historicalAddressId} anchor is not typed as crm:E53_Place and geo:Feature`,
     );
     assert(
       observation?.P2_has_type ===
@@ -335,7 +334,7 @@ function main() {
     assert(
       observation?.P140_assigned_attribute_to ===
         `${CANONICAL_BASE}place/${historicalAddressId}/location`,
-      `Historical address ${historicalAddressId} observation is not attached to its LocationPoint anchor`,
+      `Historical address ${historicalAddressId} observation is not attached to its E53/GeoSPARQL point anchor`,
     );
     assert(
       typeof addressName?.['@id'] === 'string' &&

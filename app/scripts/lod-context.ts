@@ -7,7 +7,6 @@ export function buildPlaceRecordContext(): Record<string, unknown> {
     ...buildContext(),
     stm: BASE,
     AuthorityRecord: 'stm:AuthorityRecord',
-    LocationPoint: 'stm:LocationPoint',
     E31_Document: 'crm:E31_Document',
     E42_Identifier: 'crm:E42_Identifier',
     E99_Product_Type: 'crm:E99_Product_Type',

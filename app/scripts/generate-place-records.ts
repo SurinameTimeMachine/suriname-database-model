@@ -320,7 +320,7 @@ export function generatePlaceRecords() {
       '@id': locationUri,
       '@type': [
         'crm:E53_Place',
-        ...(entry.locationPoint ? ['stm:LocationPoint'] : []),
+        ...(entry.locationPoint ? ['geo:Feature'] : []),
       ],
       'rdfs:label': entry.locationDescription ?? label,
       'prov:wasDerivedFrom': sourceUris,
