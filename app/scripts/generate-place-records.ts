@@ -167,6 +167,14 @@ function timeSpan(id: string, startYear?: number, endYear?: number): JsonObject 
   return entity;
 }
 
+function geometrySlug(wkt: string): string {
+  const type = wkt.trim().split(/\s+/, 1)[0]?.toLowerCase();
+  if (type === 'point' || type === 'multipoint') return 'point';
+  if (type === 'linestring' || type === 'multilinestring') return 'line';
+  if (type === 'polygon' || type === 'multipolygon') return 'polygon';
+  return 'geometry';
+}
+
 function wikidataUri(identifier: string): string {
   return `http://www.wikidata.org/entity/${identifier}`;
 }
@@ -332,7 +340,7 @@ export function generatePlaceRecords() {
     );
     if (notes.length > 0) location.P3_has_note = notes;
     if (entry.location?.wkt) {
-      const geometryUri = `${locationUri}/geometry/polygon`;
+      const geometryUri = `${locationUri}/geometry/${geometrySlug(entry.location.wkt)}`;
       location['geo:hasGeometry'] = geometryUri;
       graph.push({
         '@id': geometryUri,
@@ -431,6 +439,9 @@ export function generatePlaceRecords() {
         '@id': assertionUri,
         '@type': ['crm:E13_Attribute_Assignment'],
         P140_assigned_attribute_to: locationUri,
+        ...(entry.type === 'historical-address' && nameUris[0]
+          ? { P141_assigned: nameUris[0] }
+          : {}),
         P2_has_type:
           entry.type === 'historical-address'
             ? `${BASE}type/relationship/address-observation`

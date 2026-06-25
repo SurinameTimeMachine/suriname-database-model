@@ -297,8 +297,8 @@ function main() {
       `Historical address ${String(entry.id)} has no source-bound 1885 location assertion`,
     );
   }
-  const historicalAddressId = historicalAddresses[0]?.id as string | undefined;
-  if (historicalAddressId) {
+  for (const historicalAddress of historicalAddresses) {
+    const historicalAddressId = historicalAddress.id as string;
     const addressRecord = JSON.parse(
       readArtifact(PLACE_RECORDS_DIR, `${historicalAddressId}.jsonld`).toString(
         'utf-8',
@@ -314,6 +314,13 @@ function main() {
         entity['@id'] ===
         `${CANONICAL_BASE}place/${historicalAddressId}/assertion/address-observation-1885`,
     );
+    const geometryId = location?.['geo:hasGeometry'];
+    const geometry = graph.find((entity) => entity['@id'] === geometryId);
+    const addressName = graph.find((entity) =>
+      toArray(location?.P1_is_identified_by as string | string[]).includes(
+        entity['@id'] as string,
+      ),
+    );
     assert(
       toArray(location?.['@type'] as string | string[]).includes(
         'stm:LocationPoint',
@@ -324,6 +331,33 @@ function main() {
       observation?.P2_has_type ===
         `${CANONICAL_BASE}type/relationship/address-observation`,
       `Historical address ${historicalAddressId} has no address-observation relation`,
+    );
+    assert(
+      observation?.P140_assigned_attribute_to ===
+        `${CANONICAL_BASE}place/${historicalAddressId}/location`,
+      `Historical address ${historicalAddressId} observation is not attached to its LocationPoint anchor`,
+    );
+    assert(
+      typeof addressName?.['@id'] === 'string' &&
+        observation?.P141_assigned === addressName['@id'],
+      `Historical address ${historicalAddressId} observation does not assign its dated address appellation`,
+    );
+    assert(
+      observation?.P4_has_time_span ===
+        `${CANONICAL_BASE}place/${historicalAddressId}/assertion/address-observation-1885/time-span`,
+      `Historical address ${historicalAddressId} observation has no 1885 time span`,
+    );
+    assert(
+      geometryId === `${CANONICAL_BASE}place/${historicalAddressId}/location/geometry/point`,
+      `Historical address ${historicalAddressId} point geometry has a non-point URI`,
+    );
+    assert(
+      typeof geometry?.['geo:asWKT'] === 'object' &&
+        geometry['geo:asWKT'] !== null &&
+        String((geometry['geo:asWKT'] as Record<string, unknown>)['@value']).includes(
+          '> POINT ',
+        ),
+      `Historical address ${historicalAddressId} geometry is not serialized as WKT POINT`,
     );
   }
   assert(
