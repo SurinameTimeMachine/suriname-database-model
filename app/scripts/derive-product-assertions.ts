@@ -27,6 +27,7 @@ import { parse } from 'csv-parse/sync';
 import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import type { GazetteerPlace, ProductAssertion } from '../lib/types';
+import { getPrimaryAuthorityLink } from '../lib/types';
 
 // ── Paths ──────────────────────────────────────────────────────────────────
 
@@ -223,7 +224,7 @@ let noMatch = 0;
 for (const entry of graph) {
   if (entry.type !== 'plantation') continue;
 
-  const qid = entry.wikidataQid;
+  const qid = getPrimaryAuthorityLink(entry, 'wikidata')?.identifier;
   if (!qid) {
     noMatch++;
     continue;

@@ -19,7 +19,7 @@ export const DEFAULT_ZOOM = 8;
 /** Extract short place ID (e.g. "stm-02542") from a full Linked Data URI or return the input as-is. */
 export function extractPlaceId(uri: string | undefined | null): string | null {
   if (!uri) return null;
-  const match = uri.match(/\/(stm-\d+)$/);
+  const match = uri.match(/\/(stm-[a-z0-9]+(?:-[a-z0-9]+)*)$/);
   return match ? match[1] : uri;
 }
 

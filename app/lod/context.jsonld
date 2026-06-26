@@ -1,7 +1,7 @@
 {
   "@context": {
     "@vocab": "https://schema.org/",
-    "base": "https://data.suriname-timemachine.org/",
+    "base": "https://data.surinametijdmachine.org/",
     "wd": "http://www.wikidata.org/entity/",
     "wdt": "http://www.wikidata.org/prop/direct/",
     "crm": "http://www.cidoc-crm.org/cidoc-crm/",
@@ -23,12 +23,16 @@
     "OrganizationObservation": "crm:E13_Attribute_Assignment",
     "ProvenanceRecord": "prov:Entity",
     "E13_Attribute_Assignment": "crm:E13_Attribute_Assignment",
+    "E22_Human_Made_Object": "crm:E22_Human-Made_Object",
     "E22_Human-Made_Object": "crm:E22_Human-Made_Object",
-    "E25_Human_Made_Feature": "crm:E25_Human-Made_Feature",
+    "E24_Physical_Human_Made_Thing": "crm:E24_Physical_Human-Made_Thing",
     "E24_Physical_Human-Made_Thing": "crm:E24_Physical_Human-Made_Thing",
+    "E25_Human_Made_Feature": "crm:E25_Human-Made_Feature",
+    "E25_Human-Made_Feature": "crm:E25_Human-Made_Feature",
     "E26_Physical_Feature": "crm:E26_Physical_Feature",
     "E36_Visual_Item": "crm:E36_Visual_Item",
     "E41_Appellation": "crm:E41_Appellation",
+    "E52_Time_Span": "crm:E52_Time-Span",
     "E52_Time-Span": "crm:E52_Time-Span",
     "E53_Place": "crm:E53_Place",
     "E55_Type": "crm:E55_Type",
@@ -44,6 +48,10 @@
     },
     "P2_has_type": {
       "@id": "crm:P2_has_type",
+      "@type": "@id"
+    },
+    "P4_has_time_span": {
+      "@id": "crm:P4_has_time-span",
       "@type": "@id"
     },
     "P4_has_time-span": {
@@ -160,6 +168,22 @@
       "@id": "skos:closeMatch",
       "@type": "@id"
     },
+    "exactMatch": {
+      "@id": "skos:exactMatch",
+      "@type": "@id"
+    },
+    "broadMatch": {
+      "@id": "skos:broadMatch",
+      "@type": "@id"
+    },
+    "narrowMatch": {
+      "@id": "skos:narrowMatch",
+      "@type": "@id"
+    },
+    "relatedMatch": {
+      "@id": "skos:relatedMatch",
+      "@type": "@id"
+    },
     "hasGeometry": "geo:hasGeometry",
     "asWKT": {
       "@id": "geo:asWKT",
@@ -185,17 +209,25 @@
       "@id": "sdo:sameAs",
       "@type": "@id"
     },
-    "wasDerivedFrom": {
-      "@id": "prov:wasDerivedFrom",
+    "dcterms:description": {
+      "@id": "dcterms:description",
+      "@type": "xsd:string"
+    },
+    "dcterms:identifier": {
+      "@id": "dcterms:identifier",
+      "@type": "xsd:string"
+    },
+    "skos:broader": {
+      "@id": "skos:broader",
       "@type": "@id"
     },
-    "hadPrimarySource": {
-      "@id": "prov:hadPrimarySource",
-      "@type": "@id"
+    "featureType": {
+      "@id": "crm:P2_has_type",
+      "@type": "xsd:string"
     },
-    "generatedAtTime": {
-      "@id": "prov:generatedAtTime",
-      "@type": "xsd:dateTime"
+    "mainBodyWater": {
+      "@id": "crm:P3_has_note",
+      "@type": "xsd:string"
     },
     "status": {
       "@id": "crm:P2_has_type",
@@ -263,15 +295,15 @@
     },
     "hasOwner": {
       "@id": "crm:P14_carried_out_by",
-      "@type": "@id"
+      "@type": "xsd:string"
     },
     "hasAdministrator": {
       "@id": "crm:P14_carried_out_by",
-      "@type": "@id"
+      "@type": "xsd:string"
     },
     "hasDirector": {
       "@id": "crm:P14_carried_out_by",
-      "@type": "@id"
+      "@type": "xsd:string"
     },
     "locationStd": {
       "@id": "crm:P7_took_place_at",
@@ -286,8 +318,7 @@
       "@type": "xsd:string"
     },
     "depictedOnMap": {
-      "@id": "crm:P138i_has_representation",
-      "@type": "@id"
+      "@id": "crm:P138i_has_representation"
     },
     "labelOnMap": {
       "@id": "crm:P190_has_symbolic_content",
@@ -304,6 +335,18 @@
     "isEnslaverOf": {
       "@id": "hdsc:isEnslaverOf",
       "@type": "@id"
+    },
+    "wasDerivedFrom": {
+      "@id": "prov:wasDerivedFrom",
+      "@type": "@id"
+    },
+    "hadPrimarySource": {
+      "@id": "prov:hadPrimarySource",
+      "@type": "@id"
+    },
+    "generatedAtTime": {
+      "@id": "prov:generatedAtTime",
+      "@type": "xsd:dateTime"
     },
     "sourceFile": {
       "@id": "prov:hadPrimarySource",
@@ -331,14 +374,6 @@
     },
     "linkedVia": {
       "@id": "rdfs:comment",
-      "@type": "xsd:string"
-    },
-    "featureType": {
-      "@id": "crm:P2_has_type",
-      "@type": "xsd:string"
-    },
-    "mainBodyWater": {
-      "@id": "crm:P3_has_note",
       "@type": "xsd:string"
     }
   }

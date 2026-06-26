@@ -1,6 +1,8 @@
 'use client';
 
 import 'leaflet/dist/leaflet.css';
+import { loadAllmapsAnnotation } from '@/lib/allmaps';
+import { HISTORIC_MAPS } from '@/lib/historic-maps';
 import { usePlaceTypes } from '@/lib/thesaurus';
 import type { GeoJSONCollection, GeoJSONFeature } from '@/lib/types';
 import L from 'leaflet';
@@ -26,41 +28,7 @@ interface OverlayConfig {
 }
 
 const OVERLAY_CONFIGS: OverlayConfig[] = [
-  {
-    id: '1930-plantation',
-    label: '1930 Plantation Map',
-    annotationUrls: [
-      'https://annotations.allmaps.org/maps/d9191cafde1831f0', // sheet 3
-      'https://annotations.allmaps.org/maps/dc967c11ce9e86b3', // sheet 4
-      'https://annotations.allmaps.org/maps/edaf1bbc8b86f0bf', // sheet 5
-      'https://annotations.allmaps.org/maps/9eac27facff8687f', // sheet 6
-      'https://annotations.allmaps.org/maps/5e0b6889ed3816d9', // sheet 7
-      'https://annotations.allmaps.org/maps/aacef031cb456d2a', // sheet 8
-      'https://annotations.allmaps.org/maps/4d07f0d3bf9fc347', // sheet 9
-      // sheet 10 (1d7e4a0bd68f039c) excluded — smaller size, fewer GCPs, causes overlap
-      'https://annotations.allmaps.org/maps/ddd8d3ca24e1916a', // sheet 11
-    ],
-    defaultEnabled: false,
-    transformation: 'thinPlateSpline',
-    gcpCount: '10-80/sheet',
-  },
-  {
-    id: '1930-plantation-onemanifest',
-    label: '1930 Plantation Map (One Manifest)',
-    annotationUrl: 'https://annotations.allmaps.org/manifests/5178b46e14dc211e',
-    defaultEnabled: false,
-    transformation: 'thinPlateSpline',
-    gcpCount: 'unknown',
-  },
-  {
-    id: '1930-plantation-neat',
-    label: '1930 Plantation Map (Neat)',
-    annotationUrl:
-      'https://surinametijdmachine.org/iiif/mapathon/kaart-van-suriname-1930.json',
-    defaultEnabled: false,
-    transformation: 'thinPlateSpline',
-    gcpCount: '2-4/sheet',
-  },
+  ...HISTORIC_MAPS.map((map) => ({ ...map, defaultEnabled: false })),
   {
     id: 'moseberg-sheet2-1801',
     label: 'Moseberg Specialkaart Sheet 2 (1801)',
@@ -211,6 +179,18 @@ function nextFrame(): Promise<void> {
   return new Promise((resolve) => requestAnimationFrame(() => resolve()));
 }
 
+function safelyRemove(target: { remove: () => unknown } | null) {
+  if (!target) return;
+  try {
+    target.remove();
+  } catch (error) {
+    // Allmaps uses AbortController for annotation fetches. Removing a warped
+    // layer or map aborts those requests as part of normal cleanup.
+    if (error instanceof Error && error.name === 'AbortError') return;
+    console.error('Unable to remove a map layer.', error);
+  }
+}
+
 // Monkey-patch L.DomUtil.getPosition so that _leaflet_pos is never
 // undefined.  Allmaps' WebGL renderer continuously reads _leaflet_pos
 // from map pane elements; if a pane hasn't been positioned yet the
@@ -270,6 +250,9 @@ export default function MapView({
   const [enabledOverlays, setEnabledOverlays] = useState<Set<string>>(
     () => new Set(DEFAULT_ENABLED),
   );
+  const [overlayErrors, setOverlayErrors] = useState<Record<string, string>>({});
+  const enabledOverlaysRef = useRef(enabledOverlays);
+  enabledOverlaysRef.current = enabledOverlays;
   const [layersOpen, setLayersOpen] = useState(false);
   const [toolbarOpen, setToolbarOpen] = useState(true);
   const layersDropdownRef = useRef<HTMLDivElement>(null);
@@ -278,8 +261,19 @@ export default function MapView({
   );
   const enabledFeaturesRef = useRef(enabledFeatures);
   enabledFeaturesRef.current = enabledFeatures;
+  const knownFeatureTypesRef = useRef<Set<string>>(new Set(allTypes));
   const [featuresOpen, setFeaturesOpen] = useState(false);
   const featuresDropdownRef = useRef<HTMLDivElement>(null);
+
+  // The thesaurus loads after the map mounts. Enable newly published place
+  // types by default without re-enabling types a visitor has turned off.
+  useEffect(() => {
+    const known = knownFeatureTypesRef.current;
+    const newTypes = allTypes.filter((type) => !known.has(type));
+    if (newTypes.length === 0) return;
+    knownFeatureTypesRef.current = new Set([...known, ...newTypes]);
+    setEnabledFeatures((previous) => new Set([...previous, ...newTypes]));
+  }, [allTypes]);
 
   // Keep callback ref in sync
   useEffect(() => {
@@ -314,10 +308,10 @@ export default function MapView({
     return () => {
       // Remove all warped layers
       warpedLayersRef.current.forEach((layers) => {
-        layers.forEach((l) => l.remove());
+        layers.forEach(safelyRemove);
       });
       warpedLayersRef.current.clear();
-      map.remove();
+      safelyRemove(map);
       mapRef.current = null;
     };
   }, []);
@@ -343,62 +337,82 @@ export default function MapView({
     };
   }, []);
 
+  const loadOverlay = useCallback((id: string, config: OverlayConfig) => {
+    const map = mapRef.current;
+    if (!map || warpedLayersRef.current.has(id)) return;
+    const urls =
+      config.annotationUrls ??
+      (config.annotationUrl ? [config.annotationUrl] : []);
+    if (urls.length === 0) return;
+
+    Promise.all(urls.map(loadAllmapsAnnotation))
+      .then(async (annotations) => {
+        const { WarpedMapLayer } = await import('@allmaps/leaflet');
+        if (mapRef.current !== map || !enabledOverlaysRef.current.has(id)) return;
+        await nextFrame();
+        if (mapRef.current !== map || !enabledOverlaysRef.current.has(id)) return;
+
+        const warpedMapLayer = new WarpedMapLayer(annotations[0]);
+        warpedMapLayer.addTo(map);
+        warpedLayersRef.current.set(id, [warpedMapLayer]);
+        for (const annotation of annotations.slice(1)) {
+          if (mapRef.current !== map || !enabledOverlaysRef.current.has(id)) {
+            safelyRemove(warpedMapLayer);
+            warpedLayersRef.current.delete(id);
+            return;
+          }
+          (
+            warpedMapLayer as unknown as {
+              addGeoreferenceAnnotation: (value: unknown) => unknown;
+            }
+          ).addGeoreferenceAnnotation(annotation);
+        }
+        if ('setOpacity' in warpedMapLayer) {
+          (
+            warpedMapLayer as unknown as {
+              setOpacity: (o: number) => void;
+            }
+          ).setOpacity(opacityRef.current);
+        }
+      })
+      .catch(() => {
+        if (mapRef.current !== map) return;
+        setOverlayErrors((previous) => ({
+          ...previous,
+          [id]: 'Image service unavailable',
+        }));
+        const disabled = new Set(enabledOverlaysRef.current);
+        disabled.delete(id);
+        enabledOverlaysRef.current = disabled;
+        setEnabledOverlays(disabled);
+      });
+  }, []);
+
   // Toggle overlay callback — creates/destroys WarpedMapLayer lazily
   const toggleOverlay = useCallback((id: string, config: OverlayConfig) => {
     if (!ENABLE_WARPED_OVERLAYS) return;
-    setEnabledOverlays((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        // Remove existing layers
-        const layers = warpedLayersRef.current.get(id);
-        if (layers) {
-          layers.forEach((l) => l.remove());
-          warpedLayersRef.current.delete(id);
-        }
-        next.delete(id);
-      } else {
-        // Create new layers lazily
-        next.add(id);
-        const map = mapRef.current;
-        if (map) {
-          import('@allmaps/leaflet')
-            .then(async ({ WarpedMapLayer }) => {
-              if (!mapRef.current || !next.has(id)) return;
-              await nextFrame();
-              // Create a single WarpedMapLayer and add all annotations to it
-              // (matches reference site pattern: one layer, multiple sheets)
-              const urls =
-                config.annotationUrls ??
-                (config.annotationUrl ? [config.annotationUrl] : []);
-              if (urls.length === 0) return;
-              const warpedMapLayer = new WarpedMapLayer(urls[0]);
-              warpedMapLayer.addTo(map);
-              for (const url of urls.slice(1)) {
-                await (
-                  warpedMapLayer as unknown as {
-                    addGeoreferenceAnnotationByUrl: (
-                      u: string,
-                    ) => Promise<unknown>;
-                  }
-                ).addGeoreferenceAnnotationByUrl(url);
-              }
-              if ('setOpacity' in warpedMapLayer) {
-                (
-                  warpedMapLayer as unknown as {
-                    setOpacity: (o: number) => void;
-                  }
-                ).setOpacity(opacityRef.current);
-              }
-              warpedLayersRef.current.set(id, [warpedMapLayer]);
-            })
-            .catch(() => {
-              // Allmaps module failed to load
-            });
-        }
+    const next = new Set(enabledOverlaysRef.current);
+    if (next.has(id)) {
+      const layers = warpedLayersRef.current.get(id);
+      if (layers) {
+        layers.forEach(safelyRemove);
+        warpedLayersRef.current.delete(id);
       }
-      return next;
+      next.delete(id);
+      enabledOverlaysRef.current = next;
+      setEnabledOverlays(next);
+      return;
+    }
+
+    next.add(id);
+    enabledOverlaysRef.current = next;
+    setEnabledOverlays(next);
+    setOverlayErrors((previous) => {
+      const { [id]: _removed, ...remaining } = previous;
+      return remaining;
     });
-  }, []);
+    loadOverlay(id, config);
+  }, [loadOverlay]);
 
   // Initialize default-enabled overlays once map is ready
   useEffect(() => {
@@ -406,27 +420,34 @@ export default function MapView({
     const map = mapRef.current;
     if (!map) return;
 
+    let cancelled = false;
     map.whenReady(() => {
       OVERLAY_CONFIGS.forEach((config) => {
         if (config.defaultEnabled && !warpedLayersRef.current.has(config.id)) {
-          import('@allmaps/leaflet')
-            .then(async ({ WarpedMapLayer }) => {
-              if (!mapRef.current) return;
+          const urls =
+            config.annotationUrls ??
+            (config.annotationUrl ? [config.annotationUrl] : []);
+          Promise.all(urls.map(loadAllmapsAnnotation))
+            .then(async (annotations) => {
+              const { WarpedMapLayer } = await import('@allmaps/leaflet');
+              if (cancelled || mapRef.current !== map) return;
               await nextFrame();
-              const urls =
-                config.annotationUrls ??
-                (config.annotationUrl ? [config.annotationUrl] : []);
+              if (cancelled || mapRef.current !== map) return;
               if (urls.length === 0) return;
-              const warpedMapLayer = new WarpedMapLayer(urls[0]);
+              const warpedMapLayer = new WarpedMapLayer(annotations[0]);
               warpedMapLayer.addTo(map);
-              for (const url of urls.slice(1)) {
-                await (
+              warpedLayersRef.current.set(config.id, [warpedMapLayer]);
+              for (const annotation of annotations.slice(1)) {
+                if (cancelled || mapRef.current !== map) {
+                  safelyRemove(warpedMapLayer);
+                  warpedLayersRef.current.delete(config.id);
+                  return;
+                }
+                (
                   warpedMapLayer as unknown as {
-                    addGeoreferenceAnnotationByUrl: (
-                      u: string,
-                    ) => Promise<unknown>;
+                    addGeoreferenceAnnotation: (value: unknown) => unknown;
                   }
-                ).addGeoreferenceAnnotationByUrl(url);
+                ).addGeoreferenceAnnotation(annotation);
               }
               if ('setOpacity' in warpedMapLayer) {
                 (
@@ -435,7 +456,6 @@ export default function MapView({
                   }
                 ).setOpacity(opacityRef.current);
               }
-              warpedLayersRef.current.set(config.id, [warpedMapLayer]);
             })
             .catch(() => {
               // Allmaps module failed to load — map still usable
@@ -443,6 +463,10 @@ export default function MapView({
         }
       });
     });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // Add/update GeoJSON layer — recreate only when data changes
@@ -458,8 +482,12 @@ export default function MapView({
         const ft = feature?.properties?.featureType;
         return !ft || enabledFeaturesRef.current.has(ft);
       },
-      pointToLayer: (_feature, latlng) => {
-        return L.circleMarker(latlng, { radius: 5.5 });
+      pointToLayer: (feature, latlng) => {
+        const isHistoricalAddress =
+          feature.properties?.featureType === 'historical-address';
+        return L.circleMarker(latlng, {
+          radius: isHistoricalAddress ? 3.25 : 5.5,
+        });
       },
       style: (feature) => {
         const props = feature?.properties;
@@ -1015,6 +1043,7 @@ export default function MapView({
                       <ul className="max-h-80 overflow-y-auto py-1">
                         {OVERLAY_CONFIGS.map((config) => {
                           const isEnabled = enabledOverlays.has(config.id);
+                          const error = overlayErrors[config.id];
                           return (
                             <li key={config.id}>
                               <label className="flex items-center gap-2 px-3 py-1.5 hover:bg-teal-soft/20 cursor-pointer text-xs">
@@ -1028,6 +1057,23 @@ export default function MapView({
                                   {config.label}
                                 </span>
                               </label>
+                              {error && (
+                                <p className="px-3 pb-1 pl-8 text-[10px] text-stm-warm-500">
+                                  {error}
+                                </p>
+                              )}
+                              {config.annotationUrl && (
+                                <p className="px-3 pb-1 pl-8 text-[10px]">
+                                  <a
+                                    href={config.annotationUrl}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="text-stm-sepia-600 underline hover:text-stm-sepia-800"
+                                  >
+                                    Allmaps source
+                                  </a>
+                                </p>
+                              )}
                               {isEnabled && (
                                 <div className="flex items-center gap-2 px-3 pb-1 pl-8 text-[10px] text-stm-warm-400">
                                   <span title="Transformation type">

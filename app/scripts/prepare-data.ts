@@ -14,8 +14,8 @@ import { join } from 'path';
 const LOD_DIR = join(__dirname, '../lod');
 const OUT_DIR = join(__dirname, '../public/data');
 const DATA_DIR = join(__dirname, '../../data');
-const DATA_BASE = 'https://data.suriname-timemachine.org/';
-const ONTOLOGY_BASE = 'https://suriname-timemachine.org/ontology/';
+const DATA_BASE = 'https://data.surinametijdmachine.org/';
+const ONTOLOGY_BASE = 'https://data.surinametijdmachine.org/';
 const PIPELINE_TYPES = new Set(['plantation', 'river', 'creek']);
 
 mkdirSync(OUT_DIR, { recursive: true });
@@ -23,6 +23,8 @@ mkdirSync(OUT_DIR, { recursive: true });
 const gazetteerSrc = join(DATA_DIR, 'places-gazetteer.jsonld');
 const thesaurusSrc = join(DATA_DIR, 'place-types-thesaurus.jsonld');
 const sourcesSrc = join(DATA_DIR, 'sources-registry.jsonld');
+const databaseSrc = join(LOD_DIR, 'database.jsonld');
+const contextSrc = join(LOD_DIR, 'context.jsonld');
 
 type GazetteerLocation = {
   lat?: number | null;
@@ -40,6 +42,12 @@ type GazetteerName = {
   sourceYear?: number;
 };
 
+type GazetteerExternalLink = {
+  authority?: string;
+  identifier?: string;
+  matchType?: string;
+};
+
 type GazetteerEntry = Record<string, unknown> & {
   '@id'?: string;
   id?: string;
@@ -47,6 +55,7 @@ type GazetteerEntry = Record<string, unknown> & {
   prefLabel?: string;
   altLabels?: string[];
   names?: GazetteerName[];
+  externalLinks?: GazetteerExternalLink[];
   location?: GazetteerLocation | null;
   sources?: string[];
   fid?: number | null;
@@ -61,6 +70,42 @@ type GazetteerEntry = Record<string, unknown> & {
 function toArray<T>(value: T | T[] | undefined | null): T[] {
   if (value == null) return [];
   return Array.isArray(value) ? value : [value];
+}
+
+function appendValue(
+  entity: Record<string, unknown>,
+  property: string,
+  value: string,
+) {
+  const current = entity[property];
+  entity[property] = current == null ? value : [...toArray(current as string | string[]), value];
+}
+
+function addExternalAuthorityLinks(
+  entity: Record<string, unknown>,
+  links: GazetteerExternalLink[] | undefined,
+) {
+  for (const link of links ?? []) {
+    if (!link.identifier) continue;
+
+    const uri =
+      link.authority === 'wikidata'
+        ? `http://www.wikidata.org/entity/${link.identifier}`
+        : /^https?:\/\//.test(link.identifier)
+          ? link.identifier
+          : null;
+    if (!uri) continue;
+
+    switch (link.matchType) {
+      case 'exactMatch':
+      case 'closeMatch':
+      case 'broadMatch':
+      case 'narrowMatch':
+      case 'relatedMatch':
+        appendValue(entity, link.matchType, uri);
+        break;
+    }
+  }
 }
 
 function readJsonIfExists(path: string): Record<string, unknown> | null {
@@ -392,9 +437,7 @@ for (const entry of gazetteerEntries) {
     };
     if (primarySourceUri) featureEntity.P70i_is_documented_in = primarySourceUri;
     if (entry.description) featureEntity.description = entry.description;
-    if (entry.wikidataQid) {
-      featureEntity.sameAs = `http://www.wikidata.org/entity/${entry.wikidataQid}`;
-    }
+    addExternalAuthorityLinks(featureEntity, entry.externalLinks);
 
     const featureProvId = `${DATA_BASE}provenance/gazetteer-feature-${id}`;
     featureEntity.wasDerivedFrom = featureProvId;
@@ -897,6 +940,7 @@ if (existsSync(geojsonSrc)) {
 
     // Inject stmId into existing features
     let enriched = 0;
+    const mappedGazetteerIds = new Set<string>();
     for (const feature of geojson.features) {
       const props = feature.properties;
       const pipelineFeatureUri =
@@ -916,16 +960,18 @@ if (existsSync(geojsonSrc)) {
         null;
       if (stmId) {
         props.stmId = stmId;
+        mappedGazetteerIds.add(stmId);
         enriched++;
       }
     }
     console.log(`  Enriched ${enriched} existing features with stmId`);
 
-    // Existing feature types in geojson are 'plantation', 'river', 'creek'
-    // Add features for types NOT already in the pipeline
+    // Existing feature types in geojson are 'plantation', 'river', 'creek'.
+    // Add any Gazetteer entry that was not matched to one of those pipeline
+    // features, including manually added points and unmatched natural features.
     for (const entry of entries) {
       const type = entry.type as string;
-      if (PIPELINE_TYPES.has(type)) continue;
+      if (mappedGazetteerIds.has(entry.id as string)) continue;
 
       const loc = entry.location || null;
       if (!loc) continue;
@@ -950,8 +996,14 @@ if (existsSync(geojsonSrc)) {
       const status =
         type === 'road' || type === 'railroad' ? 'infrastructure' : 'named';
 
-      // LineString / MultiLineString features (road/railroad) — use WKT if available
-      if (loc.wkt && (type === 'road' || type === 'railroad')) {
+      // LineString / MultiLineString features — use WKT if available.
+      if (
+        loc.wkt &&
+        (type === 'road' ||
+          type === 'railroad' ||
+          type === 'river' ||
+          type === 'creek')
+      ) {
         const isMulti = /^MultiLineString\s*\(/i.test(loc.wkt);
         let geometry:
           | { type: 'LineString'; coordinates: number[][] }
@@ -1019,6 +1071,41 @@ if (existsSync(geojsonSrc)) {
           added++;
         }
         continue;
+      }
+
+      // Polygon features not already present in the source GeoJSON.
+      if (loc.wkt && type === 'plantation') {
+        const match = loc.wkt.match(/Polygon\s*\(\(([^)]+)\)\)/i);
+        if (match) {
+          const coordinates: number[][] = [];
+          for (const pair of match[1].split(',')) {
+            const points = pair.trim().split(/\s+/);
+            if (points.length < 2) continue;
+            const lon = parseFloat(points[0]);
+            const lat = parseFloat(points[1]);
+            if (!isNaN(lon) && !isNaN(lat)) coordinates.push([lon, lat]);
+          }
+          if (coordinates.length >= 3) {
+            geojson.features.push({
+              type: 'Feature',
+              id: `${type}-${entry.fid || entry.id}`,
+              geometry: { type: 'Polygon', coordinates: [coordinates] },
+              properties: {
+                fid: entry.fid ?? null,
+                name: displayName,
+                allNames: nameTexts,
+                stmId: entry.id as string,
+                featureUri,
+                placeUri,
+                status,
+                featureType: type,
+                mapYear: derivedMapYear,
+              },
+            });
+            added++;
+            continue;
+          }
+        }
       }
 
       // Point features — use lat/lng
@@ -1119,6 +1206,19 @@ if (existsSync(thesaurusSrc)) {
 if (existsSync(sourcesSrc)) {
   copyFileSync(sourcesSrc, join(OUT_DIR, 'sources-registry.jsonld'));
   console.log('  Copied sources-registry.jsonld');
+}
+
+// Publish the complete graph and its context alongside the frontend indexes.
+// These artifacts are generated by generate-database.ts before this script runs.
+for (const [source, name] of [
+  [databaseSrc, 'database.jsonld'],
+  [contextSrc, 'context.jsonld'],
+] as const) {
+  if (!existsSync(source)) {
+    throw new Error(`Missing generated LOD artifact: ${source}`);
+  }
+  copyFileSync(source, join(OUT_DIR, name));
+  console.log(`  Published ${name}`);
 }
 
 console.log('\nDone! Data files ready in public/data/');

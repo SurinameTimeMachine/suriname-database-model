@@ -3,7 +3,7 @@
     "skos": "http://www.w3.org/2004/02/skos/core#",
     "crm": "http://www.cidoc-crm.org/cidoc-crm/",
     "dct": "http://purl.org/dc/terms/",
-    "stm": "https://data.suriname-timemachine.org/",
+    "stm": "https://data.surinametijdmachine.org/",
     "xsd": "http://www.w3.org/2001/XMLSchema#",
     "prefLabel": {
       "@id": "skos:prefLabel",
@@ -243,11 +243,11 @@
       ],
       "closeMatch": [
         "http://www.wikidata.org/entity/Q245016",
-        "https://www.wikidata.org/wiki/Q1321241",
+        "http://www.wikidata.org/entity/Q1321241",
         "https://schema.org/DefenceEstablishment"
       ],
       "typeId": "military-post",
-      "color": "#8e9a7e",
+      "color": "#c98763",
       "crmClass": "E25_Human-Made_Feature",
       "crmBadge": "E25",
       "sortOrder": 2,
@@ -288,7 +288,7 @@
         "stm:vocabulary/place-type/creek"
       ],
       "exactMatch": [
-        "https://www.wikidata.org/wiki/Q376799"
+        "http://www.wikidata.org/entity/Q376799"
       ]
     },
     {
@@ -388,7 +388,7 @@
       "inScheme": "stm:vocabulary/place-type",
       "broader": "stm:vocabulary/place-type/human-made",
       "closeMatch": [
-        "https://www.wikidata.org/wiki/Q131862"
+        "http://www.wikidata.org/entity/Q131862"
       ],
       "typeId": "station",
       "color": "#d4a882",
@@ -410,7 +410,7 @@
         ]
       },
       "exactMatch": [
-        "https://www.wikidata.org/wiki/Q111340425"
+        "http://www.wikidata.org/entity/Q111340425"
       ]
     },
     {
@@ -477,7 +477,7 @@
       "created": "2026-04-07",
       "modified": "2026-06-23",
       "closeMatch": [
-        "https://www.wikidata.org/wiki/Q22674925",
+        "http://www.wikidata.org/entity/Q22674925",
         "https://vocab.getty.edu/aat/300008347",
         "https://lod.enslaved.org/wiki/Q194"
       ]
@@ -571,7 +571,7 @@
         "stm:vocabulary/place-type/maroon-village"
       ],
       "exactMatch": [
-        "https://www.wikidata.org/wiki/Q121777466"
+        "http://www.wikidata.org/entity/Q121777466"
       ]
     },
     {
@@ -609,8 +609,8 @@
       "inScheme": "stm:vocabulary/place-type",
       "broader": "stm:vocabulary/place-type/settlement",
       "closeMatch": [
-        "https://www.wikidata.org/wiki/Q445485",
-        "https://www.wikidata.org/wiki/Q1415423"
+        "http://www.wikidata.org/entity/Q445485",
+        "http://www.wikidata.org/entity/Q1415423"
       ],
       "typeId": "maroon-village",
       "color": "#d09070",
@@ -670,7 +670,7 @@
         "stm:vocabulary/place-type/creek"
       ],
       "closeMatch": [
-        "https://www.wikidata.org/wiki/Q355304"
+        "http://www.wikidata.org/entity/Q355304"
       ]
     },
     {
@@ -714,7 +714,7 @@
         "stm:vocabulary/place-type/river"
       ],
       "exactMatch": [
-        "https://www.wikidata.org/wiki/Q2043393",
+        "http://www.wikidata.org/entity/Q2043393",
         "https://vocab.getty.edu/aat/300008706"
       ]
     },
@@ -749,8 +749,32 @@
         "stm:vocabulary/place-type/Division"
       ],
       "closeMatch": [
-        "https://www.wikidata.org/wiki/Q1649296"
+        "http://www.wikidata.org/entity/Q1649296"
       ]
+    },
+    {
+      "@id": "stm:vocabulary/place-type/historical-address",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "prefLabel": {
+        "en": "Historical Address Point",
+        "nl": "Historisch Adrespunt"
+      },
+      "definition": {
+        "en": "A source-specific georeferenced address observation. It records an address and map position at a stated time, without asserting that the address or building remained unchanged outside that source.",
+        "nl": "Een bronspecifieke gegeorefereerde adreswaarneming. Deze registreert een adres en kaartpositie op een bepaald moment, zonder te stellen dat het adres of gebouw buiten die bronperiode onveranderd bleef."
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/administrative",
+      "typeId": "historical-address",
+      "color": "#7ab56a",
+      "crmClass": "E53_Place",
+      "crmBadge": "E53",
+      "sortOrder": 13,
+      "created": "2026-06-24",
+      "modified": "2026-06-24"
     },
     {
       "@id": "stm:vocabulary/road-attributes",
@@ -879,9 +903,9 @@
       },
       "inScheme": "stm:vocabulary/place-type",
       "broader": "stm:vocabulary/place-type/administrative",
-      "crmClass": "E25_Human-Made_Feature",
-      "crmBadge": "E25",
-      "color": "#55fd62",
+      "crmClass": "E53_Place",
+      "crmBadge": "E53",
+      "color": "#7ab56a",
       "sortOrder": 99,
       "created": "2026-06-23",
       "modified": "2026-06-23",
@@ -901,7 +925,7 @@
         "stm:vocabulary/place-type/district"
       ],
       "closeMatch": [
-        "https://www.wikidata.org/wiki/Q19832712",
+        "http://www.wikidata.org/entity/Q19832712",
         "https://schema.org/AdministrativeArea"
       ]
     },
@@ -920,7 +944,7 @@
       "broader": "stm:vocabulary/place-type/human-made",
       "crmClass": "E25_Human-Made_Feature",
       "crmBadge": "E25",
-      "color": "#a8c88a",
+      "color": "#d59670",
       "sortOrder": 99,
       "created": "2026-06-23",
       "modified": "2026-06-23",
@@ -932,7 +956,7 @@
         "stm:vocabulary/place-type/military-post"
       ],
       "exactMatch": [
-        "https://www.wikidata.org/wiki/Q134127647"
+        "http://www.wikidata.org/entity/Q134127647"
       ],
       "altLabel": {
         "nl": [
@@ -956,7 +980,7 @@
       "broader": "stm:vocabulary/place-type/MilitaryInfrastructure",
       "crmClass": "E25_Human-Made_Feature",
       "crmBadge": "E25",
-      "color": "#9eba98",
+      "color": "#c98763",
       "sortOrder": 99,
       "created": "2026-06-23",
       "modified": "2026-06-23",
@@ -977,19 +1001,19 @@
         "stm:vocabulary/place-type/MilitaryInfrastructure"
       ],
       "exactMatch": [
-        "https://www.wikidata.org/wiki/Q1785071"
+        "http://www.wikidata.org/entity/Q1785071"
       ],
       "closeMatch": [
         "https://vocab.getty.edu/aat/300006887"
       ]
     },
     {
-      "@id": "stm:vocabulary/place-type/water infrastructure",
+      "@id": "stm:vocabulary/place-type/water-infrastructure",
       "@type": [
         "skos:Concept",
         "crm:E55_Type"
       ],
-      "typeId": "water infrastructure",
+      "typeId": "water-infrastructure",
       "prefLabel": {
         "en": "water management infrastructure",
         "nl": "Waterbouwkundige infrastructuur"
@@ -998,16 +1022,13 @@
       "broader": "stm:vocabulary/place-type/human-made",
       "crmClass": "E25_Human-Made_Feature",
       "crmBadge": "E25",
-      "color": "#5583fd",
+      "color": "#d9a37b",
       "sortOrder": 99,
       "created": "2026-06-23",
       "modified": "2026-06-23",
       "definition": {
         "nl": "Het geheel van door mensen aangelegde kunstwerken en infrastructurele elementen bedoeld om de waterhuishouding te reguleren, waterwegen bevaarbaar te houden, of gronden te beschermen tegen overstroming en verdroging.",
         "en": "The totality of man-made structures and infrastructure elements designed to regulate water management, maintain the navigability of waterways, or protect land from flooding and drought."
-      },
-      "editorialNote": {
-        "nl": "[toevoegen: sluis, kanaal, werf, steiger, haven]"
       }
     }
   ]

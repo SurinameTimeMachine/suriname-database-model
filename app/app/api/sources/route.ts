@@ -4,8 +4,8 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const REGISTRY_PATH = 'data/sources-registry.jsonld';
 
-const BASE_URI = 'https://data.suriname-timemachine.org/source/';
-const TYPE_BASE = 'https://data.suriname-timemachine.org/type/source-type/';
+const BASE_URI = 'https://data.surinametijdmachine.org/source/';
+const TYPE_BASE = 'https://data.surinametijdmachine.org/type/source-type/';
 
 interface SourcePayload {
   sourceId: string;

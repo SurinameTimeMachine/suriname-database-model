@@ -1,6 +1,8 @@
 'use client';
 
 import 'leaflet/dist/leaflet.css';
+import { loadAllmapsAnnotation } from '@/lib/allmaps';
+import { HISTORIC_MAP_URLS } from '@/lib/historic-maps';
 import { usePlaceTypes } from '@/lib/thesaurus';
 import L from 'leaflet';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -23,16 +25,19 @@ if (typeof window !== 'undefined' && !_domUtilPatched) {
   _domUtilPatched = true;
 }
 
-const MAP_1930_URLS = [
-  'https://annotations.allmaps.org/maps/d9191cafde1831f0', // sheet 3
-  'https://annotations.allmaps.org/maps/dc967c11ce9e86b3', // sheet 4
-  'https://annotations.allmaps.org/maps/edaf1bbc8b86f0bf', // sheet 5
-  'https://annotations.allmaps.org/maps/9eac27facff8687f', // sheet 6
-  'https://annotations.allmaps.org/maps/5e0b6889ed3816d9', // sheet 7
-  'https://annotations.allmaps.org/maps/aacef031cb456d2a', // sheet 8
-  'https://annotations.allmaps.org/maps/4d07f0d3bf9fc347', // sheet 9
-  'https://annotations.allmaps.org/maps/ddd8d3ca24e1916a', // sheet 11
-];
+const HISTORIC_MAP_OVERLAY_URLS = HISTORIC_MAP_URLS;
+
+function safelyRemove(target: { remove: () => unknown } | null) {
+  if (!target) return;
+  try {
+    target.remove();
+  } catch (error) {
+    // Allmaps aborts in-flight annotation requests during Leaflet teardown.
+    // That is expected when React remounts this client component in dev mode.
+    if (error instanceof Error && error.name === 'AbortError') return;
+    console.error('Unable to remove the place mini-map layer.', error);
+  }
+}
 
 interface PlaceMiniMapProps {
   lat: number | null;
@@ -63,6 +68,7 @@ export default function PlaceMiniMap({
   const polylineRef = useRef<L.Polyline | null>(null);
   const warpedLayerRef = useRef<L.Layer | null>(null);
   const [show1930Map, setShow1930Map] = useState(false);
+  const [mapError, setMapError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
@@ -80,50 +86,71 @@ export default function PlaceMiniMap({
     mapRef.current = map;
 
     return () => {
-      warpedLayerRef.current?.remove();
+      safelyRemove(warpedLayerRef.current);
       warpedLayerRef.current = null;
-      map.remove();
+      safelyRemove(map);
       mapRef.current = null;
     };
   }, []);
 
-  // Load or unload the 1930 Plantation Map overlay
+  // Load or unload the curated historic-map overlay.
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
 
     if (!show1930Map) {
-      warpedLayerRef.current?.remove();
+      safelyRemove(warpedLayerRef.current);
       warpedLayerRef.current = null;
       return;
     }
 
     let cancelled = false;
-    import('@allmaps/leaflet')
-      .then(async ({ WarpedMapLayer }) => {
-        if (cancelled || !mapRef.current) return;
-        const layer = new WarpedMapLayer(MAP_1930_URLS[0]);
-        layer.addTo(mapRef.current);
-        for (const url of MAP_1930_URLS.slice(1)) {
-          if (cancelled) break;
-          await (
-            layer as unknown as {
-              addGeoreferenceAnnotationByUrl: (u: string) => Promise<unknown>;
-            }
-          ).addGeoreferenceAnnotationByUrl(url);
+    let layer: L.Layer | null = null;
+    Promise.allSettled(HISTORIC_MAP_OVERLAY_URLS.map(loadAllmapsAnnotation))
+      .then(async (results) => {
+        const annotations: unknown[] = [];
+        for (const result of results) {
+          if (result.status === 'fulfilled') annotations.push(result.value);
         }
-        if (!cancelled) warpedLayerRef.current = layer;
+        if (annotations.length === 0) {
+          throw new Error('No historic map image service is available.');
+        }
+        const { WarpedMapLayer } = await import('@allmaps/leaflet');
+        if (cancelled || !mapRef.current) return;
+        layer = new WarpedMapLayer(annotations[0]);
+        layer.addTo(mapRef.current);
+        for (const annotation of annotations.slice(1)) {
+          if (cancelled) break;
+          (
+            layer as unknown as {
+              addGeoreferenceAnnotation: (value: unknown) => unknown;
+            }
+          ).addGeoreferenceAnnotation(annotation);
+        }
+        if (!cancelled) {
+          warpedLayerRef.current = layer;
+        } else {
+          safelyRemove(layer);
+        }
       })
       .catch(() => {
-        // Allmaps failed to load — mini map still usable without overlay
+        if (!cancelled) {
+          setMapError('Historic map image services are currently unavailable.');
+          setShow1930Map(false);
+        }
       });
 
     return () => {
       cancelled = true;
+      safelyRemove(layer);
+      if (warpedLayerRef.current === layer) warpedLayerRef.current = null;
     };
   }, [show1930Map]);
 
-  const toggle1930Map = useCallback(() => setShow1930Map((v) => !v), []);
+  const toggle1930Map = useCallback(() => {
+    setMapError(null);
+    setShow1930Map((v) => !v);
+  }, []);
 
   // Update map content when props change
   useEffect(() => {
@@ -231,7 +258,7 @@ export default function PlaceMiniMap({
       <button
         type="button"
         onClick={toggle1930Map}
-        title="Toggle 1930 plantation map"
+        title={mapError ?? 'Toggle historic maps'}
         className={[
           'absolute bottom-2 right-2 z-1000 px-2 py-0.5 text-[11px] font-medium border leading-tight',
           show1930Map
@@ -239,7 +266,7 @@ export default function PlaceMiniMap({
             : 'bg-white/90 text-stm-warm-600 border-stm-warm-300 hover:bg-stm-warm-50',
         ].join(' ')}
       >
-        1930
+        {mapError ? 'Historic maps unavailable' : 'Historic maps'}
       </button>
     </div>
   );

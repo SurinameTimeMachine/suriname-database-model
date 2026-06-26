@@ -54,6 +54,36 @@ interface RelDef {
   desc: string;
 }
 
+type ImplementationStatus = 'aggregate' | 'record' | 'planned';
+
+const IMPLEMENTATION_STATUS: Record<string, ImplementationStatus> = {
+  e25: 'aggregate',
+  e26: 'aggregate',
+  e74: 'aggregate',
+  e53: 'aggregate',
+  e41: 'aggregate',
+  e22: 'aggregate',
+  e13: 'aggregate',
+  e17: 'record',
+  e36: 'aggregate',
+  e52: 'aggregate',
+  e39: 'planned',
+  e55: 'aggregate',
+  e54: 'planned',
+  e12: 'aggregate',
+  e42: 'record',
+  e81: 'planned',
+  e11: 'planned',
+  e6: 'planned',
+  e68: 'planned',
+};
+
+const STATUS_LABEL: Record<ImplementationStatus, string> = {
+  aggregate: 'Implemented in aggregate graph',
+  record: 'Implemented in place-record JSON-LD',
+  planned: 'Planned / not yet serialized',
+};
+
 const ENTITIES: EntityDef[] = [
   /* ── Data-backed entities ────────────────────────────────────── */
   {
@@ -76,7 +106,7 @@ const ENTITIES: EntityDef[] = [
       },
       {
         name: 'P52 has current owner',
-        range: 'E74 Organization (plantations only)',
+        range: 'E74 Organization (legacy aggregate link)',
       },
       {
         name: 'P51 has former or current owner',
@@ -157,7 +187,7 @@ const ENTITIES: EntityDef[] = [
         range: 'E42 Identifier (QGIS feature ID)',
       },
       { name: 'P1 is identified by', range: 'E41 Appellation (map label)' },
-      { name: 'dcterms:conformsTo', range: 'EPSG:31170 (Suriname Old TM)' },
+      { name: 'geo:asWKT CRS', range: 'CRS84 / WGS84 output geometry' },
       { name: 'geo:hasGeometry', range: 'geo:Geometry' },
       { name: 'geo:asWKT', range: 'wktLiteral (Point/LineString/Polygon)' },
       { name: 'P70i is documented in', range: 'E22 Source (map)' },
@@ -233,7 +263,7 @@ const ENTITIES: EntityDef[] = [
     type: 'E17',
     label: 'Type Assignment',
     crmClass: 'E17 Type Assignment',
-    desc: 'Time-scoped classification for any mapped feature. E17 records source presence, lifecycle status (built, present, abandoned, reactivated), and functional or use assignments. It targets the feature with P41 classified and assigns an E55 type with P42 assigned.',
+    desc: 'Time-scoped operational classification in the place-record profile. Almanakken-derived values mean cultivation attested, abandonment reported, or cultivation re-attested; they do not assert physical construction or destruction of the E25 feature.',
     color: CRM_COLORS.E17,
     cx: 400,
     cy: 490,
@@ -358,7 +388,7 @@ const ENTITIES: EntityDef[] = [
     type: 'E42',
     label: 'Identifier',
     crmClass: 'E42 Identifier',
-    desc: 'External identifiers linking entities to authority databases. Wikidata Q-IDs for organizations (e.g. Q4392658), PSUR IDs from slave registers, QGIS feature IDs (fid) for polygon geometries, and map catalogue identifiers.',
+    desc: 'Explicit identifiers in the place-record profile, including QGIS feature IDs. Aggregate graph identifiers remain partly transitional literals and are being migrated to E42 nodes.',
     color: CRM_COLORS.E42,
     cx: 920,
     cy: 100,
@@ -806,7 +836,19 @@ function SchemaGraph({
           strokeDasharray="4 2"
         />
         <text x="122" y="4" className="text-[9px] fill-stm-warm-500">
-          Structural (inferred)
+          Planned
+        </text>
+        <circle
+          cx="205"
+          cy="0"
+          r="6"
+          fill="white"
+          stroke="#a67830"
+          strokeWidth="1.5"
+          strokeDasharray="2 2"
+        />
+        <text x="217" y="4" className="text-[9px] fill-stm-warm-500">
+          Place-record profile
         </text>
       </g>
 
@@ -870,7 +912,9 @@ function SchemaGraph({
       {/* Entity nodes */}
       {ENTITIES.map((ent) => {
         const isSelected = selectedEntity === ent.id;
-        const isStructural = ent.structural;
+        const status = IMPLEMENTATION_STATUS[ent.id];
+        const isStructural = status === 'planned';
+        const isRecordOnly = status === 'record';
         const r = isStructural ? 28 : 36;
         const count = ent.dataKey
           ? (counts[ent.dataKey as keyof EntityCounts] ?? 0)
@@ -905,7 +949,9 @@ function SchemaGraph({
               fill="white"
               stroke={ent.color}
               strokeWidth={isSelected ? 3 : 2}
-              strokeDasharray={isStructural ? '6 3' : undefined}
+              strokeDasharray={
+                isStructural ? '6 3' : isRecordOnly ? '2 2' : undefined
+              }
             />
             <circle
               cx={ent.cx}
@@ -959,6 +1005,7 @@ function EntityDetail({
   entity: EntityDef;
   count: number | null;
 }) {
+  const status = IMPLEMENTATION_STATUS[entity.id];
   return (
     <div className="site-surface p-6">
       <div className="flex items-start gap-4 mb-4">
@@ -967,7 +1014,7 @@ function EntityDetail({
           style={{
             backgroundColor: entity.color,
             color: badgeTextColor(entity.color),
-            border: entity.structural
+            border: status === 'planned'
               ? '2px dashed rgba(0,0,0,0.15)'
               : undefined,
           }}
@@ -983,15 +1030,14 @@ function EntityDetail({
       <p className="mb-4 text-sm leading-relaxed text-ink/65">{entity.desc}</p>
 
       <div className="flex items-center gap-3 mb-5">
-        {entity.structural ? (
-          <span className="bg-background px-3 py-1 text-sm italic text-ink/55">
-            Structural class (inferred from data)
-          </span>
-        ) : (
+        {status === 'aggregate' && count !== null && (
           <span className="bg-background px-3 py-1 text-sm font-semibold text-ink/75">
-            {(count ?? 0).toLocaleString()} entities
+            {count.toLocaleString()} entities
           </span>
         )}
+        <span className="bg-background px-3 py-1 text-sm italic text-ink/55">
+          {STATUS_LABEL[status]}
+        </span>
       </div>
 
       <div>
@@ -1678,6 +1724,99 @@ function ModelPageInner() {
         <div className="mb-10">
           <ProvenanceBoundarySection />
         </div>
+
+        {/* Interoperability */}
+        <section className="mb-10 site-surface p-6">
+          <div className="mb-5">
+            <div className="site-kicker mb-2">Interoperability</div>
+            <h2 className="mb-2 text-2xl font-semibold text-ink">
+              CIDOC-CRM, JSON-LD, and Linked Art
+            </h2>
+            <p className="max-w-3xl text-sm leading-relaxed text-ink/65">
+              CIDOC-CRM is the data model. The project generates JSON-LD from
+              that model using a shared context. Linked Art is a CIDOC-CRM
+              application profile; it is not yet an output format or API here.
+            </p>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="site-panel p-4">
+              <h3 className="mb-2 text-sm font-semibold text-ink">
+                Current implementation
+              </h3>
+              <p className="text-sm leading-relaxed text-ink/65">
+                The generated database and standalone context use CIDOC-CRM
+                terms in JSON-LD. The context source and its validation are
+                part of the data pipeline.
+              </p>
+              <p className="mt-3 text-xs text-ink/60">
+                <a
+                  className="underline decoration-ink/30 underline-offset-2 hover:text-ink"
+                  href="https://cidoc-crm.org/versions-of-the-cidoc-crm"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  CIDOC-CRM
+                </a>
+                {' · '}
+                <a
+                  className="underline decoration-ink/30 underline-offset-2 hover:text-ink"
+                  href="https://www.w3.org/TR/json-ld/"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  JSON-LD 1.1
+                </a>
+                {' · '}
+                <a
+                  className="underline decoration-ink/30 underline-offset-2 hover:text-ink"
+                  href="https://github.com/SurinameTimeMachine/suriname-database-model/blob/main/app/scripts/lod-context.ts"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  project context source
+                </a>
+              </p>
+            </div>
+
+            <div className="site-panel p-4">
+              <h3 className="mb-2 text-sm font-semibold text-ink">
+                Planned alignment
+              </h3>
+              <p className="text-sm leading-relaxed text-ink/65">
+                Linked Art alignment would add profile-specific documents and
+                an API. It should be introduced only when those outputs are
+                defined and tested.
+              </p>
+              <p className="mt-3 text-xs text-ink/60">
+                <a
+                  className="underline decoration-ink/30 underline-offset-2 hover:text-ink"
+                  href="https://linked.art/api/1.0/json-ld/"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Linked Art JSON-LD specification
+                </a>
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-5 flex flex-wrap items-center gap-2 text-xs text-ink/65">
+            <span className="site-surface-background px-2 py-1">
+              CIDOC-CRM model
+            </span>
+            <span aria-hidden="true">→</span>
+            <span className="site-surface-background px-2 py-1">
+              JSON-LD context
+            </span>
+            <span className="border-b border-dashed border-ink/40 px-1 text-ink/50">
+              planned
+            </span>
+            <span className="site-surface-background px-2 py-1">
+              Linked Art profile / API
+            </span>
+          </div>
+        </section>
 
         {/* All entities quick reference */}
         <div className="mb-10">

@@ -22,9 +22,9 @@ proj4.defs(
 const BASE_DIR = join(__dirname, '../..');
 const RIVERS_CSV = join(BASE_DIR, 'data/07-gis-plantation-map-1930/rivers.csv');
 
-const STM = 'https://suriname-timemachine.org/ontology/';
+const STM = 'https://data.surinametijdmachine.org/';
 const VOCAB_BASE =
-  'https://data.suriname-timemachine.org/vocabulary/geographical-feature/natural';
+  'https://data.surinametijdmachine.org/vocabulary/geographical-feature/natural';
 
 // --- Types ---
 
@@ -187,7 +187,9 @@ export function transformRivers(): RiverTransformResult {
     // E41 Appellations
     let e41_1930_uri = '';
     if (label1930) {
-      e41_1930_uri = `${STM}appellation/${slugify(label1930)}-river-map1930`;
+      // `slug` is unique per river segment. A label alone may occur on
+      // multiple segments, so it cannot identify an E41 assertion.
+      e41_1930_uri = `${STM}appellation/${slug}-river-map1930`;
       e41.push({
         uri: e41_1930_uri,
         symbolic_content: label1930,
@@ -200,7 +202,7 @@ export function transformRivers(): RiverTransformResult {
     }
 
     if (label1882) {
-      const e41_1882_uri = `${STM}appellation/${slugify(label1882)}-river-map1882`;
+      const e41_1882_uri = `${STM}appellation/${slug}-river-map1882`;
       e41.push({
         uri: e41_1882_uri,
         symbolic_content: label1882,
@@ -215,7 +217,7 @@ export function transformRivers(): RiverTransformResult {
 
     if (altLabel && altLabel !== label1930 && altLabel !== label1882) {
       e41.push({
-        uri: `${STM}appellation/${slugify(altLabel)}-river-alt`,
+        uri: `${STM}appellation/${slug}-river-alt`,
         symbolic_content: altLabel,
         language: 'nl',
         carried_by: '',

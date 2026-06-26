@@ -273,6 +273,8 @@ export interface LocationAssertion {
   startYear?: number;
   endYear?: number;
   note?: string | null;
+  /** Stable feature/row locator in the original source dataset. */
+  sourceRow?: string;
 }
 
 /**
@@ -318,7 +320,8 @@ export type PlaceType =
   | 'town'
   | 'transport-infrastructure'
   | 'road'
-  | 'railroad';
+  | 'railroad'
+  | 'historical-address';
 
 // PLACE_TYPE_CRM and COLONIAL_BIAS_TYPES are now sourced from the
 // Geographical Features Thesaurus: data/place-types-thesaurus.jsonld
@@ -361,7 +364,6 @@ export interface GazetteerPlace extends TombstoneFields {
     crs: string;
   };
   sources: string[];
-  wikidataQid: string | null; // backward compat — derived from externalLinks
   externalLinks: ExternalLink[];
   fid: number | null;
   psurIds: string[];
@@ -373,6 +375,14 @@ export interface GazetteerPlace extends TombstoneFields {
   productAssertions?: ProductAssertion[];
   locationAssertions?: LocationAssertion[];
   statusAssertions?: StatusAssertion[];
+  /** The E53 location is a persistent coordinate anchor for source observations. */
+  locationPoint?: boolean;
+  /** Immutable locator for a source-derived entry, preserved across edits. */
+  sourceRecord?: {
+    dataset: string;
+    layer: string;
+    featureIndex: number;
+  };
   lifecycleEvents?: FeatureLifecycleEvent[];
   diklandRefs: DiklandRef[];
   modifiedBy: string | null;
@@ -380,6 +390,25 @@ export interface GazetteerPlace extends TombstoneFields {
   /** Set when this entry has been merged into another place. The value is the surviving place ID. */
   mergedInto?: string;
   // TombstoneFields inherited: deprecated, deprecatedAt, deprecatedBy, replacedBy, deprecationNote
+}
+
+/** Return all authority links for an authority without flattening match semantics. */
+export function getAuthorityLinks(
+  place: Pick<GazetteerPlace, 'externalLinks'>,
+  authority: string,
+): ExternalLink[] {
+  return place.externalLinks.filter((link) => link.authority === authority);
+}
+
+/**
+ * Return the first authority link for integrations that can accept one identifier only.
+ * New data should retain the complete externalLinks array.
+ */
+export function getPrimaryAuthorityLink(
+  place: Pick<GazetteerPlace, 'externalLinks'>,
+  authority: string,
+): ExternalLink | null {
+  return getAuthorityLinks(place, authority)[0] ?? null;
 }
 
 // Union type for entity lookups

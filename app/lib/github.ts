@@ -103,7 +103,7 @@ export async function writeRepoFile(
   content: string,
   sha: string | null,
   message: string,
-): Promise<void> {
+): Promise<string> {
   const owner = process.env.GITHUB_REPO_OWNER;
   const repo = process.env.GITHUB_REPO_NAME;
   const branch = process.env.GITHUB_REPO_BRANCH || 'main';
@@ -216,4 +216,6 @@ export async function writeRepoFile(
       `Failed to update ref heads/${branch}: ${updateRefRes.status} ${err}`,
     );
   }
+
+  return newCommit.sha as string;
 }

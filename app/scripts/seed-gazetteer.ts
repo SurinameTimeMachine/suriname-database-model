@@ -22,7 +22,7 @@ import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import proj4 from 'proj4';
 
-import type { PlaceType } from '../lib/types';
+import type { ExternalLink, PlaceType } from '../lib/types';
 
 // Load CRM mapping from the thesaurus file
 const thesaurusPath = join(__dirname, '../../data/place-types-thesaurus.jsonld');
@@ -80,7 +80,7 @@ interface GazetteerPlace {
     crs: string;
   };
   sources: string[];
-  wikidataQid: string | null;
+  externalLinks: ExternalLink[];
   fid: number | null;
   psurIds: string[];
   district: string | null;
@@ -318,7 +318,7 @@ for (const name of Array.from(allDistricts).sort()) {
     description: 'Administrative district/division from Surinaamse Almanakken',
     location: { lat: null, lng: null, wkt: null, crs: 'EPSG:4326' },
     sources: ['almanakken'],
-    wikidataQid: null,
+    externalLinks: [],
     fid: null,
     psurIds: [],
     district: null,
@@ -350,7 +350,7 @@ for (const name of Array.from(allLocations).sort()) {
         : 'Road or path from Surinaamse Almanakken',
     location: { lat: null, lng: null, wkt: null, crs: 'EPSG:4326' },
     sources: ['almanakken'],
-    wikidataQid: null,
+    externalLinks: [],
     fid: null,
     psurIds: [],
     district: null,
@@ -405,7 +405,7 @@ for (const feature of Object.values(physicalFeaturesRaw)) {
       crs: 'EPSG:4326',
     },
     sources: ['map-1930'],
-    wikidataQid: null,
+    externalLinks: [],
     fid: fid ?? null,
     psurIds: [],
     district: null,
@@ -497,7 +497,7 @@ for (const place of Object.values(placesRaw)) {
       crs: 'EPSG:4326',
     },
     sources,
-    wikidataQid: qid,
+    externalLinks: qid ? [{ authority: 'wikidata', identifier: qid, matchType: 'closeMatch' }] : [],
     fid,
     psurIds,
     district: districtName,
@@ -558,7 +558,7 @@ for (const [qid, agg] of almByQid) {
     description: 'Plantation from Surinaamse Almanakken (no QGIS geometry)',
     location: { lat: null, lng: null, wkt: null, crs: 'EPSG:4326' },
     sources,
-    wikidataQid: qid,
+    externalLinks: qid ? [{ authority: 'wikidata', identifier: qid, matchType: 'closeMatch' }] : [],
     fid: null,
     psurIds,
     district: districtName,
@@ -695,7 +695,7 @@ for (const row of placesRows as Record<string, string>[]) {
       crs: 'EPSG:4326',
     },
     sources,
-    wikidataQid: null,
+    externalLinks: [],
     fid,
     psurIds: [],
     district: null,
@@ -750,7 +750,7 @@ for (const row of militaryRows as Record<string, string>[]) {
       crs: 'EPSG:4326',
     },
     sources: ['map-1882'],
-    wikidataQid: null,
+    externalLinks: [],
     fid,
     psurIds: [],
     district: null,
@@ -799,7 +799,7 @@ for (const row of roadsRows as Record<string, string>[]) {
       crs: 'EPSG:4326',
     },
     sources: ['map-1930'],
-    wikidataQid: null,
+    externalLinks: [],
     fid,
     psurIds: [],
     district: null,
@@ -848,7 +848,7 @@ for (const row of railroadRows as Record<string, string>[]) {
       crs: 'EPSG:4326',
     },
     sources: ['map-1930'],
-    wikidataQid: null,
+    externalLinks: [],
     fid,
     psurIds: [],
     district: null,
@@ -891,7 +891,7 @@ for (const [type, count] of Array.from(typeCounts).sort(
   console.log(`  ${type}: ${count}`);
 }
 
-const STM_BASE = 'https://data.suriname-timemachine.org/';
+const STM_BASE = 'https://data.surinametijdmachine.org/';
 
 // Build JSON-LD graph entries
 const graph = gazetteer.map((entry) => {
@@ -907,7 +907,7 @@ const graph = gazetteer.map((entry) => {
     description: entry.description,
     location: entry.location,
     sources: entry.sources,
-    wikidataQid: entry.wikidataQid,
+    externalLinks: entry.externalLinks,
     fid: entry.fid,
     psurIds: entry.psurIds,
     district: entry.district,
