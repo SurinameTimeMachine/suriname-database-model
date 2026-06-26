@@ -10,6 +10,7 @@ const MATCH_TYPES = new Set([
   'narrowMatch',
   'relatedMatch',
 ]);
+const WIKIDATA_QID = /^Q\d+$/;
 
 const THESAURUS_FILE = join(
   process.cwd(),
@@ -32,8 +33,9 @@ function readGraph(path: string): JsonObject[] {
     return Array.isArray(document['@graph'])
       ? (document['@graph'] as JsonObject[])
       : [];
-  } catch {
-    return [];
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(`Unable to read JSON-LD graph from ${path}: ${message}`);
   }
 }
 
@@ -98,7 +100,7 @@ function assertionErrors(
   const identifiers = new Set<string>();
 
   assertions.forEach((assertion, index) => {
-    if (!assertion || typeof assertion !== 'object') {
+    if (!assertion || typeof assertion !== 'object' || Array.isArray(assertion)) {
       errors.push(`${label} statement ${index + 1} is invalid`);
       return;
     }
@@ -138,7 +140,7 @@ export function prepareEditorialPlace(raw: unknown): {
   place?: GazetteerPlace;
   errors: string[];
 } {
-  if (!raw || typeof raw !== 'object')
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw))
     return { errors: ['Place payload is invalid'] };
 
   const { wikidataQid: _legacyWikidataQid, ...candidate } = raw as Record<string, unknown>;
@@ -154,6 +156,15 @@ export function prepareEditorialPlace(raw: unknown): {
     errors.push('A Gazetteer ID is required');
   if (!place.type || !crmMapping[place.type])
     errors.push('A valid place type is required');
+  place.names = (Array.isArray(place.names) ? place.names : []).flatMap(
+    (name, index) => {
+      if (!name || typeof name !== 'object' || Array.isArray(name)) {
+        errors.push(`Name ${index + 1} is invalid`);
+        return [];
+      }
+      return [name];
+    },
+  );
   if (!Array.isArray(place.names) || place.names.length === 0)
     errors.push('At least one name is required');
   if (!place.names?.some((name) => name.isPreferred && name.text?.trim()))
@@ -166,23 +177,37 @@ export function prepareEditorialPlace(raw: unknown): {
   }
 
   const seenExternalLinks = new Set<string>();
+  if (
+    (candidate as Record<string, unknown>).externalLinks != null &&
+    !Array.isArray((candidate as Record<string, unknown>).externalLinks)
+  ) {
+    errors.push('External links must be an array');
+  }
   place.externalLinks = (Array.isArray(place.externalLinks)
     ? place.externalLinks
     : []
   ).flatMap((link) => {
+    if (!link || typeof link !== 'object' || Array.isArray(link)) {
+      errors.push('Every external link must be an object');
+      return [];
+    }
     const authority = typeof link.authority === 'string' ? link.authority.trim() : '';
     const identifier = typeof link.identifier === 'string' ? link.identifier.trim() : '';
-    const key = `${authority}\u0000${identifier}`;
     if (!authority || !identifier) {
       errors.push('Every external link needs both an authority and identifier');
       return [];
     }
-    if (seenExternalLinks.has(key)) {
-      errors.push(`External link ${authority}:${identifier} is duplicated`);
+    if (authority === 'wikidata' && !WIKIDATA_QID.test(identifier)) {
+      errors.push(`External link ${authority}:${identifier} has an invalid QID`);
       return [];
     }
     if (!MATCH_TYPES.has(link.matchType)) {
       errors.push(`External link ${authority}:${identifier} has an invalid match type`);
+      return [];
+    }
+    const key = JSON.stringify([authority, identifier, link.matchType]);
+    if (seenExternalLinks.has(key)) {
+      errors.push(`External link ${authority}:${identifier}:${link.matchType} is duplicated`);
       return [];
     }
     seenExternalLinks.add(key);
@@ -212,6 +237,9 @@ export function prepareEditorialPlace(raw: unknown): {
     place.productAssertions,
   ]) {
     for (const assertion of assertions ?? []) {
+      if (!assertion || typeof assertion !== 'object' || Array.isArray(assertion)) {
+        continue;
+      }
       if (!assertion.id) continue;
       if (assertionIds.has(assertion.id)) {
         errors.push(`Assertion ID "${assertion.id}" is reused by more than one statement`);

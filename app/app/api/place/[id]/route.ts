@@ -26,15 +26,20 @@ export async function GET(
   const format = request.nextUrl.searchParams.get('format') === 'json'
     ? 'json'
     : 'jsonld';
-  const gazetteer = JSON.parse(
-    await readFile(GAZETTEER_PATH, 'utf-8'),
-  ) as GazetteerDocument;
-  const mergedInto = gazetteer['@graph']?.find(
-    (place) => place.id === id,
-  )?.mergedInto;
+  let mergedInto: string | undefined;
+  try {
+    const gazetteer = JSON.parse(
+      await readFile(GAZETTEER_PATH, 'utf-8'),
+    ) as GazetteerDocument;
+    mergedInto = gazetteer['@graph']?.find(
+      (place) => place.id === id,
+    )?.mergedInto;
+  } catch {
+    mergedInto = undefined;
+  }
   if (mergedInto && PLACE_ID.test(mergedInto)) {
     return NextResponse.redirect(
-      new URL(`/place/${mergedInto}.${format}`, request.url),
+      new URL(`/data/place-records/${mergedInto}.${format}`, request.url),
       308,
     );
   }

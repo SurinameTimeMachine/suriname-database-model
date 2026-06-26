@@ -86,9 +86,16 @@ function addExternalAuthorityLinks(
   links: GazetteerExternalLink[] | undefined,
 ) {
   for (const link of links ?? []) {
-    if (link.authority !== 'wikidata' || !link.identifier) continue;
+    if (!link.identifier) continue;
 
-    const uri = `http://www.wikidata.org/entity/${link.identifier}`;
+    const uri =
+      link.authority === 'wikidata'
+        ? `http://www.wikidata.org/entity/${link.identifier}`
+        : /^https?:\/\//.test(link.identifier)
+          ? link.identifier
+          : null;
+    if (!uri) continue;
+
     switch (link.matchType) {
       case 'exactMatch':
       case 'closeMatch':

@@ -26,9 +26,19 @@ stm:StatusAssertionShape
   sh:targetClass crm:E17_Type_Assignment ;
   sh:property [ sh:path crm:P41_classified ; sh:minCount 1 ] ;
   sh:property [ sh:path crm:P42_assigned ; sh:minCount 1 ] ;
-  sh:property [ sh:path prov:hadPrimarySource ; sh:minCount 1 ] .
+  sh:property [
+    sh:path prov:hadPrimarySource ;
+    sh:minCount 1 ;
+    sh:nodeKind sh:IRI ;
+    sh:pattern "^https://data\\.surinametijdmachine\\.org/source/"
+  ] .
 
 stm:CultivationEvidenceShape
   a sh:NodeShape ;
   sh:targetClass crm:E13_Attribute_Assignment ;
-  sh:property [ sh:path prov:hadPrimarySource ; sh:minCount 1 ] .
+  sh:property [
+    sh:path prov:hadPrimarySource ;
+    sh:minCount 1 ;
+    sh:nodeKind sh:IRI ;
+    sh:pattern "^https://data\\.surinametijdmachine\\.org/source/"
+  ] .

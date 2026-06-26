@@ -1201,7 +1201,7 @@ function PlacesPageInner() {
       </div>
 
       {publicationNotice && (
-        <div className="border-b border-teal-strong/20 bg-teal-strong/5 px-4 py-2 text-sm text-ink sm:px-6 lg:px-8">
+        <div className="border-b border-stm-warm-300/40 bg-stm-sepia-50 px-4 py-2 text-sm text-ink sm:px-6 lg:px-8">
           Gazetteer saved. The public HTML, JSON and JSON-LD representations
           will update with the deployment generated from this commit.
           <span className="ml-2 inline-flex flex-wrap gap-2">

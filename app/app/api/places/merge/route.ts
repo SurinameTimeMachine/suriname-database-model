@@ -82,6 +82,12 @@ export async function POST(request: NextRequest) {
       { status: 400 },
     );
   }
+  if (mergedPlace.id !== primaryId) {
+    return NextResponse.json(
+      { error: 'mergedPlace.id must match primaryId' },
+      { status: 400 },
+    );
+  }
 
   try {
     const { content, sha } = await readRepoFile(token, GAZETTEER_PATH);
@@ -137,9 +143,12 @@ export async function POST(request: NextRequest) {
     // Update the primary entry
     gazetteer[primaryIdx] = prepared.place;
 
+    const { wikidataQid: _retiredLegacyWikidataQid, ...retiredPlace } =
+      gazetteer[retiredIdx] as GazetteerPlace & { wikidataQid?: unknown };
+
     // Mark the retired entry
     gazetteer[retiredIdx] = {
-      ...gazetteer[retiredIdx],
+      ...retiredPlace,
       mergedInto: primaryId,
       modifiedBy: login,
       modifiedAt: now,

@@ -3,6 +3,22 @@ type Annotation = {
 };
 
 type AnnotationDocument = Annotation | { items?: Annotation[] };
+const FETCH_TIMEOUT_MS = 10_000;
+
+async function fetchWithTimeout(url: string) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  try {
+    return await fetch(url, { signal: controller.signal });
+  } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error('The map service request timed out.');
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
 
 function annotationItems(document: AnnotationDocument): Annotation[] {
   if ('items' in document) return document.items ?? [];
@@ -21,7 +37,7 @@ function infoUrl(imageService: string) {
  * first so a 404 does not escape from the renderer as an unhandled rejection.
  */
 export async function loadAllmapsAnnotation(annotationUrl: string) {
-  const annotationResponse = await fetch(annotationUrl);
+  const annotationResponse = await fetchWithTimeout(annotationUrl);
   if (!annotationResponse.ok) {
     throw new Error('The map annotation is unavailable.');
   }
@@ -40,7 +56,7 @@ export async function loadAllmapsAnnotation(annotationUrl: string) {
   }
 
   const responses = await Promise.all(
-    sourceUrls.map((source) => fetch(infoUrl(source))),
+    sourceUrls.map((source) => fetchWithTimeout(infoUrl(source))),
   );
   if (
     responses.some(

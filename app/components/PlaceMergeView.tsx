@@ -121,7 +121,7 @@ function computeMergedPlace(
     ...(placeA.externalLinks || []),
     ...(placeB.externalLinks || []),
   ]) {
-    const dedupeKey = `${l.authority}:${l.identifier}:${l.matchType}`;
+    const dedupeKey = JSON.stringify([l.authority, l.identifier, l.matchType]);
     const jsonKey = JSON.stringify(l);
     if (
       !seenLinks.has(dedupeKey) &&
@@ -456,7 +456,7 @@ export default function PlaceMergeView({
       ...(placeA.externalLinks || []),
       ...(placeB.externalLinks || []),
     ]) {
-      const key = `${l.authority}:${l.identifier}:${l.matchType}`;
+      const key = JSON.stringify([l.authority, l.identifier, l.matchType]);
       if (!seen.has(key)) {
         seen.add(key);
         result.push(l);

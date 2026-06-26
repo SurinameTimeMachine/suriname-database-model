@@ -133,8 +133,13 @@ function main() {
     hosts.has('www.wikidata.org'),
     'Generated graph has no outbound Wikidata links',
   );
+  const hasRetiredHost = [...hosts].some(
+    (host) =>
+      host === 'suriname-timemachine.org' ||
+      host.endsWith('.suriname-timemachine.org'),
+  );
   assert(
-    !hosts.has('suriname-timemachine.org'),
+    !hasRetiredHost,
     'Generated graph still references the retired ontology host',
   );
 
@@ -148,44 +153,55 @@ function main() {
   let externalLinkCount = 0;
   for (const entry of gazetteer['@graph']) {
     assert(
-      !Object.hasOwn(entry, 'wikidataQid'),
-      `Legacy wikidataQid found on gazetteer entry ${String(entry.id)}`,
+      entry && typeof entry === 'object' && !Array.isArray(entry),
+      'Gazetteer @graph must contain only object entries',
+    );
+    const entryRecord = entry as Record<string, unknown>;
+    const entryId =
+      typeof entryRecord['@id'] === 'string'
+        ? entryRecord['@id']
+        : typeof entryRecord.id === 'string'
+          ? entryRecord.id
+          : '(missing @id)';
+    assert(
+      !Object.hasOwn(entryRecord, 'wikidataQid'),
+      `Legacy wikidataQid found on gazetteer entry ${entryId}`,
     );
     assert(
-      Array.isArray(entry.externalLinks),
-      `Gazetteer entry ${String(entry.id)} has no externalLinks array`,
+      Array.isArray(entryRecord.externalLinks),
+      `Gazetteer entry ${entryId} has no externalLinks array`,
     );
 
     const linkKeys = new Set<string>();
-    for (const link of entry.externalLinks) {
+    for (const link of entryRecord.externalLinks) {
       assert(
         link && typeof link === 'object' && !Array.isArray(link),
-        `Invalid external link on gazetteer entry ${String(entry.id)}`,
+        `Invalid external link on gazetteer entry ${entryId}`,
       );
       const { authority, identifier, matchType } = link as Record<string, unknown>;
       assert(
         typeof authority === 'string' && authority.trim().length > 0,
-        `External link has no authority on gazetteer entry ${String(entry.id)}`,
+        `External link has no authority on gazetteer entry ${entryId}`,
       );
       assert(
         typeof identifier === 'string' && identifier.trim().length > 0,
-        `External link has no identifier on gazetteer entry ${String(entry.id)}`,
+        `External link has no identifier on gazetteer entry ${entryId}`,
       );
       assert(
         typeof matchType === 'string' && SKOS_MATCH_TYPES.has(matchType),
-        `External link has invalid matchType on gazetteer entry ${String(entry.id)}`,
+        `External link has invalid matchType on gazetteer entry ${entryId}`,
       );
       if (authority === 'wikidata') {
         assert(
           WIKIDATA_QID.test(identifier),
-          `Invalid Wikidata identifier ${identifier} on gazetteer entry ${String(entry.id)}`,
+          `Invalid Wikidata identifier ${identifier} on gazetteer entry ${entryId}`,
         );
       }
 
-      const key = `${authority}:${identifier}`;
+      const key = JSON.stringify([authority, identifier, matchType]);
       assert(
         !linkKeys.has(key),
-        `Duplicate external link ${key} on gazetteer entry ${String(entry.id)}`,
+        `Duplicate external link ${key} on gazetteer entry ${entryId}`,
       );
       linkKeys.add(key);
       externalLinkCount++;

@@ -151,9 +151,12 @@ export async function PUT(request: NextRequest) {
       })
     ).json();
 
+    const { wikidataQid: _existingLegacyWikidataQid, ...existingPlace } =
+      gazetteer[idx] as GazetteerPlace & { wikidataQid?: unknown };
+
     // Merge provided fields onto existing entry
     const merged = {
-      ...gazetteer[idx],
+      ...existingPlace,
       ...partial,
     } as GazetteerPlace & {
       '@id'?: string;
@@ -247,13 +250,19 @@ export async function DELETE(request: NextRequest) {
     ).json();
 
     // Tombstone: mark deprecated in-place — never remove the entry
-    const entry = gazetteer[idx];
-    entry.deprecated = true;
-    entry.deprecatedAt = now;
-    entry.deprecatedBy = login;
+    const { wikidataQid: _legacyWikidataQid, ...entry } = gazetteer[
+      idx
+    ] as GazetteerPlace & { wikidataQid?: unknown };
+    const tombstone = {
+      ...entry,
+      deprecated: true as const,
+      deprecatedAt: now,
+      deprecatedBy: login,
+    };
     if (typeof deprecationNote === 'string' && deprecationNote.trim()) {
-      entry.deprecationNote = deprecationNote.trim();
+      tombstone.deprecationNote = deprecationNote.trim();
     }
+    gazetteer[idx] = tombstone;
 
     jsonld['@graph'] = gazetteer;
 

@@ -5,6 +5,10 @@ const RECORD_PATH = new RegExp(`^/place/(${PLACE_ID})\\.(jsonld|json)$`);
 const HTML_RECORD_PATH = new RegExp(`^/place/(${PLACE_ID})$`);
 
 export function proxy(request: NextRequest) {
+  if (request.method !== 'GET' && request.method !== 'HEAD') {
+    return NextResponse.next();
+  }
+
   const { pathname } = request.nextUrl;
   const extensionMatch = pathname.match(RECORD_PATH);
   if (extensionMatch) {

@@ -179,6 +179,17 @@ function wikidataUri(identifier: string): string {
   return `http://www.wikidata.org/entity/${identifier}`;
 }
 
+function externalLinkUri(link: ExternalLink): string | null {
+  if (!link.identifier) return null;
+  if (link.authority === 'wikidata') return wikidataUri(link.identifier);
+  return /^https?:\/\//.test(link.identifier) ? link.identifier : null;
+}
+
+function appendLink(entity: JsonObject, property: string, uri: string) {
+  const current = entity[property];
+  entity[property] = current == null ? uri : [...asArray(current as string | string[]), uri];
+}
+
 function wikidataIds(entry: GazetteerEntry): string[] {
   return (entry.externalLinks ?? [])
     .filter(
@@ -206,7 +217,7 @@ function loadAlmanakkenEvidence(): Map<string, AlmanakkenEvidence[]> {
       qid,
       year: Number.isFinite(year) ? year : undefined,
       product: (row.product_std ?? '').trim(),
-      deserted: Boolean((row.deserted ?? '').trim()),
+      deserted: (row.deserted ?? '').trim().toLowerCase() === 'verlaten',
       sourceName: (row.plantation_org ?? '').trim(),
       sourcePage: (row.page ?? '').trim(),
     };
@@ -292,7 +303,7 @@ export function generatePlaceRecords() {
       'dcterms:identifier': entry.id,
       'rdfs:label': label,
       describes: hasFeature ? [featureUri, locationUri] : [locationUri],
-      'prov:wasDerivedFrom': sourceUris,
+      'prov:wasDerivedFrom': [...sourceUris],
     };
     graph.push(record);
 
@@ -303,14 +314,21 @@ export function generatePlaceRecords() {
         'rdfs:label': label,
         P2_has_type: `${BASE}type/place-type/${entry.type}`,
         P53_has_location: locationUri,
-        'prov:wasDerivedFrom': sourceUris,
+        'prov:wasDerivedFrom': [...sourceUris],
       };
       for (const link of entry.externalLinks ?? []) {
-        if (link.authority !== 'wikidata' || !link.identifier) continue;
+        const uri = externalLinkUri(link);
+        if (!uri) continue;
         if (link.matchType === 'exactMatch') {
-          feature['skos:exactMatch'] = wikidataUri(link.identifier);
+          appendLink(feature, 'skos:exactMatch', uri);
         } else if (link.matchType === 'closeMatch') {
-          feature['skos:closeMatch'] = wikidataUri(link.identifier);
+          appendLink(feature, 'skos:closeMatch', uri);
+        } else if (link.matchType === 'broadMatch') {
+          appendLink(feature, 'skos:broadMatch', uri);
+        } else if (link.matchType === 'narrowMatch') {
+          appendLink(feature, 'skos:narrowMatch', uri);
+        } else if (link.matchType === 'relatedMatch') {
+          appendLink(feature, 'skos:relatedMatch', uri);
         }
       }
       graph.push(feature);
@@ -323,7 +341,7 @@ export function generatePlaceRecords() {
         ...(entry.locationPoint ? ['geo:Feature'] : []),
       ],
       'rdfs:label': entry.locationDescription ?? label,
-      'prov:wasDerivedFrom': sourceUris,
+      'prov:wasDerivedFrom': [...sourceUris],
     };
     if (entry.broader) {
       location.P89_falls_within = `${BASE}place/${entry.broader}/location`;
@@ -510,8 +528,6 @@ export function generatePlaceRecords() {
       }
       evidenceUris.push(assertionUri);
     }
-    if (evidenceUris.length > 0) record.hasEvidence = evidenceUris;
-
     // Preserve every matching Almanakken row as raw, source-bound evidence.
     // These observations do not make an unsupported physical-lifecycle claim.
     for (const qid of wikidataIds(entry)) {
@@ -610,6 +626,7 @@ export function generatePlaceRecords() {
       });
       sourceUris.push(sourceUriValue);
     }
+    record['prov:wasDerivedFrom'] = [...sourceUris];
 
     const document: JsonObject = {
       '@context': buildPlaceRecordContext(),
