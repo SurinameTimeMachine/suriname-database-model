@@ -47,6 +47,18 @@ app/                             # Next.js application
 
 Run the full pipeline: `pnpm pipeline`
 
+## JSON-LD publication
+
+The pipeline publishes the complete generated graph and its context as
+`/data/database.jsonld` and `/data/context.jsonld` in the deployed app. See
+[the LOD publication contract](docs/models/lod-publication.md) for validation
+coverage and the remaining canonical-domain and CIDOC-CRM conformance work.
+
+Public place authority records are generated from the editorial Gazetteer and
+are available as HTML, JSON-LD, and application JSON at `/place/{id}`,
+`/place/{id}.jsonld`, and `/place/{id}.json`. See the
+[place-record JSON-LD profile](docs/models/place-record-jsonld-profile.md).
+
 ## Data Sources
 
 | Dataset                                                                      | Records            | Period    | Primary Entity   |

@@ -20,7 +20,6 @@ interface MergeResolution {
   type: ScalarChoice;
   description: ScalarChoice;
   location: ScalarChoice;
-  wikidataQid: ScalarChoice;
   fid: ScalarChoice;
   broader: ScalarChoice;
   district: ScalarChoice;
@@ -82,7 +81,6 @@ function buildInitialResolution(): MergeResolution {
     type: 'a',
     description: 'a',
     location: 'a',
-    wikidataQid: 'a',
     fid: 'a',
     broader: 'a',
     district: 'a',
@@ -116,14 +114,14 @@ function computeMergedPlace(
     ...new Set([...(placeA.psurIds || []), ...(placeB.psurIds || [])]),
   ].filter((id) => !resolution.excludedPsurIds.has(id));
 
-  // Deduplicate external links by authority+identifier
+  // Deduplicate only identical authority links; match type carries meaning.
   const seenLinks = new Set<string>();
   const externalLinks: ExternalLink[] = [];
   for (const l of [
     ...(placeA.externalLinks || []),
     ...(placeB.externalLinks || []),
   ]) {
-    const dedupeKey = `${l.authority}:${l.identifier}`;
+    const dedupeKey = JSON.stringify([l.authority, l.identifier, l.matchType]);
     const jsonKey = JSON.stringify(l);
     if (
       !seenLinks.has(dedupeKey) &&
@@ -159,11 +157,6 @@ function computeMergedPlace(
       placeB.description,
     ),
     location: pick(resolution.location, placeA.location, placeB.location),
-    wikidataQid: pick(
-      resolution.wikidataQid,
-      placeA.wikidataQid,
-      placeB.wikidataQid,
-    ),
     fid: pick(resolution.fid, placeA.fid, placeB.fid),
     broader: pick(resolution.broader, placeA.broader, placeB.broader),
     district: pick(resolution.district, placeA.district, placeB.district),
@@ -401,7 +394,6 @@ export default function PlaceMergeView({
         | 'type'
         | 'description'
         | 'location'
-        | 'wikidataQid'
         | 'fid'
         | 'broader'
         | 'district'
@@ -464,7 +456,7 @@ export default function PlaceMergeView({
       ...(placeA.externalLinks || []),
       ...(placeB.externalLinks || []),
     ]) {
-      const key = `${l.authority}:${l.identifier}`;
+      const key = JSON.stringify([l.authority, l.identifier, l.matchType]);
       if (!seen.has(key)) {
         seen.add(key);
         result.push(l);
@@ -756,41 +748,6 @@ export default function PlaceMergeView({
               )}
             </div>
           </section>
-
-          {/* Wikidata QID */}
-          {(placeA.wikidataQid || placeB.wikidataQid) && (
-            <section>
-              <SectionHeader>Wikidata QID</SectionHeader>
-              {placeA.wikidataQid === placeB.wikidataQid ? (
-                <SameValueRow
-                  value={
-                    <span className="font-mono text-xs">
-                      {placeA.wikidataQid}
-                    </span>
-                  }
-                />
-              ) : (
-                <MergeFieldRow
-                  valueA={
-                    placeA.wikidataQid ? (
-                      <span className="font-mono text-xs">
-                        {placeA.wikidataQid}
-                      </span>
-                    ) : null
-                  }
-                  valueB={
-                    placeB.wikidataQid ? (
-                      <span className="font-mono text-xs">
-                        {placeB.wikidataQid}
-                      </span>
-                    ) : null
-                  }
-                  choice={resolution.wikidataQid}
-                  onChange={setScalar('wikidataQid')}
-                />
-              )}
-            </section>
-          )}
 
           {/* GIS FID */}
           {(placeA.fid != null || placeB.fid != null) && (

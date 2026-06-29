@@ -17,7 +17,7 @@ const ALMANAC_CSV = join(
   'data/06-almanakken - Plantations Surinaamse Almanakken/Plantations Surinaamse Almanakken v1.0.csv',
 );
 
-const STM = 'https://suriname-timemachine.org/ontology/';
+const STM = 'https://data.surinametijdmachine.org/';
 const WD = 'http://www.wikidata.org/entity/';
 
 // --- Types ---
@@ -177,7 +177,11 @@ export function transformAlmanakken(): AlmanakkenTransformResult {
       if (!seenAppKeys.has(appKey)) {
         seenAppKeys.add(appKey);
         const appSlug = slugify(plantationOrg);
-        const orgAppUri = `${STM}appellation/${appSlug}-almanac-org`;
+        const organizationSlug = slugify(plantationId);
+        // Distinct source spellings can normalize to the same slug for one
+        // organization. The source record ID keeps each E41 assertion stable.
+        const recordSlug = slugify(recordId);
+        const orgAppUri = `${STM}appellation/${appSlug}-${organizationSlug}-${recordSlug}-almanac-org`;
         let stdAppUri = '';
 
         // Standardized name variant
@@ -186,7 +190,7 @@ export function transformAlmanakken(): AlmanakkenTransformResult {
           if (!seenAppKeys.has(stdKey)) {
             seenAppKeys.add(stdKey);
             const stdSlug = slugify(plantationStd);
-            stdAppUri = `${STM}appellation/${stdSlug}-almanac-std`;
+            stdAppUri = `${STM}appellation/${stdSlug}-${organizationSlug}-${recordSlug}-almanac-std`;
             appellations.push({
               uri: stdAppUri,
               symbolic_content: plantationStd,

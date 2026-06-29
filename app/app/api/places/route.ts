@@ -1,69 +1,24 @@
 import { hasRepoAccess, readRepoFile, writeRepoFile } from '@/lib/github';
+import {
+  prepareEditorialPlace,
+  sortGazetteer,
+} from '@/lib/gazetteer-editorial';
 import { getSessionToken } from '@/lib/session';
 import type { GazetteerPlace } from '@/lib/types';
 import { getPreferredName } from '@/lib/types';
-import { readFileSync, writeFileSync } from 'fs';
 import { NextRequest, NextResponse } from 'next/server';
-import { join } from 'path';
-
-const PUBLIC_GAZETTEER = join(
-  process.cwd(),
-  'public',
-  'data',
-  'places-gazetteer.jsonld',
-);
-
-/** Best-effort sync of the public static copy so subsequent page loads
- *  reflect the latest data without needing a full rebuild. */
-function syncPublicCopy(jsonldStr: string) {
-  try {
-    writeFileSync(PUBLIC_GAZETTEER, jsonldStr, 'utf-8');
-  } catch (err) {
-    // Non-fatal: the GitHub copy is the source of truth
-    console.error(
-      'Failed to sync public gazetteer copy',
-      PUBLIC_GAZETTEER,
-      err,
-    );
-  }
-}
-
-const THESAURUS_FILE = join(
-  process.cwd(),
-  '..',
-  'data',
-  'place-types-thesaurus.jsonld',
-);
-
-/** Read thesaurus JSON-LD from disk */
-function readThesaurusGraph(): Record<string, unknown>[] {
-  try {
-    const data = JSON.parse(readFileSync(THESAURUS_FILE, 'utf-8'));
-    return (data['@graph'] || []) as Record<string, unknown>[];
-  } catch {
-    return [];
-  }
-}
-
-/** Read CRM class mapping from the thesaurus file */
-function loadCrmMapping(): Record<string, string> {
-  return Object.fromEntries(
-    readThesaurusGraph()
-      .filter((e) => e.typeId)
-      .map((e) => [e.typeId as string, e.crmClass as string]),
-  );
-}
-
-/** Read sort order from the thesaurus file */
-function loadTypeOrder(): Record<string, number> {
-  return Object.fromEntries(
-    readThesaurusGraph()
-      .filter((e) => e.typeId && typeof e.sortOrder === 'number')
-      .map((e) => [e.typeId as string, e.sortOrder as number]),
-  );
-}
 
 const GAZETTEER_PATH = 'data/places-gazetteer.jsonld';
+
+function publication(commit: string, id?: string) {
+  return {
+    state: 'pending-deployment' as const,
+    commit,
+    recordUrl: id ? `/place/${id}` : undefined,
+    jsonldUrl: id ? `/place/${id}.jsonld` : undefined,
+    jsonUrl: id ? `/place/${id}.json` : undefined,
+  };
+}
 
 /** Shared auth check — returns token or error response */
 async function authorize(): Promise<
@@ -101,20 +56,14 @@ export async function POST(request: NextRequest) {
   if (auth.error) return auth.error;
   const { token } = auth;
 
-  const place: GazetteerPlace = await request.json();
-
-  // Validate required fields
-  if (
-    !place.id ||
-    !Array.isArray(place.names) ||
-    place.names.length === 0 ||
-    !place.type
-  ) {
+  const prepared = prepareEditorialPlace(await request.json());
+  if (!prepared.place) {
     return NextResponse.json(
-      { error: 'Missing required fields: id, names (non-empty), type' },
+      { error: prepared.errors.join('. ') },
       { status: 400 },
     );
   }
+  const place = prepared.place;
 
   try {
     // Read current gazetteer from GitHub
@@ -134,38 +83,13 @@ export async function POST(request: NextRequest) {
     place.modifiedBy = login;
     place.modifiedAt = now;
 
-    // Ensure externalLinks exists
-    if (!place.externalLinks) place.externalLinks = [];
-
-    // Derive wikidataQid from externalLinks for backward compatibility
-    const wdLink = place.externalLinks.find(
-      (l: { authority: string }) => l.authority === 'wikidata',
-    );
-    place.wikidataQid = wdLink ? wdLink.identifier : null;
-
-    // Set JSON-LD properties from thesaurus
-    const crmMap = loadCrmMapping();
-    const crmClass = crmMap[place.type] || 'E53_Place';
-    const entryWithLd = {
-      ...place,
-      '@id': `stm:place/${place.id}`,
-      '@type': crmClass,
-    };
-
     if (idx >= 0) {
-      gazetteer[idx] = entryWithLd;
+      gazetteer[idx] = place;
     } else {
-      gazetteer.push(entryWithLd);
+      gazetteer.push(place);
     }
 
-    // Sort by type order from thesaurus then preferred name
-    const typeOrder = loadTypeOrder();
-    gazetteer.sort((a, b) => {
-      const diff = (typeOrder[a.type] ?? 99) - (typeOrder[b.type] ?? 99);
-      return diff !== 0
-        ? diff
-        : getPreferredName(a).localeCompare(getPreferredName(b));
-    });
+    sortGazetteer(gazetteer, getPreferredName);
 
     // Update @graph in the JSON-LD envelope
     jsonld['@graph'] = gazetteer;
@@ -177,10 +101,9 @@ export async function POST(request: NextRequest) {
         : `Add place: ${getPreferredName(place)}`;
 
     const jsonStr = JSON.stringify(jsonld, null, 2);
-    await writeRepoFile(token, GAZETTEER_PATH, jsonStr, sha, commitMsg);
-    syncPublicCopy(jsonStr);
+    const commit = await writeRepoFile(token, GAZETTEER_PATH, jsonStr, sha, commitMsg);
 
-    return NextResponse.json({ ok: true, place });
+    return NextResponse.json({ ok: true, place, publication: publication(commit, place.id) });
   } catch (err) {
     console.error('Save place error:', err);
     return NextResponse.json(
@@ -196,7 +119,10 @@ export async function PUT(request: NextRequest) {
   if (auth.error) return auth.error;
   const { token } = auth;
 
-  const partial = await request.json();
+  const rawPartial = (await request.json()) as Partial<GazetteerPlace> & {
+    wikidataQid?: unknown;
+  };
+  const { wikidataQid: _legacyWikidataQid, ...partial } = rawPartial;
 
   if (!partial.id) {
     return NextResponse.json(
@@ -225,47 +151,41 @@ export async function PUT(request: NextRequest) {
       })
     ).json();
 
+    const { wikidataQid: _existingLegacyWikidataQid, ...existingPlace } =
+      gazetteer[idx] as GazetteerPlace & { wikidataQid?: unknown };
+
     // Merge provided fields onto existing entry
-    const merged = { ...gazetteer[idx], ...partial };
+    const merged = {
+      ...existingPlace,
+      ...partial,
+    } as GazetteerPlace & {
+      '@id'?: string;
+      '@type'?: string | string[];
+    };
     merged.modifiedBy = login;
     merged.modifiedAt = now;
 
-    // Recalculate derived fields
-    if (!merged.externalLinks) merged.externalLinks = [];
-    const wdLink = merged.externalLinks.find(
-      (l: { authority: string }) => l.authority === 'wikidata',
-    );
-    merged.wikidataQid = wdLink ? wdLink.identifier : null;
+    const prepared = prepareEditorialPlace(merged);
+    if (!prepared.place) {
+      return NextResponse.json({ error: prepared.errors.join('. ') }, { status: 400 });
+    }
 
-    const crmMap = loadCrmMapping();
-    const crmClass = crmMap[merged.type] || 'E53_Place';
-    merged['@id'] = `stm:place/${merged.id}`;
-    merged['@type'] = crmClass;
+    gazetteer[idx] = prepared.place;
 
-    gazetteer[idx] = merged;
-
-    // Sort
-    const typeOrder = loadTypeOrder();
-    gazetteer.sort((a, b) => {
-      const diff = (typeOrder[a.type] ?? 99) - (typeOrder[b.type] ?? 99);
-      return diff !== 0
-        ? diff
-        : getPreferredName(a).localeCompare(getPreferredName(b));
-    });
+    sortGazetteer(gazetteer, getPreferredName);
 
     jsonld['@graph'] = gazetteer;
 
     const jsonStr = JSON.stringify(jsonld, null, 2);
-    await writeRepoFile(
+    const commit = await writeRepoFile(
       token,
       GAZETTEER_PATH,
       jsonStr,
       sha,
       `Merge update place: ${getPreferredName(merged)}`,
     );
-    syncPublicCopy(jsonStr);
 
-    return NextResponse.json({ ok: true, place: merged });
+    return NextResponse.json({ ok: true, place: prepared.place, publication: publication(commit, prepared.place.id) });
   } catch (err) {
     console.error('Merge place error:', err);
     return NextResponse.json(
@@ -330,27 +250,32 @@ export async function DELETE(request: NextRequest) {
     ).json();
 
     // Tombstone: mark deprecated in-place — never remove the entry
-    const entry = gazetteer[idx];
-    entry.deprecated = true;
-    entry.deprecatedAt = now;
-    entry.deprecatedBy = login;
+    const { wikidataQid: _legacyWikidataQid, ...entry } = gazetteer[
+      idx
+    ] as GazetteerPlace & { wikidataQid?: unknown };
+    const tombstone = {
+      ...entry,
+      deprecated: true as const,
+      deprecatedAt: now,
+      deprecatedBy: login,
+    };
     if (typeof deprecationNote === 'string' && deprecationNote.trim()) {
-      entry.deprecationNote = deprecationNote.trim();
+      tombstone.deprecationNote = deprecationNote.trim();
     }
+    gazetteer[idx] = tombstone;
 
     jsonld['@graph'] = gazetteer;
 
     const jsonStr = JSON.stringify(jsonld, null, 2);
-    await writeRepoFile(
+    const commit = await writeRepoFile(
       token,
       GAZETTEER_PATH,
       jsonStr,
       sha,
       `Deprecate place: ${label} (id: ${id})`,
     );
-    syncPublicCopy(jsonStr);
 
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({ ok: true, publication: publication(commit, id) });
   } catch (err) {
     console.error('Delete place error:', err);
     return NextResponse.json(

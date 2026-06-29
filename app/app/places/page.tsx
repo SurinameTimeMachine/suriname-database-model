@@ -47,6 +47,12 @@ type SortKey =
   | 'almanakken';
 type SortDir = 'asc' | 'desc';
 
+type PublicationNotice = {
+  recordUrl?: string;
+  jsonldUrl?: string;
+  jsonUrl?: string;
+};
+
 function normalizeNamesFromLegacy(entry: Record<string, unknown>) {
   if (Array.isArray(entry.names)) {
     return entry.names;
@@ -254,6 +260,10 @@ function normalizeLocationAssertionsFromLegacy(
             ? a.endYear
             : undefined,
         note: typeof a.note === 'string' && a.note.trim() ? a.note : null,
+        sourceRow:
+          typeof a.sourceRow === 'string' && a.sourceRow.trim()
+            ? a.sourceRow
+            : undefined,
       }))
       .filter((a) => Boolean(a.standardized || a.original));
   }
@@ -358,7 +368,6 @@ function emptyPlace(): GazetteerPlace {
     description: '',
     location: { lat: null, lng: null, wkt: null, crs: 'EPSG:4326' },
     sources: [],
-    wikidataQid: null,
     externalLinks: [],
     fid: null,
     psurIds: [],
@@ -699,6 +708,8 @@ function PlacesPageInner() {
     placeA: GazetteerPlace;
     placeB: GazetteerPlace;
   } | null>(null);
+  const [publicationNotice, setPublicationNotice] =
+    useState<PublicationNotice | null>(null);
   const columnsRef = useRef<HTMLDivElement>(null);
   const tableScrollRef = useRef<HTMLDivElement>(null);
 
@@ -824,13 +835,20 @@ function PlacesPageInner() {
       if (!res.ok) {
         throw new Error(data.error || 'Failed to merge');
       }
-      // Reload gazetteer from the updated public copy
-      const gazetteRes = await fetch('/data/places-gazetteer.jsonld');
-      const gazetteData = await gazetteRes.json();
-      const entries: GazetteerPlace[] = gazetteData['@graph'] || gazetteData;
-      if (Array.isArray(entries)) {
-        setPlaces(entries.map(normalizePlaceEntry));
+      const saved = data.place as GazetteerPlace | undefined;
+      const retired = data.retiredPlace as GazetteerPlace | undefined;
+      if (saved && retired) {
+        setPlaces((previous) =>
+          previous.map((place) =>
+            place.id === saved.id
+              ? saved
+              : place.id === retired.id
+                ? retired
+                : place,
+          ),
+        );
       }
+      setPublicationNotice(data.publication ?? null);
       setMergeView(null);
       setMergeCheckIds([]);
       setSelectedIds([merged.id]);
@@ -1068,6 +1086,7 @@ function PlacesPageInner() {
       setSelectedIds([saved.id]);
       setIsCreating(false);
       syncUrlToSelection([saved.id]);
+      setPublicationNotice(data.publication ?? null);
     },
     [syncUrlToSelection],
   );
@@ -1089,10 +1108,12 @@ function PlacesPageInner() {
         const data = await res.json();
         throw new Error(data.error || 'Failed to delete');
       }
+      const data = await res.json();
       setPlaces((prev) => prev.filter((p) => p.id !== id));
       setSelectedIds([]);
       setIsCreating(false);
       syncUrlToSelection([]);
+      setPublicationNotice(data.publication ?? null);
     },
     [syncUrlToSelection],
   );
@@ -1178,6 +1199,18 @@ function PlacesPageInner() {
           </div>
         </div>
       </div>
+
+      {publicationNotice && (
+        <div className="border-b border-stm-warm-300/40 bg-stm-sepia-50 px-4 py-2 text-sm text-ink sm:px-6 lg:px-8">
+          Gazetteer saved. The public HTML, JSON and JSON-LD representations
+          will update with the deployment generated from this commit.
+          <span className="ml-2 inline-flex flex-wrap gap-2">
+            {publicationNotice.recordUrl && <a className="underline" href={publicationNotice.recordUrl}>record</a>}
+            {publicationNotice.jsonldUrl && <a className="underline" href={publicationNotice.jsonldUrl}>JSON-LD</a>}
+            {publicationNotice.jsonUrl && <a className="underline" href={publicationNotice.jsonUrl}>JSON</a>}
+          </span>
+        </div>
+      )}
 
       {mergeView ? (
         <PlaceMergeView

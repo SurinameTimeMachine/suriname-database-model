@@ -37,7 +37,6 @@ type GazetteerEntry = {
     crs: string;
   };
   sources: string[];
-  wikidataQid: string | null;
   fid: number | null;
   psurIds: string[];
   district: string | null;
@@ -481,7 +480,7 @@ function main() {
 
     const id = nextStmId(gazetteer['@graph']);
     const entry: GazetteerEntry = {
-      '@id': `https://data.suriname-timemachine.org/place/${id}`,
+      '@id': `https://data.surinametijdmachine.org/place/${id}`,
       '@type': determineCrmType('road', gazetteer['@context']),
       id,
       type: 'road',
@@ -496,7 +495,6 @@ function main() {
         crs: 'EPSG:4326',
       },
       sources: [SOURCE_TAG],
-      wikidataQid: null,
       fid: aggregate.featureIds.find((fid) => fid >= 0) ?? null,
       psurIds: [],
       district: 'Paramaribo',

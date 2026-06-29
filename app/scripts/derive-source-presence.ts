@@ -34,6 +34,7 @@ import type {
   PlantationStatusType,
   StatusAssertion,
 } from '../lib/types';
+import { getPrimaryAuthorityLink } from '../lib/types';
 
 // ── Paths ──────────────────────────────────────────────────────────────────
 
@@ -155,7 +156,7 @@ for (const source of sources) {
   for (const entry of graph) {
     if (entry.type !== 'plantation') continue;
 
-    const qid = entry.wikidataQid;
+    const qid = getPrimaryAuthorityLink(entry, 'wikidata')?.identifier;
     if (!qid || !qids.has(qid)) {
       noMatch++;
       continue;

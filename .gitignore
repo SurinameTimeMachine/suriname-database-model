@@ -13,6 +13,7 @@ app/public/data/
 
 # misc
 .DS_Store
+.codex/
 *.tsbuildinfo
 next-env.d.ts
 npm-debug.log*

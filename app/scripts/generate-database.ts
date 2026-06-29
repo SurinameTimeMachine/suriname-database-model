@@ -29,175 +29,10 @@ import {
   type E26Row,
   transformRivers,
 } from './transform-rivers';
+import { BASE, WD, buildContext, buildContextDocument } from './lod-context';
 
 const LOD_DIR = join(__dirname, '../lod');
-const BASE = 'https://data.suriname-timemachine.org/';
-const WD = 'http://www.wikidata.org/entity/';
-
 mkdirSync(LOD_DIR, { recursive: true });
-
-// --- JSON-LD @context ---
-
-function buildContext(): Record<string, unknown> {
-  return {
-    '@vocab': 'https://schema.org/',
-    base: BASE,
-    wd: WD,
-    wdt: 'http://www.wikidata.org/prop/direct/',
-    crm: 'http://www.cidoc-crm.org/cidoc-crm/',
-    geo: 'http://www.opengis.net/ont/geosparql#',
-    skos: 'http://www.w3.org/2004/02/skos/core#',
-    prov: 'http://www.w3.org/ns/prov#',
-    sdo: 'https://schema.org/',
-    xsd: 'http://www.w3.org/2001/XMLSchema#',
-    dcterms: 'http://purl.org/dc/terms/',
-    oa: 'http://www.w3.org/ns/oa#',
-    picom: 'https://personsincontext.org/model#',
-    picot: 'https://personsincontext.org/thesaurus#',
-    // CIDOC-CRM type aliases
-    Plantation: 'crm:E25_Human-Made_Feature',
-    OrganizationObservation: 'crm:E13_Attribute_Assignment',
-    ProvenanceRecord: 'prov:Entity',
-    E13_Attribute_Assignment: 'crm:E13_Attribute_Assignment',
-    E22_Human_Made_Object: 'crm:E22_Human-Made_Object',
-    E25_Human_Made_Feature: 'crm:E25_Human-Made_Feature',
-    E26_Physical_Feature: 'crm:E26_Physical_Feature',
-    E36_Visual_Item: 'crm:E36_Visual_Item',
-    E41_Appellation: 'crm:E41_Appellation',
-    E52_Time_Span: 'crm:E52_Time-Span',
-    E53_Place: 'crm:E53_Place',
-    E55_Type: 'crm:E55_Type',
-    E74_Group: 'crm:E74_Group',
-    // E12 Production
-    E12_Production: 'crm:E12_Production',
-    // CIDOC-CRM properties
-    P1_is_identified_by: { '@id': 'crm:P1_is_identified_by', '@type': '@id' },
-    P1i_identifies: { '@id': 'crm:P1i_identifies', '@type': '@id' },
-    P2_has_type: { '@id': 'crm:P2_has_type', '@type': '@id' },
-    P4_has_time_span: { '@id': 'crm:P4_has_time-span', '@type': '@id' },
-    P52_has_current_owner: {
-      '@id': 'crm:P52_has_current_owner',
-      '@type': '@id',
-    },
-    P51_has_former_or_current_owner: {
-      '@id': 'crm:P51_has_former_or_current_owner',
-      '@type': '@id',
-    },
-    P53_has_location: {
-      '@id': 'crm:P53_has_former_or_current_location',
-      '@type': '@id',
-    },
-    P82a_begin_of_the_begin: {
-      '@id': 'crm:P82a_begin_of_the_begin',
-      '@type': 'xsd:date',
-    },
-    P82b_end_of_the_end: {
-      '@id': 'crm:P82b_end_of_the_end',
-      '@type': 'xsd:date',
-    },
-    P128_carries: { '@id': 'crm:P128_carries', '@type': '@id' },
-    P128i_is_carried_by: { '@id': 'crm:P128i_is_carried_by', '@type': '@id' },
-    P138_represents: { '@id': 'crm:P138_represents', '@type': '@id' },
-    P138i_has_representation: {
-      '@id': 'crm:P138i_has_representation',
-      '@type': '@id',
-    },
-    P139_has_alternative_form: {
-      '@id': 'crm:P139_has_alternative_form',
-      '@type': '@id',
-    },
-    P140_assigned_attribute_to: {
-      '@id': 'crm:P140_assigned_attribute_to',
-      '@type': '@id',
-    },
-    P141_assigned: { '@id': 'crm:P141_assigned', '@type': '@id' },
-    // E12 Production properties
-    P7_took_place_at: { '@id': 'crm:P7_took_place_at', '@type': 'xsd:string' },
-    P14_carried_out_by: {
-      '@id': 'crm:P14_carried_out_by',
-      '@type': 'xsd:string',
-    },
-    P108_has_produced: { '@id': 'crm:P108_has_produced', '@type': '@id' },
-    P108i_was_produced_by: {
-      '@id': 'crm:P108i_was_produced_by',
-      '@type': '@id',
-    },
-    // E36 Visual Item (digital reproduction) properties
-    P50_has_current_keeper: {
-      '@id': 'crm:P50_has_current_keeper',
-      '@type': 'xsd:string',
-    },
-    contentUrl: { '@id': 'sdo:contentUrl', '@type': '@id' },
-    P190_has_symbolic_content: {
-      '@id': 'crm:P190_has_symbolic_content',
-      '@type': 'xsd:string',
-    },
-    P70i_is_documented_in: {
-      '@id': 'crm:P70i_is_documented_in',
-      '@type': '@id',
-    },
-    P72_has_language: { '@id': 'crm:P72_has_language', '@type': '@id' },
-    // GeoSPARQL
-    hasGeometry: 'geo:hasGeometry',
-    asWKT: { '@id': 'geo:asWKT', '@type': 'geo:wktLiteral' },
-    // SKOS
-    prefLabel: 'skos:prefLabel',
-    altLabel: 'skos:altLabel',
-    closeMatch: { '@id': 'skos:closeMatch', '@type': '@id' },
-    // Schema.org
-    additionalType: { '@id': 'sdo:additionalType', '@type': '@id' },
-    sameAs: { '@id': 'sdo:sameAs', '@type': '@id' },
-    parentOrganization: { '@id': 'sdo:parentOrganization', '@type': '@id' },
-    // Dublin Core
-    'dcterms:description': {
-      '@id': 'dcterms:description',
-      '@type': 'xsd:string',
-    },
-    // Mapped properties (CRM/PROV/DC equivalents)
-    featureType: { '@id': 'crm:P2_has_type', '@type': 'xsd:string' },
-    mainBodyWater: { '@id': 'crm:P3_has_note', '@type': 'xsd:string' },
-    status: { '@id': 'crm:P2_has_type', '@type': 'xsd:string' },
-    psurId: { '@id': 'crm:P1_is_identified_by', '@type': 'xsd:string' },
-    fid: { '@id': 'crm:P48_has_preferred_identifier', '@type': 'xsd:integer' },
-    mapYear: { '@id': 'crm:P4_has_time-span', '@type': 'xsd:gYear' },
-    observedLabel: { '@id': 'crm:P1_is_identified_by', '@type': 'xsd:string' },
-    geometrySource: { '@id': 'prov:wasDerivedFrom', '@type': '@id' },
-    absorbedInto: { '@id': 'crm:P99i_was_dissolved_by', '@type': '@id' },
-    mergedInto: { '@id': 'crm:P124_transformed', '@type': '@id' },
-    observationOf: { '@id': 'crm:P140_assigned_attribute_to', '@type': '@id' },
-    observationYear: { '@id': 'crm:P4_has_time-span', '@type': 'xsd:gYear' },
-    observedName: { '@id': 'crm:P141_assigned', '@type': 'xsd:string' },
-    product: { '@id': 'crm:P141_assigned', '@type': 'xsd:string' },
-    deserted: { '@id': 'crm:P141_assigned', '@type': 'xsd:boolean' },
-    hasOwner: { '@id': 'crm:P14_carried_out_by', '@type': 'xsd:string' },
-    hasAdministrator: {
-      '@id': 'crm:P14_carried_out_by',
-      '@type': 'xsd:string',
-    },
-    hasDirector: { '@id': 'crm:P14_carried_out_by', '@type': 'xsd:string' },
-    locationStd: { '@id': 'crm:P7_took_place_at', '@type': 'xsd:string' },
-    sizeAkkers: { '@id': 'crm:P43_has_dimension', '@type': 'xsd:integer' },
-    pageReference: { '@id': 'crm:P3_has_note', '@type': 'xsd:string' },
-    // Provenance
-    wasDerivedFrom: { '@id': 'prov:wasDerivedFrom', '@type': '@id' },
-    hadPrimarySource: { '@id': 'prov:hadPrimarySource', '@type': '@id' },
-    generatedAtTime: { '@id': 'prov:generatedAtTime', '@type': 'xsd:dateTime' },
-    sourceFile: { '@id': 'prov:hadPrimarySource', '@type': 'xsd:string' },
-    sourceColumn: { '@id': 'dcterms:description', '@type': 'xsd:string' },
-    sourceRow: { '@id': 'dcterms:identifier', '@type': 'xsd:string' },
-    transformedBy: { '@id': 'prov:wasGeneratedBy', '@type': 'xsd:string' },
-    modelEntity: { '@id': 'dcterms:conformsTo', '@type': 'xsd:string' },
-    schemaTable: { '@id': 'dcterms:isPartOf', '@type': 'xsd:string' },
-    linkedVia: { '@id': 'rdfs:comment', '@type': 'xsd:string' },
-    // Map depiction
-    labelOnMap: {
-      '@id': 'crm:P190_has_symbolic_content',
-      '@type': 'xsd:string',
-    },
-    mapId: { '@id': 'crm:P48_has_preferred_identifier', '@type': 'xsd:string' },
-    hasPolygon: { '@id': 'geo:sfContains', '@type': 'xsd:boolean' },
-  };
-}
 
 // --- Entity builders ---
 
@@ -1016,6 +851,14 @@ function main() {
   writeFileSync(jsonldPath, jsonldStr, 'utf-8');
   const jsonldMB = (Buffer.byteLength(jsonldStr) / 1024 / 1024).toFixed(1);
   console.log(`\nWrote ${jsonldPath} (${jsonldMB} MB)`);
+
+  const contextPath = join(LOD_DIR, 'context.jsonld');
+  writeFileSync(
+    contextPath,
+    `${JSON.stringify(buildContextDocument(), null, 2)}\n`,
+    'utf-8',
+  );
+  console.log(`Wrote ${contextPath}`);
 
   // Build name text indexes for GeoJSON allNames
   // plantationNames: plantation URI -> all E41 name texts

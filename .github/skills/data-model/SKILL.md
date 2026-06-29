@@ -9,13 +9,27 @@ Quick reference for Suriname Time Machine data modeling. For rationale, see [ARC
 
 ## Keeping Sources of Truth in Sync
 
-The data model is defined in **three places** that must stay consistent. When changing any entity, property, or relation, update all three:
+The data model is defined in **five places** that must stay consistent. When changing any entity, property, or relation, update the relevant files together:
 
 | Source                                 | What to update                                                                                                      |
 | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| `.github/skills/data-model/SKILL.md`   | Canonical reference: entity tables, property lists, mermaid diagrams, CSV mappings                                  |
+| `.github/skills/data-model/SKILL.md`   | Working reference: entity tables, property lists, mermaid diagrams, CSV mappings                                    |
+| `app/scripts/lod-context.ts`           | Canonical JSON-LD context source used by generated LOD outputs                                                      |
+| `app/scripts/generate-database.ts`     | Entity generation logic and `database.jsonld` / `context.jsonld` output                                             |
 | `app/app/model/page.tsx`               | `ENTITIES` array (properties, descriptions), `RELATIONS` array, documentation sections                              |
 | `app/components/` + `app/lib/types.ts` | `PlantationPanel.tsx` CrmField labels/badges, `EntityGraph.tsx` nodes/links, `types.ts` interfaces and CRM comments |
+
+`app/lod/context.jsonld` is generated output. Do not hand-edit it; update `app/scripts/lod-context.ts`, run the pipeline, and commit the regenerated context file.
+
+Validation commands for LOD/schema changes. Run the pipeline first when the generated database is absent or stale; it generates the database before validating its context:
+
+```bash
+pnpm --dir app pipeline
+pnpm --dir app validate-lod
+pnpm --dir app build
+```
+
+The pipeline runs `validate-lod` after database generation. The validator fails if `app/lod/context.jsonld` drifts from the embedded `database.jsonld` context or if local graph terms/type aliases are missing from the JSON-LD context.
 
 ## Core Model: E25 Plantation as Central Entity
 
