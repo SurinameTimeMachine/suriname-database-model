@@ -376,7 +376,6 @@
         "crm:E55_Type"
       ],
       "prefLabel": {
-        "srn": "Stasi",
         "en": "Geodetic control point",
         "nl": "Geodetisch referentiepunt"
       },
@@ -391,7 +390,7 @@
         "http://www.wikidata.org/entity/Q131862"
       ],
       "typeId": "station",
-      "color": "#d4a882",
+      "color": "#afafa7",
       "crmClass": "E25_Human-Made_Feature",
       "crmBadge": "E25",
       "sortOrder": 6,
@@ -409,6 +408,9 @@
           "Geodetic control point",
           "Surveying station",
           "Astronomical Station"
+        ],
+        "srn": [
+          "Stasi"
         ]
       },
       "exactMatch": [
