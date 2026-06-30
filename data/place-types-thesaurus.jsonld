@@ -909,10 +909,10 @@
       "broader": "stm:vocabulary/place-type/administrative",
       "crmClass": "E53_Place",
       "crmBadge": "E53",
-      "color": "#7ab56a",
+      "color": "#25eafa",
       "sortOrder": 99,
       "created": "2026-06-23",
-      "modified": "2026-06-23",
+      "modified": "2026-06-30",
       "altLabel": {
         "en": [
           "district"
