@@ -28,7 +28,10 @@ interface OverlayConfig {
 }
 
 const OVERLAY_CONFIGS: OverlayConfig[] = [
-  ...HISTORIC_MAPS.map((map) => ({ ...map, defaultEnabled: false })),
+  ...HISTORIC_MAPS.map((map) => ({
+    ...map,
+    defaultEnabled: map.defaultEnabled ?? false,
+  })),
   {
     id: 'moseberg-sheet2-1801',
     label: 'Moseberg Specialkaart Sheet 2 (1801)',

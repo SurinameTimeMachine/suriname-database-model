@@ -2,17 +2,29 @@ export type HistoricMapDefinition = {
   id: string;
   label: string;
   annotationUrl: string;
+  defaultEnabled?: boolean;
   transformation: string;
   gcpCount: number;
 };
 
 const annotationUrl = (id: string) => `https://annotations.allmaps.org/maps/${id}`;
+const manifestUrl = (id: string) => `https://annotations.allmaps.org/manifests/${id}`;
+
+export const DEFAULT_HISTORIC_MAP: HistoricMapDefinition = {
+  id: 'map-1930',
+  label: 'Kaart van Suriname (1930)',
+  annotationUrl: manifestUrl('5178b46e14dc211e'),
+  defaultEnabled: true,
+  transformation: 'thinPlateSpline',
+  gcpCount: 500,
+};
 
 /**
  * Curated, independently georeferenced historic maps. Each annotation and
  * IIIF image service was checked before inclusion on 2026-06-24.
  */
 export const HISTORIC_MAPS: HistoricMapDefinition[] = [
+  DEFAULT_HISTORIC_MAP,
   { id: 'f9e0aafd0b1ebb35', label: 'Platte grond van de stad Paramaribo', annotationUrl: annotationUrl('f9e0aafd0b1ebb35'), transformation: 'polynomial', gcpCount: 8 },
   { id: '6ee8c9d9b99a4793', label: 'Historic map (UvA collection)', annotationUrl: annotationUrl('6ee8c9d9b99a4793'), transformation: 'polynomial', gcpCount: 9 },
   { id: '280903e43524e3b1', label: 'Kaart van de rivier de Suriname', annotationUrl: annotationUrl('280903e43524e3b1'), transformation: 'polynomial', gcpCount: 6 },
@@ -35,4 +47,4 @@ export const HISTORIC_MAPS: HistoricMapDefinition[] = [
   { id: '095b7bfbc102c05c', label: 'Historic map (Leiden collection)', annotationUrl: annotationUrl('095b7bfbc102c05c'), transformation: 'thinPlateSpline', gcpCount: 15 },
 ];
 
-export const HISTORIC_MAP_URLS = HISTORIC_MAPS.map((map) => map.annotationUrl);
+export const DEFAULT_HISTORIC_MAP_URLS = [DEFAULT_HISTORIC_MAP.annotationUrl];

@@ -2,7 +2,7 @@
 
 import 'leaflet/dist/leaflet.css';
 import { loadAllmapsAnnotation } from '@/lib/allmaps';
-import { HISTORIC_MAP_URLS } from '@/lib/historic-maps';
+import { DEFAULT_HISTORIC_MAP_URLS } from '@/lib/historic-maps';
 import { usePlaceTypes } from '@/lib/thesaurus';
 import L from 'leaflet';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -25,7 +25,7 @@ if (typeof window !== 'undefined' && !_domUtilPatched) {
   _domUtilPatched = true;
 }
 
-const HISTORIC_MAP_OVERLAY_URLS = HISTORIC_MAP_URLS;
+const HISTORIC_MAP_OVERLAY_URLS = DEFAULT_HISTORIC_MAP_URLS;
 
 function safelyRemove(target: { remove: () => unknown } | null) {
   if (!target) return;
@@ -93,7 +93,7 @@ export default function PlaceMiniMap({
     };
   }, []);
 
-  // Load or unload the curated historic-map overlay.
+  // Load or unload the 1930 historic-map overlay.
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
@@ -258,7 +258,7 @@ export default function PlaceMiniMap({
       <button
         type="button"
         onClick={toggle1930Map}
-        title={mapError ?? 'Toggle historic maps'}
+        title={mapError ?? 'Toggle 1930 historical map'}
         className={[
           'absolute bottom-2 right-2 z-1000 px-2 py-0.5 text-[11px] font-medium border leading-tight',
           show1930Map
@@ -266,7 +266,7 @@ export default function PlaceMiniMap({
             : 'bg-white/90 text-stm-warm-600 border-stm-warm-300 hover:bg-stm-warm-50',
         ].join(' ')}
       >
-        {mapError ? 'Historic maps unavailable' : 'Historic maps'}
+        {mapError ? '1930 map unavailable' : 'Historical map'}
       </button>
     </div>
   );
