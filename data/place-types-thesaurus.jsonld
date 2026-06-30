@@ -1186,6 +1186,64 @@
         "https://www.wikidata.org/wiki/Q111286333",
         "https://vocab.getty.edu/aat/300007466"
       ]
+    },
+    {
+      "@id": "stm:vocabulary/place-type/residential-building",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "typeId": "residential-building",
+      "prefLabel": {
+        "en": "House",
+        "nl": "Huis",
+        "srn": "Oso"
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/building",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "color": "#ff5357",
+      "sortOrder": 99,
+      "created": "2026-06-30",
+      "modified": "2026-06-30",
+      "altLabel": {
+        "en": [
+          "dwelling",
+          "quarters"
+        ],
+        "nl": [
+          "woning",
+          "residentie",
+          "hut",
+          "logeergebouw",
+          "woonhuis"
+        ],
+        "srn": [
+          "oeso"
+        ]
+      },
+      "definition": {
+        "nl": "Een permanent of semi-permanent gebouw dat primair is ingericht en bedoeld voor menselijke bewoning en huisvesting.",
+        "en": "A permanent or semi-permanent structure designed and utilized primarily for human habitation and housing."
+      },
+      "related": [
+        "stm:vocabulary/place-type/building",
+        "stm:vocabulary/place-type/indigenous-village",
+        "stm:vocabulary/place-type/settlement",
+        "stm:vocabulary/place-type/plantation",
+        "stm:vocabulary/place-type/town",
+        "stm:vocabulary/place-type/maroon-village",
+        "stm:vocabulary/place-type/historical-address"
+      ],
+      "exactMatch": [
+        "https://www.wikidata.org/wiki/Q3947",
+        "https://schema.org/House"
+      ],
+      "closeMatch": [
+        "https://www.wikidata.org/wiki/Q11755880",
+        "https://vocab.getty.edu/aat/300257729"
+      ]
     }
   ]
 }
