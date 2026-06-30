@@ -377,7 +377,7 @@
       ],
       "prefLabel": {
         "srn": "Stasi",
-        "en": "Geodetic control point, Astronomical Station",
+        "en": "Geodetic control point",
         "nl": "Geodetisch referentiepunt"
       },
       "definition": {
@@ -407,7 +407,8 @@
         "en": [
           "Astronomical observation point",
           "Geodetic control point",
-          "Surveying station"
+          "Surveying station",
+          "Astronomical Station"
         ]
       },
       "exactMatch": [
