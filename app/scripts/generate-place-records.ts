@@ -7,20 +7,15 @@
  */
 import { mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
-import { parse } from 'csv-parse/sync';
 
 import { BASE, buildPlaceRecordContext } from './lod-context';
+import { almanakkenField, readAlmanakkenRows } from './almanakken';
 
 const DATA_DIR = join(__dirname, '../../data');
 const OUT_DIR = join(__dirname, '../public/data/place-records');
 const GAZETTEER_PATH = join(DATA_DIR, 'places-gazetteer.jsonld');
 const THESAURUS_PATH = join(DATA_DIR, 'place-types-thesaurus.jsonld');
 const SOURCES_PATH = join(DATA_DIR, 'sources-registry.jsonld');
-const ALMANAKKEN_PATH = join(
-  DATA_DIR,
-  '06-almanakken - Plantations Surinaamse Almanakken',
-  'Plantations Surinaamse Almanakken v1.0.csv',
-);
 
 type JsonObject = Record<string, unknown>;
 
@@ -71,6 +66,7 @@ type AlmanakkenEvidence = {
   product: string;
   deserted: boolean;
   sourceName: string;
+  sranantongoName: string;
   sourcePage: string;
 };
 
@@ -78,6 +74,7 @@ type GazetteerEntry = JsonObject & {
   id?: string;
   type?: string;
   names?: PlaceName[];
+  sranantongoNames?: string[];
   prefLabel?: string;
   altLabels?: string[];
   broader?: string | null;
@@ -126,9 +123,8 @@ function sourceUri(sourceId: string, sourceIds: Map<string, string>): string {
 }
 
 function namesFor(entry: GazetteerEntry): PlaceName[] {
-  if (Array.isArray(entry.names) && entry.names.length > 0) return entry.names;
-  const names: PlaceName[] = [];
-  if (entry.prefLabel) {
+  const names: PlaceName[] = Array.isArray(entry.names) ? [...entry.names] : [];
+  if (names.length === 0 && entry.prefLabel) {
     names.push({
       text: entry.prefLabel,
       language: 'nl',
@@ -136,9 +132,39 @@ function namesFor(entry: GazetteerEntry): PlaceName[] {
       isPreferred: true,
     });
   }
+
   for (const text of entry.altLabels ?? []) {
-    names.push({ text, language: 'und', type: 'historical', isPreferred: false });
+    if (!text) continue;
+    const exists = names.some(
+      (name) =>
+        (name.text ?? '').toLowerCase().trim() === text.toLowerCase().trim(),
+    );
+    if (!exists) {
+      names.push({
+        text,
+        language: 'und',
+        type: 'historical',
+        isPreferred: false,
+      });
+    }
   }
+
+  for (const text of entry.sranantongoNames ?? []) {
+    if (!text) continue;
+    const exists = names.some(
+      (name) =>
+        (name.text ?? '').toLowerCase().trim() === text.toLowerCase().trim(),
+    );
+    if (!exists) {
+      names.push({
+        text,
+        language: 'srn',
+        type: 'vernacular',
+        isPreferred: false,
+      });
+    }
+  }
+
   return names;
 }
 
@@ -200,26 +226,22 @@ function wikidataIds(entry: GazetteerEntry): string[] {
 }
 
 function loadAlmanakkenEvidence(): Map<string, AlmanakkenEvidence[]> {
-  const csv = new TextDecoder('latin1').decode(readFileSync(ALMANAKKEN_PATH));
-  const rows = parse(csv, {
-    columns: true,
-    skip_empty_lines: true,
-    relax_column_count: true,
-  }) as Array<Record<string, string>>;
+  const { rows } = readAlmanakkenRows();
   const byQid = new Map<string, AlmanakkenEvidence[]>();
   for (const row of rows) {
-    const qid = (row.plantation_id ?? '').trim();
-    const recordId = (row.recordid ?? '').trim();
+    const qid = almanakkenField(row, 'plantation_id');
+    const recordId = almanakkenField(row, 'recordid');
     if (!qid || !recordId) continue;
-    const year = Number.parseInt((row.year ?? '').trim(), 10);
+    const year = Number.parseInt(almanakkenField(row, 'year'), 10);
     const evidence: AlmanakkenEvidence = {
       recordId,
       qid,
       year: Number.isFinite(year) ? year : undefined,
-      product: (row.product_std ?? '').trim(),
-      deserted: (row.deserted ?? '').trim().toLowerCase() === 'verlaten',
-      sourceName: (row.plantation_org ?? '').trim(),
-      sourcePage: (row.page ?? '').trim(),
+      product: almanakkenField(row, 'product_std'),
+      deserted: almanakkenField(row, 'deserted').toLowerCase() === 'verlaten',
+      sourceName: almanakkenField(row, 'plantation_org'),
+      sranantongoName: almanakkenField(row, 'sranantongo_naam'),
+      sourcePage: almanakkenField(row, 'page'),
     };
     const list = byQid.get(qid) ?? [];
     list.push(evidence);

@@ -33,6 +33,19 @@ export function buildPlaceRecordContext(): Record<string, unknown> {
       '@id': 'stm:standardizedContent',
       '@type': 'xsd:string',
     },
+    sranantongoName: {
+      '@id': 'stm:sranantongoName',
+      '@type': 'xsd:string',
+    },
+    hasParts: { '@id': 'stm:hasParts', '@type': '@id' },
+    hasPartLabels: { '@id': 'stm:hasPartLabels', '@type': 'xsd:string' },
+    partOf: { '@id': 'stm:partOf', '@type': '@id' },
+    partOfLabel: { '@id': 'stm:partOfLabel', '@type': 'xsd:string' },
+    ownedBy: { '@id': 'stm:ownedBy', '@type': '@id' },
+    enslavedSharedWith: {
+      '@id': 'stm:enslavedSharedWith',
+      '@type': 'xsd:string',
+    },
     sourceContent: { '@id': 'stm:sourceContent', '@type': 'xsd:string' },
     P3_has_note: { '@id': 'crm:P3_has_note', '@type': 'xsd:string' },
     P41_classified: { '@id': 'crm:P41_classified', '@type': '@id' },
@@ -263,6 +276,19 @@ export function buildContext(): Record<string, unknown> {
     modelEntity: { '@id': 'dcterms:conformsTo', '@type': 'xsd:string' },
     schemaTable: { '@id': 'dcterms:isPartOf', '@type': 'xsd:string' },
     linkedVia: { '@id': 'rdfs:comment', '@type': 'xsd:string' },
+    sranantongoName: {
+      '@id': 'stm:sranantongoName',
+      '@type': 'xsd:string',
+    },
+    hasParts: { '@id': 'stm:hasParts', '@type': '@id' },
+    hasPartLabels: { '@id': 'stm:hasPartLabels', '@type': 'xsd:string' },
+    partOf: { '@id': 'stm:partOf', '@type': '@id' },
+    partOfLabel: { '@id': 'stm:partOfLabel', '@type': 'xsd:string' },
+    ownedBy: { '@id': 'stm:ownedBy', '@type': '@id' },
+    enslavedSharedWith: {
+      '@id': 'stm:enslavedSharedWith',
+      '@type': 'xsd:string',
+    },
   };
 }
 

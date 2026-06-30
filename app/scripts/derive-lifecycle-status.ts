@@ -27,7 +27,6 @@
  *   pnpm derive-lifecycle -- --force
  */
 
-import { parse } from 'csv-parse/sync';
 import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import type {
@@ -36,15 +35,11 @@ import type {
   StatusAssertion,
 } from '../lib/types';
 import { getPrimaryAuthorityLink } from '../lib/types';
+import { almanakkenField, isVerlaten, readAlmanakkenRows } from './almanakken';
 
 // ── Paths ──────────────────────────────────────────────────────────────────
 
 const DATA_DIR = join(__dirname, '../../data');
-const ALMANAKKEN_CSV = join(
-  DATA_DIR,
-  '06-almanakken - Plantations Surinaamse Almanakken',
-  'Plantations Surinaamse Almanakken v1.0.csv',
-);
 const GAZETTEER_PATH = join(DATA_DIR, 'places-gazetteer.jsonld');
 const PUBLIC_GAZETTEER = join(
   __dirname,
@@ -93,22 +88,15 @@ interface AlmanakRow {
 // ── Read and parse CSV (latin-1) ───────────────────────────────────────────
 
 console.log('Reading almanakken CSV...');
-const buf = readFileSync(ALMANAKKEN_CSV);
-const csv = new TextDecoder('latin1').decode(buf);
-
-const rawRows: Record<string, string>[] = parse(csv, {
-  columns: true,
-  skip_empty_lines: true,
-  relax_column_count: true,
-});
+const { rows: rawRows } = readAlmanakkenRows();
 
 // Keep only rows with a Q-ID and a valid year
 const rows: AlmanakRow[] = rawRows
   .map((r) => ({
-    qid: (r['plantation_id'] ?? '').trim(),
-    year: parseInt((r['year'] ?? '').trim(), 10),
-    product: (r['product_std'] ?? '').trim(),
-    verlaten: (r['deserted'] ?? '').trim().toLowerCase() === 'verlaten',
+    qid: almanakkenField(r, 'plantation_id'),
+    year: parseInt(almanakkenField(r, 'year'), 10),
+    product: almanakkenField(r, 'product_std'),
+    verlaten: isVerlaten(r.deserted),
   }))
   .filter((r) => r.qid && !isNaN(r.year));
 

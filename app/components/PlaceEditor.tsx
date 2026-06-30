@@ -29,6 +29,7 @@ interface PlaceEditorProps {
   place: GazetteerPlace;
   districts: GazetteerPlace[];
   sourceAppellations?: SourceAppellationHint[];
+  reviewIssues?: string[];
   canEdit: boolean;
   onSave: (place: GazetteerPlace) => Promise<void>;
   onCancel: () => void;
@@ -501,6 +502,7 @@ export default function PlaceEditor({
   place,
   districts,
   sourceAppellations = [],
+  reviewIssues = [],
   canEdit,
   onSave,
   onCancel,
@@ -1166,6 +1168,21 @@ export default function PlaceEditor({
             Edit the Gazetteer record, not JSON-LD. Add a source to each
             statement; add a date or span when the source provides one.
           </p>
+        )}
+        {reviewIssues.length > 0 && (
+          <div className="border-l-2 border-amber-500 bg-amber-50 px-3 py-2 text-xs text-amber-900">
+            <p className="font-medium">Review flags</p>
+            <div className="mt-1 flex flex-wrap gap-1.5">
+              {reviewIssues.map((issue) => (
+                <span
+                  key={issue}
+                  className="inline-flex rounded border border-amber-300 bg-white px-1.5 py-0.5 text-[10px] font-medium"
+                >
+                  {issue}
+                </span>
+              ))}
+            </div>
+          </div>
         )}
         {/* Names */}
         <div>

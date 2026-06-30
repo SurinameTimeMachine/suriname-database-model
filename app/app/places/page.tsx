@@ -17,6 +17,7 @@ import type {
   LocationAssertion,
   PlantationStatusType,
   ProductAssertion,
+  PlaceName,
   StatusAssertion,
 } from '@/lib/types';
 import { getPreferredName } from '@/lib/types';
@@ -53,32 +54,45 @@ type PublicationNotice = {
   jsonUrl?: string;
 };
 
-function normalizeNamesFromLegacy(entry: Record<string, unknown>) {
-  if (Array.isArray(entry.names)) {
-    return entry.names;
-  }
-
+function normalizeNamesFromLegacy(entry: Record<string, unknown>): PlaceName[] {
+  type LegacyName = {
+    text?: string;
+    language?: string;
+    type?: string;
+    isPreferred?: boolean;
+    source?: string;
+    sourceYear?: number;
+  };
   const prefLabel =
     typeof entry.prefLabel === 'string' ? entry.prefLabel.trim() : '';
   const altLabels = Array.isArray(entry.altLabels)
     ? entry.altLabels.filter((x): x is string => typeof x === 'string')
     : [];
-  const sources = Array.isArray(entry.sources)
-    ? entry.sources.filter((x): x is string => typeof x === 'string')
+  const sranantongoNames = Array.isArray(entry.sranantongoNames)
+    ? entry.sranantongoNames.filter((x): x is string => typeof x === 'string')
     : [];
-  const sourceId = sources[0];
-
-  const names: Array<Record<string, unknown>> = [];
+  const names: LegacyName[] = Array.isArray(entry.names)
+    ? entry.names.filter((x): x is LegacyName =>
+        Boolean(x && typeof x === 'object'),
+      )
+    : [];
   if (prefLabel) {
-    names.push({
-      text: prefLabel,
-      language: 'nl',
-      type: 'official',
-      isPreferred: true,
-    });
+    const hasPreferred = names.some(
+      (name) => name.isPreferred === true && name.text === prefLabel,
+    );
+    if (!hasPreferred) {
+      names.push({
+        text: prefLabel,
+        language: 'nl',
+        type: 'official',
+        isPreferred: true,
+      });
+    }
   }
   for (const label of altLabels) {
     if (!label || label === prefLabel) continue;
+    const exists = names.some((name) => name.text === label);
+    if (exists) continue;
     names.push({
       text: label,
       language: 'und',
@@ -86,7 +100,18 @@ function normalizeNamesFromLegacy(entry: Record<string, unknown>) {
       isPreferred: false,
     });
   }
-  return names;
+  for (const name of sranantongoNames) {
+    if (!name || name === prefLabel) continue;
+    const exists = names.some((entryName) => entryName.text === name);
+    if (exists) continue;
+    names.push({
+      text: name,
+      language: 'srn',
+      type: 'vernacular',
+      isPreferred: false,
+    });
+  }
+  return names as PlaceName[];
 }
 
 function getEffectiveDistrictAssertion(
@@ -170,6 +195,21 @@ function preferAlmanakkenSource(sources: string[]): string {
   return sources.includes('almanakken')
     ? 'almanakken'
     : sources[0] || 'almanakken';
+}
+
+function getReviewIssues(place: GazetteerPlace): string[] {
+  const issues: string[] = [];
+
+  if (place.deprecated) issues.push('deprecated');
+  if (place.mergedInto) issues.push(`merged into ${place.mergedInto}`);
+  if (place.type === 'plantation' && place.psurIds.length > 1) {
+    issues.push(`multiple PSUR IDs (${place.psurIds.length})`);
+  }
+  if (place.type !== 'plantation' && (place.sranantongoNames?.length ?? 0) > 0) {
+    issues.push('Sranan name should stay on plantation');
+  }
+
+  return issues;
 }
 
 function normalizeProductAssertionsFromLegacy(
@@ -441,6 +481,7 @@ interface PlaceRowProps {
   place: GazetteerPlace;
   isSelected: boolean;
   onSelect: (id: string) => void;
+  reviewIssues: string[];
   mergeChecked?: boolean;
   mergeDisabled?: boolean;
   onMergeCheck?: (id: string, checked: boolean) => void;
@@ -453,6 +494,7 @@ const PlaceRow = memo(function PlaceRow({
   place,
   isSelected,
   onSelect,
+  reviewIssues,
   mergeChecked,
   mergeDisabled,
   onMergeCheck,
@@ -506,6 +548,14 @@ const PlaceRow = memo(function PlaceRow({
               .map((n) => n.text)
               .join(', ')}
             )
+          </span>
+        )}
+        {reviewIssues.length > 0 && (
+          <span
+            className="ml-2 inline-flex items-center rounded border border-amber-300 bg-amber-50 px-1.5 py-0.5 text-[10px] font-medium text-amber-700"
+            title={reviewIssues.join('\n')}
+          >
+            review {reviewIssues.length}
           </span>
         )}
       </td>
@@ -704,6 +754,7 @@ function PlacesPageInner() {
   const [columnsOpen, setColumnsOpen] = useState(false);
   const [mergeCheckIds, setMergeCheckIds] = useState<string[]>([]);
   const [showMerged, setShowMerged] = useState(false);
+  const [showIssuesOnly, setShowIssuesOnly] = useState(false);
   const [mergeView, setMergeView] = useState<{
     placeA: GazetteerPlace;
     placeB: GazetteerPlace;
@@ -712,6 +763,10 @@ function PlacesPageInner() {
     useState<PublicationNotice | null>(null);
   const columnsRef = useRef<HTMLDivElement>(null);
   const tableScrollRef = useRef<HTMLDivElement>(null);
+  const reviewIssuesById = useMemo(
+    () => new Map(places.map((place) => [place.id, getReviewIssues(place)])),
+    [places],
+  );
 
   // URL sync: read ?place= query param
   const searchParams = useSearchParams();
@@ -860,11 +915,13 @@ function PlacesPageInner() {
   // Filter, search, and sort
   const filtered = useMemo(() => {
     let list = places;
-    // Always hide deprecated (tombstoned) entries — they are archived, not live
-    list = list.filter((p) => !p.deprecated);
-    // Hide merged-retired entries unless explicitly shown
-    if (!showMerged) {
-      list = list.filter((p) => !p.mergedInto);
+    if (!showIssuesOnly) {
+      // Always hide deprecated (tombstoned) entries — they are archived, not live
+      list = list.filter((p) => !p.deprecated);
+      // Hide merged-retired entries unless explicitly shown
+      if (!showMerged) {
+        list = list.filter((p) => !p.mergedInto);
+      }
     }
     if (typeFilter !== 'all') {
       list = list.filter((p) => p.type === typeFilter);
@@ -903,6 +960,11 @@ function PlacesPageInner() {
           p.psurIds.some((id) => id.toLowerCase().includes(q)) ||
           (p.locationDescription &&
             p.locationDescription.toLowerCase().includes(q)),
+      );
+    }
+    if (showIssuesOnly) {
+      list = list.filter(
+        (place) => (reviewIssuesById.get(place.id)?.length ?? 0) > 0,
       );
     }
 
@@ -966,11 +1028,28 @@ function PlacesPageInner() {
       }
     });
     return list;
-  }, [places, typeFilter, search, sortKey, sortDir, sourceFilter, showMerged]);
+  }, [
+    places,
+    typeFilter,
+    search,
+    sortKey,
+    sortDir,
+    sourceFilter,
+    showMerged,
+    showIssuesOnly,
+    reviewIssuesById,
+  ]);
 
   const mergedCount = useMemo(
     () => places.filter((p) => p.mergedInto && !p.deprecated).length,
     [places],
+  );
+
+  const reviewCount = useMemo(
+    () =>
+      places.filter((place) => (reviewIssuesById.get(place.id)?.length ?? 0) > 0)
+        .length,
+    [places, reviewIssuesById],
   );
 
   const deprecatedCount = useMemo(
@@ -1297,6 +1376,18 @@ function PlacesPageInner() {
                   </div>
                 )}
 
+                <button
+                  type="button"
+                  onClick={() => setShowIssuesOnly((value) => !value)}
+                  className={`shrink-0 border px-3 py-1.5 text-sm font-medium transition ${
+                    showIssuesOnly
+                      ? 'border-amber-400 bg-amber-50 text-amber-800'
+                      : 'border-ink/20 text-ink/70 hover:border-amber-400 hover:text-amber-800'
+                  }`}
+                >
+                  Needs review ({reviewCount})
+                </button>
+
                 {/* Columns toggle */}
                 <div
                   className="relative border-l border-ink/10 pl-3 shrink-0"
@@ -1503,16 +1594,17 @@ function PlacesPageInner() {
                   </thead>
                   <tbody>
                     {filtered.map((place) => (
-                      <PlaceRow
-                        key={place.id}
-                        place={place}
-                        isSelected={selectedIds.includes(place.id)}
-                        onSelect={handleRowSelect}
-                        mergeChecked={
-                          canEdit ? mergeCheckIds.includes(place.id) : undefined
-                        }
-                        mergeDisabled={
-                          canEdit ? mergeCheckIds.length >= 2 : undefined
+                    <PlaceRow
+                      key={place.id}
+                      place={place}
+                      isSelected={selectedIds.includes(place.id)}
+                      onSelect={handleRowSelect}
+                      reviewIssues={reviewIssuesById.get(place.id) ?? []}
+                      mergeChecked={
+                        canEdit ? mergeCheckIds.includes(place.id) : undefined
+                      }
+                      mergeDisabled={
+                        canEdit ? mergeCheckIds.length >= 2 : undefined
                         }
                         onMergeCheck={canEdit ? handleMergeCheck : undefined}
                         colors={colors}
@@ -1540,6 +1632,7 @@ function PlacesPageInner() {
                     place={selectedPlace}
                     districts={districts}
                     sourceAppellations={selectedSourceAppellations}
+                    reviewIssues={reviewIssuesById.get(selectedPlace.id) ?? []}
                     canEdit={canEdit}
                     onSave={handleSave}
                     onCancel={handleCancel}
@@ -1557,6 +1650,7 @@ function PlacesPageInner() {
                     place={selectedPlace}
                     districts={districts}
                     sourceAppellations={selectedSourceAppellations}
+                    reviewIssues={reviewIssuesById.get(selectedPlace.id) ?? []}
                     canEdit={canEdit}
                     onSave={handleSave}
                     onCancel={handleCancel}

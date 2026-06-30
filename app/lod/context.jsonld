@@ -375,6 +375,34 @@
     "linkedVia": {
       "@id": "rdfs:comment",
       "@type": "xsd:string"
+    },
+    "sranantongoName": {
+      "@id": "stm:sranantongoName",
+      "@type": "xsd:string"
+    },
+    "hasParts": {
+      "@id": "stm:hasParts",
+      "@type": "@id"
+    },
+    "hasPartLabels": {
+      "@id": "stm:hasPartLabels",
+      "@type": "xsd:string"
+    },
+    "partOf": {
+      "@id": "stm:partOf",
+      "@type": "@id"
+    },
+    "partOfLabel": {
+      "@id": "stm:partOfLabel",
+      "@type": "xsd:string"
+    },
+    "ownedBy": {
+      "@id": "stm:ownedBy",
+      "@type": "@id"
+    },
+    "enslavedSharedWith": {
+      "@id": "stm:enslavedSharedWith",
+      "@type": "xsd:string"
     }
   }
 }

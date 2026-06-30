@@ -23,20 +23,15 @@
  *   pnpm derive-products -- --force
  */
 
-import { parse } from 'csv-parse/sync';
 import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import type { GazetteerPlace, ProductAssertion } from '../lib/types';
 import { getPrimaryAuthorityLink } from '../lib/types';
+import { almanakkenField, isVerlaten, readAlmanakkenRows } from './almanakken';
 
 // ── Paths ──────────────────────────────────────────────────────────────────
 
 const DATA_DIR = join(__dirname, '../../data');
-const ALMANAKKEN_CSV = join(
-  DATA_DIR,
-  '06-almanakken - Plantations Surinaamse Almanakken',
-  'Plantations Surinaamse Almanakken v1.0.csv',
-);
 const GAZETTEER_PATH = join(DATA_DIR, 'places-gazetteer.jsonld');
 const PUBLIC_GAZETTEER = join(
   __dirname,
@@ -94,30 +89,23 @@ function slugify(value: string): string {
 // ── Read and parse CSV (latin-1) ───────────────────────────────────────────
 
 console.log('Reading almanakken CSV...');
-const buf = readFileSync(ALMANAKKEN_CSV);
-const csv = new TextDecoder('latin1').decode(buf);
-
-const rawRows: Record<string, string>[] = parse(csv, {
-  columns: true,
-  skip_empty_lines: true,
-  relax_column_count: true,
-});
+const { rows: rawRows } = readAlmanakkenRows();
 
 // Keep only rows with a Q-ID, valid year, a product value, and NOT verlaten.
 // Verlaten rows are excluded because a plantation being abandoned implies no
 // active product — even if the CSV has a stale product_std on that row.
 const rows: AlmanakRow[] = rawRows
   .filter((r) => {
-    const qid = (r['plantation_id'] ?? '').trim();
-    const year = parseInt((r['year'] ?? '').trim(), 10);
-    const product = (r['product_std'] ?? '').trim();
-    const verlaten = (r['deserted'] ?? '').trim().toLowerCase() === 'verlaten';
+    const qid = almanakkenField(r, 'plantation_id');
+    const year = parseInt(almanakkenField(r, 'year'), 10);
+    const product = almanakkenField(r, 'product_std');
+    const verlaten = isVerlaten(r.deserted);
     return qid && !isNaN(year) && product && !verlaten;
   })
   .map((r) => ({
-    qid: r['plantation_id'].trim(),
-    year: parseInt(r['year'].trim(), 10),
-    product: r['product_std'].trim(),
+    qid: almanakkenField(r, 'plantation_id'),
+    year: parseInt(almanakkenField(r, 'year'), 10),
+    product: almanakkenField(r, 'product_std'),
   }));
 
 const uniqueQids = new Set(rows.map((r) => r.qid));

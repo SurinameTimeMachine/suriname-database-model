@@ -23,6 +23,7 @@ import { join } from 'path';
 import proj4 from 'proj4';
 
 import type { ExternalLink, PlaceType } from '../lib/types';
+import { almanakkenField, readAlmanakkenRows } from './almanakken';
 
 // Load CRM mapping from the thesaurus file
 const thesaurusPath = join(__dirname, '../../data/place-types-thesaurus.jsonld');
@@ -71,6 +72,7 @@ interface GazetteerPlace {
   type: PlaceType;
   prefLabel: string;
   altLabels: string[];
+  sranantongoNames?: string[];
   broader: string | null;
   description: string;
   location: {
@@ -95,11 +97,6 @@ interface GazetteerPlace {
 
 const PUBLIC_DIR = join(__dirname, '../public/data');
 const DATA_DIR = join(__dirname, '../../data');
-const ALMANAKKEN_CSV = join(
-  DATA_DIR,
-  '06-almanakken - Plantations Surinaamse Almanakken',
-  'Plantations Surinaamse Almanakken v1.0.csv',
-);
 const QGIS_CSV = join(
   DATA_DIR,
   '07-gis-plantation-map-1930',
@@ -184,12 +181,8 @@ console.log(`  ${withPsur} have PSUR IDs`);
 // ── Load almanakken CSV for district + location linking ────────────
 
 console.log('Loading almanakken CSV...');
-const almContent = readFileSync(ALMANAKKEN_CSV, 'latin1');
-const almRows = parse(almContent, {
-  columns: true,
-  skip_empty_lines: true,
-  trim: true,
-});
+const { rows: almRows, path: almPath } = readAlmanakkenRows();
+console.log(`  Using ${almPath}`);
 
 // Build per-QID aggregates: most common district, loc_std, loc_org, product, label, psur
 interface AlmAggregate {
@@ -198,6 +191,7 @@ interface AlmAggregate {
   locationsOriginal: Map<string, number>;
   products: Map<string, number>;
   labels: Map<string, number>;
+  srananNames: Map<string, number>;
   psurIds: Set<string>;
 }
 const almByQid = new Map<string, AlmAggregate>();
@@ -206,13 +200,14 @@ const allDistricts = new Set<string>();
 const allLocations = new Set<string>();
 
 for (const row of almRows as Record<string, string>[]) {
-  const qid = (row['plantation_id'] || '').trim();
-  const d = (row['district_of_divisie'] || '').trim();
-  const l = (row['loc_std'] || '').trim();
-  const lOrg = (row['loc_org'] || '').trim();
-  const prod = (row['product_std'] || '').trim();
-  const label = (row['plantation_std'] || '').trim();
-  const psur = (row['psur_id'] || '').trim();
+  const qid = almanakkenField(row, 'plantation_id');
+  const d = almanakkenField(row, 'district_of_divisie');
+  const l = almanakkenField(row, 'loc_std');
+  const lOrg = almanakkenField(row, 'loc_org');
+  const prod = almanakkenField(row, 'product_std');
+  const label = almanakkenField(row, 'plantation_std');
+  const sranan = almanakkenField(row, 'sranantongo_naam');
+  const psur = almanakkenField(row, 'psur_id');
 
   if (d) allDistricts.add(d);
   if (l) allLocations.add(l);
@@ -227,6 +222,7 @@ for (const row of almRows as Record<string, string>[]) {
       locationsOriginal: new Map(),
       products: new Map(),
       labels: new Map(),
+      srananNames: new Map(),
       psurIds: new Set(),
     };
     almByQid.set(qid, agg);
@@ -237,6 +233,7 @@ for (const row of almRows as Record<string, string>[]) {
     agg.locationsOriginal.set(lOrg, (agg.locationsOriginal.get(lOrg) || 0) + 1);
   if (prod) agg.products.set(prod, (agg.products.get(prod) || 0) + 1);
   if (label) agg.labels.set(label, (agg.labels.get(label) || 0) + 1);
+  if (sranan) agg.srananNames.set(sranan, (agg.srananNames.get(sranan) || 0) + 1);
   if (psur) agg.psurIds.add(psur);
 }
 
@@ -253,6 +250,12 @@ function mostCommon(map: Map<string, number>): string | null {
     }
   }
   return best;
+}
+
+function allCommon(map: Map<string, number>): string[] {
+  return [...map.entries()]
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .map(([value]) => value);
 }
 
 /** Build district slug for broader linking */
@@ -462,6 +465,7 @@ for (const place of Object.values(placesRaw)) {
   let locationDescription: string | null = null;
   let locationDescriptionOriginal: string | null = null;
   let placeType: string | null = null;
+  let sranantongoNames: string[] = [];
 
   if (qid) {
     const agg = almByQid.get(qid);
@@ -476,6 +480,9 @@ for (const place of Object.values(placesRaw)) {
       locationDescriptionOriginal = mostCommon(agg.locationsOriginal);
       placeType = mostCommon(agg.products);
       if (placeType) linkedProduct++;
+      sranantongoNames = allCommon(agg.srananNames).filter(
+        (name) => name && name !== prefLabel,
+      );
     }
   }
 
@@ -504,6 +511,7 @@ for (const place of Object.values(placesRaw)) {
     locationDescription,
     locationDescriptionOriginal,
     placeType,
+    sranantongoNames,
     modifiedBy: null,
     modifiedAt: null,
   });
@@ -543,6 +551,9 @@ for (const [qid, agg] of almByQid) {
   const locationDescription = mostCommon(agg.locations);
   const locationDescriptionOriginal = mostCommon(agg.locationsOriginal);
   const placeType = mostCommon(agg.products);
+  const sranantongoNames = allCommon(agg.srananNames).filter(
+    (name) => name && name !== prefLabel,
+  );
   const psurIds = Array.from(agg.psurIds);
   if (psurIds.length > 0) almOnlyWithPsur++;
 
@@ -565,6 +576,7 @@ for (const [qid, agg] of almByQid) {
     locationDescription,
     locationDescriptionOriginal,
     placeType,
+    sranantongoNames,
     modifiedBy: null,
     modifiedAt: null,
   });

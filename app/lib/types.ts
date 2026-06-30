@@ -99,6 +99,7 @@ export interface OrganizationObservation {
   observationOf: string; // CRM: P140 assigned attribute to -> E74
   observationYear: string; // CRM: P4 has time-span -> E52
   observedName?: string; // CRM: P141 assigned -> E41 Appellation
+  sranantongoName?: string; // vernacular plantation name, if recorded
   hasOwner?: string; // CRM: P14 carried out by (P14.1 picot:owner)
   hasAdministrator?: string; // CRM: P14 carried out by (P14.1 picot:administrator)
   hasDirector?: string; // CRM: P14 carried out by (P14.1 picot:director)
@@ -107,6 +108,13 @@ export interface OrganizationObservation {
   locationStd?: string; // CRM: P7 took place at -> E53 Place (text)
   sizeAkkers?: number; // CRM: P43 has dimension -> E54 Dimension (akkers)
   pageReference?: string; // CRM: P3 has note (almanac page reference)
+  hasParts?: string[];
+  hasPartLabels?: string[];
+  partOf?: string | string[];
+  partOfLabel?: string | string[];
+  ownedBy?: string | string[];
+  ownedByLabel?: string | string[];
+  enslavedSharedWith?: string;
   hadPrimarySource?: string; // prov:hadPrimarySource
   wasDerivedFrom?: string; // prov:wasDerivedFrom
 }
@@ -355,6 +363,8 @@ export interface GazetteerPlace extends TombstoneFields {
   type: PlaceType;
   /** All named forms for this place — replaces flat prefLabel + altLabels. */
   names: PlaceName[];
+  /** Stable Sranan Tongo names preserved from source data for plantations. */
+  sranantongoNames?: string[];
   broader: string | null;
   description: string;
   location: {
