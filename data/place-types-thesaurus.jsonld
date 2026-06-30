@@ -1072,6 +1072,64 @@
         "https://schema.org/Canal",
         "http://vocab.getty.edu/aat/300008695"
       ]
+    },
+    {
+      "@id": "stm:vocabulary/place-type/building",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "typeId": "building",
+      "prefLabel": {
+        "en": "Building",
+        "nl": "Gebouw"
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/human-made",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "color": "#f2607d",
+      "sortOrder": 99,
+      "created": "2026-06-30",
+      "modified": "2026-06-30",
+      "altLabel": {
+        "nl": [
+          "etablissement",
+          "huis",
+          "opstal",
+          "pand",
+          "bouwwerk",
+          "constructie"
+        ],
+        "srn": [
+          "oso"
+        ],
+        "en": [
+          "house"
+        ]
+      },
+      "definition": {
+        "nl": "Een permanent, door mensen geconstrueerd bouwwerk dat meestal is voorzien van wanden en een dak, met een specifieke functionele, maatschappelijke of institutionele bestemming.",
+        "en": "A permanent, human-made architectural structure usually enclosed by walls and a roof, designed for a specific functional, social, or institutional purpose."
+      },
+      "related": [
+        "stm:vocabulary/place-type/MilitaryInfrastructure",
+        "stm:vocabulary/place-type/historical-address",
+        "stm:vocabulary/place-type/plantation",
+        "stm:vocabulary/place-type/settlement",
+        "stm:vocabulary/place-type/indigenous-village",
+        "stm:vocabulary/place-type/Fort",
+        "stm:vocabulary/place-type/maroon-village",
+        "stm:vocabulary/place-type/town",
+        "stm:vocabulary/place-type/military-post"
+      ],
+      "exactMatch": [
+        "https://www.wikidata.org/wiki/Q41176",
+        "https://vocab.getty.edu/aat/300004790"
+      ],
+      "closeMatch": [
+        "https://schema.org/CivicStructure"
+      ]
     }
   ]
 }
