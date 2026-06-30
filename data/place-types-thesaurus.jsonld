@@ -376,9 +376,9 @@
         "crm:E55_Type"
       ],
       "prefLabel": {
-        "en": "Astronomical Station",
-        "nl": "Astronomisch Station",
-        "srn": "Stasi"
+        "srn": "Stasi",
+        "en": "Geodetic control point, Astronomical Station",
+        "nl": "Geodetisch referentiepunt"
       },
       "definition": {
         "srn": "Lanti-marki [?]",
@@ -396,12 +396,13 @@
       "crmBadge": "E25",
       "sortOrder": 6,
       "created": "2026-04-07",
-      "modified": "2026-06-23",
+      "modified": "2026-06-30",
       "altLabel": {
         "nl": [
           "Astronomisch meetpunt",
           "Geodetisch referentiepunt",
-          "Observatiestation"
+          "Observatiestation",
+          "Astronomisch Station"
         ],
         "en": [
           "Astronomical observation point",
