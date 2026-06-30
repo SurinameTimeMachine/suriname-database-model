@@ -1030,6 +1030,48 @@
         "nl": "Het geheel van door mensen aangelegde kunstwerken en infrastructurele elementen bedoeld om de waterhuishouding te reguleren, waterwegen bevaarbaar te houden, of gronden te beschermen tegen overstroming en verdroging.",
         "en": "The totality of man-made structures and infrastructure elements designed to regulate water management, maintain the navigability of waterways, or protect land from flooding and drought."
       }
+    },
+    {
+      "@id": "stm:vocabulary/place-type/canal",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "typeId": "canal",
+      "prefLabel": {
+        "en": "Canal",
+        "nl": "Kanaal"
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/water-infrastructure",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "color": "#875ef4",
+      "sortOrder": 99,
+      "created": "2026-06-30",
+      "modified": "2026-06-30",
+      "altLabel": {
+        "nl": [
+          "Gracht;Lozing;Vaargeul"
+        ],
+        "en": [
+          "Trench"
+        ]
+      },
+      "definition": {
+        "nl": "Een door mensen aangelegde, kunstmatige waterweg bedoeld voor transport, scheepvaart of waterbeheersing.",
+        "en": "A human-made, artificial waterway constructed for transportation, navigation, or water management."
+      },
+      "related": [
+        "stm:vocabulary/place-type/river",
+        "stm:vocabulary/place-type/creek",
+        "stm:vocabulary/place-type/water-infrastructure"
+      ],
+      "exactMatch": [
+        "https://www.wikidata.org/wiki/Q12284",
+        "https://schema.org/Canal",
+        "http://vocab.getty.edu/aat/300008695"
+      ]
     }
   ]
 }
