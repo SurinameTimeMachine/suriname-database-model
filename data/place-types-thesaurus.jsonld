@@ -362,12 +362,12 @@
         "http://www.wikidata.org/entity/Q22667"
       ],
       "typeId": "railroad",
-      "color": "#a06040",
+      "color": "#0fd09b",
       "crmClass": "E25_Human-Made_Feature",
       "crmBadge": "E25",
       "sortOrder": 5,
       "created": "2026-04-07",
-      "modified": "2026-06-23"
+      "modified": "2026-06-30"
     },
     {
       "@id": "stm:vocabulary/place-type/station",
