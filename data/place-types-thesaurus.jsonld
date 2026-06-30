@@ -1130,6 +1130,62 @@
       "closeMatch": [
         "https://schema.org/CivicStructure"
       ]
+    },
+    {
+      "@id": "stm:vocabulary/place-type/church",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "typeId": "church",
+      "prefLabel": {
+        "en": "Church",
+        "nl": "Kerk",
+        "srn": "Kerki"
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/building",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "color": "#b999a5",
+      "sortOrder": 99,
+      "created": "2026-06-30",
+      "modified": "2026-06-30",
+      "altLabel": {
+        "nl": [
+          "kerkgebouw",
+          "tempel",
+          "gebedshuis",
+          "moskee",
+          "mandir",
+          "missiepost",
+          "zendingspost"
+        ],
+        "en": [
+          "temple",
+          "place of worship",
+          "mission post"
+        ],
+        "srn": [
+          "Gado-oso"
+        ]
+      },
+      "definition": {
+        "nl": "Een permanent gebouw of complex dat specifiek is ingericht voor religieuze samenkomsten, liturgie en spirituele praktijken.",
+        "en": "A permanent structure or complex designed specifically for religious assemblies, liturgy, and spiritual practices."
+      },
+      "related": [
+        "stm:vocabulary/place-type/building"
+      ],
+      "exactMatch": [
+        "https://www.wikidata.org/wiki/Q1370598",
+        "https://schema.org/PlaceOfWorship"
+      ],
+      "closeMatch": [
+        "https://www.wikidata.org/wiki/Q16970",
+        "https://www.wikidata.org/wiki/Q111286333",
+        "https://vocab.getty.edu/aat/300007466"
+      ]
     }
   ]
 }
