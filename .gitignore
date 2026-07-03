@@ -11,6 +11,10 @@ app/lod/database.jsonld
 app/lod/map-features.geojson
 app/public/data/
 
+# concordans paramaribo local inputs
+data/concordans-paramaribo/raw/
+data/concordans-paramaribo/tmp/
+
 # misc
 .DS_Store
 *.tsbuildinfo
