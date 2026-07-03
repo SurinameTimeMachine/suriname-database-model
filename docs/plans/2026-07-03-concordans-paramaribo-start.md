@@ -25,7 +25,7 @@ Key constraints:
 
 ## First deliverable
 
-The first deliverable is a lightweight transformation scaffold that can later read a local concordans export and produce STM-friendly derived data without committing the raw source file.
+The first deliverable is a lightweight transformation scaffold that can later read a local concordans export and produce STM-friendly derived data without committing the raw source file. The second deliverable is a derived CSV with explicit 2022, 1885, 1837, 1817, and 1921 fields plus split/merge markers.
 
 ## Collaboration rule
 

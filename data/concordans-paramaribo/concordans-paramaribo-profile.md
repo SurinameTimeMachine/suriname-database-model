@@ -20,16 +20,26 @@ The CSV export does not contain the calculated values for formula-backed cells, 
 - Rows with split marker: 43
 - Rows with new marker: 170
 
+## 1885 comparison
+
+- Exact 1885 cell/derived matches: 0
+- Formatting-only 1885 differences: 2324
+- Derived-only 1885 rows (cell missing, reconstructable): 9
+- Real 1885 mismatches after normalization: 0
+
 ## Sample values
 
 - 2022: Henck Arron straat | Grote Combé weg | Watermolen straat | Heiligen weg | Jodenbree straat | mr.dr. J.C. de Miranda straat | Maagden straat | Neumann pad
 - 1921: Gravenstraat   2 | Gravenstraat   4 | Grote Combeweg   1 | Grote Combeweg   3 | Grote Combeweg   5 t/m 11 | Grote Combeweg  13 t/m 27 | Watermolenstraat   3 | Heiligeweg   3
-- 1885: F 8 | F 9 | F 10 | F 11 | F 12 | F 13 | F 14 | F 15
+- 1885 cell: F.  8 | F.  9 | F. 10 | F. 11 | F. 12 | F. 13 | F. 14 | F. 15
+- 1885 derived: F 8 | F 9 | F 10 | F 11 | F 12 | F 13 | F 14 | F 15
 - 1837: A.  1 | A.  1a | A.  1b | A.219 | C.  1 | C. 95 | A.108 | A.217
 - 1817: A.  1 | B.  3 | C.  2 | D.  1 | A.  2 | B.  5 | C.  4 | D.  2
 - 1885 streets: Gravenstraat | Watermolenstraat | Heiligeweg | Jodenbreestraat | Oranjestraat | Domineestraat | Klipstenenstraat | Heerenstraat
 - 1837 streets: Gravenstraat | Watermolenstraat | Heiligeweg | Jodenbreestraat | Oranjestraat | Domineestraat | Klipstenenstraat | Heerenstraat
 - 1830 streets: Gravenstraat | Watermolenstraat | Heiligeweg | Jodenbreestraat | Klipstenenstraat | Het Plein | Heerenstraat | Keizerstraat
+- Normalized 1885 cell: f8 | f9 | f10 | f11 | f12 | f13 | f14 | f15
+- Normalized 1885 derived: f8 | f9 | f10 | f11 | f12 | f13 | f14 | f15
 
 ## Immediate implications
 
