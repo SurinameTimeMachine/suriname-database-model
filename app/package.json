@@ -10,7 +10,8 @@
     "prepare-data": "tsx scripts/prepare-data.ts",
     "pipeline": "tsx scripts/generate-database.ts && tsx scripts/prepare-data.ts",
     "seed-gazetteer": "tsx scripts/seed-gazetteer.ts",
-    "transform-concordans-paramaribo": "tsx scripts/transform-concordans-paramaribo.ts"
+    "transform-concordans-paramaribo": "tsx scripts/transform-concordans-paramaribo.ts",
+    "link-concordans-paramaribo-lp": "tsx scripts/link-concordans-paramaribo-lp.ts"
   },
   "keywords": [],
   "author": "",

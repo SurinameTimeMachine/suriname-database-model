@@ -27,6 +27,8 @@ Key constraints:
 
 The first deliverable is a lightweight transformation scaffold that can later read a local concordans export and produce STM-friendly derived data without committing the raw source file. The second deliverable is a derived CSV with explicit 2022, 1885, 1837, 1817, and 1921 fields plus split/merge markers.
 
+Detailed matching logic and historical regime assumptions are documented separately in `docs/plans/2026-07-06-concordans-paramaribo-matching-logic.md`.
+
 ## Collaboration rule
 
 All project communication, commit messages, and documentation for this work are in English so collaborators can review the process consistently.

@@ -1,0 +1,4 @@
+lpId,adres1885,straatnaam1885,normalizedAdres1885,normalizedStraatnaam1885,wijk1885,huisnummer1885,toevoeging1885,lpAddressStatus,isLinkableAddress,zoneType,hasGeometry,lng,lat,redCommentaar
+807,C206,Waterkant,c206,waterkant,C,206,,address,yes,older-regime,yes,-55.15833399241693,5.823702236255419,
+808,C207,Waterkant,c207,waterkant,C,207,,address,yes,older-regime,yes,-55.158017320254196,5.823790200745068,
+810,C205,Waterkant,c205,waterkant,C,205,,address,yes,older-regime,yes,-55.15848646419899,5.823582995502784,
