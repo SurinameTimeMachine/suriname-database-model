@@ -1625,6 +1625,38 @@
       "closeMatch": [
         "https://www.wikidata.org/wiki/Q40558"
       ]
+    },
+    {
+      "@id": "stm:vocabulary/place-type/quarry",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "typeId": "quarry",
+      "prefLabel": {
+        "en": "Quarry",
+        "nl": "Steengroeve"
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/industrial-facility",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "color": "#ada0b1",
+      "sortOrder": 99,
+      "created": "2026-07-06",
+      "modified": "2026-07-06",
+      "altLabel": {
+        "nl": [
+          "steenspringerij"
+        ]
+      },
+      "definition": {
+        "nl": "Een al dan niet infrastructureel bewerkte geografische locatie of open afgraving waar door menselijke arbeid steen, harde klei, graniet of andere minerale bouwmaterialen uit de bodem worden gewonnen.",
+        "en": "A geographically altered site or open-pit excavation where stone, hard clay, granite, or other mineral construction materials are extracted through human labor."
+      },
+      "exactMatch": [
+        "https://www.wikidata.org/wiki/Q188040"
+      ]
     }
   ]
 }
