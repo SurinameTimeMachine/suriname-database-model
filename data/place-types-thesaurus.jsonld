@@ -1539,6 +1539,49 @@
       "closeMatch": [
         "https://www.wikidata.org/wiki/Q1774898"
       ]
+    },
+    {
+      "@id": "stm:vocabulary/place-type/industrial-facility",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "typeId": "industrial-facility",
+      "prefLabel": {
+        "nl": "Industriële locatie",
+        "en": "Industrial facility"
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/human-made",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "color": "#cace8e",
+      "sortOrder": 99,
+      "created": "2026-07-06",
+      "modified": "2026-07-06",
+      "altLabel": {
+        "nl": [
+          "nijverheidslocatie",
+          "fabriekscomplex",
+          "fabriek",
+          "molen",
+          "ingenieurs-etablissement"
+        ],
+        "en": [
+          "industrial complex",
+          "production site"
+        ]
+      },
+      "definition": {
+        "nl": "Een door mensen geconstrueerde geografische locatie, gebouw of complex specifiek ingericht voor industriële productie, nijverheid, of de grootschalige mechanische of handmatige verwerking van grondstoffen tot halffabrikaten en eindproducten.",
+        "en": "A human-made geographic site, building, or complex specifically designed for industrial production, manufacturing, or the large-scale mechanical or manual processing of raw materials into semi-finished and finished goods."
+      },
+      "related": [
+        "stm:vocabulary/place-type/plantation"
+      ],
+      "exactMatch": [
+        "https://www.wikidata.org/wiki/Q134496677"
+      ]
     }
   ]
 }
