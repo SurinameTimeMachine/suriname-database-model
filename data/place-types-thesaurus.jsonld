@@ -1729,6 +1729,33 @@
       "related": [
         "stm:vocabulary/place-type/plantation"
       ]
+    },
+    {
+      "@id": "stm:vocabulary/place-type/brickworks",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "typeId": "brickworks",
+      "prefLabel": {
+        "en": "Brickworks",
+        "nl": "Steenfabriek"
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/industrial-facility",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "color": "#9bb7ab",
+      "sortOrder": 99,
+      "created": "2026-07-06",
+      "modified": "2026-07-06",
+      "definition": {
+        "nl": "Een industriële productielocatie en gebouwencomplex, uitgerust met (vaak door stoom aangedreven) machines, droogloodsen en permanente ovens, specifiek ingericht voor het grootschalig verwerken van klei tot gebakken bakstenen en tegels.",
+        "en": "An industrial production site and manufacturing complex equipped with machinery (often steam-driven), drying sheds, and permanent kilns, specifically designed for the large-scale processing of clay into fired bricks and tiles."
+      },
+      "related": [
+        "stm:vocabulary/place-type/quarry"
+      ]
     }
   ]
 }
