@@ -1426,6 +1426,33 @@
       "closeMatch": [
         "https://www.wikidata.org/wiki/Q39463"
       ]
+    },
+    {
+      "@id": "stm:vocabulary/place-type/medical-facility",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "typeId": "medical-facility",
+      "prefLabel": {
+        "en": "Medical Facility",
+        "nl": "Medische instelling"
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/human-made",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "color": "#ca888d",
+      "sortOrder": 99,
+      "created": "2026-07-06",
+      "modified": "2026-07-06",
+      "definition": {
+        "nl": "Een gebouw of complex met een specifieke medische, verpleegkundige of curatieve bestemming.",
+        "en": "A building or complex designed for medical, nursing, or curative purposes."
+      },
+      "exactMatch": [
+        "https://www.wikidata.org/wiki/Q4260475"
+      ]
     }
   ]
 }
