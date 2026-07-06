@@ -984,10 +984,10 @@
       "broader": "stm:vocabulary/place-type/MilitaryInfrastructure",
       "crmClass": "E25_Human-Made_Feature",
       "crmBadge": "E25",
-      "color": "#c98763",
+      "color": "#ff2fff",
       "sortOrder": 99,
       "created": "2026-06-23",
-      "modified": "2026-06-23",
+      "modified": "2026-07-06",
       "altLabel": {
         "nl": [
           "Vestingwerk"
