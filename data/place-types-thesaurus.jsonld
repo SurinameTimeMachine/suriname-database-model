@@ -1290,6 +1290,53 @@
         "nl": "Een waterbouwkundig kunstwerk uitgerust met een beweegbare kering (zoals een schuif of deur) om de waterstroom of het waterpeil in een kanaal, kreek of polder te reguleren.",
         "en": "A hydraulic engineering structure equipped with a movable barrier (such as a gate or valve) used to regulate water flow and levels within a canal, creek, or polder."
       }
+    },
+    {
+      "@id": "stm:vocabulary/place-type/wharf",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "typeId": "wharf",
+      "prefLabel": {
+        "nl": "werf",
+        "en": "wharf"
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/human-made",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "color": "#a883e7",
+      "sortOrder": 99,
+      "created": "2026-07-06",
+      "modified": "2026-07-06",
+      "altLabel": {
+        "nl": [
+          "steiger",
+          "kade",
+          "aanlegplaats",
+          "kaai"
+        ],
+        "srn": [
+          "wari"
+        ]
+      },
+      "definition": {
+        "nl": "Een houten, stenen of gemetselde constructie (zoals een platform, kade of steiger) gebouwd langs de waterkant van een rivier of kreek, specifiek ingericht voor het aanleggen van vaartuigen en het laden en lossen van goederen en passagiers.",
+        "en": "A structure of timber, stone, or masonry (such as a platform, quay, or jetty) constructed along the shoreline of a river or creek, designed specifically for mooring vessels and the loading and unloading of cargo and passengers."
+      },
+      "related": [
+        "stm:vocabulary/place-type/creek",
+        "stm:vocabulary/place-type/canal",
+        "stm:vocabulary/place-type/road",
+        "stm:vocabulary/place-type/plantation",
+        "stm:vocabulary/place-type/transport-infrastructure",
+        "stm:vocabulary/place-type/river",
+        "stm:vocabulary/place-type/water-infrastructure"
+      ],
+      "exactMatch": [
+        "https://www.wikidata.org/wiki/Q828909"
+      ]
     }
   ]
 }
