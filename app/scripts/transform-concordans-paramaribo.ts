@@ -100,6 +100,14 @@ function deriveAddress1817(row: ConcordansRow): string {
   return clean(row['adres 1817: OW']);
 }
 
+function has1885RenumberingComponents(row: ConcordansRow): boolean {
+  return Boolean(
+    clean(row['NW 1885 La.']) ||
+      clean(row['NW 1885 no.']) ||
+      clean(row['NW 1885 bis']),
+  );
+}
+
 function compare1885(row: ConcordansRow) {
   const cell = clean(row['adres 1885: NW']);
   const derived = deriveAddress1885(row);
@@ -120,6 +128,7 @@ function compare1885(row: ConcordansRow) {
 
 function buildProfile(rows: ConcordansRow[]) {
   const with1885Cell = countFilled(rows, 'adres 1885: NW');
+  const with1885Components = rows.filter((row) => has1885RenumberingComponents(row)).length;
   const with1837 = countFilled(rows, 'adres 1837: NW');
   const with1817 = countFilled(rows, 'adres 1817: OW');
   const with2022Derived = rows.filter((row) => deriveAddress2022(row)).length;
@@ -140,6 +149,7 @@ function buildProfile(rows: ConcordansRow[]) {
   return {
     total: rows.length,
     with1885Cell,
+    with1885Components,
     with1837,
     with1817,
     with2022Derived,
@@ -188,6 +198,7 @@ function buildReport(profile: ReturnType<typeof buildProfile>, inputPath: string
   lines.push(`- Rows with 2022 formula-derived address: ${profile.with2022Derived}`);
   lines.push(`- Rows with 1921 address: ${profile.with1921}`);
   lines.push(`- Rows with 1885 address cell filled in CSV: ${profile.with1885Cell}`);
+  lines.push(`- Rows with 1885 renumbering components: ${profile.with1885Components}`);
   lines.push(`- Rows with 1837 address: ${profile.with1837}`);
   lines.push(`- Rows with 1817 address: ${profile.with1817}`);
   lines.push(`- Rows with 1885 street name: ${profile.withStreet1885}`);
@@ -233,6 +244,37 @@ function buildDerivedRows(rows: ConcordansRow[], comparisons: ReturnType<typeof 
     const address1837 = deriveAddress1837(row);
     const address1817 = deriveAddress1817(row);
     const comparison = comparisons[index];
+
+    const wijk1782Code = clean(row['Wijkno 1782']);
+    const wijk1782DistrictNumber = clean(row['wijk']);
+    const wijk1782ParcelLetter = clean(row['La.']);
+    const wijk1782ParcelNumber = clean(row['no.']);
+    const wijk1782ParcelPlus = clean(row['plus']);
+    const wijk1782Street = clean(row['Wijk straatnaam, 1782']);
+    const wijk1782Side = clean(row['zijde 1782']);
+
+    const ow1817DistrictCode = clean(row['OW']);
+    const ow1817BuurtLetter = clean(row['buurt OW La.']);
+    const ow1817BuurtNumber = clean(row['buurt OW']);
+    const ow1817ParcelLetter = clean(row['OW La.']);
+    const ow1817ParcelNumber = clean(row['OW no.']);
+    const ow1817ParcelSuffix = clean(row['OW bis']);
+
+    const nw1837DistrictCode = clean(row['NW']);
+    const nw1837OuterDistrict = clean(row['Buitenwijk']);
+    const nw1837ParcelLetter = clean(row['NW La.']);
+    const nw1837ParcelNumber = clean(row['NW no.']);
+    const nw1837ParcelSuffix = clean(row['NW bis']);
+
+    const nw1885Zone = clean(row['NW 1885 La.']);
+    const nw1885ParcelNumber = clean(row['NW 1885 no.']);
+    const nw1885ParcelSuffix = clean(row['NW 1885 bis']);
+    const has1885Renumbering = has1885RenumberingComponents(row) ? 'yes' : 'no';
+
+    const projectCode = clean(row['Project']);
+    const projectNumber = clean(row['Project no.']);
+    const projectSuffix = clean(row['Project bis']);
+
     const street1885 = clean(row['NW 1885 straatnaam']);
     const street1837 = clean(row['NW straatnaam, 1837']);
     const street1830 = clean(row['OW straatnaam, 1830']);
@@ -245,17 +287,42 @@ function buildDerivedRows(rows: ConcordansRow[], comparisons: ReturnType<typeof 
       address1921: clean(row['adres 1921 (BR)']),
       address1885Cell: comparison.cell,
       address1885Derived: comparison.derived,
+      has1885Renumbering,
+      wijk1782Code,
+      wijk1782DistrictNumber,
+      wijk1782ParcelLetter,
+      wijk1782ParcelNumber,
+      wijk1782ParcelPlus,
+      wijk1782Street,
+      wijk1782Side,
+      ow1817DistrictCode,
+      ow1817BuurtLetter,
+      ow1817BuurtNumber,
+      ow1817ParcelLetter,
+      ow1817ParcelNumber,
+      ow1817ParcelSuffix,
       normalized1885Cell: comparison.normalizedCell,
       normalized1885Derived: comparison.normalizedDerived,
       normalized1885Status: comparison.status,
       address1837,
       address1817,
+      nw1837DistrictCode,
+      nw1837OuterDistrict,
+      nw1837ParcelLetter,
+      nw1837ParcelNumber,
+      nw1837ParcelSuffix,
+      nw1885Zone,
+      nw1885ParcelNumber,
+      nw1885ParcelSuffix,
       street1885,
       street1837,
       street1830,
       normalizedStreet1885: normalizeForMatch(street1885),
       normalizedStreet1837: normalizeForMatch(street1837),
       normalizedStreet1830: normalizeForMatch(street1830),
+      projectCode,
+      projectNumber,
+      projectSuffix,
       splitMarker,
       newMarker,
       currentStreet: clean(row['Huidige straatnaam']),
@@ -276,17 +343,42 @@ function buildCsv(rows: ReturnType<typeof buildDerivedRows>): string {
     'address1921',
     'address1885Cell',
     'address1885Derived',
+    'has1885Renumbering',
+    'wijk1782Code',
+    'wijk1782DistrictNumber',
+    'wijk1782ParcelLetter',
+    'wijk1782ParcelNumber',
+    'wijk1782ParcelPlus',
+    'wijk1782Street',
+    'wijk1782Side',
+    'ow1817DistrictCode',
+    'ow1817BuurtLetter',
+    'ow1817BuurtNumber',
+    'ow1817ParcelLetter',
+    'ow1817ParcelNumber',
+    'ow1817ParcelSuffix',
     'normalized1885Cell',
     'normalized1885Derived',
     'normalized1885Status',
     'address1837',
     'address1817',
+    'nw1837DistrictCode',
+    'nw1837OuterDistrict',
+    'nw1837ParcelLetter',
+    'nw1837ParcelNumber',
+    'nw1837ParcelSuffix',
+    'nw1885Zone',
+    'nw1885ParcelNumber',
+    'nw1885ParcelSuffix',
     'street1885',
     'street1837',
     'street1830',
     'normalizedStreet1885',
     'normalizedStreet1837',
     'normalizedStreet1830',
+    'projectCode',
+    'projectNumber',
+    'projectSuffix',
     'splitMarker',
     'newMarker',
     'currentStreet',
@@ -340,6 +432,7 @@ function main() {
   console.log(`2022 addresses reconstructed from components: ${profile.with2022Derived}`);
   console.log(`1921 addresses present: ${profile.with1921}`);
   console.log(`1885 address cells filled in CSV: ${profile.with1885Cell}`);
+  console.log(`1885 renumbering components present: ${profile.with1885Components}`);
   console.log(`1885 street names present: ${profile.withStreet1885}`);
   console.log(`1885 normalized exact matches: ${profile.exact1885}`);
   console.log(`1885 formatting-only differences: ${profile.formattingOnly1885}`);

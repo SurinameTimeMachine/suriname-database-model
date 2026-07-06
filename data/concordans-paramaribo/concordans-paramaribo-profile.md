@@ -12,6 +12,7 @@ The CSV export does not contain the calculated values for formula-backed cells, 
 - Rows with 2022 formula-derived address: 5279
 - Rows with 1921 address: 5306
 - Rows with 1885 address cell filled in CSV: 2324
+- Rows with 1885 renumbering components: 2333
 - Rows with 1837 address: 5320
 - Rows with 1817 address: 5342
 - Rows with 1885 street name: 5288
