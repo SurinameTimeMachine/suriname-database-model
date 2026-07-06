@@ -1384,6 +1384,45 @@
       "closeMatch": [
         "https://www.wikidata.org/wiki/Q1306755"
       ]
+    },
+    {
+      "@id": "stm:vocabulary/place-type/civil-post",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "typeId": "civil-post",
+      "prefLabel": {
+        "nl": "Post",
+        "en": "Government outpost"
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/administrative-site",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "color": "#ce6700",
+      "sortOrder": 99,
+      "created": "2026-07-06",
+      "modified": "2026-07-06",
+      "altLabel": {
+        "nl": [
+          "Post van de Indianen",
+          "posthouder"
+        ]
+      },
+      "definition": {
+        "nl": "De standplaats en het ambtsverblijf van een burgerlijke posthouder; een koloniale ambtenaar die door het landsbestuur was aangesteld nabij de woongebieden van gepacificeerde Inheemsen (en later ook Marrons) om als diplomatiek contactpersoon te fungeren, de handel te reguleren en toezicht te houden.",
+        "en": "The official station and residence of a civil postholder (posthouder); a colonial official appointed by the government near the territories of pacified Indigenous populations (and later Maroons) to act as a diplomatic liaison, regulate trade, and maintain administrative oversight."
+      },
+      "related": [
+        "stm:vocabulary/place-type/military-post",
+        "stm:vocabulary/place-type/administrative-site",
+        "stm:vocabulary/place-type/indigenous-village",
+        "stm:vocabulary/place-type/maroon-village"
+      ],
+      "closeMatch": [
+        "https://www.wikidata.org/wiki/Q39463"
+      ]
     }
   ]
 }
