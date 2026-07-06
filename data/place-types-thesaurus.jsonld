@@ -1453,6 +1453,50 @@
       "exactMatch": [
         "https://www.wikidata.org/wiki/Q4260475"
       ]
+    },
+    {
+      "@id": "stm:vocabulary/place-type/quarantine-station",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "typeId": "quarantine-station",
+      "prefLabel": {
+        "nl": "Quarantaine-etablissement",
+        "en": "Quarantine station"
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/medical-facility",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "color": "#c80417",
+      "sortOrder": 99,
+      "created": "2026-07-06",
+      "modified": "2026-07-06",
+      "altLabel": {
+        "en": [
+          "quarantine facility"
+        ],
+        "nl": [
+          "Quarantainestation",
+          "Lazaret",
+          "Leprozerie",
+          "Melaatsen-etablissement",
+          "Besmettingspost",
+          "leprakolonie",
+          "quarantine-inrichting"
+        ]
+      },
+      "definition": {
+        "nl": "Een specifiek, dikwijls geïsoleerd gelegen medisch etablissement of buitengewone post, ingericht door de overheid om personen, bemanningen of immigranten die (mogelijk) besmet waren met infectieziekten af te zonderen.",
+        "en": "A specific, often isolated medical installation established by the government to isolate individuals, ship crews, or immigrants (suspected of) carrying infectious diseases."
+      },
+      "exactMatch": [
+        "https://www.wikidata.org/wiki/Q18822087"
+      ],
+      "closeMatch": [
+        "https://www.wikidata.org/wiki/Q1406569"
+      ]
     }
   ]
 }
