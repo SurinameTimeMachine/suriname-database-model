@@ -948,10 +948,10 @@
       "broader": "stm:vocabulary/place-type/human-made",
       "crmClass": "E25_Human-Made_Feature",
       "crmBadge": "E25",
-      "color": "#d59670",
+      "color": "#fed3fb",
       "sortOrder": 99,
       "created": "2026-06-23",
-      "modified": "2026-06-23",
+      "modified": "2026-07-06",
       "definition": {
         "nl": "Het geheel van door mensen aangelegde of ingerichte bouwwerken, verdedigingswerken en logistieke netwerken ten behoeve van defensie, bewaking en militaire operaties.",
         "en": "The totality of man-made structures, defences and logistical networks designed for defence, surveillance and military operations."
