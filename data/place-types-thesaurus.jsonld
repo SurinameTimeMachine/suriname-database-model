@@ -1561,7 +1561,6 @@
       "modified": "2026-07-06",
       "altLabel": {
         "nl": [
-          "werkplaats",
           "nijverheidslocatie",
           "fabriekscomplex",
           "fabriek",
@@ -1582,6 +1581,49 @@
       ],
       "exactMatch": [
         "https://www.wikidata.org/wiki/Q134496677"
+      ]
+    },
+    {
+      "@id": "stm:vocabulary/place-type/ironworks",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "typeId": "ironworks",
+      "prefLabel": {
+        "en": "Ironworks",
+        "nl": "IJzersmelterij"
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/industrial-facility",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "color": "#bca596",
+      "sortOrder": 99,
+      "created": "2026-07-06",
+      "modified": "2026-07-06",
+      "altLabel": {
+        "en": [
+          "iron foundry",
+          "smithy"
+        ],
+        "nl": [
+          "werkplaats",
+          "smederij",
+          "ijzergieterij",
+          "gieterij",
+          "smederij-etablissement",
+          "smid",
+          "metaalbewerking",
+          "ingenieurs-etablissement"
+        ]
+      },
+      "definition": {
+        "nl": "Een industriële of ambachtelijke locatie of gebouw dat specifiek is ingericht voor het smelten, gieten, smeden en mechanisch bewerken van ijzer en andere metalen.",
+        "en": "An industrial or artisanal facility or structure specifically designed for the melting, casting, forging, and mechanical processing of iron and other metals."
+      },
+      "closeMatch": [
+        "https://www.wikidata.org/wiki/Q40558"
       ]
     }
   ]
