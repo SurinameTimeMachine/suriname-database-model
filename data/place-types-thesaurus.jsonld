@@ -1337,6 +1337,53 @@
       "exactMatch": [
         "https://www.wikidata.org/wiki/Q828909"
       ]
+    },
+    {
+      "@id": "stm:vocabulary/place-type/administrative-site",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "typeId": "administrative-site",
+      "prefLabel": {
+        "nl": "Bestuurlijke locatie",
+        "en": "Administrative Site"
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/human-made",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "color": "#fc5f56",
+      "sortOrder": 99,
+      "created": "2026-07-06",
+      "modified": "2026-07-06",
+      "altLabel": {
+        "en": [
+          "administrative center"
+        ],
+        "nl": [
+          "Bestuursgebouw",
+          "bestuurscentrum",
+          "standplaats",
+          "overheidslocatie"
+        ]
+      },
+      "definition": {
+        "en": "A government-designated geographic site, station, or complex of buildings serving as the hub for local or regional civil administration, surveillance, and public governance.",
+        "nl": "Een door de overheid aangewezen of ingerichte geografische locatie, standplaats of gebouwencomplex dat fungeert als het centrum voor lokaal of regionaal burgerlijk bestuur, toezicht en overheidsadministratie."
+      },
+      "related": [
+        "stm:vocabulary/place-type/military-post",
+        "stm:vocabulary/place-type/district",
+        "stm:vocabulary/place-type/town",
+        "stm:vocabulary/place-type/maroon-village",
+        "stm:vocabulary/place-type/indigenous-village",
+        "stm:vocabulary/place-type/settlement",
+        "stm:vocabulary/place-type/building"
+      ],
+      "closeMatch": [
+        "https://www.wikidata.org/wiki/Q1306755"
+      ]
     }
   ]
 }
