@@ -1303,7 +1303,7 @@
         "en": "wharf"
       },
       "inScheme": "stm:vocabulary/place-type",
-      "broader": "stm:vocabulary/place-type/human-made",
+      "broader": "stm:vocabulary/place-type/water-infrastructure",
       "crmClass": "E25_Human-Made_Feature",
       "crmBadge": "E25",
       "color": "#a883e7",
