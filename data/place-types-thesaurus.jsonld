@@ -247,12 +247,12 @@
         "https://schema.org/DefenceEstablishment"
       ],
       "typeId": "military-post",
-      "color": "#c98763",
+      "color": "#fdb3fd",
       "crmClass": "E25_Human-Made_Feature",
       "crmBadge": "E25",
       "sortOrder": 2,
       "created": "2026-04-07",
-      "modified": "2026-06-23"
+      "modified": "2026-07-06"
     },
     {
       "@id": "stm:vocabulary/place-type/transport-infrastructure",
