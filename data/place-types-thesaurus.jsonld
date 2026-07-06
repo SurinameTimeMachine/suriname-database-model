@@ -1519,12 +1519,14 @@
       "modified": "2026-07-06",
       "altLabel": {
         "nl": [
-          "Chirurgisch etablissement",
+          "chirurgisch etablissement",
+          "chirurgijns-etablissement",
           "heelmeester",
           "kliniek",
           "zorgpost",
           "heelkundige inrichting",
-          "polikliniek"
+          "polikliniek",
+          "ziekenhuis"
         ],
         "en": [
           "clinic"
