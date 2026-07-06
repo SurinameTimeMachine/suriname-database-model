@@ -275,12 +275,12 @@
         "stm:vocabulary/place-type/railroad"
       ],
       "typeId": "transport-infrastructure",
-      "color": "#ad7444",
+      "color": "#529e6c",
       "crmClass": "E25_Human-Made_Feature",
       "crmBadge": "E25",
       "sortOrder": 3,
       "created": "2026-04-21",
-      "modified": "2026-06-23",
+      "modified": "2026-07-06",
       "related": [
         "stm:vocabulary/place-type/road",
         "stm:vocabulary/place-type/railroad",
@@ -1026,10 +1026,10 @@
       "broader": "stm:vocabulary/place-type/human-made",
       "crmClass": "E25_Human-Made_Feature",
       "crmBadge": "E25",
-      "color": "#7d66ee",
+      "color": "#d9a37b",
       "sortOrder": 99,
       "created": "2026-06-23",
-      "modified": "2026-07-06",
+      "modified": "2026-06-30",
       "definition": {
         "nl": "Het geheel van door mensen aangelegde kunstwerken en infrastructurele elementen bedoeld om de waterhuishouding te reguleren, waterwegen bevaarbaar te houden, of gronden te beschermen tegen overstroming en verdroging.",
         "en": "The totality of man-made structures and infrastructure elements designed to regulate water management, maintain the navigability of waterways, or protect land from flooding and drought."
