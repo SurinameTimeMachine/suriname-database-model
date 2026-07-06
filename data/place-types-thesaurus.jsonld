@@ -247,12 +247,12 @@
         "https://schema.org/DefenceEstablishment"
       ],
       "typeId": "military-post",
-      "color": "#fdb3fd",
+      "color": "#c98763",
       "crmClass": "E25_Human-Made_Feature",
       "crmBadge": "E25",
       "sortOrder": 2,
       "created": "2026-04-07",
-      "modified": "2026-07-06"
+      "modified": "2026-06-23"
     },
     {
       "@id": "stm:vocabulary/place-type/transport-infrastructure",
@@ -948,10 +948,10 @@
       "broader": "stm:vocabulary/place-type/human-made",
       "crmClass": "E25_Human-Made_Feature",
       "crmBadge": "E25",
-      "color": "#fed3fb",
+      "color": "#d59670",
       "sortOrder": 99,
       "created": "2026-06-23",
-      "modified": "2026-07-06",
+      "modified": "2026-06-23",
       "definition": {
         "nl": "Het geheel van door mensen aangelegde of ingerichte bouwwerken, verdedigingswerken en logistieke netwerken ten behoeve van defensie, bewaking en militaire operaties.",
         "en": "The totality of man-made structures, defences and logistical networks designed for defence, surveillance and military operations."
@@ -984,10 +984,10 @@
       "broader": "stm:vocabulary/place-type/MilitaryInfrastructure",
       "crmClass": "E25_Human-Made_Feature",
       "crmBadge": "E25",
-      "color": "#f333f9",
+      "color": "#c98763",
       "sortOrder": 99,
       "created": "2026-06-23",
-      "modified": "2026-07-06",
+      "modified": "2026-06-23",
       "altLabel": {
         "nl": [
           "Vestingwerk"
@@ -1247,6 +1247,44 @@
       "closeMatch": [
         "https://www.wikidata.org/wiki/Q11755880",
         "https://vocab.getty.edu/aat/300257729"
+      ]
+    },
+    {
+      "@id": "stm:vocabulary/place-type/sluice",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "typeId": "sluice",
+      "prefLabel": {
+        "nl": "Sluis",
+        "en": "Sleuce"
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/human-made",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "color": "#7435db",
+      "sortOrder": 99,
+      "created": "2026-07-06",
+      "modified": "2026-07-06",
+      "altLabel": {
+        "nl": [
+          "koker"
+        ],
+        "en": [
+          "water gate"
+        ]
+      },
+      "related": [
+        "stm:vocabulary/place-type/river",
+        "stm:vocabulary/place-type/canal",
+        "stm:vocabulary/place-type/creek",
+        "stm:vocabulary/place-type/water-infrastructure",
+        "stm:vocabulary/place-type/plantation"
+      ],
+      "exactMatch": [
+        "https://www.wikidata.org/wiki/Q107589046"
       ]
     }
   ]
