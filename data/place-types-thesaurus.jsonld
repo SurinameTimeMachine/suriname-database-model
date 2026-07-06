@@ -1285,7 +1285,11 @@
       ],
       "exactMatch": [
         "https://www.wikidata.org/wiki/Q107589046"
-      ]
+      ],
+      "definition": {
+        "nl": "Een waterbouwkundig kunstwerk uitgerust met een beweegbare kering (zoals een schuif of deur) om de waterstroom of het waterpeil in een kanaal, kreek of polder te reguleren.",
+        "en": "A hydraulic engineering structure equipped with a movable barrier (such as a gate or valve) used to regulate water flow and levels within a canal, creek, or polder."
+      }
     }
   ]
 }
