@@ -29,11 +29,34 @@ interface PlaceEditorProps {
   place: GazetteerPlace;
   districts: GazetteerPlace[];
   sourceAppellations?: SourceAppellationHint[];
-  reviewIssues?: string[];
+  almanakkenReview?: AlmanakkenReviewEntry;
   canEdit: boolean;
   onSave: (place: GazetteerPlace) => Promise<void>;
   onCancel: () => void;
   onDelete?: (id: string) => Promise<void>;
+}
+
+interface AlmanakkenReviewEntry {
+  placeId: string;
+  qid: string;
+  sourceVersion: string;
+  rows: number;
+  firstYear: number | null;
+  lastYear: number | null;
+  productRows: number;
+  desertedRows: number;
+  sourceNames: number;
+  products: string[];
+  v1OnlyRows: number;
+  v2OnlyRows: number;
+  hasGazetteerSource: boolean;
+  hasProductAssertions: boolean;
+  hasStatusAssertions: boolean;
+  issues: Array<{
+    type: string;
+    label: string;
+    detail?: string;
+  }>;
 }
 
 interface SourceAppellationHint {
@@ -186,6 +209,32 @@ function normalizeStatusAssertions(place: GazetteerPlace): StatusAssertion[] {
     }));
   }
   return [];
+}
+
+const ALMANAKKEN_ISSUE_DISPLAY: Record<
+  string,
+  { short: string; label: string }
+> = {
+  'duplicate-gazetteer-link': {
+    short: 'dup',
+    label: 'Duplicate QID links',
+  },
+  'missing-source-tag': {
+    short: 'src',
+    label: 'Missing Almanakken source tag',
+  },
+  'v1-v2-qid-change': {
+    short: 'qid',
+    label: 'v1 to v2 QID changes',
+  },
+};
+
+function almanakkenIssueShortLabel(type: string): string {
+  return ALMANAKKEN_ISSUE_DISPLAY[type]?.short ?? type;
+}
+
+function almanakkenIssueLongLabel(type: string): string {
+  return ALMANAKKEN_ISSUE_DISPLAY[type]?.label ?? type;
 }
 
 const CATEGORY_ORDER = [
@@ -502,7 +551,7 @@ export default function PlaceEditor({
   place,
   districts,
   sourceAppellations = [],
-  reviewIssues = [],
+  almanakkenReview,
   canEdit,
   onSave,
   onCancel,
@@ -1116,6 +1165,23 @@ export default function PlaceEditor({
     update('sources', sources);
   };
 
+  const almanakkenProductAssertions = productAssertions.filter(
+    (assertion) => assertion.source === 'almanakken',
+  );
+  const almanakkenStatusAssertions = statusAssertions.filter(
+    (assertion) => assertion.source === 'almanakken',
+  );
+  const almanakkenYears =
+    almanakkenReview?.firstYear && almanakkenReview.lastYear
+      ? `${almanakkenReview.firstYear}-${almanakkenReview.lastYear}`
+      : null;
+  const almanakkenProducts =
+    almanakkenReview && almanakkenReview.products.length > 0
+      ? almanakkenReview.products.join(', ')
+      : null;
+  const almanakkenHasUrgentReview =
+    Boolean(almanakkenReview && almanakkenReview.issues.length > 0);
+
   return (
     <div className="h-full min-h-0 flex flex-col border border-stm-warm-200 bg-white shadow-sm">
       {/* Header */}
@@ -1169,21 +1235,128 @@ export default function PlaceEditor({
             statement; add a date or span when the source provides one.
           </p>
         )}
-        {reviewIssues.length > 0 && (
-          <div className="border-l-2 border-amber-500 bg-amber-50 px-3 py-2 text-xs text-amber-900">
-            <p className="font-medium">Review flags</p>
-            <div className="mt-1 flex flex-wrap gap-1.5">
-              {reviewIssues.map((issue) => (
-                <span
-                  key={issue}
-                  className="inline-flex rounded border border-amber-300 bg-white px-1.5 py-0.5 text-[10px] font-medium"
-                >
-                  {issue}
-                </span>
-              ))}
+
+        {almanakkenReview && (
+          <div
+            className={`border p-3 text-xs ${
+              almanakkenHasUrgentReview
+                ? 'border-amber-300 bg-amber-50 text-amber-900'
+                : 'border-stm-teal-200 bg-stm-teal-50 text-stm-teal-900'
+            }`}
+          >
+            <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <div className="text-[10px] font-medium uppercase tracking-[0.18em] opacity-70">
+                  Almanakken {almanakkenReview.sourceVersion}
+                </div>
+                <div className="font-medium">
+                  {almanakkenReview.rows} observations
+                  {almanakkenYears ? ` (${almanakkenYears})` : ''}
+                </div>
+              </div>
+              <span
+                className={`border px-2 py-1 text-[10px] font-medium ${
+                  almanakkenHasUrgentReview
+                    ? 'border-amber-400 bg-white/70 text-amber-800'
+                    : 'border-stm-teal-300 bg-white/70 text-stm-teal-800'
+                }`}
+              >
+                {almanakkenHasUrgentReview
+                  ? `${almanakkenReview.issues.length} urgent review${almanakkenReview.issues.length === 1 ? '' : 's'}`
+                  : 'no urgent review'}
+              </span>
             </div>
+
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              <div className="border border-black/10 bg-white/60 p-2">
+                <div className="text-[10px] uppercase tracking-[0.16em] opacity-60">
+                  Products
+                </div>
+                <div className="font-medium">
+                  {almanakkenReview.productRows} rows
+                </div>
+                <div className="mt-1 line-clamp-2 text-[11px] opacity-75">
+                  {almanakkenProducts ?? 'none'}
+                </div>
+              </div>
+              <div className="border border-black/10 bg-white/60 p-2">
+                <div className="text-[10px] uppercase tracking-[0.16em] opacity-60">
+                  Materialized
+                </div>
+                <div className="font-medium">
+                  {almanakkenProductAssertions.length} product
+                </div>
+                <div className="text-[11px] opacity-75">
+                  {almanakkenStatusAssertions.length} lifecycle
+                </div>
+              </div>
+              <div className="border border-black/10 bg-white/60 p-2">
+                <div className="text-[10px] uppercase tracking-[0.16em] opacity-60">
+                  Deserted
+                </div>
+                <div className="font-medium">
+                  {almanakkenReview.desertedRows} rows
+                </div>
+                <div className="text-[11px] opacity-75">
+                  {almanakkenReview.sourceNames} name variants
+                </div>
+              </div>
+              <div className="border border-black/10 bg-white/60 p-2">
+                <div className="text-[10px] uppercase tracking-[0.16em] opacity-60">
+                  v1/v2 context
+                </div>
+                <div className="font-medium">
+                  v1-only {almanakkenReview.v1OnlyRows}
+                </div>
+                <div className="text-[11px] opacity-75">
+                  v2-only {almanakkenReview.v2OnlyRows}
+                </div>
+              </div>
+            </div>
+
+            {almanakkenReview.issues.length > 0 && (
+              <div className="mt-2 space-y-1">
+                {almanakkenReview.issues.map((issue) => (
+                  <div
+                    key={`${issue.type}-${issue.detail ?? ''}`}
+                    className="flex items-start gap-2 border border-amber-300 bg-white/70 px-2 py-1.5"
+                  >
+                    <span className="shrink-0 border border-amber-400 bg-amber-100 px-1.5 py-0.5 font-mono text-[10px] text-amber-800">
+                      {almanakkenIssueShortLabel(issue.type)}
+                    </span>
+                    <span>
+                      <span className="font-medium">
+                        {almanakkenIssueLongLabel(issue.type)}
+                      </span>
+                      {issue.detail && (
+                        <span className="ml-1 font-mono text-[11px] opacity-75">
+                          {issue.detail}
+                        </span>
+                      )}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {almanakkenReview.productRows > 0 &&
+              almanakkenProductAssertions.length === 0 && (
+                <p className="mt-2 border border-amber-300 bg-white/70 px-2 py-1.5 text-[11px] text-amber-800">
+                  Product rows exist in Almanakken, but no Almanakken product
+                  assertions are currently materialized below.
+                </p>
+              )}
+
+            {almanakkenReview.rows > 0 &&
+              almanakkenStatusAssertions.length === 0 && (
+                <p className="mt-2 border border-amber-300 bg-white/70 px-2 py-1.5 text-[11px] text-amber-800">
+                  Almanakken rows exist, but no Almanakken lifecycle assertions
+                  are currently materialized below.
+                </p>
+              )}
           </div>
         )}
+
         {/* Names */}
         <div>
           <div className="flex items-center justify-between mb-1">

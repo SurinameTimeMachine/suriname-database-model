@@ -45,13 +45,53 @@ type SortKey =
   | 'lat'
   | 'modifiedAt'
   | 'map1930'
-  | 'almanakken';
+  | 'almanakken'
+  | 'almanakkenReview';
 type SortDir = 'asc' | 'desc';
 
 type PublicationNotice = {
   recordUrl?: string;
   jsonldUrl?: string;
   jsonUrl?: string;
+};
+
+type AlmanakkenReviewEntry = {
+  placeId: string;
+  qid: string;
+  sourceVersion: string;
+  rows: number;
+  firstYear: number | null;
+  lastYear: number | null;
+  productRows: number;
+  desertedRows: number;
+  sourceNames: number;
+  products: string[];
+  v1OnlyRows: number;
+  v2OnlyRows: number;
+  hasGazetteerSource: boolean;
+  hasProductAssertions: boolean;
+  hasStatusAssertions: boolean;
+  issues: Array<{
+    type: string;
+    label: string;
+    detail?: string;
+  }>;
+};
+
+type AlmanakkenMissingQid = {
+  qid: string;
+  rows: number;
+  firstYear: number | null;
+  lastYear: number | null;
+  sourceNames: string[];
+  products: string[];
+};
+
+type AlmanakkenReviewData = {
+  sourceVersion: string;
+  generatedAt: string;
+  byPlaceId: Record<string, AlmanakkenReviewEntry>;
+  missingQids?: AlmanakkenMissingQid[];
 };
 
 function normalizeNamesFromLegacy(entry: Record<string, unknown>): PlaceName[] {
@@ -195,21 +235,6 @@ function preferAlmanakkenSource(sources: string[]): string {
   return sources.includes('almanakken')
     ? 'almanakken'
     : sources[0] || 'almanakken';
-}
-
-function getReviewIssues(place: GazetteerPlace): string[] {
-  const issues: string[] = [];
-
-  if (place.deprecated) issues.push('deprecated');
-  if (place.mergedInto) issues.push(`merged into ${place.mergedInto}`);
-  if (place.type === 'plantation' && place.psurIds.length > 1) {
-    issues.push(`multiple PSUR IDs (${place.psurIds.length})`);
-  }
-  if (place.type !== 'plantation' && (place.sranantongoNames?.length ?? 0) > 0) {
-    issues.push('Sranan name should stay on plantation');
-  }
-
-  return issues;
 }
 
 function normalizeProductAssertionsFromLegacy(
@@ -443,6 +468,7 @@ const COLUMN_DEFS: {
   { key: 'modifiedAt', label: 'Modified', defaultVisible: true },
   { key: 'map1930', label: 'Map', defaultVisible: true },
   { key: 'almanakken', label: 'Alm.', defaultVisible: true },
+  { key: 'almanakkenReview', label: 'Alm. review', defaultVisible: true },
 ];
 
 const LS_COLUMNS_KEY = 'stm-places-visible-columns';
@@ -452,7 +478,9 @@ function loadVisibleColumns(): Set<SortKey> {
     const stored = localStorage.getItem(LS_COLUMNS_KEY);
     if (stored) {
       const parsed = JSON.parse(stored) as SortKey[];
-      return new Set(parsed);
+      const columns = new Set(parsed);
+      columns.add('almanakkenReview');
+      return columns;
     }
   } catch {
     // ignore
@@ -477,11 +505,77 @@ function SortArrow({ active, dir }: { active: boolean; dir: SortDir }) {
   );
 }
 
+function almanakkenReviewSeverity(
+  review: AlmanakkenReviewEntry | undefined,
+): number {
+  if (!review) return 0;
+  return review.issues.length > 0 ? 3 : review.rows > 0 ? 1 : 0;
+}
+
+const ALMANAKKEN_ISSUE_DISPLAY: Record<
+  string,
+  { short: string; label: string }
+> = {
+  'duplicate-gazetteer-link': {
+    short: 'dup',
+    label: 'Duplicate QID links',
+  },
+  'missing-source-tag': {
+    short: 'src',
+    label: 'Missing source tag',
+  },
+  'v1-v2-qid-change': {
+    short: 'qid',
+    label: 'v1 to v2 QID changes',
+  },
+};
+
+function almanakkenIssueShortLabel(type: string): string {
+  return ALMANAKKEN_ISSUE_DISPLAY[type]?.short ?? type;
+}
+
+function almanakkenIssueLongLabel(type: string): string {
+  return ALMANAKKEN_ISSUE_DISPLAY[type]?.label ?? type;
+}
+
+function almanakkenReviewTitle(
+  review: AlmanakkenReviewEntry | undefined,
+): string | undefined {
+  if (!review) return undefined;
+  const years =
+    review.firstYear && review.lastYear
+      ? `${review.firstYear}-${review.lastYear}`
+      : 'no dated rows';
+  const products =
+    review.products.length > 0
+      ? review.products.slice(0, 8).join(', ')
+      : 'none';
+  return [
+    `Almanakken ${review.sourceVersion}`,
+    `QID: ${review.qid}`,
+    `Source observations: ${review.rows} (${years})`,
+    `Product observations: ${review.productRows}`,
+    `Deserted observations: ${review.desertedRows}`,
+    `Source-name variants: ${review.sourceNames}`,
+    `Products: ${products}${review.products.length > 8 ? ', ...' : ''}`,
+    `Preserved v1-only observations: ${review.v1OnlyRows}`,
+    `New v2-only observations: ${review.v2OnlyRows}`,
+    `Gazetteer source tag: ${review.hasGazetteerSource ? 'yes' : 'no'}`,
+    `Editable product assertions: ${review.hasProductAssertions ? 'yes' : 'no'}`,
+    `Editable status assertions: ${review.hasStatusAssertions ? 'yes' : 'no'}`,
+    review.issues.length > 0
+      ? `Fixes:\n${review.issues
+          .map((issue) => `- ${issue.label}${issue.detail ? ` (${issue.detail})` : ''}`)
+          .join('\n')}`
+      : 'Fixes: none',
+  ].join('\n');
+}
+
 interface PlaceRowProps {
   place: GazetteerPlace;
   isSelected: boolean;
   onSelect: (id: string) => void;
-  reviewIssues: string[];
+  almanakkenReview?: AlmanakkenReviewEntry;
   mergeChecked?: boolean;
   mergeDisabled?: boolean;
   onMergeCheck?: (id: string, checked: boolean) => void;
@@ -494,7 +588,7 @@ const PlaceRow = memo(function PlaceRow({
   place,
   isSelected,
   onSelect,
-  reviewIssues,
+  almanakkenReview,
   mergeChecked,
   mergeDisabled,
   onMergeCheck,
@@ -508,6 +602,12 @@ const PlaceRow = memo(function PlaceRow({
   );
   const altNames = place.names.filter((n) => !n.isPreferred);
   const vis = (key: SortKey) => visibleColumns.has(key);
+  const almanakkenSeverity = almanakkenReviewSeverity(almanakkenReview);
+  const visibleAlmanakkenIssues = almanakkenReview?.issues.slice(0, 3) ?? [];
+  const hiddenAlmanakkenIssueCount = Math.max(
+    0,
+    (almanakkenReview?.issues.length ?? 0) - visibleAlmanakkenIssues.length,
+  );
 
   return (
     <tr
@@ -548,14 +648,6 @@ const PlaceRow = memo(function PlaceRow({
               .map((n) => n.text)
               .join(', ')}
             )
-          </span>
-        )}
-        {reviewIssues.length > 0 && (
-          <span
-            className="ml-2 inline-flex items-center rounded border border-amber-300 bg-amber-50 px-1.5 py-0.5 text-[10px] font-medium text-amber-700"
-            title={reviewIssues.join('\n')}
-          >
-            review {reviewIssues.length}
           </span>
         )}
       </td>
@@ -711,6 +803,41 @@ const PlaceRow = memo(function PlaceRow({
           )}
         </td>
       )}
+
+      {/* Almanakken merge review */}
+      {vis('almanakkenReview') && (
+        <td className="py-1.5 px-2">
+          {almanakkenReview ? (
+            <span
+              className={`inline-flex max-w-56 items-center gap-1 rounded border px-1.5 py-0.5 text-[10px] font-medium ${
+                almanakkenSeverity === 3
+                  ? 'border-amber-300 bg-amber-50 text-amber-700'
+                  : 'border-stm-teal-200 bg-stm-teal-50 text-stm-teal-700'
+              }`}
+              title={almanakkenReviewTitle(almanakkenReview)}
+            >
+              {visibleAlmanakkenIssues.length > 0 ? (
+                <>
+                  {visibleAlmanakkenIssues.map((issue) => (
+                    <span key={issue.type} className="whitespace-nowrap">
+                      {almanakkenIssueShortLabel(issue.type)}
+                    </span>
+                  ))}
+                  {hiddenAlmanakkenIssueCount > 0 && (
+                    <span className="whitespace-nowrap">
+                      +{hiddenAlmanakkenIssueCount}
+                    </span>
+                  )}
+                </>
+              ) : (
+                <span className="whitespace-nowrap">ok</span>
+              )}
+            </span>
+          ) : (
+            <span className="text-stm-warm-200">-</span>
+          )}
+        </td>
+      )}
     </tr>
   );
 });
@@ -737,6 +864,11 @@ function PlacesPageInner() {
   );
   const [places, setPlaces] = useState<GazetteerPlace[]>([]);
   const [allData, setAllData] = useState<AllData | null>(null);
+  const [almanakkenReview, setAlmanakkenReview] =
+    useState<AlmanakkenReviewData | null>(null);
+  const [almanakkenIssueFilter, setAlmanakkenIssueFilter] = useState<
+    string | null
+  >(null);
   const [loading, setLoading] = useState(true);
   const { canEdit } = useAuth();
   const [search, setSearch] = useState('');
@@ -754,7 +886,6 @@ function PlacesPageInner() {
   const [columnsOpen, setColumnsOpen] = useState(false);
   const [mergeCheckIds, setMergeCheckIds] = useState<string[]>([]);
   const [showMerged, setShowMerged] = useState(false);
-  const [showIssuesOnly, setShowIssuesOnly] = useState(false);
   const [mergeView, setMergeView] = useState<{
     placeA: GazetteerPlace;
     placeB: GazetteerPlace;
@@ -763,10 +894,6 @@ function PlacesPageInner() {
     useState<PublicationNotice | null>(null);
   const columnsRef = useRef<HTMLDivElement>(null);
   const tableScrollRef = useRef<HTMLDivElement>(null);
-  const reviewIssuesById = useMemo(
-    () => new Map(places.map((place) => [place.id, getReviewIssues(place)])),
-    [places],
-  );
 
   // URL sync: read ?place= query param
   const searchParams = useSearchParams();
@@ -796,6 +923,13 @@ function PlacesPageInner() {
     loadAllData()
       .then(setAllData)
       .catch(() => setAllData(null));
+
+    fetch('/data/almanakken-review.json')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data: AlmanakkenReviewData | null) => {
+        setAlmanakkenReview(data);
+      })
+      .catch(() => setAlmanakkenReview(null));
   }, []);
 
   // Initialize/update selection from URL ?place= param
@@ -829,6 +963,7 @@ function PlacesPageInner() {
         'dikland',
         'map1930',
         'almanakken',
+        'almanakkenReview',
       ];
       if (key === sortKey) {
         setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
@@ -915,16 +1050,24 @@ function PlacesPageInner() {
   // Filter, search, and sort
   const filtered = useMemo(() => {
     let list = places;
-    if (!showIssuesOnly) {
-      // Always hide deprecated (tombstoned) entries — they are archived, not live
-      list = list.filter((p) => !p.deprecated);
-      // Hide merged-retired entries unless explicitly shown
-      if (!showMerged) {
-        list = list.filter((p) => !p.mergedInto);
-      }
+    // Always hide deprecated (tombstoned) entries - they are archived, not live
+    list = list.filter((p) => !p.deprecated);
+    // Hide merged-retired entries unless explicitly shown
+    if (!showMerged) {
+      list = list.filter((p) => !p.mergedInto);
     }
     if (typeFilter !== 'all') {
       list = list.filter((p) => p.type === typeFilter);
+    }
+    if (almanakkenIssueFilter) {
+      list = list.filter((p) => {
+        const review = almanakkenReview?.byPlaceId[p.id];
+        if (!review) return false;
+        if (almanakkenIssueFilter === 'any') return review.issues.length > 0;
+        return review.issues.some(
+          (issue) => issue.type === almanakkenIssueFilter,
+        );
+      });
     }
     // Source filter
     if (sourceFilter.selected.size > 0) {
@@ -962,12 +1105,6 @@ function PlacesPageInner() {
             p.locationDescription.toLowerCase().includes(q)),
       );
     }
-    if (showIssuesOnly) {
-      list = list.filter(
-        (place) => (reviewIssuesById.get(place.id)?.length ?? 0) > 0,
-      );
-    }
-
     // Sort
     const dir = sortDir === 'asc' ? 1 : -1;
     list = [...list].sort((a, b) => {
@@ -1023,6 +1160,17 @@ function PlacesPageInner() {
             a.sources.includes('almanakken') ? 1 : 0,
             b.sources.includes('almanakken') ? 1 : 0,
           );
+        case 'almanakkenReview':
+          return cmp(
+            almanakkenReviewSeverity(almanakkenReview?.byPlaceId[a.id]) *
+              100000 +
+              (almanakkenReview?.byPlaceId[a.id]?.issues.length ?? 0) * 1000 +
+              (almanakkenReview?.byPlaceId[a.id]?.rows ?? 0),
+            almanakkenReviewSeverity(almanakkenReview?.byPlaceId[b.id]) *
+              100000 +
+              (almanakkenReview?.byPlaceId[b.id]?.issues.length ?? 0) * 1000 +
+              (almanakkenReview?.byPlaceId[b.id]?.rows ?? 0),
+          );
         default:
           return 0;
       }
@@ -1036,8 +1184,8 @@ function PlacesPageInner() {
     sortDir,
     sourceFilter,
     showMerged,
-    showIssuesOnly,
-    reviewIssuesById,
+    almanakkenReview,
+    almanakkenIssueFilter,
   ]);
 
   const mergedCount = useMemo(
@@ -1045,16 +1193,36 @@ function PlacesPageInner() {
     [places],
   );
 
-  const reviewCount = useMemo(
-    () =>
-      places.filter((place) => (reviewIssuesById.get(place.id)?.length ?? 0) > 0)
-        .length,
-    [places, reviewIssuesById],
-  );
-
   const deprecatedCount = useMemo(
     () => places.filter((p) => p.deprecated).length,
     [places],
+  );
+
+  const almanakkenIssueCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    const reviews = Object.values(almanakkenReview?.byPlaceId ?? {});
+    for (const review of reviews) {
+      if (review.issues.length > 0) counts.any = (counts.any ?? 0) + 1;
+      for (const issue of review.issues) {
+        counts[issue.type] = (counts[issue.type] ?? 0) + 1;
+      }
+    }
+    return counts;
+  }, [almanakkenReview]);
+
+  const almanakkenIssueTypes = useMemo(
+    () =>
+      Object.keys(almanakkenIssueCounts)
+        .filter((type) => type !== 'any')
+        .sort(
+          (a, b) =>
+            (almanakkenIssueCounts[b] ?? 0) -
+              (almanakkenIssueCounts[a] ?? 0) ||
+            almanakkenIssueLongLabel(a).localeCompare(
+              almanakkenIssueLongLabel(b),
+            ),
+        ),
+    [almanakkenIssueCounts],
   );
 
   const districts = useMemo(
@@ -1376,18 +1544,6 @@ function PlacesPageInner() {
                   </div>
                 )}
 
-                <button
-                  type="button"
-                  onClick={() => setShowIssuesOnly((value) => !value)}
-                  className={`shrink-0 border px-3 py-1.5 text-sm font-medium transition ${
-                    showIssuesOnly
-                      ? 'border-amber-400 bg-amber-50 text-amber-800'
-                      : 'border-ink/20 text-ink/70 hover:border-amber-400 hover:text-amber-800'
-                  }`}
-                >
-                  Needs review ({reviewCount})
-                </button>
-
                 {/* Columns toggle */}
                 <div
                   className="relative border-l border-ink/10 pl-3 shrink-0"
@@ -1513,6 +1669,91 @@ function PlacesPageInner() {
             </div>
           </div>
 
+          {almanakkenReview && (
+            <div className="border-b border-ink/10 bg-background/80 px-4 py-2 text-xs text-ink/60 sm:px-6 lg:px-8">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="font-medium text-ink/75">
+                  Almanakken {almanakkenReview.sourceVersion}
+                </span>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setAlmanakkenIssueFilter((current) =>
+                      current === 'any' ? null : 'any',
+                    )
+                  }
+                  className={`border px-2 py-1 transition-colors ${
+                    almanakkenIssueFilter === 'any'
+                      ? 'border-teal-strong bg-teal-soft/40 text-teal-strong'
+                      : 'border-ink/15 bg-cream/80 hover:border-teal-strong/40'
+                  }`}
+                  title="Places with urgent Almanakken linking review issues"
+                >
+                  {almanakkenIssueCounts.any ?? 0} urgent reviews
+                </button>
+                {almanakkenIssueTypes.slice(0, 7).map((type) => (
+                  <button
+                    key={type}
+                    type="button"
+                    onClick={() =>
+                      setAlmanakkenIssueFilter((current) =>
+                        current === type ? null : type,
+                      )
+                    }
+                    className={`border px-2 py-1 transition-colors ${
+                      almanakkenIssueFilter === type
+                        ? 'border-teal-strong bg-teal-soft/40 text-teal-strong'
+                        : 'border-ink/15 bg-cream/80 hover:border-teal-strong/40'
+                    }`}
+                    title={almanakkenIssueLongLabel(type)}
+                  >
+                    {almanakkenIssueShortLabel(type)}{' '}
+                    {almanakkenIssueCounts[type] ?? 0}
+                  </button>
+                ))}
+                {almanakkenIssueFilter && (
+                  <button
+                    type="button"
+                    onClick={() => setAlmanakkenIssueFilter(null)}
+                    className="text-ink/45 underline hover:text-teal-strong"
+                  >
+                    clear
+                  </button>
+                )}
+                {(almanakkenReview.missingQids?.length ?? 0) > 0 && (
+                  <span
+                    className="ml-1 inline-flex max-w-full flex-wrap items-center gap-1 text-ink/50"
+                    title="Almanakken QIDs with observations but no active Gazetteer place link"
+                  >
+                    <span>
+                      {almanakkenReview.missingQids?.length ?? 0} unlinked QIDs:
+                    </span>
+                    {almanakkenReview.missingQids?.slice(0, 5).map((missing) => {
+                      const name = missing.sourceNames?.[0];
+                      const years =
+                        missing.firstYear && missing.lastYear
+                          ? `${missing.firstYear}-${missing.lastYear}`
+                          : 'no dated rows';
+                      const products =
+                        missing.products?.length > 0
+                          ? `; products: ${missing.products.join(', ')}`
+                          : '';
+                      return (
+                        <span
+                          key={missing.qid}
+                          className="border border-ink/10 bg-cream/70 px-1.5 py-0.5 font-mono text-[10px] text-ink/55"
+                          title={`${missing.qid}: ${missing.rows} rows (${years})${name ? `; ${name}` : ''}${products}`}
+                        >
+                          {missing.qid}
+                        </span>
+                      );
+                    })}
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Main content: table + editor */}
           <div className="flex min-h-0 flex-1 overflow-hidden">
             {/* Place table */}
@@ -1594,17 +1835,19 @@ function PlacesPageInner() {
                   </thead>
                   <tbody>
                     {filtered.map((place) => (
-                    <PlaceRow
-                      key={place.id}
-                      place={place}
-                      isSelected={selectedIds.includes(place.id)}
-                      onSelect={handleRowSelect}
-                      reviewIssues={reviewIssuesById.get(place.id) ?? []}
-                      mergeChecked={
-                        canEdit ? mergeCheckIds.includes(place.id) : undefined
-                      }
-                      mergeDisabled={
-                        canEdit ? mergeCheckIds.length >= 2 : undefined
+                      <PlaceRow
+                        key={place.id}
+                        place={place}
+                        isSelected={selectedIds.includes(place.id)}
+                        onSelect={handleRowSelect}
+                        almanakkenReview={
+                          almanakkenReview?.byPlaceId[place.id]
+                        }
+                        mergeChecked={
+                          canEdit ? mergeCheckIds.includes(place.id) : undefined
+                        }
+                        mergeDisabled={
+                          canEdit ? mergeCheckIds.length >= 2 : undefined
                         }
                         onMergeCheck={canEdit ? handleMergeCheck : undefined}
                         colors={colors}
@@ -1632,7 +1875,9 @@ function PlacesPageInner() {
                     place={selectedPlace}
                     districts={districts}
                     sourceAppellations={selectedSourceAppellations}
-                    reviewIssues={reviewIssuesById.get(selectedPlace.id) ?? []}
+                    almanakkenReview={
+                      almanakkenReview?.byPlaceId[selectedPlace.id]
+                    }
                     canEdit={canEdit}
                     onSave={handleSave}
                     onCancel={handleCancel}
@@ -1650,7 +1895,6 @@ function PlacesPageInner() {
                     place={selectedPlace}
                     districts={districts}
                     sourceAppellations={selectedSourceAppellations}
-                    reviewIssues={reviewIssuesById.get(selectedPlace.id) ?? []}
                     canEdit={canEdit}
                     onSave={handleSave}
                     onCancel={handleCancel}

@@ -42,7 +42,6 @@ export interface ObservationRow {
   split4_lab: string;
   partof_id: string;
   partof_lab: string;
-  reference_std_id: string;
   free_residents: string;
   owned_by_id: string;
   owned_by_id2: string;
@@ -147,7 +146,7 @@ export function transformAlmanakken(): AlmanakkenTransformResult {
       administrator: almanakkenField(row, 'administrateurs'),
       director: almanakkenField(row, 'directeuren'),
       product: almanakkenField(row, 'product_std'),
-      enslaved_count: safeInt(row.slaven),
+      enslaved_count: safeInt(almanakkenField(row, 'enslaved_norm', 'slaven')),
       is_deserted: isVerlaten(row.deserted) ? '1' : '',
       location_std: almanakkenField(row, 'loc_std'),
       location_org: almanakkenField(row, 'loc_org'),
@@ -165,8 +164,7 @@ export function transformAlmanakken(): AlmanakkenTransformResult {
       split4_lab: almanakkenField(row, 'has_parts4_lab', 'split4_lab'),
       partof_id: almanakkenField(row, 'part_of_id', 'partof_id'),
       partof_lab: almanakkenField(row, 'part_of_lab', 'partof_lab'),
-      reference_std_id: almanakkenField(row, 'reference_org', 'reference_std_id'),
-      free_residents: safeInt(row.vrije_bewoners ?? row.free_residents),
+      free_residents: safeInt(almanakkenField(row, 'vrije_bewoners', 'free_residents')),
       owned_by_id: almanakkenField(row, 'owned_by_id'),
       owned_by_id2: almanakkenField(row, 'owned_by_id2'),
       enslaved_shared_with: almanakkenField(row, 'enslaved_shared_with'),

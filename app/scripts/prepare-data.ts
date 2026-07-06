@@ -10,6 +10,12 @@ import {
   writeFileSync,
 } from 'fs';
 import { join } from 'path';
+import {
+  almanakkenField,
+  isVerlaten,
+  readAlmanakkenRows,
+  readAlmanakkenVersionRows,
+} from './almanakken';
 
 const LOD_DIR = join(__dirname, '../lod');
 const OUT_DIR = join(__dirname, '../public/data');
@@ -46,6 +52,46 @@ type GazetteerExternalLink = {
   authority?: string;
   identifier?: string;
   matchType?: string;
+};
+
+type AlmanakkenReviewEntry = {
+  placeId: string;
+  qid: string;
+  sourceVersion: string;
+  rows: number;
+  firstYear: number | null;
+  lastYear: number | null;
+  productRows: number;
+  desertedRows: number;
+  sourceNames: number;
+  products: string[];
+  v1OnlyRows: number;
+  v2OnlyRows: number;
+  hasGazetteerSource: boolean;
+  hasProductAssertions: boolean;
+  hasStatusAssertions: boolean;
+  issues: Array<{
+    type:
+      | 'missing-gazetteer-link'
+      | 'duplicate-gazetteer-link'
+      | 'missing-source-tag'
+      | 'missing-product-assertions'
+      | 'missing-status-assertions'
+      | 'v1-only-rows'
+      | 'v2-only-rows'
+      | 'v1-v2-qid-change';
+    label: string;
+    detail?: string;
+  }>;
+};
+
+type AlmanakkenMissingQid = {
+  qid: string;
+  rows: number;
+  firstYear: number | null;
+  lastYear: number | null;
+  sourceNames: string[];
+  products: string[];
 };
 
 type GazetteerEntry = Record<string, unknown> & {
@@ -192,6 +238,193 @@ function mapYearFromSources(
   if (sourceIds.includes('paramaribo-street-map-1916')) return '1916';
   if (sourceIds.includes('map-1882')) return '1882';
   return '1930';
+}
+
+function primaryWikidataQid(entry: GazetteerEntry): string | null {
+  const link = entry.externalLinks?.find(
+    (candidate) =>
+      candidate.authority === 'wikidata' &&
+      typeof candidate.identifier === 'string' &&
+      candidate.identifier.trim(),
+  );
+  return link?.identifier?.trim() ?? null;
+}
+
+function buildAlmanakkenReview(entries: GazetteerEntry[]): {
+  sourceVersion: string;
+  generatedAt: string;
+  byPlaceId: Record<string, AlmanakkenReviewEntry>;
+  missingQids: AlmanakkenMissingQid[];
+} {
+  const { version, rows } = readAlmanakkenRows();
+  type Summary = {
+    rows: number;
+    years: number[];
+    productRows: number;
+    desertedRows: number;
+    sourceNames: Set<string>;
+    products: Set<string>;
+    recordIds: Set<string>;
+    v1OnlyRows: number;
+    v2OnlyRows: number;
+  };
+  const v1ByRecordId = new Map(
+    readAlmanakkenVersionRows('v1')
+      .map((row) => [almanakkenField(row, 'recordid'), row] as const)
+      .filter(([recordId]) => Boolean(recordId)),
+  );
+  const v2ByRecordId = new Map(
+    readAlmanakkenVersionRows('v2')
+      .map((row) => [almanakkenField(row, 'recordid'), row] as const)
+      .filter(([recordId]) => Boolean(recordId)),
+  );
+  const byQid = new Map<string, Summary>();
+  const qidChangedAway = new Map<string, Set<string>>();
+
+  for (const row of rows) {
+    const qid = almanakkenField(row, 'plantation_id');
+    if (!qid) continue;
+    const recordId = almanakkenField(row, 'recordid');
+    const summary =
+      byQid.get(qid) ??
+      {
+        rows: 0,
+        years: [],
+        productRows: 0,
+        desertedRows: 0,
+        sourceNames: new Set<string>(),
+        products: new Set<string>(),
+        recordIds: new Set<string>(),
+        v1OnlyRows: 0,
+        v2OnlyRows: 0,
+      };
+    summary.rows++;
+    if (recordId) summary.recordIds.add(recordId);
+    if (recordId && v1ByRecordId.has(recordId) && !v2ByRecordId.has(recordId)) {
+      summary.v1OnlyRows++;
+    }
+    if (recordId && v2ByRecordId.has(recordId) && !v1ByRecordId.has(recordId)) {
+      summary.v2OnlyRows++;
+    }
+
+    const year = Number.parseInt(almanakkenField(row, 'year'), 10);
+    if (Number.isFinite(year)) summary.years.push(year);
+
+    const product = almanakkenField(row, 'product_std');
+    if (product) {
+      summary.productRows++;
+      summary.products.add(product);
+    }
+
+    if (isVerlaten(row.deserted)) summary.desertedRows++;
+
+    const sourceName = almanakkenField(row, 'plantation_org');
+    if (sourceName) summary.sourceNames.add(sourceName);
+    byQid.set(qid, summary);
+  }
+
+  for (const [recordId, v1Row] of v1ByRecordId) {
+    const v2Row = v2ByRecordId.get(recordId);
+    if (!v2Row) continue;
+    const v1Qid = almanakkenField(v1Row, 'plantation_id');
+    const v2Qid = almanakkenField(v2Row, 'plantation_id');
+    if (!v1Qid || !v2Qid || v1Qid === v2Qid) continue;
+    const changedTo = qidChangedAway.get(v1Qid) ?? new Set<string>();
+    changedTo.add(v2Qid);
+    qidChangedAway.set(v1Qid, changedTo);
+  }
+
+  const placeIdsByQid = new Map<string, string[]>();
+  for (const entry of entries) {
+    if (entry.deprecated || entry.mergedInto || entry.type !== 'plantation') {
+      continue;
+    }
+    if (!entry.id) continue;
+    const qid = primaryWikidataQid(entry);
+    if (!qid) continue;
+    placeIdsByQid.set(qid, [...(placeIdsByQid.get(qid) ?? []), entry.id]);
+  }
+
+  const byPlaceId: Record<string, AlmanakkenReviewEntry> = {};
+  for (const entry of entries) {
+    if (entry.deprecated || entry.mergedInto || entry.type !== 'plantation') {
+      continue;
+    }
+    if (!entry.id) continue;
+    const qid = primaryWikidataQid(entry);
+    if (!qid) continue;
+    const summary = byQid.get(qid);
+    if (!summary && !entry.sources?.includes('almanakken')) continue;
+
+    const years = summary?.years ?? [];
+    const issues: AlmanakkenReviewEntry['issues'] = [];
+    const mappedPlaceIds = placeIdsByQid.get(qid) ?? [];
+    if (summary && mappedPlaceIds.length > 1) {
+      issues.push({
+        type: 'duplicate-gazetteer-link',
+        label: `${mappedPlaceIds.length} places share this Almanakken QID`,
+        detail: mappedPlaceIds.join(', '),
+      });
+    }
+    if (summary && !entry.sources?.includes('almanakken')) {
+      issues.push({
+        type: 'missing-source-tag',
+        label: 'Almanakken rows exist but the Gazetteer source tag is missing',
+      });
+    }
+    const changedTo = qidChangedAway.get(qid);
+    if (changedTo?.size) {
+      issues.push({
+        type: 'v1-v2-qid-change',
+        label: 'v1 rows for this QID moved to different v2 QID(s)',
+        detail: [...changedTo].join(', '),
+      });
+    }
+
+    byPlaceId[entry.id] = {
+      placeId: entry.id,
+      qid,
+      sourceVersion: version,
+      rows: summary?.rows ?? 0,
+      firstYear: years.length > 0 ? Math.min(...years) : null,
+      lastYear: years.length > 0 ? Math.max(...years) : null,
+      productRows: summary?.productRows ?? 0,
+      desertedRows: summary?.desertedRows ?? 0,
+      sourceNames: summary?.sourceNames.size ?? 0,
+      products: [...(summary?.products ?? [])].sort(),
+      v1OnlyRows: summary?.v1OnlyRows ?? 0,
+      v2OnlyRows: summary?.v2OnlyRows ?? 0,
+      hasGazetteerSource: entry.sources?.includes('almanakken') ?? false,
+      hasProductAssertions:
+        entry.productAssertions?.some(
+          (assertion) => assertion.source === 'almanakken',
+        ) ?? false,
+      hasStatusAssertions:
+        entry.statusAssertions?.some(
+          (assertion) => assertion.source === 'almanakken',
+        ) ?? false,
+      issues,
+    };
+  }
+
+  const missingQids = [...byQid.entries()]
+    .filter(([qid]) => !placeIdsByQid.has(qid))
+    .map(([qid, summary]) => ({
+      qid,
+      rows: summary.rows,
+      firstYear: summary.years.length > 0 ? Math.min(...summary.years) : null,
+      lastYear: summary.years.length > 0 ? Math.max(...summary.years) : null,
+      sourceNames: [...summary.sourceNames].sort(),
+      products: [...summary.products].sort(),
+    }))
+    .sort((a, b) => b.rows - a.rows || a.qid.localeCompare(b.qid));
+
+  return {
+    sourceVersion: version,
+    generatedAt: new Date().toISOString(),
+    byPlaceId,
+    missingQids,
+  };
 }
 
 function eventTypeToCrmType(crmClass: string): string {
@@ -996,22 +1229,25 @@ if (existsSync(geojsonSrc)) {
       const status =
         type === 'road' || type === 'railroad' ? 'infrastructure' : 'named';
 
-      // LineString / MultiLineString features — use WKT if available.
+      // LineString / MultiLineString features - use WKT if available.
+      const wkt = typeof loc.wkt === 'string' ? loc.wkt : null;
+      const isLineWkt =
+        wkt !== null && /^(?:Multi)?LineString\s*\(/i.test(wkt);
       if (
-        loc.wkt &&
+        isLineWkt &&
         (type === 'road' ||
           type === 'railroad' ||
           type === 'river' ||
           type === 'creek')
       ) {
-        const isMulti = /^MultiLineString\s*\(/i.test(loc.wkt);
+        const isMulti = /^MultiLineString\s*\(/i.test(wkt);
         let geometry:
           | { type: 'LineString'; coordinates: number[][] }
           | { type: 'MultiLineString'; coordinates: number[][][] }
           | null = null;
 
         if (isMulti) {
-          const inner = loc.wkt
+          const inner = wkt
             .replace(/^MultiLineString\s*\(/i, '')
             .replace(/\)\s*$/, '');
           const segmentMatches = [...inner.matchAll(/\(([^)]+)\)/g)];
@@ -1034,7 +1270,7 @@ if (existsSync(geojsonSrc)) {
             geometry = { type: 'MultiLineString', coordinates: allSegments };
           }
         } else {
-          const match = loc.wkt.match(/LineString\s*\(([^)]+)\)/i);
+          const match = wkt.match(/LineString\s*\(([^)]+)\)/i);
           if (match) {
             const coords: number[][] = [];
             for (const pair of match[1].split(',')) {
@@ -1194,6 +1430,15 @@ if (gazetteerRaw) {
     JSON.stringify({ ...gazetteerRaw, '@graph': migratedGraph }),
   );
   console.log('  Wrote places-gazetteer.jsonld');
+
+  const almanakkenReview = buildAlmanakkenReview(gazetteerEntries);
+  writeFileSync(
+    join(OUT_DIR, 'almanakken-review.json'),
+    JSON.stringify(almanakkenReview),
+  );
+  console.log(
+    `  Wrote almanakken-review.json (${Object.keys(almanakkenReview.byPlaceId).length} places)`,
+  );
 }
 
 // Copy place-types thesaurus
