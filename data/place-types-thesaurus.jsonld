@@ -1696,6 +1696,39 @@
       "exactMatch": [
         "https://www.wikidata.org/wiki/Q820477"
       ]
+    },
+    {
+      "@id": "stm:vocabulary/place-type/central-factory",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "typeId": "central-factory",
+      "prefLabel": {
+        "en": "Central factory",
+        "nl": "Centraalfabriek"
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/industrial-facility",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "color": "#bab898",
+      "sortOrder": 99,
+      "created": "2026-07-06",
+      "modified": "2026-07-06",
+      "altLabel": {
+        "nl": [
+          "centralisatie",
+          "centrale fabriek"
+        ]
+      },
+      "definition": {
+        "nl": "Een grootschalige, gecentraliseerde industriële verwerkingsfaciliteit specifiek ingericht voor de gezamenlijke en mechanische verwerking van agrarische plantageproducten (met name suikerriet).",
+        "en": "A large-scale, centralized industrial processing facility designed for the collective and mechanical processing of agricultural plantation products (primarily sugarcane)."
+      },
+      "related": [
+        "stm:vocabulary/place-type/plantation"
+      ]
     }
   ]
 }
