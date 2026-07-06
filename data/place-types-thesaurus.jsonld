@@ -1497,6 +1497,46 @@
       "closeMatch": [
         "https://www.wikidata.org/wiki/Q1406569"
       ]
+    },
+    {
+      "@id": "stm:vocabulary/place-type/medical-post",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "typeId": "medical-post",
+      "prefLabel": {
+        "nl": "Medische post",
+        "en": "Medical post"
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/medical-facility",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "color": "#75171f",
+      "sortOrder": 99,
+      "created": "2026-07-06",
+      "modified": "2026-07-06",
+      "altLabel": {
+        "nl": [
+          "Chirurgisch etablissement",
+          "heelmeester",
+          "kliniek",
+          "zorgpost",
+          "heelkundige inrichting",
+          "polikliniek"
+        ],
+        "en": [
+          "clinic"
+        ]
+      },
+      "definition": {
+        "nl": "Een kleinschalige, lokale medische faciliteit, praktijkruimte of poliklinisch steunpunt, veelal bemand door een chirurgijn of heelmeester, gericht op eerste hulp, ambulante zorg of specifieke heelkundige ingrepen.",
+        "en": "A small-scale, local medical facility, outpatient clinic, or medical outpost, typically staffed by a surgeon or medical practitioner, dedicated to first aid, ambulatory care, or specific surgical procedures."
+      },
+      "closeMatch": [
+        "https://www.wikidata.org/wiki/Q1774898"
+      ]
     }
   ]
 }
