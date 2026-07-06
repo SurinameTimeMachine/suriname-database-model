@@ -1353,7 +1353,7 @@
       "broader": "stm:vocabulary/place-type/human-made",
       "crmClass": "E25_Human-Made_Feature",
       "crmBadge": "E25",
-      "color": "#fc5f56",
+      "color": "#ff8040",
       "sortOrder": 99,
       "created": "2026-07-06",
       "modified": "2026-07-06",
