@@ -1657,6 +1657,45 @@
       "exactMatch": [
         "https://www.wikidata.org/wiki/Q188040"
       ]
+    },
+    {
+      "@id": "stm:vocabulary/place-type/mine",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "typeId": "mine",
+      "prefLabel": {
+        "en": "Mine",
+        "nl": "Mijn"
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/industrial-facility",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "color": "#ba9c98",
+      "sortOrder": 99,
+      "created": "2026-07-06",
+      "modified": "2026-07-06",
+      "altLabel": {
+        "nl": [
+          "goudmijn",
+          "goudveld",
+          "concessive",
+          "placer",
+          "bauxietmijn",
+          "bauxietontginning",
+          "dagbouwmijn",
+          "graverij"
+        ]
+      },
+      "definition": {
+        "nl": "Een al dan niet infrastructureel bewerkte geografische locatie, graverij of complex (bovengronds of ondergronds) specifiek ingericht voor de grootschalige winning van delfstoffen, ertsen en edelmetalen uit de bodem.",
+        "en": "A geographically altered site, excavation, or complex (open-pit or underground) specifically designed for the large-scale extraction of minerals, ores, and precious metals from the earth."
+      },
+      "exactMatch": [
+        "https://www.wikidata.org/wiki/Q820477"
+      ]
     }
   ]
 }
