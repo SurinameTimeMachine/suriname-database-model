@@ -252,7 +252,10 @@
       "crmBadge": "E25",
       "sortOrder": 2,
       "created": "2026-04-07",
-      "modified": "2026-07-06"
+      "modified": "2026-07-06",
+      "exactMatch": [
+        "https://www.wikidata.org/wiki/Q1321241"
+      ]
     },
     {
       "@id": "stm:vocabulary/place-type/transport-infrastructure",
