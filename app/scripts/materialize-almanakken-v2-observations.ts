@@ -6,8 +6,8 @@
  * the same evidence is not copied onto competing place records before review.
  */
 
-import { readFileSync, writeFileSync } from 'fs';
-import { join } from 'path';
+import { mkdirSync, readFileSync, writeFileSync } from 'fs';
+import { dirname, join } from 'path';
 import type {
   AlmanakkenPlantationObservation,
   AlmanakkenPlantationRelation,
@@ -274,6 +274,7 @@ console.log(
 
 const outStr = JSON.stringify(gazetteerJsonld, null, 2);
 writeFileSync(GAZETTEER_PATH, outStr, 'utf-8');
+mkdirSync(dirname(PUBLIC_GAZETTEER), { recursive: true });
 writeFileSync(PUBLIC_GAZETTEER, outStr, 'utf-8');
 console.log(`  Wrote ${GAZETTEER_PATH}`);
 console.log(`  Wrote public copy: ${PUBLIC_GAZETTEER}`);
