@@ -314,6 +314,80 @@ export interface StatusAssertion {
   note?: string | null;
 }
 
+export interface AlmanakkenPlantationRelation {
+  qid: string;
+  label?: string;
+}
+
+export interface AlmanakkenPopulationObservation {
+  enslavedCount?: number;
+  enslavedOriginal?: string;
+  enslavedSharedWith?: string;
+  plantationMaleUnfreeResidents?: number;
+  plantationFemaleUnfreeResidents?: number;
+  plantationTotalUnfreeResidents?: number;
+  privateMaleUnfreeResidents?: number;
+  privateFemaleUnfreeResidents?: number;
+  privateTotalUnfreeResidents?: number;
+  freeResidents?: number;
+  totalResidents?: number;
+  generalTotalEnslaved?: number;
+  enslavedFitForWorkPlantations?: number;
+  enslavedFitForWorkPrivate?: number;
+  enslavedUnfitForWorkPlantations?: number;
+  enslavedUnfitForWorkPrivate?: number;
+  enslavedOnPlantationsFitForWork?: number;
+  enslavedOnPlantationsUnfitForWork?: number;
+  freePlantationBoys?: number;
+  freePlantationMen?: number;
+  freePlantationGirls?: number;
+  freePlantationWomen?: number;
+  freePlantationTotal?: number;
+}
+
+export interface AlmanakkenPlantationObservation {
+  recordId: string;
+  source: 'almanakken';
+  sourceVersion: 'v2';
+  qid: string;
+  year?: number;
+  page?: string;
+  littera?: string;
+  districtOrDivision?: string;
+  locationOriginal?: string;
+  locationStandardized?: string;
+  riverOrRoad?: string;
+  direction?: string;
+  plantationOriginal?: string;
+  plantationStandardized?: string;
+  psurIds?: string[];
+  hasParts?: AlmanakkenPlantationRelation[];
+  partOf?: AlmanakkenPlantationRelation[];
+  referenceOriginal?: string;
+  ownedBy?: AlmanakkenPlantationRelation[];
+  sizeAkkers?: number;
+  product?: string;
+  function?: string;
+  additionalInfo?: string;
+  deserted?: boolean;
+  lot?: string;
+  sranantongoName?: string;
+  population?: AlmanakkenPopulationObservation;
+  mill?: {
+    type?: string;
+    steam?: string;
+    water?: string;
+  };
+  rawManagement?: {
+    administrators?: string;
+    directors?: string;
+    owners?: string;
+    administratorsInEurope?: string;
+    administratorsInSuriname?: string;
+    blankOfficer?: string;
+  };
+}
+
 /** All valid gazetteer place types */
 export type PlaceType =
   | 'plantation'
@@ -385,6 +459,7 @@ export interface GazetteerPlace extends TombstoneFields {
   productAssertions?: ProductAssertion[];
   locationAssertions?: LocationAssertion[];
   statusAssertions?: StatusAssertion[];
+  almanakkenObservations?: AlmanakkenPlantationObservation[];
   /** The E53 location is a persistent coordinate anchor for source observations. */
   locationPoint?: boolean;
   /** Immutable locator for a source-derived entry, preserved across edits. */

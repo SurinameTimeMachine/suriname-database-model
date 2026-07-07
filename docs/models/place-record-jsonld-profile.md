@@ -20,8 +20,9 @@ For `stm-00705` the public contract is:
 - `https://data.surinametijdmachine.org/place/stm-00705` — authority record and HTML representation.
 - `.../place/stm-00705.jsonld` — JSON-LD representation.
 - `.../place/stm-00705.json` — application JSON representation.
-- `.../place/stm-00705/feature` — E25/E26 physical feature when applicable.
-- `.../place/stm-00705/location` — E53 Place.
+- `.../place/stm-00705#record` — E31 authority-record node.
+- `.../place/stm-00705#feature` — E25/E26 physical feature when applicable.
+- `.../place/stm-00705#location` — E53 Place.
 
 The HTTPS URL is canonical until an ARK name assigning authority issues ARKs.
 The generated identifier manifest is the only place future ARK redirects are

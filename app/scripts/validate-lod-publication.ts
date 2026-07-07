@@ -273,6 +273,15 @@ function main() {
   const activeGazetteer = gazetteer['@graph'].filter(
     (entry) => !entry.deprecated && !entry.mergedInto,
   );
+  for (const entry of activeGazetteer) {
+    if (entry.type !== 'river' && entry.type !== 'creek') continue;
+    const location = entry.location as Record<string, unknown> | undefined;
+    assert(
+      typeof location?.wkt === 'string' &&
+        /^(?:Multi)?LineString\s*\(/i.test(location.wkt),
+      `${String(entry.type)} ${String(entry.id)} is not backed by line geometry`,
+    );
+  }
   const sourceAddressFeatures = (addressPointSource.features ?? []).filter(
     (feature) =>
       feature.geometry?.type === 'Point' &&
@@ -323,12 +332,12 @@ function main() {
     const graph = addressRecord['@graph'] ?? [];
     const location = graph.find(
       (entity) =>
-        entity['@id'] === `${CANONICAL_BASE}place/${historicalAddressId}/location`,
+        entity['@id'] === `${CANONICAL_BASE}place/${historicalAddressId}#location`,
     );
     const observation = graph.find(
       (entity) =>
         entity['@id'] ===
-        `${CANONICAL_BASE}place/${historicalAddressId}/assertion/address-observation-1885`,
+        `${CANONICAL_BASE}place/${historicalAddressId}#assertion-address-observation-1885`,
     );
     const geometryId = location?.['geo:hasGeometry'];
     const geometry = graph.find((entity) => entity['@id'] === geometryId);
@@ -349,7 +358,7 @@ function main() {
     );
     assert(
       observation?.P140_assigned_attribute_to ===
-        `${CANONICAL_BASE}place/${historicalAddressId}/location`,
+        `${CANONICAL_BASE}place/${historicalAddressId}#location`,
       `Historical address ${historicalAddressId} observation is not attached to its E53/GeoSPARQL point anchor`,
     );
     assert(
@@ -359,11 +368,11 @@ function main() {
     );
     assert(
       observation?.P4_has_time_span ===
-        `${CANONICAL_BASE}place/${historicalAddressId}/assertion/address-observation-1885/time-span`,
+        `${CANONICAL_BASE}place/${historicalAddressId}#assertion-address-observation-1885-time-span`,
       `Historical address ${historicalAddressId} observation has no 1885 time span`,
     );
     assert(
-      geometryId === `${CANONICAL_BASE}place/${historicalAddressId}/location/geometry/point`,
+      geometryId === `${CANONICAL_BASE}place/${historicalAddressId}#geometry-point`,
       `Historical address ${historicalAddressId} point geometry has a non-point URI`,
     );
     assert(
@@ -428,7 +437,7 @@ function main() {
       `Authority record ${id} has no graph`,
     );
     const recordNode = jsonld['@graph'].find(
-      (entity) => entity['@id'] === jsonld['@id'],
+      (entity) => entity['@id'] === `${CANONICAL_BASE}place/${id}#record`,
     );
     assert(recordNode, `Authority record ${id} has no record node`);
     assert(
@@ -451,6 +460,10 @@ function main() {
       assert(
         typeof entityId === 'string' && entityId.startsWith(CANONICAL_BASE),
         `Authority record ${id} has a non-canonical entity @id`,
+      );
+      assert(
+        !entityId.startsWith(`${CANONICAL_BASE}place/${id}/`),
+        `Authority record ${id} uses a non-dereferenceable place subpath ${entityId}`,
       );
       assert(!graphIds.has(entityId), `Authority record ${id} has duplicate @id ${entityId}`);
       graphIds.add(entityId);

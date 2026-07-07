@@ -556,7 +556,7 @@ function buildObservations(obs: ObservationRow[]): {
         '@id': provId,
         '@type': ['ProvenanceRecord'],
         sourceFile:
-          'data/06-almanakken - Plantations Surinaamse Almanakken/Plantations Surinaamse Almanakken v1.0.csv + Plantations Surinaamse Almanakken v2.0 (1).csv',
+          'data/06-almanakken - Plantations Surinaamse Almanakken/Plantations Surinaamse Almanakken v2.0 (1).csv',
         sourceColumn:
           'recordid, plantation_id, year, eigenaren, enslaved_norm/slaven, product_std, has_parts*, part_of_id, owned_by_id, sranantongo_naam',
         sourceRow: `year=${year}`,

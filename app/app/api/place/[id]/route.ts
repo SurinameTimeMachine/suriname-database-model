@@ -23,9 +23,13 @@ export async function GET(
     return NextResponse.json({ error: 'Unknown place identifier' }, { status: 404 });
   }
 
-  const format = request.nextUrl.searchParams.get('format') === 'json'
-    ? 'json'
-    : 'jsonld';
+  const requestedUrl = request.url;
+  const format =
+    request.nextUrl.searchParams.get('format') === 'json' ||
+    requestedUrl.includes('.json?') ||
+    requestedUrl.endsWith('.json')
+      ? 'json'
+      : 'jsonld';
   let mergedInto: string | undefined;
   try {
     const gazetteer = JSON.parse(
@@ -38,13 +42,25 @@ export async function GET(
     mergedInto = undefined;
   }
   if (mergedInto && PLACE_ID.test(mergedInto)) {
-    return NextResponse.redirect(
-      new URL(`/data/place-records/${mergedInto}.${format}`, request.url),
-      308,
-    );
+    return NextResponse.redirect(new URL(`/place/${mergedInto}.${format}`, request.url), 308);
   }
 
-  return NextResponse.redirect(
-    new URL(`/data/place-records/${id}.${format}`, request.url),
-  );
+  try {
+    const recordResponse = await fetch(
+      new URL(`/data/place-records/${id}.${format}`, request.url),
+    );
+    if (!recordResponse.ok) throw new Error('Record not found');
+    const body = await recordResponse.text();
+    return new NextResponse(body, {
+      headers: {
+        'Content-Type':
+          format === 'jsonld'
+            ? 'application/ld+json; charset=utf-8'
+            : 'application/json; charset=utf-8',
+        Link: `<${new URL(`/place/${id}`, request.url).toString()}>; rel="canonical"`,
+      },
+    });
+  } catch {
+    return NextResponse.json({ error: 'Unknown place identifier' }, { status: 404 });
+  }
 }

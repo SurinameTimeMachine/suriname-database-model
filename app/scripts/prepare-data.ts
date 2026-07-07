@@ -65,11 +65,11 @@ type AlmanakkenReviewEntry = {
   desertedRows: number;
   sourceNames: number;
   products: string[];
-  v1OnlyRows: number;
   v2OnlyRows: number;
   hasGazetteerSource: boolean;
   hasProductAssertions: boolean;
   hasStatusAssertions: boolean;
+  hasAlmanakkenObservations: boolean;
   issues: Array<{
     type:
       | 'missing-gazetteer-link'
@@ -108,6 +108,7 @@ type GazetteerEntry = Record<string, unknown> & {
   description?: string;
   statusAssertions?: Array<Record<string, unknown>>;
   productAssertions?: Array<Record<string, unknown>>;
+  almanakkenObservations?: Array<Record<string, unknown>>;
   lifecycleEvents?: Array<Record<string, unknown>>;
   deprecated?: true;
   mergedInto?: string;
@@ -265,7 +266,6 @@ function buildAlmanakkenReview(entries: GazetteerEntry[]): {
     sourceNames: Set<string>;
     products: Set<string>;
     recordIds: Set<string>;
-    v1OnlyRows: number;
     v2OnlyRows: number;
   };
   const v1ByRecordId = new Map(
@@ -295,14 +295,10 @@ function buildAlmanakkenReview(entries: GazetteerEntry[]): {
         sourceNames: new Set<string>(),
         products: new Set<string>(),
         recordIds: new Set<string>(),
-        v1OnlyRows: 0,
         v2OnlyRows: 0,
       };
     summary.rows++;
     if (recordId) summary.recordIds.add(recordId);
-    if (recordId && v1ByRecordId.has(recordId) && !v2ByRecordId.has(recordId)) {
-      summary.v1OnlyRows++;
-    }
     if (recordId && v2ByRecordId.has(recordId) && !v1ByRecordId.has(recordId)) {
       summary.v2OnlyRows++;
     }
@@ -392,7 +388,6 @@ function buildAlmanakkenReview(entries: GazetteerEntry[]): {
       desertedRows: summary?.desertedRows ?? 0,
       sourceNames: summary?.sourceNames.size ?? 0,
       products: [...(summary?.products ?? [])].sort(),
-      v1OnlyRows: summary?.v1OnlyRows ?? 0,
       v2OnlyRows: summary?.v2OnlyRows ?? 0,
       hasGazetteerSource: entry.sources?.includes('almanakken') ?? false,
       hasProductAssertions:
@@ -403,6 +398,8 @@ function buildAlmanakkenReview(entries: GazetteerEntry[]): {
         entry.statusAssertions?.some(
           (assertion) => assertion.source === 'almanakken',
         ) ?? false,
+      hasAlmanakkenObservations:
+        (entry.almanakkenObservations?.length ?? 0) > 0,
       issues,
     };
   }

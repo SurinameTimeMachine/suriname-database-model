@@ -3,7 +3,7 @@ import { join } from 'path';
 
 import { parse } from 'csv-parse/sync';
 
-export type AlmanakkenCsvVersion = 'v1' | 'v2' | 'v1+v2';
+export type AlmanakkenCsvVersion = 'v1' | 'v2';
 export type AlmanakkenRow = Record<string, string>;
 
 const DATA_DIR = join(__dirname, '../..', 'data');
@@ -31,7 +31,7 @@ function decodeCsv(filePath: string, version: AlmanakkenCsvVersion): string {
 
 export function getAlmanakkenSourcePath(): {
   path: string;
-  version: Exclude<AlmanakkenCsvVersion, 'v1+v2'>;
+  version: AlmanakkenCsvVersion;
 } {
   if (existsSync(V2_CSV)) return { path: V2_CSV, version: 'v2' };
   return { path: V1_CSV, version: 'v1' };
@@ -42,25 +42,6 @@ export function readAlmanakkenRows(): {
   version: AlmanakkenCsvVersion;
   rows: AlmanakkenRow[];
 } {
-  if (existsSync(V1_CSV) && existsSync(V2_CSV)) {
-    const v1Rows = readAlmanakkenVersionRows('v1');
-    const v2Rows = readAlmanakkenVersionRows('v2');
-    const byRecordId = new Map<string, AlmanakkenRow>();
-    for (const row of v1Rows) {
-      const recordId = almanakkenField(row, 'recordid');
-      if (recordId) byRecordId.set(recordId, row);
-    }
-    for (const row of v2Rows) {
-      const recordId = almanakkenField(row, 'recordid');
-      if (recordId) byRecordId.set(recordId, row);
-    }
-    return {
-      path: V2_CSV,
-      version: 'v1+v2',
-      rows: [...byRecordId.values()],
-    };
-  }
-
   const { path, version } = getAlmanakkenSourcePath();
   return {
     path,
@@ -72,7 +53,7 @@ export function readAlmanakkenRows(): {
 }
 
 export function readAlmanakkenVersionRows(
-  version: Exclude<AlmanakkenCsvVersion, 'v1+v2'>,
+  version: AlmanakkenCsvVersion,
 ): AlmanakkenRow[] {
   const path = version === 'v1' ? V1_CSV : V2_CSV;
   return readCsvRows(path, version).map((row) =>
@@ -82,7 +63,7 @@ export function readAlmanakkenVersionRows(
 
 function readCsvRows(
   path: string,
-  version: Exclude<AlmanakkenCsvVersion, 'v1+v2'>,
+  version: AlmanakkenCsvVersion,
 ): AlmanakkenRow[] {
   const csv = decodeCsv(path, version);
   return parse(csv, {
@@ -96,7 +77,7 @@ function readCsvRows(
 
 function normalizeAlmanakkenRow(
   row: AlmanakkenRow,
-  version: Exclude<AlmanakkenCsvVersion, 'v1+v2'>,
+  version: AlmanakkenCsvVersion,
 ): AlmanakkenRow {
   const normalized: AlmanakkenRow = { ...row };
   const aliases: Array<[string, string]> = [

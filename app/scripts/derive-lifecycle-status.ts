@@ -49,6 +49,9 @@ const PUBLIC_GAZETTEER = join(
 // ── Config ─────────────────────────────────────────────────────────────────
 
 const FORCE = process.argv.includes('--force');
+const INCLUDE_DUPLICATE_QIDS = process.argv.includes(
+  '--include-duplicate-qids',
+);
 const SOURCE_ID = 'almanakken'; // registry sourceId (prov:hadPrimarySource)
 
 // ── Validate SOURCE_ID against sources-registry.jsonld ─────────────────────
@@ -246,8 +249,19 @@ const gazeteerRaw = readFileSync(GAZETTEER_PATH, 'utf-8');
 const gazetteerJsonld = JSON.parse(gazeteerRaw);
 const graph: GazetteerPlace[] = gazetteerJsonld['@graph'] || [];
 
+const activePlaceCountByQid = new Map<string, number>();
+for (const entry of graph) {
+  if (entry.type !== 'plantation' || entry.deprecated || entry.mergedInto) {
+    continue;
+  }
+  const qid = getPrimaryAuthorityLink(entry, 'wikidata')?.identifier;
+  if (!qid) continue;
+  activePlaceCountByQid.set(qid, (activePlaceCountByQid.get(qid) ?? 0) + 1);
+}
+
 let patched = 0;
 let skipped = 0;
+let duplicateQidSkipped = 0;
 let noMatch = 0;
 
 for (const entry of graph) {
@@ -265,6 +279,11 @@ for (const entry of graph) {
     continue;
   }
 
+  if (!INCLUDE_DUPLICATE_QIDS && (activePlaceCountByQid.get(qid) ?? 0) > 1) {
+    duplicateQidSkipped++;
+    continue;
+  }
+
   // Skip if already has manual assertions (unless --force)
   const existing = entry.statusAssertions ?? [];
   if (existing.length > 0 && !FORCE) {
@@ -277,7 +296,7 @@ for (const entry of graph) {
 }
 
 console.log(
-  `  Patched: ${patched}  Skipped (has manual assertions): ${skipped}  No almanakken match: ${noMatch}`,
+  `  Patched: ${patched}  Skipped (has manual assertions): ${skipped}  Skipped duplicate QIDs: ${duplicateQidSkipped}  No almanakken match: ${noMatch}`,
 );
 
 if (patched === 0) {

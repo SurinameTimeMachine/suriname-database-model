@@ -66,11 +66,11 @@ type AlmanakkenReviewEntry = {
   desertedRows: number;
   sourceNames: number;
   products: string[];
-  v1OnlyRows: number;
   v2OnlyRows: number;
   hasGazetteerSource: boolean;
   hasProductAssertions: boolean;
   hasStatusAssertions: boolean;
+  hasAlmanakkenObservations: boolean;
   issues: Array<{
     type: string;
     label: string;
@@ -558,9 +558,9 @@ function almanakkenReviewTitle(
     `Deserted observations: ${review.desertedRows}`,
     `Source-name variants: ${review.sourceNames}`,
     `Products: ${products}${review.products.length > 8 ? ', ...' : ''}`,
-    `Preserved v1-only observations: ${review.v1OnlyRows}`,
     `New v2-only observations: ${review.v2OnlyRows}`,
     `Gazetteer source tag: ${review.hasGazetteerSource ? 'yes' : 'no'}`,
+    `Saved v2 observation rows: ${review.hasAlmanakkenObservations ? 'yes' : 'no'}`,
     `Editable product assertions: ${review.hasProductAssertions ? 'yes' : 'no'}`,
     `Editable status assertions: ${review.hasStatusAssertions ? 'yes' : 'no'}`,
     review.issues.length > 0

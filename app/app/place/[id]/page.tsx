@@ -1,8 +1,10 @@
 import { readFile } from 'fs/promises';
 import Link from 'next/link';
+import { headers } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { join } from 'path';
 
+const CANONICAL_BASE = 'https://data.surinametijdmachine.org';
 const GAZETTEER_PATH = join(
   process.cwd(),
   '..',
@@ -15,8 +17,16 @@ type PlaceProjection = {
   id: string;
   label: string;
   type: string;
+  recordUrl: string;
   jsonldUrl: string;
   jsonUrl: string;
+  feature: { id: string; crmClass: string } | null;
+  location: {
+    id: string;
+    lat: number | null;
+    lng: number | null;
+    wkt: string | null;
+  };
   names: Array<{ text?: string; language?: string; type?: string }>;
   sources: string[];
   statusAssertions: Array<{
@@ -52,7 +62,34 @@ type PlaceProjection = {
   }>;
 };
 
-type GazetteerDocument = { '@graph'?: PlaceProjection[] };
+type GazetteerDocument = {
+  '@graph'?: Array<{ id?: string; mergedInto?: string }>;
+};
+
+async function readMergedInto(id: string): Promise<string | undefined> {
+  try {
+    const gazetteer = JSON.parse(
+      await readFile(GAZETTEER_PATH, 'utf-8'),
+    ) as GazetteerDocument;
+    const entry = gazetteer['@graph']?.find((candidate) => candidate.id === id);
+    return typeof entry?.mergedInto === 'string' ? entry.mergedInto : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+async function loadPlaceProjection(id: string): Promise<PlaceProjection | null> {
+  const requestHeaders = await headers();
+  const host = requestHeaders.get('host');
+  if (!host) return null;
+  const protocol = requestHeaders.get('x-forwarded-proto') ?? 'http';
+  const response = await fetch(
+    `${protocol}://${host}/data/place-records/${id}.json`,
+    { cache: 'no-store' },
+  );
+  if (!response.ok) return null;
+  return (await response.json()) as PlaceProjection;
+}
 
 export default async function PlaceRecordPage({
   params,
@@ -62,47 +99,39 @@ export default async function PlaceRecordPage({
   const { id } = await params;
   if (!PLACE_ID.test(id)) notFound();
 
-  let entry: PlaceProjection | undefined;
-  try {
-    const gazetteer = JSON.parse(
-      await readFile(GAZETTEER_PATH, 'utf-8'),
-    ) as GazetteerDocument;
-    entry = gazetteer['@graph']?.find(
-      (candidate) => candidate.id === id,
-    );
-  } catch {
-    notFound();
-  }
-
-  if (!entry || (entry as Record<string, unknown>).deprecated) notFound();
-  const mergedInto = (entry as Record<string, unknown>).mergedInto;
+  const mergedInto = await readMergedInto(id);
   if (typeof mergedInto === 'string' && PLACE_ID.test(mergedInto)) {
     redirect(`/place/${mergedInto}`);
   }
 
-  const place: PlaceProjection = {
-    ...entry,
+  let place = await loadPlaceProjection(id);
+  if (!place) notFound();
+
+  place = {
+    ...place,
+    recordUrl: `/place/${id}`,
     jsonldUrl: `/place/${id}.jsonld`,
     jsonUrl: `/place/${id}.json`,
-    names: entry.names ?? [],
-    sources: entry.sources ?? [],
-    statusAssertions: entry.statusAssertions ?? [],
-    productAssertions: entry.productAssertions ?? [],
-    locationAssertions: entry.locationAssertions ?? [],
-    diklandRefs: entry.diklandRefs ?? [],
+    names: place.names ?? [],
+    sources: place.sources ?? [],
+    statusAssertions: place.statusAssertions ?? [],
+    productAssertions: place.productAssertions ?? [],
+    locationAssertions: place.locationAssertions ?? [],
+    diklandRefs: place.diklandRefs ?? [],
   };
+  const canonicalUri = `${CANONICAL_BASE}/place/${id}`;
 
   return (
     <main className="min-h-screen bg-background px-4 py-10 text-ink sm:px-6 lg:px-10">
-      <article className="mx-auto max-w-4xl">
+      <article id="record" className="mx-auto max-w-4xl">
         <p className="mb-3 text-xs font-semibold uppercase tracking-[0.28em] text-teal-strong">
           Authority record · {place.id}
         </p>
         <h1 className="text-4xl font-semibold">{place.label}</h1>
         <p className="mt-2 text-sm text-ink/65">{place.type}</p>
         <nav className="mt-6 flex flex-wrap gap-3 text-sm">
-          <Link className="border border-ink/20 px-3 py-2 hover:border-teal-strong" href="/places">
-            Gazetteer
+          <Link className="border border-ink/20 px-3 py-2 hover:border-teal-strong" href={`/places?place=${id}`}>
+            Edit in Gazetteer
           </Link>
           <a className="border border-ink/20 px-3 py-2 hover:border-teal-strong" href={place.jsonldUrl}>
             JSON-LD
@@ -111,6 +140,70 @@ export default async function PlaceRecordPage({
             JSON
           </a>
         </nav>
+
+        <section className="mt-8 border border-ink/10 bg-white/70 p-4 text-sm">
+          <h2 className="text-base font-semibold">Identifiers</h2>
+          <dl className="mt-3 grid gap-3">
+            <div>
+              <dt className="text-xs uppercase tracking-[0.18em] text-ink/50">Canonical URI</dt>
+              <dd className="mt-1 break-all font-mono text-xs">
+                <a className="underline decoration-teal-strong" href={canonicalUri}>{canonicalUri}</a>
+              </dd>
+            </div>
+            {place.feature && (
+              <div>
+                <dt className="text-xs uppercase tracking-[0.18em] text-ink/50">Feature URI</dt>
+                <dd className="mt-1 break-all font-mono text-xs">
+                  <a className="underline decoration-teal-strong" href={place.feature.id}>{place.feature.id}</a>
+                </dd>
+              </div>
+            )}
+            <div>
+              <dt className="text-xs uppercase tracking-[0.18em] text-ink/50">Location URI</dt>
+              <dd className="mt-1 break-all font-mono text-xs">
+                <a className="underline decoration-teal-strong" href={place.location.id}>{place.location.id}</a>
+              </dd>
+            </div>
+          </dl>
+        </section>
+
+        {place.feature && (
+          <section id="feature" className="mt-10 border-t border-ink/10 pt-6">
+            <h2 className="text-xl font-semibold">Feature</h2>
+            <dl className="mt-3 grid gap-2 text-sm">
+              <div>
+                <dt className="text-ink/55">CRM class</dt>
+                <dd>{place.feature.crmClass}</dd>
+              </div>
+              <div>
+                <dt className="text-ink/55">URI</dt>
+                <dd className="break-all font-mono text-xs">{place.feature.id}</dd>
+              </div>
+            </dl>
+          </section>
+        )}
+
+        <section id="location" className="mt-10 border-t border-ink/10 pt-6">
+          <h2 className="text-xl font-semibold">Location</h2>
+          <dl className="mt-3 grid gap-2 text-sm">
+            <div>
+              <dt className="text-ink/55">URI</dt>
+              <dd className="break-all font-mono text-xs">{place.location.id}</dd>
+            </div>
+            {place.location.lat != null && place.location.lng != null && (
+              <div>
+                <dt className="text-ink/55">Centroid</dt>
+                <dd>{place.location.lat}, {place.location.lng}</dd>
+              </div>
+            )}
+            {place.location.wkt && (
+              <div>
+                <dt className="text-ink/55">WKT</dt>
+                <dd className="break-all font-mono text-xs">{place.location.wkt}</dd>
+              </div>
+            )}
+          </dl>
+        </section>
 
         <section className="mt-10 border-t border-ink/10 pt-6">
           <h2 className="text-xl font-semibold">Names</h2>

@@ -334,37 +334,11 @@ for (const name of Array.from(allDistricts).sort()) {
 }
 console.log(`  ${allDistricts.size} districts`);
 
-// ── 2. River/creek/road entries ────────────────────────────────────
+// ── 2. Almanakken location labels ───────────────────────────────────
 
-console.log('Creating river/location entries...');
-for (const name of Array.from(allLocations).sort()) {
-  gazetteer.push({
-    id: nextId('stm'),
-    type: 'river',
-    prefLabel: name,
-    altLabels: [],
-    broader: null,
-    description:
-      name.includes('Kreek') ||
-      name.includes('rivier') ||
-      name.includes('Kanaal') ||
-      name.includes('kust')
-        ? 'River, creek, or waterway from Surinaamse Almanakken'
-        : 'Road or path from Surinaamse Almanakken',
-    location: { lat: null, lng: null, wkt: null, crs: 'EPSG:4326' },
-    sources: ['almanakken'],
-    externalLinks: [],
-    fid: null,
-    psurIds: [],
-    district: null,
-    locationDescription: null,
-    locationDescriptionOriginal: null,
-    placeType: null,
-    modifiedBy: null,
-    modifiedAt: null,
-  });
-}
-console.log(`  ${allLocations.size} locations (rivers/creeks/roads)`);
+console.log(
+  `Skipping ${allLocations.size} Almanakken location labels without geometry`,
+);
 
 // ── 3. QGIS river/creek features (E26 Physical Features) ──────────
 
@@ -385,6 +359,9 @@ for (const feature of Object.values(physicalFeaturesRaw)) {
   const placeEntity = placeUri ? placesRaw[placeUri] : undefined;
   const geom = placeEntity?.['hasGeometry'] as { asWKT?: string } | undefined;
   const wkt = geom?.asWKT || null;
+  if (!wkt || !/^(?:Multi)?LineString\s*\(/i.test(wkt)) {
+    continue;
+  }
   const centroid = wkt ? centroidFromWKT(wkt) : null;
   const fid = placeEntity?.['fid'] as number | undefined;
 

@@ -3,6 +3,7 @@
 import { getSourcesByCategory, useSourceRegistry } from '@/lib/sources';
 import { usePlaceTypes } from '@/lib/thesaurus';
 import type {
+  AlmanakkenPlantationObservation,
   AssertionCertainty,
   DiklandRef,
   DistrictAssertion,
@@ -47,11 +48,11 @@ interface AlmanakkenReviewEntry {
   desertedRows: number;
   sourceNames: number;
   products: string[];
-  v1OnlyRows: number;
   v2OnlyRows: number;
   hasGazetteerSource: boolean;
   hasProductAssertions: boolean;
   hasStatusAssertions: boolean;
+  hasAlmanakkenObservations: boolean;
   issues: Array<{
     type: string;
     label: string;
@@ -75,6 +76,52 @@ function normalizeAppellationText(text: string): string {
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9]+/g, ' ')
     .trim();
+}
+
+function observationValue(value: string | number | undefined): string {
+  return value == null || value === '' ? '-' : String(value);
+}
+
+function observationRelations(
+  relations: AlmanakkenPlantationObservation['hasParts'],
+): string {
+  if (!relations?.length) return '-';
+  return relations
+    .map((relation) => relation.label || relation.qid)
+    .filter(Boolean)
+    .join(', ');
+}
+
+function observationPopulation(
+  observation: AlmanakkenPlantationObservation,
+): string {
+  const population = observation.population;
+  if (!population) return '-';
+  const values = [
+    population.enslavedCount != null
+      ? `${population.enslavedCount} enslaved`
+      : null,
+    population.freeResidents != null
+      ? `${population.freeResidents} free`
+      : null,
+    population.totalResidents != null
+      ? `${population.totalResidents} total`
+      : null,
+  ].filter(Boolean);
+  return values.length > 0 ? values.join(', ') : '-';
+}
+
+function observationDetails(
+  observation: AlmanakkenPlantationObservation,
+): string {
+  const values = [
+    observation.sizeAkkers != null ? `${observation.sizeAkkers} akkers` : null,
+    observation.function ? `function: ${observation.function}` : null,
+    observation.lot ? `lot: ${observation.lot}` : null,
+    observation.mill?.type ? `mill: ${observation.mill.type}` : null,
+    observation.additionalInfo,
+  ].filter(Boolean);
+  return values.length > 0 ? values.join(' | ') : '-';
 }
 
 function getEffectiveDistrictAssertion(
@@ -1171,8 +1218,17 @@ export default function PlaceEditor({
   const almanakkenStatusAssertions = statusAssertions.filter(
     (assertion) => assertion.source === 'almanakken',
   );
+  const almanakkenObservations = [...(draft.almanakkenObservations ?? [])].sort(
+    (a, b) =>
+      (a.year ?? 0) - (b.year ?? 0) || a.recordId.localeCompare(b.recordId),
+  );
+  const almanakkenObservationYears = almanakkenObservations
+    .map((observation) => observation.year)
+    .filter((year): year is number => year != null);
   const almanakkenYears =
-    almanakkenReview?.firstYear && almanakkenReview.lastYear
+    almanakkenObservationYears.length > 0
+      ? `${Math.min(...almanakkenObservationYears)}-${Math.max(...almanakkenObservationYears)}`
+      : almanakkenReview?.firstYear && almanakkenReview.lastYear
       ? `${almanakkenReview.firstYear}-${almanakkenReview.lastYear}`
       : null;
   const almanakkenProducts =
@@ -1287,7 +1343,8 @@ export default function PlaceEditor({
                   {almanakkenProductAssertions.length} product
                 </div>
                 <div className="text-[11px] opacity-75">
-                  {almanakkenStatusAssertions.length} lifecycle
+                  {almanakkenStatusAssertions.length} lifecycle,{' '}
+                  {almanakkenObservations.length} v2 rows
                 </div>
               </div>
               <div className="border border-black/10 bg-white/60 p-2">
@@ -1303,16 +1360,112 @@ export default function PlaceEditor({
               </div>
               <div className="border border-black/10 bg-white/60 p-2">
                 <div className="text-[10px] uppercase tracking-[0.16em] opacity-60">
-                  v1/v2 context
+                  v2 context
                 </div>
                 <div className="font-medium">
-                  v1-only {almanakkenReview.v1OnlyRows}
-                </div>
-                <div className="text-[11px] opacity-75">
                   v2-only {almanakkenReview.v2OnlyRows}
                 </div>
               </div>
             </div>
+
+            {almanakkenObservations.length > 0 && (
+              <div className="mt-3 border border-black/10 bg-white/70">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-black/10 px-2 py-1.5">
+                  <div className="font-medium">
+                    Saved Almanakken v2 observations
+                  </div>
+                  <div className="font-mono text-[10px] opacity-70">
+                    {almanakkenObservations.length} rows
+                  </div>
+                </div>
+                <div className="max-h-72 overflow-auto">
+                  <table className="min-w-full border-collapse text-left text-[11px]">
+                    <thead className="sticky top-0 bg-white text-[10px] uppercase tracking-[0.12em] opacity-70">
+                      <tr>
+                        <th className="whitespace-nowrap border-b border-black/10 px-2 py-1">
+                          Year
+                        </th>
+                        <th className="whitespace-nowrap border-b border-black/10 px-2 py-1">
+                          Source row
+                        </th>
+                        <th className="border-b border-black/10 px-2 py-1">
+                          Name / product
+                        </th>
+                        <th className="border-b border-black/10 px-2 py-1">
+                          Location
+                        </th>
+                        <th className="border-b border-black/10 px-2 py-1">
+                          Population
+                        </th>
+                        <th className="border-b border-black/10 px-2 py-1">
+                          Relations
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {almanakkenObservations.map((observation) => (
+                        <tr
+                          key={observation.recordId}
+                          className="border-b border-black/5 align-top"
+                        >
+                          <td className="whitespace-nowrap px-2 py-1 font-mono">
+                            {observationValue(observation.year)}
+                          </td>
+                          <td className="whitespace-nowrap px-2 py-1 font-mono">
+                            {observation.recordId}
+                          </td>
+                          <td className="min-w-44 px-2 py-1">
+                            <div className="font-medium">
+                              {observationValue(
+                                observation.plantationOriginal ||
+                                  observation.plantationStandardized,
+                              )}
+                            </div>
+                            <div className="opacity-75">
+                              {observation.product || '-'}
+                              {observation.deserted ? ' | deserted' : ''}
+                            </div>
+                            <div className="opacity-75">
+                              {observationDetails(observation)}
+                            </div>
+                          </td>
+                          <td className="min-w-48 px-2 py-1">
+                            <div>
+                              {observationValue(
+                                observation.locationStandardized,
+                              )}
+                            </div>
+                            <div className="opacity-70">
+                              {observation.locationOriginal || '-'}
+                            </div>
+                            <div className="opacity-70">
+                              {[observation.riverOrRoad, observation.direction]
+                                .filter(Boolean)
+                                .join(' | ') || '-'}
+                            </div>
+                          </td>
+                          <td className="min-w-36 px-2 py-1">
+                            {observationPopulation(observation)}
+                          </td>
+                          <td className="min-w-44 px-2 py-1">
+                            <div>
+                              part of: {observationRelations(observation.partOf)}
+                            </div>
+                            <div>
+                              has parts:{' '}
+                              {observationRelations(observation.hasParts)}
+                            </div>
+                            <div>
+                              owned by: {observationRelations(observation.ownedBy)}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
 
             {almanakkenReview.issues.length > 0 && (
               <div className="mt-2 space-y-1">
@@ -1344,6 +1497,14 @@ export default function PlaceEditor({
                 <p className="mt-2 border border-amber-300 bg-white/70 px-2 py-1.5 text-[11px] text-amber-800">
                   Product rows exist in Almanakken, but no Almanakken product
                   assertions are currently materialized below.
+                </p>
+              )}
+
+            {almanakkenReview.rows > 0 &&
+              almanakkenObservations.length === 0 && (
+                <p className="mt-2 border border-amber-300 bg-white/70 px-2 py-1.5 text-[11px] text-amber-800">
+                  Almanakken rows exist, but no saved Almanakken v2 observation
+                  rows are attached to this Gazetteer record.
                 </p>
               )}
 
