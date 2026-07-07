@@ -1,34 +1,34 @@
-## **Documentation Dataset Plantations Surinaamse Almanakken version 2.0** 
+## **Documentation Dataset Plantations Surinaamse Almanakken version 2.0**
 
-Thunnis van Oort, Rick Mourits and Coen van Galen, June 2026 
+Thunnis van Oort, Rick Mourits and Coen van Galen, June 2026
 
-The dataset ‘Plantations Surinaamse Almanakken v2.0.csv’ is an improved version of v1.0 and is based on list of plantations published in the _Surinaamsche Almanak_ (1818-1847) and the _Almanak voor de Nederlandsche West-Indische bezittingen, en de kust van Guinea_ (1856-1861). New editions of the almanacks were published for most years between 1818 and 1861, containing wide-ranging information about the then Dutch colony or Suriname, including a detailed list of plantations.[1] The almanacs are available online at dbnl.org (National Library of the Netherlands) as scans and ocr’ed text.[2] The plantation tables published in each of these editions form the basis for the dataset. 
+The dataset ‘Plantations Surinaamse Almanakken v2.0.csv’ is an improved version of v1.0 and is based on list of plantations published in the _Surinaamsche Almanak_ (1818-1847) and the _Almanak voor de Nederlandsche West-Indische bezittingen, en de kust van Guinea_ (1856-1861). New editions of the almanacks were published for most years between 1818 and 1861, containing wide-ranging information about the then Dutch colony or Suriname, including a detailed list of plantations.[1] The almanacs are available online at dbnl.org (National Library of the Netherlands) as scans and ocr’ed text.[2] The plantation tables published in each of these editions form the basis for the dataset.
 
-The ocr’ed information from the Almanacs was transcribed and imported into one spreadsheet per annual edition by student assistant Doortje Swaters as part of the Historical Database of Suriname and the Caribbean (HDSC) project at Radboud University. The ocr’ed data was corrected and cleaned by Evi Smits during an internship at the HDSC team. In the next phase, the separate spreadsheets have been merged into a single spreadsheet by Nico Altink and Thunnis van Oort. They have continued to clean and standardize the data, using Open Refine. They received support from student assistant Damian Pikulić. 
+The ocr’ed information from the Almanacs was transcribed and imported into one spreadsheet per annual edition by student assistant Doortje Swaters as part of the Historical Database of Suriname and the Caribbean (HDSC) project at Radboud University. The ocr’ed data was corrected and cleaned by Evi Smits during an internship at the HDSC team. In the next phase, the separate spreadsheets have been merged into a single spreadsheet by Nico Altink and Thunnis van Oort. They have continued to clean and standardize the data, using Open Refine. They received support from student assistant Damian Pikulić.
 
-Each edition of the Almanac contained a list of plantations in Suriname and some other locations such as military posts. The plantations were organized per river or creek, and in some cases per road. Per plantation, at least the name of the plantation is listed, and usually the produce, owner, administrator, and plantation manager. In later editions, information was added about the number of enslaved and free persons living on the plantation, the size of the plot, the type of mill and the district or division in which the plantation was located. Especially the information on enslaved and free workers became more elaborate in the 1850s. 
+Each edition of the Almanac contained a list of plantations in Suriname and some other locations such as military posts. The plantations were organized per river or creek, and in some cases per road. Per plantation, at least the name of the plantation is listed, and usually the produce, owner, administrator, and plantation manager. In later editions, information was added about the number of enslaved and free persons living on the plantation, the size of the plot, the type of mill and the district or division in which the plantation was located. Especially the information on enslaved and free workers became more elaborate in the 1850s.
 
-The dataset includes references to www.wikidata.org. The wikidata identifier (Q-id) functions as the unique identifier of a plantation. 
+The dataset includes references to www.wikidata.org. The wikidata identifier (Q-id) functions as the unique identifier of a plantation.
 
-In the period covered by the Almanaks, plantations would regularly merge into larger units or split into smaller parts. E.g. the plantations “Waterland” (Q59134059) and “Adrichem” (Q124812970) on the Suriname river merged into the combined “Waterland en Adrichem” (Q59134062) during the years 1828-1831 and after those years continued as separate plantations. When a plantation was merged or split, the dataset contains both the singular plantation_id and the id of the composite plantation it was part of ('part_of_id'); or the other way around, the singular ids ('has_parts_id' 1 to 4) of which a merged plantation was composed. 
+In the period covered by the Almanaks, plantations would regularly merge into larger units or split into smaller parts. E.g. the plantations “Waterland” (Q59134059) and “Adrichem” (Q124812970) on the Suriname river merged into the combined “Waterland en Adrichem” (Q59134062) during the years 1828-1831 and after those years continued as separate plantations. When a plantation was merged or split, the dataset contains both the singular plantation_id and the id of the composite plantation it was part of ('part_of_id'); or the other way around, the singular ids ('has_parts_id' 1 to 4) of which a merged plantation was composed.
 
-Plantations in the dataset have been linked to plantations that occur in another dataset: the Suriname Plantation Dataset from the Suriname Slave registers.[3] This second dataset contains all 
+Plantations in the dataset have been linked to plantations that occur in another dataset: the Suriname Plantation Dataset from the Suriname Slave registers.[3] This second dataset contains all
 
-> 1Fred. Oudschans Dentz, 'Surinaamsche Almanakken', De West-Indische Gids, 28 (1947), 175-176. See also Carl Haarnack, Surinaamsche Almanak voor het jaar 1832. Departement Paramaribo der Maatschappij Tot Nut van ’t Algemeen. Amsterdam: C.G. Sulpke, 1831, Bukubooks blog, https://bukubooks.wordpress.com/2014/12/07/almanak1832/ [consulted 18-12-2024] 2Surinaamsche Almanak: https://www.dbnl.org/tekst/_sur001suri01_01/  and Almanak voor de Nederlandsche West-Indische Bezittingen: https://www.dbnl.org/tekst/_alm009alma00_01/ 
+> 1Fred. Oudschans Dentz, 'Surinaamsche Almanakken', De West-Indische Gids, 28 (1947), 175-176. See also Carl Haarnack, Surinaamsche Almanak voor het jaar 1832. Departement Paramaribo der Maatschappij Tot Nut van ’t Algemeen. Amsterdam: C.G. Sulpke, 1831, Bukubooks blog, https://bukubooks.wordpress.com/2014/12/07/almanak1832/ [consulted 18-12-2024] 2Surinaamsche Almanak: https://www.dbnl.org/tekst/_sur001suri01_01/  and Almanak voor de Nederlandsche West-Indische Bezittingen: https://www.dbnl.org/tekst/_alm009alma00_01/
 
-> 3 Rosenbaum-Feldbrügge, Matthias; van Galen, Coen; Swaters, Doortje, 2023, "Suriname Plantation Dataset Version 
+> 3 Rosenbaum-Feldbrügge, Matthias; van Galen, Coen; Swaters, Doortje, 2023, "Suriname Plantation Dataset Version
 
-> 1.0", https://hdl.handle.net/10622/VTL43W, IISH Data Collection, V1, UNF:6:by8B0cpjp8fexFugrZZ34A== [fileUNF] 
+> 1.0", https://hdl.handle.net/10622/VTL43W, IISH Data Collection, V1, UNF:6:by8B0cpjp8fexFugrZZ34A== [fileUNF]
 
-the plantations (identified with the 'psur_id') that were legal entities that owned enslaved persons. 
+the plantations (identified with the 'psur_id') that were legal entities that owned enslaved persons.
 
-## **What is new in version 2?** 
+## **What is new in version 2?**
 
-Version 1.0 of the dataset contained numerous errors, both transcription mistakes and other data errors, for example plantations that were incorrectly disambiguated – especially plantations at different locations carrying the same name. Thunnis van Oort and Rick Mourits have cleaned the data through multiple iterations of correction rounds, checking for duplications, missing years and other chronological discontinuities, and unusual patterns in crop type or surface area of plantations. This has resulted in a multitude of corrections in the new version. 
+Version 1.0 of the dataset contained numerous errors, both transcription mistakes and other data errors, for example plantations that were incorrectly disambiguated – especially plantations at different locations carrying the same name. Thunnis van Oort and Rick Mourits have cleaned the data through multiple iterations of correction rounds, checking for duplications, missing years and other chronological discontinuities, and unusual patterns in crop type or surface area of plantations. This has resulted in a multitude of corrections in the new version.
 
-Entries were changed, de-duplicated, removed, or added. Version 1 counted 1,172 entries (unique plantations/locations); version 2 has 1,110, of which 972 return in version 2 with the same identifier and name; 93 have received corrections to the name; 6 plantations received a new identifier; 101 plantations were removed, and 39 plantations were added. And many values have been corrected, such as plantation product, size, etcetera. 
+Entries were changed, de-duplicated, removed, or added. Version 1 counted 1,172 entries (unique plantations/locations); version 2 has 1,110, of which 972 return in version 2 with the same identifier and name; 93 have received corrections to the name; 6 plantations received a new identifier; 101 plantations were removed, and 39 plantations were added. And many values have been corrected, such as plantation product, size, etcetera.
 
-The following table contains a brief explanation of all the columns in the dataset. Please note that the columns after ‘lot’, in particular the information about owners, administrators and managers, contain unprocessed transcription data: the information in these columns has not been cleaned or standardized and can still contain errors and should be used with caution. In a future version 3 of the dataset, we plan to further enhance the data these columns, especially on persons and legal entities that owned or managed plantations. 
+The following table contains a brief explanation of all the columns in the dataset. Please note that the columns after ‘lot’, in particular the information about owners, administrators and managers, contain unprocessed transcription data: the information in these columns has not been cleaned or standardized and can still contain errors and should be used with caution. In a future version 3 of the dataset, we plan to further enhance the data these columns, especially on persons and legal entities that owned or managed plantations.
 
 |**Field name v2.0**|**Explanation**|**Orig. field name**<br>**(v1.0)**|
 |---|---|---|
@@ -115,7 +115,7 @@ The following table contains a brief explanation of all the columns in the datas
 
 
 
-The table below contains a brief explanation of some of the Dutch words that occur in the dataset. 
+The table below contains a brief explanation of some of the Dutch words that occur in the dataset.
 
 |**Dutch term**|**Explanation**|
 |---|---|
@@ -161,6 +161,3 @@ The table below contains a brief explanation of some of the Dutch words that occ
 |Weggespoeld|flooded|
 |Zeekust|sea coast|
 |Zie|‘see’ –plantationbelongs to (incolumn ‘eigenaren’)|
-
-
-
