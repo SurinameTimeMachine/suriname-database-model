@@ -201,12 +201,12 @@
         "http://www.wikidata.org/entity/Q188913"
       ],
       "typeId": "plantation",
-      "color": "#e6956b",
+      "color": "#fff753",
       "crmClass": "E25_Human-Made_Feature",
       "crmBadge": "E25",
       "sortOrder": 1,
       "created": "2026-04-07",
-      "modified": "2026-04-07"
+      "modified": "2026-06-30"
     },
     {
       "@id": "stm:vocabulary/place-type/military-post",
@@ -247,12 +247,15 @@
         "https://schema.org/DefenceEstablishment"
       ],
       "typeId": "military-post",
-      "color": "#c98763",
+      "color": "#ff0984",
       "crmClass": "E25_Human-Made_Feature",
       "crmBadge": "E25",
       "sortOrder": 2,
       "created": "2026-04-07",
-      "modified": "2026-06-23"
+      "modified": "2026-07-06",
+      "exactMatch": [
+        "https://www.wikidata.org/wiki/Q1321241"
+      ]
     },
     {
       "@id": "stm:vocabulary/place-type/transport-infrastructure",
@@ -275,12 +278,12 @@
         "stm:vocabulary/place-type/railroad"
       ],
       "typeId": "transport-infrastructure",
-      "color": "#ad7444",
+      "color": "#529e6c",
       "crmClass": "E25_Human-Made_Feature",
       "crmBadge": "E25",
       "sortOrder": 3,
       "created": "2026-04-21",
-      "modified": "2026-06-23",
+      "modified": "2026-07-06",
       "related": [
         "stm:vocabulary/place-type/road",
         "stm:vocabulary/place-type/railroad",
@@ -328,12 +331,12 @@
         "http://www.wikidata.org/entity/Q34442"
       ],
       "typeId": "road",
-      "color": "#b87d4a",
+      "color": "#2cfb06",
       "crmClass": "E25_Human-Made_Feature",
       "crmBadge": "E25",
       "sortOrder": 4,
       "created": "2026-04-07",
-      "modified": "2026-06-23",
+      "modified": "2026-06-30",
       "related": [
         "stm:vocabulary/place-type/railroad"
       ],
@@ -362,12 +365,12 @@
         "http://www.wikidata.org/entity/Q22667"
       ],
       "typeId": "railroad",
-      "color": "#a06040",
+      "color": "#0fd09b",
       "crmClass": "E25_Human-Made_Feature",
       "crmBadge": "E25",
       "sortOrder": 5,
       "created": "2026-04-07",
-      "modified": "2026-06-23"
+      "modified": "2026-06-30"
     },
     {
       "@id": "stm:vocabulary/place-type/station",
@@ -376,9 +379,8 @@
         "crm:E55_Type"
       ],
       "prefLabel": {
-        "en": "Astronomical Station",
-        "nl": "Astronomisch Station",
-        "srn": "Stasi"
+        "en": "Geodetic control point",
+        "nl": "Geodetisch referentiepunt"
       },
       "definition": {
         "srn": "Lanti-marki [?]",
@@ -391,22 +393,27 @@
         "http://www.wikidata.org/entity/Q131862"
       ],
       "typeId": "station",
-      "color": "#d4a882",
+      "color": "#afafa7",
       "crmClass": "E25_Human-Made_Feature",
       "crmBadge": "E25",
       "sortOrder": 6,
       "created": "2026-04-07",
-      "modified": "2026-06-23",
+      "modified": "2026-06-30",
       "altLabel": {
         "nl": [
           "Astronomisch meetpunt",
           "Geodetisch referentiepunt",
-          "Observatiestation"
+          "Observatiestation",
+          "Astronomisch Station"
         ],
         "en": [
           "Astronomical observation point",
           "Geodetic control point",
-          "Surveying station"
+          "Surveying station",
+          "Astronomical Station"
+        ],
+        "srn": [
+          "Stasi"
         ]
       },
       "exactMatch": [
@@ -905,10 +912,10 @@
       "broader": "stm:vocabulary/place-type/administrative",
       "crmClass": "E53_Place",
       "crmBadge": "E53",
-      "color": "#7ab56a",
+      "color": "#25eafa",
       "sortOrder": 99,
       "created": "2026-06-23",
-      "modified": "2026-06-23",
+      "modified": "2026-06-30",
       "altLabel": {
         "en": [
           "district"
@@ -944,10 +951,10 @@
       "broader": "stm:vocabulary/place-type/human-made",
       "crmClass": "E25_Human-Made_Feature",
       "crmBadge": "E25",
-      "color": "#d59670",
+      "color": "#ff80ff",
       "sortOrder": 99,
       "created": "2026-06-23",
-      "modified": "2026-06-23",
+      "modified": "2026-07-06",
       "definition": {
         "nl": "Het geheel van door mensen aangelegde of ingerichte bouwwerken, verdedigingswerken en logistieke netwerken ten behoeve van defensie, bewaking en militaire operaties.",
         "en": "The totality of man-made structures, defences and logistical networks designed for defence, surveillance and military operations."
@@ -980,10 +987,10 @@
       "broader": "stm:vocabulary/place-type/MilitaryInfrastructure",
       "crmClass": "E25_Human-Made_Feature",
       "crmBadge": "E25",
-      "color": "#c98763",
+      "color": "#ff2fff",
       "sortOrder": 99,
       "created": "2026-06-23",
-      "modified": "2026-06-23",
+      "modified": "2026-07-06",
       "altLabel": {
         "nl": [
           "Vestingwerk"
@@ -1015,21 +1022,740 @@
       ],
       "typeId": "water-infrastructure",
       "prefLabel": {
-        "en": "water management infrastructure",
+        "en": "Water management infrastructure",
         "nl": "Waterbouwkundige infrastructuur"
       },
       "inScheme": "stm:vocabulary/place-type",
       "broader": "stm:vocabulary/place-type/human-made",
       "crmClass": "E25_Human-Made_Feature",
       "crmBadge": "E25",
-      "color": "#d9a37b",
+      "color": "#b863be",
       "sortOrder": 99,
       "created": "2026-06-23",
-      "modified": "2026-06-23",
+      "modified": "2026-07-06",
       "definition": {
         "nl": "Het geheel van door mensen aangelegde kunstwerken en infrastructurele elementen bedoeld om de waterhuishouding te reguleren, waterwegen bevaarbaar te houden, of gronden te beschermen tegen overstroming en verdroging.",
         "en": "The totality of man-made structures and infrastructure elements designed to regulate water management, maintain the navigability of waterways, or protect land from flooding and drought."
       }
+    },
+    {
+      "@id": "stm:vocabulary/place-type/canal",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "typeId": "canal",
+      "prefLabel": {
+        "en": "Canal",
+        "nl": "Kanaal"
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/water-infrastructure",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "color": "#875ef4",
+      "sortOrder": 99,
+      "created": "2026-06-30",
+      "modified": "2026-06-30",
+      "altLabel": {
+        "nl": [
+          "Gracht;Lozing;Vaargeul"
+        ],
+        "en": [
+          "Trench"
+        ]
+      },
+      "definition": {
+        "nl": "Een door mensen aangelegde, kunstmatige waterweg bedoeld voor transport, scheepvaart of waterbeheersing.",
+        "en": "A human-made, artificial waterway constructed for transportation, navigation, or water management."
+      },
+      "related": [
+        "stm:vocabulary/place-type/river",
+        "stm:vocabulary/place-type/creek",
+        "stm:vocabulary/place-type/water-infrastructure"
+      ],
+      "exactMatch": [
+        "https://www.wikidata.org/wiki/Q12284",
+        "https://schema.org/Canal",
+        "http://vocab.getty.edu/aat/300008695"
+      ]
+    },
+    {
+      "@id": "stm:vocabulary/place-type/building",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "typeId": "building",
+      "prefLabel": {
+        "en": "Building",
+        "nl": "Gebouw"
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/human-made",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "color": "#f2607d",
+      "sortOrder": 99,
+      "created": "2026-06-30",
+      "modified": "2026-06-30",
+      "altLabel": {
+        "nl": [
+          "etablissement",
+          "huis",
+          "opstal",
+          "pand",
+          "bouwwerk",
+          "constructie"
+        ],
+        "srn": [
+          "oso"
+        ],
+        "en": [
+          "house"
+        ]
+      },
+      "definition": {
+        "nl": "Een permanent, door mensen geconstrueerd bouwwerk dat meestal is voorzien van wanden en een dak, met een specifieke functionele, maatschappelijke of institutionele bestemming.",
+        "en": "A permanent, human-made architectural structure usually enclosed by walls and a roof, designed for a specific functional, social, or institutional purpose."
+      },
+      "related": [
+        "stm:vocabulary/place-type/MilitaryInfrastructure",
+        "stm:vocabulary/place-type/historical-address",
+        "stm:vocabulary/place-type/plantation",
+        "stm:vocabulary/place-type/settlement",
+        "stm:vocabulary/place-type/indigenous-village",
+        "stm:vocabulary/place-type/Fort",
+        "stm:vocabulary/place-type/maroon-village",
+        "stm:vocabulary/place-type/town",
+        "stm:vocabulary/place-type/military-post"
+      ],
+      "exactMatch": [
+        "https://www.wikidata.org/wiki/Q41176",
+        "https://vocab.getty.edu/aat/300004790"
+      ],
+      "closeMatch": [
+        "https://schema.org/CivicStructure"
+      ]
+    },
+    {
+      "@id": "stm:vocabulary/place-type/church",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "typeId": "church",
+      "prefLabel": {
+        "en": "Church",
+        "nl": "Kerk",
+        "srn": "Kerki"
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/building",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "color": "#b999a5",
+      "sortOrder": 99,
+      "created": "2026-06-30",
+      "modified": "2026-06-30",
+      "altLabel": {
+        "nl": [
+          "kerkgebouw",
+          "tempel",
+          "gebedshuis",
+          "moskee",
+          "mandir",
+          "missiepost",
+          "zendingspost"
+        ],
+        "en": [
+          "temple",
+          "place of worship",
+          "mission post"
+        ],
+        "srn": [
+          "Gado-oso"
+        ]
+      },
+      "definition": {
+        "nl": "Een permanent gebouw of complex dat specifiek is ingericht voor religieuze samenkomsten, liturgie en spirituele praktijken.",
+        "en": "A permanent structure or complex designed specifically for religious assemblies, liturgy, and spiritual practices."
+      },
+      "related": [
+        "stm:vocabulary/place-type/building"
+      ],
+      "exactMatch": [
+        "https://www.wikidata.org/wiki/Q1370598",
+        "https://schema.org/PlaceOfWorship"
+      ],
+      "closeMatch": [
+        "https://www.wikidata.org/wiki/Q16970",
+        "https://www.wikidata.org/wiki/Q111286333",
+        "https://vocab.getty.edu/aat/300007466"
+      ]
+    },
+    {
+      "@id": "stm:vocabulary/place-type/residential-building",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "typeId": "residential-building",
+      "prefLabel": {
+        "en": "House",
+        "nl": "Huis",
+        "srn": "Oso"
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/building",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "color": "#ff5357",
+      "sortOrder": 99,
+      "created": "2026-06-30",
+      "modified": "2026-06-30",
+      "altLabel": {
+        "en": [
+          "dwelling",
+          "quarters"
+        ],
+        "nl": [
+          "woning",
+          "residentie",
+          "hut",
+          "logeergebouw",
+          "woonhuis"
+        ],
+        "srn": [
+          "oeso"
+        ]
+      },
+      "definition": {
+        "nl": "Een permanent of semi-permanent gebouw dat primair is ingericht en bedoeld voor menselijke bewoning en huisvesting.",
+        "en": "A permanent or semi-permanent structure designed and utilized primarily for human habitation and housing."
+      },
+      "related": [
+        "stm:vocabulary/place-type/building",
+        "stm:vocabulary/place-type/indigenous-village",
+        "stm:vocabulary/place-type/settlement",
+        "stm:vocabulary/place-type/plantation",
+        "stm:vocabulary/place-type/town",
+        "stm:vocabulary/place-type/maroon-village",
+        "stm:vocabulary/place-type/historical-address"
+      ],
+      "exactMatch": [
+        "https://www.wikidata.org/wiki/Q3947",
+        "https://schema.org/House"
+      ],
+      "closeMatch": [
+        "https://www.wikidata.org/wiki/Q11755880",
+        "https://vocab.getty.edu/aat/300257729"
+      ]
+    },
+    {
+      "@id": "stm:vocabulary/place-type/sluice",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "typeId": "sluice",
+      "prefLabel": {
+        "nl": "Sluis",
+        "en": "Sleuce"
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/water-infrastructure",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "color": "#7435db",
+      "sortOrder": 99,
+      "created": "2026-07-06",
+      "modified": "2026-07-06",
+      "altLabel": {
+        "nl": [
+          "koker"
+        ],
+        "en": [
+          "water gate"
+        ]
+      },
+      "related": [
+        "stm:vocabulary/place-type/river",
+        "stm:vocabulary/place-type/canal",
+        "stm:vocabulary/place-type/creek",
+        "stm:vocabulary/place-type/water-infrastructure",
+        "stm:vocabulary/place-type/plantation"
+      ],
+      "exactMatch": [
+        "https://www.wikidata.org/wiki/Q107589046"
+      ],
+      "definition": {
+        "nl": "Een waterbouwkundig kunstwerk uitgerust met een beweegbare kering (zoals een schuif of deur) om de waterstroom of het waterpeil in een kanaal, kreek of polder te reguleren.",
+        "en": "A hydraulic engineering structure equipped with a movable barrier (such as a gate or valve) used to regulate water flow and levels within a canal, creek, or polder."
+      }
+    },
+    {
+      "@id": "stm:vocabulary/place-type/wharf",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "typeId": "wharf",
+      "prefLabel": {
+        "nl": "werf",
+        "en": "wharf"
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/water-infrastructure",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "color": "#a883e7",
+      "sortOrder": 99,
+      "created": "2026-07-06",
+      "modified": "2026-07-06",
+      "altLabel": {
+        "nl": [
+          "steiger",
+          "kade",
+          "aanlegplaats",
+          "kaai"
+        ],
+        "srn": [
+          "wari"
+        ]
+      },
+      "definition": {
+        "nl": "Een houten, stenen of gemetselde constructie (zoals een platform, kade of steiger) gebouwd langs de waterkant van een rivier of kreek, specifiek ingericht voor het aanleggen van vaartuigen en het laden en lossen van goederen en passagiers.",
+        "en": "A structure of timber, stone, or masonry (such as a platform, quay, or jetty) constructed along the shoreline of a river or creek, designed specifically for mooring vessels and the loading and unloading of cargo and passengers."
+      },
+      "related": [
+        "stm:vocabulary/place-type/creek",
+        "stm:vocabulary/place-type/canal",
+        "stm:vocabulary/place-type/road",
+        "stm:vocabulary/place-type/plantation",
+        "stm:vocabulary/place-type/transport-infrastructure",
+        "stm:vocabulary/place-type/river",
+        "stm:vocabulary/place-type/water-infrastructure"
+      ],
+      "exactMatch": [
+        "https://www.wikidata.org/wiki/Q828909"
+      ]
+    },
+    {
+      "@id": "stm:vocabulary/place-type/administrative-site",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "typeId": "administrative-site",
+      "prefLabel": {
+        "nl": "Bestuurlijke locatie",
+        "en": "Administrative Site"
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/human-made",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "color": "#ff8040",
+      "sortOrder": 99,
+      "created": "2026-07-06",
+      "modified": "2026-07-06",
+      "altLabel": {
+        "en": [
+          "administrative center"
+        ],
+        "nl": [
+          "Bestuursgebouw",
+          "bestuurscentrum",
+          "standplaats",
+          "overheidslocatie"
+        ]
+      },
+      "definition": {
+        "en": "A government-designated geographic site, station, or complex of buildings serving as the hub for local or regional civil administration, surveillance, and public governance.",
+        "nl": "Een door de overheid aangewezen of ingerichte geografische locatie, standplaats of gebouwencomplex dat fungeert als het centrum voor lokaal of regionaal burgerlijk bestuur, toezicht en overheidsadministratie."
+      },
+      "related": [
+        "stm:vocabulary/place-type/military-post",
+        "stm:vocabulary/place-type/district",
+        "stm:vocabulary/place-type/town",
+        "stm:vocabulary/place-type/maroon-village",
+        "stm:vocabulary/place-type/indigenous-village",
+        "stm:vocabulary/place-type/settlement",
+        "stm:vocabulary/place-type/building"
+      ],
+      "closeMatch": [
+        "https://www.wikidata.org/wiki/Q1306755"
+      ]
+    },
+    {
+      "@id": "stm:vocabulary/place-type/civil-post",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "typeId": "civil-post",
+      "prefLabel": {
+        "nl": "Post",
+        "en": "Government outpost"
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/administrative-site",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "color": "#ce6700",
+      "sortOrder": 99,
+      "created": "2026-07-06",
+      "modified": "2026-07-06",
+      "altLabel": {
+        "nl": [
+          "Post van de Indianen",
+          "posthouder"
+        ]
+      },
+      "definition": {
+        "nl": "De standplaats en het ambtsverblijf van een burgerlijke posthouder; een koloniale ambtenaar die door het landsbestuur was aangesteld nabij de woongebieden van gepacificeerde Inheemsen (en later ook Marrons) om als diplomatiek contactpersoon te fungeren, de handel te reguleren en toezicht te houden.",
+        "en": "The official station and residence of a civil postholder (posthouder); a colonial official appointed by the government near the territories of pacified Indigenous populations (and later Maroons) to act as a diplomatic liaison, regulate trade, and maintain administrative oversight."
+      },
+      "related": [
+        "stm:vocabulary/place-type/military-post",
+        "stm:vocabulary/place-type/administrative-site",
+        "stm:vocabulary/place-type/indigenous-village",
+        "stm:vocabulary/place-type/maroon-village"
+      ],
+      "closeMatch": [
+        "https://www.wikidata.org/wiki/Q39463"
+      ]
+    },
+    {
+      "@id": "stm:vocabulary/place-type/medical-facility",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "typeId": "medical-facility",
+      "prefLabel": {
+        "en": "Medical Facility",
+        "nl": "Medische instelling"
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/human-made",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "color": "#ca888d",
+      "sortOrder": 99,
+      "created": "2026-07-06",
+      "modified": "2026-07-06",
+      "definition": {
+        "nl": "Een gebouw of complex met een specifieke medische, verpleegkundige of curatieve bestemming.",
+        "en": "A building or complex designed for medical, nursing, or curative purposes."
+      },
+      "exactMatch": [
+        "https://www.wikidata.org/wiki/Q4260475"
+      ]
+    },
+    {
+      "@id": "stm:vocabulary/place-type/quarantine-station",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "typeId": "quarantine-station",
+      "prefLabel": {
+        "nl": "Quarantaine-etablissement",
+        "en": "Quarantine station"
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/medical-facility",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "color": "#c80417",
+      "sortOrder": 99,
+      "created": "2026-07-06",
+      "modified": "2026-07-06",
+      "altLabel": {
+        "en": [
+          "quarantine facility"
+        ],
+        "nl": [
+          "Quarantainestation",
+          "Lazaret",
+          "Leprozerie",
+          "Melaatsen-etablissement",
+          "Besmettingspost",
+          "leprakolonie",
+          "quarantine-inrichting"
+        ]
+      },
+      "definition": {
+        "nl": "Een specifiek, dikwijls geïsoleerd gelegen medisch etablissement of buitengewone post, ingericht door de overheid om personen, bemanningen of immigranten die (mogelijk) besmet waren met infectieziekten af te zonderen.",
+        "en": "A specific, often isolated medical installation established by the government to isolate individuals, ship crews, or immigrants (suspected of) carrying infectious diseases."
+      },
+      "exactMatch": [
+        "https://www.wikidata.org/wiki/Q18822087"
+      ],
+      "closeMatch": [
+        "https://www.wikidata.org/wiki/Q1406569"
+      ]
+    },
+    {
+      "@id": "stm:vocabulary/place-type/medical-post",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "typeId": "medical-post",
+      "prefLabel": {
+        "nl": "Medische post",
+        "en": "Medical post"
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/medical-facility",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "color": "#75171f",
+      "sortOrder": 99,
+      "created": "2026-07-06",
+      "modified": "2026-07-06",
+      "altLabel": {
+        "nl": [
+          "chirurgisch etablissement",
+          "chirurgijns-etablissement",
+          "heelmeester",
+          "kliniek",
+          "zorgpost",
+          "heelkundige inrichting",
+          "polikliniek",
+          "ziekenhuis"
+        ],
+        "en": [
+          "clinic"
+        ]
+      },
+      "definition": {
+        "nl": "Een kleinschalige, lokale medische faciliteit, praktijkruimte of poliklinisch steunpunt, veelal bemand door een chirurgijn of heelmeester, gericht op eerste hulp, ambulante zorg of specifieke heelkundige ingrepen.",
+        "en": "A small-scale, local medical facility, outpatient clinic, or medical outpost, typically staffed by a surgeon or medical practitioner, dedicated to first aid, ambulatory care, or specific surgical procedures."
+      },
+      "closeMatch": [
+        "https://www.wikidata.org/wiki/Q1774898"
+      ]
+    },
+    {
+      "@id": "stm:vocabulary/place-type/industrial-facility",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "typeId": "industrial-facility",
+      "prefLabel": {
+        "nl": "Industriële locatie",
+        "en": "Industrial facility"
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/human-made",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "color": "#cace8e",
+      "sortOrder": 99,
+      "created": "2026-07-06",
+      "modified": "2026-07-06",
+      "altLabel": {
+        "nl": [
+          "nijverheidslocatie",
+          "fabriekscomplex",
+          "fabriek",
+          "molen",
+          "ingenieurs-etablissement"
+        ],
+        "en": [
+          "industrial complex",
+          "production site"
+        ]
+      },
+      "definition": {
+        "nl": "Een door mensen geconstrueerde geografische locatie, gebouw of complex specifiek ingericht voor industriële productie, nijverheid, of de grootschalige mechanische of handmatige verwerking van grondstoffen tot halffabrikaten en eindproducten.",
+        "en": "A human-made geographic site, building, or complex specifically designed for industrial production, manufacturing, or the large-scale mechanical or manual processing of raw materials into semi-finished and finished goods."
+      },
+      "related": [
+        "stm:vocabulary/place-type/plantation"
+      ],
+      "exactMatch": [
+        "https://www.wikidata.org/wiki/Q134496677"
+      ]
+    },
+    {
+      "@id": "stm:vocabulary/place-type/ironworks",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "typeId": "ironworks",
+      "prefLabel": {
+        "en": "Ironworks",
+        "nl": "IJzersmelterij"
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/industrial-facility",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "color": "#a6aea4",
+      "sortOrder": 99,
+      "created": "2026-07-06",
+      "modified": "2026-07-06",
+      "altLabel": {
+        "en": [
+          "iron foundry",
+          "smithy"
+        ],
+        "nl": [
+          "werkplaats",
+          "smederij",
+          "ijzergieterij",
+          "gieterij",
+          "smederij-etablissement",
+          "smid",
+          "metaalbewerking",
+          "ingenieurs-etablissement"
+        ]
+      },
+      "definition": {
+        "nl": "Een industriële of ambachtelijke locatie of gebouw dat specifiek is ingericht voor het smelten, gieten, smeden en mechanisch bewerken van ijzer en andere metalen.",
+        "en": "An industrial or artisanal facility or structure specifically designed for the melting, casting, forging, and mechanical processing of iron and other metals."
+      },
+      "closeMatch": [
+        "https://www.wikidata.org/wiki/Q40558"
+      ]
+    },
+    {
+      "@id": "stm:vocabulary/place-type/quarry",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "typeId": "quarry",
+      "prefLabel": {
+        "en": "Quarry",
+        "nl": "Steengroeve"
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/industrial-facility",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "color": "#ada0b1",
+      "sortOrder": 99,
+      "created": "2026-07-06",
+      "modified": "2026-07-06",
+      "altLabel": {
+        "nl": [
+          "steenspringerij"
+        ]
+      },
+      "definition": {
+        "nl": "Een al dan niet infrastructureel bewerkte geografische locatie of open afgraving waar door menselijke arbeid steen, harde klei, graniet of andere minerale bouwmaterialen uit de bodem worden gewonnen.",
+        "en": "A geographically altered site or open-pit excavation where stone, hard clay, granite, or other mineral construction materials are extracted through human labor."
+      },
+      "exactMatch": [
+        "https://www.wikidata.org/wiki/Q188040"
+      ]
+    },
+    {
+      "@id": "stm:vocabulary/place-type/mine",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "typeId": "mine",
+      "prefLabel": {
+        "en": "Mine",
+        "nl": "Mijn"
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/industrial-facility",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "color": "#ba9c98",
+      "sortOrder": 99,
+      "created": "2026-07-06",
+      "modified": "2026-07-06",
+      "altLabel": {
+        "nl": [
+          "goudmijn",
+          "goudveld",
+          "concessive",
+          "placer",
+          "bauxietmijn",
+          "bauxietontginning",
+          "dagbouwmijn",
+          "graverij"
+        ]
+      },
+      "definition": {
+        "nl": "Een al dan niet infrastructureel bewerkte geografische locatie, graverij of complex (bovengronds of ondergronds) specifiek ingericht voor de grootschalige winning van delfstoffen, ertsen en edelmetalen uit de bodem.",
+        "en": "A geographically altered site, excavation, or complex (open-pit or underground) specifically designed for the large-scale extraction of minerals, ores, and precious metals from the earth."
+      },
+      "exactMatch": [
+        "https://www.wikidata.org/wiki/Q820477"
+      ]
+    },
+    {
+      "@id": "stm:vocabulary/place-type/central-factory",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "typeId": "central-factory",
+      "prefLabel": {
+        "en": "Central factory",
+        "nl": "Centraalfabriek"
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/industrial-facility",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "color": "#bab898",
+      "sortOrder": 99,
+      "created": "2026-07-06",
+      "modified": "2026-07-06",
+      "altLabel": {
+        "nl": [
+          "centralisatie",
+          "centrale fabriek"
+        ]
+      },
+      "definition": {
+        "nl": "Een grootschalige, gecentraliseerde industriële verwerkingsfaciliteit specifiek ingericht voor de gezamenlijke en mechanische verwerking van agrarische plantageproducten (met name suikerriet).",
+        "en": "A large-scale, centralized industrial processing facility designed for the collective and mechanical processing of agricultural plantation products (primarily sugarcane)."
+      },
+      "related": [
+        "stm:vocabulary/place-type/plantation"
+      ]
+    },
+    {
+      "@id": "stm:vocabulary/place-type/brickworks",
+      "@type": [
+        "skos:Concept",
+        "crm:E55_Type"
+      ],
+      "typeId": "brickworks",
+      "prefLabel": {
+        "en": "Brickworks",
+        "nl": "Steenfabriek"
+      },
+      "inScheme": "stm:vocabulary/place-type",
+      "broader": "stm:vocabulary/place-type/industrial-facility",
+      "crmClass": "E25_Human-Made_Feature",
+      "crmBadge": "E25",
+      "color": "#9bb7ab",
+      "sortOrder": 99,
+      "created": "2026-07-06",
+      "modified": "2026-07-06",
+      "definition": {
+        "nl": "Een industriële productielocatie en gebouwencomplex, uitgerust met (vaak door stoom aangedreven) machines, droogloodsen en permanente ovens, specifiek ingericht voor het grootschalig verwerken van klei tot gebakken bakstenen en tegels.",
+        "en": "An industrial production site and manufacturing complex equipped with machinery (often steam-driven), drying sheds, and permanent kilns, specifically designed for the large-scale processing of clay into fired bricks and tiles."
+      },
+      "related": [
+        "stm:vocabulary/place-type/quarry"
+      ]
     }
   ]
 }
