@@ -21,8 +21,6 @@ export default function SiteFooter() {
           <Link href="/#partners" className="transition hover:text-teal-strong">
             Partners
           </Link>
-          <span className="text-ink/25">•</span>
-          <span>Data sources (coming soon)</span>
         </div>
       </div>
     </footer>
