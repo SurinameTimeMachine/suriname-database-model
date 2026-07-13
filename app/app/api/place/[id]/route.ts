@@ -3,6 +3,7 @@ import { join } from 'path';
 import { NextRequest, NextResponse } from 'next/server';
 
 const PLACE_ID = /^stm-[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const CANONICAL_BASE = 'https://data.surinametijdmachine.org';
 const GAZETTEER_PATH = join(
   process.cwd(),
   '..',
@@ -57,7 +58,8 @@ export async function GET(
           format === 'jsonld'
             ? 'application/ld+json; charset=utf-8'
             : 'application/json; charset=utf-8',
-        Link: `<${new URL(`/place/${id}`, request.url).toString()}>; rel="canonical"`,
+        Link: `<${CANONICAL_BASE}/place/${id}>; rel="canonical"`,
+        Vary: 'Accept',
       },
     });
   } catch {

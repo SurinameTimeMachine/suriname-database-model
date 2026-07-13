@@ -9,7 +9,7 @@ import SourceFilter, {
 import { useAuth } from '@/lib/auth';
 import { type AllData, loadAllData } from '@/lib/data';
 import { getActiveSources, useSourceRegistry } from '@/lib/sources';
-import { usePlaceTypes } from '@/lib/thesaurus';
+import { readableTypeTextColor, usePlaceTypes } from '@/lib/thesaurus';
 import type {
   DistrictAssertion,
   E41Appellation,
@@ -90,8 +90,24 @@ type AlmanakkenMissingQid = {
 type AlmanakkenReviewData = {
   sourceVersion: string;
   generatedAt: string;
+  rowCounts?: {
+    total: number;
+    withQid: number;
+    withoutQid: number;
+    attached: number;
+    unresolved: number;
+  };
   byPlaceId: Record<string, AlmanakkenReviewEntry>;
   missingQids?: AlmanakkenMissingQid[];
+  unlinkedRows?: Array<{
+    recordId: string;
+    year: number | null;
+    page: string | null;
+    sourceName: string | null;
+    standardizedName: string | null;
+    location: string | null;
+    product: string | null;
+  }>;
 };
 
 function normalizeNamesFromLegacy(entry: Record<string, unknown>): PlaceName[] {
@@ -524,6 +540,18 @@ const ALMANAKKEN_ISSUE_DISPLAY: Record<
     short: 'src',
     label: 'Missing source tag',
   },
+  'missing-product-assertions': {
+    short: 'prod',
+    label: 'Missing product assertions',
+  },
+  'missing-status-assertions': {
+    short: 'life',
+    label: 'Missing lifecycle assertions',
+  },
+  'missing-almanakken-observations': {
+    short: 'rows',
+    label: 'Missing saved v2 observations',
+  },
   'v1-v2-qid-change': {
     short: 'qid',
     label: 'v1 to v2 QID changes',
@@ -656,10 +684,11 @@ const PlaceRow = memo(function PlaceRow({
       {vis('type') && (
         <td className="py-1.5 px-2">
           <span
-            className="inline-block px-1.5 py-0.5 text-[10px] font-medium rounded"
+            className="inline-block rounded border px-1.5 py-0.5 text-[10px] font-medium"
             style={{
-              backgroundColor: (colors[place.type] || '#888') + '20',
-              color: colors[place.type] || '#888',
+              backgroundColor: (colors[place.type] || '#888888') + '4d',
+              borderColor: (colors[place.type] || '#888888') + '99',
+              color: readableTypeTextColor(colors[place.type] || '#888888'),
             }}
           >
             {labels[place.type] || place.type}
@@ -1266,15 +1295,7 @@ function PlacesPageInner() {
     const props = selectedFeature.properties;
     const plantationUri = props.plantationUri ?? null;
     const featureUri = props.featureUri ?? props.placeUri ?? null;
-    let orgUri = props.organizationQid
-      ? `http://www.wikidata.org/entity/${props.organizationQid}`
-      : null;
-    if (!orgUri && plantationUri) {
-      orgUri =
-        allData.plantations[plantationUri]?.P52_has_current_owner ?? null;
-    }
-
-    const uriCandidates = [plantationUri, featureUri, orgUri].filter(
+    const uriCandidates = [plantationUri, featureUri].filter(
       (uri): uri is string => Boolean(uri),
     );
 
@@ -1675,6 +1696,14 @@ function PlacesPageInner() {
                 <span className="font-medium text-ink/75">
                   Almanakken {almanakkenReview.sourceVersion}
                 </span>
+                {almanakkenReview.rowCounts && (
+                  <span className="border border-ink/10 bg-cream/70 px-2 py-1 font-mono text-[10px] text-ink/55">
+                    {almanakkenReview.rowCounts.attached}/
+                    {almanakkenReview.rowCounts.total} rows attached;{' '}
+                    {almanakkenReview.rowCounts.unresolved} unresolved;{' '}
+                    {almanakkenReview.rowCounts.withoutQid} without QID
+                  </span>
+                )}
                 <button
                   type="button"
                   onClick={() =>
@@ -1749,6 +1778,40 @@ function PlacesPageInner() {
                       );
                     })}
                   </span>
+                )}
+                {(almanakkenReview.unlinkedRows?.length ?? 0) > 0 && (
+                  <details className="max-w-full">
+                    <summary className="cursor-pointer border border-amber-300 bg-amber-50 px-2 py-1 text-amber-900">
+                      {almanakkenReview.unlinkedRows?.length ?? 0} source rows
+                      without QID
+                    </summary>
+                    <div className="mt-1 max-h-64 min-w-[min(42rem,90vw)] overflow-auto border border-amber-200 bg-cream p-2 shadow-lg">
+                      <table className="w-full border-collapse text-left text-[11px]">
+                        <thead>
+                          <tr className="border-b border-ink/10 text-ink/45">
+                            <th className="px-1 py-1">Source row</th>
+                            <th className="px-1 py-1">Name</th>
+                            <th className="px-1 py-1">Location</th>
+                            <th className="px-1 py-1">Product</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {almanakkenReview.unlinkedRows?.map((row) => (
+                            <tr key={row.recordId} className="border-b border-ink/5">
+                              <td className="whitespace-nowrap px-1 py-1 font-mono">
+                                {row.recordId}
+                              </td>
+                              <td className="px-1 py-1">
+                                {row.sourceName || row.standardizedName || '-'}
+                              </td>
+                              <td className="px-1 py-1">{row.location || '-'}</td>
+                              <td className="px-1 py-1">{row.product || '-'}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </details>
                 )}
               </div>
             </div>

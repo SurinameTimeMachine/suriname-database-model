@@ -59,7 +59,7 @@ type ImplementationStatus = 'aggregate' | 'record' | 'planned';
 const IMPLEMENTATION_STATUS: Record<string, ImplementationStatus> = {
   e25: 'aggregate',
   e26: 'aggregate',
-  e74: 'aggregate',
+  e74: 'planned',
   e53: 'aggregate',
   e41: 'aggregate',
   e22: 'aggregate',
@@ -91,7 +91,7 @@ const ENTITIES: EntityDef[] = [
     type: 'E25',
     label: 'Human-Made Feature',
     crmClass: 'E25 Human-Made Feature',
-    desc: 'The central entity for all human-made landscape features: plantation polygons, road and railroad lines, military posts, stations, settlements, towns, and named villages. Plantations are the ownership-bearing E25 subtype and connect to organizations via P52; all E25 instances connect to an E53 location via P53 and are classified through the geographical-feature thesaurus.',
+    desc: 'The central entity for all human-made landscape features: plantation polygons, road and railroad lines, military posts, stations, settlements, towns, and named villages. Plantation QIDs are conservative external authority matches; all E25 instances connect to an E53 location via P53 and are classified through the geographical-feature thesaurus.',
     color: CRM_COLORS.E25,
     cx: 380,
     cy: 330,
@@ -104,14 +104,8 @@ const ENTITIES: EntityDef[] = [
         name: 'P53 has location',
         range: 'E53 Place (Polygon, LineString, or Point geometry)',
       },
-      {
-        name: 'P52 has current owner',
-        range: 'E74 Organization (legacy aggregate link)',
-      },
-      {
-        name: 'P51 has former or current owner',
-        range: 'E74 Organization (plantations only)',
-      },
+      { name: 'skos:closeMatch', range: 'Wikidata plantation authority' },
+      { name: 'stm:psurId', range: 'PSUR source identifier transcription' },
       {
         name: 'P124i was transformed by',
         range: 'E81 Transformation (merger)',
@@ -148,7 +142,7 @@ const ENTITIES: EntityDef[] = [
     type: 'E74',
     label: 'Organization',
     crmClass: 'E74 Group / sdo:Organization',
-    desc: 'The legal entity that owns or operates the plantation. Identified by Wikidata Q-IDs. Separated from E25 to model the distinction between the physical place and its legal operator. Annual observations (E13) record time-varying properties.',
+    desc: 'A future authority-backed actor that owns or operates a plantation. The current plantation QIDs identify plantations, not actors, so E74 entities are not serialized until owner and operator transcriptions have been reconciled with evidence.',
     color: CRM_COLORS.E74,
     cx: 720,
     cy: 290,

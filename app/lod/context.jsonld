@@ -136,11 +136,11 @@
     },
     "P7_took_place_at": {
       "@id": "crm:P7_took_place_at",
-      "@type": "xsd:string"
+      "@type": "@id"
     },
     "P14_carried_out_by": {
       "@id": "crm:P14_carried_out_by",
-      "@type": "xsd:string"
+      "@type": "@id"
     },
     "P108_has_produced": {
       "@id": "crm:P108_has_produced",
@@ -152,7 +152,7 @@
     },
     "P50_has_current_keeper": {
       "@id": "crm:P50_has_current_keeper",
-      "@type": "xsd:string"
+      "@type": "@id"
     },
     "contentUrl": {
       "@id": "sdo:contentUrl",
@@ -222,7 +222,7 @@
       "@type": "@id"
     },
     "featureType": {
-      "@id": "crm:P2_has_type",
+      "@id": "stm:featureType",
       "@type": "xsd:string"
     },
     "mainBodyWater": {
@@ -230,27 +230,27 @@
       "@type": "xsd:string"
     },
     "status": {
-      "@id": "crm:P2_has_type",
+      "@id": "stm:status",
       "@type": "xsd:string"
     },
     "psurId": {
-      "@id": "crm:P1_is_identified_by",
+      "@id": "stm:psurId",
       "@type": "xsd:string"
     },
     "fid": {
-      "@id": "crm:P48_has_preferred_identifier",
+      "@id": "stm:fid",
       "@type": "xsd:integer"
     },
     "mapId": {
-      "@id": "crm:P48_has_preferred_identifier",
+      "@id": "stm:mapId",
       "@type": "xsd:string"
     },
     "mapYear": {
-      "@id": "crm:P4_has_time-span",
+      "@id": "stm:mapYear",
       "@type": "xsd:gYear"
     },
     "observedLabel": {
-      "@id": "crm:P1_is_identified_by",
+      "@id": "stm:observedLabel",
       "@type": "xsd:string"
     },
     "geometrySource": {
@@ -270,47 +270,47 @@
       "@type": "@id"
     },
     "observationYear": {
-      "@id": "crm:P4_has_time-span",
+      "@id": "stm:observationYear",
       "@type": "xsd:gYear"
     },
     "observedName": {
-      "@id": "crm:P141_assigned",
+      "@id": "stm:observedName",
       "@type": "xsd:string"
     },
     "product": {
-      "@id": "crm:P141_assigned",
+      "@id": "stm:productLabel",
       "@type": "xsd:string"
     },
     "enslavedCount": {
-      "@id": "crm:P43_has_dimension",
+      "@id": "stm:enslavedCount",
       "@type": "xsd:integer"
     },
     "deserted": {
-      "@id": "crm:P141_assigned",
+      "@id": "stm:desertedReported",
       "@type": "xsd:boolean"
     },
     "freeResidentsCount": {
-      "@id": "crm:P43_has_dimension",
+      "@id": "stm:freeResidentsCount",
       "@type": "xsd:integer"
     },
     "hasOwner": {
-      "@id": "crm:P14_carried_out_by",
+      "@id": "stm:ownerTranscription",
       "@type": "xsd:string"
     },
     "hasAdministrator": {
-      "@id": "crm:P14_carried_out_by",
+      "@id": "stm:administratorTranscription",
       "@type": "xsd:string"
     },
     "hasDirector": {
-      "@id": "crm:P14_carried_out_by",
+      "@id": "stm:directorTranscription",
       "@type": "xsd:string"
     },
     "locationStd": {
-      "@id": "crm:P7_took_place_at",
+      "@id": "stm:locationLabel",
       "@type": "xsd:string"
     },
     "sizeAkkers": {
-      "@id": "crm:P43_has_dimension",
+      "@id": "stm:sizeAkkers",
       "@type": "xsd:integer"
     },
     "pageReference": {
@@ -349,7 +349,7 @@
       "@type": "xsd:dateTime"
     },
     "sourceFile": {
-      "@id": "prov:hadPrimarySource",
+      "@id": "stm:sourceFile",
       "@type": "xsd:string"
     },
     "sourceColumn": {
@@ -361,7 +361,7 @@
       "@type": "xsd:string"
     },
     "transformedBy": {
-      "@id": "prov:wasGeneratedBy",
+      "@id": "stm:transformedBy",
       "@type": "xsd:string"
     },
     "modelEntity": {
@@ -374,6 +374,18 @@
     },
     "linkedVia": {
       "@id": "rdfs:comment",
+      "@type": "xsd:string"
+    },
+    "sourceMaker": {
+      "@id": "stm:sourceMaker",
+      "@type": "xsd:string"
+    },
+    "publicationPlace": {
+      "@id": "stm:publicationPlace",
+      "@type": "xsd:string"
+    },
+    "holdingArchive": {
+      "@id": "stm:holdingArchive",
       "@type": "xsd:string"
     },
     "sranantongoName": {
@@ -402,6 +414,10 @@
     },
     "enslavedSharedWith": {
       "@id": "stm:enslavedSharedWith",
+      "@type": "xsd:string"
+    },
+    "sourcePlantationQid": {
+      "@id": "stm:sourcePlantationQid",
       "@type": "xsd:string"
     }
   }

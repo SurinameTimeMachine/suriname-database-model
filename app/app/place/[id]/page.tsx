@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { headers } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { join } from 'path';
+import type { Metadata } from 'next';
 
 const CANONICAL_BASE = 'https://data.surinametijdmachine.org';
 const GAZETTEER_PATH = join(
@@ -89,6 +90,25 @@ async function loadPlaceProjection(id: string): Promise<PlaceProjection | null> 
   );
   if (!response.ok) return null;
   return (await response.json()) as PlaceProjection;
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  if (!PLACE_ID.test(id)) return {};
+  const canonical = `${CANONICAL_BASE}/place/${id}`;
+  return {
+    alternates: {
+      canonical,
+      types: {
+        'application/ld+json': `${canonical}.jsonld`,
+        'application/json': `${canonical}.json`,
+      },
+    },
+  };
 }
 
 export default async function PlaceRecordPage({

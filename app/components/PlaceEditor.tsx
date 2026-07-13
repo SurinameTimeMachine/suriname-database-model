@@ -270,6 +270,18 @@ const ALMANAKKEN_ISSUE_DISPLAY: Record<
     short: 'src',
     label: 'Missing Almanakken source tag',
   },
+  'missing-product-assertions': {
+    short: 'prod',
+    label: 'Missing product assertions',
+  },
+  'missing-status-assertions': {
+    short: 'life',
+    label: 'Missing lifecycle assertions',
+  },
+  'missing-almanakken-observations': {
+    short: 'rows',
+    label: 'Missing saved v2 observations',
+  },
   'v1-v2-qid-change': {
     short: 'qid',
     label: 'v1 to v2 QID changes',

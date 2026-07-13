@@ -498,9 +498,7 @@ export default function PlantationPanel({
   const featureUri = props.featureUri ?? props.placeUri ?? '';
   const physicalFeature = data.physicalFeatures?.[featureUri];
 
-  const orgUri = props.organizationQid
-    ? `http://www.wikidata.org/entity/${props.organizationQid}`
-    : plantation?.P52_has_current_owner;
+  const orgUri = plantation?.P52_has_current_owner;
   const organization = orgUri
     ? (data.organizations[orgUri] as E74Organization | undefined)
     : undefined;
@@ -524,9 +522,7 @@ export default function PlantationPanel({
   const featureApps = featureUri
     ? ((data.appellations[featureUri] || []) as E41Appellation[])
     : [];
-  const orgApps = orgUri
-    ? ((data.appellations[orgUri] || []) as E41Appellation[])
-    : [];
+  const orgApps: E41Appellation[] = [];
 
   // Deduplicate per-entity to preserve entity scoping
   const uniquePlantationApps = Array.from(

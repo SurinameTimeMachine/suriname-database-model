@@ -123,6 +123,17 @@ const RAILROAD_CSV = join(
   'railroad_1930.csv',
 );
 
+function plantationQid(plantation: Record<string, unknown> | undefined) {
+  const matches = plantation?.closeMatch;
+  const uris = Array.isArray(matches) ? matches : matches ? [matches] : [];
+  const uri = uris.find(
+    (value): value is string =>
+      typeof value === 'string' &&
+      /^https?:\/\/www\.wikidata\.org\/entity\/Q\d+$/.test(value),
+  );
+  return uri?.split('/').pop() ?? null;
+}
+
 // ── Load existing processed data ───────────────────────────────────
 
 console.log('Loading places.json...');
@@ -420,10 +431,7 @@ for (const place of Object.values(placesRaw)) {
 
   // Find linked plantation for Q-ID
   const plantation = plantationByPlace.get(placeId);
-  const ownerUri = plantation?.['P52_has_current_owner'] as string | undefined;
-  const qid = ownerUri?.startsWith('http://www.wikidata.org/entity/')
-    ? ownerUri.replace('http://www.wikidata.org/entity/', '')
-    : null;
+  const qid = plantationQid(plantation);
 
   // Alt labels
   const altLabels: string[] = [];
@@ -508,10 +516,7 @@ console.log('Processing almanakken-only plantations...');
 const qidsInQgis = new Set<string>();
 for (const place of Object.values(placesRaw)) {
   const plantation = plantationByPlace.get(place['@id'] as string);
-  const ownerUri = plantation?.['P52_has_current_owner'] as string | undefined;
-  const qid = ownerUri?.startsWith('http://www.wikidata.org/entity/')
-    ? ownerUri.replace('http://www.wikidata.org/entity/', '')
-    : null;
+  const qid = plantationQid(plantation);
   if (qid) qidsInQgis.add(qid);
 }
 

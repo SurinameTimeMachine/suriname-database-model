@@ -77,6 +77,7 @@ type AlmanakkenReviewEntry = {
       | 'missing-source-tag'
       | 'missing-product-assertions'
       | 'missing-status-assertions'
+      | 'missing-almanakken-observations'
       | 'v1-only-rows'
       | 'v2-only-rows'
       | 'v1-v2-qid-change';
@@ -92,6 +93,16 @@ type AlmanakkenMissingQid = {
   lastYear: number | null;
   sourceNames: string[];
   products: string[];
+};
+
+type AlmanakkenUnlinkedRow = {
+  recordId: string;
+  year: number | null;
+  page: string | null;
+  sourceName: string | null;
+  standardizedName: string | null;
+  location: string | null;
+  product: string | null;
 };
 
 type GazetteerEntry = Record<string, unknown> & {
@@ -254,8 +265,16 @@ function primaryWikidataQid(entry: GazetteerEntry): string | null {
 function buildAlmanakkenReview(entries: GazetteerEntry[]): {
   sourceVersion: string;
   generatedAt: string;
+  rowCounts: {
+    total: number;
+    withQid: number;
+    withoutQid: number;
+    attached: number;
+    unresolved: number;
+  };
   byPlaceId: Record<string, AlmanakkenReviewEntry>;
   missingQids: AlmanakkenMissingQid[];
+  unlinkedRows: AlmanakkenUnlinkedRow[];
 } {
   const { version, rows } = readAlmanakkenRows();
   type Summary = {
@@ -280,10 +299,23 @@ function buildAlmanakkenReview(entries: GazetteerEntry[]): {
   );
   const byQid = new Map<string, Summary>();
   const qidChangedAway = new Map<string, Set<string>>();
+  const unlinkedRows: AlmanakkenUnlinkedRow[] = [];
 
   for (const row of rows) {
     const qid = almanakkenField(row, 'plantation_id');
-    if (!qid) continue;
+    if (!qid) {
+      const year = Number.parseInt(almanakkenField(row, 'year'), 10);
+      unlinkedRows.push({
+        recordId: almanakkenField(row, 'recordid'),
+        year: Number.isFinite(year) ? year : null,
+        page: almanakkenField(row, 'page') || null,
+        sourceName: almanakkenField(row, 'plantation_org') || null,
+        standardizedName: almanakkenField(row, 'plantation_std') || null,
+        location: almanakkenField(row, 'loc_std', 'loc_org') || null,
+        product: almanakkenField(row, 'product_std') || null,
+      });
+      continue;
+    }
     const recordId = almanakkenField(row, 'recordid');
     const summary =
       byQid.get(qid) ??
@@ -368,6 +400,38 @@ function buildAlmanakkenReview(entries: GazetteerEntry[]): {
         label: 'Almanakken rows exist but the Gazetteer source tag is missing',
       });
     }
+    const hasProductAssertions =
+      entry.productAssertions?.some(
+        (assertion) => assertion.source === 'almanakken',
+      ) ?? false;
+    const hasStatusAssertions =
+      entry.statusAssertions?.some(
+        (assertion) => assertion.source === 'almanakken',
+      ) ?? false;
+    const hasAlmanakkenObservations =
+      (entry.almanakkenObservations?.length ?? 0) > 0;
+    if (summary && summary.productRows > 0 && !hasProductAssertions) {
+      issues.push({
+        type: 'missing-product-assertions',
+        label: 'Product rows exist but editable product assertions are missing',
+      });
+    }
+    if (
+      summary &&
+      (summary.productRows > 0 || summary.desertedRows > 0) &&
+      !hasStatusAssertions
+    ) {
+      issues.push({
+        type: 'missing-status-assertions',
+        label: 'Operational evidence exists but lifecycle assertions are missing',
+      });
+    }
+    if (summary && !hasAlmanakkenObservations) {
+      issues.push({
+        type: 'missing-almanakken-observations',
+        label: 'Almanakken rows exist but saved v2 observations are missing',
+      });
+    }
     const changedTo = qidChangedAway.get(qid);
     if (changedTo?.size) {
       issues.push({
@@ -390,16 +454,9 @@ function buildAlmanakkenReview(entries: GazetteerEntry[]): {
       products: [...(summary?.products ?? [])].sort(),
       v2OnlyRows: summary?.v2OnlyRows ?? 0,
       hasGazetteerSource: entry.sources?.includes('almanakken') ?? false,
-      hasProductAssertions:
-        entry.productAssertions?.some(
-          (assertion) => assertion.source === 'almanakken',
-        ) ?? false,
-      hasStatusAssertions:
-        entry.statusAssertions?.some(
-          (assertion) => assertion.source === 'almanakken',
-        ) ?? false,
-      hasAlmanakkenObservations:
-        (entry.almanakkenObservations?.length ?? 0) > 0,
+      hasProductAssertions,
+      hasStatusAssertions,
+      hasAlmanakkenObservations,
       issues,
     };
   }
@@ -416,11 +473,29 @@ function buildAlmanakkenReview(entries: GazetteerEntry[]): {
     }))
     .sort((a, b) => b.rows - a.rows || a.qid.localeCompare(b.qid));
 
+  const attachedRecordIds = new Set<string>();
+  for (const entry of entries) {
+    if (entry.deprecated || entry.mergedInto) continue;
+    for (const observation of entry.almanakkenObservations ?? []) {
+      const recordId = observation.recordId;
+      if (typeof recordId === 'string' && recordId) attachedRecordIds.add(recordId);
+    }
+  }
+  const withQid = rows.length - unlinkedRows.length;
+
   return {
     sourceVersion: version,
     generatedAt: new Date().toISOString(),
+    rowCounts: {
+      total: rows.length,
+      withQid,
+      withoutQid: unlinkedRows.length,
+      attached: attachedRecordIds.size,
+      unresolved: withQid - attachedRecordIds.size,
+    },
     byPlaceId,
     missingQids,
+    unlinkedRows,
   };
 }
 

@@ -14,8 +14,7 @@ const WD = 'http://www.wikidata.org/entity/';
 export interface ObservationRow {
   uri: string;
   record_id: string;
-  organization_qid: string;
-  organization_uri: string;
+  plantation_qid: string;
   observation_year: string;
   observed_name: string;
   standardized_name: string;
@@ -128,7 +127,7 @@ export function transformAlmanakken(): AlmanakkenTransformResult {
     if (year) almanacYears.add(year);
 
     const obsUri = `${STM}obs/${recordId}`;
-    const orgUri = plantationId ? `${WD}${plantationId}` : '';
+    const plantationAuthorityUri = plantationId ? `${WD}${plantationId}` : '';
     if (!plantationId) unlinkedCount++;
 
     const sourceUri = year ? `${STM}source/almanac-${year}` : '';
@@ -136,8 +135,7 @@ export function transformAlmanakken(): AlmanakkenTransformResult {
     observations.push({
       uri: obsUri,
       record_id: recordId,
-      organization_qid: plantationId,
-      organization_uri: orgUri,
+      plantation_qid: plantationId,
       observation_year: year,
       observed_name: plantationOrg,
       standardized_name: plantationStd,
@@ -197,8 +195,8 @@ export function transformAlmanakken(): AlmanakkenTransformResult {
               symbolic_content: plantationStd,
               language: 'nl',
               carried_by: sourceUri,
-              identifies_uri: orgUri,
-              identifies_type: 'E74',
+              identifies_uri: plantationAuthorityUri,
+              identifies_type: 'external',
               source_year: year,
               alt_form_of: orgAppUri,
             });
@@ -210,8 +208,8 @@ export function transformAlmanakken(): AlmanakkenTransformResult {
           symbolic_content: plantationOrg,
           language: 'nl',
           carried_by: sourceUri,
-          identifies_uri: orgUri,
-          identifies_type: 'E74',
+          identifies_uri: plantationAuthorityUri,
+          identifies_type: 'external',
           source_year: year,
           alt_form_of: stdAppUri,
         });

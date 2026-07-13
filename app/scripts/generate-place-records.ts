@@ -284,7 +284,6 @@ export function generatePlaceRecords() {
     const label = preferredName(names);
     const graph: JsonObject[] = [];
     const productTypeUris = new Set<string>();
-    const organizationUris = new Set<string>();
     const referencedSourceIds = new Set<string>(entry.sources ?? []);
     for (const name of names) if (name.source) referencedSourceIds.add(name.source);
     for (const assertion of [
@@ -426,7 +425,6 @@ export function generatePlaceRecords() {
 
     const evidenceUris: string[] = [];
     const statusUris: string[] = [];
-    const organizationalAssociationUris: string[] = [];
     for (const assertion of asArray(entry.districtAssertions)) {
       if (!assertion.id || !assertion.districtId) continue;
       const assertionUri = fragmentUri(pageUri, `assertion-${assertion.id}`);
@@ -539,31 +537,21 @@ export function generatePlaceRecords() {
     }
     // Preserve saved Almanakken v2 rows as source-bound observations.
     // These rows are evidence for review; curated claims remain the assertions above.
-    const rawEvidenceUrisByQid = new Map<string, string[]>();
     const almanakkenObservations = asArray(entry.almanakkenObservations);
     for (const evidence of almanakkenObservations) {
       const evidenceUri = fragmentUri(
         pageUri,
         `observation-almanakken-${evidence.recordId}`,
       );
-      const organizationUri = fragmentUri(pageUri, `organization-${evidence.qid}`);
       const spanUri = fragmentUri(
         pageUri,
         `observation-almanakken-${evidence.recordId}-time-span`,
       );
-      if (!organizationUris.has(organizationUri)) {
-        organizationUris.add(organizationUri);
-        graph.push({
-          '@id': organizationUri,
-          '@type': ['crm:E74_Group'],
-          'skos:exactMatch': wikidataUri(evidence.qid),
-        });
-      }
       if (evidence.year) graph.push(timeSpan(spanUri, evidence.year)!);
       const observation: JsonObject = {
         '@id': evidenceUri,
         '@type': ['crm:E13_Attribute_Assignment'],
-        P140_assigned_attribute_to: organizationUri,
+        P140_assigned_attribute_to: targetUri,
         ...(evidence.year ? { P4_has_time_span: spanUri } : {}),
         'prov:hadPrimarySource': sourceUri('almanakken', sourceIds),
         sourceRow: evidence.recordId,
@@ -588,7 +576,7 @@ export function generatePlaceRecords() {
         ...(evidence.psurIds?.length ? { psurIds: evidence.psurIds } : {}),
         ...(evidence.hasParts?.length
           ? {
-              hasParts: evidence.hasParts.map((part) => `${BASE}organization/${part.qid}`),
+              hasParts: evidence.hasParts.map((part) => wikidataUri(part.qid)),
               hasPartLabels: evidence.hasParts
                 .map((part) => part.label)
                 .filter(Boolean),
@@ -596,7 +584,7 @@ export function generatePlaceRecords() {
           : {}),
         ...(evidence.partOf?.length
           ? {
-              partOf: evidence.partOf.map((part) => `${BASE}organization/${part.qid}`),
+              partOf: evidence.partOf.map((part) => wikidataUri(part.qid)),
               partOfLabel: evidence.partOf
                 .map((part) => part.label)
                 .filter(Boolean),
@@ -607,7 +595,7 @@ export function generatePlaceRecords() {
           : {}),
         ...(evidence.ownedBy?.length
           ? {
-              ownedBy: evidence.ownedBy.map((owner) => `${BASE}organization/${owner.qid}`),
+              ownedBy: evidence.ownedBy.map((owner) => wikidataUri(owner.qid)),
               ownedByLabel: evidence.ownedBy
                 .map((owner) => owner.label)
                 .filter(Boolean),
@@ -644,49 +632,8 @@ export function generatePlaceRecords() {
       }
       graph.push(observation);
       if (!evidenceUris.includes(evidenceUri)) evidenceUris.push(evidenceUri);
-      const rawEvidenceUris = rawEvidenceUrisByQid.get(evidence.qid) ?? [];
-      rawEvidenceUris.push(evidenceUri);
-      rawEvidenceUrisByQid.set(evidence.qid, rawEvidenceUris);
-    }
-    for (const [qid, rawEvidenceUris] of rawEvidenceUrisByQid) {
-      if (rawEvidenceUris.length > 0) {
-        const associationUri = fragmentUri(
-          pageUri,
-          `association-organization-${qid}`,
-        );
-        const years = almanakkenObservations
-          .filter((evidence) => evidence.qid === qid)
-          .map((evidence) => evidence.year)
-          .filter((year): year is number => year != null);
-        const spanUri = fragmentUri(
-          pageUri,
-          `association-organization-${qid}-time-span`,
-        );
-        const span = timeSpan(
-          spanUri,
-          years.length > 0 ? Math.min(...years) : undefined,
-          years.length > 0 ? Math.max(...years) : undefined,
-        );
-        if (span) graph.push(span);
-        graph.push({
-          '@id': associationUri,
-          '@type': ['crm:E13_Attribute_Assignment'],
-          P140_assigned_attribute_to: targetUri,
-          P141_assigned: fragmentUri(pageUri, `organization-${qid}`),
-          P2_has_type: `${BASE}type/relationship/source-linked-organisation`,
-          ...(span ? { P4_has_time_span: spanUri } : {}),
-          'prov:hadPrimarySource': sourceUri('almanakken', sourceIds),
-          'prov:wasDerivedFrom': rawEvidenceUris,
-          certainty: `${BASE}type/certainty/probable`,
-        });
-        organizationalAssociationUris.push(associationUri);
-      }
     }
     if (evidenceUris.length > 0) record.hasEvidence = evidenceUris;
-    if (organizationalAssociationUris.length > 0) {
-      record.hasOrganizationalAssociation = organizationalAssociationUris;
-    }
-
     for (const [position, ref] of (entry.diklandRefs ?? []).entries()) {
       if (!ref.folderPath && !ref.driveUrl) continue;
       const sourceUriValue = fragmentUri(pageUri, `source-dikland-${position + 1}`);

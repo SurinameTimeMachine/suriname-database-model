@@ -99,6 +99,23 @@ export function langEn(map: LangMap): string {
   return map.en || Object.values(map).find((v) => v) || '';
 }
 
+/** Choose an ink color that remains readable when a type color is used as a tint. */
+export function readableTypeTextColor(color: string): string {
+  const match = /^#([0-9a-f]{6})$/i.exec(color);
+  if (!match) return '#16362f';
+  const channels = [0, 2, 4].map((offset) =>
+    Number.parseInt(match[1].slice(offset, offset + 2), 16) / 255,
+  );
+  const linear = channels.map((channel) =>
+    channel <= 0.04045
+      ? channel / 12.92
+      : ((channel + 0.055) / 1.055) ** 2.4,
+  );
+  const luminance =
+    0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2];
+  return luminance > 0.42 ? '#16362f' : color;
+}
+
 /** Flatten a LangArrayMap into a single string array (all languages). */
 function flattenLangArrayMap(map: LangArrayMap): string[] {
   return Object.values(map).flat().filter(Boolean) as string[];
@@ -243,7 +260,7 @@ const FALLBACK_DATA: ThesaurusData = {
       definition: {},
       editorialNote: {},
       historyNote: null,
-      color: '#e6956b',
+      color: '#fff753',
       crmClass: 'E25_Human-Made_Feature',
       crmBadge: 'E25',
       sortOrder: 1,

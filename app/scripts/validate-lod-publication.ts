@@ -5,6 +5,7 @@
  */
 import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
+import jsonld from 'jsonld';
 
 const LOD_DIR = join(__dirname, '../lod');
 const PUBLIC_DATA_DIR = join(__dirname, '../public/data');
@@ -44,6 +45,29 @@ interface AddressPointSource {
   }>;
 }
 
+interface AlmanakkenReviewDocument {
+  rowCounts?: {
+    total: number;
+    withQid: number;
+    withoutQid: number;
+    attached: number;
+    unresolved: number;
+  };
+  byPlaceId?: Record<
+    string,
+    {
+      rows?: number;
+      productRows?: number;
+      desertedRows?: number;
+      hasProductAssertions?: boolean;
+      hasStatusAssertions?: boolean;
+      hasAlmanakkenObservations?: boolean;
+      issues?: Array<{ type?: string }>;
+    }
+  >;
+  unlinkedRows?: Array<{ recordId?: string }>;
+}
+
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
 }
@@ -74,7 +98,23 @@ function collectHttpHosts(value: unknown, hosts: Set<string>) {
   }
 }
 
-function main() {
+function collectCanonicalReferences(value: unknown, references: Set<string>) {
+  if (Array.isArray(value)) {
+    value.forEach((item) => collectCanonicalReferences(item, references));
+    return;
+  }
+  if (!value || typeof value !== 'object') return;
+
+  for (const child of Object.values(value)) {
+    if (typeof child === 'string' && child.startsWith(CANONICAL_BASE)) {
+      references.add(child);
+    } else {
+      collectCanonicalReferences(child, references);
+    }
+  }
+}
+
+async function main() {
   const database = readArtifact(LOD_DIR, 'database.jsonld');
   const context = readArtifact(LOD_DIR, 'context.jsonld');
   const publishedDatabase = readArtifact(PUBLIC_DATA_DIR, 'database.jsonld');
@@ -91,6 +131,9 @@ function main() {
   const mapFeatures = JSON.parse(
     readArtifact(PUBLIC_DATA_DIR, 'map-features.geojson').toString('utf-8'),
   ) as GeoJsonDocument;
+  const almanakkenReview = JSON.parse(
+    readArtifact(PUBLIC_DATA_DIR, 'almanakken-review.json').toString('utf-8'),
+  ) as AlmanakkenReviewDocument;
 
   assert(
     database.equals(publishedDatabase),
@@ -116,6 +159,16 @@ function main() {
     'database.jsonld must identify itself as an sdo:Dataset',
   );
 
+  const expanded = (await jsonld.expand(
+    document as unknown as jsonld.JsonLdDocument,
+  )) as unknown as Array<Record<string, unknown>>;
+  assert(expanded.length === 1, 'JSON-LD expansion must produce one dataset node');
+  assert(
+    Array.isArray(expanded[0]['@graph']) &&
+      expanded[0]['@graph'].length === document['@graph'].length,
+    'JSON-LD expansion must preserve every generated graph entity',
+  );
+
   const ids = new Set<string>();
   for (const entity of document['@graph']) {
     const id = entity['@id'];
@@ -124,8 +177,38 @@ function main() {
       'Every generated graph entity must have an absolute HTTP @id',
     );
     assert(!ids.has(id), `Duplicate JSON-LD entity @id: ${id}`);
+    assert(
+      !id.startsWith('http://www.wikidata.org/entity/') &&
+        !id.startsWith('https://www.wikidata.org/entity/'),
+      `External Wikidata entity must not be redefined in the local graph: ${id}`,
+    );
+    const types = toArray(entity['@type']);
+    if (types.includes('E25_Human_Made_Feature')) {
+      for (const property of [
+        'P51_has_former_or_current_owner',
+        'P52_has_current_owner',
+      ]) {
+        assert(
+          !toArray(entity[property]).some(
+            (value) =>
+              typeof value === 'string' &&
+              /^https?:\/\/www\.wikidata\.org\/entity\/Q\d+$/.test(value),
+          ),
+          `${id} uses a plantation authority QID as ${property}`,
+        );
+      }
+    }
     ids.add(id);
   }
+
+  ids.add(document['@id']);
+  const canonicalReferences = new Set<string>();
+  collectCanonicalReferences(document['@graph'], canonicalReferences);
+  const danglingReferences = [...canonicalReferences].filter((uri) => !ids.has(uri));
+  assert(
+    danglingReferences.length === 0,
+    `Generated graph has undefined canonical URI references:\n${danglingReferences.join('\n')}`,
+  );
 
   const hosts = new Set<string>();
   collectHttpHosts(document['@graph'], hosts);
@@ -273,6 +356,116 @@ function main() {
   const activeGazetteer = gazetteer['@graph'].filter(
     (entry) => !entry.deprecated && !entry.mergedInto,
   );
+  const rowCounts = almanakkenReview.rowCounts;
+  assert(rowCounts, 'Almanakken review has no row completeness counts');
+  assert(
+    rowCounts.total === rowCounts.withQid + rowCounts.withoutQid,
+    'Almanakken review row totals are inconsistent',
+  );
+  assert(
+    rowCounts.withQid === rowCounts.attached + rowCounts.unresolved,
+    'Almanakken linked-row totals are inconsistent',
+  );
+  assert(
+    almanakkenReview.unlinkedRows?.length === rowCounts.withoutQid,
+    'Almanakken rows without QIDs are not all exposed for review',
+  );
+  const aggregateEntitiesById = new Map(
+    document['@graph'].map((entity) => [entity['@id'], entity]),
+  );
+  const aggregateAlmanakkenEvidence = document['@graph'].filter(
+    (entity) =>
+      typeof entity['@id'] === 'string' &&
+      entity['@id'].startsWith(`${CANONICAL_BASE}obs/`),
+  );
+  assert(
+    aggregateAlmanakkenEvidence.length === rowCounts.total,
+    'Aggregate JSON-LD does not preserve every Almanakken source row',
+  );
+  for (const evidence of aggregateAlmanakkenEvidence) {
+    const targetId = evidence.P140_assigned_attribute_to;
+    if (targetId == null) continue;
+    assert(
+      typeof targetId === 'string',
+      'Aggregate Almanakken observation has a non-string target',
+    );
+    const target = aggregateEntitiesById.get(targetId);
+    assert(target, `Aggregate Almanakken observation targets unknown entity ${targetId}`);
+    assert(
+      toArray(target['@type'] as string | string[]).includes(
+        'E25_Human_Made_Feature',
+      ),
+      `Aggregate Almanakken observation targets a non-E25 entity ${targetId}`,
+    );
+  }
+  const attachedSourceRows = new Set<string>();
+  for (const entry of activeGazetteer) {
+    const observations = toArray(
+      entry.almanakkenObservations as Record<string, unknown>[] | undefined,
+    );
+    if (observations.length === 0) continue;
+    const id = entry.id;
+    assert(typeof id === 'string', 'Almanakken-bearing place has no ID');
+    const record = JSON.parse(
+      readArtifact(PLACE_RECORDS_DIR, `${id}.jsonld`).toString('utf-8'),
+    ) as JsonLdDocument;
+    const graph = record['@graph'] ?? [];
+    const evidence = graph.filter(
+      (entity) => entity.sourceVersion === 'v2' && typeof entity.sourceRow === 'string',
+    );
+    assert(
+      evidence.length === observations.length,
+      `Authority record ${id} does not preserve every Almanakken observation`,
+    );
+    for (const observation of evidence) {
+      const sourceRow = observation.sourceRow as string;
+      assert(
+        !attachedSourceRows.has(sourceRow),
+        `Almanakken source row ${sourceRow} is attached more than once`,
+      );
+      attachedSourceRows.add(sourceRow);
+      const target = graph.find(
+        (entity) => entity['@id'] === observation.P140_assigned_attribute_to,
+      );
+      assert(target, `Almanakken observation ${sourceRow} has no local target`);
+      assert(
+        toArray(target['@type'] as string | string[]).includes(
+          'crm:E25_Human_Made_Feature',
+        ),
+        `Almanakken observation ${sourceRow} does not target an E25 feature`,
+      );
+    }
+  }
+  assert(
+    attachedSourceRows.size === rowCounts.attached,
+    'Almanakken attached-row count differs from published authority records',
+  );
+  for (const [placeId, review] of Object.entries(
+    almanakkenReview.byPlaceId ?? {},
+  )) {
+    const issueTypes = new Set((review.issues ?? []).map((issue) => issue.type));
+    if ((review.rows ?? 0) > 0 && !review.hasAlmanakkenObservations) {
+      assert(
+        issueTypes.has('missing-almanakken-observations'),
+        `Place ${placeId} hides missing Almanakken observations from review`,
+      );
+    }
+    if ((review.productRows ?? 0) > 0 && !review.hasProductAssertions) {
+      assert(
+        issueTypes.has('missing-product-assertions'),
+        `Place ${placeId} hides missing product assertions from review`,
+      );
+    }
+    if (
+      ((review.productRows ?? 0) > 0 || (review.desertedRows ?? 0) > 0) &&
+      !review.hasStatusAssertions
+    ) {
+      assert(
+        issueTypes.has('missing-status-assertions'),
+        `Place ${placeId} hides missing lifecycle assertions from review`,
+      );
+    }
+  }
   for (const entry of activeGazetteer) {
     if (entry.type !== 'river' && entry.type !== 'creek') continue;
     const location = entry.location as Record<string, unknown> | undefined;
@@ -500,4 +693,7 @@ function main() {
   );
 }
 
-main();
+main().catch((error: unknown) => {
+  console.error(error);
+  process.exitCode = 1;
+});

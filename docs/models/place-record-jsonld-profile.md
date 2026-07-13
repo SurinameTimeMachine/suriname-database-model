@@ -48,6 +48,17 @@ assertions. A source statement such as a reported abandonment is `certain` as
 a statement by that source, not as an unqualified historical fact. The raw
 Almanakken record ID remains on each observation so summaries are reproducible.
 
+`plantation_id` is retained as a source matching key. An observation receives
+`P140 assigned attribute to` only when that key resolves to one unambiguous E25
+feature. Rows with missing or ambiguous matches remain published as unresolved
+evidence and are listed in the editorial review artifact; they are not assigned
+to an E74 organisation as a fallback.
+
+Compound v2 transcription fields such as population, mill, and raw management
+details are preserved as JSON literals on the source observation. They are not
+claimed as CIDOC CRM statements. Acreage is likewise retained as an STM source
+field until it can be represented by an E54 Dimension with a value and unit.
+
 ## Sources and geometry
 
 Names are E41 Appellations, identifiers are E42 Identifiers, source documents

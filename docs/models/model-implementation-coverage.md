@@ -6,9 +6,11 @@ currently serialized data.
 
 ## Aggregate graph
 
-E25, E26, E74, E53, E41, E22, E13, E36, E52, E55, and E12 are generated in
-`database.jsonld`. Some property ranges remain transitional: actors and
-dimensions are still literals, and several identifiers are not yet E42 nodes.
+E25, E26, E53, E41, E22, E13, E36, E52, E55, and E12 are generated in
+`database.jsonld`. Plantation QIDs are external `skos:closeMatch` authority
+links, not locally retyped E74 organizations. Owner and management values are
+source transcriptions pending actor reconciliation; dimensions and several
+identifiers are also not yet modeled as their own CRM nodes.
 
 ## Place-record profile
 
@@ -18,7 +20,7 @@ and probable time-scoped source-linked organisation associations.
 
 ## Planned
 
-E39 Actor, E54 Dimension, E81 Transformation, E11 Modification, E6
-Destruction, and E68 Dissolution are not yet emitted as graph entities.
+E39 Actor, E74 Group, E54 Dimension, E81 Transformation, E11 Modification,
+E6 Destruction, and E68 Dissolution are not yet emitted as graph entities.
 Rijksmuseum, vital records, ward registers, and emancipation registers remain
 future source adapters.

@@ -16,7 +16,11 @@ export interface E25Plantation {
   status: string;
   featureType: string;
   prefLabel: string; // rdfs:label
+  closeMatch?: string | string[];
+  psurId?: string | string[];
+  /** @deprecated Legacy aggregate field; the current pipeline does not emit it. */
   P52_has_current_owner?: string;
+  /** @deprecated Legacy aggregate field; the current pipeline does not emit it. */
   P51_has_former_or_current_owner?: string;
   P53_has_location?: string;
   P1_is_identified_by?: string | string[];
@@ -92,11 +96,12 @@ export interface E22Source {
   sameAs?: string;
 }
 
-/** E13 Attribute Assignment — annual observation from Almanakken */
+/** E13 Attribute Assignment - annual observation from Almanakken. */
 export interface OrganizationObservation {
   '@id': string;
   '@type': string[];
-  observationOf: string; // CRM: P140 assigned attribute to -> E74
+  observationOf: string; // CRM: P140 assigned attribute to -> unambiguous E25
+  sourcePlantationQid?: string; // Source matching key, retained even when unresolved
   observationYear: string; // CRM: P4 has time-span -> E52
   observedName?: string; // CRM: P141 assigned -> E41 Appellation
   sranantongoName?: string; // vernacular plantation name, if recorded
@@ -174,7 +179,7 @@ export interface GeoJSONFeatureProperties {
   stmId?: string; // Gazetteer ID (e.g. "stm-00522") — canonical short ID for cross-linking
   plantationUri?: string;
   featureUri?: string;
-  organizationQid?: string;
+  wikidataQid?: string;
   mainBodyWater?: string;
   placeUri?: string;
 }

@@ -146,6 +146,28 @@ function computeMergedPlace(
     }
   }
 
+  const almanakkenObservations = Array.from(
+    new Map(
+      [
+        ...(placeA.almanakkenObservations || []),
+        ...(placeB.almanakkenObservations || []),
+      ].map((observation) => [observation.recordId, observation]),
+    ).values(),
+  );
+  const sranantongoNames = [
+    ...new Set([
+      ...(placeA.sranantongoNames || []),
+      ...(placeB.sranantongoNames || []),
+    ]),
+  ];
+  const lifecycleEvents = Array.from(
+    new Map(
+      [...(placeA.lifecycleEvents || []), ...(placeB.lifecycleEvents || [])].map(
+        (event) => [event['@id'], event],
+      ),
+    ).values(),
+  );
+
   return {
     ...primary,
     id: primary.id,
@@ -164,6 +186,9 @@ function computeMergedPlace(
     psurIds,
     externalLinks,
     diklandRefs,
+    almanakkenObservations,
+    sranantongoNames,
+    lifecycleEvents,
     statusAssertions: [
       ...(placeA.statusAssertions || []),
       ...(placeB.statusAssertions || []),

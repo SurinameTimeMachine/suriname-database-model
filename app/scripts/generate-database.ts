@@ -91,10 +91,16 @@ function buildE25Plantations(
     }
 
     if (p.prefLabel) entity.prefLabel = p.prefLabel;
-    if (p.p52_owner_qid)
-      entity.P52_has_current_owner = `${WD}${p.p52_owner_qid}`;
-    if (p.p51_former_owner_qid)
-      entity.P51_has_former_or_current_owner = `${WD}${p.p51_former_owner_qid}`;
+    const authorityMatches = [p.wikidata_qid, p.wikidata_alt_qid]
+      .filter(Boolean)
+      .map((qid) => `${WD}${qid}`);
+    if (authorityMatches.length > 0) {
+      entity.closeMatch =
+        authorityMatches.length === 1 ? authorityMatches[0] : authorityMatches;
+    }
+    if (p.psur_ids.length > 0) {
+      entity.psurId = p.psur_ids.length === 1 ? p.psur_ids[0] : p.psur_ids;
+    }
     if (p.p53_place_uri) entity.P53_has_location = p.p53_place_uri;
 
     const appUris = appellationIndex.get(p.uri) ?? [];
@@ -136,7 +142,7 @@ function buildE25Plantations(
       transformedBy: 'scripts/transform-plantations.ts',
       modelEntity: 'E25_Human-Made_Feature',
       schemaTable: 'e25_human_made_features',
-      linkedVia: `qid -> P52_has_current_owner -> wd:${p.p52_owner_qid}`,
+      linkedVia: `qid -> skos:closeMatch -> wd:${p.wikidata_qid}`,
     });
 
     entities.push(entity);
@@ -185,60 +191,6 @@ function buildE26PhysicalFeatures(
       modelEntity: 'E26_Physical_Feature',
       schemaTable: 'e26_physical_features',
       linkedVia: `P2_has_type -> ${VOCAB_BASE}/${f.featureType}`,
-    });
-
-    entities.push(entity);
-  }
-
-  return { entities, provenance };
-}
-
-function buildE74Organizations(
-  orgs: {
-    qid: string;
-    uri: string;
-    prefLabel: string;
-    psur_id: string;
-    psur_id2: string;
-    psur_id3: string;
-    absorbed_into_qid: string;
-  }[],
-): {
-  entities: Record<string, unknown>[];
-  provenance: Record<string, unknown>[];
-} {
-  const entities: Record<string, unknown>[] = [];
-  const provenance: Record<string, unknown>[] = [];
-
-  for (const o of orgs) {
-    const entity: Record<string, unknown> = {
-      '@id': o.uri,
-      '@type': ['E74_Group', 'sdo:Organization'],
-      additionalType: `${WD}Q188913`,
-    };
-
-    if (o.prefLabel) entity.prefLabel = o.prefLabel;
-
-    const psurIds = [o.psur_id, o.psur_id2, o.psur_id3].filter(Boolean);
-    if (psurIds.length > 0)
-      entity.psurId = psurIds.length === 1 ? psurIds[0] : psurIds;
-    if (o.absorbed_into_qid)
-      entity.absorbedInto = `${WD}${o.absorbed_into_qid}`;
-    entity.sameAs = o.uri;
-
-    const provId = `${BASE}provenance/e74-${o.qid}`;
-    entity.wasDerivedFrom = provId;
-    provenance.push({
-      '@id': provId,
-      '@type': ['ProvenanceRecord'],
-      sourceFile:
-        'data/07-gis-plantation-map-1930/plantation_polygons_1930.csv',
-      sourceColumn: 'qid, psur_id, qid_alt',
-      sourceRow: `qid=${o.qid}`,
-      transformedBy: 'scripts/transform-plantations.ts',
-      modelEntity: 'E74_Group',
-      schemaTable: 'e74_groups',
-      linkedVia: 'P52i_is_current_owner_of -> plantation/{slug}',
     });
 
     entities.push(entity);
@@ -385,48 +337,65 @@ function buildE36VisualItems(mapLinks: MapLink[]): Record<string, unknown>[] {
 }
 
 function buildE55Types(): Record<string, unknown>[] {
-  const types: { id: string; label: string; broader?: string }[] = [
+  const types: {
+    uri: string;
+    label: string;
+    broader?: string;
+  }[] = [
     // Plantation status vocabulary
     {
-      id: 'plantation-status/built',
+      uri: `${BASE}type/plantation-status`,
+      label: 'Plantation status',
+    },
+    {
+      uri: `${BASE}type/plantation-status/built`,
       label: 'Built',
-      broader: 'plantation-status',
+      broader: `${BASE}type/plantation-status`,
     },
     {
-      id: 'plantation-status/planned',
+      uri: `${BASE}type/plantation-status/planned`,
       label: 'Planned',
-      broader: 'plantation-status',
+      broader: `${BASE}type/plantation-status`,
     },
     {
-      id: 'plantation-status/abandoned',
+      uri: `${BASE}type/plantation-status/abandoned`,
       label: 'Abandoned',
-      broader: 'plantation-status',
+      broader: `${BASE}type/plantation-status`,
     },
     {
-      id: 'plantation-status/unknown',
+      uri: `${BASE}type/plantation-status/unknown`,
       label: 'Unknown',
-      broader: 'plantation-status',
+      broader: `${BASE}type/plantation-status`,
     },
     // Source type vocabulary
-    { id: 'source-type/map', label: 'Map' },
-    { id: 'source-type/almanac', label: 'Almanac' },
-    { id: 'source-type/register', label: 'Register' },
+    { uri: `${BASE}type/source-type/map`, label: 'Map' },
+    { uri: `${BASE}type/source-type/almanac`, label: 'Almanac' },
+    { uri: `${BASE}type/source-type/register`, label: 'Register' },
     // Product types
-    { id: 'product/sugar', label: 'Sugar' },
-    { id: 'product/coffee', label: 'Coffee' },
-    { id: 'product/cacao', label: 'Cacao' },
-    { id: 'product/cotton', label: 'Cotton' },
-    { id: 'product/wood', label: 'Wood' },
+    { uri: `${BASE}type/product/sugar`, label: 'Sugar' },
+    { uri: `${BASE}type/product/coffee`, label: 'Coffee' },
+    { uri: `${BASE}type/product/cacao`, label: 'Cacao' },
+    { uri: `${BASE}type/product/cotton`, label: 'Cotton' },
+    { uri: `${BASE}type/product/wood`, label: 'Wood' },
+    // Natural-feature vocabulary used by E26 records
+    {
+      uri: `${BASE}vocabulary/geographical-feature/natural/river`,
+      label: 'River',
+    },
+    {
+      uri: `${BASE}vocabulary/geographical-feature/natural/creek`,
+      label: 'Creek',
+    },
   ];
 
   return types.map((t) => {
     const entity: Record<string, unknown> = {
-      '@id': `${BASE}type/${t.id}`,
+      '@id': t.uri,
       '@type': ['E55_Type'],
       prefLabel: t.label,
     };
     if (t.broader) {
-      entity['skos:broader'] = `${BASE}type/${t.broader}`;
+      entity['skos:broader'] = t.broader;
     }
     return entity;
   });
@@ -453,8 +422,8 @@ function buildE12Productions(sources: SourceRow[]): Record<string, unknown>[] {
       prefLabel: `Production of ${s.label}`,
       P108_has_produced: s.uri,
     };
-    if (s.maker) entity.P14_carried_out_by = s.maker;
-    if (s.publication_place) entity.P7_took_place_at = s.publication_place;
+    if (s.maker) entity.sourceMaker = s.maker;
+    if (s.publication_place) entity.publicationPlace = s.publication_place;
     if (s.year) entity.P4_has_time_span = `${BASE}timespan/${s.year}`;
     return entity;
   });
@@ -472,22 +441,27 @@ function buildE36Images(sources: SourceRow[]): Record<string, unknown>[] {
     };
     if (s.iiif_info_url) entity.contentUrl = s.iiif_info_url;
     if (s.iiif_manifest) entity.sameAs = s.iiif_manifest;
-    if (s.holding_archive) entity.P50_has_current_keeper = s.holding_archive;
+    if (s.holding_archive) entity.holdingArchive = s.holding_archive;
     if (s.handle_url) entity['dcterms:identifier'] = s.handle_url;
     entities.push(entity);
   }
   return entities;
 }
 
-function buildObservations(obs: ObservationRow[]): {
+function buildObservations(
+  obs: ObservationRow[],
+  plantationUriByQid: Map<string, string>,
+): {
   entities: Record<string, unknown>[];
   provenance: Record<string, unknown>[];
   observationYears: Set<string>;
+  resolvedTargets: number;
 } {
   const entities: Record<string, unknown>[] = [];
   const provenance: Record<string, unknown>[] = [];
   const seenYears = new Set<string>();
   const observationYears = new Set<string>();
+  let resolvedTargets = 0;
 
   for (const o of obs) {
     // Type: E13_Attribute_Assignment
@@ -497,10 +471,15 @@ function buildObservations(obs: ObservationRow[]): {
     };
 
     // CRM properties
-    if (o.organization_uri) {
-      entity.observationOf = o.organization_uri;
+    if (o.plantation_qid) {
+      entity.sourcePlantationQid = o.plantation_qid;
+    }
+    const plantationUri = plantationUriByQid.get(o.plantation_qid);
+    if (plantationUri) {
+      entity.observationOf = plantationUri;
       // CRM alignment: P140 assigned attribute to
-      entity.P140_assigned_attribute_to = o.organization_uri;
+      entity.P140_assigned_attribute_to = plantationUri;
+      resolvedTargets++;
     }
     if (o.observation_year) {
       entity.observationYear = o.observation_year;
@@ -570,7 +549,7 @@ function buildObservations(obs: ObservationRow[]): {
     entities.push(entity);
   }
 
-  return { entities, provenance, observationYears };
+  return { entities, provenance, observationYears, resolvedTargets };
 }
 
 // --- WKT to GeoJSON ---
@@ -646,7 +625,7 @@ function buildGeoJson(
         featureType: 'plantation',
         mapYear: pl.map_year,
         plantationUri: pl.plantation_uri,
-        organizationQid: plantation?.p52_owner_qid ?? '',
+        wikidataQid: plantation?.wikidata_qid ?? '',
         placeUri: pl.uri,
       },
     });
@@ -789,25 +768,50 @@ function main() {
   const e26Result = buildE26PhysicalFeatures(riverResult.e26, appellationIndex);
   console.log(`  E26 Rivers/Creeks:  ${e26Result.entities.length}`);
 
-  const e74Result = buildE74Organizations(plantResult.e74);
-  console.log(`  E74 Organizations:  ${e74Result.entities.length}`);
-
   const e53Result = buildE53Places(plantResult.e53);
   const e53RiverResult = buildE53RiverPlaces(riverResult.e53);
   console.log(
     `  E53 Places:         ${e53Result.entities.length + e53RiverResult.entities.length} (${e53Result.entities.length} plantation, ${e53RiverResult.entities.length} river)`,
   );
 
+  const plantationUrisByQid = new Map<string, string[]>();
+  for (const plantation of plantResult.e25) {
+    if (!plantation.wikidata_qid) continue;
+    plantationUrisByQid.set(plantation.wikidata_qid, [
+      ...(plantationUrisByQid.get(plantation.wikidata_qid) ?? []),
+      plantation.uri,
+    ]);
+  }
+  const unambiguousPlantationUriByQid = new Map(
+    [...plantationUrisByQid.entries()]
+      .filter(([, uris]) => uris.length === 1)
+      .map(([qid, uris]) => [qid, uris[0]]),
+  );
+  const almanacAppellations = almResult.appellations.map((appellation) => {
+    const qid = appellation.identifies_uri.replace(
+      /^https?:\/\/www\.wikidata\.org\/entity\//,
+      '',
+    );
+    return {
+      ...appellation,
+      identifies_uri:
+        unambiguousPlantationUriByQid.get(qid) ?? appellation.identifies_uri,
+      identifies_type: unambiguousPlantationUriByQid.has(qid) ? 'E25' : 'external',
+    };
+  });
   const e41All = buildE41Appellations([
     ...plantResult.e41,
-    ...almResult.appellations,
+    ...almanacAppellations,
     ...riverResult.e41,
   ]);
   console.log(`  E41 Appellations:   ${e41All.length}`);
 
-  const obsResult = buildObservations(almResult.observations);
+  const obsResult = buildObservations(
+    almResult.observations,
+    unambiguousPlantationUriByQid,
+  );
   console.log(
-    `  Observations:       ${obsResult.entities.length} (dual-typed E13)`,
+    `  Observations:       ${obsResult.entities.length} E13 (${obsResult.resolvedTargets} with unambiguous E25 targets)`,
   );
 
   // Structural entities
@@ -816,7 +820,12 @@ function main() {
   const e55Types = buildE55Types();
   console.log(`  E55 Types:          ${e55Types.length}`);
 
-  const e52TimeSpans = buildE52TimeSpans(obsResult.observationYears);
+  const e52TimeSpans = buildE52TimeSpans(
+    new Set([
+      ...obsResult.observationYears,
+      ...allSources.map((source) => source.year).filter(Boolean),
+    ]),
+  );
   console.log(`  E52 Time-Spans:     ${e52TimeSpans.length}`);
 
   // E12 Production events: who made each source, where, when
@@ -830,7 +839,6 @@ function main() {
   const allProv = [
     ...e25Result.provenance,
     ...e26Result.provenance,
-    ...e74Result.provenance,
     ...e53Result.provenance,
     ...e53RiverResult.provenance,
     ...obsResult.provenance,
@@ -841,7 +849,6 @@ function main() {
     ...e22,
     ...e25Result.entities,
     ...e26Result.entities,
-    ...e74Result.entities,
     ...e53Result.entities,
     ...e53RiverResult.entities,
     ...e41All,
@@ -954,7 +961,7 @@ function main() {
 
   const obsLinked = obsResult.entities.filter((e) => e.observationOf).length;
   console.log(
-    `  Observations with org link: ${obsLinked}/${obsResult.entities.length}`,
+    `  Observations with unambiguous E25 target: ${obsLinked}/${obsResult.entities.length}`,
   );
 
   const obsWithE13 = obsResult.entities.filter(
@@ -963,7 +970,7 @@ function main() {
       (e['@type'] as string[]).includes('E13_Attribute_Assignment'),
   ).length;
   console.log(
-    `  Observations dual-typed E13: ${obsWithE13}/${obsResult.entities.length}`,
+    `  Observations typed E13: ${obsWithE13}/${obsResult.entities.length}`,
   );
 
   const obsWithP4 = obsResult.entities.filter((e) => e.P4_has_time_span).length;
@@ -994,14 +1001,14 @@ function main() {
     `  E12 with P108 (has produced): ${e12WithP108}/${e12Productions.length}`,
   );
 
-  const e12WithP14 = e12Productions.filter((e) => e.P14_carried_out_by).length;
+  const e12WithMaker = e12Productions.filter((e) => e.sourceMaker).length;
   console.log(
-    `  E12 with P14 (carried out by): ${e12WithP14}/${e12Productions.length}`,
+    `  E12 with source maker transcription: ${e12WithMaker}/${e12Productions.length}`,
   );
 
-  const e12WithP7 = e12Productions.filter((e) => e.P7_took_place_at).length;
+  const e12WithPlace = e12Productions.filter((e) => e.publicationPlace).length;
   console.log(
-    `  E12 with P7 (took place at): ${e12WithP7}/${e12Productions.length}`,
+    `  E12 with publication-place transcription: ${e12WithPlace}/${e12Productions.length}`,
   );
 
   const e36WithContent = e36Images.filter((e) => e.contentUrl).length;
@@ -1009,9 +1016,9 @@ function main() {
     `  E36 with IIIF contentUrl: ${e36WithContent}/${e36Images.length}`,
   );
 
-  const e36WithP50 = e36Images.filter((e) => e.P50_has_current_keeper).length;
+  const e36WithKeeper = e36Images.filter((e) => e.holdingArchive).length;
   console.log(
-    `  E36 with P50 (current keeper): ${e36WithP50}/${e36Images.length}`,
+    `  E36 with holding-archive transcription: ${e36WithKeeper}/${e36Images.length}`,
   );
 
   const polygonFeatures = (
