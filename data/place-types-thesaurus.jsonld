@@ -331,12 +331,12 @@
         "http://www.wikidata.org/entity/Q34442"
       ],
       "typeId": "road",
-      "color": "#2cfb06",
+      "color": "#78a35f",
       "crmClass": "E25_Human-Made_Feature",
       "crmBadge": "E25",
       "sortOrder": 4,
       "created": "2026-04-07",
-      "modified": "2026-06-30",
+      "modified": "2026-07-13",
       "related": [
         "stm:vocabulary/place-type/railroad"
       ],
