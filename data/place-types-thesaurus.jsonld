@@ -201,12 +201,12 @@
         "http://www.wikidata.org/entity/Q188913"
       ],
       "typeId": "plantation",
-      "color": "#fff753",
+      "color": "#ea61f1",
       "crmClass": "E25_Human-Made_Feature",
       "crmBadge": "E25",
       "sortOrder": 1,
       "created": "2026-04-07",
-      "modified": "2026-06-30"
+      "modified": "2026-07-13"
     },
     {
       "@id": "stm:vocabulary/place-type/military-post",
