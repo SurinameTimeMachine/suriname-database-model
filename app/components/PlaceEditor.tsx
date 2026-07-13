@@ -7,11 +7,15 @@ import type {
   AssertionCertainty,
   DiklandRef,
   DistrictAssertion,
+  E25Plantation,
+  E74Organization,
   ExternalLink,
   GazetteerPlace,
   LanguageCode,
   LocationAssertion,
   NameType,
+  OrganizationAssociationStatus,
+  OrganizationObservation,
   PlaceName,
   PlantationStatusType,
   ProductAssertion,
@@ -31,10 +35,19 @@ interface PlaceEditorProps {
   districts: GazetteerPlace[];
   sourceAppellations?: SourceAppellationHint[];
   almanakkenReview?: AlmanakkenReviewEntry;
+  organizationContext?: PlaceOrganizationContext;
   canEdit: boolean;
   onSave: (place: GazetteerPlace) => Promise<void>;
   onCancel: () => void;
   onDelete?: (id: string) => Promise<void>;
+}
+
+export interface PlaceOrganizationContext {
+  organization: E74Organization | null;
+  associationStatus: OrganizationAssociationStatus;
+  linkedPlantations: E25Plantation[];
+  observations: OrganizationObservation[];
+  qid: string | null;
 }
 
 interface AlmanakkenReviewEntry {
@@ -611,6 +624,7 @@ export default function PlaceEditor({
   districts,
   sourceAppellations = [],
   almanakkenReview,
+  organizationContext,
   canEdit,
   onSave,
   onCancel,
@@ -1249,6 +1263,42 @@ export default function PlaceEditor({
       : null;
   const almanakkenHasUrgentReview =
     Boolean(almanakkenReview && almanakkenReview.issues.length > 0);
+  const reportedOwners = useMemo(() => {
+    const values = (organizationContext?.observations ?? [])
+      .filter(
+        (observation): observation is OrganizationObservation & {
+          hasOwner: string;
+        } => Boolean(observation.hasOwner?.trim()),
+      )
+      .map((observation) => ({
+        year: observation.observationYear,
+        value: observation.hasOwner.trim(),
+      }))
+      .sort((a, b) => b.year.localeCompare(a.year));
+
+    return Array.from(
+      new Map(
+        values.map((value) => [
+          `${value.year}\u0000${value.value}`,
+          value,
+        ]),
+      ).values(),
+    );
+  }, [organizationContext]);
+  const physicalOwnershipAssertions = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          (organizationContext?.linkedPlantations ?? []).flatMap((plantation) =>
+            [
+              plantation.P51_has_former_or_current_owner,
+              plantation.P52_has_current_owner,
+            ].filter((value): value is string => Boolean(value)),
+          ),
+        ),
+      ),
+    [organizationContext],
+  );
 
   return (
     <div className="h-full min-h-0 flex flex-col border border-stm-warm-200 bg-white shadow-sm">
@@ -1302,6 +1352,143 @@ export default function PlaceEditor({
             Edit the Gazetteer record, not JSON-LD. Add a source to each
             statement; add a date or span when the source provides one.
           </p>
+        )}
+
+        {organizationContext && (
+          <section className="min-w-0 overflow-hidden border border-stm-warm-200 bg-stm-warm-50 p-3 text-xs text-stm-warm-800">
+            <div className="grid min-w-0 grid-cols-1 items-start gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
+              <div className="min-w-0">
+                <div className="text-[10px] font-medium uppercase tracking-[0.16em] text-stm-warm-500">
+                  Organization
+                </div>
+                {organizationContext.organization ? (
+                  <Link
+                    href={`/organizations?organization=${encodeURIComponent(
+                      organizationContext.qid ??
+                        organizationContext.organization['@id'],
+                    )}`}
+                    className="break-words text-sm font-semibold text-stm-teal-700 hover:underline"
+                  >
+                    {organizationContext.organization.prefLabel}
+                  </Link>
+                ) : (
+                  <div className="text-sm font-semibold">
+                    No organization linked
+                  </div>
+                )}
+              </div>
+              <span
+                className={`w-fit border px-2 py-1 text-[10px] font-medium sm:justify-self-end ${
+                  organizationContext.associationStatus === 'linked'
+                    ? 'border-stm-teal-300 bg-stm-teal-50 text-stm-teal-800'
+                    : 'border-amber-400 bg-amber-50 text-amber-900'
+                }`}
+              >
+                {organizationContext.associationStatus === 'linked'
+                  ? 'linked'
+                  : organizationContext.associationStatus ===
+                      'needs-organization-link'
+                    ? 'needs organization link'
+                    : 'needs physical-link review'}
+              </span>
+            </div>
+
+            <dl className="mt-3 grid min-w-0 grid-cols-1 gap-x-3 gap-y-1 border-t border-stm-warm-200 pt-3 sm:grid-cols-[8rem_minmax(0,1fr)] sm:gap-y-2">
+              <dt className="text-stm-warm-500">Authority match</dt>
+              <dd className="min-w-0 break-words pb-1 sm:pb-0">
+                {organizationContext.qid ? (
+                  <a
+                    href={`https://www.wikidata.org/entity/${organizationContext.qid}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-mono text-stm-teal-700 hover:underline"
+                  >
+                    {organizationContext.qid}
+                  </a>
+                ) : (
+                  <span className="text-amber-800">Not established</span>
+                )}
+                {organizationContext.organization && (
+                  <span className="ml-2 text-stm-warm-500">
+                    exact match for E74
+                  </span>
+                )}
+              </dd>
+
+              <dt className="text-stm-warm-500">Physical plantation</dt>
+              <dd className="min-w-0 break-words pb-1 sm:pb-0">
+                {organizationContext.linkedPlantations.length > 0 ? (
+                  <div className="flex flex-wrap gap-x-3 gap-y-1">
+                    {organizationContext.linkedPlantations.map((plantation) => (
+                      <a
+                        key={plantation['@id']}
+                        href={plantation['@id']}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-stm-teal-700 hover:underline"
+                      >
+                        {plantation.prefLabel}
+                      </a>
+                    ))}
+                  </div>
+                ) : (
+                  <span className="text-amber-800">Needs review</span>
+                )}
+              </dd>
+
+              <dt className="text-stm-warm-500">Land ownership</dt>
+              <dd className="min-w-0 break-words">
+                {physicalOwnershipAssertions.length > 0 ? (
+                  <div className="space-y-1">
+                    {physicalOwnershipAssertions.map((owner) => (
+                      <a
+                        key={owner}
+                        href={owner}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="block break-all text-stm-teal-700 hover:underline"
+                      >
+                        {owner}
+                      </a>
+                    ))}
+                  </div>
+                ) : (
+                  <span>No sourced P51/P52 assertion</span>
+                )}
+              </dd>
+            </dl>
+
+            {reportedOwners.length > 0 && (
+              <div className="mt-3 border-t border-stm-warm-200 pt-3">
+                <div className="mb-1 grid min-w-0 grid-cols-1 gap-1 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+                  <span className="font-medium">
+                    Reported owners in Almanakken
+                  </span>
+                  <span className="font-mono text-[10px] text-stm-warm-500 sm:text-right">
+                    {reportedOwners.length} dated transcription
+                    {reportedOwners.length === 1 ? '' : 's'}
+                  </span>
+                </div>
+                <div className="max-h-28 overflow-auto border border-stm-warm-200 bg-white">
+                  {reportedOwners.map((owner) => (
+                    <div
+                      key={`${owner.year}-${owner.value}`}
+                      className="grid grid-cols-[3.5rem_minmax(0,1fr)] gap-2 border-b border-stm-warm-100 px-2 py-1 last:border-b-0"
+                    >
+                      <span className="font-mono text-stm-warm-500">
+                        {owner.year}
+                      </span>
+                      <span className="min-w-0 break-words">{owner.value}</span>
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-2 text-[11px] leading-4 text-stm-warm-600">
+                  These are dated source transcriptions about the organization;
+                  they do not by themselves assert ownership of the land.
+                </p>
+              </div>
+            )}
+          </section>
         )}
 
         {almanakkenReview && (
@@ -1814,7 +2001,7 @@ export default function PlaceEditor({
         </div>
 
         {/* External Links */}
-        <div>
+        <div id="external-links">
           <label className="block text-sm font-medium text-stm-warm-700 mb-1">
             External Links
             <span className="text-stm-warm-400 font-normal text-xs ml-1">

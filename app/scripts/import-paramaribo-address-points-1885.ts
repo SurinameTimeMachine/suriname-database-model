@@ -86,6 +86,7 @@ function main() {
   let imported = 0;
   let skippedExisting = 0;
   let skippedWithoutPoint = 0;
+  let retiredLegacyDuplicates = 0;
 
   for (const [offset, feature] of (source.features ?? []).entries()) {
     const sourceIndex = offset + 1;
@@ -177,13 +178,60 @@ function main() {
     imported++;
   }
 
+  // An early Gazetteer seed treated every E53 place as a plantation. That
+  // created one false plantation for every address point and also allowed FID
+  // collisions to attach unrelated plantation metadata. Preserve those
+  // published IDs as tombstones and direct clients to the source-bound record.
+  for (const entry of graph) {
+    if (
+      entry.type !== 'plantation' ||
+      entry.deprecated === true ||
+      typeof entry.fid !== 'number' ||
+      typeof entry.id !== 'string' ||
+      entry.sourceRecord != null ||
+      !Array.isArray(entry.sources) ||
+      !entry.sources.includes('map-1930')
+    ) {
+      continue;
+    }
+
+    const addressId = `stm-1885-address-${String(entry.fid).padStart(4, '0')}`;
+    const address = entriesById.get(addressId);
+    const legacyLocation = entry.location as
+      | { lat?: unknown; lng?: unknown; wkt?: unknown }
+      | undefined;
+    const addressLocation = address?.location as
+      | { lat?: unknown; lng?: unknown }
+      | undefined;
+    if (
+      address?.type !== 'historical-address' ||
+      typeof legacyLocation?.wkt !== 'string' ||
+      !/^Point\s*\(/i.test(legacyLocation.wkt) ||
+      legacyLocation.lat !== addressLocation?.lat ||
+      legacyLocation.lng !== addressLocation?.lng ||
+      entry.modifiedAt != null ||
+      entry.modifiedBy != null ||
+      (Array.isArray(entry.externalLinks) && entry.externalLinks.length > 0)
+    ) {
+      continue;
+    }
+
+    entry.deprecated = true;
+    entry.deprecatedAt = '2026-07-13';
+    entry.deprecatedBy = 'data-migration/address-point-deduplication';
+    entry.replacedBy = `https://data.surinametijdmachine.org/place/${addressId}`;
+    entry.deprecationNote =
+      'Erroneous plantation created by a legacy seed from an 1885 historical address point.';
+    retiredLegacyDuplicates++;
+  }
+
   if (write) {
     gazetteer['@graph'] = graph;
     writeFileSync(GAZETTEER_PATH, `${JSON.stringify(gazetteer, null, 2)}\n`);
   }
 
   console.log(
-    `${write ? 'Imported' : 'Would import'} ${imported} address points; ${skippedExisting} already present; ${skippedWithoutPoint} source rows have no point geometry.`,
+    `${write ? 'Imported' : 'Would import'} ${imported} address points; ${skippedExisting} already present; ${skippedWithoutPoint} source rows have no point geometry; ${retiredLegacyDuplicates} legacy plantation duplicates ${write ? 'retired' : 'would be retired'}.`,
   );
 }
 

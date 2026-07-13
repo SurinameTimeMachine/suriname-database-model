@@ -416,6 +416,7 @@ let linkedDistricts = 0;
 let linkedLocDesc = 0;
 let linkedProduct = 0;
 let linkedPsur = 0;
+let qgisPlantationCount = 0;
 
 for (const place of Object.values(placesRaw)) {
   const placeId = place['@id'] as string;
@@ -427,6 +428,9 @@ for (const place of Object.values(placesRaw)) {
   const label = (place['observedLabel'] as string) || `Place ${fid}`;
   const geom = place['hasGeometry'] as { asWKT?: string } | undefined;
   const wkt = geom?.asWKT || null;
+  // Plantation authority records describe areas of cultivated land. Point
+  // observations, including the 1885 address layer, must remain E53 places.
+  if (!wkt || !/^(?:Multi)?Polygon\s*\(/i.test(wkt)) continue;
   const centroid = wkt ? centroidFromWKT(wkt) : null;
 
   // Find linked plantation for Q-ID
@@ -500,11 +504,10 @@ for (const place of Object.values(placesRaw)) {
     modifiedBy: null,
     modifiedAt: null,
   });
+  qgisPlantationCount++;
 }
 
-console.log(
-  `  ${Object.keys(placesRaw).length - riverPlaceUris.size} plantation places (from QGIS)`,
-);
+console.log(`  ${qgisPlantationCount} plantation places (from QGIS polygons)`);
 console.log(`  ${linkedDistricts} linked to districts`);
 console.log(`  ${linkedLocDesc} with location descriptions`);
 console.log(`  ${linkedProduct} with product/place types`);
@@ -897,6 +900,7 @@ const graph = gazetteer.map((entry) => {
     type: entry.type,
     prefLabel: entry.prefLabel,
     altLabels: entry.altLabels,
+    sranantongoNames: entry.sranantongoNames ?? [],
     broader: entry.broader,
     description: entry.description,
     location: entry.location,

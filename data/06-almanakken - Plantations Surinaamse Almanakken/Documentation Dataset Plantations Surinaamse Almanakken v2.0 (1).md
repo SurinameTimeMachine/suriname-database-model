@@ -46,7 +46,6 @@ The following table contains a brief explanation of all the columns in the datas
 
 
 |plantation_std|Standardized name of the planta-<br>tion||
-|---|---|---|
 |plantation_org|Original plantation name||
 |plantation_id|Unique id for plantation, also refer-<br>ring to the wikidata.org page<br>(https://www.wiki-<br>data.org/wiki/[place id here])||
 |psur_id|ID of the same plantation in the Su-<br>riname Plantation Dataset from the<br>Suriname Slave registers||
@@ -68,7 +67,6 @@ The following table contains a brief explanation of all the columns in the datas
 
 
 |owned_by_id2|Reference to a second plantation id<br>that is the legal entity that owns the<br>plantation in this row|[NEW in v2.0]|
-|---|---|---|
 |size_std|Size of the land area in acres ('ak-<br>ker'), standardized||
 |product_std|Produce cultivated at the planta-<br>tion, standardized||
 |enslaved_norm|Total number of enslaved on this<br>plantation (normalized integer that<br>includes the sum of all relevant col-<br>umns)|[NEW in v2.0]|
@@ -94,7 +92,6 @@ The following table contains a brief explanation of all the columns in the datas
 
 
 |privé_vrouwelijke_niet_vrije_be-<br>woners|Number of female enslaved inhabit-<br>ants owned by private person||
-|---|---|---|
 |soort_van_molen|Type of mill||
 |totaal_generaal_bewoners|Total number of inhabitants||
 |vrije_bewoners|Total number of free inhabitants||
@@ -127,7 +124,6 @@ The table below contains a brief explanation of some of the Dutch words that occ
 
 
 |Blankofficier|litt: white overseer, free overseer|
-|---|---|
 |Brandhout|fire wood|
 |Chirurgisch etablissement|medical post|
 |Cacao|cocoa|

@@ -10,7 +10,6 @@ const GAZETTEER_PATH = join(
   'data',
   'places-gazetteer.jsonld',
 );
-
 type GazetteerDocument = {
   '@graph'?: Array<{ id?: string; mergedInto?: string }>;
 };
@@ -49,6 +48,7 @@ export async function GET(
   try {
     const recordResponse = await fetch(
       new URL(`/data/place-records/${id}.${format}`, request.url),
+      { signal: AbortSignal.timeout(10_000) },
     );
     if (!recordResponse.ok) throw new Error('Record not found');
     const body = await recordResponse.text();

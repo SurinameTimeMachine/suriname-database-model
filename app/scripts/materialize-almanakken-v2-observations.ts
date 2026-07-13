@@ -33,6 +33,12 @@ function parseIntField(value: string): number | undefined {
   return Number.isFinite(parsed) ? Math.trunc(parsed) : undefined;
 }
 
+function parseDecimalField(value: string): number | undefined {
+  if (!value) return undefined;
+  const parsed = Number.parseFloat(value.replace(/\s+/g, '').replace(',', '.'));
+  return Number.isFinite(parsed) ? parsed : undefined;
+}
+
 function compactObject<T extends object>(value: T): T | undefined {
   const result: Partial<T> = {};
   for (const [key, item] of Object.entries(value as Record<string, unknown>)) {
@@ -173,7 +179,7 @@ function buildObservation(row: Record<string, string>): AlmanakkenPlantationObse
       [almanakkenField(row, 'owned_by_id'), almanakkenField(row, 'owned_by_lab')],
       [almanakkenField(row, 'owned_by_id2'), almanakkenField(row, 'owned_by_lab')],
     ]),
-    sizeAkkers: parseIntField(almanakkenField(row, 'size_std')),
+    sizeAkkers: parseDecimalField(almanakkenField(row, 'size_std')),
     product: almanakkenField(row, 'product_std'),
     function: almanakkenField(row, 'function'),
     additionalInfo: almanakkenField(row, 'additional_info'),

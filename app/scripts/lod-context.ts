@@ -105,6 +105,7 @@ export function buildContext(): Record<string, unknown> {
   return {
     '@vocab': 'https://schema.org/',
     base: BASE,
+    stm: BASE,
     wd: WD,
     wdt: 'http://www.wikidata.org/prop/direct/',
     crm: 'http://www.cidoc-crm.org/cidoc-crm/',
@@ -142,6 +143,9 @@ export function buildContext(): Record<string, unknown> {
     E55_Type: 'crm:E55_Type',
     E74_Group: 'crm:E74_Group',
     E12_Production: 'crm:E12_Production',
+    PresenceInference: 'stm:PresenceInference',
+    InferenceRule: 'prov:Plan',
+    OrganizationAuthorityOverride: 'stm:OrganizationAuthorityOverride',
 
     P1_is_identified_by: { '@id': 'crm:P1_is_identified_by', '@type': '@id' },
     P1i_identifies: { '@id': 'crm:P1i_identifies', '@type': '@id' },
@@ -209,10 +213,10 @@ export function buildContext(): Record<string, unknown> {
       '@type': '@id',
     },
     P141_assigned: { '@id': 'crm:P141_assigned', '@type': '@id' },
-    P7_took_place_at: { '@id': 'crm:P7_took_place_at', '@type': '@id' },
+    P7_took_place_at: { '@id': 'crm:P7_took_place_at', '@type': 'xsd:string' },
     P14_carried_out_by: {
       '@id': 'crm:P14_carried_out_by',
-      '@type': '@id',
+      '@type': 'xsd:string',
     },
     P108_has_produced: { '@id': 'crm:P108_has_produced', '@type': '@id' },
     P108i_was_produced_by: {
@@ -221,7 +225,7 @@ export function buildContext(): Record<string, unknown> {
     },
     P50_has_current_keeper: {
       '@id': 'crm:P50_has_current_keeper',
-      '@type': '@id',
+      '@type': 'xsd:string',
     },
     contentUrl: { '@id': 'sdo:contentUrl', '@type': '@id' },
     P190_has_symbolic_content: {
@@ -236,6 +240,39 @@ export function buildContext(): Record<string, unknown> {
     broadMatch: { '@id': 'skos:broadMatch', '@type': '@id' },
     narrowMatch: { '@id': 'skos:narrowMatch', '@type': '@id' },
     relatedMatch: { '@id': 'skos:relatedMatch', '@type': '@id' },
+    hasOrganizationalAssociation: {
+      '@id': 'stm:hasOrganizationalAssociation',
+      '@type': '@id',
+    },
+    hasDerivedInference: {
+      '@id': 'stm:hasDerivedInference',
+      '@type': '@id',
+    },
+    inferredPopulationAssociatedWith: {
+      '@id': 'stm:inferredPopulationAssociatedWith',
+      '@type': '@id',
+    },
+    inferredPresenceAt: { '@id': 'stm:inferredPresenceAt', '@type': '@id' },
+    inferredPlace: { '@id': 'stm:inferredPlace', '@type': '@id' },
+    populationCategory: { '@id': 'stm:populationCategory', '@type': '@id' },
+    populationCount: { '@id': 'stm:populationCount', '@type': 'xsd:integer' },
+    certainty: { '@id': 'stm:certainty', '@type': '@id' },
+    inferenceRule: { '@id': 'stm:inferenceRule', '@type': '@id' },
+    presenceInferenceStatus: {
+      '@id': 'stm:presenceInferenceStatus',
+      '@type': 'xsd:string',
+    },
+    editorialNote: { '@id': 'dcterms:description', '@type': 'xsd:string' },
+    authorityReviewStatus: {
+      '@id': 'stm:authorityReviewStatus',
+      '@type': 'xsd:string',
+    },
+    organizationAssociationStatus: {
+      '@id': 'stm:organizationAssociationStatus',
+      '@type': 'xsd:string',
+    },
+    modifiedAt: { '@id': 'dcterms:modified', '@type': 'xsd:date' },
+    modifiedBy: { '@id': 'stm:modifiedBy', '@type': 'xsd:string' },
     hasGeometry: 'geo:hasGeometry',
     asWKT: { '@id': 'geo:asWKT', '@type': 'geo:wktLiteral' },
     additionalType: { '@id': 'sdo:additionalType', '@type': '@id' },
@@ -269,6 +306,14 @@ export function buildContext(): Record<string, unknown> {
     observedName: { '@id': 'stm:observedName', '@type': 'xsd:string' },
     product: { '@id': 'stm:productLabel', '@type': 'xsd:string' },
     enslavedCount: { '@id': 'stm:enslavedCount', '@type': 'xsd:integer' },
+    privateEnslavedCount: {
+      '@id': 'stm:privateEnslavedCount',
+      '@type': 'xsd:integer',
+    },
+    explicitPlantationEnslavedCount: {
+      '@id': 'stm:explicitPlantationEnslavedCount',
+      '@type': 'xsd:integer',
+    },
     deserted: { '@id': 'stm:desertedReported', '@type': 'xsd:boolean' },
     freeResidentsCount: {
       '@id': 'stm:freeResidentsCount',

@@ -59,7 +59,7 @@ type ImplementationStatus = 'aggregate' | 'record' | 'planned';
 const IMPLEMENTATION_STATUS: Record<string, ImplementationStatus> = {
   e25: 'aggregate',
   e26: 'aggregate',
-  e74: 'planned',
+  e74: 'aggregate',
   e53: 'aggregate',
   e41: 'aggregate',
   e22: 'aggregate',
@@ -142,7 +142,7 @@ const ENTITIES: EntityDef[] = [
     type: 'E74',
     label: 'Organization',
     crmClass: 'E74 Group / sdo:Organization',
-    desc: 'A future authority-backed actor that owns or operates a plantation. The current plantation QIDs identify plantations, not actors, so E74 entities are not serialized until owner and operator transcriptions have been reconciled with evidence.',
+    desc: 'An authority-backed plantation organization, distinct from the physical E25 plantation. Its Wikidata QID is an exact authority match; the corresponding E25 uses a close match. Ownership, operation, splits, and mergers require their own dated evidence.',
     color: CRM_COLORS.E74,
     cx: 720,
     cy: 290,
@@ -150,10 +150,9 @@ const ENTITIES: EntityDef[] = [
     properties: [
       { name: 'P1 is identified by', range: 'E41 Appellation' },
       { name: 'rdfs:label', range: 'string (@nl)' },
-      { name: 'sdo:additionalType', range: 'wd:Q188913' },
       {
-        name: 'P48 has preferred identifier',
-        range: 'E42 Identifier (Wikidata Q-ID)',
+        name: 'skos:exactMatch',
+        range: 'Wikidata plantation authority entity',
       },
       {
         name: 'P1 is identified by',
@@ -474,8 +473,8 @@ const RELATIONS: RelDef[] = [
   {
     from: 'e25',
     to: 'e74',
-    label: 'P52 has current owner',
-    desc: 'Plantation E25 instances can be owned or operated by an organization',
+    label: 'STM organizational association',
+    desc: 'The authority QID connects the physical E25 plantation to its corresponding E74 organization; this does not assert ownership',
   },
   {
     from: 'e25',
@@ -560,12 +559,6 @@ const RELATIONS: RelDef[] = [
     to: 'e39',
     label: 'P14 carried out by',
     desc: 'People involved: eigenaar, administrateur, directeur',
-  },
-  {
-    from: 'e74',
-    to: 'e55',
-    label: 'P2 has type',
-    desc: 'Organization type: plantation type (via sdo:additionalType / wd:Q188913)',
   },
   {
     from: 'e13',
@@ -1156,11 +1149,11 @@ function SourcePatternSection() {
           {' -> geo:hasGeometry -> geo:asWKT -> POLYGON(...)'}
         </div>
         <div>
-          <span className="text-ink/45">Ownership:</span>{' '}
+          <span className="text-ink/45">Authority correspondence:</span>{' '}
           <span style={{ color: CRM_COLORS.E25 }}>E25 Plantation</span>
-          {' -> P52 -> '}
+          {' -> STM association -> '}
           <span style={{ color: CRM_COLORS.E74 }}>E74 Organization</span>
-          {' (wd:Q-ID)'}
+          {' -> skos:exactMatch -> Wikidata Q-ID'}
         </div>
         <div>
           <span className="text-ink/45">Time:</span>{' '}

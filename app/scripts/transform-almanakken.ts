@@ -24,6 +24,8 @@ export interface ObservationRow {
   director: string;
   product: string;
   enslaved_count: string;
+  private_enslaved_count: string;
+  explicit_plantation_enslaved_count: string;
   is_deserted: string;
   location_std: string;
   location_org: string;
@@ -54,7 +56,7 @@ export interface AppellationRow {
   symbolic_content: string;
   language: string;
   carried_by: string;
-  identifies_uri: string;
+  identifies_uri: string | string[];
   identifies_type: string;
   source_year: string;
   alt_form_of: string;
@@ -98,6 +100,14 @@ function safeInt(val: string | undefined): string {
   if (!val || !val.trim()) return '';
   const n = parseFloat(val.trim());
   return isNaN(n) ? '' : String(Math.floor(n));
+}
+
+function sumIntFields(...values: string[]): string {
+  const parsed = values
+    .map((value) => safeInt(value))
+    .filter(Boolean)
+    .map(Number);
+  return parsed.length > 0 ? String(parsed.reduce((sum, value) => sum + value, 0)) : '';
 }
 
 // --- Main ---
@@ -145,6 +155,26 @@ export function transformAlmanakken(): AlmanakkenTransformResult {
       director: almanakkenField(row, 'directeuren'),
       product: almanakkenField(row, 'product_std'),
       enslaved_count: safeInt(almanakkenField(row, 'enslaved_norm', 'slaven')),
+      private_enslaved_count:
+        safeInt(almanakkenField(row, 'privé_totaal_niet_vrije_bewoners')) ||
+        sumIntFields(
+          almanakkenField(row, 'privé_mannelijke_niet_vrije_bewoners'),
+          almanakkenField(row, 'privé_vrouwelijke_niet_vrije_bewoners'),
+        ) ||
+        sumIntFields(
+          almanakkenField(row, 'generale_macht_slaven_geschikt_tot_werken_privé'),
+          almanakkenField(row, 'generale_macht_slaven_ongeschikt_tot_werken_privé'),
+        ),
+      explicit_plantation_enslaved_count: sumIntFields(
+        almanakkenField(
+          row,
+          'totaal_slaven_op_de_plantages_aanwezig_geschikt_tot_werk',
+        ),
+        almanakkenField(
+          row,
+          'totaal_slaven_op_de_plantages_aanwezig_ongeschikt_tot_werk',
+        ),
+      ),
       is_deserted: isVerlaten(row.deserted) ? '1' : '',
       location_std: almanakkenField(row, 'loc_std'),
       location_org: almanakkenField(row, 'loc_org'),

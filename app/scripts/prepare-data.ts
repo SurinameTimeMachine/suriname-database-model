@@ -545,6 +545,7 @@ const places: Record<string, unknown>[] = [];
 const appellations: Record<string, unknown>[] = [];
 const sources: Record<string, unknown>[] = [];
 const observations: Record<string, unknown>[] = [];
+const presenceInferences: Record<string, unknown>[] = [];
 const provenance: Record<string, unknown>[] = [];
 
 for (const entity of graph) {
@@ -567,6 +568,8 @@ for (const entity of graph) {
     sources.push(entity);
   } else if (typeSet.has('E13_Attribute_Assignment')) {
     observations.push(entity);
+  } else if (typeSet.has('PresenceInference')) {
+    presenceInferences.push(entity);
   } else if (typeSet.has('ProvenanceRecord')) {
     provenance.push(entity);
   }
@@ -579,6 +582,7 @@ console.log(`  Places: ${places.length}`);
 console.log(`  Appellations: ${appellations.length}`);
 console.log(`  Sources: ${sources.length}`);
 console.log(`  Observations: ${observations.length}`);
+console.log(`  Presence inferences: ${presenceInferences.length}`);
 console.log(`  Provenance: ${provenance.length}`);
 
 // Build indexes
@@ -595,7 +599,7 @@ for (const f of physicalFeatures) {
   physicalFeatureIndex[f['@id'] as string] = f;
 }
 
-// Organization index: keyed by @id (wd:Q...)
+// Organization index: keyed by canonical local @id
 const orgIndex: Record<string, unknown> = {};
 for (const o of organizations) {
   orgIndex[o['@id'] as string] = o;
@@ -616,13 +620,20 @@ for (const s of sources) {
 // Appellation index: grouped by P1i_identifies
 const appellationsByEntity: Record<string, unknown[]> = {};
 for (const a of appellations) {
-  const identifies = a['P1i_identifies'] as string;
-  if (identifies) {
+  for (const identifies of toArray(a['P1i_identifies'] as string | string[])) {
     if (!appellationsByEntity[identifies]) {
       appellationsByEntity[identifies] = [];
     }
     appellationsByEntity[identifies].push(a);
   }
+}
+
+const presenceInferencesByPlantation: Record<string, unknown[]> = {};
+for (const inference of presenceInferences) {
+  const plantation = inference.inferredPresenceAt as string;
+  if (!plantation) continue;
+  presenceInferencesByPlantation[plantation] ??= [];
+  presenceInferencesByPlantation[plantation].push(inference);
 }
 
 // Observation index: grouped by observationOf (organization URI)
@@ -650,6 +661,29 @@ for (const p of provenance) {
 // them through the same CIDOC-CRM shape.
 const gazetteerRaw = readJsonIfExists(gazetteerSrc);
 const gazetteerEntries = (gazetteerRaw?.['@graph'] || []) as GazetteerEntry[];
+const activePlantationsByQid = new Map<string, GazetteerEntry[]>();
+const activeGazetteerById = new Map<string, GazetteerEntry>();
+for (const entry of gazetteerEntries) {
+  if (entry.deprecated || entry.mergedInto || !entry.id) continue;
+  activeGazetteerById.set(entry.id, entry);
+  if (entry.type !== 'plantation') continue;
+  const qid = primaryWikidataQid(entry);
+  if (!qid) continue;
+  activePlantationsByQid.set(qid, [
+    ...(activePlantationsByQid.get(qid) ?? []),
+    entry,
+  ]);
+}
+
+function organizationAssociationStatus(
+  entry: GazetteerEntry,
+): 'linked' | 'needs-organization-link' | 'needs-physical-link-review' {
+  const qid = primaryWikidataQid(entry);
+  if (!qid) return 'needs-organization-link';
+  return (activePlantationsByQid.get(qid)?.length ?? 0) > 1
+    ? 'needs-physical-link-review'
+    : 'linked';
+}
 
 const thesaurusRaw = readJsonIfExists(thesaurusSrc);
 const placeTypeConcepts = ((thesaurusRaw?.['@graph'] || []) as Record<
@@ -1216,6 +1250,7 @@ writeJSON('places.json', placeIndex);
 writeJSON('sources.json', sourceIndex);
 writeJSON('appellations-by-entity.json', appellationsByEntity);
 writeJSON('observations-by-org.json', observationsByOrg);
+writeJSON('presence-inferences-by-plantation.json', presenceInferencesByPlantation);
 writeJSON('lifecycle-events.json', lifecycleEventsByEntity);
 writeJSON('provenance.json', provenanceIndex);
 
@@ -1265,6 +1300,12 @@ if (existsSync(geojsonSrc)) {
         null;
       if (stmId) {
         props.stmId = stmId;
+        const gazetteerEntry = activeGazetteerById.get(stmId);
+        if (gazetteerEntry?.type === 'plantation') {
+          props.wikidataQid = primaryWikidataQid(gazetteerEntry) ?? undefined;
+          props.organizationAssociationStatus =
+            organizationAssociationStatus(gazetteerEntry);
+        }
         mappedGazetteerIds.add(stmId);
         enriched++;
       }
@@ -1300,6 +1341,10 @@ if (existsSync(geojsonSrc)) {
         crmBadge === 'E53' ? entryUri : `${entryUri}/location`;
       const status =
         type === 'road' || type === 'railroad' ? 'infrastructure' : 'named';
+      const wikidataQid =
+        type === 'plantation' ? primaryWikidataQid(entry) : null;
+      const associationStatus =
+        type === 'plantation' ? organizationAssociationStatus(entry) : undefined;
 
       // LineString / MultiLineString features - use WKT if available.
       const wkt = typeof loc.wkt === 'string' ? loc.wkt : null;
@@ -1374,6 +1419,8 @@ if (existsSync(geojsonSrc)) {
               status,
               featureType: type,
               mapYear: derivedMapYear,
+              wikidataQid: wikidataQid ?? undefined,
+              organizationAssociationStatus: associationStatus,
             },
           });
           added++;
@@ -1408,6 +1455,8 @@ if (existsSync(geojsonSrc)) {
                 status,
                 featureType: type,
                 mapYear: derivedMapYear,
+                wikidataQid: wikidataQid ?? undefined,
+                organizationAssociationStatus: associationStatus,
               },
             });
             added++;
@@ -1435,6 +1484,8 @@ if (existsSync(geojsonSrc)) {
             status,
             featureType: type,
             mapYear: derivedMapYear,
+            wikidataQid: wikidataQid ?? undefined,
+            organizationAssociationStatus: associationStatus,
           },
         });
         added++;

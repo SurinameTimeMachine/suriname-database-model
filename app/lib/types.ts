@@ -17,6 +17,8 @@ export interface E25Plantation {
   featureType: string;
   prefLabel: string; // rdfs:label
   closeMatch?: string | string[];
+  hasOrganizationalAssociation?: string;
+  organizationAssociationStatus?: OrganizationAssociationStatus;
   psurId?: string | string[];
   /** @deprecated Legacy aggregate field; the current pipeline does not emit it. */
   P52_has_current_owner?: string;
@@ -42,19 +44,44 @@ export interface E26PhysicalFeature {
   P1_is_identified_by?: string | string[];
   mainBodyWater?: string;
   description?: string;
+  hasOrganizationalAssociation?: string;
+  organizationAssociationStatus?: OrganizationAssociationStatus;
   lifecycleEvents?: string[]; // Event URIs: E12/E11/E6/E17/E81 etc.
   wasDerivedFrom?: string;
 }
+
+export type OrganizationAssociationStatus =
+  | 'linked'
+  | 'needs-organization-link'
+  | 'needs-physical-link-review';
 
 export interface E74Organization {
   '@id': string;
   '@type': string[];
   additionalType?: string; // sdo:additionalType -> wd:Q188913
   prefLabel: string; // rdfs:label
-  psurId?: string; // CRM: P1 is identified by -> E42 Identifier (PSUR register ID)
+  psurId?: string | string[]; // source register identifiers
   absorbedInto?: string; // CRM: P99i was dissolved by -> E68 Dissolution (successor E74)
-  sameAs?: string;
+  exactMatch?: string;
+  altLabel?: string | string[];
+  editorialNote?: string;
+  authorityReviewStatus?: 'unreviewed' | 'reviewed' | 'disputed';
+  modifiedAt?: string;
+  modifiedBy?: string;
+  P1_is_identified_by?: string | string[];
   wasDerivedFrom?: string; // prov:wasDerivedFrom
+}
+
+export interface OrganizationAuthorityOverride {
+  '@id': string;
+  '@type': 'OrganizationAuthorityOverride';
+  qid: string;
+  preferredLabel?: string;
+  alternativeLabels?: string[];
+  editorialNote?: string;
+  reviewStatus: 'unreviewed' | 'reviewed' | 'disputed';
+  modifiedAt?: string;
+  modifiedBy?: string;
 }
 
 export interface Geometry {
@@ -81,7 +108,7 @@ export interface E41Appellation {
   P190_has_symbolic_content: string;
   P72_has_language?: string;
   P128i_is_carried_by?: string;
-  P1i_identifies?: string;
+  P1i_identifies?: string | string[];
   P139_has_alternative_form?: string;
   mapYear?: string; // Derivable from E22 source -> E12 Production -> P4 has time-span
 }
@@ -100,7 +127,7 @@ export interface E22Source {
 export interface OrganizationObservation {
   '@id': string;
   '@type': string[];
-  observationOf: string; // CRM: P140 assigned attribute to -> unambiguous E25
+  observationOf?: string; // CRM: P140 assigned attribute to -> local E74 organization
   sourcePlantationQid?: string; // Source matching key, retained even when unresolved
   observationYear: string; // CRM: P4 has time-span -> E52
   observedName?: string; // CRM: P141 assigned -> E41 Appellation
@@ -109,6 +136,12 @@ export interface OrganizationObservation {
   hasAdministrator?: string; // CRM: P14 carried out by (P14.1 picot:administrator)
   hasDirector?: string; // CRM: P14 carried out by (P14.1 picot:director)
   product?: string; // CRM: P141 assigned -> E55 Type
+  enslavedCount?: number;
+  privateEnslavedCount?: number;
+  explicitPlantationEnslavedCount?: number;
+  freeResidentsCount?: number;
+  presenceInferenceStatus?: string;
+  hasDerivedInference?: string;
   deserted?: boolean; // CRM: E17 Type Assignment (P41 classified E25, P42 assigned E55 abandoned)
   locationStd?: string; // CRM: P7 took place at -> E53 Place (text)
   sizeAkkers?: number; // CRM: P43 has dimension -> E54 Dimension (akkers)
@@ -122,6 +155,21 @@ export interface OrganizationObservation {
   enslavedSharedWith?: string;
   hadPrimarySource?: string; // prov:hadPrimarySource
   wasDerivedFrom?: string; // prov:wasDerivedFrom
+}
+
+export interface PresenceInference {
+  '@id': string;
+  '@type': string[];
+  inferredPopulationAssociatedWith: string;
+  inferredPresenceAt: string;
+  inferredPlace?: string;
+  populationCategory: string;
+  populationCount: number;
+  certainty: string;
+  inferenceRule: string;
+  P4_has_time_span?: string;
+  hadPrimarySource?: string;
+  wasDerivedFrom: string;
 }
 
 export interface ProvenanceRecord {
@@ -180,6 +228,7 @@ export interface GeoJSONFeatureProperties {
   plantationUri?: string;
   featureUri?: string;
   wikidataQid?: string;
+  organizationAssociationStatus?: OrganizationAssociationStatus;
   mainBodyWater?: string;
   placeUri?: string;
 }

@@ -1,6 +1,8 @@
 'use client';
 
-import PlaceEditor from '@/components/PlaceEditor';
+import PlaceEditor, {
+  type PlaceOrganizationContext,
+} from '@/components/PlaceEditor';
 import PlaceMergeView from '@/components/PlaceMergeView';
 import SourceFilter, {
   emptyFilterState,
@@ -133,10 +135,10 @@ function normalizeNamesFromLegacy(entry: Record<string, unknown>): PlaceName[] {
       )
     : [];
   if (prefLabel) {
-    const hasPreferred = names.some(
-      (name) => name.isPreferred === true && name.text === prefLabel,
-    );
-    if (!hasPreferred) {
+    const existingPreferred = names.find((name) => name.text === prefLabel);
+    if (existingPreferred) {
+      existingPreferred.isPreferred = true;
+    } else {
       names.push({
         text: prefLabel,
         language: 'nl',
@@ -494,9 +496,7 @@ function loadVisibleColumns(): Set<SortKey> {
     const stored = localStorage.getItem(LS_COLUMNS_KEY);
     if (stored) {
       const parsed = JSON.parse(stored) as SortKey[];
-      const columns = new Set(parsed);
-      columns.add('almanakkenReview');
-      return columns;
+      return new Set(parsed);
     }
   } catch {
     // ignore
@@ -1319,11 +1319,83 @@ function PlacesPageInner() {
     );
   }, [allData, selectedId, isCreating]);
 
+  const selectedOrganizationContext = useMemo<
+    PlaceOrganizationContext | undefined
+  >(() => {
+    if (!allData || !selectedPlace || isCreating) return undefined;
+    if (selectedPlace.type !== 'plantation') return undefined;
+
+    const selectedFeature = allData.geojson.features.find((feature) => {
+      const props = feature.properties;
+      return (
+        props.stmId === selectedPlace.id ||
+        extractPlaceId(props.placeUri) === selectedPlace.id ||
+        extractPlaceId(props.plantationUri) === selectedPlace.id ||
+        extractPlaceId(props.featureUri) === selectedPlace.id ||
+        feature.id === selectedPlace.id
+      );
+    });
+    const featureUri =
+      selectedFeature?.properties.plantationUri ??
+      selectedFeature?.properties.featureUri ??
+      selectedFeature?.properties.placeUri;
+    const physicalEntity = featureUri
+      ? (allData.plantations[featureUri] ?? allData.physicalFeatures[featureUri])
+      : undefined;
+    const gazetteerQid = selectedPlace.externalLinks
+      .find((link) => link.authority === 'wikidata')
+      ?.identifier.match(/Q\d+/i)?.[0]
+      ?.toUpperCase();
+    const organizationUri =
+      physicalEntity?.hasOrganizationalAssociation ??
+      (gazetteerQid
+        ? `https://data.surinametijdmachine.org/organization/${gazetteerQid}`
+        : undefined);
+    const organization = organizationUri
+      ? (allData.organizations[organizationUri] ?? null)
+      : null;
+    const organizationQid =
+      organization?.exactMatch?.match(/Q\d+/i)?.[0]?.toUpperCase() ??
+      gazetteerQid ??
+      null;
+    const linkedPlantations = organizationUri
+      ? Object.values(allData.plantations).filter(
+          (plantation) =>
+            plantation.hasOrganizationalAssociation === organizationUri,
+        )
+      : [];
+    const associationStatus =
+      selectedFeature?.properties.organizationAssociationStatus ??
+      physicalEntity?.organizationAssociationStatus ??
+      (organization && linkedPlantations.length > 0
+        ? gazetteerQid
+          ? 'linked'
+          : 'needs-organization-link'
+        : organization
+          ? 'needs-physical-link-review'
+          : 'needs-organization-link');
+
+    return {
+      organization,
+      associationStatus,
+      linkedPlantations,
+      observations: organizationUri
+        ? (allData.observations[organizationUri] ?? [])
+        : [],
+      qid: organizationQid,
+    };
+  }, [allData, selectedPlace, isCreating]);
+
   const typeCounts = useMemo(() => {
-    const counts: Record<string, number> = { all: places.length };
-    for (const p of places) counts[p.type] = (counts[p.type] || 0) + 1;
+    const countable = places.filter(
+      (place) => !place.deprecated && (showMerged || !place.mergedInto),
+    );
+    const counts: Record<string, number> = { all: countable.length };
+    for (const place of countable) {
+      counts[place.type] = (counts[place.type] || 0) + 1;
+    }
     return counts;
-  }, [places]);
+  }, [places, showMerged]);
 
   const handleSave = useCallback(
     async (updated: GazetteerPlace) => {
@@ -1941,6 +2013,7 @@ function PlacesPageInner() {
                     almanakkenReview={
                       almanakkenReview?.byPlaceId[selectedPlace.id]
                     }
+                    organizationContext={selectedOrganizationContext}
                     canEdit={canEdit}
                     onSave={handleSave}
                     onCancel={handleCancel}
@@ -1958,6 +2031,10 @@ function PlacesPageInner() {
                     place={selectedPlace}
                     districts={districts}
                     sourceAppellations={selectedSourceAppellations}
+                    almanakkenReview={
+                      almanakkenReview?.byPlaceId[selectedPlace.id]
+                    }
+                    organizationContext={selectedOrganizationContext}
                     canEdit={canEdit}
                     onSave={handleSave}
                     onCancel={handleCancel}

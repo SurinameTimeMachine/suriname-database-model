@@ -134,6 +134,11 @@ async function main() {
   const almanakkenReview = JSON.parse(
     readArtifact(PUBLIC_DATA_DIR, 'almanakken-review.json').toString('utf-8'),
   ) as AlmanakkenReviewDocument;
+  const organizationOverrides = JSON.parse(
+    readArtifact(DATA_DIR, 'organization-authority-overrides.jsonld').toString(
+      'utf-8',
+    ),
+  ) as JsonLdDocument;
 
   assert(
     database.equals(publishedDatabase),
@@ -197,6 +202,17 @@ async function main() {
           `${id} uses a plantation authority QID as ${property}`,
         );
       }
+    }
+    if (types.includes('E74_Group')) {
+      assert(
+        id.startsWith(`${CANONICAL_BASE}organization/Q`),
+        `E74 organization must use a canonical local URI: ${id}`,
+      );
+      assert(
+        typeof entity.exactMatch === 'string' &&
+          /^https?:\/\/www\.wikidata\.org\/entity\/Q\d+$/.test(entity.exactMatch),
+        `E74 organization must have one Wikidata skos:exactMatch: ${id}`,
+      );
     }
     ids.add(id);
   }
@@ -373,6 +389,79 @@ async function main() {
   const aggregateEntitiesById = new Map(
     document['@graph'].map((entity) => [entity['@id'], entity]),
   );
+  const associationStatuses = new Set([
+    'linked',
+    'needs-organization-link',
+    'needs-physical-link-review',
+  ]);
+  for (const entity of document['@graph'].filter((candidate) =>
+    toArray(candidate['@type'] as string | string[]).includes('Plantation'),
+  )) {
+    const status = entity.organizationAssociationStatus;
+    assert(
+      typeof status === 'string' && associationStatuses.has(status),
+      `Plantation ${entity['@id']} has no valid organization association status`,
+    );
+    const organizationUri = entity.hasOrganizationalAssociation;
+    if (status === 'needs-organization-link') {
+      assert(
+        organizationUri == null,
+        `Plantation ${entity['@id']} is marked unlinked but has an E74 association`,
+      );
+      continue;
+    }
+    assert(
+      typeof organizationUri === 'string',
+      `Plantation ${entity['@id']} is marked ${status} without an E74 association`,
+    );
+    const organization = aggregateEntitiesById.get(organizationUri);
+    assert(
+      organization &&
+        toArray(organization['@type'] as string | string[]).includes('E74_Group'),
+      `Plantation ${entity['@id']} association does not resolve to E74`,
+    );
+    assert(
+      toArray(entity.closeMatch as string | string[]).includes(
+        organization.exactMatch as string,
+      ),
+      `Plantation ${entity['@id']} and E74 association do not share the authority QID`,
+    );
+  }
+  for (const feature of mapFeatures.features ?? []) {
+    const properties = feature.properties ?? {};
+    if (properties.featureType !== 'plantation') continue;
+    const status = properties.organizationAssociationStatus;
+    assert(
+      typeof status === 'string' && associationStatuses.has(status),
+      `Explore plantation ${String(properties.stmId)} has no association review status`,
+    );
+    assert(
+      typeof properties.wikidataQid === 'string'
+        ? status !== 'needs-organization-link'
+        : status === 'needs-organization-link',
+      `Explore plantation ${String(properties.stmId)} has inconsistent QID and association status`,
+    );
+  }
+  const overrideQids = new Set<string>();
+  for (const override of organizationOverrides['@graph'] ?? []) {
+    const qid = override.qid;
+    assert(
+      typeof qid === 'string' && /^Q\d+$/.test(qid),
+      'Organization authority override has an invalid QID',
+    );
+    assert(!overrideQids.has(qid), `Duplicate organization override for ${qid}`);
+    assert(
+      aggregateEntitiesById.has(`${CANONICAL_BASE}organization/${qid}`),
+      `Organization override targets unknown E74 organization ${qid}`,
+    );
+    assert(
+      ['unreviewed', 'reviewed', 'disputed'].includes(
+        String(override.reviewStatus),
+      ),
+      `Organization override ${qid} has an invalid review status`,
+    );
+    overrideQids.add(qid);
+  }
   const aggregateAlmanakkenEvidence = document['@graph'].filter(
     (entity) =>
       typeof entity['@id'] === 'string' &&
@@ -384,6 +473,17 @@ async function main() {
   );
   for (const evidence of aggregateAlmanakkenEvidence) {
     const targetId = evidence.P140_assigned_attribute_to;
+    if (typeof evidence.sourcePlantationQid === 'string') {
+      assert(
+        targetId != null,
+        `QID-bearing Almanakken observation has no E74 target: ${evidence['@id']}`,
+      );
+    } else {
+      assert(
+        targetId == null,
+        `Almanakken observation without a QID has an unsupported target: ${evidence['@id']}`,
+      );
+    }
     if (targetId == null) continue;
     assert(
       typeof targetId === 'string',
@@ -392,10 +492,51 @@ async function main() {
     const target = aggregateEntitiesById.get(targetId);
     assert(target, `Aggregate Almanakken observation targets unknown entity ${targetId}`);
     assert(
-      toArray(target['@type'] as string | string[]).includes(
-        'E25_Human_Made_Feature',
-      ),
-      `Aggregate Almanakken observation targets a non-E25 entity ${targetId}`,
+      toArray(target['@type'] as string | string[]).includes('E74_Group'),
+      `Aggregate Almanakken observation targets a non-E74 entity ${targetId}`,
+    );
+  }
+  const inferredPresence = document['@graph'].filter((entity) =>
+    toArray(entity['@type'] as string | string[]).includes('PresenceInference'),
+  );
+  assert(
+    aggregateAlmanakkenEvidence.every(
+      (entity) => typeof entity.presenceInferenceStatus === 'string',
+    ),
+    'Every Almanakken observation must expose its presence-inference status',
+  );
+  assert(
+    inferredPresence.length ===
+      aggregateAlmanakkenEvidence.filter(
+        (entity) => entity.presenceInferenceStatus === 'inferred-probable',
+      ).length,
+    'Presence inference nodes and inferred observation statuses differ',
+  );
+  for (const inference of inferredPresence) {
+    const inferenceId = String(inference['@id']);
+    const observation = aggregateEntitiesById.get(inference.wasDerivedFrom);
+    const organization = aggregateEntitiesById.get(
+      inference.inferredPopulationAssociatedWith,
+    );
+    const plantation = aggregateEntitiesById.get(inference.inferredPresenceAt);
+    assert(observation, `${inferenceId} has no source observation`);
+    assert(
+      organization &&
+        toArray(organization['@type'] as string | string[]).includes('E74_Group'),
+      `${inferenceId} has no E74 organization`,
+    );
+    assert(
+      plantation &&
+        toArray(plantation['@type'] as string | string[]).includes(
+          'E25_Human_Made_Feature',
+        ),
+      `${inferenceId} has no E25 plantation`,
+    );
+    assert(
+      inference.certainty === `${CANONICAL_BASE}type/certainty/probable` &&
+        typeof inference.populationCount === 'number' &&
+        inference.populationCount > 0,
+      `${inferenceId} is not a qualified probable population assertion`,
     );
   }
   const attachedSourceRows = new Set<string>();
@@ -473,6 +614,14 @@ async function main() {
       typeof location?.wkt === 'string' &&
         /^(?:Multi)?LineString\s*\(/i.test(location.wkt),
       `${String(entry.type)} ${String(entry.id)} is not backed by line geometry`,
+    );
+  }
+  for (const entry of activeGazetteer) {
+    if (entry.type !== 'plantation') continue;
+    const location = entry.location as Record<string, unknown> | undefined;
+    assert(
+      typeof location?.wkt !== 'string' || !/^Point\s*\(/i.test(location.wkt),
+      `Plantation ${String(entry.id)} is incorrectly backed by point geometry`,
     );
   }
   const sourceAddressFeatures = (addressPointSource.features ?? []).filter(

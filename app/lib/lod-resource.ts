@@ -9,11 +9,14 @@ export const resourcePrefixes = new Set([
   'database',
   'feature',
   'image',
+  'inference',
   'obs',
+  'organization',
   'place',
   'plantation',
   'production',
   'provenance',
+  'rule',
   'source',
   'timespan',
   'type',
@@ -36,7 +39,12 @@ async function loadDatabase(): Promise<DatabaseDocument> {
   databasePromise ??= readFile(
     join(process.cwd(), 'public', 'data', 'database.jsonld'),
     'utf-8',
-  ).then((content) => JSON.parse(content) as DatabaseDocument);
+  )
+    .then((content) => JSON.parse(content) as DatabaseDocument)
+    .catch((error: unknown) => {
+      databasePromise = null;
+      throw error;
+    });
   return await databasePromise;
 }
 

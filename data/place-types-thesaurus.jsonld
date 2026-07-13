@@ -186,18 +186,21 @@
         "srn": "Plantasi"
       },
       "definition": {
-        "en": "A large agricultural estate, typically established during the colonial period for the production of export crops using enslaved labor.",
-        "nl": "Een groot landbouwbedrijf, doorgaans opgericht tijdens de koloniale periode voor de productie van exportgewassen met gebruik van tot slaaf gemaakte arbeid."
+        "en": "A physically altered agricultural complex comprising cultivated land and fixed works such as drainage systems, buildings, mills, and factories used for crop production. The physical complex is distinct from the plantation organization and from the geographic place it occupies.",
+        "nl": "Een fysiek ingericht landbouwcomplex bestaande uit cultuurgrond en vaste werken zoals afwateringssystemen, gebouwen, molens en fabrieken voor gewasproductie. Het fysieke complex is onderscheiden van de plantageorganisatie en van de geografische plaats die het inneemt."
       },
       "editorialNote": {
-        "en": "Colonial data bias: Plantations were the primary sites of enslaved labor in Suriname. The term itself carries the weight of colonial exploitation."
+        "en": "Colonial data bias: plantations were principal sites of coerced and enslaved labor in Suriname. This concept classifies the physical agricultural complex; legal, operational, labor, and coercive relations belong to the separate plantation organization and source-qualified observations."
       },
       "inScheme": "stm:vocabulary/place-type",
       "broader": "stm:vocabulary/place-type/human-made",
       "related": [
-        "stm:vocabulary/place-type/settlement"
+        "stm:vocabulary/place-type/settlement",
+        "stm:vocabulary/place-type/building",
+        "stm:vocabulary/place-type/industrial-facility",
+        "stm:vocabulary/place-type/central-factory"
       ],
-      "exactMatch": [
+      "closeMatch": [
         "http://www.wikidata.org/entity/Q188913"
       ],
       "typeId": "plantation",
@@ -206,7 +209,7 @@
       "crmBadge": "E25",
       "sortOrder": 1,
       "created": "2026-04-07",
-      "modified": "2026-06-30"
+      "modified": "2026-07-13"
     },
     {
       "@id": "stm:vocabulary/place-type/military-post",

@@ -8,7 +8,7 @@
  *
  * No intermediate CSV files -- everything stays in memory.
  */
-import { mkdirSync, writeFileSync } from 'fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import {
   type AppellationRow,
@@ -32,7 +32,33 @@ import {
 import { BASE, WD, buildContext, buildContextDocument } from './lod-context';
 
 const LOD_DIR = join(__dirname, '../lod');
+const ORGANIZATION_OVERRIDES_PATH = join(
+  __dirname,
+  '../../data/organization-authority-overrides.jsonld',
+);
 mkdirSync(LOD_DIR, { recursive: true });
+
+type OrganizationOverride = {
+  qid?: string;
+  preferredLabel?: string;
+  alternativeLabels?: string[];
+  editorialNote?: string;
+  reviewStatus?: 'unreviewed' | 'reviewed' | 'disputed';
+  modifiedAt?: string;
+  modifiedBy?: string;
+};
+
+function readOrganizationOverrides(): Map<string, OrganizationOverride> {
+  if (!existsSync(ORGANIZATION_OVERRIDES_PATH)) return new Map();
+  const document = JSON.parse(
+    readFileSync(ORGANIZATION_OVERRIDES_PATH, 'utf-8'),
+  ) as { '@graph'?: OrganizationOverride[] };
+  return new Map(
+    (document['@graph'] ?? [])
+      .filter((entry) => typeof entry.qid === 'string' && /^Q\d+$/.test(entry.qid))
+      .map((entry) => [entry.qid!, entry]),
+  );
+}
 
 // --- Entity builders ---
 
@@ -70,6 +96,8 @@ function buildE25Plantations(
   plantations: E25Row[],
   appellationIndex: Map<string, string[]>,
   mapLinkIndex: Map<string, MapLink[]>,
+  organizationUriByQid: Map<string, string>,
+  plantationUrisByQid: Map<string, string[]>,
 ): {
   entities: Record<string, unknown>[];
   provenance: Record<string, unknown>[];
@@ -102,6 +130,16 @@ function buildE25Plantations(
       entity.psurId = p.psur_ids.length === 1 ? p.psur_ids[0] : p.psur_ids;
     }
     if (p.p53_place_uri) entity.P53_has_location = p.p53_place_uri;
+    const organizationUri = organizationUriByQid.get(p.wikidata_qid);
+    if (organizationUri) {
+      entity.hasOrganizationalAssociation = organizationUri;
+      entity.organizationAssociationStatus =
+        (plantationUrisByQid.get(p.wikidata_qid)?.length ?? 0) > 1
+          ? 'needs-physical-link-review'
+          : 'linked';
+    } else {
+      entity.organizationAssociationStatus = 'needs-organization-link';
+    }
 
     const appUris = appellationIndex.get(p.uri) ?? [];
     if (appUris.length > 0) {
@@ -149,6 +187,107 @@ function buildE25Plantations(
   }
 
   return { entities, provenance };
+}
+
+function buildE74Organizations(
+  plantations: E25Row[],
+  observations: ObservationRow[],
+  appellationIndex: Map<string, string[]>,
+  overrides: Map<string, OrganizationOverride>,
+): {
+  entities: Record<string, unknown>[];
+  provenance: Record<string, unknown>[];
+  uriByQid: Map<string, string>;
+} {
+  const namesByQid = new Map<string, Map<string, number>>();
+  const psurByQid = new Map<string, Set<string>>();
+
+  const addName = (qid: string, name: string) => {
+    if (!qid || !name.trim()) return;
+    const names = namesByQid.get(qid) ?? new Map<string, number>();
+    names.set(name.trim(), (names.get(name.trim()) ?? 0) + 1);
+    namesByQid.set(qid, names);
+  };
+  const addPsur = (qid: string, value: string) => {
+    if (!qid || !value.trim()) return;
+    const identifiers = psurByQid.get(qid) ?? new Set<string>();
+    for (const id of value.split(/[;,]/).map((part) => part.trim()).filter(Boolean)) {
+      identifiers.add(id);
+    }
+    psurByQid.set(qid, identifiers);
+  };
+
+  for (const plantation of plantations) {
+    if (!plantation.wikidata_qid) continue;
+    addName(plantation.wikidata_qid, plantation.prefLabel);
+    for (const id of plantation.psur_ids) addPsur(plantation.wikidata_qid, id);
+  }
+  for (const observation of observations) {
+    if (!observation.plantation_qid) continue;
+    addName(
+      observation.plantation_qid,
+      observation.standardized_name || observation.observed_name,
+    );
+    addName(observation.plantation_qid, observation.observed_name);
+    addPsur(observation.plantation_qid, observation.psur_id);
+  }
+
+  const qids = [...new Set([...namesByQid.keys(), ...psurByQid.keys()])].sort();
+  const uriByQid = new Map(qids.map((qid) => [qid, `${BASE}organization/${qid}`]));
+  const provenance: Record<string, unknown>[] = [];
+  const entities = qids.map((qid) => {
+    const uri = uriByQid.get(qid)!;
+    const names = [...(namesByQid.get(qid)?.entries() ?? [])].sort(
+      (a, b) => b[1] - a[1] || a[0].localeCompare(b[0]),
+    );
+    const identifiers = [...(psurByQid.get(qid) ?? [])].sort();
+    const appUris = appellationIndex.get(uri) ?? [];
+    const provId = `${BASE}provenance/e74-${qid.toLowerCase()}`;
+    const entity: Record<string, unknown> = {
+      '@id': uri,
+      '@type': ['E74_Group'],
+      prefLabel: names[0]?.[0] ?? qid,
+      exactMatch: `${WD}${qid}`,
+      wasDerivedFrom: provId,
+    };
+    const override = overrides.get(qid);
+    if (override?.preferredLabel?.trim()) {
+      entity.prefLabel = override.preferredLabel.trim();
+    }
+    const alternativeLabels = (override?.alternativeLabels ?? [])
+      .map((label) => label.trim())
+      .filter(Boolean);
+    if (alternativeLabels.length > 0) {
+      entity.altLabel = alternativeLabels;
+    }
+    if (override?.editorialNote?.trim()) {
+      entity.editorialNote = override.editorialNote.trim();
+    }
+    entity.authorityReviewStatus = override?.reviewStatus ?? 'unreviewed';
+    if (override?.modifiedAt) entity.modifiedAt = override.modifiedAt;
+    if (override?.modifiedBy) entity.modifiedBy = override.modifiedBy;
+    if (identifiers.length > 0) {
+      entity.psurId = identifiers.length === 1 ? identifiers[0] : identifiers;
+    }
+    if (appUris.length > 0) {
+      entity.P1_is_identified_by = appUris.length === 1 ? appUris[0] : appUris;
+    }
+    provenance.push({
+      '@id': provId,
+      '@type': ['ProvenanceRecord'],
+      sourceFile:
+        'data/06-almanakken - Plantations Surinaamse Almanakken/Plantations Surinaamse Almanakken v2.0 (1).csv; data/07-gis-plantation-map-1930/plantation_polygons_1930.csv',
+      sourceColumn: 'plantation_id/qid, plantation_std/plantation_org',
+      sourceRow: `plantation_id=${qid}`,
+      transformedBy: 'scripts/generate-database.ts',
+      modelEntity: 'E74_Group',
+      schemaTable: 'organizations',
+      linkedVia: `plantation_id -> skos:exactMatch -> wd:${qid}`,
+    });
+    return entity;
+  });
+
+  return { entities, provenance, uriByQid };
 }
 
 function buildE26PhysicalFeatures(
@@ -377,6 +516,11 @@ function buildE55Types(): Record<string, unknown>[] {
     { uri: `${BASE}type/product/cacao`, label: 'Cacao' },
     { uri: `${BASE}type/product/cotton`, label: 'Cotton' },
     { uri: `${BASE}type/product/wood`, label: 'Wood' },
+    { uri: `${BASE}type/certainty/probable`, label: 'Probable' },
+    {
+      uri: `${BASE}type/population/enslaved`,
+      label: 'Enslaved population',
+    },
     // Natural-feature vocabulary used by E26 records
     {
       uri: `${BASE}vocabulary/geographical-feature/natural/river`,
@@ -399,6 +543,18 @@ function buildE55Types(): Record<string, unknown>[] {
     }
     return entity;
   });
+}
+
+function buildInferenceRules(): Record<string, unknown>[] {
+  return [
+    {
+      '@id': `${BASE}rule/enslaved-population-presence-at-matched-plantation`,
+      '@type': ['InferenceRule'],
+      prefLabel: 'Enslaved population presence at matched plantation',
+      'dcterms:description':
+        'A positive Almanakken enslaved-person count about a plantation organization supports probable presence at the uniquely matched physical plantation, unless the source states that the population was shared with another plantation.',
+    },
+  ];
 }
 
 function buildE52TimeSpans(years: Set<string>): Record<string, unknown>[] {
@@ -450,14 +606,18 @@ function buildE36Images(sources: SourceRow[]): Record<string, unknown>[] {
 
 function buildObservations(
   obs: ObservationRow[],
+  organizationUriByQid: Map<string, string>,
   plantationUriByQid: Map<string, string>,
+  placeUriByPlantationUri: Map<string, string>,
 ): {
   entities: Record<string, unknown>[];
+  inferences: Record<string, unknown>[];
   provenance: Record<string, unknown>[];
   observationYears: Set<string>;
   resolvedTargets: number;
 } {
   const entities: Record<string, unknown>[] = [];
+  const inferences: Record<string, unknown>[] = [];
   const provenance: Record<string, unknown>[] = [];
   const seenYears = new Set<string>();
   const observationYears = new Set<string>();
@@ -474,11 +634,11 @@ function buildObservations(
     if (o.plantation_qid) {
       entity.sourcePlantationQid = o.plantation_qid;
     }
-    const plantationUri = plantationUriByQid.get(o.plantation_qid);
-    if (plantationUri) {
-      entity.observationOf = plantationUri;
+    const organizationUri = organizationUriByQid.get(o.plantation_qid);
+    if (organizationUri) {
+      entity.observationOf = organizationUri;
       // CRM alignment: P140 assigned attribute to
-      entity.P140_assigned_attribute_to = plantationUri;
+      entity.P140_assigned_attribute_to = organizationUri;
       resolvedTargets++;
     }
     if (o.observation_year) {
@@ -493,6 +653,20 @@ function buildObservations(
     if (o.administrator) entity.hasAdministrator = o.administrator;
     if (o.director) entity.hasDirector = o.director;
     if (o.product) entity.product = o.product;
+    const enslavedCount = parseInt(o.enslaved_count);
+    if (!isNaN(enslavedCount)) entity.enslavedCount = enslavedCount;
+    const privateEnslavedCount = parseInt(o.private_enslaved_count);
+    if (!isNaN(privateEnslavedCount)) {
+      entity.privateEnslavedCount = privateEnslavedCount;
+    }
+    const explicitPlantationCount = parseInt(
+      o.explicit_plantation_enslaved_count,
+    );
+    if (!isNaN(explicitPlantationCount)) {
+      entity.explicitPlantationEnslavedCount = explicitPlantationCount;
+    }
+    const freeResidentsCount = parseInt(o.free_residents);
+    if (!isNaN(freeResidentsCount)) entity.freeResidentsCount = freeResidentsCount;
     if (o.is_deserted) entity.deserted = true;
     if (o.location_std) entity.locationStd = o.location_std;
     if (o.size_akkers) {
@@ -522,8 +696,55 @@ function buildObservations(
         .filter(Boolean)
         .map((id) => `${WD}${id}`);
     }
-    if (o.enslaved_shared_with)
+    if (o.enslaved_shared_with) {
       entity.enslavedSharedWith = o.enslaved_shared_with;
+    }
+
+    const plantationUri = plantationUriByQid.get(o.plantation_qid);
+    const inferredPopulationCount =
+      Number.isFinite(explicitPlantationCount) && explicitPlantationCount > 0
+        ? explicitPlantationCount
+        : enslavedCount;
+    if (!organizationUri) {
+      entity.presenceInferenceStatus = 'unresolved-organization';
+    } else if (
+      !Number.isFinite(inferredPopulationCount) ||
+      inferredPopulationCount <= 0
+    ) {
+      entity.presenceInferenceStatus = 'not-applicable-no-positive-count';
+    } else if (o.enslaved_shared_with) {
+      entity.presenceInferenceStatus = 'suppressed-shared-population';
+    } else if (
+      Number.isFinite(privateEnslavedCount) &&
+      privateEnslavedCount > 0 &&
+      !(Number.isFinite(explicitPlantationCount) && explicitPlantationCount > 0)
+    ) {
+      entity.presenceInferenceStatus = 'suppressed-private-assignment';
+    } else if (!plantationUri) {
+      entity.presenceInferenceStatus = 'unresolved-physical-plantation';
+    } else {
+      const inferenceUri = `${BASE}inference/presence/${o.record_id}`;
+      entity.presenceInferenceStatus = 'inferred-probable';
+      entity.hasDerivedInference = inferenceUri;
+      const inference: Record<string, unknown> = {
+        '@id': inferenceUri,
+        '@type': ['PresenceInference'],
+        inferredPopulationAssociatedWith: organizationUri,
+        inferredPresenceAt: plantationUri,
+        populationCategory: `${BASE}type/population/enslaved`,
+        populationCount: inferredPopulationCount,
+        certainty: `${BASE}type/certainty/probable`,
+        inferenceRule: `${BASE}rule/enslaved-population-presence-at-matched-plantation`,
+        wasDerivedFrom: o.uri,
+      };
+      const placeUri = placeUriByPlantationUri.get(plantationUri);
+      if (placeUri) inference.inferredPlace = placeUri;
+      if (o.source_uri) inference.hadPrimarySource = o.source_uri;
+      if (o.observation_year) {
+        inference.P4_has_time_span = `${BASE}timespan/${o.observation_year}`;
+      }
+      inferences.push(inference);
+    }
 
     const year = o.observation_year;
     const provId = `${BASE}provenance/obs-almanac-${year}`;
@@ -542,14 +763,14 @@ function buildObservations(
         transformedBy: 'scripts/transform-almanakken.ts',
         modelEntity: 'E13_Attribute_Assignment / OrganizationObservation',
         schemaTable: 'observations',
-        linkedVia: 'plantation_id -> P140/observationOf -> wd:{Q-ID}',
+        linkedVia: 'plantation_id -> P140/observationOf -> local E74 organization',
       });
     }
 
     entities.push(entity);
   }
 
-  return { entities, provenance, observationYears, resolvedTargets };
+  return { entities, inferences, provenance, observationYears, resolvedTargets };
 }
 
 // --- WKT to GeoJSON ---
@@ -692,20 +913,6 @@ function main() {
   const allSources = [...plantResult.sources, ...almResult.sources];
 
   // Build indexes
-  const appellationIndex = new Map<string, string[]>();
-  for (const a of [
-    ...plantResult.e41,
-    ...almResult.appellations,
-    ...riverResult.e41,
-  ]) {
-    const key = a.identifies_uri;
-    if (key) {
-      const list = appellationIndex.get(key) ?? [];
-      list.push(a.uri);
-      appellationIndex.set(key, list);
-    }
-  }
-
   const mapLinkIndex = new Map<string, MapLink[]>();
   for (const m of plantResult.mapLinks) {
     const list = mapLinkIndex.get(m.plantation_uri) ?? [];
@@ -721,6 +928,64 @@ function main() {
   const riverMap = new Map<string, E26Row>();
   for (const r of riverResult.e26) {
     riverMap.set(r.uri, r);
+  }
+
+  const plantationUrisByQid = new Map<string, string[]>();
+  for (const plantation of plantResult.e25) {
+    if (!plantation.wikidata_qid) continue;
+    plantationUrisByQid.set(plantation.wikidata_qid, [
+      ...(plantationUrisByQid.get(plantation.wikidata_qid) ?? []),
+      plantation.uri,
+    ]);
+  }
+  const unambiguousPlantationUriByQid = new Map(
+    [...plantationUrisByQid.entries()]
+      .filter(([, uris]) => uris.length === 1)
+      .map(([qid, uris]) => [qid, uris[0]]),
+  );
+  const organizationQids = new Set([
+    ...plantResult.e25.map((plantation) => plantation.wikidata_qid),
+    ...almResult.observations.map((observation) => observation.plantation_qid),
+  ].filter(Boolean));
+  const organizationUriByQid = new Map(
+    [...organizationQids].map((qid) => [qid, `${BASE}organization/${qid}`]),
+  );
+  const almanacAppellations = almResult.appellations.map((appellation) => {
+    const authorityUri = Array.isArray(appellation.identifies_uri)
+      ? appellation.identifies_uri[0] ?? ''
+      : appellation.identifies_uri;
+    const qid = authorityUri.replace(
+      /^https?:\/\/www\.wikidata\.org\/entity\//,
+      '',
+    );
+    const organizationUri = organizationUriByQid.get(qid);
+    const plantationUri = unambiguousPlantationUriByQid.get(qid);
+    const targets = [organizationUri, plantationUri].filter(
+      (uri): uri is string => Boolean(uri),
+    );
+    return {
+      ...appellation,
+      identifies_uri: targets.length === 1 ? targets[0] : targets,
+      identifies_type: plantationUri ? 'E74+E25' : 'E74',
+    };
+  });
+  const allAppellations = [
+    ...plantResult.e41,
+    ...almanacAppellations,
+    ...riverResult.e41,
+  ];
+  const appellationIndex = new Map<string, string[]>();
+  for (const appellation of allAppellations) {
+    const targets = Array.isArray(appellation.identifies_uri)
+      ? appellation.identifies_uri
+      : [appellation.identifies_uri];
+    for (const target of targets) {
+      if (!target) continue;
+      appellationIndex.set(target, [
+        ...(appellationIndex.get(target) ?? []),
+        appellation.uri,
+      ]);
+    }
   }
 
   // Build indexes for E22 P128 carries
@@ -762,6 +1027,8 @@ function main() {
     plantResult.e25,
     appellationIndex,
     mapLinkIndex,
+    organizationUriByQid,
+    plantationUrisByQid,
   );
   console.log(`  E25 Plantations:    ${e25Result.entities.length}`);
 
@@ -774,45 +1041,27 @@ function main() {
     `  E53 Places:         ${e53Result.entities.length + e53RiverResult.entities.length} (${e53Result.entities.length} plantation, ${e53RiverResult.entities.length} river)`,
   );
 
-  const plantationUrisByQid = new Map<string, string[]>();
-  for (const plantation of plantResult.e25) {
-    if (!plantation.wikidata_qid) continue;
-    plantationUrisByQid.set(plantation.wikidata_qid, [
-      ...(plantationUrisByQid.get(plantation.wikidata_qid) ?? []),
-      plantation.uri,
-    ]);
-  }
-  const unambiguousPlantationUriByQid = new Map(
-    [...plantationUrisByQid.entries()]
-      .filter(([, uris]) => uris.length === 1)
-      .map(([qid, uris]) => [qid, uris[0]]),
+  const organizationResult = buildE74Organizations(
+    plantResult.e25,
+    almResult.observations,
+    appellationIndex,
+    readOrganizationOverrides(),
   );
-  const almanacAppellations = almResult.appellations.map((appellation) => {
-    const qid = appellation.identifies_uri.replace(
-      /^https?:\/\/www\.wikidata\.org\/entity\//,
-      '',
-    );
-    return {
-      ...appellation,
-      identifies_uri:
-        unambiguousPlantationUriByQid.get(qid) ?? appellation.identifies_uri,
-      identifies_type: unambiguousPlantationUriByQid.has(qid) ? 'E25' : 'external',
-    };
-  });
-  const e41All = buildE41Appellations([
-    ...plantResult.e41,
-    ...almanacAppellations,
-    ...riverResult.e41,
-  ]);
+  console.log(`  E74 Organizations: ${organizationResult.entities.length}`);
+
+  const e41All = buildE41Appellations(allAppellations);
   console.log(`  E41 Appellations:   ${e41All.length}`);
 
   const obsResult = buildObservations(
     almResult.observations,
+    organizationResult.uriByQid,
     unambiguousPlantationUriByQid,
+    new Map(plantResult.e53.map((place) => [place.plantation_uri, place.uri])),
   );
   console.log(
-    `  Observations:       ${obsResult.entities.length} E13 (${obsResult.resolvedTargets} with unambiguous E25 targets)`,
+    `  Observations:       ${obsResult.entities.length} E13 (${obsResult.resolvedTargets} with local E74 targets)`,
   );
+  console.log(`  Presence inferences:${obsResult.inferences.length}`);
 
   // Structural entities
   console.log(`  E36 Visual Items:   ${e36Entities.length}`);
@@ -838,6 +1087,7 @@ function main() {
 
   const allProv = [
     ...e25Result.provenance,
+    ...organizationResult.provenance,
     ...e26Result.provenance,
     ...e53Result.provenance,
     ...e53RiverResult.provenance,
@@ -848,16 +1098,19 @@ function main() {
   const graph = [
     ...e22,
     ...e25Result.entities,
+    ...organizationResult.entities,
     ...e26Result.entities,
     ...e53Result.entities,
     ...e53RiverResult.entities,
     ...e41All,
     ...e36Entities,
     ...e55Types,
+    ...buildInferenceRules(),
     ...e52TimeSpans,
     ...e12Productions,
     ...e36Images,
     ...obsResult.entities,
+    ...obsResult.inferences,
     ...allProv,
   ];
   console.log(`\n  Total entities in @graph: ${graph.length}`);
@@ -961,7 +1214,7 @@ function main() {
 
   const obsLinked = obsResult.entities.filter((e) => e.observationOf).length;
   console.log(
-    `  Observations with unambiguous E25 target: ${obsLinked}/${obsResult.entities.length}`,
+    `  Observations with local E74 target: ${obsLinked}/${obsResult.entities.length}`,
   );
 
   const obsWithE13 = obsResult.entities.filter(
