@@ -5,6 +5,7 @@
  */
 import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
+import jsonld from 'jsonld';
 
 const LOD_DIR = join(__dirname, '../lod');
 const PUBLIC_DATA_DIR = join(__dirname, '../public/data');
@@ -44,6 +45,29 @@ interface AddressPointSource {
   }>;
 }
 
+interface AlmanakkenReviewDocument {
+  rowCounts?: {
+    total: number;
+    withQid: number;
+    withoutQid: number;
+    attached: number;
+    unresolved: number;
+  };
+  byPlaceId?: Record<
+    string,
+    {
+      rows?: number;
+      productRows?: number;
+      desertedRows?: number;
+      hasProductAssertions?: boolean;
+      hasStatusAssertions?: boolean;
+      hasAlmanakkenObservations?: boolean;
+      issues?: Array<{ type?: string }>;
+    }
+  >;
+  unlinkedRows?: Array<{ recordId?: string }>;
+}
+
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
 }
@@ -74,7 +98,23 @@ function collectHttpHosts(value: unknown, hosts: Set<string>) {
   }
 }
 
-function main() {
+function collectCanonicalReferences(value: unknown, references: Set<string>) {
+  if (Array.isArray(value)) {
+    value.forEach((item) => collectCanonicalReferences(item, references));
+    return;
+  }
+  if (!value || typeof value !== 'object') return;
+
+  for (const child of Object.values(value)) {
+    if (typeof child === 'string' && child.startsWith(CANONICAL_BASE)) {
+      references.add(child);
+    } else {
+      collectCanonicalReferences(child, references);
+    }
+  }
+}
+
+async function main() {
   const database = readArtifact(LOD_DIR, 'database.jsonld');
   const context = readArtifact(LOD_DIR, 'context.jsonld');
   const publishedDatabase = readArtifact(PUBLIC_DATA_DIR, 'database.jsonld');
@@ -91,6 +131,14 @@ function main() {
   const mapFeatures = JSON.parse(
     readArtifact(PUBLIC_DATA_DIR, 'map-features.geojson').toString('utf-8'),
   ) as GeoJsonDocument;
+  const almanakkenReview = JSON.parse(
+    readArtifact(PUBLIC_DATA_DIR, 'almanakken-review.json').toString('utf-8'),
+  ) as AlmanakkenReviewDocument;
+  const organizationOverrides = JSON.parse(
+    readArtifact(DATA_DIR, 'organization-authority-overrides.jsonld').toString(
+      'utf-8',
+    ),
+  ) as JsonLdDocument;
 
   assert(
     database.equals(publishedDatabase),
@@ -116,6 +164,16 @@ function main() {
     'database.jsonld must identify itself as an sdo:Dataset',
   );
 
+  const expanded = (await jsonld.expand(
+    document as unknown as jsonld.JsonLdDocument,
+  )) as unknown as Array<Record<string, unknown>>;
+  assert(expanded.length === 1, 'JSON-LD expansion must produce one dataset node');
+  assert(
+    Array.isArray(expanded[0]['@graph']) &&
+      expanded[0]['@graph'].length === document['@graph'].length,
+    'JSON-LD expansion must preserve every generated graph entity',
+  );
+
   const ids = new Set<string>();
   for (const entity of document['@graph']) {
     const id = entity['@id'];
@@ -124,8 +182,49 @@ function main() {
       'Every generated graph entity must have an absolute HTTP @id',
     );
     assert(!ids.has(id), `Duplicate JSON-LD entity @id: ${id}`);
+    assert(
+      !id.startsWith('http://www.wikidata.org/entity/') &&
+        !id.startsWith('https://www.wikidata.org/entity/'),
+      `External Wikidata entity must not be redefined in the local graph: ${id}`,
+    );
+    const types = toArray(entity['@type']);
+    if (types.includes('E25_Human_Made_Feature')) {
+      for (const property of [
+        'P51_has_former_or_current_owner',
+        'P52_has_current_owner',
+      ]) {
+        assert(
+          !toArray(entity[property]).some(
+            (value) =>
+              typeof value === 'string' &&
+              /^https?:\/\/www\.wikidata\.org\/entity\/Q\d+$/.test(value),
+          ),
+          `${id} uses a plantation authority QID as ${property}`,
+        );
+      }
+    }
+    if (types.includes('E74_Group')) {
+      assert(
+        id.startsWith(`${CANONICAL_BASE}organization/Q`),
+        `E74 organization must use a canonical local URI: ${id}`,
+      );
+      assert(
+        typeof entity.exactMatch === 'string' &&
+          /^https?:\/\/www\.wikidata\.org\/entity\/Q\d+$/.test(entity.exactMatch),
+        `E74 organization must have one Wikidata skos:exactMatch: ${id}`,
+      );
+    }
     ids.add(id);
   }
+
+  ids.add(document['@id']);
+  const canonicalReferences = new Set<string>();
+  collectCanonicalReferences(document['@graph'], canonicalReferences);
+  const danglingReferences = [...canonicalReferences].filter((uri) => !ids.has(uri));
+  assert(
+    danglingReferences.length === 0,
+    `Generated graph has undefined canonical URI references:\n${danglingReferences.join('\n')}`,
+  );
 
   const hosts = new Set<string>();
   collectHttpHosts(document['@graph'], hosts);
@@ -273,6 +372,258 @@ function main() {
   const activeGazetteer = gazetteer['@graph'].filter(
     (entry) => !entry.deprecated && !entry.mergedInto,
   );
+  const rowCounts = almanakkenReview.rowCounts;
+  assert(rowCounts, 'Almanakken review has no row completeness counts');
+  assert(
+    rowCounts.total === rowCounts.withQid + rowCounts.withoutQid,
+    'Almanakken review row totals are inconsistent',
+  );
+  assert(
+    rowCounts.withQid === rowCounts.attached + rowCounts.unresolved,
+    'Almanakken linked-row totals are inconsistent',
+  );
+  assert(
+    almanakkenReview.unlinkedRows?.length === rowCounts.withoutQid,
+    'Almanakken rows without QIDs are not all exposed for review',
+  );
+  const aggregateEntitiesById = new Map(
+    document['@graph'].map((entity) => [entity['@id'], entity]),
+  );
+  const associationStatuses = new Set([
+    'linked',
+    'needs-organization-link',
+    'needs-physical-link-review',
+  ]);
+  for (const entity of document['@graph'].filter((candidate) =>
+    toArray(candidate['@type'] as string | string[]).includes('Plantation'),
+  )) {
+    const status = entity.organizationAssociationStatus;
+    assert(
+      typeof status === 'string' && associationStatuses.has(status),
+      `Plantation ${entity['@id']} has no valid organization association status`,
+    );
+    const organizationUri = entity.hasOrganizationalAssociation;
+    if (status === 'needs-organization-link') {
+      assert(
+        organizationUri == null,
+        `Plantation ${entity['@id']} is marked unlinked but has an E74 association`,
+      );
+      continue;
+    }
+    assert(
+      typeof organizationUri === 'string',
+      `Plantation ${entity['@id']} is marked ${status} without an E74 association`,
+    );
+    const organization = aggregateEntitiesById.get(organizationUri);
+    assert(
+      organization &&
+        toArray(organization['@type'] as string | string[]).includes('E74_Group'),
+      `Plantation ${entity['@id']} association does not resolve to E74`,
+    );
+    assert(
+      toArray(entity.closeMatch as string | string[]).includes(
+        organization.exactMatch as string,
+      ),
+      `Plantation ${entity['@id']} and E74 association do not share the authority QID`,
+    );
+  }
+  for (const feature of mapFeatures.features ?? []) {
+    const properties = feature.properties ?? {};
+    if (properties.featureType !== 'plantation') continue;
+    const status = properties.organizationAssociationStatus;
+    assert(
+      typeof status === 'string' && associationStatuses.has(status),
+      `Explore plantation ${String(properties.stmId)} has no association review status`,
+    );
+    assert(
+      typeof properties.wikidataQid === 'string'
+        ? status !== 'needs-organization-link'
+        : status === 'needs-organization-link',
+      `Explore plantation ${String(properties.stmId)} has inconsistent QID and association status`,
+    );
+  }
+  const overrideQids = new Set<string>();
+  for (const override of organizationOverrides['@graph'] ?? []) {
+    const qid = override.qid;
+    assert(
+      typeof qid === 'string' && /^Q\d+$/.test(qid),
+      'Organization authority override has an invalid QID',
+    );
+    assert(!overrideQids.has(qid), `Duplicate organization override for ${qid}`);
+    assert(
+      aggregateEntitiesById.has(`${CANONICAL_BASE}organization/${qid}`),
+      `Organization override targets unknown E74 organization ${qid}`,
+    );
+    assert(
+      ['unreviewed', 'reviewed', 'disputed'].includes(
+        String(override.reviewStatus),
+      ),
+      `Organization override ${qid} has an invalid review status`,
+    );
+    overrideQids.add(qid);
+  }
+  const aggregateAlmanakkenEvidence = document['@graph'].filter(
+    (entity) =>
+      typeof entity['@id'] === 'string' &&
+      entity['@id'].startsWith(`${CANONICAL_BASE}obs/`),
+  );
+  assert(
+    aggregateAlmanakkenEvidence.length === rowCounts.total,
+    'Aggregate JSON-LD does not preserve every Almanakken source row',
+  );
+  for (const evidence of aggregateAlmanakkenEvidence) {
+    const targetId = evidence.P140_assigned_attribute_to;
+    if (typeof evidence.sourcePlantationQid === 'string') {
+      assert(
+        targetId != null,
+        `QID-bearing Almanakken observation has no E74 target: ${evidence['@id']}`,
+      );
+    } else {
+      assert(
+        targetId == null,
+        `Almanakken observation without a QID has an unsupported target: ${evidence['@id']}`,
+      );
+    }
+    if (targetId == null) continue;
+    assert(
+      typeof targetId === 'string',
+      'Aggregate Almanakken observation has a non-string target',
+    );
+    const target = aggregateEntitiesById.get(targetId);
+    assert(target, `Aggregate Almanakken observation targets unknown entity ${targetId}`);
+    assert(
+      toArray(target['@type'] as string | string[]).includes('E74_Group'),
+      `Aggregate Almanakken observation targets a non-E74 entity ${targetId}`,
+    );
+  }
+  const inferredPresence = document['@graph'].filter((entity) =>
+    toArray(entity['@type'] as string | string[]).includes('PresenceInference'),
+  );
+  assert(
+    aggregateAlmanakkenEvidence.every(
+      (entity) => typeof entity.presenceInferenceStatus === 'string',
+    ),
+    'Every Almanakken observation must expose its presence-inference status',
+  );
+  assert(
+    inferredPresence.length ===
+      aggregateAlmanakkenEvidence.filter(
+        (entity) => entity.presenceInferenceStatus === 'inferred-probable',
+      ).length,
+    'Presence inference nodes and inferred observation statuses differ',
+  );
+  for (const inference of inferredPresence) {
+    const inferenceId = String(inference['@id']);
+    const observation = aggregateEntitiesById.get(inference.wasDerivedFrom);
+    const organization = aggregateEntitiesById.get(
+      inference.inferredPopulationAssociatedWith,
+    );
+    const plantation = aggregateEntitiesById.get(inference.inferredPresenceAt);
+    assert(observation, `${inferenceId} has no source observation`);
+    assert(
+      organization &&
+        toArray(organization['@type'] as string | string[]).includes('E74_Group'),
+      `${inferenceId} has no E74 organization`,
+    );
+    assert(
+      plantation &&
+        toArray(plantation['@type'] as string | string[]).includes(
+          'E25_Human_Made_Feature',
+        ),
+      `${inferenceId} has no E25 plantation`,
+    );
+    assert(
+      inference.certainty === `${CANONICAL_BASE}type/certainty/probable` &&
+        typeof inference.populationCount === 'number' &&
+        inference.populationCount > 0,
+      `${inferenceId} is not a qualified probable population assertion`,
+    );
+  }
+  const attachedSourceRows = new Set<string>();
+  for (const entry of activeGazetteer) {
+    const observations = toArray(
+      entry.almanakkenObservations as Record<string, unknown>[] | undefined,
+    );
+    if (observations.length === 0) continue;
+    const id = entry.id;
+    assert(typeof id === 'string', 'Almanakken-bearing place has no ID');
+    const record = JSON.parse(
+      readArtifact(PLACE_RECORDS_DIR, `${id}.jsonld`).toString('utf-8'),
+    ) as JsonLdDocument;
+    const graph = record['@graph'] ?? [];
+    const evidence = graph.filter(
+      (entity) => entity.sourceVersion === 'v2' && typeof entity.sourceRow === 'string',
+    );
+    assert(
+      evidence.length === observations.length,
+      `Authority record ${id} does not preserve every Almanakken observation`,
+    );
+    for (const observation of evidence) {
+      const sourceRow = observation.sourceRow as string;
+      assert(
+        !attachedSourceRows.has(sourceRow),
+        `Almanakken source row ${sourceRow} is attached more than once`,
+      );
+      attachedSourceRows.add(sourceRow);
+      const target = graph.find(
+        (entity) => entity['@id'] === observation.P140_assigned_attribute_to,
+      );
+      assert(target, `Almanakken observation ${sourceRow} has no local target`);
+      assert(
+        toArray(target['@type'] as string | string[]).includes(
+          'crm:E25_Human_Made_Feature',
+        ),
+        `Almanakken observation ${sourceRow} does not target an E25 feature`,
+      );
+    }
+  }
+  assert(
+    attachedSourceRows.size === rowCounts.attached,
+    'Almanakken attached-row count differs from published authority records',
+  );
+  for (const [placeId, review] of Object.entries(
+    almanakkenReview.byPlaceId ?? {},
+  )) {
+    const issueTypes = new Set((review.issues ?? []).map((issue) => issue.type));
+    if ((review.rows ?? 0) > 0 && !review.hasAlmanakkenObservations) {
+      assert(
+        issueTypes.has('missing-almanakken-observations'),
+        `Place ${placeId} hides missing Almanakken observations from review`,
+      );
+    }
+    if ((review.productRows ?? 0) > 0 && !review.hasProductAssertions) {
+      assert(
+        issueTypes.has('missing-product-assertions'),
+        `Place ${placeId} hides missing product assertions from review`,
+      );
+    }
+    if (
+      ((review.productRows ?? 0) > 0 || (review.desertedRows ?? 0) > 0) &&
+      !review.hasStatusAssertions
+    ) {
+      assert(
+        issueTypes.has('missing-status-assertions'),
+        `Place ${placeId} hides missing lifecycle assertions from review`,
+      );
+    }
+  }
+  for (const entry of activeGazetteer) {
+    if (entry.type !== 'river' && entry.type !== 'creek') continue;
+    const location = entry.location as Record<string, unknown> | undefined;
+    assert(
+      typeof location?.wkt === 'string' &&
+        /^(?:Multi)?LineString\s*\(/i.test(location.wkt),
+      `${String(entry.type)} ${String(entry.id)} is not backed by line geometry`,
+    );
+  }
+  for (const entry of activeGazetteer) {
+    if (entry.type !== 'plantation') continue;
+    const location = entry.location as Record<string, unknown> | undefined;
+    assert(
+      typeof location?.wkt !== 'string' || !/^Point\s*\(/i.test(location.wkt),
+      `Plantation ${String(entry.id)} is incorrectly backed by point geometry`,
+    );
+  }
   const sourceAddressFeatures = (addressPointSource.features ?? []).filter(
     (feature) =>
       feature.geometry?.type === 'Point' &&
@@ -323,12 +674,12 @@ function main() {
     const graph = addressRecord['@graph'] ?? [];
     const location = graph.find(
       (entity) =>
-        entity['@id'] === `${CANONICAL_BASE}place/${historicalAddressId}/location`,
+        entity['@id'] === `${CANONICAL_BASE}place/${historicalAddressId}#location`,
     );
     const observation = graph.find(
       (entity) =>
         entity['@id'] ===
-        `${CANONICAL_BASE}place/${historicalAddressId}/assertion/address-observation-1885`,
+        `${CANONICAL_BASE}place/${historicalAddressId}#assertion-address-observation-1885`,
     );
     const geometryId = location?.['geo:hasGeometry'];
     const geometry = graph.find((entity) => entity['@id'] === geometryId);
@@ -349,7 +700,7 @@ function main() {
     );
     assert(
       observation?.P140_assigned_attribute_to ===
-        `${CANONICAL_BASE}place/${historicalAddressId}/location`,
+        `${CANONICAL_BASE}place/${historicalAddressId}#location`,
       `Historical address ${historicalAddressId} observation is not attached to its E53/GeoSPARQL point anchor`,
     );
     assert(
@@ -359,11 +710,11 @@ function main() {
     );
     assert(
       observation?.P4_has_time_span ===
-        `${CANONICAL_BASE}place/${historicalAddressId}/assertion/address-observation-1885/time-span`,
+        `${CANONICAL_BASE}place/${historicalAddressId}#assertion-address-observation-1885-time-span`,
       `Historical address ${historicalAddressId} observation has no 1885 time span`,
     );
     assert(
-      geometryId === `${CANONICAL_BASE}place/${historicalAddressId}/location/geometry/point`,
+      geometryId === `${CANONICAL_BASE}place/${historicalAddressId}#geometry-point`,
       `Historical address ${historicalAddressId} point geometry has a non-point URI`,
     );
     assert(
@@ -428,7 +779,7 @@ function main() {
       `Authority record ${id} has no graph`,
     );
     const recordNode = jsonld['@graph'].find(
-      (entity) => entity['@id'] === jsonld['@id'],
+      (entity) => entity['@id'] === `${CANONICAL_BASE}place/${id}#record`,
     );
     assert(recordNode, `Authority record ${id} has no record node`);
     assert(
@@ -451,6 +802,10 @@ function main() {
       assert(
         typeof entityId === 'string' && entityId.startsWith(CANONICAL_BASE),
         `Authority record ${id} has a non-canonical entity @id`,
+      );
+      assert(
+        !entityId.startsWith(`${CANONICAL_BASE}place/${id}/`),
+        `Authority record ${id} uses a non-dereferenceable place subpath ${entityId}`,
       );
       assert(!graphIds.has(entityId), `Authority record ${id} has duplicate @id ${entityId}`);
       graphIds.add(entityId);
@@ -487,4 +842,7 @@ function main() {
   );
 }
 
-main();
+main().catch((error: unknown) => {
+  console.error(error);
+  process.exitCode = 1;
+});

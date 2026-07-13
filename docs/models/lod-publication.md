@@ -16,7 +16,9 @@ The Next.js application explicitly serves `.jsonld` files as `application/ld+jso
 3. the complete graph and context copied to `public/data` exactly match their generated counterparts; and
 4. the graph includes outbound Wikidata links.
 
-These checks establish JSON-LD publication hygiene. They do not by themselves prove full CIDOC-CRM conformance or make project identifiers dereferenceable on the public web.
+These checks establish JSON-LD publication hygiene and the dereferenceable
+place-record route contract. They do not by themselves prove full CIDOC-CRM
+conformance for every property in the graph.
 
 ## Deployment requirements
 
@@ -24,10 +26,15 @@ The canonical identifier base is `https://data.surinametijdmachine.org/`. Before
 
 1. DNS and TLS for `data.surinametijdmachine.org`;
 2. a stable route from the canonical dataset URI to `/data/database.jsonld`;
-3. stable routes for individual entity identifiers, with HTML for browsers and JSON-LD for machine clients; and
+3. stable routes for individual place-record identifiers, with HTML for browsers and JSON-LD for machine clients; and
 4. redirects or persistent aliases if URI patterns change.
 
-The current application deployment exposes the dataset files, but it does not yet satisfy items 1–3 for the canonical URI base.
+Place-record routes use `https://data.surinametijdmachine.org/place/{stm-id}`
+as the canonical browser URI. JSON-LD and application JSON are available at
+`/place/{stm-id}.jsonld` and `/place/{stm-id}.json`. Entities that are only
+defined inside one place record use URI fragments, for example
+`/place/stm-02085#feature` and `/place/stm-02085#location`, so the identifier
+dereferences to the same record page and representation set.
 
 ## Semantic conformance work
 

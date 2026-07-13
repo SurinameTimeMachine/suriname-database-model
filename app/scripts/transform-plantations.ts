@@ -6,7 +6,7 @@ import { parse } from 'csv-parse/sync';
  * CRS: EPSG:31170 (Suriname Old TM / Zanderij datum) -> EPSG:4326 (WGS84) via proj4
  *
  * Produces in-memory entity arrays (no intermediate CSVs):
- *   E25 plantations (human-made features), E74 organizations, E53 places,
+ *   E25 plantations (human-made features), E53 places,
  *   E41 appellations, E22 sources, plantation-map links
  */
 import { readFileSync } from 'fs';
@@ -27,7 +27,6 @@ const GIS_CSV = join(
 );
 
 const STM = 'https://data.surinametijdmachine.org/';
-const WD = 'http://www.wikidata.org/entity/';
 
 /**
  * The supplied 1930 QGIS CSV contains U+FFFD replacement characters in a
@@ -85,19 +84,10 @@ export interface E25Row {
   prefLabel: string;
   status: string;
   featureType: string;
-  p52_owner_qid: string;
-  p51_former_owner_qid: string;
+  wikidata_qid: string;
+  wikidata_alt_qid: string;
+  psur_ids: string[];
   p53_place_uri: string;
-}
-
-export interface E74Row {
-  qid: string;
-  uri: string;
-  prefLabel: string;
-  psur_id: string;
-  psur_id2: string;
-  psur_id3: string;
-  absorbed_into_qid: string;
 }
 
 export interface E53Row {
@@ -149,7 +139,6 @@ export interface SourceRow {
 
 export interface PlantationTransformResult {
   e25: E25Row[];
-  e74: E74Row[];
   e53: E53Row[];
   e41: E41Row[];
   mapLinks: MapLink[];
@@ -202,11 +191,9 @@ export function transformPlantations(): PlantationTransformResult {
   );
 
   const e25: E25Row[] = [];
-  const e74: E74Row[] = [];
   const e53: E53Row[] = [];
   const e41: E41Row[] = [];
   const mapLinks: MapLink[] = [];
-  const seenQids = new Set<string>();
   const seenSlugs = new Set<string>();
 
   for (const p of rows) {
@@ -242,36 +229,11 @@ export function transformPlantations(): PlantationTransformResult {
       prefLabel: label,
       status,
       featureType: 'plantation',
-      p52_owner_qid: qid,
-      p51_former_owner_qid: qidAlt,
+      wikidata_qid: qid,
+      wikidata_alt_qid: qidAlt,
+      psur_ids: [psurId, psurId2, psurId3].filter(Boolean),
       p53_place_uri: coordsUtm ? `${STM}place/1930/fid-${fid}` : '',
     });
-
-    // E74 Organization (deduplicated by Q-ID)
-    if (qid && !seenQids.has(qid)) {
-      seenQids.add(qid);
-      e74.push({
-        qid,
-        uri: `${WD}${qid}`,
-        prefLabel: label,
-        psur_id: psurId,
-        psur_id2: psurId2,
-        psur_id3: psurId3,
-        absorbed_into_qid: qidAlt,
-      });
-    }
-    if (qidAlt && !seenQids.has(qidAlt)) {
-      seenQids.add(qidAlt);
-      e74.push({
-        qid: qidAlt,
-        uri: `${WD}${qidAlt}`,
-        prefLabel: '',
-        psur_id: '',
-        psur_id2: '',
-        psur_id3: '',
-        absorbed_into_qid: '',
-      });
-    }
 
     // E53 Place
     if (coordsUtm) {
@@ -394,7 +356,6 @@ export function transformPlantations(): PlantationTransformResult {
   ];
 
   console.log(`  E25 Plantations:  ${e25.length}`);
-  console.log(`  E74 Organizations: ${e74.length}`);
   console.log(`  E53 Places:       ${e53.length}`);
   console.log(`  E41 Appellations: ${e41.length}`);
   console.log(`  Map depictions:   ${mapLinks.length}`);
@@ -414,7 +375,7 @@ export function transformPlantations(): PlantationTransformResult {
     }
   }
 
-  return { e25, e74, e53, e41, mapLinks, sources };
+  return { e25, e53, e41, mapLinks, sources };
 }
 
 // Run standalone

@@ -23,6 +23,7 @@ import { join } from 'path';
 import proj4 from 'proj4';
 
 import type { ExternalLink, PlaceType } from '../lib/types';
+import { almanakkenField, readAlmanakkenRows } from './almanakken';
 
 // Load CRM mapping from the thesaurus file
 const thesaurusPath = join(__dirname, '../../data/place-types-thesaurus.jsonld');
@@ -71,6 +72,7 @@ interface GazetteerPlace {
   type: PlaceType;
   prefLabel: string;
   altLabels: string[];
+  sranantongoNames?: string[];
   broader: string | null;
   description: string;
   location: {
@@ -95,11 +97,6 @@ interface GazetteerPlace {
 
 const PUBLIC_DIR = join(__dirname, '../public/data');
 const DATA_DIR = join(__dirname, '../../data');
-const ALMANAKKEN_CSV = join(
-  DATA_DIR,
-  '06-almanakken - Plantations Surinaamse Almanakken',
-  'Plantations Surinaamse Almanakken v1.0.csv',
-);
 const QGIS_CSV = join(
   DATA_DIR,
   '07-gis-plantation-map-1930',
@@ -125,6 +122,17 @@ const RAILROAD_CSV = join(
   '07-gis-plantation-map-1930',
   'railroad_1930.csv',
 );
+
+function plantationQid(plantation: Record<string, unknown> | undefined) {
+  const matches = plantation?.closeMatch;
+  const uris = Array.isArray(matches) ? matches : matches ? [matches] : [];
+  const uri = uris.find(
+    (value): value is string =>
+      typeof value === 'string' &&
+      /^https?:\/\/www\.wikidata\.org\/entity\/Q\d+$/.test(value),
+  );
+  return uri?.split('/').pop() ?? null;
+}
 
 // ── Load existing processed data ───────────────────────────────────
 
@@ -184,12 +192,8 @@ console.log(`  ${withPsur} have PSUR IDs`);
 // ── Load almanakken CSV for district + location linking ────────────
 
 console.log('Loading almanakken CSV...');
-const almContent = readFileSync(ALMANAKKEN_CSV, 'latin1');
-const almRows = parse(almContent, {
-  columns: true,
-  skip_empty_lines: true,
-  trim: true,
-});
+const { rows: almRows, path: almPath } = readAlmanakkenRows();
+console.log(`  Using ${almPath}`);
 
 // Build per-QID aggregates: most common district, loc_std, loc_org, product, label, psur
 interface AlmAggregate {
@@ -198,6 +202,7 @@ interface AlmAggregate {
   locationsOriginal: Map<string, number>;
   products: Map<string, number>;
   labels: Map<string, number>;
+  srananNames: Map<string, number>;
   psurIds: Set<string>;
 }
 const almByQid = new Map<string, AlmAggregate>();
@@ -206,13 +211,14 @@ const allDistricts = new Set<string>();
 const allLocations = new Set<string>();
 
 for (const row of almRows as Record<string, string>[]) {
-  const qid = (row['plantation_id'] || '').trim();
-  const d = (row['district_of_divisie'] || '').trim();
-  const l = (row['loc_std'] || '').trim();
-  const lOrg = (row['loc_org'] || '').trim();
-  const prod = (row['product_std'] || '').trim();
-  const label = (row['plantation_std'] || '').trim();
-  const psur = (row['psur_id'] || '').trim();
+  const qid = almanakkenField(row, 'plantation_id');
+  const d = almanakkenField(row, 'district_of_divisie');
+  const l = almanakkenField(row, 'loc_std');
+  const lOrg = almanakkenField(row, 'loc_org');
+  const prod = almanakkenField(row, 'product_std');
+  const label = almanakkenField(row, 'plantation_std');
+  const sranan = almanakkenField(row, 'sranantongo_naam');
+  const psur = almanakkenField(row, 'psur_id');
 
   if (d) allDistricts.add(d);
   if (l) allLocations.add(l);
@@ -227,6 +233,7 @@ for (const row of almRows as Record<string, string>[]) {
       locationsOriginal: new Map(),
       products: new Map(),
       labels: new Map(),
+      srananNames: new Map(),
       psurIds: new Set(),
     };
     almByQid.set(qid, agg);
@@ -237,6 +244,7 @@ for (const row of almRows as Record<string, string>[]) {
     agg.locationsOriginal.set(lOrg, (agg.locationsOriginal.get(lOrg) || 0) + 1);
   if (prod) agg.products.set(prod, (agg.products.get(prod) || 0) + 1);
   if (label) agg.labels.set(label, (agg.labels.get(label) || 0) + 1);
+  if (sranan) agg.srananNames.set(sranan, (agg.srananNames.get(sranan) || 0) + 1);
   if (psur) agg.psurIds.add(psur);
 }
 
@@ -253,6 +261,12 @@ function mostCommon(map: Map<string, number>): string | null {
     }
   }
   return best;
+}
+
+function allCommon(map: Map<string, number>): string[] {
+  return [...map.entries()]
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .map(([value]) => value);
 }
 
 /** Build district slug for broader linking */
@@ -331,37 +345,11 @@ for (const name of Array.from(allDistricts).sort()) {
 }
 console.log(`  ${allDistricts.size} districts`);
 
-// ── 2. River/creek/road entries ────────────────────────────────────
+// ── 2. Almanakken location labels ───────────────────────────────────
 
-console.log('Creating river/location entries...');
-for (const name of Array.from(allLocations).sort()) {
-  gazetteer.push({
-    id: nextId('stm'),
-    type: 'river',
-    prefLabel: name,
-    altLabels: [],
-    broader: null,
-    description:
-      name.includes('Kreek') ||
-      name.includes('rivier') ||
-      name.includes('Kanaal') ||
-      name.includes('kust')
-        ? 'River, creek, or waterway from Surinaamse Almanakken'
-        : 'Road or path from Surinaamse Almanakken',
-    location: { lat: null, lng: null, wkt: null, crs: 'EPSG:4326' },
-    sources: ['almanakken'],
-    externalLinks: [],
-    fid: null,
-    psurIds: [],
-    district: null,
-    locationDescription: null,
-    locationDescriptionOriginal: null,
-    placeType: null,
-    modifiedBy: null,
-    modifiedAt: null,
-  });
-}
-console.log(`  ${allLocations.size} locations (rivers/creeks/roads)`);
+console.log(
+  `Skipping ${allLocations.size} Almanakken location labels without geometry`,
+);
 
 // ── 3. QGIS river/creek features (E26 Physical Features) ──────────
 
@@ -382,6 +370,9 @@ for (const feature of Object.values(physicalFeaturesRaw)) {
   const placeEntity = placeUri ? placesRaw[placeUri] : undefined;
   const geom = placeEntity?.['hasGeometry'] as { asWKT?: string } | undefined;
   const wkt = geom?.asWKT || null;
+  if (!wkt || !/^(?:Multi)?LineString\s*\(/i.test(wkt)) {
+    continue;
+  }
   const centroid = wkt ? centroidFromWKT(wkt) : null;
   const fid = placeEntity?.['fid'] as number | undefined;
 
@@ -425,6 +416,7 @@ let linkedDistricts = 0;
 let linkedLocDesc = 0;
 let linkedProduct = 0;
 let linkedPsur = 0;
+let qgisPlantationCount = 0;
 
 for (const place of Object.values(placesRaw)) {
   const placeId = place['@id'] as string;
@@ -436,14 +428,14 @@ for (const place of Object.values(placesRaw)) {
   const label = (place['observedLabel'] as string) || `Place ${fid}`;
   const geom = place['hasGeometry'] as { asWKT?: string } | undefined;
   const wkt = geom?.asWKT || null;
+  // Plantation authority records describe areas of cultivated land. Point
+  // observations, including the 1885 address layer, must remain E53 places.
+  if (!wkt || !/^(?:Multi)?Polygon\s*\(/i.test(wkt)) continue;
   const centroid = wkt ? centroidFromWKT(wkt) : null;
 
   // Find linked plantation for Q-ID
   const plantation = plantationByPlace.get(placeId);
-  const ownerUri = plantation?.['P52_has_current_owner'] as string | undefined;
-  const qid = ownerUri?.startsWith('http://www.wikidata.org/entity/')
-    ? ownerUri.replace('http://www.wikidata.org/entity/', '')
-    : null;
+  const qid = plantationQid(plantation);
 
   // Alt labels
   const altLabels: string[] = [];
@@ -462,6 +454,7 @@ for (const place of Object.values(placesRaw)) {
   let locationDescription: string | null = null;
   let locationDescriptionOriginal: string | null = null;
   let placeType: string | null = null;
+  let sranantongoNames: string[] = [];
 
   if (qid) {
     const agg = almByQid.get(qid);
@@ -476,6 +469,9 @@ for (const place of Object.values(placesRaw)) {
       locationDescriptionOriginal = mostCommon(agg.locationsOriginal);
       placeType = mostCommon(agg.products);
       if (placeType) linkedProduct++;
+      sranantongoNames = allCommon(agg.srananNames).filter(
+        (name) => name && name !== prefLabel,
+      );
     }
   }
 
@@ -504,14 +500,14 @@ for (const place of Object.values(placesRaw)) {
     locationDescription,
     locationDescriptionOriginal,
     placeType,
+    sranantongoNames,
     modifiedBy: null,
     modifiedAt: null,
   });
+  qgisPlantationCount++;
 }
 
-console.log(
-  `  ${Object.keys(placesRaw).length - riverPlaceUris.size} plantation places (from QGIS)`,
-);
+console.log(`  ${qgisPlantationCount} plantation places (from QGIS polygons)`);
 console.log(`  ${linkedDistricts} linked to districts`);
 console.log(`  ${linkedLocDesc} with location descriptions`);
 console.log(`  ${linkedProduct} with product/place types`);
@@ -523,10 +519,7 @@ console.log('Processing almanakken-only plantations...');
 const qidsInQgis = new Set<string>();
 for (const place of Object.values(placesRaw)) {
   const plantation = plantationByPlace.get(place['@id'] as string);
-  const ownerUri = plantation?.['P52_has_current_owner'] as string | undefined;
-  const qid = ownerUri?.startsWith('http://www.wikidata.org/entity/')
-    ? ownerUri.replace('http://www.wikidata.org/entity/', '')
-    : null;
+  const qid = plantationQid(plantation);
   if (qid) qidsInQgis.add(qid);
 }
 
@@ -543,6 +536,9 @@ for (const [qid, agg] of almByQid) {
   const locationDescription = mostCommon(agg.locations);
   const locationDescriptionOriginal = mostCommon(agg.locationsOriginal);
   const placeType = mostCommon(agg.products);
+  const sranantongoNames = allCommon(agg.srananNames).filter(
+    (name) => name && name !== prefLabel,
+  );
   const psurIds = Array.from(agg.psurIds);
   if (psurIds.length > 0) almOnlyWithPsur++;
 
@@ -565,6 +561,7 @@ for (const [qid, agg] of almByQid) {
     locationDescription,
     locationDescriptionOriginal,
     placeType,
+    sranantongoNames,
     modifiedBy: null,
     modifiedAt: null,
   });
@@ -903,6 +900,7 @@ const graph = gazetteer.map((entry) => {
     type: entry.type,
     prefLabel: entry.prefLabel,
     altLabels: entry.altLabels,
+    sranantongoNames: entry.sranantongoNames ?? [],
     broader: entry.broader,
     description: entry.description,
     location: entry.location,

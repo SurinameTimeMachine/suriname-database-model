@@ -23,20 +23,15 @@
  *   pnpm derive-products -- --force
  */
 
-import { parse } from 'csv-parse/sync';
 import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import type { GazetteerPlace, ProductAssertion } from '../lib/types';
 import { getPrimaryAuthorityLink } from '../lib/types';
+import { almanakkenField, isVerlaten, readAlmanakkenRows } from './almanakken';
 
 // ── Paths ──────────────────────────────────────────────────────────────────
 
 const DATA_DIR = join(__dirname, '../../data');
-const ALMANAKKEN_CSV = join(
-  DATA_DIR,
-  '06-almanakken - Plantations Surinaamse Almanakken',
-  'Plantations Surinaamse Almanakken v1.0.csv',
-);
 const GAZETTEER_PATH = join(DATA_DIR, 'places-gazetteer.jsonld');
 const PUBLIC_GAZETTEER = join(
   __dirname,
@@ -46,6 +41,9 @@ const PUBLIC_GAZETTEER = join(
 // ── Config ─────────────────────────────────────────────────────────────────
 
 const FORCE = process.argv.includes('--force');
+const INCLUDE_DUPLICATE_QIDS = process.argv.includes(
+  '--include-duplicate-qids',
+);
 const SOURCE_ID = 'almanakken'; // registry sourceId (prov:hadPrimarySource)
 
 // ── Validate SOURCE_ID against sources-registry.jsonld ─────────────────────
@@ -94,30 +92,23 @@ function slugify(value: string): string {
 // ── Read and parse CSV (latin-1) ───────────────────────────────────────────
 
 console.log('Reading almanakken CSV...');
-const buf = readFileSync(ALMANAKKEN_CSV);
-const csv = new TextDecoder('latin1').decode(buf);
-
-const rawRows: Record<string, string>[] = parse(csv, {
-  columns: true,
-  skip_empty_lines: true,
-  relax_column_count: true,
-});
+const { rows: rawRows } = readAlmanakkenRows();
 
 // Keep only rows with a Q-ID, valid year, a product value, and NOT verlaten.
 // Verlaten rows are excluded because a plantation being abandoned implies no
 // active product — even if the CSV has a stale product_std on that row.
 const rows: AlmanakRow[] = rawRows
   .filter((r) => {
-    const qid = (r['plantation_id'] ?? '').trim();
-    const year = parseInt((r['year'] ?? '').trim(), 10);
-    const product = (r['product_std'] ?? '').trim();
-    const verlaten = (r['deserted'] ?? '').trim().toLowerCase() === 'verlaten';
+    const qid = almanakkenField(r, 'plantation_id');
+    const year = parseInt(almanakkenField(r, 'year'), 10);
+    const product = almanakkenField(r, 'product_std');
+    const verlaten = isVerlaten(r.deserted);
     return qid && !isNaN(year) && product && !verlaten;
   })
   .map((r) => ({
-    qid: r['plantation_id'].trim(),
-    year: parseInt(r['year'].trim(), 10),
-    product: r['product_std'].trim(),
+    qid: almanakkenField(r, 'plantation_id'),
+    year: parseInt(almanakkenField(r, 'year'), 10),
+    product: almanakkenField(r, 'product_std'),
   }));
 
 const uniqueQids = new Set(rows.map((r) => r.qid));
@@ -217,8 +208,19 @@ const gazetteerRaw = readFileSync(GAZETTEER_PATH, 'utf-8');
 const gazetteerJsonld = JSON.parse(gazetteerRaw);
 const graph: GazetteerPlace[] = gazetteerJsonld['@graph'] || [];
 
+const activePlaceCountByQid = new Map<string, number>();
+for (const entry of graph) {
+  if (entry.type !== 'plantation' || entry.deprecated || entry.mergedInto) {
+    continue;
+  }
+  const qid = getPrimaryAuthorityLink(entry, 'wikidata')?.identifier;
+  if (!qid) continue;
+  activePlaceCountByQid.set(qid, (activePlaceCountByQid.get(qid) ?? 0) + 1);
+}
+
 let patched = 0;
 let skipped = 0;
+let duplicateQidSkipped = 0;
 let noMatch = 0;
 
 for (const entry of graph) {
@@ -236,6 +238,11 @@ for (const entry of graph) {
     continue;
   }
 
+  if (!INCLUDE_DUPLICATE_QIDS && (activePlaceCountByQid.get(qid) ?? 0) > 1) {
+    duplicateQidSkipped++;
+    continue;
+  }
+
   // Skip if already has manual assertions (unless --force)
   const existing = entry.productAssertions ?? [];
   if (existing.length > 0 && !FORCE) {
@@ -248,7 +255,7 @@ for (const entry of graph) {
 }
 
 console.log(
-  `  Patched: ${patched}  Skipped (has manual assertions): ${skipped}  No almanakken match: ${noMatch}`,
+  `  Patched: ${patched}  Skipped (has manual assertions): ${skipped}  Skipped duplicate QIDs: ${duplicateQidSkipped}  No almanakken match: ${noMatch}`,
 );
 
 if (patched === 0) {

@@ -91,7 +91,7 @@ const ENTITIES: EntityDef[] = [
     type: 'E25',
     label: 'Human-Made Feature',
     crmClass: 'E25 Human-Made Feature',
-    desc: 'The central entity for all human-made landscape features: plantation polygons, road and railroad lines, military posts, stations, settlements, towns, and named villages. Plantations are the ownership-bearing E25 subtype and connect to organizations via P52; all E25 instances connect to an E53 location via P53 and are classified through the geographical-feature thesaurus.',
+    desc: 'The central entity for all human-made landscape features: plantation polygons, road and railroad lines, military posts, stations, settlements, towns, and named villages. Plantation QIDs are conservative external authority matches; all E25 instances connect to an E53 location via P53 and are classified through the geographical-feature thesaurus.',
     color: CRM_COLORS.E25,
     cx: 380,
     cy: 330,
@@ -104,14 +104,8 @@ const ENTITIES: EntityDef[] = [
         name: 'P53 has location',
         range: 'E53 Place (Polygon, LineString, or Point geometry)',
       },
-      {
-        name: 'P52 has current owner',
-        range: 'E74 Organization (legacy aggregate link)',
-      },
-      {
-        name: 'P51 has former or current owner',
-        range: 'E74 Organization (plantations only)',
-      },
+      { name: 'skos:closeMatch', range: 'Wikidata plantation authority' },
+      { name: 'stm:psurId', range: 'PSUR source identifier transcription' },
       {
         name: 'P124i was transformed by',
         range: 'E81 Transformation (merger)',
@@ -148,7 +142,7 @@ const ENTITIES: EntityDef[] = [
     type: 'E74',
     label: 'Organization',
     crmClass: 'E74 Group / sdo:Organization',
-    desc: 'The legal entity that owns or operates the plantation. Identified by Wikidata Q-IDs. Separated from E25 to model the distinction between the physical place and its legal operator. Annual observations (E13) record time-varying properties.',
+    desc: 'An authority-backed plantation organization, distinct from the physical E25 plantation. Its Wikidata QID is an exact authority match; the corresponding E25 uses a close match. Ownership, operation, splits, and mergers require their own dated evidence.',
     color: CRM_COLORS.E74,
     cx: 720,
     cy: 290,
@@ -156,10 +150,9 @@ const ENTITIES: EntityDef[] = [
     properties: [
       { name: 'P1 is identified by', range: 'E41 Appellation' },
       { name: 'rdfs:label', range: 'string (@nl)' },
-      { name: 'sdo:additionalType', range: 'wd:Q188913' },
       {
-        name: 'P48 has preferred identifier',
-        range: 'E42 Identifier (Wikidata Q-ID)',
+        name: 'skos:exactMatch',
+        range: 'Wikidata plantation authority entity',
       },
       {
         name: 'P1 is identified by',
@@ -480,8 +473,8 @@ const RELATIONS: RelDef[] = [
   {
     from: 'e25',
     to: 'e74',
-    label: 'P52 has current owner',
-    desc: 'Plantation E25 instances can be owned or operated by an organization',
+    label: 'STM organizational association',
+    desc: 'The authority QID connects the physical E25 plantation to its corresponding E74 organization; this does not assert ownership',
   },
   {
     from: 'e25',
@@ -566,12 +559,6 @@ const RELATIONS: RelDef[] = [
     to: 'e39',
     label: 'P14 carried out by',
     desc: 'People involved: eigenaar, administrateur, directeur',
-  },
-  {
-    from: 'e74',
-    to: 'e55',
-    label: 'P2 has type',
-    desc: 'Organization type: plantation type (via sdo:additionalType / wd:Q188913)',
   },
   {
     from: 'e13',
@@ -1162,11 +1149,11 @@ function SourcePatternSection() {
           {' -> geo:hasGeometry -> geo:asWKT -> POLYGON(...)'}
         </div>
         <div>
-          <span className="text-ink/45">Ownership:</span>{' '}
+          <span className="text-ink/45">Authority correspondence:</span>{' '}
           <span style={{ color: CRM_COLORS.E25 }}>E25 Plantation</span>
-          {' -> P52 -> '}
+          {' -> STM association -> '}
           <span style={{ color: CRM_COLORS.E74 }}>E74 Organization</span>
-          {' (wd:Q-ID)'}
+          {' -> skos:exactMatch -> Wikidata Q-ID'}
         </div>
         <div>
           <span className="text-ink/45">Time:</span>{' '}

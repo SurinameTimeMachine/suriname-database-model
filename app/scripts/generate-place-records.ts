@@ -5,9 +5,16 @@
  * JSON-LD record graph and a separate application JSON projection for every
  * public place record.
  */
-import { mkdirSync, readFileSync, writeFileSync } from 'fs';
+import {
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  unlinkSync,
+  writeFileSync,
+} from 'fs';
 import { join } from 'path';
-import { parse } from 'csv-parse/sync';
+import type { AlmanakkenPlantationObservation } from '../lib/types';
 
 import { BASE, buildPlaceRecordContext } from './lod-context';
 
@@ -16,11 +23,6 @@ const OUT_DIR = join(__dirname, '../public/data/place-records');
 const GAZETTEER_PATH = join(DATA_DIR, 'places-gazetteer.jsonld');
 const THESAURUS_PATH = join(DATA_DIR, 'place-types-thesaurus.jsonld');
 const SOURCES_PATH = join(DATA_DIR, 'sources-registry.jsonld');
-const ALMANAKKEN_PATH = join(
-  DATA_DIR,
-  '06-almanakken - Plantations Surinaamse Almanakken',
-  'Plantations Surinaamse Almanakken v1.0.csv',
-);
 
 type JsonObject = Record<string, unknown>;
 
@@ -64,20 +66,11 @@ type DiklandRef = {
   notes?: string | null;
 };
 
-type AlmanakkenEvidence = {
-  recordId: string;
-  qid: string;
-  year: number | undefined;
-  product: string;
-  deserted: boolean;
-  sourceName: string;
-  sourcePage: string;
-};
-
 type GazetteerEntry = JsonObject & {
   id?: string;
   type?: string;
   names?: PlaceName[];
+  sranantongoNames?: string[];
   prefLabel?: string;
   altLabels?: string[];
   broader?: string | null;
@@ -96,6 +89,7 @@ type GazetteerEntry = JsonObject & {
   productAssertions?: Assertion[];
   districtAssertions?: Assertion[];
   locationAssertions?: Assertion[];
+  almanakkenObservations?: AlmanakkenPlantationObservation[];
   locationPoint?: boolean;
   diklandRefs?: DiklandRef[];
   deprecated?: boolean;
@@ -117,6 +111,15 @@ function slug(value: string): string {
     .replace(/^-+|-+$/g, '');
 }
 
+function fragmentUri(pageUri: string, fragment: string): string {
+  const safeFragment = fragment
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9._:-]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  return `${pageUri}#${safeFragment}`;
+}
+
 function asArray<T>(value: T | T[] | undefined | null): T[] {
   return value == null ? [] : Array.isArray(value) ? value : [value];
 }
@@ -126,9 +129,8 @@ function sourceUri(sourceId: string, sourceIds: Map<string, string>): string {
 }
 
 function namesFor(entry: GazetteerEntry): PlaceName[] {
-  if (Array.isArray(entry.names) && entry.names.length > 0) return entry.names;
-  const names: PlaceName[] = [];
-  if (entry.prefLabel) {
+  const names: PlaceName[] = Array.isArray(entry.names) ? [...entry.names] : [];
+  if (names.length === 0 && entry.prefLabel) {
     names.push({
       text: entry.prefLabel,
       language: 'nl',
@@ -136,9 +138,39 @@ function namesFor(entry: GazetteerEntry): PlaceName[] {
       isPreferred: true,
     });
   }
+
   for (const text of entry.altLabels ?? []) {
-    names.push({ text, language: 'und', type: 'historical', isPreferred: false });
+    if (!text) continue;
+    const exists = names.some(
+      (name) =>
+        (name.text ?? '').toLowerCase().trim() === text.toLowerCase().trim(),
+    );
+    if (!exists) {
+      names.push({
+        text,
+        language: 'und',
+        type: 'historical',
+        isPreferred: false,
+      });
+    }
   }
+
+  for (const text of entry.sranantongoNames ?? []) {
+    if (!text) continue;
+    const exists = names.some(
+      (name) =>
+        (name.text ?? '').toLowerCase().trim() === text.toLowerCase().trim(),
+    );
+    if (!exists) {
+      names.push({
+        text,
+        language: 'srn',
+        type: 'vernacular',
+        isPreferred: false,
+      });
+    }
+  }
+
   return names;
 }
 
@@ -190,44 +222,6 @@ function appendLink(entity: JsonObject, property: string, uri: string) {
   entity[property] = current == null ? uri : [...asArray(current as string | string[]), uri];
 }
 
-function wikidataIds(entry: GazetteerEntry): string[] {
-  return (entry.externalLinks ?? [])
-    .filter(
-      (link): link is ExternalLink & { identifier: string } =>
-        link.authority === 'wikidata' && Boolean(link.identifier),
-    )
-    .map((link) => link.identifier);
-}
-
-function loadAlmanakkenEvidence(): Map<string, AlmanakkenEvidence[]> {
-  const csv = new TextDecoder('latin1').decode(readFileSync(ALMANAKKEN_PATH));
-  const rows = parse(csv, {
-    columns: true,
-    skip_empty_lines: true,
-    relax_column_count: true,
-  }) as Array<Record<string, string>>;
-  const byQid = new Map<string, AlmanakkenEvidence[]>();
-  for (const row of rows) {
-    const qid = (row.plantation_id ?? '').trim();
-    const recordId = (row.recordid ?? '').trim();
-    if (!qid || !recordId) continue;
-    const year = Number.parseInt((row.year ?? '').trim(), 10);
-    const evidence: AlmanakkenEvidence = {
-      recordId,
-      qid,
-      year: Number.isFinite(year) ? year : undefined,
-      product: (row.product_std ?? '').trim(),
-      deserted: (row.deserted ?? '').trim().toLowerCase() === 'verlaten',
-      sourceName: (row.plantation_org ?? '').trim(),
-      sourcePage: (row.page ?? '').trim(),
-    };
-    const list = byQid.get(qid) ?? [];
-    list.push(evidence);
-    byQid.set(qid, list);
-  }
-  return byQid;
-}
-
 function statusType(status: string): string {
   const normalized =
     status === 'built'
@@ -265,26 +259,31 @@ export function generatePlaceRecords() {
       )
       .map((entry) => [entry.sourceId as string, entry['@id'] as string]),
   );
-  const almanakkenByQid = loadAlmanakkenEvidence();
-
   mkdirSync(OUT_DIR, { recursive: true });
+  if (existsSync(OUT_DIR)) {
+    for (const fileName of readdirSync(OUT_DIR)) {
+      if (/\.json(?:ld)?$/.test(fileName)) {
+        unlinkSync(join(OUT_DIR, fileName));
+      }
+    }
+  }
   const index: JsonObject[] = [];
   let records = 0;
 
   for (const entry of gazetteer) {
     if (!entry.id || entry.deprecated || entry.mergedInto) continue;
 
-    const recordUri = `${BASE}place/${entry.id}`;
+    const pageUri = `${BASE}place/${entry.id}`;
+    const recordUri = fragmentUri(pageUri, 'record');
     const placeClass = crmByPlaceType.get(entry.type ?? '') ?? 'E53_Place';
-    const featureUri = `${recordUri}/feature`;
-    const locationUri = `${recordUri}/location`;
+    const featureUri = fragmentUri(pageUri, 'feature');
+    const locationUri = fragmentUri(pageUri, 'location');
     const hasFeature = isPhysicalFeature(placeClass);
     const targetUri = hasFeature ? featureUri : locationUri;
     const names = namesFor(entry);
     const label = preferredName(names);
     const graph: JsonObject[] = [];
     const productTypeUris = new Set<string>();
-    const organizationUris = new Set<string>();
     const referencedSourceIds = new Set<string>(entry.sources ?? []);
     for (const name of names) if (name.source) referencedSourceIds.add(name.source);
     for (const assertion of [
@@ -344,7 +343,10 @@ export function generatePlaceRecords() {
       'prov:wasDerivedFrom': [...sourceUris],
     };
     if (entry.broader) {
-      location.P89_falls_within = `${BASE}place/${entry.broader}/location`;
+      location.P89_falls_within = fragmentUri(
+        `${BASE}place/${entry.broader}`,
+        'location',
+      );
     }
     const locationObservations = asArray(entry.locationAssertions);
     const notes = (locationObservations.length > 0
@@ -358,7 +360,10 @@ export function generatePlaceRecords() {
     );
     if (notes.length > 0) location.P3_has_note = notes;
     if (entry.location?.wkt) {
-      const geometryUri = `${locationUri}/geometry/${geometrySlug(entry.location.wkt)}`;
+      const geometryUri = fragmentUri(
+        pageUri,
+        `geometry-${geometrySlug(entry.location.wkt)}`,
+      );
       location['geo:hasGeometry'] = geometryUri;
       graph.push({
         '@id': geometryUri,
@@ -370,7 +375,7 @@ export function generatePlaceRecords() {
       });
     }
     if (entry.location?.lat != null && entry.location.lng != null) {
-      const centroidUri = `${locationUri}/geometry/centroid`;
+      const centroidUri = fragmentUri(pageUri, 'geometry-centroid');
       location['geo:hasCentroid'] = centroidUri;
       graph.push({
         '@id': centroidUri,
@@ -382,7 +387,7 @@ export function generatePlaceRecords() {
       });
     }
     if (entry.fid != null) {
-      const identifierUri = `${locationUri}/identifier/qgis-fid`;
+      const identifierUri = fragmentUri(pageUri, 'identifier-qgis-fid');
       location.P48_has_preferred_identifier = identifierUri;
       graph.push({
         '@id': identifierUri,
@@ -396,7 +401,7 @@ export function generatePlaceRecords() {
     const nameUris: string[] = [];
     names.forEach((name, position) => {
       if (!name.text) return;
-      const nameUri = `${recordUri}/name/${position + 1}`;
+      const nameUri = fragmentUri(pageUri, `name-${position + 1}`);
       nameUris.push(nameUri);
       graph.push({
         '@id': nameUri,
@@ -420,11 +425,10 @@ export function generatePlaceRecords() {
 
     const evidenceUris: string[] = [];
     const statusUris: string[] = [];
-    const organizationalAssociationUris: string[] = [];
     for (const assertion of asArray(entry.districtAssertions)) {
       if (!assertion.id || !assertion.districtId) continue;
-      const assertionUri = `${recordUri}/assertion/${assertion.id}`;
-      const spanUri = `${assertionUri}/time-span`;
+      const assertionUri = fragmentUri(pageUri, `assertion-${assertion.id}`);
+      const spanUri = fragmentUri(pageUri, `assertion-${assertion.id}-time-span`);
       const span = timeSpan(
         spanUri,
         assertion.sourceYear ?? assertion.startYear,
@@ -435,7 +439,10 @@ export function generatePlaceRecords() {
         '@id': assertionUri,
         '@type': ['crm:E13_Attribute_Assignment'],
         P140_assigned_attribute_to: targetUri,
-        P141_assigned: `${BASE}place/${assertion.districtId}/location`,
+        P141_assigned: fragmentUri(
+          `${BASE}place/${assertion.districtId}`,
+          'location',
+        ),
         P2_has_type: `${BASE}type/relationship/district-membership`,
         ...(span ? { P4_has_time_span: spanUri } : {}),
         ...(assertion.source
@@ -449,8 +456,8 @@ export function generatePlaceRecords() {
 
     for (const assertion of locationObservations) {
       if (!assertion.id || (!assertion.standardized && !assertion.original)) continue;
-      const assertionUri = `${recordUri}/assertion/${assertion.id}`;
-      const spanUri = `${assertionUri}/time-span`;
+      const assertionUri = fragmentUri(pageUri, `assertion-${assertion.id}`);
+      const spanUri = fragmentUri(pageUri, `assertion-${assertion.id}-time-span`);
       const span = timeSpan(spanUri, assertion.startYear, assertion.endYear);
       if (span) graph.push(span);
       graph.push({
@@ -478,8 +485,8 @@ export function generatePlaceRecords() {
 
     for (const assertion of entry.statusAssertions ?? []) {
       if (!assertion.id || !assertion.status) continue;
-      const assertionUri = `${recordUri}/assertion/${assertion.id}`;
-      const spanUri = `${assertionUri}/time-span`;
+      const assertionUri = fragmentUri(pageUri, `assertion-${assertion.id}`);
+      const spanUri = fragmentUri(pageUri, `assertion-${assertion.id}-time-span`);
       const span = timeSpan(spanUri, assertion.startYear, assertion.endYear);
       if (span) graph.push(span);
       graph.push({
@@ -501,8 +508,8 @@ export function generatePlaceRecords() {
 
     for (const assertion of entry.productAssertions ?? []) {
       if (!assertion.id || !assertion.value) continue;
-      const assertionUri = `${recordUri}/assertion/${assertion.id}`;
-      const spanUri = `${assertionUri}/time-span`;
+      const assertionUri = fragmentUri(pageUri, `assertion-${assertion.id}`);
+      const spanUri = fragmentUri(pageUri, `assertion-${assertion.id}-time-span`);
       const span = timeSpan(spanUri, assertion.startYear, assertion.endYear);
       if (span) graph.push(span);
       graph.push({
@@ -528,90 +535,108 @@ export function generatePlaceRecords() {
       }
       evidenceUris.push(assertionUri);
     }
-    // Preserve every matching Almanakken row as raw, source-bound evidence.
-    // These observations do not make an unsupported physical-lifecycle claim.
-    for (const qid of wikidataIds(entry)) {
-      const qidEvidence = almanakkenByQid.get(qid) ?? [];
-      const rawEvidenceUris: string[] = [];
-      for (const evidence of qidEvidence) {
-        const evidenceUri = `${BASE}observation/almanakken/${evidence.recordId}`;
-        const organizationUri = `${BASE}organization/${evidence.qid}`;
-        const spanUri = `${evidenceUri}/time-span`;
-        if (!organizationUris.has(organizationUri)) {
-          organizationUris.add(organizationUri);
+    // Preserve saved Almanakken v2 rows as source-bound observations.
+    // These rows are evidence for review; curated claims remain the assertions above.
+    const almanakkenObservations = asArray(entry.almanakkenObservations);
+    for (const evidence of almanakkenObservations) {
+      const evidenceUri = fragmentUri(
+        pageUri,
+        `observation-almanakken-${evidence.recordId}`,
+      );
+      const spanUri = fragmentUri(
+        pageUri,
+        `observation-almanakken-${evidence.recordId}-time-span`,
+      );
+      if (evidence.year) graph.push(timeSpan(spanUri, evidence.year)!);
+      const observation: JsonObject = {
+        '@id': evidenceUri,
+        '@type': ['crm:E13_Attribute_Assignment'],
+        P140_assigned_attribute_to: targetUri,
+        ...(evidence.year ? { P4_has_time_span: spanUri } : {}),
+        'prov:hadPrimarySource': sourceUri('almanakken', sourceIds),
+        sourceRow: evidence.recordId,
+        sourceVersion: evidence.sourceVersion,
+        ...(evidence.plantationOriginal ? { P3_has_note: evidence.plantationOriginal } : {}),
+        ...(evidence.page ? { pageReference: evidence.page } : {}),
+        ...(evidence.littera ? { littera: evidence.littera } : {}),
+        ...(evidence.districtOrDivision
+          ? { districtOrDivision: evidence.districtOrDivision }
+          : {}),
+        ...(evidence.locationOriginal
+          ? { sourceContent: evidence.locationOriginal }
+          : {}),
+        ...(evidence.locationStandardized
+          ? { standardizedContent: evidence.locationStandardized }
+          : {}),
+        ...(evidence.riverOrRoad ? { riverOrRoad: evidence.riverOrRoad } : {}),
+        ...(evidence.direction ? { direction: evidence.direction } : {}),
+        ...(evidence.plantationStandardized
+          ? { standardizedName: evidence.plantationStandardized }
+          : {}),
+        ...(evidence.psurIds?.length ? { psurIds: evidence.psurIds } : {}),
+        ...(evidence.hasParts?.length
+          ? {
+              hasParts: evidence.hasParts.map((part) => wikidataUri(part.qid)),
+              hasPartLabels: evidence.hasParts
+                .map((part) => part.label)
+                .filter(Boolean),
+            }
+          : {}),
+        ...(evidence.partOf?.length
+          ? {
+              partOf: evidence.partOf.map((part) => wikidataUri(part.qid)),
+              partOfLabel: evidence.partOf
+                .map((part) => part.label)
+                .filter(Boolean),
+            }
+          : {}),
+        ...(evidence.referenceOriginal
+          ? { referenceOriginal: evidence.referenceOriginal }
+          : {}),
+        ...(evidence.ownedBy?.length
+          ? {
+              ownedBy: evidence.ownedBy.map((owner) => wikidataUri(owner.qid)),
+              ownedByLabel: evidence.ownedBy
+                .map((owner) => owner.label)
+                .filter(Boolean),
+            }
+          : {}),
+        ...(evidence.sizeAkkers != null ? { sizeAkkers: evidence.sizeAkkers } : {}),
+        ...(evidence.function ? { function: evidence.function } : {}),
+        ...(evidence.additionalInfo ? { additionalInfo: evidence.additionalInfo } : {}),
+        ...(evidence.lot ? { lot: evidence.lot } : {}),
+        ...(evidence.sranantongoName
+          ? { sranantongoName: evidence.sranantongoName }
+          : {}),
+        ...(evidence.population ? { population: evidence.population } : {}),
+        ...(evidence.mill ? { mill: evidence.mill } : {}),
+        ...(evidence.rawManagement ? { rawManagement: evidence.rawManagement } : {}),
+        ...(evidence.deserted
+          ? {
+              reportedOperationalStatus:
+                `${BASE}type/operational-status/abandonment-reported`,
+            }
+          : {}),
+      };
+      if (evidence.product) {
+        const productTypeUri = `${BASE}type/product/${slug(evidence.product)}`;
+        observation.P141_assigned = productTypeUri;
+        if (!productTypeUris.has(productTypeUri)) {
+          productTypeUris.add(productTypeUri);
           graph.push({
-            '@id': organizationUri,
-            '@type': ['crm:E74_Group'],
-            'skos:exactMatch': wikidataUri(evidence.qid),
+            '@id': productTypeUri,
+            '@type': ['crm:E99_Product_Type'],
+            'rdfs:label': evidence.product,
           });
         }
-        if (evidence.year) graph.push(timeSpan(spanUri, evidence.year)!);
-        const observation: JsonObject = {
-          '@id': evidenceUri,
-          '@type': ['crm:E13_Attribute_Assignment'],
-          P140_assigned_attribute_to: organizationUri,
-          ...(evidence.year ? { P4_has_time_span: spanUri } : {}),
-          'prov:hadPrimarySource': sourceUri('almanakken', sourceIds),
-          sourceRow: evidence.recordId,
-          ...(evidence.sourceName ? { P3_has_note: evidence.sourceName } : {}),
-          ...(evidence.sourcePage ? { pageReference: evidence.sourcePage } : {}),
-          ...(evidence.deserted
-            ? {
-                reportedOperationalStatus:
-                  `${BASE}type/operational-status/abandonment-reported`,
-              }
-            : {}),
-        };
-        if (evidence.product) {
-          const productTypeUri = `${BASE}type/product/${slug(evidence.product)}`;
-          observation.P141_assigned = productTypeUri;
-          if (!productTypeUris.has(productTypeUri)) {
-            productTypeUris.add(productTypeUri);
-            graph.push({
-              '@id': productTypeUri,
-              '@type': ['crm:E99_Product_Type'],
-              'rdfs:label': evidence.product,
-            });
-          }
-        }
-        graph.push(observation);
-        if (!evidenceUris.includes(evidenceUri)) evidenceUris.push(evidenceUri);
-        rawEvidenceUris.push(evidenceUri);
       }
-      if (rawEvidenceUris.length > 0) {
-        const associationUri = `${recordUri}/association/organization/${qid}`;
-        const years = qidEvidence
-          .map((evidence) => evidence.year)
-          .filter((year): year is number => year != null);
-        const spanUri = `${associationUri}/time-span`;
-        const span = timeSpan(
-          spanUri,
-          years.length > 0 ? Math.min(...years) : undefined,
-          years.length > 0 ? Math.max(...years) : undefined,
-        );
-        if (span) graph.push(span);
-        graph.push({
-          '@id': associationUri,
-          '@type': ['crm:E13_Attribute_Assignment'],
-          P140_assigned_attribute_to: targetUri,
-          P141_assigned: `${BASE}organization/${qid}`,
-          P2_has_type: `${BASE}type/relationship/source-linked-organisation`,
-          ...(span ? { P4_has_time_span: spanUri } : {}),
-          'prov:hadPrimarySource': sourceUri('almanakken', sourceIds),
-          'prov:wasDerivedFrom': rawEvidenceUris,
-          certainty: `${BASE}type/certainty/probable`,
-        });
-        organizationalAssociationUris.push(associationUri);
-      }
+      graph.push(observation);
+      if (!evidenceUris.includes(evidenceUri)) evidenceUris.push(evidenceUri);
     }
     if (evidenceUris.length > 0) record.hasEvidence = evidenceUris;
-    if (organizationalAssociationUris.length > 0) {
-      record.hasOrganizationalAssociation = organizationalAssociationUris;
-    }
-
     for (const [position, ref] of (entry.diklandRefs ?? []).entries()) {
       if (!ref.folderPath && !ref.driveUrl) continue;
-      const sourceUriValue = `${recordUri}/source/dikland/${position + 1}`;
+      const sourceUriValue = fragmentUri(pageUri, `source-dikland-${position + 1}`);
       graph.push({
         '@id': sourceUriValue,
         '@type': ['crm:E22_Human-Made_Object', 'crm:E31_Document'],
@@ -630,7 +655,7 @@ export function generatePlaceRecords() {
 
     const document: JsonObject = {
       '@context': buildPlaceRecordContext(),
-      '@id': recordUri,
+      '@id': pageUri,
       '@type': ['stm:AuthorityRecord'],
       '@graph': graph,
     };
@@ -665,11 +690,12 @@ export function generatePlaceRecords() {
       productAssertions: asArray(entry.productAssertions),
       districtAssertions: asArray(entry.districtAssertions),
       locationAssertions: asArray(entry.locationAssertions),
+      almanakkenObservations,
       diklandRefs: asArray(entry.diklandRefs),
     };
     writeFileSync(join(OUT_DIR, `${entry.id}.jsonld`), `${JSON.stringify(document, null, 2)}\n`);
     writeFileSync(join(OUT_DIR, `${entry.id}.json`), `${JSON.stringify(projection, null, 2)}\n`);
-    index.push({ id: entry.id, label, type: entry.type, recordUri });
+    index.push({ id: entry.id, label, type: entry.type, recordUri: pageUri });
     records++;
   }
 

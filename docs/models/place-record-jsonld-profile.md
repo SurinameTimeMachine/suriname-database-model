@@ -20,8 +20,9 @@ For `stm-00705` the public contract is:
 - `https://data.surinametijdmachine.org/place/stm-00705` — authority record and HTML representation.
 - `.../place/stm-00705.jsonld` — JSON-LD representation.
 - `.../place/stm-00705.json` — application JSON representation.
-- `.../place/stm-00705/feature` — E25/E26 physical feature when applicable.
-- `.../place/stm-00705/location` — E53 Place.
+- `.../place/stm-00705#record` — E31 authority-record node.
+- `.../place/stm-00705#feature` — E25/E26 physical feature when applicable.
+- `.../place/stm-00705#location` — E53 Place.
 
 The HTTPS URL is canonical until an ARK name assigning authority issues ARKs.
 The generated identifier manifest is the only place future ARK redirects are
@@ -46,6 +47,17 @@ Derived periods are marked `probable` where they summarize multiple source
 assertions. A source statement such as a reported abandonment is `certain` as
 a statement by that source, not as an unqualified historical fact. The raw
 Almanakken record ID remains on each observation so summaries are reproducible.
+
+`plantation_id` is retained as a source matching key. An observation receives
+`P140 assigned attribute to` only when that key resolves to one unambiguous E25
+feature. Rows with missing or ambiguous matches remain published as unresolved
+evidence and are listed in the editorial review artifact; they are not assigned
+to an E74 organisation as a fallback.
+
+Compound v2 transcription fields such as population, mill, and raw management
+details are preserved as JSON literals on the source observation. They are not
+claimed as CIDOC CRM statements. Acreage is likewise retained as an STM source
+field until it can be represented by an E54 Dimension with a value and unit.
 
 ## Sources and geometry
 

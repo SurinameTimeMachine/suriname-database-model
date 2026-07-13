@@ -1184,9 +1184,9 @@ function SearchInput({
                 }}
               >
                 <span className="font-medium">{f.properties.name}</span>
-                {f.properties.organizationQid && (
+                {f.properties.wikidataQid && (
                   <span className="ml-2 text-xs text-stm-warm-400">
-                    {f.properties.organizationQid}
+                    {f.properties.wikidataQid}
                   </span>
                 )}
               </button>

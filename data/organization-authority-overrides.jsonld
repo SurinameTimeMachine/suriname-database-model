@@ -1,0 +1,21 @@
+{
+  "@context": {
+    "stm": "https://data.surinametijdmachine.org/",
+    "skos": "http://www.w3.org/2004/02/skos/core#",
+    "dcterms": "http://purl.org/dc/terms/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "qid": "stm:sourcePlantationQid",
+    "preferredLabel": "skos:prefLabel",
+    "alternativeLabels": "skos:altLabel",
+    "editorialNote": "dcterms:description",
+    "reviewStatus": "stm:authorityReviewStatus",
+    "modifiedAt": {
+      "@id": "dcterms:modified",
+      "@type": "xsd:date"
+    },
+    "modifiedBy": "stm:modifiedBy"
+  },
+  "@id": "https://data.surinametijdmachine.org/dataset/organization-authority-overrides",
+  "@type": "stm:OrganizationAuthorityOverrideDataset",
+  "@graph": []
+}

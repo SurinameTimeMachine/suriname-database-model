@@ -3,14 +3,19 @@
 import { getSourcesByCategory, useSourceRegistry } from '@/lib/sources';
 import { usePlaceTypes } from '@/lib/thesaurus';
 import type {
+  AlmanakkenPlantationObservation,
   AssertionCertainty,
   DiklandRef,
   DistrictAssertion,
+  E25Plantation,
+  E74Organization,
   ExternalLink,
   GazetteerPlace,
   LanguageCode,
   LocationAssertion,
   NameType,
+  OrganizationAssociationStatus,
+  OrganizationObservation,
   PlaceName,
   PlantationStatusType,
   ProductAssertion,
@@ -29,10 +34,43 @@ interface PlaceEditorProps {
   place: GazetteerPlace;
   districts: GazetteerPlace[];
   sourceAppellations?: SourceAppellationHint[];
+  almanakkenReview?: AlmanakkenReviewEntry;
+  organizationContext?: PlaceOrganizationContext;
   canEdit: boolean;
   onSave: (place: GazetteerPlace) => Promise<void>;
   onCancel: () => void;
   onDelete?: (id: string) => Promise<void>;
+}
+
+export interface PlaceOrganizationContext {
+  organization: E74Organization | null;
+  associationStatus: OrganizationAssociationStatus;
+  linkedPlantations: E25Plantation[];
+  observations: OrganizationObservation[];
+  qid: string | null;
+}
+
+interface AlmanakkenReviewEntry {
+  placeId: string;
+  qid: string;
+  sourceVersion: string;
+  rows: number;
+  firstYear: number | null;
+  lastYear: number | null;
+  productRows: number;
+  desertedRows: number;
+  sourceNames: number;
+  products: string[];
+  v2OnlyRows: number;
+  hasGazetteerSource: boolean;
+  hasProductAssertions: boolean;
+  hasStatusAssertions: boolean;
+  hasAlmanakkenObservations: boolean;
+  issues: Array<{
+    type: string;
+    label: string;
+    detail?: string;
+  }>;
 }
 
 interface SourceAppellationHint {
@@ -51,6 +89,52 @@ function normalizeAppellationText(text: string): string {
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9]+/g, ' ')
     .trim();
+}
+
+function observationValue(value: string | number | undefined): string {
+  return value == null || value === '' ? '-' : String(value);
+}
+
+function observationRelations(
+  relations: AlmanakkenPlantationObservation['hasParts'],
+): string {
+  if (!relations?.length) return '-';
+  return relations
+    .map((relation) => relation.label || relation.qid)
+    .filter(Boolean)
+    .join(', ');
+}
+
+function observationPopulation(
+  observation: AlmanakkenPlantationObservation,
+): string {
+  const population = observation.population;
+  if (!population) return '-';
+  const values = [
+    population.enslavedCount != null
+      ? `${population.enslavedCount} enslaved`
+      : null,
+    population.freeResidents != null
+      ? `${population.freeResidents} free`
+      : null,
+    population.totalResidents != null
+      ? `${population.totalResidents} total`
+      : null,
+  ].filter(Boolean);
+  return values.length > 0 ? values.join(', ') : '-';
+}
+
+function observationDetails(
+  observation: AlmanakkenPlantationObservation,
+): string {
+  const values = [
+    observation.sizeAkkers != null ? `${observation.sizeAkkers} akkers` : null,
+    observation.function ? `function: ${observation.function}` : null,
+    observation.lot ? `lot: ${observation.lot}` : null,
+    observation.mill?.type ? `mill: ${observation.mill.type}` : null,
+    observation.additionalInfo,
+  ].filter(Boolean);
+  return values.length > 0 ? values.join(' | ') : '-';
 }
 
 function getEffectiveDistrictAssertion(
@@ -185,6 +269,44 @@ function normalizeStatusAssertions(place: GazetteerPlace): StatusAssertion[] {
     }));
   }
   return [];
+}
+
+const ALMANAKKEN_ISSUE_DISPLAY: Record<
+  string,
+  { short: string; label: string }
+> = {
+  'duplicate-gazetteer-link': {
+    short: 'dup',
+    label: 'Duplicate QID links',
+  },
+  'missing-source-tag': {
+    short: 'src',
+    label: 'Missing Almanakken source tag',
+  },
+  'missing-product-assertions': {
+    short: 'prod',
+    label: 'Missing product assertions',
+  },
+  'missing-status-assertions': {
+    short: 'life',
+    label: 'Missing lifecycle assertions',
+  },
+  'missing-almanakken-observations': {
+    short: 'rows',
+    label: 'Missing saved v2 observations',
+  },
+  'v1-v2-qid-change': {
+    short: 'qid',
+    label: 'v1 to v2 QID changes',
+  },
+};
+
+function almanakkenIssueShortLabel(type: string): string {
+  return ALMANAKKEN_ISSUE_DISPLAY[type]?.short ?? type;
+}
+
+function almanakkenIssueLongLabel(type: string): string {
+  return ALMANAKKEN_ISSUE_DISPLAY[type]?.label ?? type;
 }
 
 const CATEGORY_ORDER = [
@@ -501,6 +623,8 @@ export default function PlaceEditor({
   place,
   districts,
   sourceAppellations = [],
+  almanakkenReview,
+  organizationContext,
   canEdit,
   onSave,
   onCancel,
@@ -1114,6 +1238,68 @@ export default function PlaceEditor({
     update('sources', sources);
   };
 
+  const almanakkenProductAssertions = productAssertions.filter(
+    (assertion) => assertion.source === 'almanakken',
+  );
+  const almanakkenStatusAssertions = statusAssertions.filter(
+    (assertion) => assertion.source === 'almanakken',
+  );
+  const almanakkenObservations = [...(draft.almanakkenObservations ?? [])].sort(
+    (a, b) =>
+      (a.year ?? 0) - (b.year ?? 0) || a.recordId.localeCompare(b.recordId),
+  );
+  const almanakkenObservationYears = almanakkenObservations
+    .map((observation) => observation.year)
+    .filter((year): year is number => year != null);
+  const almanakkenYears =
+    almanakkenObservationYears.length > 0
+      ? `${Math.min(...almanakkenObservationYears)}-${Math.max(...almanakkenObservationYears)}`
+      : almanakkenReview?.firstYear && almanakkenReview.lastYear
+      ? `${almanakkenReview.firstYear}-${almanakkenReview.lastYear}`
+      : null;
+  const almanakkenProducts =
+    almanakkenReview && almanakkenReview.products.length > 0
+      ? almanakkenReview.products.join(', ')
+      : null;
+  const almanakkenHasUrgentReview =
+    Boolean(almanakkenReview && almanakkenReview.issues.length > 0);
+  const reportedOwners = useMemo(() => {
+    const values = (organizationContext?.observations ?? [])
+      .filter(
+        (observation): observation is OrganizationObservation & {
+          hasOwner: string;
+        } => Boolean(observation.hasOwner?.trim()),
+      )
+      .map((observation) => ({
+        year: observation.observationYear,
+        value: observation.hasOwner.trim(),
+      }))
+      .sort((a, b) => b.year.localeCompare(a.year));
+
+    return Array.from(
+      new Map(
+        values.map((value) => [
+          `${value.year}\u0000${value.value}`,
+          value,
+        ]),
+      ).values(),
+    );
+  }, [organizationContext]);
+  const physicalOwnershipAssertions = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          (organizationContext?.linkedPlantations ?? []).flatMap((plantation) =>
+            [
+              plantation.P51_has_former_or_current_owner,
+              plantation.P52_has_current_owner,
+            ].filter((value): value is string => Boolean(value)),
+          ),
+        ),
+      ),
+    [organizationContext],
+  );
+
   return (
     <div className="h-full min-h-0 flex flex-col border border-stm-warm-200 bg-white shadow-sm">
       {/* Header */}
@@ -1167,6 +1353,370 @@ export default function PlaceEditor({
             statement; add a date or span when the source provides one.
           </p>
         )}
+
+        {organizationContext && (
+          <section className="min-w-0 overflow-hidden border border-stm-warm-200 bg-stm-warm-50 p-3 text-xs text-stm-warm-800">
+            <div className="grid min-w-0 grid-cols-1 items-start gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
+              <div className="min-w-0">
+                <div className="text-[10px] font-medium uppercase tracking-[0.16em] text-stm-warm-500">
+                  Organization
+                </div>
+                {organizationContext.organization ? (
+                  <Link
+                    href={`/organizations?organization=${encodeURIComponent(
+                      organizationContext.qid ??
+                        organizationContext.organization['@id'],
+                    )}`}
+                    className="break-words text-sm font-semibold text-stm-teal-700 hover:underline"
+                  >
+                    {organizationContext.organization.prefLabel}
+                  </Link>
+                ) : (
+                  <div className="text-sm font-semibold">
+                    No organization linked
+                  </div>
+                )}
+              </div>
+              <span
+                className={`w-fit border px-2 py-1 text-[10px] font-medium sm:justify-self-end ${
+                  organizationContext.associationStatus === 'linked'
+                    ? 'border-stm-teal-300 bg-stm-teal-50 text-stm-teal-800'
+                    : 'border-amber-400 bg-amber-50 text-amber-900'
+                }`}
+              >
+                {organizationContext.associationStatus === 'linked'
+                  ? 'linked'
+                  : organizationContext.associationStatus ===
+                      'needs-organization-link'
+                    ? 'needs organization link'
+                    : 'needs physical-link review'}
+              </span>
+            </div>
+
+            <dl className="mt-3 grid min-w-0 grid-cols-1 gap-x-3 gap-y-1 border-t border-stm-warm-200 pt-3 sm:grid-cols-[8rem_minmax(0,1fr)] sm:gap-y-2">
+              <dt className="text-stm-warm-500">Authority match</dt>
+              <dd className="min-w-0 break-words pb-1 sm:pb-0">
+                {organizationContext.qid ? (
+                  <a
+                    href={`https://www.wikidata.org/entity/${organizationContext.qid}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-mono text-stm-teal-700 hover:underline"
+                  >
+                    {organizationContext.qid}
+                  </a>
+                ) : (
+                  <span className="text-amber-800">Not established</span>
+                )}
+                {organizationContext.organization && (
+                  <span className="ml-2 text-stm-warm-500">
+                    exact match for E74
+                  </span>
+                )}
+              </dd>
+
+              <dt className="text-stm-warm-500">Physical plantation</dt>
+              <dd className="min-w-0 break-words pb-1 sm:pb-0">
+                {organizationContext.linkedPlantations.length > 0 ? (
+                  <div className="flex flex-wrap gap-x-3 gap-y-1">
+                    {organizationContext.linkedPlantations.map((plantation) => (
+                      <a
+                        key={plantation['@id']}
+                        href={plantation['@id']}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-stm-teal-700 hover:underline"
+                      >
+                        {plantation.prefLabel}
+                      </a>
+                    ))}
+                  </div>
+                ) : (
+                  <span className="text-amber-800">Needs review</span>
+                )}
+              </dd>
+
+              <dt className="text-stm-warm-500">Land ownership</dt>
+              <dd className="min-w-0 break-words">
+                {physicalOwnershipAssertions.length > 0 ? (
+                  <div className="space-y-1">
+                    {physicalOwnershipAssertions.map((owner) => (
+                      <a
+                        key={owner}
+                        href={owner}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="block break-all text-stm-teal-700 hover:underline"
+                      >
+                        {owner}
+                      </a>
+                    ))}
+                  </div>
+                ) : (
+                  <span>No sourced P51/P52 assertion</span>
+                )}
+              </dd>
+            </dl>
+
+            {reportedOwners.length > 0 && (
+              <div className="mt-3 border-t border-stm-warm-200 pt-3">
+                <div className="mb-1 grid min-w-0 grid-cols-1 gap-1 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+                  <span className="font-medium">
+                    Reported owners in Almanakken
+                  </span>
+                  <span className="font-mono text-[10px] text-stm-warm-500 sm:text-right">
+                    {reportedOwners.length} dated transcription
+                    {reportedOwners.length === 1 ? '' : 's'}
+                  </span>
+                </div>
+                <div className="max-h-28 overflow-auto border border-stm-warm-200 bg-white">
+                  {reportedOwners.map((owner) => (
+                    <div
+                      key={`${owner.year}-${owner.value}`}
+                      className="grid grid-cols-[3.5rem_minmax(0,1fr)] gap-2 border-b border-stm-warm-100 px-2 py-1 last:border-b-0"
+                    >
+                      <span className="font-mono text-stm-warm-500">
+                        {owner.year}
+                      </span>
+                      <span className="min-w-0 break-words">{owner.value}</span>
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-2 text-[11px] leading-4 text-stm-warm-600">
+                  These are dated source transcriptions about the organization;
+                  they do not by themselves assert ownership of the land.
+                </p>
+              </div>
+            )}
+          </section>
+        )}
+
+        {almanakkenReview && (
+          <div
+            className={`border p-3 text-xs ${
+              almanakkenHasUrgentReview
+                ? 'border-amber-300 bg-amber-50 text-amber-900'
+                : 'border-stm-teal-200 bg-stm-teal-50 text-stm-teal-900'
+            }`}
+          >
+            <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <div className="text-[10px] font-medium uppercase tracking-[0.18em] opacity-70">
+                  Almanakken {almanakkenReview.sourceVersion}
+                </div>
+                <div className="font-medium">
+                  {almanakkenReview.rows} observations
+                  {almanakkenYears ? ` (${almanakkenYears})` : ''}
+                </div>
+              </div>
+              <span
+                className={`border px-2 py-1 text-[10px] font-medium ${
+                  almanakkenHasUrgentReview
+                    ? 'border-amber-400 bg-white/70 text-amber-800'
+                    : 'border-stm-teal-300 bg-white/70 text-stm-teal-800'
+                }`}
+              >
+                {almanakkenHasUrgentReview
+                  ? `${almanakkenReview.issues.length} urgent review${almanakkenReview.issues.length === 1 ? '' : 's'}`
+                  : 'no urgent review'}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              <div className="border border-black/10 bg-white/60 p-2">
+                <div className="text-[10px] uppercase tracking-[0.16em] opacity-60">
+                  Products
+                </div>
+                <div className="font-medium">
+                  {almanakkenReview.productRows} rows
+                </div>
+                <div className="mt-1 line-clamp-2 text-[11px] opacity-75">
+                  {almanakkenProducts ?? 'none'}
+                </div>
+              </div>
+              <div className="border border-black/10 bg-white/60 p-2">
+                <div className="text-[10px] uppercase tracking-[0.16em] opacity-60">
+                  Materialized
+                </div>
+                <div className="font-medium">
+                  {almanakkenProductAssertions.length} product
+                </div>
+                <div className="text-[11px] opacity-75">
+                  {almanakkenStatusAssertions.length} lifecycle,{' '}
+                  {almanakkenObservations.length} v2 rows
+                </div>
+              </div>
+              <div className="border border-black/10 bg-white/60 p-2">
+                <div className="text-[10px] uppercase tracking-[0.16em] opacity-60">
+                  Deserted
+                </div>
+                <div className="font-medium">
+                  {almanakkenReview.desertedRows} rows
+                </div>
+                <div className="text-[11px] opacity-75">
+                  {almanakkenReview.sourceNames} name variants
+                </div>
+              </div>
+              <div className="border border-black/10 bg-white/60 p-2">
+                <div className="text-[10px] uppercase tracking-[0.16em] opacity-60">
+                  v2 context
+                </div>
+                <div className="font-medium">
+                  v2-only {almanakkenReview.v2OnlyRows}
+                </div>
+              </div>
+            </div>
+
+            {almanakkenObservations.length > 0 && (
+              <div className="mt-3 border border-black/10 bg-white/70">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-black/10 px-2 py-1.5">
+                  <div className="font-medium">
+                    Saved Almanakken v2 observations
+                  </div>
+                  <div className="font-mono text-[10px] opacity-70">
+                    {almanakkenObservations.length} rows
+                  </div>
+                </div>
+                <div className="max-h-72 overflow-auto">
+                  <table className="min-w-full border-collapse text-left text-[11px]">
+                    <thead className="sticky top-0 bg-white text-[10px] uppercase tracking-[0.12em] opacity-70">
+                      <tr>
+                        <th className="whitespace-nowrap border-b border-black/10 px-2 py-1">
+                          Year
+                        </th>
+                        <th className="whitespace-nowrap border-b border-black/10 px-2 py-1">
+                          Source row
+                        </th>
+                        <th className="border-b border-black/10 px-2 py-1">
+                          Name / product
+                        </th>
+                        <th className="border-b border-black/10 px-2 py-1">
+                          Location
+                        </th>
+                        <th className="border-b border-black/10 px-2 py-1">
+                          Population
+                        </th>
+                        <th className="border-b border-black/10 px-2 py-1">
+                          Relations
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {almanakkenObservations.map((observation) => (
+                        <tr
+                          key={observation.recordId}
+                          className="border-b border-black/5 align-top"
+                        >
+                          <td className="whitespace-nowrap px-2 py-1 font-mono">
+                            {observationValue(observation.year)}
+                          </td>
+                          <td className="whitespace-nowrap px-2 py-1 font-mono">
+                            {observation.recordId}
+                          </td>
+                          <td className="min-w-44 px-2 py-1">
+                            <div className="font-medium">
+                              {observationValue(
+                                observation.plantationOriginal ||
+                                  observation.plantationStandardized,
+                              )}
+                            </div>
+                            <div className="opacity-75">
+                              {observation.product || '-'}
+                              {observation.deserted ? ' | deserted' : ''}
+                            </div>
+                            <div className="opacity-75">
+                              {observationDetails(observation)}
+                            </div>
+                          </td>
+                          <td className="min-w-48 px-2 py-1">
+                            <div>
+                              {observationValue(
+                                observation.locationStandardized,
+                              )}
+                            </div>
+                            <div className="opacity-70">
+                              {observation.locationOriginal || '-'}
+                            </div>
+                            <div className="opacity-70">
+                              {[observation.riverOrRoad, observation.direction]
+                                .filter(Boolean)
+                                .join(' | ') || '-'}
+                            </div>
+                          </td>
+                          <td className="min-w-36 px-2 py-1">
+                            {observationPopulation(observation)}
+                          </td>
+                          <td className="min-w-44 px-2 py-1">
+                            <div>
+                              part of: {observationRelations(observation.partOf)}
+                            </div>
+                            <div>
+                              has parts:{' '}
+                              {observationRelations(observation.hasParts)}
+                            </div>
+                            <div>
+                              owned by: {observationRelations(observation.ownedBy)}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {almanakkenReview.issues.length > 0 && (
+              <div className="mt-2 space-y-1">
+                {almanakkenReview.issues.map((issue) => (
+                  <div
+                    key={`${issue.type}-${issue.detail ?? ''}`}
+                    className="flex items-start gap-2 border border-amber-300 bg-white/70 px-2 py-1.5"
+                  >
+                    <span className="shrink-0 border border-amber-400 bg-amber-100 px-1.5 py-0.5 font-mono text-[10px] text-amber-800">
+                      {almanakkenIssueShortLabel(issue.type)}
+                    </span>
+                    <span>
+                      <span className="font-medium">
+                        {almanakkenIssueLongLabel(issue.type)}
+                      </span>
+                      {issue.detail && (
+                        <span className="ml-1 font-mono text-[11px] opacity-75">
+                          {issue.detail}
+                        </span>
+                      )}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {almanakkenReview.productRows > 0 &&
+              almanakkenProductAssertions.length === 0 && (
+                <p className="mt-2 border border-amber-300 bg-white/70 px-2 py-1.5 text-[11px] text-amber-800">
+                  Product rows exist in Almanakken, but no Almanakken product
+                  assertions are currently materialized below.
+                </p>
+              )}
+
+            {almanakkenReview.rows > 0 &&
+              almanakkenObservations.length === 0 && (
+                <p className="mt-2 border border-amber-300 bg-white/70 px-2 py-1.5 text-[11px] text-amber-800">
+                  Almanakken rows exist, but no saved Almanakken v2 observation
+                  rows are attached to this Gazetteer record.
+                </p>
+              )}
+
+            {almanakkenReview.rows > 0 &&
+              almanakkenStatusAssertions.length === 0 && (
+                <p className="mt-2 border border-amber-300 bg-white/70 px-2 py-1.5 text-[11px] text-amber-800">
+                  Almanakken rows exist, but no Almanakken lifecycle assertions
+                  are currently materialized below.
+                </p>
+              )}
+          </div>
+        )}
+
         {/* Names */}
         <div>
           <div className="flex items-center justify-between mb-1">
@@ -1451,7 +2001,7 @@ export default function PlaceEditor({
         </div>
 
         {/* External Links */}
-        <div>
+        <div id="external-links">
           <label className="block text-sm font-medium text-stm-warm-700 mb-1">
             External Links
             <span className="text-stm-warm-400 font-normal text-xs ml-1">

@@ -8,6 +8,7 @@ import { useCallback, useEffect, useState } from 'react';
 const NAV_ITEMS = [
   { href: '/explore', label: 'Map' },
   { href: '/places', label: 'Places' },
+  { href: '/organizations', label: 'Organizations' },
   { href: '/sources', label: 'Sources' },
   { href: '/model', label: 'Model' },
   { href: '/vocabulary', label: 'Vocabulary' },

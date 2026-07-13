@@ -101,7 +101,7 @@ function buildGraph(
     links.push({
       source: centerId,
       target: 'e74',
-      label: 'P52 has current owner',
+      label: 'STM organization association',
     });
   }
 
@@ -142,8 +142,13 @@ function buildGraph(
       x: CX + Math.cos(angle) * 120,
       y: CY + Math.sin(angle) * 100,
     });
+    const identifies = Array.isArray(app.P1i_identifies)
+      ? app.P1i_identifies
+      : app.P1i_identifies
+        ? [app.P1i_identifies]
+        : [];
     const identifiesOrg = Boolean(
-      organization && app.P1i_identifies?.includes('wikidata'),
+      organization && identifies.includes(organization['@id']),
     );
     links.push({
       source: identifiesOrg ? 'e74' : centerId,

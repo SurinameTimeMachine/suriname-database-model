@@ -27,6 +27,9 @@ interface MergeResolution {
   excludedPsurIds: Set<string>;
   excludedExternalLinks: Set<string>; // JSON.stringify'd link objects
   excludedDiklandRefs: Set<string>; // JSON.stringify'd ref objects
+  excludedAlmanakkenObservations: Set<string>; // observation record IDs
+  excludedSranantongoNames: Set<string>;
+  excludedLifecycleEvents: Set<string>; // event @ids
   excludedStatusAssertions: Set<string>; // assertion .id values
   excludedProductAssertions: Set<string>;
   excludedDistrictAssertions: Set<string>;
@@ -88,6 +91,9 @@ function buildInitialResolution(): MergeResolution {
     excludedPsurIds: new Set(),
     excludedExternalLinks: new Set(),
     excludedDiklandRefs: new Set(),
+    excludedAlmanakkenObservations: new Set(),
+    excludedSranantongoNames: new Set(),
+    excludedLifecycleEvents: new Set(),
     excludedStatusAssertions: new Set(),
     excludedProductAssertions: new Set(),
     excludedDistrictAssertions: new Set(),
@@ -146,6 +152,33 @@ function computeMergedPlace(
     }
   }
 
+  const almanakkenObservations = Array.from(
+    new Map(
+      [
+        ...(placeA.almanakkenObservations || []),
+        ...(placeB.almanakkenObservations || []),
+      ].map((observation) => [observation.recordId, observation]),
+    ).values(),
+  ).filter(
+    (observation) =>
+      !resolution.excludedAlmanakkenObservations.has(observation.recordId),
+  );
+  const sranantongoNames = [
+    ...new Set([
+      ...(placeA.sranantongoNames || []),
+      ...(placeB.sranantongoNames || []),
+    ]),
+  ].filter((name) => !resolution.excludedSranantongoNames.has(name));
+  const lifecycleEvents = Array.from(
+    new Map(
+      [...(placeA.lifecycleEvents || []), ...(placeB.lifecycleEvents || [])].map(
+        (event) => [event['@id'], event],
+      ),
+    ).values(),
+  ).filter(
+    (event) => !resolution.excludedLifecycleEvents.has(event['@id']),
+  );
+
   return {
     ...primary,
     id: primary.id,
@@ -164,6 +197,9 @@ function computeMergedPlace(
     psurIds,
     externalLinks,
     diklandRefs,
+    almanakkenObservations,
+    sranantongoNames,
+    lifecycleEvents,
     statusAssertions: [
       ...(placeA.statusAssertions || []),
       ...(placeB.statusAssertions || []),
@@ -411,6 +447,9 @@ export default function PlaceMergeView({
         | 'excludedPsurIds'
         | 'excludedExternalLinks'
         | 'excludedDiklandRefs'
+        | 'excludedAlmanakkenObservations'
+        | 'excludedSranantongoNames'
+        | 'excludedLifecycleEvents'
         | 'excludedStatusAssertions'
         | 'excludedProductAssertions'
         | 'excludedDistrictAssertions'
@@ -480,6 +519,42 @@ export default function PlaceMergeView({
     }
     return result;
   }, [placeA.diklandRefs, placeB.diklandRefs]);
+
+  const allAlmanakkenObservations = useMemo(
+    () =>
+      Array.from(
+        new Map(
+          [
+            ...(placeA.almanakkenObservations || []),
+            ...(placeB.almanakkenObservations || []),
+          ].map((observation) => [observation.recordId, observation]),
+        ).values(),
+      ),
+    [placeA.almanakkenObservations, placeB.almanakkenObservations],
+  );
+
+  const allSranantongoNames = useMemo(
+    () =>
+      Array.from(
+        new Set([
+          ...(placeA.sranantongoNames || []),
+          ...(placeB.sranantongoNames || []),
+        ]),
+      ),
+    [placeA.sranantongoNames, placeB.sranantongoNames],
+  );
+
+  const allLifecycleEvents = useMemo(
+    () =>
+      Array.from(
+        new Map(
+          [...(placeA.lifecycleEvents || []), ...(placeB.lifecycleEvents || [])].map(
+            (event) => [event['@id'], event],
+          ),
+        ).values(),
+      ),
+    [placeA.lifecycleEvents, placeB.lifecycleEvents],
+  );
 
   const allStatusAssertions = useMemo(() => {
     const seen = new Set<string>();
@@ -892,6 +967,78 @@ export default function PlaceMergeView({
                 )}
                 excluded={resolution.excludedDiklandRefs}
                 onToggle={toggleArrayItem('excludedDiklandRefs')}
+              />
+            </section>
+          )}
+
+          {allAlmanakkenObservations.length > 0 && (
+            <section>
+              <SectionHeader>
+                Almanakken observations (
+                {allAlmanakkenObservations.length -
+                  resolution.excludedAlmanakkenObservations.size}{' '}
+                of {allAlmanakkenObservations.length} kept)
+              </SectionHeader>
+              <MergeArraySection
+                items={allAlmanakkenObservations}
+                keyFn={(observation) => observation.recordId}
+                labelFn={(observation) => (
+                  <span className="text-xs">
+                    <span className="font-mono text-stm-warm-500">
+                      {observation.year ?? '-'}
+                    </span>{' '}
+                    {observation.plantationOriginal ||
+                      observation.plantationStandardized ||
+                      observation.recordId}
+                  </span>
+                )}
+                excluded={resolution.excludedAlmanakkenObservations}
+                onToggle={toggleArrayItem('excludedAlmanakkenObservations')}
+              />
+            </section>
+          )}
+
+          {allSranantongoNames.length > 0 && (
+            <section>
+              <SectionHeader>
+                Sranan Tongo names (
+                {allSranantongoNames.length -
+                  resolution.excludedSranantongoNames.size}{' '}
+                of {allSranantongoNames.length} kept)
+              </SectionHeader>
+              <MergeArraySection
+                items={allSranantongoNames}
+                keyFn={(name) => name}
+                labelFn={(name) => <span className="text-xs">{name}</span>}
+                excluded={resolution.excludedSranantongoNames}
+                onToggle={toggleArrayItem('excludedSranantongoNames')}
+              />
+            </section>
+          )}
+
+          {allLifecycleEvents.length > 0 && (
+            <section>
+              <SectionHeader>
+                Lifecycle events (
+                {allLifecycleEvents.length -
+                  resolution.excludedLifecycleEvents.size}{' '}
+                of {allLifecycleEvents.length} kept)
+              </SectionHeader>
+              <MergeArraySection
+                items={allLifecycleEvents}
+                keyFn={(event) => event['@id']}
+                labelFn={(event) => (
+                  <span className="text-xs">
+                    {event.prefLabel}
+                    {event.startYear != null && (
+                      <span className="ml-1.5 font-mono text-stm-warm-400">
+                        {event.startYear}
+                      </span>
+                    )}
+                  </span>
+                )}
+                excluded={resolution.excludedLifecycleEvents}
+                onToggle={toggleArrayItem('excludedLifecycleEvents')}
               />
             </section>
           )}

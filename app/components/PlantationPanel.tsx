@@ -315,6 +315,48 @@ function TimelineEntry({
             value={obs.product}
           />
           <CrmField
+            label="Enslaved population"
+            crmClass="E13"
+            property="STM enslaved count"
+            value={obs.enslavedCount != null ? String(obs.enslavedCount) : null}
+          />
+          <CrmField
+            label="Free residents"
+            crmClass="E13"
+            property="STM free residents count"
+            value={
+              obs.freeResidentsCount != null
+                ? String(obs.freeResidentsCount)
+                : null
+            }
+          />
+          <CrmField
+            label="Explicitly present on plantation"
+            crmClass="E13"
+            property="STM explicit plantation count"
+            value={
+              obs.explicitPlantationEnslavedCount != null
+                ? String(obs.explicitPlantationEnslavedCount)
+                : null
+            }
+          />
+          <CrmField
+            label="Private assignment"
+            crmClass="E13"
+            property="STM private enslaved count"
+            value={
+              obs.privateEnslavedCount != null
+                ? String(obs.privateEnslavedCount)
+                : null
+            }
+          />
+          <CrmField
+            label="Presence inference"
+            crmClass="PROV"
+            property="STM inference status"
+            value={obs.presenceInferenceStatus}
+          />
+          <CrmField
             label="Owner"
             crmClass="E39"
             property="P14 carried out by"
@@ -498,12 +540,24 @@ export default function PlantationPanel({
   const featureUri = props.featureUri ?? props.placeUri ?? '';
   const physicalFeature = data.physicalFeatures?.[featureUri];
 
-  const orgUri = props.organizationQid
-    ? `http://www.wikidata.org/entity/${props.organizationQid}`
-    : plantation?.P52_has_current_owner;
+  const associatedQid = props.wikidataQid;
+  const candidateOrgUri = associatedQid
+    ? `https://data.surinametijdmachine.org/organization/${associatedQid}`
+    : undefined;
+  const orgUri =
+    plantation?.hasOrganizationalAssociation ??
+    physicalFeature?.hasOrganizationalAssociation ??
+    (candidateOrgUri && data.organizations[candidateOrgUri]
+      ? candidateOrgUri
+      : undefined);
   const organization = orgUri
     ? (data.organizations[orgUri] as E74Organization | undefined)
     : undefined;
+  const organizationAssociationStatus =
+    props.organizationAssociationStatus ??
+    plantation?.organizationAssociationStatus ??
+    physicalFeature?.organizationAssociationStatus ??
+    (organization ? 'linked' : 'needs-organization-link');
 
   const placeUri = props.placeUri ?? physicalFeature?.P53_has_location ?? null;
   const place = placeUri
@@ -708,6 +762,60 @@ export default function PlantationPanel({
           </div>
         )}
 
+        {ft === 'plantation' && (
+          <div
+            className={`mx-4 mt-3 border px-3 py-2 ${
+              organizationAssociationStatus === 'linked'
+                ? 'border-stm-teal-300 bg-stm-teal-50'
+                : 'border-yellow-400 bg-yellow-50'
+            }`}
+          >
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="min-w-0">
+                <p className="text-[10px] font-semibold uppercase text-ink/50">
+                  E25 plantation - E74 organization
+                </p>
+                {organization ? (
+                  <Link
+                    href={`/organizations?organization=${organization.exactMatch?.split('/').pop() ?? associatedQid ?? ''}`}
+                    className="mt-0.5 block truncate text-sm font-semibold text-stm-teal-700 hover:underline"
+                  >
+                    {organization.prefLabel}
+                  </Link>
+                ) : (
+                  <p className="mt-0.5 text-sm font-semibold text-yellow-900">
+                    Organization not linked
+                  </p>
+                )}
+              </div>
+              <span
+                className={`shrink-0 px-2 py-1 text-[10px] font-semibold uppercase ${
+                  organizationAssociationStatus === 'linked'
+                    ? 'bg-stm-teal-100 text-stm-teal-800'
+                    : 'bg-yellow-200 text-yellow-950'
+                }`}
+              >
+                {organizationAssociationStatus === 'linked'
+                  ? 'Linked'
+                  : organizationAssociationStatus ===
+                      'needs-physical-link-review'
+                    ? 'Needs update: physical link'
+                    : organization
+                      ? 'Needs update: Gazetteer link'
+                      : 'Needs update: organization link'}
+              </span>
+            </div>
+            {organizationAssociationStatus !== 'linked' && props.stmId && (
+              <Link
+                href={`/places?place=${props.stmId}`}
+                className="mt-2 inline-block text-xs font-medium text-yellow-900 underline"
+              >
+                Review plantation authority record
+              </Link>
+            )}
+          </div>
+        )}
+
         {/* Entity Graph */}
         <div className="px-4 py-3 bg-cream border-b border-ink/10">
           <p className="text-[10px] font-semibold text-ink/45 uppercase tracking-wider mb-1.5">
@@ -765,9 +873,9 @@ export default function PlantationPanel({
                     value={plantation.status}
                   />
                   <CrmField
-                    label="Owner"
+                    label="Associated organization"
                     crmClass="E74"
-                    property="P52 has current owner"
+                    property="STM organizational association"
                     value={organization?.prefLabel}
                   />
                   <CrmField
@@ -895,7 +1003,7 @@ export default function PlantationPanel({
               (organization ? (
                 <div className="px-4 pb-3 space-y-0">
                   <p className="text-[9px] text-stm-warm-300 font-mono mb-1">
-                    P52 has current owner
+                    STM organizational association (authority correspondence)
                   </p>
                   <CrmField
                     label="Name"
@@ -903,14 +1011,31 @@ export default function PlantationPanel({
                     property="P1 is identified by"
                     value={organization.prefLabel}
                   />
-                  <CrmField label="Wikidata" crmClass="E74" property="@id" mono>
-                    <WikidataLink qid={organization['@id']} />
+                  <CrmField
+                    label="Wikidata"
+                    crmClass="E74"
+                    property="skos:exactMatch"
+                    mono
+                  >
+                    <WikidataLink qid={organization.exactMatch || ''} />
                   </CrmField>
+                  <div className="border-b border-stm-warm-100 py-1.5">
+                    <Link
+                      href={`/organizations?organization=${organization.exactMatch?.split('/').pop() ?? ''}`}
+                      className="text-xs font-medium text-stm-teal-700 hover:underline"
+                    >
+                      Open organization workspace
+                    </Link>
+                  </div>
                   <CrmField
                     label="PSUR ID"
                     crmClass="E42"
                     property="P1 is identified by (E42 PSUR)"
-                    value={organization.psurId}
+                    value={
+                      Array.isArray(organization.psurId)
+                        ? organization.psurId.join(', ')
+                        : organization.psurId
+                    }
                     mono
                   />
                   <CrmField
