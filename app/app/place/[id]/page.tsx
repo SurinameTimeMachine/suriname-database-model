@@ -1,6 +1,5 @@
 import { readFile } from 'fs/promises';
 import Link from 'next/link';
-import { headers } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { join } from 'path';
 import type { Metadata } from 'next';
@@ -11,6 +10,12 @@ const GAZETTEER_PATH = join(
   '..',
   'data',
   'places-gazetteer.jsonld',
+);
+const PLACE_RECORDS_DIR = join(
+  process.cwd(),
+  'public',
+  'data',
+  'place-records',
 );
 const PLACE_ID = /^stm-[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
@@ -80,16 +85,13 @@ async function readMergedInto(id: string): Promise<string | undefined> {
 }
 
 async function loadPlaceProjection(id: string): Promise<PlaceProjection | null> {
-  const requestHeaders = await headers();
-  const host = requestHeaders.get('host');
-  if (!host) return null;
-  const protocol = requestHeaders.get('x-forwarded-proto') ?? 'http';
-  const response = await fetch(
-    `${protocol}://${host}/data/place-records/${id}.json`,
-    { cache: 'no-store' },
-  );
-  if (!response.ok) return null;
-  return (await response.json()) as PlaceProjection;
+  try {
+    return JSON.parse(
+      await readFile(join(PLACE_RECORDS_DIR, `${id}.json`), 'utf-8'),
+    ) as PlaceProjection;
+  } catch {
+    return null;
+  }
 }
 
 export async function generateMetadata({
