@@ -272,33 +272,6 @@ function normalizeStatusAssertions(place: GazetteerPlace): StatusAssertion[] {
   return [];
 }
 
-const ALMANAKKEN_ISSUE_DISPLAY: Record<
-  string,
-  {
-    label: string;
-    summary: string;
-    actionLabel: string;
-    target?: { href: string; label: string };
-  }
-> = {
-  'shared-organization-link': {
-    label: 'Are these the same physical plantation?',
-    summary:
-      'Compare the records, then merge them or confirm that all are valid.',
-    actionLabel: 'Compare places',
-  },
-  'v1-v2-qid-change': {
-    label: 'Did the organization QID change correctly?',
-    summary: 'Check the current Wikidata link against the v1 and v2 source rows.',
-    actionLabel: 'Check QID',
-    target: { href: '#external-links', label: 'Review external links' },
-  },
-};
-
-function almanakkenIssueLongLabel(type: string): string {
-  return ALMANAKKEN_ISSUE_DISPLAY[type]?.label ?? type;
-}
-
 const CATEGORY_ORDER = [
   'map',
   'register',
@@ -1246,8 +1219,16 @@ export default function PlaceEditor({
     almanakkenReview && almanakkenReview.products.length > 0
       ? almanakkenReview.products.join(', ')
       : null;
-  const almanakkenHasUrgentReview =
-    Boolean(almanakkenReview && almanakkenReview.issues.length > 0);
+  const sharedPhysicalLinkReview = almanakkenReview?.issues.find(
+    (issue) => issue.type === 'shared-organization-link',
+  );
+  const sharedPhysicalPlaceIds = (sharedPhysicalLinkReview?.detail ?? '')
+    .split(',')
+    .map((id) => id.trim())
+    .filter(Boolean);
+  const qidChangeReview = almanakkenReview?.issues.find(
+    (issue) => issue.type === 'v1-v2-qid-change',
+  );
   const reportedOwners = useMemo(() => {
     const values = (organizationContext?.observations ?? [])
       .filter(
@@ -1419,6 +1400,26 @@ export default function PlaceEditor({
                 ) : (
                   <span className="text-amber-800">Needs review</span>
                 )}
+                {sharedPhysicalLinkReview && (
+                  <div className="mt-2 flex flex-col gap-2 border-l-2 border-amber-500 bg-amber-50 px-2 py-1.5 sm:flex-row sm:items-center sm:justify-between">
+                    <span className="text-[11px] leading-4 text-amber-900">
+                      <strong>Review:</strong> same physical plantation or
+                      separate valid plantations?
+                    </span>
+                    {sharedPhysicalPlaceIds.length >= 2 &&
+                      onReviewPhysicalLinks && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            onReviewPhysicalLinks(sharedPhysicalPlaceIds)
+                          }
+                          className="shrink-0 border border-amber-600 bg-amber-600 px-2.5 py-1 text-[11px] font-semibold text-white hover:bg-amber-700"
+                        >
+                          Compare places
+                        </button>
+                      )}
+                  </div>
+                )}
               </dd>
 
               <dt className="text-stm-warm-500">Land ownership</dt>
@@ -1477,14 +1478,8 @@ export default function PlaceEditor({
         )}
 
         {almanakkenReview && (
-          <div
-            className={`border p-3 text-xs ${
-              almanakkenHasUrgentReview
-                ? 'border-amber-300 bg-amber-50 text-amber-900'
-                : 'border-stm-teal-200 bg-stm-teal-50 text-stm-teal-900'
-            }`}
-          >
-            <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+          <div className="border border-stm-teal-200 bg-stm-teal-50 p-3 text-xs text-stm-teal-900">
+            <div className="mb-2">
               <div>
                 <div className="text-[10px] font-medium uppercase tracking-[0.18em] opacity-70">
                   Almanakken {almanakkenReview.sourceVersion} organization evidence
@@ -1494,72 +1489,7 @@ export default function PlaceEditor({
                   {almanakkenYears ? ` (${almanakkenYears})` : ''}
                 </div>
               </div>
-              <span
-                className={`border px-2 py-1 text-[10px] font-medium ${
-                  almanakkenHasUrgentReview
-                    ? 'border-amber-400 bg-white/70 text-amber-800'
-                    : 'border-stm-teal-300 bg-white/70 text-stm-teal-800'
-                }`}
-              >
-                {almanakkenHasUrgentReview
-                  ? `${almanakkenReview.issues.length} check${almanakkenReview.issues.length === 1 ? '' : 's'} to resolve`
-                  : 'checks complete'}
-              </span>
             </div>
-
-            {almanakkenReview.issues.length > 0 && (
-              <div className="mb-3 divide-y divide-amber-200 border-y border-amber-300 bg-white/80">
-                {almanakkenReview.issues.map((issue) => {
-                  const display = ALMANAKKEN_ISSUE_DISPLAY[issue.type];
-                  const affectedPlaceIds = (issue.detail ?? '')
-                    .split(',')
-                    .map((id) => id.trim())
-                    .filter(Boolean);
-                  const canCompare =
-                    issue.type === 'shared-organization-link' &&
-                    affectedPlaceIds.length >= 2 &&
-                    onReviewPhysicalLinks;
-                  return (
-                    <div
-                      key={`${issue.type}-${issue.detail ?? ''}`}
-                      className="flex flex-col gap-2 px-2 py-2 sm:flex-row sm:items-center"
-                    >
-                      <div className="min-w-0 flex-1">
-                        <div className="font-semibold text-amber-950">
-                          {almanakkenIssueLongLabel(issue.type)}
-                        </div>
-                        <div className="mt-0.5 text-[11px] leading-4 text-amber-800">
-                          {display?.summary ?? issue.label}
-                          {affectedPlaceIds.length > 0 && (
-                            <span className="ml-1 font-mono text-[10px] opacity-70">
-                              {affectedPlaceIds.join(', ')}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      {canCompare ? (
-                        <button
-                          type="button"
-                          onClick={() =>
-                            onReviewPhysicalLinks(affectedPlaceIds)
-                          }
-                          className="shrink-0 border border-amber-600 bg-amber-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-700"
-                        >
-                          {display?.actionLabel ?? 'Review'}
-                        </button>
-                      ) : display?.target ? (
-                        <a
-                          href={display.target.href}
-                          className="shrink-0 border border-amber-500 bg-amber-100 px-3 py-1.5 text-xs font-semibold text-amber-950 hover:bg-amber-200"
-                        >
-                          {display.actionLabel}
-                        </a>
-                      ) : null}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
 
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
               <div className="border border-black/10 bg-white/60 p-2">
@@ -2000,6 +1930,16 @@ export default function PlaceEditor({
               (LOD authority links with match closeness)
             </span>
           </label>
+
+          {qidChangeReview && (
+            <div className="mb-2 border-l-2 border-amber-500 bg-amber-50 px-2 py-1.5 text-[11px] leading-4 text-amber-900">
+              <strong>Review this QID:</strong> v2 uses{' '}
+              <span className="font-mono">
+                {qidChangeReview.detail || 'a different QID'}
+              </span>
+              . Confirm or correct the Wikidata identifier below.
+            </div>
+          )}
 
           {/* Existing links */}
           {(draft.externalLinks || []).length > 0 && (
