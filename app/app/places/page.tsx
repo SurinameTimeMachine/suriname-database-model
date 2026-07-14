@@ -533,28 +533,28 @@ const ALMANAKKEN_ISSUE_DISPLAY: Record<
   { short: string; label: string }
 > = {
   'duplicate-gazetteer-link': {
-    short: 'dup',
-    label: 'Duplicate QID links',
+    short: 'shared QID',
+    label: 'Several places use the same Wikidata QID',
   },
   'missing-source-tag': {
-    short: 'src',
-    label: 'Missing source tag',
+    short: 'source',
+    label: 'Almanakken is not listed as a source',
   },
   'missing-product-assertions': {
-    short: 'prod',
-    label: 'Missing product assertions',
+    short: 'products',
+    label: 'Products were transcribed but not recorded as assertions',
   },
   'missing-status-assertions': {
-    short: 'life',
-    label: 'Missing lifecycle assertions',
+    short: 'lifecycle',
+    label: 'Lifecycle evidence has no dated status assertion',
   },
   'missing-almanakken-observations': {
-    short: 'rows',
-    label: 'Missing saved v2 observations',
+    short: 'import rows',
+    label: 'Attached source rows are missing from the saved record',
   },
   'v1-v2-qid-change': {
-    short: 'qid',
-    label: 'v1 to v2 QID changes',
+    short: 'QID changed',
+    label: 'The authority link changed between v1 and v2',
   },
 };
 
@@ -1788,9 +1788,9 @@ function PlacesPageInner() {
                       ? 'border-teal-strong bg-teal-soft/40 text-teal-strong'
                       : 'border-ink/15 bg-cream/80 hover:border-teal-strong/40'
                   }`}
-                  title="Places with urgent Almanakken linking review issues"
+                  title="Places with Almanakken checks that still need action or a research decision"
                 >
-                  {almanakkenIssueCounts.any ?? 0} urgent reviews
+                  {almanakkenIssueCounts.any ?? 0} records need review
                 </button>
                 {almanakkenIssueTypes.slice(0, 7).map((type) => (
                   <button
@@ -2003,7 +2003,7 @@ function PlacesPageInner() {
 
             {/* Detail panel */}
             {selectedPlace && (
-              <aside className="hidden w-[42%] min-w-96 max-w-160 shrink-0 flex-col overflow-hidden border-l border-ink/10 bg-background lg:flex">
+              <aside className="absolute inset-y-0 right-0 z-40 hidden w-[clamp(34rem,52vw,58rem)] flex-col overflow-hidden border-l border-ink/10 bg-background shadow-[-20px_0_50px_rgba(0,30,24,0.16)] lg:flex">
                 <div className="min-h-0 flex-1 overflow-hidden">
                   <PlaceEditor
                     key={selectedPlace.id}
@@ -2024,7 +2024,7 @@ function PlacesPageInner() {
             )}
 
             {selectedPlace && (
-              <div className="absolute inset-x-0 bottom-0 z-40 flex max-h-[78dvh] flex-col overflow-hidden border-t border-ink/10 bg-background shadow-[0_-20px_50px_rgba(0,30,24,0.16)] lg:hidden">
+              <div className="fixed inset-0 z-50 flex w-screen max-w-full flex-col overflow-hidden bg-background lg:hidden">
                 <div className="min-h-0 flex-1 overflow-hidden">
                   <PlaceEditor
                     key={selectedPlace.id}

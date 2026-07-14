@@ -273,37 +273,68 @@ function normalizeStatusAssertions(place: GazetteerPlace): StatusAssertion[] {
 
 const ALMANAKKEN_ISSUE_DISPLAY: Record<
   string,
-  { short: string; label: string }
+  {
+    label: string;
+    owner: 'Researcher action' | 'Research decision' | 'Data import';
+    problem: string;
+    action: string;
+    target?: { href: string; label: string };
+  }
 > = {
   'duplicate-gazetteer-link': {
-    short: 'dup',
-    label: 'Duplicate QID links',
+    label: 'Several places use the same Wikidata QID',
+    owner: 'Research decision',
+    problem:
+      'The Almanakken rows cannot be assigned unambiguously because this authority identifier is linked to more than one active Gazetteer place.',
+    action:
+      'Compare the listed Gazetteer records. Merge records that describe the same physical plantation, or correct the Wikidata link on records that describe a different place.',
+    target: { href: '#external-links', label: 'Review external links' },
   },
   'missing-source-tag': {
-    short: 'src',
-    label: 'Missing Almanakken source tag',
+    label: 'Almanakken is not listed as a source',
+    owner: 'Researcher action',
+    problem:
+      'Almanakken rows are attached to this place, but the Gazetteer record does not credit Almanakken in its source list.',
+    action:
+      'Add Almanakken under Sources and save the record. Do not remove other sources.',
+    target: { href: '#sources', label: 'Go to Sources' },
   },
   'missing-product-assertions': {
-    short: 'prod',
-    label: 'Missing product assertions',
+    label: 'Products were transcribed but not recorded as assertions',
+    owner: 'Researcher action',
+    problem:
+      'The source rows name one or more products, but this place has no editable product observation sourced to Almanakken.',
+    action:
+      'Add a product observation for each supported product and year. Select Almanakken as the source, then save the record.',
+    target: { href: '#product-observations', label: 'Go to Products' },
   },
   'missing-status-assertions': {
-    short: 'life',
-    label: 'Missing lifecycle assertions',
+    label: 'Lifecycle evidence has no dated status assertion',
+    owner: 'Researcher action',
+    problem:
+      'Almanakken records production or a deserted plantation, but no lifecycle event sourced to Almanakken represents that evidence.',
+    action:
+      'Add a dated lifecycle event: Built / Active for supported operational evidence or Abandoned for an explicit deserted entry. Preserve uncertainty in the note when needed.',
+    target: { href: '#plantation-lifecycle', label: 'Go to Lifecycle' },
   },
   'missing-almanakken-observations': {
-    short: 'rows',
-    label: 'Missing saved v2 observations',
+    label: 'Attached source rows are missing from the saved record',
+    owner: 'Data import',
+    problem:
+      'The review index found Almanakken rows for this QID, but their row-level v2 observations were not copied into the Gazetteer record.',
+    action:
+      'Do not recreate these rows by hand. Report this place ID and QID for an Almanakken import rerun; verify the saved observations after the import completes.',
   },
   'v1-v2-qid-change': {
-    short: 'qid',
-    label: 'v1 to v2 QID changes',
+    label: 'The authority link changed between v1 and v2',
+    owner: 'Research decision',
+    problem:
+      'Rows previously grouped under this QID use a different QID in v2. This may be a correction, a split, or a mistaken authority match.',
+    action:
+      'Compare the v1 and v2 names and locations with Wikidata. Keep the v2 QID when the change is justified; otherwise correct the external link and flag the source-row mapping for re-import.',
+    target: { href: '#external-links', label: 'Review external links' },
   },
 };
-
-function almanakkenIssueShortLabel(type: string): string {
-  return ALMANAKKEN_ISSUE_DISPLAY[type]?.short ?? type;
-}
 
 function almanakkenIssueLongLabel(type: string): string {
   return ALMANAKKEN_ISSUE_DISPLAY[type]?.label ?? type;
@@ -1301,7 +1332,7 @@ export default function PlaceEditor({
   );
 
   return (
-    <div className="h-full min-h-0 flex flex-col border border-stm-warm-200 bg-white shadow-sm">
+    <div className="flex h-full min-h-0 w-full min-w-0 max-w-full flex-col overflow-hidden border border-stm-warm-200 bg-white shadow-sm">
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-3 border-b border-stm-warm-100">
         <div className="min-w-0">
@@ -1517,8 +1548,8 @@ export default function PlaceEditor({
                 }`}
               >
                 {almanakkenHasUrgentReview
-                  ? `${almanakkenReview.issues.length} urgent review${almanakkenReview.issues.length === 1 ? '' : 's'}`
-                  : 'no urgent review'}
+                  ? `${almanakkenReview.issues.length} check${almanakkenReview.issues.length === 1 ? '' : 's'} to resolve`
+                  : 'checks complete'}
               </span>
             </div>
 
@@ -1536,7 +1567,7 @@ export default function PlaceEditor({
               </div>
               <div className="border border-black/10 bg-white/60 p-2">
                 <div className="text-[10px] uppercase tracking-[0.16em] opacity-60">
-                  Materialized
+                  Saved in record
                 </div>
                 <div className="font-medium">
                   {almanakkenProductAssertions.length} product
@@ -1667,53 +1698,59 @@ export default function PlaceEditor({
             )}
 
             {almanakkenReview.issues.length > 0 && (
-              <div className="mt-2 space-y-1">
+              <div className="mt-3 space-y-2">
                 {almanakkenReview.issues.map((issue) => (
                   <div
                     key={`${issue.type}-${issue.detail ?? ''}`}
-                    className="flex items-start gap-2 border border-amber-300 bg-white/70 px-2 py-1.5"
+                    className="border border-amber-300 bg-white/80 p-3 text-amber-950"
                   >
-                    <span className="shrink-0 border border-amber-400 bg-amber-100 px-1.5 py-0.5 font-mono text-[10px] text-amber-800">
-                      {almanakkenIssueShortLabel(issue.type)}
-                    </span>
-                    <span>
-                      <span className="font-medium">
+                    <div className="flex flex-wrap items-start justify-between gap-2">
+                      <span className="font-semibold">
                         {almanakkenIssueLongLabel(issue.type)}
                       </span>
+                      <span className="shrink-0 border border-amber-400 bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-[0.12em] text-amber-900">
+                        {ALMANAKKEN_ISSUE_DISPLAY[issue.type]?.owner ??
+                          'Researcher action'}
+                      </span>
+                    </div>
+                    <dl className="mt-2 grid gap-x-3 gap-y-1 text-[11px] leading-4 sm:grid-cols-[5rem_minmax(0,1fr)]">
+                      <dt className="font-semibold text-amber-800">Problem</dt>
+                      <dd>
+                        {ALMANAKKEN_ISSUE_DISPLAY[issue.type]?.problem ??
+                          issue.label}
+                      </dd>
                       {issue.detail && (
-                        <span className="ml-1 font-mono text-[11px] opacity-75">
-                          {issue.detail}
-                        </span>
+                        <>
+                          <dt className="font-semibold text-amber-800">
+                            Affected
+                          </dt>
+                          <dd className="break-words font-mono">
+                            {issue.detail}
+                          </dd>
+                        </>
                       )}
-                    </span>
+                      <dt className="font-semibold text-amber-800">Action</dt>
+                      <dd>
+                        {ALMANAKKEN_ISSUE_DISPLAY[issue.type]?.action ??
+                          'Review the source evidence and update the Gazetteer record.'}
+                      </dd>
+                    </dl>
+                    {ALMANAKKEN_ISSUE_DISPLAY[issue.type]?.target && (
+                      <a
+                        href={
+                          ALMANAKKEN_ISSUE_DISPLAY[issue.type]?.target?.href ??
+                          '#'
+                        }
+                        className="mt-2 inline-flex border border-amber-500 bg-amber-100 px-2 py-1 text-[11px] font-medium text-amber-950 hover:bg-amber-200"
+                      >
+                        {ALMANAKKEN_ISSUE_DISPLAY[issue.type]?.target?.label ??
+                          'Review record'}
+                      </a>
+                    )}
                   </div>
                 ))}
               </div>
             )}
-
-            {almanakkenReview.productRows > 0 &&
-              almanakkenProductAssertions.length === 0 && (
-                <p className="mt-2 border border-amber-300 bg-white/70 px-2 py-1.5 text-[11px] text-amber-800">
-                  Product rows exist in Almanakken, but no Almanakken product
-                  assertions are currently materialized below.
-                </p>
-              )}
-
-            {almanakkenReview.rows > 0 &&
-              almanakkenObservations.length === 0 && (
-                <p className="mt-2 border border-amber-300 bg-white/70 px-2 py-1.5 text-[11px] text-amber-800">
-                  Almanakken rows exist, but no saved Almanakken v2 observation
-                  rows are attached to this Gazetteer record.
-                </p>
-              )}
-
-            {almanakkenReview.rows > 0 &&
-              almanakkenStatusAssertions.length === 0 && (
-                <p className="mt-2 border border-amber-300 bg-white/70 px-2 py-1.5 text-[11px] text-amber-800">
-                  Almanakken rows exist, but no Almanakken lifecycle assertions
-                  are currently materialized below.
-                </p>
-              )}
           </div>
         )}
 
@@ -2001,7 +2038,7 @@ export default function PlaceEditor({
         </div>
 
         {/* External Links */}
-        <div id="external-links">
+        <div id="external-links" className="scroll-mt-4">
           <label className="block text-sm font-medium text-stm-warm-700 mb-1">
             External Links
             <span className="text-stm-warm-400 font-normal text-xs ml-1">
@@ -2174,7 +2211,7 @@ export default function PlaceEditor({
         </div>
 
         {/* Dikland Collection */}
-        <div>
+        <div id="sources" className="scroll-mt-4">
           <label className="block text-sm font-medium text-stm-warm-700 mb-1">
             Dikland Collection
             <span className="text-stm-warm-400 font-normal text-xs ml-1">
@@ -2528,7 +2565,7 @@ export default function PlaceEditor({
           <label className="block text-sm font-medium text-stm-warm-700">
             Location Context
           </label>
-          <div>
+          <div id="product-observations" className="scroll-mt-4">
             <label className="block text-sm font-medium text-stm-warm-700 mb-1">
               District (according to {districtSourceSummary})
             </label>
@@ -2879,7 +2916,7 @@ export default function PlaceEditor({
 
         {/* Plantation Lifecycle */}
         {draft.type === 'plantation' && (
-          <div className="space-y-3">
+          <div id="plantation-lifecycle" className="scroll-mt-4 space-y-3">
             <div className="flex items-center justify-between">
               <label className="block text-sm font-medium text-stm-warm-700">
                 Plantation Lifecycle
