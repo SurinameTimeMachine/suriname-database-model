@@ -120,42 +120,42 @@ E41a --P139 has alternative form--> E41b
 
 ### Step 5.1 -- Plantation mergers and splits (has_parts / part_of)
 
-**What:** Map Almanakken `split1_id`..`split5_id` and `part_of_id` columns to structural relationships between E74 organizations and/or E25 plantations.
+**What:** Retain Almanakken v2 `has_parts1_id`..`has_parts4_id` and `part_of_id` as source-qualified structural evidence pending event reconciliation.
 
 **CSV columns involved:**
 
-- `split1_lab`, `split1_id` .. `split5_lab`, `split5_id` -- plantations that have been merged into this one (this plantation "has parts")
-- `partof_lab`, `part_of_id` -- this plantation is part of a larger merged combination
+- `has_parts1_lab`, `has_parts1_id` .. `has_parts4_lab`, `has_parts4_id` -- source references to component plantations
+- `part_of_lab`, `part_of_id` -- source reference to a larger combined plantation
 
 **Rationale:** These columns capture a critical part of Surinamese plantation history -- mergers, splits, and absorptions. The SKILL.md models `P99i was dissolved by` (E68 Dissolution) and `P124i was transformed by` (E81 Transformation) but doesn't map _which CSV columns_ drive this. Without this mapping, a significant part of the plantation network is invisible.
 
 **Modeling approach (proposed):**
 
 ```
-E74 (split1_id) --P99i was dissolved by--> E68 Dissolution --P14 carried out by--> E74 (plantation_id)   [has parts]
-E74 (plantation_id) --P107i is member of--> E74 (part_of_id) [part of larger combination]
+E13 observation --stm:hasPartReference--> E74 (has_parts1_id)
+E13 observation --stm:partOfReference--> E74 (part_of_id)
 ```
 
 Using `P107i is current or former member of` (CIDOC-CRM standard for group membership) rather than a custom `partOf` property. When a plantation organization becomes part of a larger merged combination, it is organizational membership -- one E74 group belongs to a larger E74 group.
 
 **Enables:** Answering: plantation network reconstruction, understanding why PSUR IDs may link to a component plantation rather than the combined one.
 
-### Step 5.2 -- Reference/ownership plantations
+### Step 5.2 -- Ownership references
 
-**What:** Map `reference_std_id` / `reference_std_lab` to a relationship showing that another plantation owns or references this one.
+**What:** Retain `owned_by_id`, `owned_by_id2`, and `owned_by_lab` as source-qualified ownership references.
 
 **CSV columns involved:**
 
-- `reference_std_id` -- Q-ID of the owning/referencing plantation
-- `reference_std_lab` -- label of that plantation
-- `reference_org` -- raw original text (not priority)
+- `owned_by_id`, `owned_by_id2` -- Q-IDs of referenced owning organizations
+- `owned_by_lab` -- standardized label of the referenced organization
+- `reference_org` -- original source text
 
 **Rationale:** Some almanac entries say "see Plantation X" or indicate that plantation A is owned by plantation B. This is an inter-plantation reference network that can help in linking when direct matches are not available.
 
 **Modeling approach (proposed):**
 
 ```
-E74 (plantation_id) --crm:P67_refers_to--> E74 (reference_std_id)
+E13 observation --stm:ownedByReference--> E74 (owned_by_id)
 ```
 
 **Enables:** Following reference chains for linking. If plantation A has no direct PSUR link, but its reference plantation B does, we can trace the path.
@@ -167,7 +167,7 @@ E74 (plantation_id) --crm:P67_refers_to--> E74 (reference_std_id)
 **CSV columns involved:**
 
 - QGIS: `psur_id`, `psur_id2`, `psur_id3` (multiple PSUR IDs per polygon because of mergers)
-- Almanakken: `psur_id`
+- Almanakken v2: `psur_id`, `psur_id2`
 
 **Rationale:** PSUR IDs are the bridge to the slave and emancipation register dataset (~35,000 records). Without this mapping, dataset 05 is disconnected. Multiple PSUR IDs per QGIS polygon exist because merged plantations retain the component plantations' PSUR IDs.
 
@@ -318,7 +318,7 @@ The comprehensive flowchart in `data-source-mapping.mmd` shows how every CSV col
 | Band   | Location | Contents                                                                                                               |
 | ------ | -------- | ---------------------------------------------------------------------------------------------------------------------- |
 | Left   | QGIS     | 8 columns from `plantation_polygons_1930.csv`                                                                          |
-| Right  | ALM      | 18 key columns from `Plantations Surinaamse Almanakken v1.0.csv`, grouped into core / people / enrichment / structural |
+| Right  | ALM      | Key columns from `Plantations Surinaamse Almanakken v2.0 (1).csv`, grouped into core / people / enrichment / structural |
 | Center | CIDOC    | 13 CIDOC-CRM entity nodes                                                                                              |
 
 Every edge is annotated with:

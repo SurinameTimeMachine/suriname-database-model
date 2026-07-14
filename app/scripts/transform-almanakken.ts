@@ -33,16 +33,16 @@ export interface ObservationRow {
   page_reference: string;
   psur_id: string;
   source_uri: string;
-  split1_id: string;
-  split1_lab: string;
-  split2_id: string;
-  split2_lab: string;
-  split3_id: string;
-  split3_lab: string;
-  split4_id: string;
-  split4_lab: string;
-  partof_id: string;
-  partof_lab: string;
+  has_parts1_id: string;
+  has_parts1_lab: string;
+  has_parts2_id: string;
+  has_parts2_lab: string;
+  has_parts3_id: string;
+  has_parts3_lab: string;
+  has_parts4_id: string;
+  has_parts4_lab: string;
+  part_of_id: string;
+  part_of_lab: string;
   free_residents: string;
   owned_by_id: string;
   owned_by_id2: string;
@@ -182,17 +182,17 @@ export function transformAlmanakken(): AlmanakkenTransformResult {
       page_reference: almanakkenField(row, 'page'),
       psur_id: psurId,
       source_uri: sourceUri,
-      split1_id: almanakkenField(row, 'has_parts1_id', 'split1_id'),
-      split1_lab: almanakkenField(row, 'has_parts1_lab', 'split1_lab'),
-      split2_id: almanakkenField(row, 'has_parts2_id', 'split2_id'),
-      split2_lab: almanakkenField(row, 'has_parts2_lab', 'split2_lab'),
-      split3_id: almanakkenField(row, 'has_parts3_id', 'split3_id'),
-      split3_lab: almanakkenField(row, 'has_parts3_lab', 'split3_lab'),
-      split4_id: almanakkenField(row, 'has_parts4_id', 'split4_id'),
-      split4_lab: almanakkenField(row, 'has_parts4_lab', 'split4_lab'),
-      partof_id: almanakkenField(row, 'part_of_id', 'partof_id'),
-      partof_lab: almanakkenField(row, 'part_of_lab', 'partof_lab'),
-      free_residents: safeInt(almanakkenField(row, 'vrije_bewoners', 'free_residents')),
+      has_parts1_id: almanakkenField(row, 'has_parts1_id'),
+      has_parts1_lab: almanakkenField(row, 'has_parts1_lab'),
+      has_parts2_id: almanakkenField(row, 'has_parts2_id'),
+      has_parts2_lab: almanakkenField(row, 'has_parts2_lab'),
+      has_parts3_id: almanakkenField(row, 'has_parts3_id'),
+      has_parts3_lab: almanakkenField(row, 'has_parts3_lab'),
+      has_parts4_id: almanakkenField(row, 'has_parts4_id'),
+      has_parts4_lab: almanakkenField(row, 'has_parts4_lab'),
+      part_of_id: almanakkenField(row, 'part_of_id'),
+      part_of_lab: almanakkenField(row, 'part_of_lab'),
+      free_residents: safeInt(almanakkenField(row, 'vrije_bewoners')),
       owned_by_id: almanakkenField(row, 'owned_by_id'),
       owned_by_id2: almanakkenField(row, 'owned_by_id2'),
       enslaved_shared_with: almanakkenField(row, 'enslaved_shared_with'),

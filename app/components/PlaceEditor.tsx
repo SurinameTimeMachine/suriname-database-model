@@ -41,10 +41,6 @@ interface PlaceEditorProps {
   onCancel: () => void;
   onDelete?: (id: string) => Promise<void>;
   onReviewPhysicalLinks?: (placeIds: string[]) => void;
-  onConfirmQidReview?: (
-    qid: string,
-    changedToQids: string[],
-  ) => Promise<void>;
 }
 
 export interface PlaceOrganizationContext {
@@ -66,7 +62,6 @@ interface AlmanakkenReviewEntry {
   desertedRows: number;
   sourceNames: number;
   products: string[];
-  v2OnlyRows: number;
   hasGazetteerSource: boolean;
   hasProductAssertions: boolean;
   hasStatusAssertions: boolean;
@@ -597,7 +592,6 @@ export default function PlaceEditor({
   onCancel,
   onDelete,
   onReviewPhysicalLinks,
-  onConfirmQidReview,
 }: PlaceEditorProps) {
   const { labels, crmBadges, biasTypes, allTypes } = usePlaceTypes();
   const { sources: registrySources, categories: registryCategories } =
@@ -624,7 +618,6 @@ export default function PlaceEditor({
   });
   const hydratedFromAppellations = useRef(false);
   const [saving, setSaving] = useState(false);
-  const [savingReview, setSavingReview] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sourceDropdownOpen, setSourceDropdownOpen] = useState(false);
   const diklandRefs: DiklandRef[] = draft.diklandRefs ?? [];
@@ -1232,31 +1225,6 @@ export default function PlaceEditor({
     .split(',')
     .map((id) => id.trim())
     .filter(Boolean);
-  const qidChangeReview = almanakkenReview?.issues.find(
-    (issue) => issue.type === 'v1-v2-qid-change',
-  );
-  const reviewedQid = almanakkenReview?.qid;
-  const currentWikidataQid = draft.externalLinks
-    .find((link) => link.authority === 'wikidata')
-    ?.identifier.trim()
-    .toUpperCase();
-  const qidChangeTargets = (qidChangeReview?.detail ?? '')
-    .split(',')
-    .map((qid) => qid.trim().toUpperCase())
-    .filter((qid) => /^Q\d+$/.test(qid));
-
-  const confirmCurrentQid = async () => {
-    if (!reviewedQid || !onConfirmQidReview) return;
-    setSavingReview(true);
-    setError(null);
-    try {
-      await onConfirmQidReview(reviewedQid, qidChangeTargets);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save review');
-    } finally {
-      setSavingReview(false);
-    }
-  };
   const reportedOwners = useMemo(() => {
     const values = (organizationContext?.observations ?? [])
       .filter(
@@ -1553,14 +1521,6 @@ export default function PlaceEditor({
                 </div>
                 <div className="text-[11px] opacity-75">
                   {almanakkenReview.sourceNames} name variants
-                </div>
-              </div>
-              <div className="border border-black/10 bg-white/60 p-2">
-                <div className="text-[10px] uppercase tracking-[0.16em] opacity-60">
-                  v2 context
-                </div>
-                <div className="font-medium">
-                  v2-only {almanakkenReview.v2OnlyRows}
                 </div>
               </div>
             </div>
@@ -1958,35 +1918,6 @@ export default function PlaceEditor({
               (LOD authority links with match closeness)
             </span>
           </label>
-
-          {qidChangeReview && (
-            <div className="mb-2 flex flex-wrap items-center justify-between gap-2 border-l-2 border-amber-500 bg-amber-50 px-2 py-1.5 text-[11px] leading-4 text-amber-900">
-              <span>
-                v1 uses{' '}
-                <strong className="font-mono">{reviewedQid}</strong>;
-                v2 also uses{' '}
-                <strong className="font-mono">
-                  {qidChangeReview.detail || 'a different QID'}
-                </strong>
-                .
-              </span>
-              {canEdit &&
-                onConfirmQidReview &&
-                reviewedQid &&
-                currentWikidataQid === reviewedQid && (
-                <button
-                  type="button"
-                  onClick={confirmCurrentQid}
-                  disabled={savingReview || qidChangeTargets.length === 0}
-                  className="shrink-0 border border-amber-600 bg-white px-2 py-1 font-medium text-amber-900 transition hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {savingReview
-                    ? 'Saving...'
-                    : `Keep ${reviewedQid}`}
-                </button>
-              )}
-            </div>
-          )}
 
           {/* Existing links */}
           {(draft.externalLinks || []).length > 0 && (

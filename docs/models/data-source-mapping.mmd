@@ -23,7 +23,7 @@ flowchart TB
     %% RIGHT: ALMANAKKEN CSV COLUMNS
     %% =============================================================
 
-    subgraph ALM["Plantations Surinaamse Almanakken v1.0.csv"]
+    subgraph ALM["Plantations Surinaamse Almanakken v2.0.csv"]
         direction TB
 
         subgraph ALM_CORE["Core columns"]
@@ -41,7 +41,7 @@ flowchart TB
         end
 
         subgraph ALM_ENRICH["Enrichment columns"]
-            A_slaven["slaven"]
+            A_slaven["enslaved_norm / slaven"]
             A_product["product_std"]
             A_deserted["deserted"]
             A_loc_std["loc_std"]
@@ -50,10 +50,10 @@ flowchart TB
         end
 
         subgraph ALM_STRUCT["Structural columns"]
-            A_psur["psur_id"]
-            A_split["split1_id .. split5_id"]
+            A_psur["psur_id / psur_id2"]
+            A_split["has_parts1_id .. has_parts4_id"]
             A_partof["part_of_id"]
-            A_ref["reference_std_id"]
+            A_ref["owned_by_id / owned_by_id2"]
         end
     end
 
@@ -74,7 +74,8 @@ flowchart TB
 
         E74["E74 Group / sdo:Organization
         Legal entity operating plantation
-        URI: wd:Q-ID"]
+        URI: organization/Q-ID
+        exactMatch wd:Q-ID"]
 
         E74_ALT["E74 Group
         Absorbed / former org
@@ -86,7 +87,7 @@ flowchart TB
 
         E74_REF["E74 Group
         Reference plantation
-        URI: wd:reference_std_id"]
+        URI: organization/owned_by_id"]
 
         E41_MAP["E41 Appellation
         Map label identifies E25
@@ -133,8 +134,8 @@ flowchart TB
     Q_plantation_label -->|"skos:prefLabel
     (display convenience only)"| E25
 
-    Q_qid -->|"P52 has current owner
-    (E18 Physical Thing -> E39 Actor)"| E74
+    Q_qid -->|"researched organizational association
+    (does not assert physical ownership)"| E74
 
     Q_qid_alt -->|"P51 has former or current owner
     (historical ownership before merger)"| E74_ALT
@@ -181,16 +182,14 @@ flowchart TB
     A_psur -->|"skos:closeMatch
     (same caveats as QGIS psur)"| E74
 
-    A_split -->|"P99i was dissolved by
-    (E68 Dissolution: split orgs
-    dissolved into this one)"| E74
+    A_split -->|"source-qualified structural
+    references retained on observation"| OBS
 
-    A_partof -->|"P107i is member of
-    (CIDOC-CRM: org belongs to
-    larger group)"| E74_PARENT
+    A_partof -->|"source-qualified part-of
+    reference retained on observation"| OBS
 
-    A_ref -->|"crm:P67_refers_to
-    (almanac cross-reference)"| E74_REF
+    A_ref -->|"source-qualified ownership
+    reference retained on observation"| OBS
 
     %% =============================================================
     %% CIDOC-CRM RELATIONSHIPS BETWEEN ENTITIES
@@ -200,9 +199,9 @@ flowchart TB
     (E25 -> E53: the plantation
     is at this location)"| E53
 
-    E25 -->|"P52 has current owner
-    (E18 -> E39: physical thing
-    is owned by an actor)"| E74
+    E25 -->|"stm:hasOrganizationalAssociation
+    (editorial correspondence;
+    not automatic P52 ownership)"| E74
 
     E25 -->|"P1 is identified by
     (map label names E25)"| E41_MAP
@@ -245,7 +244,7 @@ flowchart TB
         QID_LINK["Wikidata Q-ID connects:
         QGIS qid column +
         Almanakken plantation_id column +
-        E25 -> P52 -> E74 ownership
+        curated E25 <-> E74 association
         All meet at the same E74 entity"]
     end
 

@@ -17,13 +17,15 @@
     "import-streets-1916": "tsx scripts/import-streets-paramaribo-1916.ts",
     "lint": "eslint .",
     "materialize-almanakken": "tsx scripts/materialize-almanakken-v2-observations.ts",
-    "pipeline": "tsx scripts/generate-database.ts && tsx scripts/validate-lod-context.ts && tsx scripts/materialize-almanakken-v2-observations.ts && tsx scripts/prepare-data.ts && tsx scripts/generate-place-records.ts && tsx scripts/validate-lod-publication.ts",
+    "migrate-almanakken-v2": "node --import tsx scripts/migrate-almanakken-v2.ts --write && node --import tsx scripts/derive-product-assertions.ts && node --import tsx scripts/derive-lifecycle-status.ts && node --import tsx scripts/materialize-almanakken-v2-observations.ts",
+    "pipeline": "pnpm migrate-almanakken-v2 && tsx scripts/generate-database.ts && tsx scripts/validate-lod-context.ts && tsx scripts/prepare-data.ts && tsx scripts/generate-place-records.ts && tsx scripts/validate-lod-publication.ts",
     "prepare-data": "tsx scripts/prepare-data.ts",
     "seed-gazetteer": "tsx scripts/seed-gazetteer.ts",
     "start": "next start",
     "validate-lod": "tsx scripts/validate-lod-context.ts",
     "validate-lod-publication": "tsx scripts/validate-lod-publication.ts",
     "validate-links:live": "node --import tsx scripts/validate-external-links.ts",
+    "validate-almanakken-v2": "node --import tsx scripts/migrate-almanakken-v2.ts",
     "validate-routes": "node --import tsx scripts/validate-linked-data-routes.ts"
   },
   "dependencies": {

@@ -70,7 +70,6 @@ type AlmanakkenReviewEntry = {
   desertedRows: number;
   sourceNames: number;
   products: string[];
-  v2OnlyRows: number;
   hasGazetteerSource: boolean;
   hasProductAssertions: boolean;
   hasStatusAssertions: boolean;
@@ -538,10 +537,6 @@ const ALMANAKKEN_ISSUE_DISPLAY: Record<
     short: 'Choose one or keep both',
     label: 'Decide whether these are one or several physical plantations',
   },
-  'v1-v2-qid-change': {
-    short: 'Check Wikidata QID',
-    label: 'Confirm which Wikidata organization identifier is correct',
-  },
 };
 
 function almanakkenIssueShortLabel(type: string): string {
@@ -568,7 +563,6 @@ function almanakkenReviewTitle(
     `Deserted observations: ${review.desertedRows}`,
     `Source-name variants: ${review.sourceNames}`,
     `Products: ${products}${review.products.length > 8 ? ', ...' : ''}`,
-    `New v2-only observations: ${review.v2OnlyRows}`,
     `Gazetteer source tag: ${review.hasGazetteerSource ? 'yes' : 'no'}`,
     `Physical-place projection saved: ${review.hasAlmanakkenObservations ? 'yes' : 'no'}`,
     review.issues.length > 0
@@ -1042,24 +1036,6 @@ function PlacesPageInner() {
     [],
   );
 
-  const clearReviewIssueByQid = useCallback(
-    (qid: string, issueType: string) => {
-      setAlmanakkenReview((current) => {
-        if (!current) return current;
-        const byPlaceId = { ...current.byPlaceId };
-        for (const [placeId, review] of Object.entries(byPlaceId)) {
-          if (review.qid !== qid) continue;
-          byPlaceId[placeId] = {
-            ...review,
-            issues: review.issues.filter((issue) => issue.type !== issueType),
-          };
-        }
-        return { ...current, byPlaceId };
-      });
-    },
-    [],
-  );
-
   const handleMergeCheck = useCallback(
     (id: string, checked: boolean) => {
       setMergeCheckIds((prev) => {
@@ -1183,31 +1159,6 @@ function PlacesPageInner() {
       syncUrlToSelection(placeIds.slice(0, 1));
     },
     [clearReviewIssue, syncUrlToSelection],
-  );
-
-  const handleConfirmQidReview = useCallback(
-    async (qid: string, changedToQids: string[]) => {
-      const res = await fetch('/api/organizations', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'confirm-qid-change',
-          qid,
-          changedToQids,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to confirm the Wikidata QID');
-      }
-      clearReviewIssueByQid(qid, 'v1-v2-qid-change');
-      setPublicationNotice({
-        ...(data.publication ?? {}),
-        message:
-          'Review saved. The current Wikidata QID is confirmed and this record is no longer in the review queue; public data updates after deployment.',
-      });
-    },
-    [clearReviewIssueByQid],
   );
 
   // Filter, search, and sort
@@ -1514,19 +1465,6 @@ function PlacesPageInner() {
 
   const handleSave = useCallback(
     async (updated: GazetteerPlace) => {
-      const previousQid = almanakkenReview?.byPlaceId[updated.id]?.qid;
-      const savedQid = updated.externalLinks
-        .find((link) => link.authority === 'wikidata')
-        ?.identifier.trim()
-        .toUpperCase();
-      const resolvesQidReview = Boolean(
-        previousQid &&
-          savedQid &&
-          previousQid !== savedQid &&
-          almanakkenReview?.byPlaceId[updated.id]?.issues.some(
-            (issue) => issue.type === 'v1-v2-qid-change',
-          ),
-      );
       const res = await fetch('/api/places', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1554,17 +1492,9 @@ function PlacesPageInner() {
       setSelectedIds([saved.id]);
       setIsCreating(false);
       syncUrlToSelection([saved.id]);
-      if (resolvesQidReview && previousQid) {
-        clearReviewIssueByQid(previousQid, 'v1-v2-qid-change');
-      }
-      setPublicationNotice({
-        ...(data.publication ?? {}),
-        message: resolvesQidReview
-          ? 'Place and review saved. The corrected QID removes this record from the review queue; public data updates after deployment.'
-          : undefined,
-      });
+      setPublicationNotice(data.publication ?? {});
     },
-    [almanakkenReview, clearReviewIssueByQid, syncUrlToSelection],
+    [syncUrlToSelection],
   );
 
   const handleCancel = useCallback(() => {
@@ -2123,7 +2053,6 @@ function PlacesPageInner() {
                     onCancel={handleCancel}
                     onDelete={canEdit ? handleDelete : undefined}
                     onReviewPhysicalLinks={openMergeForPlaces}
-                    onConfirmQidReview={handleConfirmQidReview}
                   />
                 </div>
               </aside>
@@ -2146,7 +2075,6 @@ function PlacesPageInner() {
                     onCancel={handleCancel}
                     onDelete={canEdit ? handleDelete : undefined}
                     onReviewPhysicalLinks={openMergeForPlaces}
-                    onConfirmQidReview={handleConfirmQidReview}
                   />
                 </div>
               </div>

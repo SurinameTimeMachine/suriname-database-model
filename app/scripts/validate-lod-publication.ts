@@ -480,26 +480,6 @@ async function main() {
         `Organization override ${qid} has an invalid reviewed place ID`,
       );
     }
-    if (override.qidChangeReviewStatus != null) {
-      assert(
-        override.qidChangeReviewStatus === 'confirmed-current',
-        `Organization override ${qid} has an invalid QID-change review status`,
-      );
-      const reviewedTargets = Array.isArray(override.reviewedQidChangeTargets)
-        ? override.reviewedQidChangeTargets
-        : [];
-      assert(
-        reviewedTargets.length > 0 &&
-          new Set(reviewedTargets).size === reviewedTargets.length &&
-          reviewedTargets.every(
-            (target) =>
-              typeof target === 'string' &&
-              /^Q\d+$/.test(target) &&
-              target !== qid,
-          ),
-        `Organization override ${qid} must identify distinct reviewed v2 QID targets`,
-      );
-    }
     overrideQids.add(qid);
   }
   const aggregateAlmanakkenEvidence = document['@graph'].filter(

@@ -6,7 +6,7 @@ The [universal source pattern](source-pattern-explained.mdx) describes how sourc
 
 ## The Problem: 23,000 Rows of Change
 
-The Almanakken CSV contains 23,003 rows. Each row is an annual snapshot of a plantation organization: who owned it, who managed it, how many enslaved people were recorded, what it produced, whether it was deserted. The same organization (`wd:Q4392658`, Geijersvlijt) appears in row after row, year after year, with different values.
+The Almanakken v2 CSV contains 22,482 rows. Each row is an annual snapshot of a plantation organization: who owned it, who managed it, how many enslaved people were recorded, what it produced, whether it was deserted. The same organization (`wd:Q4392658`, Geijersvlijt) appears in row after row, year after year, with different values.
 
 If we modeled each fact as a permanent property of the E74 organization, we would have contradictions. Geijersvlijt had 250 enslaved people in 1818 and 0 in 1920. It produced coffee in 1818 and nothing in 1920. These are not errors --- they are observations at different points in time.
 
@@ -214,9 +214,9 @@ flowchart TB
     subgraph "Has parts (split columns)"
         SPLIT1["E74 Heystvliet
         wd:Q59115689
-        (split1_id)"]
+        (has_parts1_id)"]
         SPLIT2["E74 Vriendsbeleid
-        (split2_id)"]
+        (has_parts2_id)"]
     end
 
     MAIN["E74 Geijersvlijt
@@ -230,7 +230,7 @@ flowchart TB
 
     subgraph "References (reference columns)"
         REF["E74 Owner plantation
-        (reference_std_id)"]
+        (owned_by_id)"]
     end
 
     SPLIT1 -->|"P99i was dissolved by<br/>(E68 Dissolution)"| MAIN
@@ -244,11 +244,11 @@ flowchart TB
 
 ### Mergers: P99i was dissolved by (E68 Dissolution)
 
-Surinamese plantation history is full of mergers. Small coffee plantations were absorbed by larger sugar plantations as the coffee economy declined. The Almanakken track this through the `split` columns:
+Surinamese plantation history is full of mergers. Small coffee plantations were absorbed by larger sugar plantations as the coffee economy declined. Almanakken v2 records structural references in the `has_parts` columns:
 
-- `split1_lab` / `split1_id` through `split5_lab` / `split5_id` --- these are plantations that have been **merged into** the current plantation. The naming is confusing (they are called "split" in the CSV but represent the opposite: components that were _absorbed_).
+- `has_parts1_lab` / `has_parts1_id` through `has_parts4_lab` / `has_parts4_id` record referenced component plantations.
 
-When `split1_id = Q59115689` on the row for `plantation_id = Q4392658`, it means:
+When `has_parts1_id = Q59115689` on the row for `plantation_id = Q4392658`, it records:
 
 ```
 E74 Q59115689 (Heystvliet) --P99i was dissolved by--> E68 Dissolution
@@ -267,7 +267,7 @@ E74 (qid_alt) --P99i was dissolved by--> E68 Dissolution --P14 carried out by-->
 
 ### Part-of: P107i is member of
 
-Some plantations are part of larger merged combinations. The `partof_lab` / `part_of_id` columns record this:
+Some plantations are part of larger merged combinations. The `part_of_lab` / `part_of_id` columns record this:
 
 ```
 E74 (plantation_id) --P107i is member of--> E74 (part_of_id)
@@ -277,10 +277,10 @@ We use CIDOC-CRM's standard `P107 has current or former member` (inverse: `P107i
 
 ### References: crm:P67_refers_to
 
-Some almanac entries say "see Plantation X" or indicate that plantation A is owned by or related to plantation B. The `reference_std_id` / `reference_std_lab` columns capture this:
+Some almanac entries indicate that one plantation organization is owned by another. The `owned_by_id` / `owned_by_id2` / `owned_by_lab` columns capture this:
 
 ```
-E74 (plantation_id) --crm:P67_refers_to--> E74 (reference_std_id)
+E13 observation --stm:ownedByReference--> E74 (owned_by_id)
 ```
 
 This is a weaker link than absorption or membership --- it indicates a reference relationship that may be ownership, administrative connection, or simply that the almanac clerk pointed researchers to another entry for more information. The reference network is valuable for linking when direct PSUR matches fail: if plantation A references plantation B, and B has a PSUR ID, we may be able to trace A through B.

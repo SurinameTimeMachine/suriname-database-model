@@ -19,12 +19,11 @@
  *   3. reactivated — the first year with a product_std value that occurs
  *                    after a verlaten span.
  *
- * Skips: entries whose statusAssertions array is already non-empty (manual
- *        edits take precedence). Pass --force to overwrite.
+ * Existing Almanakken-derived assertions are replaced deterministically.
+ * Assertions from every other source are preserved.
  *
  * Run with:
  *   pnpm derive-lifecycle
- *   pnpm derive-lifecycle -- --force
  */
 
 import { readFileSync, writeFileSync } from 'fs';
@@ -48,7 +47,6 @@ const PUBLIC_GAZETTEER = join(
 
 // ── Config ─────────────────────────────────────────────────────────────────
 
-const FORCE = process.argv.includes('--force');
 const INCLUDE_DUPLICATE_QIDS = process.argv.includes(
   '--include-duplicate-qids',
 );
@@ -75,7 +73,7 @@ const SOURCE_ID = 'almanakken'; // registry sourceId (prov:hadPrimarySource)
     console.error(
       `Error: SOURCE_ID "${SOURCE_ID}" not found as an E22 entry in sources registry.`,
     );
-    if (!FORCE) process.exit(1);
+    process.exit(1);
   }
 }
 
@@ -88,7 +86,7 @@ interface AlmanakRow {
   verlaten: boolean; // deserted column = 'verlaten'
 }
 
-// ── Read and parse CSV (latin-1) ───────────────────────────────────────────
+// ── Read and parse canonical v2 CSV ────────────────────────────────────────
 
 console.log('Reading almanakken CSV...');
 const { rows: rawRows } = readAlmanakkenRows();
@@ -260,51 +258,39 @@ for (const entry of graph) {
 }
 
 let patched = 0;
-let skipped = 0;
 let duplicateQidSkipped = 0;
 let noMatch = 0;
 
 for (const entry of graph) {
   if (entry.type !== 'plantation') continue;
 
-  const qid = getPrimaryAuthorityLink(entry, 'wikidata')?.identifier;
-  if (!qid) {
-    noMatch++;
-    continue;
-  }
-
-  const derived = derivedByQid.get(qid);
-  if (!derived || derived.length === 0) {
-    noMatch++;
-    continue;
-  }
-
-  if (!INCLUDE_DUPLICATE_QIDS && (activePlaceCountByQid.get(qid) ?? 0) > 1) {
-    duplicateQidSkipped++;
-    continue;
-  }
-
-  // Skip if already has manual assertions (unless --force)
   const existing = entry.statusAssertions ?? [];
-  if (existing.length > 0 && !FORCE) {
-    skipped++;
-    continue;
+  const preserved = existing.filter((assertion) => assertion.source !== SOURCE_ID);
+  const qid = getPrimaryAuthorityLink(entry, 'wikidata')?.identifier;
+  let derived: StatusAssertion[] = [];
+
+  if (!qid || !derivedByQid.has(qid)) {
+    noMatch++;
+  } else if (
+    !INCLUDE_DUPLICATE_QIDS &&
+    (activePlaceCountByQid.get(qid) ?? 0) > 1
+  ) {
+    duplicateQidSkipped++;
+  } else {
+    derived = derivedByQid.get(qid) ?? [];
   }
 
-  entry.statusAssertions = derived;
-  patched++;
+  const next = [...preserved, ...derived];
+  if (JSON.stringify(existing) !== JSON.stringify(next)) {
+    if (next.length > 0) entry.statusAssertions = next;
+    else delete entry.statusAssertions;
+    patched++;
+  }
 }
 
 console.log(
-  `  Patched: ${patched}  Skipped (has manual assertions): ${skipped}  Skipped duplicate QIDs: ${duplicateQidSkipped}  No almanakken match: ${noMatch}`,
+  `  Updated: ${patched}  Skipped duplicate QIDs: ${duplicateQidSkipped}  No Almanakken match: ${noMatch}`,
 );
-
-if (patched === 0) {
-  console.log(
-    '  Nothing to write. Run with --force to overwrite existing assertions.',
-  );
-  process.exit(0);
-}
 
 // ── Write out ──────────────────────────────────────────────────────────────
 

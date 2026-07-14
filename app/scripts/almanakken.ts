@@ -1,125 +1,132 @@
-import { existsSync, readFileSync } from 'fs';
-import { join } from 'path';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 
 import { parse } from 'csv-parse/sync';
 
-export type AlmanakkenCsvVersion = 'v1' | 'v2';
-export type AlmanakkenRow = Record<string, string>;
+export const ALMANAKKEN_VERSION = 'v2' as const;
+export const ALMANAKKEN_V2_COLUMNS = [
+  'recordid',
+  'id',
+  'year',
+  'page',
+  'litt_std',
+  'district_of_divisie',
+  'loc_org',
+  'loc_std',
+  'river_or_road',
+  'direction',
+  'plantation_std',
+  'plantation_org',
+  'plantation_id',
+  'psur_id',
+  'psur_id2',
+  'has_parts1_lab',
+  'has_parts1_id',
+  'has_parts2_lab',
+  'has_parts2_id',
+  'has_parts3_lab',
+  'has_parts3_id',
+  'has_parts4_lab',
+  'has_parts4_id',
+  'part_of_lab',
+  'part_of_id',
+  'reference_org',
+  'owned_by_lab',
+  'owned_by_id',
+  'owned_by_id2',
+  'size_std',
+  'product_std',
+  'enslaved_norm',
+  'enslaved_shared_with',
+  'function',
+  'additional_info',
+  'deserted',
+  'lot',
+  'administrateurs',
+  'directeuren',
+  'eigenaren',
+  'administrateurs_in_Europa',
+  'administrateurs_in_suriname',
+  'blank-officier',
+  'slaven',
+  'sranantongo_naam',
+  'plantage_mannelijke_niet_vrije_bewoners',
+  'plantage_totaal_niet_vrije_bewoners',
+  'plantage_vrouwelijke_niet_vrije_bewoners',
+  'privé_mannelijke_niet_vrije_bewoners',
+  'privé_totaal_niet_vrije_bewoners',
+  'privé_vrouwelijke_niet_vrije_bewoners',
+  'soort_van_molen',
+  'totaal_generaal_bewoners',
+  'vrije_bewoners',
+  'generaal_totaal_slaven',
+  'generale_macht_slaven_geschikt_tot_werken_plantages',
+  'generale_macht_slaven_geschikt_tot_werken_privé',
+  'generale_macht_slaven_ongeschikt_tot_werken_plantages',
+  'generale_macht_slaven_ongeschikt_tot_werken_privé',
+  'totaal_slaven_op_de_plantages_aanwezig_geschikt_tot_werk',
+  'totaal_slaven_op_de_plantages_aanwezig_ongeschikt_tot_werk',
+  'vrije_personen_op_plantages_jongens',
+  'vrije_personen_op_plantages_mannen',
+  'vrije_personen_op_plantages_meisjes',
+  'vrije_personen_op_plantages_vrouwen',
+  'vrije_personen_op_plantages_totaal',
+  'werktuig_stoom',
+  'werktuig_water',
+] as const;
+
+export type AlmanakkenV2Column = (typeof ALMANAKKEN_V2_COLUMNS)[number];
+export type AlmanakkenRow = Record<AlmanakkenV2Column, string>;
 
 const DATA_DIR = join(__dirname, '../..', 'data');
-const ALMANAKKEN_DIR = join(
+const ALMANAKKEN_V2_CSV = join(
   DATA_DIR,
   '06-almanakken - Plantations Surinaamse Almanakken',
-);
-const V2_CSV = join(
-  ALMANAKKEN_DIR,
   'Plantations Surinaamse Almanakken v2.0 (1).csv',
 );
-const V1_CSV = join(
-  ALMANAKKEN_DIR,
-  'Plantations Surinaamse Almanakken v1.0.csv',
-);
 
-function decodeCsv(filePath: string, version: AlmanakkenCsvVersion): string {
-  const buf = readFileSync(filePath);
-  const text =
-    version === 'v2'
-      ? new TextDecoder('utf-8').decode(buf)
-      : new TextDecoder('latin1').decode(buf);
-  return text.replace(/^\uFEFF/, '');
-}
+function readCsvRows(path: string): AlmanakkenRow[] {
+  const csv = new TextDecoder('utf-8', { fatal: true })
+    .decode(readFileSync(path))
+    .replace(/^\uFEFF/, '');
+  const rows = parse(csv, {
+    columns: true,
+    skip_empty_lines: true,
+    delimiter: ';',
+    trim: true,
+  }) as AlmanakkenRow[];
 
-export function getAlmanakkenSourcePath(): {
-  path: string;
-  version: AlmanakkenCsvVersion;
-} {
-  if (existsSync(V2_CSV)) return { path: V2_CSV, version: 'v2' };
-  return { path: V1_CSV, version: 'v1' };
+  if (rows.length === 0) throw new Error('Almanakken v2 CSV has no data rows.');
+  const actualColumns = Object.keys(rows[0]);
+  const expectedColumns = new Set<string>(ALMANAKKEN_V2_COLUMNS);
+  const missing = ALMANAKKEN_V2_COLUMNS.filter(
+    (column) => !actualColumns.includes(column),
+  );
+  const unexpected = actualColumns.filter((column) => !expectedColumns.has(column));
+  if (missing.length > 0 || unexpected.length > 0) {
+    throw new Error(
+      `Almanakken v2 schema mismatch. Missing: ${missing.join(', ') || 'none'}. Unexpected: ${unexpected.join(', ') || 'none'}.`,
+    );
+  }
+
+  return rows;
 }
 
 export function readAlmanakkenRows(): {
   path: string;
-  version: AlmanakkenCsvVersion;
+  version: typeof ALMANAKKEN_VERSION;
   rows: AlmanakkenRow[];
 } {
-  const { path, version } = getAlmanakkenSourcePath();
   return {
-    path,
-    version,
-    rows: readCsvRows(path, version).map((row) =>
-      normalizeAlmanakkenRow(row, version),
-    ),
+    path: ALMANAKKEN_V2_CSV,
+    version: ALMANAKKEN_VERSION,
+    rows: readCsvRows(ALMANAKKEN_V2_CSV),
   };
 }
 
-export function readAlmanakkenVersionRows(
-  version: AlmanakkenCsvVersion,
-): AlmanakkenRow[] {
-  const path = version === 'v1' ? V1_CSV : V2_CSV;
-  return readCsvRows(path, version).map((row) =>
-    normalizeAlmanakkenRow(row, version),
-  );
-}
-
-function readCsvRows(
-  path: string,
-  version: AlmanakkenCsvVersion,
-): AlmanakkenRow[] {
-  const csv = decodeCsv(path, version);
-  return parse(csv, {
-    columns: true,
-    skip_empty_lines: true,
-    relax_column_count: true,
-    delimiter: version === 'v2' ? ';' : ',',
-    trim: true,
-  }) as AlmanakkenRow[];
-}
-
-function normalizeAlmanakkenRow(
-  row: AlmanakkenRow,
-  version: AlmanakkenCsvVersion,
-): AlmanakkenRow {
-  const normalized: AlmanakkenRow = { ...row };
-  const aliases: Array<[string, string]> = [
-    ['split1_lab', 'has_parts1_lab'],
-    ['split1_id', 'has_parts1_id'],
-    ['split2_lab', 'has_parts2_lab'],
-    ['split2_id', 'has_parts2_id'],
-    ['split3_lab', 'has_parts3_lab'],
-    ['split3_id', 'has_parts3_id'],
-    ['split4_lab', 'has_parts4_lab'],
-    ['split4_id', 'has_parts4_id'],
-    ['partof_lab', 'part_of_lab'],
-    ['part of_id', 'part_of_id'],
-    ['reference_std_lab', 'owned_by_lab'],
-    ['reference_std_id', 'owned_by_id'],
-    ['nummer', 'lot'],
-    ['namen_totslaafgemaakten', 'sranantongo_naam'],
-  ];
-
-  for (const [legacyKey, canonicalKey] of aliases) {
-    if (!normalized[canonicalKey] && normalized[legacyKey]) {
-      normalized[canonicalKey] = normalized[legacyKey];
-    }
-  }
-
-  if (version === 'v1') {
-    normalized.psur_id2 ??= '';
-    normalized.river_or_road ??= '';
-    normalized.owned_by_lab ??= '';
-    normalized.owned_by_id ??= '';
-    normalized.owned_by_id2 ??= '';
-    normalized.enslaved_norm ||= normalized.slaven ?? '';
-    normalized.enslaved_shared_with ??= '';
-    normalized.sranantongo_naam ??= '';
-  }
-
-  return normalized;
-}
-
 export function almanakkenField(
-  row: AlmanakkenRow,
-  ...keys: string[]
+  row: Partial<AlmanakkenRow>,
+  ...keys: AlmanakkenV2Column[]
 ): string {
   for (const key of keys) {
     const value = row[key];

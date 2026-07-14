@@ -14,7 +14,6 @@ import {
   almanakkenField,
   isVerlaten,
   readAlmanakkenRows,
-  readAlmanakkenVersionRows,
 } from './almanakken';
 
 const LOD_DIR = join(__dirname, '../lod');
@@ -69,7 +68,6 @@ type AlmanakkenReviewEntry = {
   desertedRows: number;
   sourceNames: number;
   products: string[];
-  v2OnlyRows: number;
   hasGazetteerSource: boolean;
   hasProductAssertions: boolean;
   hasStatusAssertions: boolean;
@@ -81,10 +79,7 @@ type AlmanakkenReviewEntry = {
       | 'missing-source-tag'
       | 'missing-product-assertions'
       | 'missing-status-assertions'
-      | 'missing-almanakken-observations'
-      | 'v1-only-rows'
-      | 'v2-only-rows'
-      | 'v1-v2-qid-change';
+      | 'missing-almanakken-observations';
     label: string;
     detail?: string;
   }>;
@@ -94,8 +89,6 @@ type OrganizationOverride = {
   qid?: string;
   physicalLinkReviewStatus?: 'confirmed-multiple';
   reviewedPhysicalPlaceIds?: string[];
-  qidChangeReviewStatus?: 'confirmed-current';
-  reviewedQidChangeTargets?: string[];
 };
 
 type AlmanakkenMissingQid = {
@@ -299,21 +292,8 @@ function buildAlmanakkenReview(
     desertedRows: number;
     sourceNames: Set<string>;
     products: Set<string>;
-    recordIds: Set<string>;
-    v2OnlyRows: number;
   };
-  const v1ByRecordId = new Map(
-    readAlmanakkenVersionRows('v1')
-      .map((row) => [almanakkenField(row, 'recordid'), row] as const)
-      .filter(([recordId]) => Boolean(recordId)),
-  );
-  const v2ByRecordId = new Map(
-    readAlmanakkenVersionRows('v2')
-      .map((row) => [almanakkenField(row, 'recordid'), row] as const)
-      .filter(([recordId]) => Boolean(recordId)),
-  );
   const byQid = new Map<string, Summary>();
-  const qidChangedAway = new Map<string, Set<string>>();
   const unlinkedRows: AlmanakkenUnlinkedRow[] = [];
 
   for (const row of rows) {
@@ -331,7 +311,6 @@ function buildAlmanakkenReview(
       });
       continue;
     }
-    const recordId = almanakkenField(row, 'recordid');
     const summary =
       byQid.get(qid) ??
       {
@@ -341,14 +320,8 @@ function buildAlmanakkenReview(
         desertedRows: 0,
         sourceNames: new Set<string>(),
         products: new Set<string>(),
-        recordIds: new Set<string>(),
-        v2OnlyRows: 0,
       };
     summary.rows++;
-    if (recordId) summary.recordIds.add(recordId);
-    if (recordId && v2ByRecordId.has(recordId) && !v1ByRecordId.has(recordId)) {
-      summary.v2OnlyRows++;
-    }
 
     const year = Number.parseInt(almanakkenField(row, 'year'), 10);
     if (Number.isFinite(year)) summary.years.push(year);
@@ -364,17 +337,6 @@ function buildAlmanakkenReview(
     const sourceName = almanakkenField(row, 'plantation_org');
     if (sourceName) summary.sourceNames.add(sourceName);
     byQid.set(qid, summary);
-  }
-
-  for (const [recordId, v1Row] of v1ByRecordId) {
-    const v2Row = v2ByRecordId.get(recordId);
-    if (!v2Row) continue;
-    const v1Qid = almanakkenField(v1Row, 'plantation_id');
-    const v2Qid = almanakkenField(v2Row, 'plantation_id');
-    if (!v1Qid || !v2Qid || v1Qid === v2Qid) continue;
-    const changedTo = qidChangedAway.get(v1Qid) ?? new Set<string>();
-    changedTo.add(v2Qid);
-    qidChangedAway.set(v1Qid, changedTo);
   }
 
   const placeIdsByQid = new Map<string, string[]>();
@@ -427,24 +389,6 @@ function buildAlmanakkenReview(
       ) ?? false;
     const hasAlmanakkenObservations =
       (entry.almanakkenObservations?.length ?? 0) > 0;
-    const changedTo = qidChangedAway.get(qid);
-    const reviewedQidTargets = [
-      ...(organizationOverrides.get(qid)?.reviewedQidChangeTargets ?? []),
-    ].sort();
-    const currentQidTargets = [...(changedTo ?? [])].sort();
-    const qidChangeConfirmed =
-      organizationOverrides.get(qid)?.qidChangeReviewStatus ===
-        'confirmed-current' &&
-      currentQidTargets.length > 0 &&
-      currentQidTargets.join('\u0000') === reviewedQidTargets.join('\u0000');
-    if (changedTo?.size && !qidChangeConfirmed) {
-      issues.push({
-        type: 'v1-v2-qid-change',
-        label: 'v1 rows for this QID moved to different v2 QID(s)',
-        detail: [...changedTo].join(', '),
-      });
-    }
-
     byPlaceId[entry.id] = {
       placeId: entry.id,
       qid,
@@ -456,7 +400,6 @@ function buildAlmanakkenReview(
       desertedRows: summary?.desertedRows ?? 0,
       sourceNames: summary?.sourceNames.size ?? 0,
       products: [...(summary?.products ?? [])].sort(),
-      v2OnlyRows: summary?.v2OnlyRows ?? 0,
       hasGazetteerSource: entry.sources?.includes('almanakken') ?? false,
       hasProductAssertions,
       hasStatusAssertions,

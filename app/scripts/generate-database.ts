@@ -50,8 +50,6 @@ type OrganizationOverride = {
   reviewStatus?: 'unreviewed' | 'reviewed' | 'disputed';
   physicalLinkReviewStatus?: 'confirmed-multiple';
   reviewedPhysicalPlaceIds?: string[];
-  qidChangeReviewStatus?: 'confirmed-current';
-  reviewedQidChangeTargets?: string[];
   modifiedAt?: string;
   modifiedBy?: string;
 };
@@ -328,12 +326,6 @@ function buildE74Organizations(
     }
     if (override?.reviewedPhysicalPlaceIds?.length) {
       entity.reviewedPhysicalPlaceIds = override.reviewedPhysicalPlaceIds;
-    }
-    if (override?.qidChangeReviewStatus) {
-      entity.qidChangeReviewStatus = override.qidChangeReviewStatus;
-    }
-    if (override?.reviewedQidChangeTargets?.length) {
-      entity.reviewedQidChangeTargets = override.reviewedQidChangeTargets;
     }
     if (identifiers.length > 0) {
       entity.psurId = identifiers.length === 1 ? identifiers[0] : identifiers;
@@ -744,22 +736,25 @@ function buildObservations(
     }
     if (o.page_reference) entity.pageReference = o.page_reference;
     if (o.source_uri) entity.hadPrimarySource = o.source_uri;
-    const splitIds = [o.split1_id, o.split2_id, o.split3_id, o.split4_id].filter(
-      Boolean,
-    );
+    const splitIds = [
+      o.has_parts1_id,
+      o.has_parts2_id,
+      o.has_parts3_id,
+      o.has_parts4_id,
+    ].filter(Boolean);
     const splitLabels = [
-      o.split1_lab,
-      o.split2_lab,
-      o.split3_lab,
-      o.split4_lab,
+      o.has_parts1_lab,
+      o.has_parts2_lab,
+      o.has_parts3_lab,
+      o.has_parts4_lab,
     ].filter(Boolean);
     if (splitIds.length > 0) {
       entity.hasParts = splitIds.map((id) => `${WD}${id}`);
       entity.mergedInto = `${WD}${splitIds[0]}`;
     }
     if (splitLabels.length > 0) entity.hasPartLabels = splitLabels;
-    if (o.partof_id) entity.partOf = `${WD}${o.partof_id}`;
-    if (o.partof_lab) entity.partOfLabel = o.partof_lab;
+    if (o.part_of_id) entity.partOf = `${WD}${o.part_of_id}`;
+    if (o.part_of_lab) entity.partOfLabel = o.part_of_lab;
     if (o.owned_by_id || o.owned_by_id2) {
       entity.ownedBy = [o.owned_by_id, o.owned_by_id2]
         .filter(Boolean)

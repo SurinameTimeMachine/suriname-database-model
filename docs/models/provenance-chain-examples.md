@@ -186,27 +186,27 @@ flowchart LR
 
 **Example A**
 
-- Claim text: Plantation Leonsberg is listed in 1818 with product “koffie”.
+- Claim text: Plantation Nieuw-Zorg is listed in 1818 with product “hout”.
 - Claim type: organization
-- Primary evidence: almanakken record `recordid=1818-28-1`
+- Primary evidence: Almanakken v2 record `recordid=1818-100-656`
 - Supporting evidence: none
 - Provenance depth: D2
 - Linking assumptions: `plantation_std` represents standardized name.
 - Uncertainty notes: product may be partial/seasonal.
-- Source link(s): [data/06-almanakken - Plantations Surinaamse Almanakken/Plantations Surinaamse Almanakken v1.0.csv](data/06-almanakken%20-%20Plantations%20Surinaamse%20Almanakken/Plantations%20Surinaamse%20Almanakken%20v1.0.csv)
-- Flow: claim → record (recordid=1818-28-1) → dataset (almanakken)
+- Source link(s): [data/06-almanakken - Plantations Surinaamse Almanakken/Plantations Surinaamse Almanakken v2.0 (1).csv](data/06-almanakken%20-%20Plantations%20Surinaamse%20Almanakken/Plantations%20Surinaamse%20Almanakken%20v2.0%20(1).csv)
+- Flow: claim → record (recordid=1818-100-656) → dataset (Almanakken v2)
 
 **Example B**
 
-- Claim text: Leonsberg is linked to `psur_id=PSUR0197`.
+- Claim text: An Almanakken v2 organization observation may carry a `psur_id`.
 - Claim type: organization
-- Primary evidence: almanakken record `recordid=1818-28-1`
+- Primary evidence: a v2 row with a non-empty `psur_id`
 - Supporting evidence: none
 - Provenance depth: D2
 - Linking assumptions: PSUR identifiers align with Plantagen dataset.
 - Uncertainty notes: linkage may require manual verification.
-- Source link(s): [data/06-almanakken - Plantations Surinaamse Almanakken/Plantations Surinaamse Almanakken v1.0.csv](data/06-almanakken%20-%20Plantations%20Surinaamse%20Almanakken/Plantations%20Surinaamse%20Almanakken%20v1.0.csv)
-- Flow: claim → record (recordid=1818-28-1) → dataset (almanakken)
+- Source link(s): [data/06-almanakken - Plantations Surinaamse Almanakken/Plantations Surinaamse Almanakken v2.0 (1).csv](data/06-almanakken%20-%20Plantations%20Surinaamse%20Almanakken/Plantations%20Surinaamse%20Almanakken%20v2.0%20(1).csv)
+- Flow: claim → v2 record → dataset (Almanakken v2)
 
 ---
 

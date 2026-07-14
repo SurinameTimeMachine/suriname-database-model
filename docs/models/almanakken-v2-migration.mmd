@@ -1,0 +1,35 @@
+---
+title: Almanakken v2-only migration
+---
+flowchart LR
+    V2["Canonical v2 CSV<br/>22,482 rows / 68 columns"]
+    VALIDATE["Strict schema audit<br/>UTF-8; semicolon; unique recordid; QID shape"]
+    EDITORIAL["Curated Gazetteer<br/>geometry; names; authority links;<br/>merges; non-Almanakken assertions"]
+    SOURCE["Replaceable v2 projection<br/>observations; products; lifecycle;<br/>Almanakken source membership"]
+    E13["E13 annual observations<br/>obs/{recordid}"]
+    E74["Local E74 organizations<br/>exactMatch Wikidata QID"]
+    E25["Local E25 physical plantations"]
+    REVIEW["Research review<br/>multiple E25 records for one E74<br/>or missing v2 QID"]
+    JSONLD["Fetchable JSON-LD<br/>aggregate and entity records"]
+
+    V2 --> VALIDATE --> SOURCE
+    EDITORIAL -->|"preserved byte-for-byte<br/>outside projection fields"| SOURCE
+    SOURCE --> E13
+    E13 -->|"P140 assigned attribute to"| E74
+    E25 <-->|"researched association;<br/>not automatic P52 ownership"| E74
+    E25 --> REVIEW
+    E74 --> REVIEW
+    E13 --> JSONLD
+    E74 --> JSONLD
+    E25 --> JSONLD
+
+    classDef source fill:#fef3ba,stroke:#000,color:#000
+    classDef physical fill:#c78e66,stroke:#000,color:#000
+    classDef actor fill:#ffbdca,stroke:#000,color:#000
+    classDef event fill:#82ddff,stroke:#000,color:#000
+    classDef output fill:#e8f4ea,stroke:#000,color:#000
+    class V2,VALIDATE,SOURCE source
+    class EDITORIAL,E25 physical
+    class E74 actor
+    class E13 event
+    class REVIEW,JSONLD output

@@ -128,10 +128,9 @@ when substantial physical continuity and replacement are documented.
   physical plantations associated with the same E74. A reviewer may merge the
   former or persist `confirmed-multiple` with the exact reviewed Gazetteer IDs
   for the latter. The decision becomes stale when that active ID set changes.
-- Almanakken v1-to-v2 QID changes remain review candidates rather than silently
-  rewriting authority links. A reviewer may correct the Gazetteer QID or persist
-  `confirmed-current` with the exact set of v2 alternative QIDs considered. The
-  decision becomes stale and returns to the queue when that set changes.
+- Almanakken v2 is the sole source dataset. Its QIDs drive E74 observation
+  targets but never silently rewrite curated Gazetteer authority links; the old
+  cross-version comparison is not a research review task.
 - Explore and the organization workspace present the E25-E74 correspondence in
   both directions. `stm:organizationAssociationStatus` distinguishes a linked
   correspondence from a missing Gazetteer authority link or a physical-link

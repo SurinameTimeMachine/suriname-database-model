@@ -68,8 +68,6 @@ export interface E74Organization {
   authorityReviewStatus?: 'unreviewed' | 'reviewed' | 'disputed';
   physicalLinkReviewStatus?: 'confirmed-multiple';
   reviewedPhysicalPlaceIds?: string[];
-  qidChangeReviewStatus?: 'confirmed-current';
-  reviewedQidChangeTargets?: string[];
   modifiedAt?: string;
   modifiedBy?: string;
   P1_is_identified_by?: string | string[];
@@ -86,8 +84,6 @@ export interface OrganizationAuthorityOverride {
   reviewStatus: 'unreviewed' | 'reviewed' | 'disputed';
   physicalLinkReviewStatus?: 'confirmed-multiple';
   reviewedPhysicalPlaceIds?: string[];
-  qidChangeReviewStatus?: 'confirmed-current';
-  reviewedQidChangeTargets?: string[];
   modifiedAt?: string;
   modifiedBy?: string;
 }

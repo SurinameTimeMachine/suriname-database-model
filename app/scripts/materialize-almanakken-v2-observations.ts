@@ -16,6 +16,7 @@ import type {
 } from '../lib/types';
 import { getPrimaryAuthorityLink } from '../lib/types';
 import { almanakkenField, isVerlaten, readAlmanakkenRows } from './almanakken';
+import type { AlmanakkenRow } from './almanakken';
 
 const DATA_DIR = join(__dirname, '../../data');
 const GAZETTEER_PATH = join(DATA_DIR, 'places-gazetteer.jsonld');
@@ -68,7 +69,7 @@ function strings(...values: string[]): string[] | undefined {
   return unique.length > 0 ? unique : undefined;
 }
 
-function population(row: Record<string, string>): AlmanakkenPopulationObservation | undefined {
+function population(row: AlmanakkenRow): AlmanakkenPopulationObservation | undefined {
   return compactObject({
     enslavedCount: parseIntField(almanakkenField(row, 'enslaved_norm')),
     enslavedOriginal: almanakkenField(row, 'slaven'),
@@ -132,7 +133,7 @@ function population(row: Record<string, string>): AlmanakkenPopulationObservatio
   });
 }
 
-function rawManagement(row: Record<string, string>) {
+function rawManagement(row: AlmanakkenRow) {
   return compactObject({
     administrators: almanakkenField(row, 'administrateurs'),
     directors: almanakkenField(row, 'directeuren'),
@@ -143,7 +144,7 @@ function rawManagement(row: Record<string, string>) {
   });
 }
 
-function buildObservation(row: Record<string, string>): AlmanakkenPlantationObservation | null {
+function buildObservation(row: AlmanakkenRow): AlmanakkenPlantationObservation | null {
   const recordId = almanakkenField(row, 'recordid');
   const qid = almanakkenField(row, 'plantation_id');
   if (!recordId || !qid) return null;
@@ -199,11 +200,7 @@ function buildObservation(row: Record<string, string>): AlmanakkenPlantationObse
 }
 
 console.log('Reading Almanakken v2 observations...');
-const { version, rows } = readAlmanakkenRows();
-if (version !== 'v2') {
-  console.error('Error: Almanakken v2 CSV is required for materialized observations.');
-  process.exit(1);
-}
+const { rows } = readAlmanakkenRows();
 
 const byQid = new Map<string, AlmanakkenPlantationObservation[]>();
 for (const row of rows) {
