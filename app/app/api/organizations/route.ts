@@ -207,6 +207,12 @@ export async function POST(request: NextRequest) {
     if (existing?.reviewedPhysicalPlaceIds?.length) {
       entry.reviewedPhysicalPlaceIds = existing.reviewedPhysicalPlaceIds;
     }
+    if (existing?.qidChangeReviewStatus) {
+      entry.qidChangeReviewStatus = existing.qidChangeReviewStatus;
+    }
+    if (existing?.reviewedQidChangeTargets?.length) {
+      entry.reviewedQidChangeTargets = existing.reviewedQidChangeTargets;
+    }
     if (existingIndex >= 0) entries[existingIndex] = entry;
     else entries.push(entry);
     entries.sort((a, b) => a.qid.localeCompare(b.qid, undefined, { numeric: true }));
@@ -251,13 +257,37 @@ export async function PATCH(request: NextRequest) {
   const auth = await authorize();
   if (auth.error) return auth.error;
   const raw = (await request.json()) as Record<string, unknown>;
+  const action =
+    raw.action === 'confirm-qid-change'
+      ? 'confirm-qid-change'
+      : 'confirm-multiple-physical-links';
   const qid = typeof raw.qid === 'string' ? raw.qid.trim().toUpperCase() : '';
   const requestedPlaceIds = Array.isArray(raw.placeIds)
     ? [...new Set(raw.placeIds.map(String).map((id) => id.trim()).filter(Boolean))].sort()
     : [];
-  if (!/^Q\d+$/.test(qid) || requestedPlaceIds.length < 2) {
+  const changedToQids = Array.isArray(raw.changedToQids)
+    ? [
+        ...new Set(
+          raw.changedToQids
+            .map(String)
+            .map((value) => value.trim().toUpperCase())
+            .filter((value) => /^Q\d+$/.test(value) && value !== qid),
+        ),
+      ].sort()
+    : [];
+  if (
+    !/^Q\d+$/.test(qid) ||
+    (action === 'confirm-multiple-physical-links' &&
+      requestedPlaceIds.length < 2) ||
+    (action === 'confirm-qid-change' && changedToQids.length === 0)
+  ) {
     return NextResponse.json(
-      { error: 'A valid QID and at least two distinct place IDs are required.' },
+      {
+        error:
+          action === 'confirm-qid-change'
+            ? 'A valid current QID and at least one different v2 QID are required.'
+            : 'A valid QID and at least two distinct place IDs are required.',
+      },
       { status: 400 },
     );
   }
@@ -284,7 +314,10 @@ export async function PATCH(request: NextRequest) {
       )
       .map((entry) => String(entry.id))
       .sort();
-    if (activePlaceIds.join('\u0000') !== requestedPlaceIds.join('\u0000')) {
+    if (
+      action === 'confirm-multiple-physical-links' &&
+      activePlaceIds.join('\u0000') !== requestedPlaceIds.join('\u0000')
+    ) {
       return NextResponse.json(
         {
           error:
@@ -308,11 +341,16 @@ export async function PATCH(request: NextRequest) {
         qid,
         reviewStatus: 'unreviewed' as const,
       }),
-      physicalLinkReviewStatus: 'confirmed-multiple',
-      reviewedPhysicalPlaceIds: activePlaceIds,
       modifiedAt: new Date().toISOString().slice(0, 10),
       modifiedBy: user.login ?? 'unknown',
     };
+    if (action === 'confirm-qid-change') {
+      entry.qidChangeReviewStatus = 'confirmed-current';
+      entry.reviewedQidChangeTargets = changedToQids;
+    } else {
+      entry.physicalLinkReviewStatus = 'confirmed-multiple';
+      entry.reviewedPhysicalPlaceIds = activePlaceIds;
+    }
     if (existingIndex >= 0) entries[existingIndex] = entry;
     else entries.push(entry);
     entries.sort((a, b) => a.qid.localeCompare(b.qid, undefined, { numeric: true }));
@@ -323,7 +361,9 @@ export async function PATCH(request: NextRequest) {
       overridesPath,
       JSON.stringify(document, null, 2),
       overrideFile.sha,
-      `Confirm multiple physical plantations for ${qid}`,
+      action === 'confirm-qid-change'
+        ? `Confirm Almanakken QID decision for ${qid}`
+        : `Confirm multiple physical plantations for ${qid}`,
     );
     return NextResponse.json({
       ok: true,
@@ -331,13 +371,13 @@ export async function PATCH(request: NextRequest) {
       publication: { state: 'pending-deployment', commit },
     });
   } catch (error) {
-    console.error('Confirm organization physical links error:', error);
+    console.error('Confirm organization review error:', error);
     return NextResponse.json(
       {
         error:
           error instanceof Error
             ? error.message
-            : 'Failed to confirm physical plantation links',
+            : 'Failed to confirm organization review',
       },
       { status: 500 },
     );

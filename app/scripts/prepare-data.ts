@@ -94,6 +94,8 @@ type OrganizationOverride = {
   qid?: string;
   physicalLinkReviewStatus?: 'confirmed-multiple';
   reviewedPhysicalPlaceIds?: string[];
+  qidChangeReviewStatus?: 'confirmed-current';
+  reviewedQidChangeTargets?: string[];
 };
 
 type AlmanakkenMissingQid = {
@@ -426,7 +428,16 @@ function buildAlmanakkenReview(
     const hasAlmanakkenObservations =
       (entry.almanakkenObservations?.length ?? 0) > 0;
     const changedTo = qidChangedAway.get(qid);
-    if (changedTo?.size) {
+    const reviewedQidTargets = [
+      ...(organizationOverrides.get(qid)?.reviewedQidChangeTargets ?? []),
+    ].sort();
+    const currentQidTargets = [...(changedTo ?? [])].sort();
+    const qidChangeConfirmed =
+      organizationOverrides.get(qid)?.qidChangeReviewStatus ===
+        'confirmed-current' &&
+      currentQidTargets.length > 0 &&
+      currentQidTargets.join('\u0000') === reviewedQidTargets.join('\u0000');
+    if (changedTo?.size && !qidChangeConfirmed) {
       issues.push({
         type: 'v1-v2-qid-change',
         label: 'v1 rows for this QID moved to different v2 QID(s)',

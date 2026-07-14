@@ -11,6 +11,8 @@
     "reviewStatus": "stm:authorityReviewStatus",
     "physicalLinkReviewStatus": "stm:physicalLinkReviewStatus",
     "reviewedPhysicalPlaceIds": "stm:reviewedPhysicalPlaceId",
+    "qidChangeReviewStatus": "stm:qidChangeReviewStatus",
+    "reviewedQidChangeTargets": "stm:reviewedQidChangeTarget",
     "modifiedAt": {
       "@id": "dcterms:modified",
       "@type": "xsd:date"

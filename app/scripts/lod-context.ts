@@ -148,6 +148,8 @@ export function buildContext(): Record<string, unknown> {
     OrganizationAuthorityOverride: 'stm:OrganizationAuthorityOverride',
     physicalLinkReviewStatus: 'stm:physicalLinkReviewStatus',
     reviewedPhysicalPlaceIds: 'stm:reviewedPhysicalPlaceId',
+    qidChangeReviewStatus: 'stm:qidChangeReviewStatus',
+    reviewedQidChangeTargets: 'stm:reviewedQidChangeTarget',
 
     P1_is_identified_by: { '@id': 'crm:P1_is_identified_by', '@type': '@id' },
     P1i_identifies: { '@id': 'crm:P1i_identifies', '@type': '@id' },

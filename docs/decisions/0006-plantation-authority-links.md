@@ -2,9 +2,10 @@
 
 ## Status
 
-Accepted. The E25/E74 separation, Almanakken v2 targeting, and initial
-presence-inference rule are implemented; researcher overrides remain follow-up
-work.
+Accepted. The E25/E74 separation, Almanakken v2 targeting, initial
+presence-inference rule, and organization-link review overrides are
+implemented. Researcher acceptance or rejection of presence inferences remains
+follow-up work.
 
 ## Context
 
@@ -127,6 +128,10 @@ when substantial physical continuity and replacement are documented.
   physical plantations associated with the same E74. A reviewer may merge the
   former or persist `confirmed-multiple` with the exact reviewed Gazetteer IDs
   for the latter. The decision becomes stale when that active ID set changes.
+- Almanakken v1-to-v2 QID changes remain review candidates rather than silently
+  rewriting authority links. A reviewer may correct the Gazetteer QID or persist
+  `confirmed-current` with the exact set of v2 alternative QIDs considered. The
+  decision becomes stale and returns to the queue when that set changes.
 - Explore and the organization workspace present the E25-E74 correspondence in
   both directions. `stm:organizationAssociationStatus` distinguishes a linked
   correspondence from a missing Gazetteer authority link or a physical-link

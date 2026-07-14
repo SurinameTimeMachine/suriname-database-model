@@ -50,6 +50,8 @@ type OrganizationOverride = {
   reviewStatus?: 'unreviewed' | 'reviewed' | 'disputed';
   physicalLinkReviewStatus?: 'confirmed-multiple';
   reviewedPhysicalPlaceIds?: string[];
+  qidChangeReviewStatus?: 'confirmed-current';
+  reviewedQidChangeTargets?: string[];
   modifiedAt?: string;
   modifiedBy?: string;
 };
@@ -326,6 +328,12 @@ function buildE74Organizations(
     }
     if (override?.reviewedPhysicalPlaceIds?.length) {
       entity.reviewedPhysicalPlaceIds = override.reviewedPhysicalPlaceIds;
+    }
+    if (override?.qidChangeReviewStatus) {
+      entity.qidChangeReviewStatus = override.qidChangeReviewStatus;
+    }
+    if (override?.reviewedQidChangeTargets?.length) {
+      entity.reviewedQidChangeTargets = override.reviewedQidChangeTargets;
     }
     if (identifiers.length > 0) {
       entity.psurId = identifiers.length === 1 ? identifiers[0] : identifiers;

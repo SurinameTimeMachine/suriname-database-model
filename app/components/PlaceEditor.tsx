@@ -41,6 +41,10 @@ interface PlaceEditorProps {
   onCancel: () => void;
   onDelete?: (id: string) => Promise<void>;
   onReviewPhysicalLinks?: (placeIds: string[]) => void;
+  onConfirmQidReview?: (
+    qid: string,
+    changedToQids: string[],
+  ) => Promise<void>;
 }
 
 export interface PlaceOrganizationContext {
@@ -593,6 +597,7 @@ export default function PlaceEditor({
   onCancel,
   onDelete,
   onReviewPhysicalLinks,
+  onConfirmQidReview,
 }: PlaceEditorProps) {
   const { labels, crmBadges, biasTypes, allTypes } = usePlaceTypes();
   const { sources: registrySources, categories: registryCategories } =
@@ -619,6 +624,7 @@ export default function PlaceEditor({
   });
   const hydratedFromAppellations = useRef(false);
   const [saving, setSaving] = useState(false);
+  const [savingReview, setSavingReview] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sourceDropdownOpen, setSourceDropdownOpen] = useState(false);
   const diklandRefs: DiklandRef[] = draft.diklandRefs ?? [];
@@ -1229,6 +1235,28 @@ export default function PlaceEditor({
   const qidChangeReview = almanakkenReview?.issues.find(
     (issue) => issue.type === 'v1-v2-qid-change',
   );
+  const reviewedQid = almanakkenReview?.qid;
+  const currentWikidataQid = draft.externalLinks
+    .find((link) => link.authority === 'wikidata')
+    ?.identifier.trim()
+    .toUpperCase();
+  const qidChangeTargets = (qidChangeReview?.detail ?? '')
+    .split(',')
+    .map((qid) => qid.trim().toUpperCase())
+    .filter((qid) => /^Q\d+$/.test(qid));
+
+  const confirmCurrentQid = async () => {
+    if (!reviewedQid || !onConfirmQidReview) return;
+    setSavingReview(true);
+    setError(null);
+    try {
+      await onConfirmQidReview(reviewedQid, qidChangeTargets);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save review');
+    } finally {
+      setSavingReview(false);
+    }
+  };
   const reportedOwners = useMemo(() => {
     const values = (organizationContext?.observations ?? [])
       .filter(
@@ -1932,12 +1960,31 @@ export default function PlaceEditor({
           </label>
 
           {qidChangeReview && (
-            <div className="mb-2 border-l-2 border-amber-500 bg-amber-50 px-2 py-1.5 text-[11px] leading-4 text-amber-900">
-              <strong>Review this QID:</strong> v2 uses{' '}
-              <span className="font-mono">
-                {qidChangeReview.detail || 'a different QID'}
+            <div className="mb-2 flex flex-wrap items-center justify-between gap-2 border-l-2 border-amber-500 bg-amber-50 px-2 py-1.5 text-[11px] leading-4 text-amber-900">
+              <span>
+                v1 uses{' '}
+                <strong className="font-mono">{reviewedQid}</strong>;
+                v2 also uses{' '}
+                <strong className="font-mono">
+                  {qidChangeReview.detail || 'a different QID'}
+                </strong>
+                .
               </span>
-              . Confirm or correct the Wikidata identifier below.
+              {canEdit &&
+                onConfirmQidReview &&
+                reviewedQid &&
+                currentWikidataQid === reviewedQid && (
+                <button
+                  type="button"
+                  onClick={confirmCurrentQid}
+                  disabled={savingReview || qidChangeTargets.length === 0}
+                  className="shrink-0 border border-amber-600 bg-white px-2 py-1 font-medium text-amber-900 transition hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {savingReview
+                    ? 'Saving...'
+                    : `Keep ${reviewedQid}`}
+                </button>
+              )}
             </div>
           )}
 
