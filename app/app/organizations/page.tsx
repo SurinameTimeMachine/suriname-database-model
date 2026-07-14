@@ -326,6 +326,14 @@ function OrganizationsPageInner() {
                     <a href={selected['@id']} className="break-all font-mono text-teal-strong hover:underline">{selected['@id']}</a>
                     <a href={`${selected['@id']}.jsonld`} className="text-teal-strong hover:underline">JSON-LD</a>
                     {selected.exactMatch && <a href={selected.exactMatch} target="_blank" rel="noreferrer" className="text-teal-strong hover:underline">Wikidata {qidFor(selected)}</a>}
+                    {(details?.gazetteerPlantations.length ?? 0) > 1 &&
+                      details?.gazetteerPlantations.every(
+                        (plantation) => plantation.associationStatus === 'linked',
+                      ) && (
+                        <span className="border border-teal-strong/30 bg-teal-soft px-1.5 py-0.5 text-teal-strong">
+                          Multiple physical plantations reviewed
+                        </span>
+                      )}
                   </div>
                 </div>
                 <span className={`px-2 py-1 text-[10px] font-semibold uppercase ${statusClass(selected.authorityReviewStatus ?? 'unreviewed')}`}>

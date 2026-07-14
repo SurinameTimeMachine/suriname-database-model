@@ -532,25 +532,9 @@ const ALMANAKKEN_ISSUE_DISPLAY: Record<
   string,
   { short: string; label: string }
 > = {
-  'duplicate-gazetteer-link': {
-    short: 'shared QID',
-    label: 'Several places use the same Wikidata QID',
-  },
-  'missing-source-tag': {
-    short: 'source',
-    label: 'Almanakken is not listed as a source',
-  },
-  'missing-product-assertions': {
-    short: 'products',
-    label: 'Products were transcribed but not recorded as assertions',
-  },
-  'missing-status-assertions': {
-    short: 'lifecycle',
-    label: 'Lifecycle evidence has no dated status assertion',
-  },
-  'missing-almanakken-observations': {
-    short: 'import rows',
-    label: 'Attached source rows are missing from the saved record',
+  'shared-organization-link': {
+    short: 'physical links',
+    label: 'Review multiple physical plantations linked to one organization',
   },
   'v1-v2-qid-change': {
     short: 'QID changed',
@@ -588,14 +572,12 @@ function almanakkenReviewTitle(
     `Products: ${products}${review.products.length > 8 ? ', ...' : ''}`,
     `New v2-only observations: ${review.v2OnlyRows}`,
     `Gazetteer source tag: ${review.hasGazetteerSource ? 'yes' : 'no'}`,
-    `Saved v2 observation rows: ${review.hasAlmanakkenObservations ? 'yes' : 'no'}`,
-    `Editable product assertions: ${review.hasProductAssertions ? 'yes' : 'no'}`,
-    `Editable status assertions: ${review.hasStatusAssertions ? 'yes' : 'no'}`,
+    `Physical-place projection saved: ${review.hasAlmanakkenObservations ? 'yes' : 'no'}`,
     review.issues.length > 0
-      ? `Fixes:\n${review.issues
+      ? `Research decisions:\n${review.issues
           .map((issue) => `- ${issue.label}${issue.detail ? ` (${issue.detail})` : ''}`)
           .join('\n')}`
-      : 'Fixes: none',
+      : 'Research decisions: none',
   ].join('\n');
 }
 
@@ -918,6 +900,7 @@ function PlacesPageInner() {
   const [mergeView, setMergeView] = useState<{
     placeA: GazetteerPlace;
     placeB: GazetteerPlace;
+    organizationPeers: GazetteerPlace[];
   } | null>(null);
   const [publicationNotice, setPublicationNotice] =
     useState<PublicationNotice | null>(null);
@@ -1033,7 +1016,27 @@ function PlacesPageInner() {
     const placeA = places.find((p) => p.id === mergeCheckIds[0]);
     const placeB = places.find((p) => p.id === mergeCheckIds[1]);
     if (placeA && placeB) {
-      setMergeView({ placeA, placeB });
+      const qidA = placeA.externalLinks.find(
+        (link) => link.authority === 'wikidata',
+      )?.identifier;
+      const qidB = placeB.externalLinks.find(
+        (link) => link.authority === 'wikidata',
+      )?.identifier;
+      const organizationPeers =
+        qidA && qidA === qidB
+          ? places.filter(
+              (place) =>
+                place.type === 'plantation' &&
+                !place.deprecated &&
+                !place.mergedInto &&
+                place.externalLinks.some(
+                  (link) =>
+                    link.authority === 'wikidata' &&
+                    link.identifier === qidA,
+                ),
+            )
+          : [placeA, placeB];
+      setMergeView({ placeA, placeB, organizationPeers });
       setSelectedIds([]);
       setIsCreating(false);
     }
@@ -1072,6 +1075,26 @@ function PlacesPageInner() {
       setMergeCheckIds([]);
       setSelectedIds([merged.id]);
       syncUrlToSelection([merged.id]);
+    },
+    [syncUrlToSelection],
+  );
+
+  const handleKeepBothPlaces = useCallback(
+    async (qid: string, placeIds: string[]) => {
+      const res = await fetch('/api/organizations', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ qid, placeIds }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to confirm both places');
+      }
+      setPublicationNotice(data.publication ?? null);
+      setMergeView(null);
+      setMergeCheckIds([]);
+      setSelectedIds(placeIds.slice(0, 1));
+      syncUrlToSelection(placeIds.slice(0, 1));
     },
     [syncUrlToSelection],
   );
@@ -1556,9 +1579,11 @@ function PlacesPageInner() {
         <PlaceMergeView
           placeA={mergeView.placeA}
           placeB={mergeView.placeB}
+          organizationPeers={mergeView.organizationPeers}
           districts={districts}
           canEdit={canEdit}
           onMerge={handleMergeConfirm}
+          onKeepBoth={handleKeepBothPlaces}
           onCancel={() => setMergeView(null)}
         />
       ) : (
@@ -1771,8 +1796,8 @@ function PlacesPageInner() {
                 {almanakkenReview.rowCounts && (
                   <span className="border border-ink/10 bg-cream/70 px-2 py-1 font-mono text-[10px] text-ink/55">
                     {almanakkenReview.rowCounts.attached}/
-                    {almanakkenReview.rowCounts.total} rows attached;{' '}
-                    {almanakkenReview.rowCounts.unresolved} unresolved;{' '}
+                    {almanakkenReview.rowCounts.total} rows projected to one physical place;{' '}
+                    {almanakkenReview.rowCounts.unresolved} need a physical-link decision;{' '}
                     {almanakkenReview.rowCounts.withoutQid} without QID
                   </span>
                 )}
@@ -1827,7 +1852,7 @@ function PlacesPageInner() {
                     title="Almanakken QIDs with observations but no active Gazetteer place link"
                   >
                     <span>
-                      {almanakkenReview.missingQids?.length ?? 0} unlinked QIDs:
+                      {almanakkenReview.missingQids?.length ?? 0} organization QIDs without a physical place:
                     </span>
                     {almanakkenReview.missingQids?.slice(0, 5).map((missing) => {
                       const name = missing.sourceNames?.[0];

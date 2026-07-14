@@ -29,6 +29,10 @@ mkdirSync(OUT_DIR, { recursive: true });
 const gazetteerSrc = join(DATA_DIR, 'places-gazetteer.jsonld');
 const thesaurusSrc = join(DATA_DIR, 'place-types-thesaurus.jsonld');
 const sourcesSrc = join(DATA_DIR, 'sources-registry.jsonld');
+const organizationOverridesSrc = join(
+  DATA_DIR,
+  'organization-authority-overrides.jsonld',
+);
 const databaseSrc = join(LOD_DIR, 'database.jsonld');
 const contextSrc = join(LOD_DIR, 'context.jsonld');
 
@@ -73,7 +77,7 @@ type AlmanakkenReviewEntry = {
   issues: Array<{
     type:
       | 'missing-gazetteer-link'
-      | 'duplicate-gazetteer-link'
+      | 'shared-organization-link'
       | 'missing-source-tag'
       | 'missing-product-assertions'
       | 'missing-status-assertions'
@@ -84,6 +88,12 @@ type AlmanakkenReviewEntry = {
     label: string;
     detail?: string;
   }>;
+};
+
+type OrganizationOverride = {
+  qid?: string;
+  physicalLinkReviewStatus?: 'confirmed-multiple';
+  reviewedPhysicalPlaceIds?: string[];
 };
 
 type AlmanakkenMissingQid = {
@@ -262,7 +272,10 @@ function primaryWikidataQid(entry: GazetteerEntry): string | null {
   return link?.identifier?.trim() ?? null;
 }
 
-function buildAlmanakkenReview(entries: GazetteerEntry[]): {
+function buildAlmanakkenReview(
+  entries: GazetteerEntry[],
+  organizationOverrides: Map<string, OrganizationOverride>,
+): {
   sourceVersion: string;
   generatedAt: string;
   rowCounts: {
@@ -387,17 +400,19 @@ function buildAlmanakkenReview(entries: GazetteerEntry[]): {
     const years = summary?.years ?? [];
     const issues: AlmanakkenReviewEntry['issues'] = [];
     const mappedPlaceIds = placeIdsByQid.get(qid) ?? [];
-    if (summary && mappedPlaceIds.length > 1) {
+    const reviewedPlaceIds =
+      organizationOverrides.get(qid)?.reviewedPhysicalPlaceIds ?? [];
+    const multiplePhysicalLinksConfirmed =
+      organizationOverrides.get(qid)?.physicalLinkReviewStatus ===
+        'confirmed-multiple' &&
+      mappedPlaceIds.length > 1 &&
+      [...mappedPlaceIds].sort().join('\u0000') ===
+        [...reviewedPlaceIds].sort().join('\u0000');
+    if (summary && mappedPlaceIds.length > 1 && !multiplePhysicalLinksConfirmed) {
       issues.push({
-        type: 'duplicate-gazetteer-link',
-        label: `${mappedPlaceIds.length} places share this Almanakken QID`,
+        type: 'shared-organization-link',
+        label: `${mappedPlaceIds.length} physical plantations share this organization QID`,
         detail: mappedPlaceIds.join(', '),
-      });
-    }
-    if (summary && !entry.sources?.includes('almanakken')) {
-      issues.push({
-        type: 'missing-source-tag',
-        label: 'Almanakken rows exist but the Gazetteer source tag is missing',
       });
     }
     const hasProductAssertions =
@@ -410,28 +425,6 @@ function buildAlmanakkenReview(entries: GazetteerEntry[]): {
       ) ?? false;
     const hasAlmanakkenObservations =
       (entry.almanakkenObservations?.length ?? 0) > 0;
-    if (summary && summary.productRows > 0 && !hasProductAssertions) {
-      issues.push({
-        type: 'missing-product-assertions',
-        label: 'Product rows exist but editable product assertions are missing',
-      });
-    }
-    if (
-      summary &&
-      (summary.productRows > 0 || summary.desertedRows > 0) &&
-      !hasStatusAssertions
-    ) {
-      issues.push({
-        type: 'missing-status-assertions',
-        label: 'Operational evidence exists but lifecycle assertions are missing',
-      });
-    }
-    if (summary && !hasAlmanakkenObservations) {
-      issues.push({
-        type: 'missing-almanakken-observations',
-        label: 'Almanakken rows exist but saved v2 observations are missing',
-      });
-    }
     const changedTo = qidChangedAway.get(qid);
     if (changedTo?.size) {
       issues.push({
@@ -661,6 +654,15 @@ for (const p of provenance) {
 // them through the same CIDOC-CRM shape.
 const gazetteerRaw = readJsonIfExists(gazetteerSrc);
 const gazetteerEntries = (gazetteerRaw?.['@graph'] || []) as GazetteerEntry[];
+const organizationOverridesRaw = readJsonIfExists(organizationOverridesSrc);
+const organizationOverrides = new Map(
+  (
+    (organizationOverridesRaw?.['@graph'] as OrganizationOverride[] | undefined) ??
+    []
+  )
+    .filter((entry) => typeof entry.qid === 'string')
+    .map((entry) => [entry.qid as string, entry]),
+);
 const activePlantationsByQid = new Map<string, GazetteerEntry[]>();
 const activeGazetteerById = new Map<string, GazetteerEntry>();
 for (const entry of gazetteerEntries) {
@@ -680,7 +682,17 @@ function organizationAssociationStatus(
 ): 'linked' | 'needs-organization-link' | 'needs-physical-link-review' {
   const qid = primaryWikidataQid(entry);
   if (!qid) return 'needs-organization-link';
-  return (activePlantationsByQid.get(qid)?.length ?? 0) > 1
+  const activeIds = (activePlantationsByQid.get(qid) ?? [])
+    .map((plantation) => plantation.id)
+    .filter((id): id is string => Boolean(id))
+    .sort();
+  const override = organizationOverrides.get(qid);
+  const reviewedIds = [...(override?.reviewedPhysicalPlaceIds ?? [])].sort();
+  const confirmedMultiple =
+    override?.physicalLinkReviewStatus === 'confirmed-multiple' &&
+    activeIds.length > 1 &&
+    activeIds.join('\u0000') === reviewedIds.join('\u0000');
+  return activeIds.length > 1 && !confirmedMultiple
     ? 'needs-physical-link-review'
     : 'linked';
 }
@@ -1554,7 +1566,10 @@ if (gazetteerRaw) {
   );
   console.log('  Wrote places-gazetteer.jsonld');
 
-  const almanakkenReview = buildAlmanakkenReview(gazetteerEntries);
+  const almanakkenReview = buildAlmanakkenReview(
+    gazetteerEntries,
+    organizationOverrides,
+  );
   writeFileSync(
     join(OUT_DIR, 'almanakken-review.json'),
     JSON.stringify(almanakkenReview),

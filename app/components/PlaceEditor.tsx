@@ -281,49 +281,13 @@ const ALMANAKKEN_ISSUE_DISPLAY: Record<
     target?: { href: string; label: string };
   }
 > = {
-  'duplicate-gazetteer-link': {
-    label: 'Several places use the same Wikidata QID',
+  'shared-organization-link': {
+    label: 'Review the physical plantations linked to this organization',
     owner: 'Research decision',
     problem:
-      'The Almanakken rows cannot be assigned unambiguously because this authority identifier is linked to more than one active Gazetteer place.',
+      'This QID is an exact match for one E74 organization and a close match for more than one E25 physical plantation. The places may be duplicates, or both may be valid.',
     action:
-      'Compare the listed Gazetteer records. Merge records that describe the same physical plantation, or correct the Wikidata link on records that describe a different place.',
-    target: { href: '#external-links', label: 'Review external links' },
-  },
-  'missing-source-tag': {
-    label: 'Almanakken is not listed as a source',
-    owner: 'Researcher action',
-    problem:
-      'Almanakken rows are attached to this place, but the Gazetteer record does not credit Almanakken in its source list.',
-    action:
-      'Add Almanakken under Sources and save the record. Do not remove other sources.',
-    target: { href: '#sources', label: 'Go to Sources' },
-  },
-  'missing-product-assertions': {
-    label: 'Products were transcribed but not recorded as assertions',
-    owner: 'Researcher action',
-    problem:
-      'The source rows name one or more products, but this place has no editable product observation sourced to Almanakken.',
-    action:
-      'Add a product observation for each supported product and year. Select Almanakken as the source, then save the record.',
-    target: { href: '#product-observations', label: 'Go to Products' },
-  },
-  'missing-status-assertions': {
-    label: 'Lifecycle evidence has no dated status assertion',
-    owner: 'Researcher action',
-    problem:
-      'Almanakken records production or a deserted plantation, but no lifecycle event sourced to Almanakken represents that evidence.',
-    action:
-      'Add a dated lifecycle event: Built / Active for supported operational evidence or Abandoned for an explicit deserted entry. Preserve uncertainty in the note when needed.',
-    target: { href: '#plantation-lifecycle', label: 'Go to Lifecycle' },
-  },
-  'missing-almanakken-observations': {
-    label: 'Attached source rows are missing from the saved record',
-    owner: 'Data import',
-    problem:
-      'The review index found Almanakken rows for this QID, but their row-level v2 observations were not copied into the Gazetteer record.',
-    action:
-      'Do not recreate these rows by hand. Report this place ID and QID for an Almanakken import rerun; verify the saved observations after the import completes.',
+      'Open the merge workspace with the listed records. Merge them only if they represent one physical plantation; otherwise choose Keep both to confirm two distinct physical plantations linked to the same organization.',
   },
   'v1-v2-qid-change': {
     label: 'The authority link changed between v1 and v2',
@@ -1269,12 +1233,6 @@ export default function PlaceEditor({
     update('sources', sources);
   };
 
-  const almanakkenProductAssertions = productAssertions.filter(
-    (assertion) => assertion.source === 'almanakken',
-  );
-  const almanakkenStatusAssertions = statusAssertions.filter(
-    (assertion) => assertion.source === 'almanakken',
-  );
   const almanakkenObservations = [...(draft.almanakkenObservations ?? [])].sort(
     (a, b) =>
       (a.year ?? 0) - (b.year ?? 0) || a.recordId.localeCompare(b.recordId),
@@ -1533,7 +1491,7 @@ export default function PlaceEditor({
             <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
               <div>
                 <div className="text-[10px] font-medium uppercase tracking-[0.18em] opacity-70">
-                  Almanakken {almanakkenReview.sourceVersion}
+                  Almanakken {almanakkenReview.sourceVersion} organization evidence
                 </div>
                 <div className="font-medium">
                   {almanakkenReview.rows} observations
@@ -1567,14 +1525,15 @@ export default function PlaceEditor({
               </div>
               <div className="border border-black/10 bg-white/60 p-2">
                 <div className="text-[10px] uppercase tracking-[0.16em] opacity-60">
-                  Saved in record
+                  Physical projection
                 </div>
                 <div className="font-medium">
-                  {almanakkenProductAssertions.length} product
+                  {almanakkenObservations.length} rows
                 </div>
                 <div className="text-[11px] opacity-75">
-                  {almanakkenStatusAssertions.length} lifecycle,{' '}
-                  {almanakkenObservations.length} v2 rows
+                  {almanakkenObservations.length > 0
+                    ? 'shown here for context'
+                    : 'organization only'}
                 </div>
               </div>
               <div className="border border-black/10 bg-white/60 p-2">

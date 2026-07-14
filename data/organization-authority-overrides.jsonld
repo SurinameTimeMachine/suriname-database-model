@@ -9,6 +9,8 @@
     "alternativeLabels": "skos:altLabel",
     "editorialNote": "dcterms:description",
     "reviewStatus": "stm:authorityReviewStatus",
+    "physicalLinkReviewStatus": "stm:physicalLinkReviewStatus",
+    "reviewedPhysicalPlaceIds": "stm:reviewedPhysicalPlaceId",
     "modifiedAt": {
       "@id": "dcterms:modified",
       "@type": "xsd:date"

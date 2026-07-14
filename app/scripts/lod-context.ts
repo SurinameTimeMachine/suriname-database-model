@@ -146,6 +146,8 @@ export function buildContext(): Record<string, unknown> {
     PresenceInference: 'stm:PresenceInference',
     InferenceRule: 'prov:Plan',
     OrganizationAuthorityOverride: 'stm:OrganizationAuthorityOverride',
+    physicalLinkReviewStatus: 'stm:physicalLinkReviewStatus',
+    reviewedPhysicalPlaceIds: 'stm:reviewedPhysicalPlaceId',
 
     P1_is_identified_by: { '@id': 'crm:P1_is_identified_by', '@type': '@id' },
     P1i_identifies: { '@id': 'crm:P1i_identifies', '@type': '@id' },

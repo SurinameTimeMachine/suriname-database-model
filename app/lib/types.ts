@@ -66,6 +66,8 @@ export interface E74Organization {
   altLabel?: string | string[];
   editorialNote?: string;
   authorityReviewStatus?: 'unreviewed' | 'reviewed' | 'disputed';
+  physicalLinkReviewStatus?: 'confirmed-multiple';
+  reviewedPhysicalPlaceIds?: string[];
   modifiedAt?: string;
   modifiedBy?: string;
   P1_is_identified_by?: string | string[];
@@ -80,6 +82,8 @@ export interface OrganizationAuthorityOverride {
   alternativeLabels?: string[];
   editorialNote?: string;
   reviewStatus: 'unreviewed' | 'reviewed' | 'disputed';
+  physicalLinkReviewStatus?: 'confirmed-multiple';
+  reviewedPhysicalPlaceIds?: string[];
   modifiedAt?: string;
   modifiedBy?: string;
 }

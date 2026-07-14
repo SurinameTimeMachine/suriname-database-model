@@ -6,6 +6,7 @@ import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 const overridesPath = 'data/organization-authority-overrides.jsonld';
+const gazetteerPath = 'data/places-gazetteer.jsonld';
 const organizationBase = 'https://data.surinametijdmachine.org/organization/';
 const validStatuses = new Set(['unreviewed', 'reviewed', 'disputed']);
 
@@ -84,7 +85,12 @@ export async function GET(request: NextRequest) {
         associationStatus: 'linked',
       };
     });
-  if (gazetteerPlantations.length > 1) {
+  const physicalLinksNeedReview = plantations.some(
+    (plantation) =>
+      plantation.organizationAssociationStatus ===
+      'needs-physical-link-review',
+  );
+  if (gazetteerPlantations.length > 1 && physicalLinksNeedReview) {
     for (const plantation of gazetteerPlantations) {
       plantation.associationStatus = 'needs-physical-link-review';
     }
@@ -194,6 +200,13 @@ export async function POST(request: NextRequest) {
       modifiedBy: user.login ?? 'unknown',
     };
     const existingIndex = entries.findIndex((candidate) => candidate.qid === qid);
+    const existing = existingIndex >= 0 ? entries[existingIndex] : undefined;
+    if (existing?.physicalLinkReviewStatus) {
+      entry.physicalLinkReviewStatus = existing.physicalLinkReviewStatus;
+    }
+    if (existing?.reviewedPhysicalPlaceIds?.length) {
+      entry.reviewedPhysicalPlaceIds = existing.reviewedPhysicalPlaceIds;
+    }
     if (existingIndex >= 0) entries[existingIndex] = entry;
     else entries.push(entry);
     entries.sort((a, b) => a.qid.localeCompare(b.qid, undefined, { numeric: true }));
@@ -215,6 +228,117 @@ export async function POST(request: NextRequest) {
     console.error('Save organization error:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to save organization' },
+      { status: 500 },
+    );
+  }
+}
+
+function primaryWikidataQid(entry: Record<string, unknown>): string | null {
+  const links = Array.isArray(entry.externalLinks)
+    ? (entry.externalLinks as Array<Record<string, unknown>>)
+    : [];
+  const link = links.find(
+    (candidate) =>
+      candidate.authority === 'wikidata' &&
+      typeof candidate.identifier === 'string',
+  );
+  return typeof link?.identifier === 'string'
+    ? link.identifier.trim().toUpperCase()
+    : null;
+}
+
+export async function PATCH(request: NextRequest) {
+  const auth = await authorize();
+  if (auth.error) return auth.error;
+  const raw = (await request.json()) as Record<string, unknown>;
+  const qid = typeof raw.qid === 'string' ? raw.qid.trim().toUpperCase() : '';
+  const requestedPlaceIds = Array.isArray(raw.placeIds)
+    ? [...new Set(raw.placeIds.map(String).map((id) => id.trim()).filter(Boolean))].sort()
+    : [];
+  if (!/^Q\d+$/.test(qid) || requestedPlaceIds.length < 2) {
+    return NextResponse.json(
+      { error: 'A valid QID and at least two distinct place IDs are required.' },
+      { status: 400 },
+    );
+  }
+
+  try {
+    const { token } = auth;
+    const [overrideFile, gazetteerFile, userResponse] = await Promise.all([
+      readRepoFile(token, overridesPath),
+      readRepoFile(token, gazetteerPath),
+      fetch('https://api.github.com/user', {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+    ]);
+    const gazetteer = JSON.parse(gazetteerFile.content) as {
+      '@graph'?: Array<Record<string, unknown>>;
+    };
+    const activePlaceIds = (gazetteer['@graph'] ?? [])
+      .filter(
+        (entry) =>
+          entry.type === 'plantation' &&
+          !entry.deprecated &&
+          !entry.mergedInto &&
+          primaryWikidataQid(entry) === qid,
+      )
+      .map((entry) => String(entry.id))
+      .sort();
+    if (activePlaceIds.join('\u0000') !== requestedPlaceIds.join('\u0000')) {
+      return NextResponse.json(
+        {
+          error:
+            'The selected records no longer match all active physical plantations for this organization. Reload and review the current set.',
+        },
+        { status: 409 },
+      );
+    }
+
+    const document = JSON.parse(overrideFile.content) as {
+      '@graph'?: OrganizationAuthorityOverride[];
+    };
+    const entries = document['@graph'] ?? [];
+    const existingIndex = entries.findIndex((entry) => entry.qid === qid);
+    const user = (await userResponse.json()) as { login?: string };
+    const existing = existingIndex >= 0 ? entries[existingIndex] : undefined;
+    const entry: OrganizationAuthorityOverride = {
+      ...(existing ?? {
+        '@id': `${organizationBase}${qid}#editorial-override`,
+        '@type': 'OrganizationAuthorityOverride' as const,
+        qid,
+        reviewStatus: 'unreviewed' as const,
+      }),
+      physicalLinkReviewStatus: 'confirmed-multiple',
+      reviewedPhysicalPlaceIds: activePlaceIds,
+      modifiedAt: new Date().toISOString().slice(0, 10),
+      modifiedBy: user.login ?? 'unknown',
+    };
+    if (existingIndex >= 0) entries[existingIndex] = entry;
+    else entries.push(entry);
+    entries.sort((a, b) => a.qid.localeCompare(b.qid, undefined, { numeric: true }));
+    document['@graph'] = entries;
+
+    const commit = await writeRepoFile(
+      token,
+      overridesPath,
+      JSON.stringify(document, null, 2),
+      overrideFile.sha,
+      `Confirm multiple physical plantations for ${qid}`,
+    );
+    return NextResponse.json({
+      ok: true,
+      organization: entry,
+      publication: { state: 'pending-deployment', commit },
+    });
+  } catch (error) {
+    console.error('Confirm organization physical links error:', error);
+    return NextResponse.json(
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : 'Failed to confirm physical plantation links',
+      },
       { status: 500 },
     );
   }

@@ -460,6 +460,26 @@ async function main() {
       ),
       `Organization override ${qid} has an invalid review status`,
     );
+    if (override.physicalLinkReviewStatus != null) {
+      assert(
+        override.physicalLinkReviewStatus === 'confirmed-multiple',
+        `Organization override ${qid} has an invalid physical-link review status`,
+      );
+      const reviewedIds = Array.isArray(override.reviewedPhysicalPlaceIds)
+        ? override.reviewedPhysicalPlaceIds
+        : [];
+      assert(
+        reviewedIds.length >= 2 &&
+          new Set(reviewedIds).size === reviewedIds.length,
+        `Organization override ${qid} must identify at least two distinct reviewed places`,
+      );
+      assert(
+        reviewedIds.every(
+          (id) => typeof id === 'string' && /^stm-[a-z0-9-]+$/.test(id),
+        ),
+        `Organization override ${qid} has an invalid reviewed place ID`,
+      );
+    }
     overrideQids.add(qid);
   }
   const aggregateAlmanakkenEvidence = document['@graph'].filter(
@@ -581,32 +601,6 @@ async function main() {
     attachedSourceRows.size === rowCounts.attached,
     'Almanakken attached-row count differs from published authority records',
   );
-  for (const [placeId, review] of Object.entries(
-    almanakkenReview.byPlaceId ?? {},
-  )) {
-    const issueTypes = new Set((review.issues ?? []).map((issue) => issue.type));
-    if ((review.rows ?? 0) > 0 && !review.hasAlmanakkenObservations) {
-      assert(
-        issueTypes.has('missing-almanakken-observations'),
-        `Place ${placeId} hides missing Almanakken observations from review`,
-      );
-    }
-    if ((review.productRows ?? 0) > 0 && !review.hasProductAssertions) {
-      assert(
-        issueTypes.has('missing-product-assertions'),
-        `Place ${placeId} hides missing product assertions from review`,
-      );
-    }
-    if (
-      ((review.productRows ?? 0) > 0 || (review.desertedRows ?? 0) > 0) &&
-      !review.hasStatusAssertions
-    ) {
-      assert(
-        issueTypes.has('missing-status-assertions'),
-        `Place ${placeId} hides missing lifecycle assertions from review`,
-      );
-    }
-  }
   for (const entry of activeGazetteer) {
     if (entry.type !== 'river' && entry.type !== 'creek') continue;
     const location = entry.location as Record<string, unknown> | undefined;

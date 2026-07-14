@@ -45,9 +45,11 @@ interface MergedName {
 export interface PlaceMergeViewProps {
   placeA: GazetteerPlace;
   placeB: GazetteerPlace;
+  organizationPeers: GazetteerPlace[];
   districts: GazetteerPlace[];
   canEdit: boolean;
   onMerge: (merged: GazetteerPlace, retiredId: string) => Promise<void>;
+  onKeepBoth: (qid: string, placeIds: string[]) => Promise<void>;
   onCancel: () => void;
 }
 
@@ -99,6 +101,14 @@ function buildInitialResolution(): MergeResolution {
     excludedDistrictAssertions: new Set(),
     excludedLocationAssertions: new Set(),
   };
+}
+
+function wikidataQid(place: GazetteerPlace): string | null {
+  return (
+    place.externalLinks.find(
+      (link) => link.authority === 'wikidata' && /^Q\d+$/.test(link.identifier),
+    )?.identifier ?? null
+  );
 }
 
 function computeMergedPlace(
@@ -401,10 +411,26 @@ function MergeArraySection<T>({
 export default function PlaceMergeView({
   placeA,
   placeB,
+  organizationPeers,
   canEdit,
   onMerge,
+  onKeepBoth,
   onCancel,
 }: PlaceMergeViewProps) {
+  const qidA = wikidataQid(placeA);
+  const qidB = wikidataQid(placeB);
+  const sharedOrganizationQid = qidA && qidA === qidB ? qidA : null;
+  const confirmedPhysicalPlaces = useMemo(
+    () => (sharedOrganizationQid ? organizationPeers : [placeA, placeB]),
+    [organizationPeers, placeA, placeB, sharedOrganizationQid],
+  );
+  const confirmedPhysicalPlaceIds = useMemo(
+    () => confirmedPhysicalPlaces.map((place) => place.id),
+    [confirmedPhysicalPlaces],
+  );
+  const [mergeAction, setMergeAction] = useState<
+    'merge' | 'keep-both' | null
+  >(sharedOrganizationQid ? null : 'merge');
   const [primaryId, setPrimaryId] = useState(placeA.id);
   const [mergedNames, setMergedNames] = useState<MergedName[]>(() =>
     buildMergedNames(placeA, placeB),
@@ -470,12 +496,24 @@ export default function PlaceMergeView({
     setSaving(true);
     setError(null);
     try {
-      await onMerge(mergedPlace, retiredId);
+      if (mergeAction === 'keep-both' && sharedOrganizationQid) {
+        await onKeepBoth(sharedOrganizationQid, confirmedPhysicalPlaceIds);
+      } else if (mergeAction === 'merge') {
+        await onMerge(mergedPlace, retiredId);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to merge');
       setSaving(false);
     }
-  }, [mergedPlace, retiredId, onMerge]);
+  }, [
+    mergeAction,
+    mergedPlace,
+    onKeepBoth,
+    onMerge,
+    confirmedPhysicalPlaceIds,
+    retiredId,
+    sharedOrganizationQid,
+  ]);
 
   // Derive union arrays for display
   const allSources = useMemo(
@@ -608,6 +646,101 @@ export default function PlaceMergeView({
       {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-4xl mx-auto px-6 py-6 space-y-8">
+          <section>
+            <SectionHeader>Decide what the two records represent</SectionHeader>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <button
+                type="button"
+                onClick={() => setMergeAction('merge')}
+                className={`border p-4 text-left transition-colors ${
+                  mergeAction === 'merge'
+                    ? 'border-stm-sepia-500 bg-stm-sepia-50'
+                    : 'border-stm-warm-200 bg-white hover:border-stm-warm-300'
+                }`}
+              >
+                <span className="flex items-start gap-3">
+                  <input
+                    type="radio"
+                    readOnly
+                    checked={mergeAction === 'merge'}
+                    className="mt-1 accent-stm-sepia-500"
+                    aria-hidden="true"
+                    tabIndex={-1}
+                  />
+                  <span>
+                    <span className="block text-sm font-semibold text-stm-warm-800">
+                      One physical plantation
+                    </span>
+                    <span className="mt-1 block text-xs leading-5 text-stm-warm-500">
+                      Combine both records. One ID survives and the other remains
+                      as a provenance redirect.
+                    </span>
+                  </span>
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  sharedOrganizationQid && setMergeAction('keep-both')
+                }
+                disabled={!sharedOrganizationQid}
+                className={`border p-4 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-45 ${
+                  mergeAction === 'keep-both'
+                    ? 'border-stm-teal-500 bg-stm-teal-50'
+                    : 'border-stm-warm-200 bg-white hover:border-stm-warm-300'
+                }`}
+              >
+                <span className="flex items-start gap-3">
+                  <span className="mt-0.5 flex gap-1" aria-hidden="true">
+                    <input
+                      type="checkbox"
+                      readOnly
+                      checked={mergeAction === 'keep-both'}
+                      tabIndex={-1}
+                      className="accent-stm-teal-600"
+                    />
+                    <input
+                      type="checkbox"
+                      readOnly
+                      checked={mergeAction === 'keep-both'}
+                      tabIndex={-1}
+                      className="accent-stm-teal-600"
+                    />
+                  </span>
+                  <span>
+                    <span className="block text-sm font-semibold text-stm-warm-800">
+                      Multiple valid physical plantations
+                    </span>
+                    <span className="mt-1 block text-xs leading-5 text-stm-warm-500">
+                      Keep all {confirmedPhysicalPlaces.length} current records
+                      and confirm that their E25 features are linked to the same
+                      E74 organization
+                      {sharedOrganizationQid
+                        ? ` (${sharedOrganizationQid}).`
+                        : '. This requires the same organization QID on both records.'}
+                    </span>
+                  </span>
+                </span>
+              </button>
+            </div>
+          </section>
+
+          {mergeAction === 'keep-both' && (
+            <section className="border border-stm-teal-200 bg-stm-teal-50 p-4">
+              <h3 className="text-sm font-semibold text-stm-teal-900">
+                All reviewed records will remain active
+              </h3>
+              <p className="mt-1 text-xs leading-5 text-stm-teal-800">
+                This records a reviewed physical-link decision for the exact
+                current set:{' '}
+                {confirmedPhysicalPlaceIds.join(', ')}. Almanakken observations
+                remain attached to organization {sharedOrganizationQid}; they
+                are not duplicated as source assertions on the physical places.
+              </p>
+            </section>
+          )}
+
+          <div className={mergeAction === 'keep-both' ? 'hidden' : 'contents'}>
           {/* Primary selection */}
           <section>
             <SectionHeader>
@@ -1201,6 +1334,7 @@ export default function PlaceMergeView({
               />
             </section>
           )}
+          </div>
         </div>
       </div>
 
@@ -1211,6 +1345,11 @@ export default function PlaceMergeView({
         ) : !canEdit ? (
           <p className="text-sm text-stm-warm-400">
             Sign in with GitHub to save a merge.
+          </p>
+        ) : mergeAction === 'keep-both' ? (
+          <p className="text-sm text-stm-warm-500">
+            Keeping <span className="font-mono font-medium">{placeA.id}</span>{' '}
+            and <span className="font-mono font-medium">{placeB.id}</span>
           </p>
         ) : (
           <p className="text-sm text-stm-warm-500">
@@ -1228,11 +1367,22 @@ export default function PlaceMergeView({
           </button>
           <button
             onClick={handleConfirm}
-            disabled={saving || includedNameCount === 0 || !canEdit}
+            disabled={
+              saving ||
+              !mergeAction ||
+              (mergeAction === 'merge' && includedNameCount === 0) ||
+              !canEdit
+            }
             title={!canEdit ? 'Sign in with GitHub to save' : undefined}
             className="px-4 py-2 text-sm font-medium bg-stm-sepia-600 text-white hover:bg-stm-sepia-700 disabled:opacity-50 transition-colors"
           >
-            {saving ? 'Merging...' : 'Confirm Merge'}
+            {saving
+              ? mergeAction === 'keep-both'
+                ? 'Confirming...'
+                : 'Merging...'
+              : mergeAction === 'keep-both'
+                ? 'Confirm Both Places'
+                : 'Confirm Merge'}
           </button>
         </div>
       </div>

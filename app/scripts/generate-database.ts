@@ -36,6 +36,10 @@ const ORGANIZATION_OVERRIDES_PATH = join(
   __dirname,
   '../../data/organization-authority-overrides.jsonld',
 );
+const GAZETTEER_PATH = join(
+  __dirname,
+  '../../data/places-gazetteer.jsonld',
+);
 mkdirSync(LOD_DIR, { recursive: true });
 
 type OrganizationOverride = {
@@ -44,6 +48,8 @@ type OrganizationOverride = {
   alternativeLabels?: string[];
   editorialNote?: string;
   reviewStatus?: 'unreviewed' | 'reviewed' | 'disputed';
+  physicalLinkReviewStatus?: 'confirmed-multiple';
+  reviewedPhysicalPlaceIds?: string[];
   modifiedAt?: string;
   modifiedBy?: string;
 };
@@ -57,6 +63,50 @@ function readOrganizationOverrides(): Map<string, OrganizationOverride> {
     (document['@graph'] ?? [])
       .filter((entry) => typeof entry.qid === 'string' && /^Q\d+$/.test(entry.qid))
       .map((entry) => [entry.qid!, entry]),
+  );
+}
+
+function confirmedPhysicalLinkQids(
+  overrides: Map<string, OrganizationOverride>,
+): Set<string> {
+  if (!existsSync(GAZETTEER_PATH)) return new Set();
+  const document = JSON.parse(readFileSync(GAZETTEER_PATH, 'utf-8')) as {
+    '@graph'?: Array<Record<string, unknown>>;
+  };
+  const activeIdsByQid = new Map<string, string[]>();
+  for (const entry of document['@graph'] ?? []) {
+    if (
+      entry.type !== 'plantation' ||
+      entry.deprecated ||
+      entry.mergedInto ||
+      typeof entry.id !== 'string'
+    ) {
+      continue;
+    }
+    const links = Array.isArray(entry.externalLinks)
+      ? (entry.externalLinks as Array<Record<string, unknown>>)
+      : [];
+    const qid = links.find(
+      (link) =>
+        link.authority === 'wikidata' &&
+        typeof link.identifier === 'string' &&
+        /^Q\d+$/.test(link.identifier),
+    )?.identifier as string | undefined;
+    if (!qid) continue;
+    activeIdsByQid.set(qid, [...(activeIdsByQid.get(qid) ?? []), entry.id]);
+  }
+  return new Set(
+    [...overrides.entries()]
+      .filter(([qid, override]) => {
+        const activeIds = [...(activeIdsByQid.get(qid) ?? [])].sort();
+        const reviewedIds = [...(override.reviewedPhysicalPlaceIds ?? [])].sort();
+        return (
+          override.physicalLinkReviewStatus === 'confirmed-multiple' &&
+          activeIds.length > 1 &&
+          activeIds.join('\u0000') === reviewedIds.join('\u0000')
+        );
+      })
+      .map(([qid]) => qid),
   );
 }
 
@@ -98,6 +148,7 @@ function buildE25Plantations(
   mapLinkIndex: Map<string, MapLink[]>,
   organizationUriByQid: Map<string, string>,
   plantationUrisByQid: Map<string, string[]>,
+  confirmedPhysicalLinks: Set<string>,
 ): {
   entities: Record<string, unknown>[];
   provenance: Record<string, unknown>[];
@@ -133,8 +184,12 @@ function buildE25Plantations(
     const organizationUri = organizationUriByQid.get(p.wikidata_qid);
     if (organizationUri) {
       entity.hasOrganizationalAssociation = organizationUri;
+      const physicalLinkConfirmed = confirmedPhysicalLinks.has(
+        p.wikidata_qid,
+      );
       entity.organizationAssociationStatus =
-        (plantationUrisByQid.get(p.wikidata_qid)?.length ?? 0) > 1
+        (plantationUrisByQid.get(p.wikidata_qid)?.length ?? 0) > 1 &&
+        !physicalLinkConfirmed
           ? 'needs-physical-link-review'
           : 'linked';
     } else {
@@ -266,6 +321,12 @@ function buildE74Organizations(
     entity.authorityReviewStatus = override?.reviewStatus ?? 'unreviewed';
     if (override?.modifiedAt) entity.modifiedAt = override.modifiedAt;
     if (override?.modifiedBy) entity.modifiedBy = override.modifiedBy;
+    if (override?.physicalLinkReviewStatus) {
+      entity.physicalLinkReviewStatus = override.physicalLinkReviewStatus;
+    }
+    if (override?.reviewedPhysicalPlaceIds?.length) {
+      entity.reviewedPhysicalPlaceIds = override.reviewedPhysicalPlaceIds;
+    }
     if (identifiers.length > 0) {
       entity.psurId = identifiers.length === 1 ? identifiers[0] : identifiers;
     }
@@ -950,6 +1011,10 @@ function main() {
   const organizationUriByQid = new Map(
     [...organizationQids].map((qid) => [qid, `${BASE}organization/${qid}`]),
   );
+  const organizationOverrides = readOrganizationOverrides();
+  const confirmedPhysicalLinks = confirmedPhysicalLinkQids(
+    organizationOverrides,
+  );
   const almanacAppellations = almResult.appellations.map((appellation) => {
     const authorityUri = Array.isArray(appellation.identifies_uri)
       ? appellation.identifies_uri[0] ?? ''
@@ -1029,6 +1094,7 @@ function main() {
     mapLinkIndex,
     organizationUriByQid,
     plantationUrisByQid,
+    confirmedPhysicalLinks,
   );
   console.log(`  E25 Plantations:    ${e25Result.entities.length}`);
 
@@ -1045,7 +1111,7 @@ function main() {
     plantResult.e25,
     almResult.observations,
     appellationIndex,
-    readOrganizationOverrides(),
+    organizationOverrides,
   );
   console.log(`  E74 Organizations: ${organizationResult.entities.length}`);
 

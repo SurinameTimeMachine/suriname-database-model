@@ -45,8 +45,8 @@ appellations without being identical.
   identify the matched E25 when the source usage does not distinguish the
   organization from the physical plantation complex.
 - Almanakken E13 observations target the E74 when `plantation_id` resolves
-  unambiguously. Unresolved rows retain the source QID and remain in the
-  researcher review queue.
+  to a QID. Rows without a QID remain in the researcher review queue. More than
+  one E25 close match for the same QID does not make the E74 target ambiguous.
 - Owner, administrator, and director values remain source transcriptions until
   reconciled to E21/E39/E74 authority records and qualified roles.
 
@@ -123,7 +123,10 @@ when substantial physical continuity and replacement are documented.
 - Plantation organization mergers do not silently rewrite physical boundaries,
   and later settlements do not erase plantation history.
 - E74 records use local STM URIs, Almanakken observations target them, and the
-  existing merge review workflow remains available for unresolved rows.
+  merge review workflow distinguishes duplicate E25 records from multiple valid
+  physical plantations associated with the same E74. A reviewer may merge the
+  former or persist `confirmed-multiple` with the exact reviewed Gazetteer IDs
+  for the latter. The decision becomes stale when that active ID set changes.
 - Explore and the organization workspace present the E25-E74 correspondence in
   both directions. `stm:organizationAssociationStatus` distinguishes a linked
   correspondence from a missing Gazetteer authority link or a physical-link

@@ -2,8 +2,8 @@
  * Attach Almanakken v2 annual plantation observations to Gazetteer plantation
  * records. These are source-bound observations, not curated claims.
  *
- * Duplicate Gazetteer links for the same Wikidata QID are skipped by default so
- * the same evidence is not copied onto competing place records before review.
+ * Multiple Gazetteer links for the same organization QID are skipped by default
+ * so E74 evidence is not copied onto more than one E25 physical-place record.
  */
 
 import { mkdirSync, readFileSync, writeFileSync } from 'fs';
