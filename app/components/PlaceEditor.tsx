@@ -40,6 +40,7 @@ interface PlaceEditorProps {
   onSave: (place: GazetteerPlace) => Promise<void>;
   onCancel: () => void;
   onDelete?: (id: string) => Promise<void>;
+  onReviewPhysicalLinks?: (placeIds: string[]) => void;
 }
 
 export interface PlaceOrganizationContext {
@@ -275,27 +276,21 @@ const ALMANAKKEN_ISSUE_DISPLAY: Record<
   string,
   {
     label: string;
-    owner: 'Researcher action' | 'Research decision' | 'Data import';
-    problem: string;
-    action: string;
+    summary: string;
+    actionLabel: string;
     target?: { href: string; label: string };
   }
 > = {
   'shared-organization-link': {
-    label: 'Review the physical plantations linked to this organization',
-    owner: 'Research decision',
-    problem:
-      'This QID is an exact match for one E74 organization and a close match for more than one E25 physical plantation. The places may be duplicates, or both may be valid.',
-    action:
-      'Open the merge workspace with the listed records. Merge them only if they represent one physical plantation; otherwise choose Keep both to confirm two distinct physical plantations linked to the same organization.',
+    label: 'Are these the same physical plantation?',
+    summary:
+      'Compare the records, then merge them or confirm that all are valid.',
+    actionLabel: 'Compare places',
   },
   'v1-v2-qid-change': {
-    label: 'The authority link changed between v1 and v2',
-    owner: 'Research decision',
-    problem:
-      'Rows previously grouped under this QID use a different QID in v2. This may be a correction, a split, or a mistaken authority match.',
-    action:
-      'Compare the v1 and v2 names and locations with Wikidata. Keep the v2 QID when the change is justified; otherwise correct the external link and flag the source-row mapping for re-import.',
+    label: 'Did the organization QID change correctly?',
+    summary: 'Check the current Wikidata link against the v1 and v2 source rows.',
+    actionLabel: 'Check QID',
     target: { href: '#external-links', label: 'Review external links' },
   },
 };
@@ -624,6 +619,7 @@ export default function PlaceEditor({
   onSave,
   onCancel,
   onDelete,
+  onReviewPhysicalLinks,
 }: PlaceEditorProps) {
   const { labels, crmBadges, biasTypes, allTypes } = usePlaceTypes();
   const { sources: registrySources, categories: registryCategories } =
@@ -1511,6 +1507,60 @@ export default function PlaceEditor({
               </span>
             </div>
 
+            {almanakkenReview.issues.length > 0 && (
+              <div className="mb-3 divide-y divide-amber-200 border-y border-amber-300 bg-white/80">
+                {almanakkenReview.issues.map((issue) => {
+                  const display = ALMANAKKEN_ISSUE_DISPLAY[issue.type];
+                  const affectedPlaceIds = (issue.detail ?? '')
+                    .split(',')
+                    .map((id) => id.trim())
+                    .filter(Boolean);
+                  const canCompare =
+                    issue.type === 'shared-organization-link' &&
+                    affectedPlaceIds.length >= 2 &&
+                    onReviewPhysicalLinks;
+                  return (
+                    <div
+                      key={`${issue.type}-${issue.detail ?? ''}`}
+                      className="flex flex-col gap-2 px-2 py-2 sm:flex-row sm:items-center"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <div className="font-semibold text-amber-950">
+                          {almanakkenIssueLongLabel(issue.type)}
+                        </div>
+                        <div className="mt-0.5 text-[11px] leading-4 text-amber-800">
+                          {display?.summary ?? issue.label}
+                          {affectedPlaceIds.length > 0 && (
+                            <span className="ml-1 font-mono text-[10px] opacity-70">
+                              {affectedPlaceIds.join(', ')}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      {canCompare ? (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            onReviewPhysicalLinks(affectedPlaceIds)
+                          }
+                          className="shrink-0 border border-amber-600 bg-amber-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-700"
+                        >
+                          {display?.actionLabel ?? 'Review'}
+                        </button>
+                      ) : display?.target ? (
+                        <a
+                          href={display.target.href}
+                          className="shrink-0 border border-amber-500 bg-amber-100 px-3 py-1.5 text-xs font-semibold text-amber-950 hover:bg-amber-200"
+                        >
+                          {display.actionLabel}
+                        </a>
+                      ) : null}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
               <div className="border border-black/10 bg-white/60 p-2">
                 <div className="text-[10px] uppercase tracking-[0.16em] opacity-60">
@@ -1656,60 +1706,6 @@ export default function PlaceEditor({
               </div>
             )}
 
-            {almanakkenReview.issues.length > 0 && (
-              <div className="mt-3 space-y-2">
-                {almanakkenReview.issues.map((issue) => (
-                  <div
-                    key={`${issue.type}-${issue.detail ?? ''}`}
-                    className="border border-amber-300 bg-white/80 p-3 text-amber-950"
-                  >
-                    <div className="flex flex-wrap items-start justify-between gap-2">
-                      <span className="font-semibold">
-                        {almanakkenIssueLongLabel(issue.type)}
-                      </span>
-                      <span className="shrink-0 border border-amber-400 bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-[0.12em] text-amber-900">
-                        {ALMANAKKEN_ISSUE_DISPLAY[issue.type]?.owner ??
-                          'Researcher action'}
-                      </span>
-                    </div>
-                    <dl className="mt-2 grid gap-x-3 gap-y-1 text-[11px] leading-4 sm:grid-cols-[5rem_minmax(0,1fr)]">
-                      <dt className="font-semibold text-amber-800">Problem</dt>
-                      <dd>
-                        {ALMANAKKEN_ISSUE_DISPLAY[issue.type]?.problem ??
-                          issue.label}
-                      </dd>
-                      {issue.detail && (
-                        <>
-                          <dt className="font-semibold text-amber-800">
-                            Affected
-                          </dt>
-                          <dd className="break-words font-mono">
-                            {issue.detail}
-                          </dd>
-                        </>
-                      )}
-                      <dt className="font-semibold text-amber-800">Action</dt>
-                      <dd>
-                        {ALMANAKKEN_ISSUE_DISPLAY[issue.type]?.action ??
-                          'Review the source evidence and update the Gazetteer record.'}
-                      </dd>
-                    </dl>
-                    {ALMANAKKEN_ISSUE_DISPLAY[issue.type]?.target && (
-                      <a
-                        href={
-                          ALMANAKKEN_ISSUE_DISPLAY[issue.type]?.target?.href ??
-                          '#'
-                        }
-                        className="mt-2 inline-flex border border-amber-500 bg-amber-100 px-2 py-1 text-[11px] font-medium text-amber-950 hover:bg-amber-200"
-                      >
-                        {ALMANAKKEN_ISSUE_DISPLAY[issue.type]?.target?.label ??
-                          'Review record'}
-                      </a>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
         )}
 

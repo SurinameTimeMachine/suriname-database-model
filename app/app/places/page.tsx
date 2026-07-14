@@ -1011,10 +1011,10 @@ function PlacesPageInner() {
     [places],
   );
 
-  const handleOpenMergeView = useCallback(() => {
-    if (mergeCheckIds.length !== 2) return;
-    const placeA = places.find((p) => p.id === mergeCheckIds[0]);
-    const placeB = places.find((p) => p.id === mergeCheckIds[1]);
+  const openMergeForPlaces = useCallback((placeIds: string[]) => {
+    if (placeIds.length < 2) return;
+    const placeA = places.find((p) => p.id === placeIds[0]);
+    const placeB = places.find((p) => p.id === placeIds[1]);
     if (placeA && placeB) {
       const qidA = placeA.externalLinks.find(
         (link) => link.authority === 'wikidata',
@@ -1040,7 +1040,12 @@ function PlacesPageInner() {
       setSelectedIds([]);
       setIsCreating(false);
     }
-  }, [mergeCheckIds, places]);
+  }, [places]);
+
+  const handleOpenMergeView = useCallback(() => {
+    if (mergeCheckIds.length !== 2) return;
+    openMergeForPlaces(mergeCheckIds);
+  }, [mergeCheckIds, openMergeForPlaces]);
 
   const handleMergeConfirm = useCallback(
     async (merged: GazetteerPlace, retiredId: string) => {
@@ -2043,6 +2048,7 @@ function PlacesPageInner() {
                     onSave={handleSave}
                     onCancel={handleCancel}
                     onDelete={canEdit ? handleDelete : undefined}
+                    onReviewPhysicalLinks={openMergeForPlaces}
                   />
                 </div>
               </aside>
@@ -2064,6 +2070,7 @@ function PlacesPageInner() {
                     onSave={handleSave}
                     onCancel={handleCancel}
                     onDelete={canEdit ? handleDelete : undefined}
+                    onReviewPhysicalLinks={openMergeForPlaces}
                   />
                 </div>
               </div>
