@@ -83,6 +83,9 @@ export async function GET(request: NextRequest) {
         id: entry.id,
         prefLabel: String(preferred ?? qid),
         associationStatus: 'linked',
+        diklandRefs: Array.isArray(entry.diklandRefs)
+          ? entry.diklandRefs
+          : [],
       };
     });
   const physicalLinksNeedReview = plantations.some(

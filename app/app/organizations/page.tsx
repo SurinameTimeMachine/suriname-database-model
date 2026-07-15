@@ -2,6 +2,7 @@
 
 import { useAuth } from '@/lib/auth';
 import type {
+  DiklandRef,
   E25Plantation,
   E41Appellation,
   E74Organization,
@@ -24,6 +25,7 @@ type OrganizationDetails = {
     id: string;
     prefLabel: string;
     associationStatus: 'linked' | 'needs-physical-link-review';
+    diklandRefs: DiklandRef[];
   }>;
   explorePlantations: Array<{
     id: string;
@@ -50,6 +52,16 @@ const emptyData: OrganizationData = {
 function asArray(value: string | string[] | undefined): string[] {
   if (!value) return [];
   return Array.isArray(value) ? value : [value];
+}
+
+function diklandRefKey(ref: DiklandRef): string {
+  return JSON.stringify([
+    ref.folderPath,
+    ref.driveUrl,
+    ref.author,
+    ref.year,
+    ref.notes,
+  ]);
 }
 
 function qidFor(organization: E74Organization): string {
@@ -220,6 +232,15 @@ function OrganizationsPageInner() {
       )
     : [];
   const appellations = details?.appellations ?? [];
+  const diklandRefs = useMemo(() => {
+    const refs = new Map<string, DiklandRef>();
+    for (const plantation of details?.gazetteerPlantations ?? []) {
+      for (const ref of plantation.diklandRefs) {
+        refs.set(diklandRefKey(ref), ref);
+      }
+    }
+    return [...refs.values()];
+  }, [details]);
   const years = observations.map((observation) => Number(observation.observationYear)).filter(Number.isFinite);
 
   function selectOrganization(organization: E74Organization) {
@@ -427,6 +448,27 @@ function OrganizationsPageInner() {
                     </div>
                   )}
                 </section>
+
+                {diklandRefs.length > 0 && (
+                  <section className="px-4 py-4 sm:px-5">
+                    <h3 className="mb-2 text-xs font-semibold uppercase text-ink/55">Dikland collection</h3>
+                    <div className="divide-y divide-ink/10 border-y border-ink/10 bg-white">
+                      {diklandRefs.map((ref) => (
+                        <div key={`dikland-ref-${diklandRefKey(ref)}`} className="px-3 py-2 text-xs">
+                          <a href={ref.driveUrl} target="_blank" rel="noreferrer" className="break-all font-mono text-teal-strong hover:underline">
+                            {ref.folderPath}
+                          </a>
+                          {(ref.author || ref.year) && (
+                            <p className="mt-1 text-ink/50">
+                              {[ref.author, ref.year].filter(Boolean).join(', ')}
+                            </p>
+                          )}
+                          {ref.notes && <p className="mt-1 text-ink/65">{ref.notes}</p>}
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                )}
 
                 <section className="px-4 py-4 sm:px-5">
                   <h3 className="mb-2 text-xs font-semibold uppercase text-ink/55">Source appellations</h3>
