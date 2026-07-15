@@ -194,6 +194,10 @@
       "@id": "stm:hasOrganizationalAssociation",
       "@type": "@id"
     },
+    "associatedPhysicalPlantation": {
+      "@id": "stm:associatedPhysicalPlantation",
+      "@type": "@id"
+    },
     "hasDerivedInference": {
       "@id": "stm:hasDerivedInference",
       "@type": "@id"
@@ -466,25 +470,29 @@
       "@id": "stm:sranantongoName",
       "@type": "xsd:string"
     },
-    "hasParts": {
-      "@id": "stm:hasParts",
+    "reportedComponentOrganization": {
+      "@id": "stm:reportedComponentOrganization",
       "@type": "@id"
     },
-    "hasPartLabels": {
-      "@id": "stm:hasPartLabels",
+    "reportedComponentOrganizationLabel": {
+      "@id": "stm:reportedComponentOrganizationLabel",
       "@type": "xsd:string"
     },
-    "partOf": {
-      "@id": "stm:partOf",
+    "reportedCompositeOrganization": {
+      "@id": "stm:reportedCompositeOrganization",
       "@type": "@id"
     },
-    "partOfLabel": {
-      "@id": "stm:partOfLabel",
+    "reportedCompositeOrganizationLabel": {
+      "@id": "stm:reportedCompositeOrganizationLabel",
       "@type": "xsd:string"
     },
-    "ownedBy": {
-      "@id": "stm:ownedBy",
+    "reportedOwnerOrganization": {
+      "@id": "stm:reportedOwnerOrganization",
       "@type": "@id"
+    },
+    "reportedOwnerOrganizationLabel": {
+      "@id": "stm:reportedOwnerOrganizationLabel",
+      "@type": "xsd:string"
     },
     "enslavedSharedWith": {
       "@id": "stm:enslavedSharedWith",

@@ -46,8 +46,12 @@ migration. It stops if anything outside the right-hand column changes.
 3. Replace only Almanakken-derived product and lifecycle assertions.
 4. Replace materialized annual observations, withholding ambiguous E25
    projections when several active physical places share an E74 QID.
-5. Generate aggregate JSON-LD and per-place linked-data records.
-6. Validate the JSON-LD context, provenance, entity targets, and row coverage.
+5. Resolve subject, ownership, and component/composite QIDs to local E74
+   records; keep those relationships on their dated E13 source rows.
+6. Generate reciprocal E25-E74 association links without asserting ownership.
+7. Generate aggregate JSON-LD and per-place linked-data records.
+8. Validate the JSON-LD context, provenance, reciprocal entity targets, and row
+   coverage.
 
 The runnable transition diagram is
 [`almanakken-v2-migration.mmd`](almanakken-v2-migration.mmd).

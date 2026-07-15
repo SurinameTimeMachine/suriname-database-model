@@ -110,6 +110,39 @@ function confirmedPhysicalLinkQids(
   );
 }
 
+function gazetteerPlantationUrisByQid(): Map<string, string[]> {
+  if (!existsSync(GAZETTEER_PATH)) return new Map();
+  const document = JSON.parse(readFileSync(GAZETTEER_PATH, 'utf-8')) as {
+    '@graph'?: Array<Record<string, unknown>>;
+  };
+  const urisByQid = new Map<string, string[]>();
+  for (const entry of document['@graph'] ?? []) {
+    if (
+      entry.type !== 'plantation' ||
+      entry.deprecated ||
+      entry.mergedInto ||
+      typeof entry.id !== 'string'
+    ) {
+      continue;
+    }
+    const links = Array.isArray(entry.externalLinks)
+      ? (entry.externalLinks as Array<Record<string, unknown>>)
+      : [];
+    const qid = links.find(
+      (link) =>
+        link.authority === 'wikidata' &&
+        typeof link.identifier === 'string' &&
+        /^Q\d+$/.test(link.identifier),
+    )?.identifier as string | undefined;
+    if (!qid) continue;
+    urisByQid.set(qid, [
+      ...(urisByQid.get(qid) ?? []),
+      `${BASE}place/${entry.id}#feature`,
+    ]);
+  }
+  return urisByQid;
+}
+
 // --- Entity builders ---
 
 function buildE22Sources(
@@ -249,6 +282,9 @@ function buildE74Organizations(
   observations: ObservationRow[],
   appellationIndex: Map<string, string[]>,
   overrides: Map<string, OrganizationOverride>,
+  plantationUrisByQid: Map<string, string[]>,
+  gazetteerPlantationUris: Map<string, string[]>,
+  confirmedPhysicalLinks: Set<string>,
 ): {
   entities: Record<string, unknown>[];
   provenance: Record<string, unknown>[];
@@ -256,15 +292,22 @@ function buildE74Organizations(
 } {
   const namesByQid = new Map<string, Map<string, number>>();
   const psurByQid = new Map<string, Set<string>>();
+  const allQids = new Set<string>();
+
+  const addQid = (qid: string) => {
+    if (/^Q\d+$/.test(qid)) allQids.add(qid);
+  };
 
   const addName = (qid: string, name: string) => {
-    if (!qid || !name.trim()) return;
+    addQid(qid);
+    if (!/^Q\d+$/.test(qid) || !name.trim()) return;
     const names = namesByQid.get(qid) ?? new Map<string, number>();
     names.set(name.trim(), (names.get(name.trim()) ?? 0) + 1);
     namesByQid.set(qid, names);
   };
   const addPsur = (qid: string, value: string) => {
-    if (!qid || !value.trim()) return;
+    addQid(qid);
+    if (!/^Q\d+$/.test(qid) || !value.trim()) return;
     const identifiers = psurByQid.get(qid) ?? new Set<string>();
     for (const id of value.split(/[;,]/).map((part) => part.trim()).filter(Boolean)) {
       identifiers.add(id);
@@ -274,20 +317,35 @@ function buildE74Organizations(
 
   for (const plantation of plantations) {
     if (!plantation.wikidata_qid) continue;
+    addQid(plantation.wikidata_qid);
     addName(plantation.wikidata_qid, plantation.prefLabel);
     for (const id of plantation.psur_ids) addPsur(plantation.wikidata_qid, id);
   }
   for (const observation of observations) {
-    if (!observation.plantation_qid) continue;
-    addName(
-      observation.plantation_qid,
-      observation.standardized_name || observation.observed_name,
-    );
-    addName(observation.plantation_qid, observation.observed_name);
-    addPsur(observation.plantation_qid, observation.psur_id);
+    if (observation.plantation_qid) {
+      addQid(observation.plantation_qid);
+      addName(
+        observation.plantation_qid,
+        observation.standardized_name || observation.observed_name,
+      );
+      addName(observation.plantation_qid, observation.observed_name);
+      addPsur(observation.plantation_qid, observation.psur_id);
+    }
+    for (const [qid, label] of [
+      [observation.has_parts1_id, observation.has_parts1_lab],
+      [observation.has_parts2_id, observation.has_parts2_lab],
+      [observation.has_parts3_id, observation.has_parts3_lab],
+      [observation.has_parts4_id, observation.has_parts4_lab],
+      [observation.part_of_id, observation.part_of_lab],
+      [observation.owned_by_id, observation.owned_by_lab],
+      [observation.owned_by_id2, observation.owned_by_lab],
+    ]) {
+      addQid(qid);
+      addName(qid, label);
+    }
   }
 
-  const qids = [...new Set([...namesByQid.keys(), ...psurByQid.keys()])].sort();
+  const qids = [...allQids].sort();
   const uriByQid = new Map(qids.map((qid) => [qid, `${BASE}organization/${qid}`]));
   const provenance: Record<string, unknown>[] = [];
   const entities = qids.map((qid) => {
@@ -332,6 +390,24 @@ function buildE74Organizations(
     }
     if (appUris.length > 0) {
       entity.P1_is_identified_by = appUris.length === 1 ? appUris[0] : appUris;
+    }
+    const mappedPlantations = plantationUrisByQid.get(qid) ?? [];
+    const curatedPlantations = gazetteerPlantationUris.get(qid) ?? [];
+    const physicalPlantations = [
+      ...new Set([...mappedPlantations, ...curatedPlantations]),
+    ];
+    if (physicalPlantations.length > 0) {
+      entity.associatedPhysicalPlantation =
+        physicalPlantations.length === 1
+          ? physicalPlantations[0]
+          : physicalPlantations;
+      entity.organizationAssociationStatus =
+        (mappedPlantations.length > 1 || curatedPlantations.length > 1) &&
+        !confirmedPhysicalLinks.has(qid)
+          ? 'needs-physical-link-review'
+          : 'linked';
+    } else {
+      entity.organizationAssociationStatus = 'needs-physical-plantation-link';
     }
     provenance.push({
       '@id': provId,
@@ -741,7 +817,7 @@ function buildObservations(
       o.has_parts2_id,
       o.has_parts3_id,
       o.has_parts4_id,
-    ].filter(Boolean);
+    ].filter((qid) => organizationUriByQid.has(qid));
     const splitLabels = [
       o.has_parts1_lab,
       o.has_parts2_lab,
@@ -749,16 +825,30 @@ function buildObservations(
       o.has_parts4_lab,
     ].filter(Boolean);
     if (splitIds.length > 0) {
-      entity.hasParts = splitIds.map((id) => `${WD}${id}`);
-      entity.mergedInto = `${WD}${splitIds[0]}`;
+      entity.reportedComponentOrganization = splitIds.map(
+        (id) => organizationUriByQid.get(id)!,
+      );
     }
-    if (splitLabels.length > 0) entity.hasPartLabels = splitLabels;
-    if (o.part_of_id) entity.partOf = `${WD}${o.part_of_id}`;
-    if (o.part_of_lab) entity.partOfLabel = o.part_of_lab;
+    if (splitLabels.length > 0) {
+      entity.reportedComponentOrganizationLabel = splitLabels;
+    }
+    const compositeOrganizationUri = organizationUriByQid.get(o.part_of_id);
+    if (compositeOrganizationUri) {
+      entity.reportedCompositeOrganization = compositeOrganizationUri;
+    }
+    if (o.part_of_lab) {
+      entity.reportedCompositeOrganizationLabel = o.part_of_lab;
+    }
     if (o.owned_by_id || o.owned_by_id2) {
-      entity.ownedBy = [o.owned_by_id, o.owned_by_id2]
-        .filter(Boolean)
-        .map((id) => `${WD}${id}`);
+      const ownerUris = [o.owned_by_id, o.owned_by_id2]
+        .map((qid) => organizationUriByQid.get(qid))
+        .filter((uri): uri is string => Boolean(uri));
+      if (ownerUris.length > 0) {
+        entity.reportedOwnerOrganization = ownerUris;
+      }
+    }
+    if (o.owned_by_lab) {
+      entity.reportedOwnerOrganizationLabel = o.owned_by_lab;
     }
     if (o.enslaved_shared_with) {
       entity.enslavedSharedWith = o.enslaved_shared_with;
@@ -1010,6 +1100,15 @@ function main() {
   const organizationQids = new Set([
     ...plantResult.e25.map((plantation) => plantation.wikidata_qid),
     ...almResult.observations.map((observation) => observation.plantation_qid),
+    ...almResult.observations.flatMap((observation) => [
+      observation.has_parts1_id,
+      observation.has_parts2_id,
+      observation.has_parts3_id,
+      observation.has_parts4_id,
+      observation.part_of_id,
+      observation.owned_by_id,
+      observation.owned_by_id2,
+    ]),
   ].filter(Boolean));
   const organizationUriByQid = new Map(
     [...organizationQids].map((qid) => [qid, `${BASE}organization/${qid}`]),
@@ -1018,6 +1117,7 @@ function main() {
   const confirmedPhysicalLinks = confirmedPhysicalLinkQids(
     organizationOverrides,
   );
+  const gazetteerPlantationUris = gazetteerPlantationUrisByQid();
   const almanacAppellations = almResult.appellations.map((appellation) => {
     const authorityUri = Array.isArray(appellation.identifies_uri)
       ? appellation.identifies_uri[0] ?? ''
@@ -1115,6 +1215,9 @@ function main() {
     almResult.observations,
     appellationIndex,
     organizationOverrides,
+    plantationUrisByQid,
+    gazetteerPlantationUris,
+    confirmedPhysicalLinks,
   );
   console.log(`  E74 Organizations: ${organizationResult.entities.length}`);
 

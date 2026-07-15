@@ -36,7 +36,9 @@ Step-by-step record of every modeling decision, change, and planned extension. E
 
 ### Step 2.1 -- E74 Organization as separate entity from E25
 
-**What:** The legal/social entity operating a plantation (E74 Group) is a separate entity from the physical plantation (E25). They are linked by `P52 has current owner` (E25 -> E74).
+**What:** The legal/social plantation organization (E74 Group) is separate from
+the physical plantation (E25). A shared researched QID links them with the
+reciprocal STM association properties documented in ADR 0006.
 
 **Why:** "Geijersvlijt" the coffee plantation (physical thing with soil and buildings) is not the same as "Geijersvlijt" the organization (legal entity with owners, administrators, enslaved people). Organizations can be absorbed, merged, or transferred independently of the physical land. Keeping them separate allows tracking organizational changes (ownership transfers, mergers) independently of physical changes (boundary shifts, building construction).
 
@@ -44,19 +46,26 @@ Step-by-step record of every modeling decision, change, and planned extension. E
 
 **Enables:** Tracking ownership transfers over time. Answering: _who owned plantation X in year Y?_ (L03), _trace organizational mergers_ (temporal changes section).
 
-### Step 2.2 -- P52 has current owner (not custom operatedBy)
+### Step 2.2 -- Association is not automatic ownership
 
-**What:** Use standard CIDOC-CRM `P52 has current owner` and `P51 has former or current owner` to connect E25 to E74, instead of a custom `operatedBy` property.
+**What:** Use `stm:hasOrganizationalAssociation` and its published reciprocal
+`stm:associatedPhysicalPlantation` for the QID correspondence. Use P51/P52 only
+when a dated source supports legal ownership of the physical feature.
 
-**Why:** P52 is the correct CIDOC-CRM property for this relationship (E18 Physical Thing -> E39 Actor). Using standard properties means interoperability with other CIDOC-CRM datasets and no need to maintain custom vocabulary documentation.
+**Why:** The shared QID says that the physical and organizational records belong
+to the same researched plantation complex. It does not say that the E74 owned
+the land at the publication date.
 
-**Enables:** Standard CIDOC-CRM queries. Other projects can understand the relationship without reading our custom vocabulary.
+**Enables:** Bidirectional discovery without overstating ownership.
 
 ### Step 2.3 -- Q-ID as linking key
 
-**What:** Wikidata Q-IDs are the primary identifier for E74 organizations (`wd:Q4392658`). Both QGIS CSV (`qid` column) and Almanakken CSV (`plantation_id` column) use Q-IDs to refer to the same organization.
+**What:** Local HTTPS URIs are the primary identifiers for E74 organizations.
+Each organization has `skos:exactMatch` to its Wikidata QID. Both QGIS `qid`
+and Almanakken `plantation_id` use that QID as the matching key.
 
-**Why:** Q-IDs are stable, globally unique, and already assigned for most Surinamese plantations. They provide a ready-made bridge between our two main datasets. Using `wd:` URIs directly means our data links to the broader Wikidata knowledge graph.
+**Why:** QIDs provide a bridge between sources, while local identifiers keep the
+STM record editable and retrievable independently of Wikidata.
 
 **Enables:** Joining QGIS polygons to Almanakken observations. Answering: cross-source linking queries (X06).
 
@@ -116,7 +125,7 @@ E41a --P139 has alternative form--> E41b
 
 ---
 
-## Phase 5: Structural relationships (TO DO)
+## Phase 5: Structural relationship evidence (IMPLEMENTED)
 
 ### Step 5.1 -- Plantation mergers and splits (has_parts / part_of)
 
@@ -127,16 +136,21 @@ E41a --P139 has alternative form--> E41b
 - `has_parts1_lab`, `has_parts1_id` .. `has_parts4_lab`, `has_parts4_id` -- source references to component plantations
 - `part_of_lab`, `part_of_id` -- source reference to a larger combined plantation
 
-**Rationale:** These columns capture a critical part of Surinamese plantation history -- mergers, splits, and absorptions. The SKILL.md models `P99i was dissolved by` (E68 Dissolution) and `P124i was transformed by` (E81 Transformation) but doesn't map _which CSV columns_ drive this. Without this mapping, a significant part of the plantation network is invisible.
+**Rationale:** These columns expose possible mergers, splits, and combinations.
+They make the network visible, but do not alone establish the CRM events needed
+to assert dissolution or transformation.
 
-**Modeling approach (proposed):**
+**Published profile:**
 
 ```
-E13 observation --stm:hasPartReference--> E74 (has_parts1_id)
-E13 observation --stm:partOfReference--> E74 (part_of_id)
+E13 observation --stm:reportedComponentOrganization--> E74 (has_parts1_id)
+E13 observation --stm:reportedCompositeOrganization--> E74 (part_of_id)
 ```
 
-Using `P107i is current or former member of` (CIDOC-CRM standard for group membership) rather than a custom `partOf` property. When a plantation organization becomes part of a larger merged combination, it is organizational membership -- one E74 group belongs to a larger E74 group.
+These links remain on the dated E13 because the columns are evidence of a
+source-reported structure, not sufficient evidence for a permanent P107
+membership, E68 dissolution, or E81 transformation. Reviewed events can be
+added later without changing the preserved source row.
 
 **Enables:** Answering: plantation network reconstruction, understanding why PSUR IDs may link to a component plantation rather than the combined one.
 
@@ -152,11 +166,14 @@ Using `P107i is current or former member of` (CIDOC-CRM standard for group membe
 
 **Rationale:** Some almanac entries say "see Plantation X" or indicate that plantation A is owned by plantation B. This is an inter-plantation reference network that can help in linking when direct matches are not available.
 
-**Modeling approach (proposed):**
+**Published profile:**
 
 ```
-E13 observation --stm:ownedByReference--> E74 (owned_by_id)
+E13 observation --stm:reportedOwnerOrganization--> E74 (owned_by_id)
 ```
+
+This does not assert P51/P52 ownership of the E25 land. It records what the
+dated Almanakken row reports about the E74 organization.
 
 **Enables:** Following reference chains for linking. If plantation A has no direct PSUR link, but its reference plantation B does, we can trace the path.
 
@@ -203,10 +220,12 @@ Using `skos:closeMatch` (not `owl:sameAs` or `skos:exactMatch`) because the matc
 **Modeling approach (proposed):**
 
 ```
-E25 polygon --P52--> E74 (qid, primary org)
-E25 polygon --P51--> E74 (qid_alt, former org, now absorbed)
-E74 (qid_alt) --P99i was dissolved by--> E68 Dissolution --P14 carried out by--> E74 (qid)
+E25 polygon --skos:closeMatch--> wd:qid
+E25 polygon --skos:closeMatch--> wd:qid_alt
 ```
+
+`qid_alt` remains an authority hint. Ownership, absorption, dissolution, and
+transformation require separate reviewed assertions with sources and dates.
 
 **Enables:** Tracing plantation identity through mergers. Answering: _link plantation across maps from different years_ (X06).
 
@@ -360,10 +379,9 @@ Example -- Geijersvlijt:
 | Property                           | Domain -> Range         | Why used                           |
 | ---------------------------------- | ----------------------- | ---------------------------------- |
 | P1 is identified by                | E1 -> E41               | Names assigned to entities         |
-| P52 has current owner              | E18 -> E39              | Plantation owned by organization   |
-| P51 has former or current owner    | E18 -> E39              | Historical ownership (qid_alt)     |
 | P53 has former or current location | E18 -> E53              | Plantation at a place              |
-| P107i is member of                 | E74 -> E74              | Sub-organization belongs to parent |
+| stm:hasOrganizationalAssociation   | E25 -> E74              | Researched QID correspondence      |
+| stm:associatedPhysicalPlantation   | E74 -> E25              | Reciprocal QID correspondence      |
 | P128 carries                       | E18 -> E90              | Physical source carries a name     |
 | P138 represents                    | E36 -> E1               | Visual item depicts a thing        |
 | P139 has alternative form          | E41 -> E41              | Variant spellings linked           |
@@ -372,4 +390,6 @@ Example -- Geijersvlijt:
 | geo:asWKT                          | geo:Geometry -> literal | GeoSPARQL spatial encoding         |
 | skos:closeMatch                    | concept -> concept      | PSUR ID approximate link           |
 | P140 assigned attribute to         | E13 -> E74              | Annual snapshot of org             |
-| P99i was dissolved by              | E74 -> E68              | Plantation org dissolution         |
+| stm:reportedOwnerOrganization      | E13 -> E74              | Dated v2 ownership reference       |
+| stm:reportedComponentOrganization  | E13 -> E74              | Dated v2 component reference       |
+| stm:reportedCompositeOrganization  | E13 -> E74              | Dated v2 composite reference       |

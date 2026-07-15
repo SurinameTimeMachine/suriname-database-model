@@ -211,6 +211,10 @@ function wikidataUri(identifier: string): string {
   return `http://www.wikidata.org/entity/${identifier}`;
 }
 
+function organizationUri(identifier: string): string {
+  return `${BASE}organization/${identifier}`;
+}
+
 function externalLinkUri(link: ExternalLink): string | null {
   if (!link.identifier) return null;
   if (link.authority === 'wikidata') return wikidataUri(link.identifier);
@@ -283,6 +287,36 @@ export function generatePlaceRecords() {
     const names = namesFor(entry);
     const label = preferredName(names);
     const graph: JsonObject[] = [];
+    const organizationNodes = new Map<string, JsonObject>();
+    const ensureOrganization = (
+      qid: string,
+      organizationLabel?: string,
+      physicalPlantationUri?: string,
+    ): string => {
+      const uri = organizationUri(qid);
+      let organization = organizationNodes.get(qid);
+      if (!organization) {
+        organization = {
+          '@id': uri,
+          '@type': ['crm:E74_Group'],
+          'rdfs:label': organizationLabel || qid,
+          'skos:exactMatch': wikidataUri(qid),
+          organizationAssociationStatus: 'needs-physical-plantation-link',
+        };
+        organizationNodes.set(qid, organization);
+        graph.push(organization);
+      } else if (
+        organizationLabel &&
+        organization['rdfs:label'] === qid
+      ) {
+        organization['rdfs:label'] = organizationLabel;
+      }
+      if (physicalPlantationUri) {
+        organization.associatedPhysicalPlantation = physicalPlantationUri;
+        organization.organizationAssociationStatus = 'linked';
+      }
+      return uri;
+    };
     const productTypeUris = new Set<string>();
     const referencedSourceIds = new Set<string>(entry.sources ?? []);
     for (const name of names) if (name.source) referencedSourceIds.add(name.source);
@@ -307,6 +341,15 @@ export function generatePlaceRecords() {
     graph.push(record);
 
     if (hasFeature) {
+      const plantationQid =
+        entry.type === 'plantation'
+          ? entry.externalLinks?.find(
+              (link) =>
+                link.authority === 'wikidata' &&
+                typeof link.identifier === 'string' &&
+                /^Q\d+$/.test(link.identifier),
+            )?.identifier
+          : undefined;
       const feature: JsonObject = {
         '@id': featureUri,
         '@type': [`crm:${placeClass}`],
@@ -315,6 +358,16 @@ export function generatePlaceRecords() {
         P53_has_location: locationUri,
         'prov:wasDerivedFrom': [...sourceUris],
       };
+      if (plantationQid) {
+        feature.hasOrganizationalAssociation = ensureOrganization(
+          plantationQid,
+          label,
+          featureUri,
+        );
+        feature.organizationAssociationStatus = 'linked';
+      } else if (entry.type === 'plantation') {
+        feature.organizationAssociationStatus = 'needs-organization-link';
+      }
       for (const link of entry.externalLinks ?? []) {
         const uri = externalLinkUri(link);
         if (!uri) continue;
@@ -548,14 +601,20 @@ export function generatePlaceRecords() {
         `observation-almanakken-${evidence.recordId}-time-span`,
       );
       if (evidence.year) graph.push(timeSpan(spanUri, evidence.year)!);
+      const evidenceOrganizationUri = ensureOrganization(
+        evidence.qid,
+        evidence.plantationStandardized || evidence.plantationOriginal,
+        undefined,
+      );
       const observation: JsonObject = {
         '@id': evidenceUri,
         '@type': ['crm:E13_Attribute_Assignment'],
-        P140_assigned_attribute_to: targetUri,
+        P140_assigned_attribute_to: evidenceOrganizationUri,
         ...(evidence.year ? { P4_has_time_span: spanUri } : {}),
         'prov:hadPrimarySource': sourceUri('almanakken', sourceIds),
         sourceRow: evidence.recordId,
         sourceVersion: evidence.sourceVersion,
+        sourcePlantationQid: evidence.qid,
         ...(evidence.plantationOriginal ? { P3_has_note: evidence.plantationOriginal } : {}),
         ...(evidence.page ? { pageReference: evidence.page } : {}),
         ...(evidence.littera ? { littera: evidence.littera } : {}),
@@ -576,16 +635,20 @@ export function generatePlaceRecords() {
         ...(evidence.psurIds?.length ? { psurIds: evidence.psurIds } : {}),
         ...(evidence.hasParts?.length
           ? {
-              hasParts: evidence.hasParts.map((part) => wikidataUri(part.qid)),
-              hasPartLabels: evidence.hasParts
+              reportedComponentOrganization: evidence.hasParts.map((part) =>
+                ensureOrganization(part.qid, part.label),
+              ),
+              reportedComponentOrganizationLabel: evidence.hasParts
                 .map((part) => part.label)
                 .filter(Boolean),
             }
           : {}),
         ...(evidence.partOf?.length
           ? {
-              partOf: evidence.partOf.map((part) => wikidataUri(part.qid)),
-              partOfLabel: evidence.partOf
+              reportedCompositeOrganization: evidence.partOf.map((part) =>
+                ensureOrganization(part.qid, part.label),
+              ),
+              reportedCompositeOrganizationLabel: evidence.partOf
                 .map((part) => part.label)
                 .filter(Boolean),
             }
@@ -595,8 +658,10 @@ export function generatePlaceRecords() {
           : {}),
         ...(evidence.ownedBy?.length
           ? {
-              ownedBy: evidence.ownedBy.map((owner) => wikidataUri(owner.qid)),
-              ownedByLabel: evidence.ownedBy
+              reportedOwnerOrganization: evidence.ownedBy.map((owner) =>
+                ensureOrganization(owner.qid, owner.label),
+              ),
+              reportedOwnerOrganizationLabel: evidence.ownedBy
                 .map((owner) => owner.label)
                 .filter(Boolean),
             }

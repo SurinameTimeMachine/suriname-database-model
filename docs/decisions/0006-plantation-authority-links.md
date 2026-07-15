@@ -57,6 +57,31 @@ statement. Publish P51/P52 only when a source supports ownership of the
 physical feature for a stated time. Operational, labor, residence, and
 coercive relations require their own source-qualified assertions.
 
+Publish this correspondence in both directions with
+`stm:hasOrganizationalAssociation` from E25 to E74 and
+`stm:associatedPhysicalPlantation` from E74 to E25. These are project-profile
+association properties, not ownership properties. An E74 without a matched
+physical feature is retained with `needs-physical-plantation-link`; it is not
+dropped merely because it appears only as the target of a v2 relationship.
+
+### Dated ownership and structural references
+
+The v2 `owned_by_id`, `has_parts*_id`, and `part_of_id` QIDs identify E74
+organizations. They mint or resolve local E74 records and are projected from
+the dated, source-qualified E13 row as:
+
+- `stm:reportedOwnerOrganization`;
+- `stm:reportedComponentOrganization`;
+- `stm:reportedCompositeOrganization`.
+
+The wording is intentionally evidential. A row does not by itself establish a
+permanent current owner, organizational membership, dissolution, merger, or
+physical transformation. Do not generate P51/P52, P107, E68, or E81 from these
+columns alone. A later reconciliation may create such CRM events or relations
+only when the source meaning, participants, and time interval have been
+reviewed. The source labels and original reference text remain available beside
+the linked local organizations.
+
 ### Shared names and projections
 
 CIDOC CRM P1 is many-to-many. Do not duplicate an E41 merely because the same

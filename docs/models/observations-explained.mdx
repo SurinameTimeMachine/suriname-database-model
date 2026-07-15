@@ -201,12 +201,13 @@ A single `eigenaren` field may contain: `"J.H. Franke, E.G. Veldwijk en de Curat
 
 ## Layer 10 --- Mergers, Splits, and Structural Relationships
 
-**Relationships:**
+The Almanakken columns are annual, source-qualified evidence. They do not by
+themselves prove permanent membership, dissolution, merger, or physical
+transformation. The publication keeps all three link types on the dated E13:
 
-- `E74 --P99i was dissolved by--> E68 Dissolution` (organization dissolved by successor)
-- `E25 --P124i was transformed by--> E81 Transformation` (physical plantation merged)
-- `E74 --P107i is member of--> E74` (part-of relationship)
-- `E74 --crm:P67_refers_to--> E74` (inter-plantation reference)
+- `stm:reportedComponentOrganization` for `has_parts*_id`;
+- `stm:reportedCompositeOrganization` for `part_of_id`;
+- `stm:reportedOwnerOrganization` for `owned_by_id` and `owned_by_id2`.
 
 ```mermaid
 %%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#e8f4ea'}}}%%
@@ -233,57 +234,54 @@ flowchart TB
         (owned_by_id)"]
     end
 
-    SPLIT1 -->|"P99i was dissolved by<br/>(E68 Dissolution)"| MAIN
-    SPLIT2 -->|"P99i was dissolved by<br/>(E68 Dissolution)"| MAIN
-    MAIN -->|"P107i is member of"| PARENT
-    MAIN -->|"crm:P67_refers_to"| REF
+    OBS["E13 dated Almanakken observation"]
+    OBS -->|"reported component"| SPLIT1
+    OBS -->|"reported component"| SPLIT2
+    OBS -->|"assigned to"| MAIN
+    OBS -->|"reported composite"| PARENT
+    OBS -->|"reported owner"| REF
 
     classDef crm_E39_Actor fill:#ffbdca,stroke:#000000,color:#000000
     class SPLIT1,SPLIT2,MAIN,PARENT,REF crm_E39_Actor
 ```
 
-### Mergers: P99i was dissolved by (E68 Dissolution)
+### Component and composite evidence
 
 Surinamese plantation history is full of mergers. Small coffee plantations were absorbed by larger sugar plantations as the coffee economy declined. Almanakken v2 records structural references in the `has_parts` columns:
 
 - `has_parts1_lab` / `has_parts1_id` through `has_parts4_lab` / `has_parts4_id` record referenced component plantations.
 
-When `has_parts1_id = Q59115689` on the row for `plantation_id = Q4392658`, it records:
+When `has_parts1_id = Q59115689` occurs on the row for
+`plantation_id = Q4392658`, the publication records:
 
 ```
-E74 Q59115689 (Heystvliet) --P99i was dissolved by--> E68 Dissolution
-E68 Dissolution --P14 carried out by--> E74 Q4392658 (Geijersvlijt, successor)
+E13 row --P140 assigned attribute to--> E74 Q4392658 (Geijersvlijt)
+E13 row --stm:reportedComponentOrganization--> E74 Q59115689 (Heystvliet)
 ```
 
-The dissolved organization's Q-ID still exists in Wikidata but is marked as having been dissolved. This matters for PSUR linking --- a PSUR ID might reference the dissolved plantation, not the surviving one. Without tracking the dissolution, that link would break.
+The label and original reference text stay on the observation. Researchers can
+later reconcile this into E66/E68/E81 events if other evidence establishes
+what changed, when it changed, and whether the organization, physical
+plantation, or both were affected.
 
-On the QGIS side, the `qid_alt` column captures the same phenomenon: a polygon has a primary Q-ID (`qid`) and an alternative Q-ID (`qid_alt`) for the dissolved entity:
-
-```
-E25 polygon --P52 has current owner--> E74 (qid, surviving org)
-E25 polygon --P51 has former or current owner--> E74 (qid_alt, dissolved org)
-E74 (qid_alt) --P99i was dissolved by--> E68 Dissolution --P14 carried out by--> E74 (qid)
-```
-
-### Part-of: P107i is member of
-
-Some plantations are part of larger merged combinations. The `part_of_lab` / `part_of_id` columns record this:
+The `part_of_lab` / `part_of_id` columns use the same evidence pattern:
 
 ```
-E74 (plantation_id) --P107i is member of--> E74 (part_of_id)
+E13 row --stm:reportedCompositeOrganization--> E74 (part_of_id)
 ```
 
-We use CIDOC-CRM's standard `P107 has current or former member` (inverse: `P107i is current or former member of`) because this is organizational membership --- one E74 group belongs to a larger E74 group around. This is standard CRM for nested organizations.
-
-### References: crm:P67_refers_to
+### Reported ownership
 
 Some almanac entries indicate that one plantation organization is owned by another. The `owned_by_id` / `owned_by_id2` / `owned_by_lab` columns capture this:
 
 ```
-E13 observation --stm:ownedByReference--> E74 (owned_by_id)
+E13 observation --stm:reportedOwnerOrganization--> E74 (owned_by_id)
 ```
 
-This is a weaker link than absorption or membership --- it indicates a reference relationship that may be ownership, administrative connection, or simply that the almanac clerk pointed researchers to another entry for more information. The reference network is valuable for linking when direct PSUR matches fail: if plantation A references plantation B, and B has a PSUR ID, we may be able to trace A through B.
+This is ownership reported for the E74 organization in one dated row. It is not
+a P51/P52 claim that the referenced organization owned the E25 land. It also
+remains distinct from the verbatim owner-name transcription, which has not yet
+been reconciled to a person or organization authority record.
 
 ---
 
@@ -375,7 +373,8 @@ flowchart LR
     (Almanakken row)"]
 
     E74_ORG ---|"skos:closeMatch"| PSUR
-    E25 -->|"P52 has current owner"| E74_ORG
+    E25 -->|"stm:hasOrganizationalAssociation"| E74_ORG
+    E74_ORG -->|"stm:associatedPhysicalPlantation"| E25
     ALM -->|"P140 assigned attribute to"| E74_ORG
 
     classDef crm_E39_Actor fill:#ffbdca,stroke:#000000,color:#000000
@@ -408,13 +407,17 @@ Consider this scenario:
 - But by 1930, Geijersvlijt had absorbed "Kl. Suzanna'sdal" (Q131349015)
 - The QGIS polygon for Geijersvlijt also carries `psur_id2` for the absorbed plantation
 
-Without the merger network (Layer 10), you cannot know that PSUR0118 connects through a dissolution chain. The `skos:closeMatch` on E74, combined with `P99i was dissolved by`, gives us the full picture:
+The Layer 10 reference network makes the possible connection visible without
+claiming a dissolution chain that the row alone cannot establish:
 
 ```
-E74 Q4392658 (Geijersvlijt) --skos:closeMatch--> psur:PSUR0118
-E74 Q131349015 (Kl. Suzanna'sdal) --P99i was dissolved by--> E68 Dissolution --P14 carried out by--> E74 Q4392658
-E74 Q131349015 --skos:closeMatch--> psur:PSUR02xx (if assigned)
+E13 row for Q4392658 --stm:reportedComponentOrganization--> E74 Q131349015
+E74 Q4392658 --stm:psurId--> "PSUR0118"
+E74 Q131349015 --stm:psurId--> "PSUR02xx" (if assigned)
 ```
+
+A reviewed follow-up assertion may add an E68 dissolution or E81
+transformation, with its own source and time-span.
 
 ---
 
@@ -436,7 +439,8 @@ flowchart TB
         E22 -->|"P128 carries"| E36
         E36 -->|"P138 represents"| E25
         E25 -->|"P53 has location"| E53
-        E25 -->|"P52 has current owner"| E74_ORG
+        E25 -->|"stm:hasOrganizationalAssociation"| E74_ORG
+        E74_ORG -->|"stm:associatedPhysicalPlantation"| E25
     end
 
     subgraph "Observation Pattern (temporal)"
@@ -445,11 +449,11 @@ flowchart TB
         PO["PersonObservation
         'Abraham de Leon'
         role: owner"]
-        SPLIT["E74 Dissolved org"]
+        SPLIT["E74 referenced component"]
 
         OBS -->|"P140 assigned attribute to"| E74_ORG
         OBS -->|"P14 carried out by<br/>(P14.1 role: picot:owner)"| PO
-        SPLIT -->|"P99i was dissolved by<br/>(E68 Dissolution)"| E74_ORG
+        OBS -->|"reported component organization"| SPLIT
     end
 
     subgraph "External linking"
@@ -477,9 +481,9 @@ flowchart TB
 
 The E74 Organization is the meeting point. Everything connects through it:
 
-- The plantation (E25) is owned by it (P52)
+- The plantation (E25) has a reciprocal researched association with it
 - The observations describe it (P140 assigned attribute to)
 - The people relate to it (via P14 carried out by, with role qualifiers)
 - The PSUR links identify it (skos:closeMatch)
-- Dissolved organizations connect to it (P99i was dissolved by -> E68 Dissolution)
+- Dated ownership and component/composite references connect other E74 records
 - The Q-ID is its permanent identifier, shared across datasets

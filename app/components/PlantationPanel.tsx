@@ -248,6 +248,26 @@ function AppellationRow({
   );
 }
 
+function relationSummary(
+  targets?: string | string[],
+  labels?: string | string[],
+): string | null {
+  const targetList = targets
+    ? Array.isArray(targets)
+      ? targets
+      : [targets]
+    : [];
+  const labelList = labels
+    ? Array.isArray(labels)
+      ? labels
+      : [labels]
+    : [];
+  if (targetList.length === 0) return null;
+  return targetList
+    .map((target, index) => labelList[index] || labelList[0] || uriLabel(target))
+    .join(', ');
+}
+
 function TimelineEntry({
   obs,
   sourceLabel,
@@ -361,6 +381,33 @@ function TimelineEntry({
             crmClass="E39"
             property="P14 carried out by"
             value={obs.hasOwner}
+          />
+          <CrmField
+            label="Reported owner organization"
+            crmClass="E74"
+            property="STM reported owner organization"
+            value={relationSummary(
+              obs.reportedOwnerOrganization,
+              obs.reportedOwnerOrganizationLabel,
+            )}
+          />
+          <CrmField
+            label="Reported component organizations"
+            crmClass="E74"
+            property="STM reported component organization"
+            value={relationSummary(
+              obs.reportedComponentOrganization,
+              obs.reportedComponentOrganizationLabel,
+            )}
+          />
+          <CrmField
+            label="Reported composite organization"
+            crmClass="E74"
+            property="STM reported composite organization"
+            value={relationSummary(
+              obs.reportedCompositeOrganization,
+              obs.reportedCompositeOrganizationLabel,
+            )}
           />
           <CrmField
             label="Administrator"
@@ -1037,16 +1084,6 @@ export default function PlantationPanel({
                         : organization.psurId
                     }
                     mono
-                  />
-                  <CrmField
-                    label="Dissolved by"
-                    crmClass="E68"
-                    property="P99i was dissolved by"
-                    value={
-                      organization.absorbedInto
-                        ? uriLabel(organization.absorbedInto)
-                        : null
-                    }
                   />
                 </div>
               ) : (

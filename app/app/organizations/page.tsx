@@ -74,7 +74,41 @@ function statusClass(status: string): string {
 function associationStatusLabel(status: string): string {
   if (status === 'linked') return 'Linked';
   if (status === 'needs-organization-link') return 'Needs Gazetteer authority link';
+  if (status === 'needs-physical-plantation-link') return 'Needs physical plantation link';
   return 'Needs physical-link review';
+}
+
+function ObservationOrganizationLinks({
+  label,
+  targets,
+  labels,
+}: {
+  label: string;
+  targets?: string | string[];
+  labels?: string | string[];
+}) {
+  const targetList = asArray(targets);
+  const labelList = asArray(labels);
+  if (targetList.length === 0) return null;
+  return (
+    <div>
+      <span className="text-ink/45">{label}: </span>
+      {targetList.map((target, index) => {
+        const qid = target.split('/').pop() ?? target;
+        return (
+          <span key={`organization-link-${target}`}>
+            {index > 0 && ', '}
+            <Link
+              href={`/organizations?organization=${qid}`}
+              className="text-teal-strong hover:underline"
+            >
+              {labelList[index] || labelList[0] || qid}
+            </Link>
+          </span>
+        );
+      })}
+    </div>
+  );
 }
 
 export default function OrganizationsPage() {
@@ -406,14 +440,20 @@ function OrganizationsPageInner() {
                 <section className="px-4 py-4 sm:px-5">
                   <h3 className="mb-2 text-xs font-semibold uppercase text-ink/55">Almanakken observations</h3>
                   {detailsLoading ? <p className="text-sm text-ink/50">Loading observations...</p> : <div className="overflow-x-auto border border-ink/10 bg-white">
-                    <table className="w-full min-w-[680px] border-collapse text-left text-xs">
-                      <thead className="bg-cream text-[10px] uppercase text-ink/50"><tr><th className="px-2 py-2">Year</th><th className="px-2 py-2">Name</th><th className="px-2 py-2">Owner</th><th className="px-2 py-2">Product</th><th className="px-2 py-2">Population</th><th className="px-2 py-2">Inference</th></tr></thead>
+                    <table className="w-full min-w-[880px] border-collapse text-left text-xs">
+                      <thead className="bg-cream text-[10px] uppercase text-ink/50"><tr><th className="px-2 py-2">Year</th><th className="px-2 py-2">Name</th><th className="px-2 py-2">Owner text</th><th className="px-2 py-2">Linked relations</th><th className="px-2 py-2">Product</th><th className="px-2 py-2">Population</th><th className="px-2 py-2">Inference</th></tr></thead>
                       <tbody className="divide-y divide-ink/10">
                         {observations.map((observation) => (
                           <tr key={observation['@id']}>
                             <td className="px-2 py-2 font-mono tabular-nums">{observation.observationYear}</td>
                             <td className="px-2 py-2">{observation.observedName || '-'}</td>
                             <td className="max-w-[220px] truncate px-2 py-2" title={observation.hasOwner}>{observation.hasOwner || '-'}</td>
+                            <td className="min-w-[190px] px-2 py-2">
+                              <ObservationOrganizationLinks label="Reported owner" targets={observation.reportedOwnerOrganization} labels={observation.reportedOwnerOrganizationLabel} />
+                              <ObservationOrganizationLinks label="Components" targets={observation.reportedComponentOrganization} labels={observation.reportedComponentOrganizationLabel} />
+                              <ObservationOrganizationLinks label="Part of" targets={observation.reportedCompositeOrganization} labels={observation.reportedCompositeOrganizationLabel} />
+                              {!observation.reportedOwnerOrganization && !observation.reportedComponentOrganization && !observation.reportedCompositeOrganization && '-'}
+                            </td>
                             <td className="px-2 py-2">{observation.product || '-'}</td>
                             <td className="px-2 py-2 tabular-nums">{observation.enslavedCount ?? '-'}</td>
                             <td className="px-2 py-2 text-[10px]">{observation.presenceInferenceStatus || '-'}</td>

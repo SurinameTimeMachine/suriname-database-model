@@ -46,6 +46,7 @@ export interface ObservationRow {
   free_residents: string;
   owned_by_id: string;
   owned_by_id2: string;
+  owned_by_lab: string;
   enslaved_shared_with: string;
   admin_in_europe: string;
   admin_in_suriname: string;
@@ -195,6 +196,7 @@ export function transformAlmanakken(): AlmanakkenTransformResult {
       free_residents: safeInt(almanakkenField(row, 'vrije_bewoners')),
       owned_by_id: almanakkenField(row, 'owned_by_id'),
       owned_by_id2: almanakkenField(row, 'owned_by_id2'),
+      owned_by_lab: almanakkenField(row, 'owned_by_lab'),
       enslaved_shared_with: almanakkenField(row, 'enslaved_shared_with'),
       admin_in_europe: almanakkenField(row, 'administrateurs_in_Europa'),
       admin_in_suriname: almanakkenField(row, 'administrateurs_in_suriname'),

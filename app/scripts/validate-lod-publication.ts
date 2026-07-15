@@ -218,6 +218,17 @@ async function main() {
   }
 
   ids.add(document['@id']);
+  for (const entry of gazetteer['@graph'] ?? []) {
+    if (
+      entry.type === 'plantation' &&
+      typeof entry.id === 'string' &&
+      !entry.deprecated &&
+      !entry.mergedInto
+    ) {
+      // These E25 nodes are defined in their public per-place JSON-LD records.
+      ids.add(`${CANONICAL_BASE}place/${entry.id}#feature`);
+    }
+  }
   const canonicalReferences = new Set<string>();
   collectCanonicalReferences(document['@graph'], canonicalReferences);
   const danglingReferences = [...canonicalReferences].filter((uri) => !ids.has(uri));
@@ -389,43 +400,115 @@ async function main() {
   const aggregateEntitiesById = new Map(
     document['@graph'].map((entity) => [entity['@id'], entity]),
   );
+  const gazetteerPlantationsByFeatureUri = new Map(
+    activeGazetteer
+      .filter(
+        (entry) => entry.type === 'plantation' && typeof entry.id === 'string',
+      )
+      .map((entry) => [
+        `${CANONICAL_BASE}place/${String(entry.id)}#feature`,
+        entry,
+      ]),
+  );
   const associationStatuses = new Set([
     'linked',
     'needs-organization-link',
     'needs-physical-link-review',
+    'needs-physical-plantation-link',
   ]);
   for (const entity of document['@graph'].filter((candidate) =>
     toArray(candidate['@type'] as string | string[]).includes('Plantation'),
   )) {
+    const entityId = String(entity['@id']);
     const status = entity.organizationAssociationStatus;
     assert(
       typeof status === 'string' && associationStatuses.has(status),
-      `Plantation ${entity['@id']} has no valid organization association status`,
+      `Plantation ${entityId} has no valid organization association status`,
     );
     const organizationUri = entity.hasOrganizationalAssociation;
     if (status === 'needs-organization-link') {
       assert(
         organizationUri == null,
-        `Plantation ${entity['@id']} is marked unlinked but has an E74 association`,
+        `Plantation ${entityId} is marked unlinked but has an E74 association`,
       );
       continue;
     }
     assert(
       typeof organizationUri === 'string',
-      `Plantation ${entity['@id']} is marked ${status} without an E74 association`,
+      `Plantation ${entityId} is marked ${String(status)} without an E74 association`,
     );
     const organization = aggregateEntitiesById.get(organizationUri);
     assert(
       organization &&
         toArray(organization['@type'] as string | string[]).includes('E74_Group'),
-      `Plantation ${entity['@id']} association does not resolve to E74`,
+      `Plantation ${entityId} association does not resolve to E74`,
     );
     assert(
       toArray(entity.closeMatch as string | string[]).includes(
         organization.exactMatch as string,
       ),
-      `Plantation ${entity['@id']} and E74 association do not share the authority QID`,
+      `Plantation ${entityId} and E74 association do not share the authority QID`,
     );
+    assert(
+      toArray(
+        organization.associatedPhysicalPlantation as string | string[],
+      ).includes(entityId),
+      `Plantation ${entityId} association is not reciprocal on ${organizationUri}`,
+    );
+  }
+  for (const organization of document['@graph'].filter((candidate) =>
+    toArray(candidate['@type'] as string | string[]).includes('E74_Group'),
+  )) {
+    const organizationId = String(organization['@id']);
+    const status = organization.organizationAssociationStatus;
+    const physicalPlantations = toArray(
+      organization.associatedPhysicalPlantation as string | string[],
+    );
+    assert(
+      typeof status === 'string' && associationStatuses.has(status),
+      `Organization ${organizationId} has no valid physical association status`,
+    );
+    assert(
+      physicalPlantations.length > 0
+        ? status !== 'needs-physical-plantation-link'
+        : status === 'needs-physical-plantation-link',
+      `Organization ${organizationId} has an inconsistent physical association status`,
+    );
+    for (const plantationUri of physicalPlantations) {
+      const plantation = aggregateEntitiesById.get(plantationUri);
+      if (plantation) {
+        assert(
+          toArray(plantation['@type'] as string | string[]).includes(
+            'E25_Human_Made_Feature',
+          ),
+          `Organization ${organizationId} links to a non-E25 plantation`,
+        );
+        assert(
+          plantation.hasOrganizationalAssociation === organizationId,
+          `Organization ${organizationId} association is not reciprocal on ${plantationUri}`,
+        );
+        continue;
+      }
+      const gazetteerPlantation =
+        gazetteerPlantationsByFeatureUri.get(plantationUri);
+      assert(
+        gazetteerPlantation,
+        `Organization ${organizationId} links to an unknown physical plantation`,
+      );
+      const externalLinks = Array.isArray(gazetteerPlantation.externalLinks)
+        ? (gazetteerPlantation.externalLinks as Array<Record<string, unknown>>)
+        : [];
+      const qid = externalLinks.find(
+        (link) =>
+          link.authority === 'wikidata' &&
+          typeof link.identifier === 'string',
+      )?.identifier;
+      assert(
+        typeof qid === 'string' &&
+          String(organization.exactMatch).endsWith(`/${qid}`),
+        `Organization ${organizationId} and Gazetteer plantation ${plantationUri} do not share a QID`,
+      );
+    }
   }
   for (const feature of mapFeatures.features ?? []) {
     const properties = feature.properties ?? {};
@@ -492,17 +575,48 @@ async function main() {
     'Aggregate JSON-LD does not preserve every Almanakken source row',
   );
   for (const evidence of aggregateAlmanakkenEvidence) {
+    const evidenceId = String(evidence['@id']);
     const targetId = evidence.P140_assigned_attribute_to;
     if (typeof evidence.sourcePlantationQid === 'string') {
       assert(
         targetId != null,
-        `QID-bearing Almanakken observation has no E74 target: ${evidence['@id']}`,
+        `QID-bearing Almanakken observation has no E74 target: ${evidenceId}`,
       );
     } else {
       assert(
         targetId == null,
-        `Almanakken observation without a QID has an unsupported target: ${evidence['@id']}`,
+        `Almanakken observation without a QID has an unsupported target: ${evidenceId}`,
       );
+    }
+    for (const legacyProperty of ['hasParts', 'partOf', 'ownedBy', 'mergedInto']) {
+      assert(
+        evidence[legacyProperty] == null,
+        `Aggregate Almanakken observation still emits ambiguous ${legacyProperty}: ${evidenceId}`,
+      );
+    }
+    for (const relationshipProperty of [
+      'reportedComponentOrganization',
+      'reportedCompositeOrganization',
+      'reportedOwnerOrganization',
+    ]) {
+      for (const relationshipTarget of toArray(
+        evidence[relationshipProperty] as string | string[],
+      )) {
+        assert(
+          relationshipTarget.startsWith(`${CANONICAL_BASE}organization/`),
+          `${evidenceId} ${relationshipProperty} does not use a local organization URI`,
+        );
+        const relationshipOrganization = aggregateEntitiesById.get(
+          relationshipTarget,
+        );
+        assert(
+          relationshipOrganization &&
+            toArray(
+              relationshipOrganization['@type'] as string | string[],
+            ).includes('E74_Group'),
+          `${evidenceId} ${relationshipProperty} targets an unknown E74`,
+        );
+      }
     }
     if (targetId == null) continue;
     assert(
@@ -591,9 +705,50 @@ async function main() {
       assert(target, `Almanakken observation ${sourceRow} has no local target`);
       assert(
         toArray(target['@type'] as string | string[]).includes(
-          'crm:E25_Human_Made_Feature',
+          'crm:E74_Group',
         ),
-        `Almanakken observation ${sourceRow} does not target an E25 feature`,
+        `Almanakken observation ${sourceRow} does not target an E74 organization`,
+      );
+      for (const relationshipProperty of [
+        'reportedComponentOrganization',
+        'reportedCompositeOrganization',
+        'reportedOwnerOrganization',
+      ]) {
+        for (const relationshipTarget of toArray(
+          observation[relationshipProperty] as string | string[],
+        )) {
+          const relationshipOrganization = graph.find(
+            (entity) => entity['@id'] === relationshipTarget,
+          );
+          assert(
+            relationshipOrganization &&
+              toArray(
+                relationshipOrganization['@type'] as string | string[],
+              ).includes('crm:E74_Group'),
+            `Almanakken observation ${sourceRow} has an unresolved ${relationshipProperty}`,
+          );
+        }
+      }
+    }
+    for (const feature of graph.filter((entity) =>
+      toArray(entity['@type'] as string | string[]).includes(
+        'crm:E25_Human_Made_Feature',
+      ),
+    )) {
+      const organizationUri = feature.hasOrganizationalAssociation;
+      if (organizationUri == null) continue;
+      const organization = graph.find(
+        (entity) => entity['@id'] === organizationUri,
+      );
+      assert(
+        organization &&
+          toArray(organization['@type'] as string | string[]).includes(
+            'crm:E74_Group',
+          ) &&
+          toArray(
+            organization.associatedPhysicalPlantation as string | string[],
+          ).includes(feature['@id'] as string),
+        `Authority record ${id} has a non-reciprocal E25-E74 association`,
       );
     }
   }

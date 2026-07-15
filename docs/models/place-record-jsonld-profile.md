@@ -48,11 +48,20 @@ assertions. A source statement such as a reported abandonment is `certain` as
 a statement by that source, not as an unqualified historical fact. The raw
 Almanakken record ID remains on each observation so summaries are reproducible.
 
-`plantation_id` is retained as a source matching key. An observation receives
-`P140 assigned attribute to` only when that key resolves to one unambiguous E25
-feature. Rows with missing or ambiguous matches remain published as unresolved
-evidence and are listed in the editorial review artifact; they are not assigned
-to an E74 organisation as a fallback.
+`plantation_id` is retained as a source matching key. When it contains a valid
+QID, the observation receives `P140 assigned attribute to` pointing to the
+local E74 plantation organization. This remains valid when more than one E25
+physical plantation is associated with that organization. Rows without QIDs
+remain published as unresolved evidence and are listed in the editorial review
+artifact. The E25-E74 association is separately published in both directions
+and carries an editorial status; it is not an ownership assertion.
+
+The v2 ownership and component/composite QIDs also resolve to local E74 records.
+They remain properties of the dated E13 observation using the
+`stm:reportedOwnerOrganization`, `stm:reportedComponentOrganization`, and
+`stm:reportedCompositeOrganization` profile terms. The publication does not
+derive a static P51/P52, merger, dissolution, membership, or transformation
+claim from these references alone.
 
 Compound v2 transcription fields such as population, mill, and raw management
 details are preserved as JSON literals on the source observation. They are not

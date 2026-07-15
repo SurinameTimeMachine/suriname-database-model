@@ -53,13 +53,16 @@ export interface E26PhysicalFeature {
 export type OrganizationAssociationStatus =
   | 'linked'
   | 'needs-organization-link'
-  | 'needs-physical-link-review';
+  | 'needs-physical-link-review'
+  | 'needs-physical-plantation-link';
 
 export interface E74Organization {
   '@id': string;
   '@type': string[];
   additionalType?: string; // sdo:additionalType -> wd:Q188913
   prefLabel: string; // rdfs:label
+  associatedPhysicalPlantation?: string | string[];
+  organizationAssociationStatus?: OrganizationAssociationStatus;
   psurId?: string | string[]; // source register identifiers
   absorbedInto?: string; // CRM: P99i was dissolved by -> E68 Dissolution (successor E74)
   exactMatch?: string;
@@ -150,12 +153,12 @@ export interface OrganizationObservation {
   locationStd?: string; // CRM: P7 took place at -> E53 Place (text)
   sizeAkkers?: number; // CRM: P43 has dimension -> E54 Dimension (akkers)
   pageReference?: string; // CRM: P3 has note (almanac page reference)
-  hasParts?: string[];
-  hasPartLabels?: string[];
-  partOf?: string | string[];
-  partOfLabel?: string | string[];
-  ownedBy?: string | string[];
-  ownedByLabel?: string | string[];
+  reportedComponentOrganization?: string | string[];
+  reportedComponentOrganizationLabel?: string | string[];
+  reportedCompositeOrganization?: string | string[];
+  reportedCompositeOrganizationLabel?: string | string[];
+  reportedOwnerOrganization?: string | string[];
+  reportedOwnerOrganizationLabel?: string | string[];
   enslavedSharedWith?: string;
   hadPrimarySource?: string; // prov:hadPrimarySource
   wasDerivedFrom?: string; // prov:wasDerivedFrom

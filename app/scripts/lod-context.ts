@@ -21,6 +21,10 @@ export function buildPlaceRecordContext(): Record<string, unknown> {
       '@id': 'stm:hasOrganizationalAssociation',
       '@type': '@id',
     },
+    associatedPhysicalPlantation: {
+      '@id': 'stm:associatedPhysicalPlantation',
+      '@type': '@id',
+    },
     certainty: { '@id': 'stm:certainty', '@type': '@id' },
     reportedOperationalStatus: {
       '@id': 'stm:reportedOperationalStatus',
@@ -37,12 +41,30 @@ export function buildPlaceRecordContext(): Record<string, unknown> {
       '@id': 'stm:sranantongoName',
       '@type': 'xsd:string',
     },
-    hasParts: { '@id': 'stm:hasParts', '@type': '@id' },
-    hasPartLabels: { '@id': 'stm:hasPartLabels', '@type': 'xsd:string' },
-    partOf: { '@id': 'stm:partOf', '@type': '@id' },
-    partOfLabel: { '@id': 'stm:partOfLabel', '@type': 'xsd:string' },
-    ownedBy: { '@id': 'stm:ownedBy', '@type': '@id' },
-    ownedByLabel: { '@id': 'stm:ownedByLabel', '@type': 'xsd:string' },
+    reportedComponentOrganization: {
+      '@id': 'stm:reportedComponentOrganization',
+      '@type': '@id',
+    },
+    reportedComponentOrganizationLabel: {
+      '@id': 'stm:reportedComponentOrganizationLabel',
+      '@type': 'xsd:string',
+    },
+    reportedCompositeOrganization: {
+      '@id': 'stm:reportedCompositeOrganization',
+      '@type': '@id',
+    },
+    reportedCompositeOrganizationLabel: {
+      '@id': 'stm:reportedCompositeOrganizationLabel',
+      '@type': 'xsd:string',
+    },
+    reportedOwnerOrganization: {
+      '@id': 'stm:reportedOwnerOrganization',
+      '@type': '@id',
+    },
+    reportedOwnerOrganizationLabel: {
+      '@id': 'stm:reportedOwnerOrganizationLabel',
+      '@type': 'xsd:string',
+    },
     enslavedSharedWith: {
       '@id': 'stm:enslavedSharedWith',
       '@type': 'xsd:string',
@@ -246,6 +268,10 @@ export function buildContext(): Record<string, unknown> {
       '@id': 'stm:hasOrganizationalAssociation',
       '@type': '@id',
     },
+    associatedPhysicalPlantation: {
+      '@id': 'stm:associatedPhysicalPlantation',
+      '@type': '@id',
+    },
     hasDerivedInference: {
       '@id': 'stm:hasDerivedInference',
       '@type': '@id',
@@ -356,11 +382,30 @@ export function buildContext(): Record<string, unknown> {
       '@id': 'stm:sranantongoName',
       '@type': 'xsd:string',
     },
-    hasParts: { '@id': 'stm:hasParts', '@type': '@id' },
-    hasPartLabels: { '@id': 'stm:hasPartLabels', '@type': 'xsd:string' },
-    partOf: { '@id': 'stm:partOf', '@type': '@id' },
-    partOfLabel: { '@id': 'stm:partOfLabel', '@type': 'xsd:string' },
-    ownedBy: { '@id': 'stm:ownedBy', '@type': '@id' },
+    reportedComponentOrganization: {
+      '@id': 'stm:reportedComponentOrganization',
+      '@type': '@id',
+    },
+    reportedComponentOrganizationLabel: {
+      '@id': 'stm:reportedComponentOrganizationLabel',
+      '@type': 'xsd:string',
+    },
+    reportedCompositeOrganization: {
+      '@id': 'stm:reportedCompositeOrganization',
+      '@type': '@id',
+    },
+    reportedCompositeOrganizationLabel: {
+      '@id': 'stm:reportedCompositeOrganizationLabel',
+      '@type': 'xsd:string',
+    },
+    reportedOwnerOrganization: {
+      '@id': 'stm:reportedOwnerOrganization',
+      '@type': '@id',
+    },
+    reportedOwnerOrganizationLabel: {
+      '@id': 'stm:reportedOwnerOrganizationLabel',
+      '@type': 'xsd:string',
+    },
     enslavedSharedWith: {
       '@id': 'stm:enslavedSharedWith',
       '@type': 'xsd:string',

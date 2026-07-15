@@ -94,8 +94,9 @@ flowchart TB
     E25 -->|"P53 has location"| E53
     E26 -->|"P53 has location"| E53
 
-    %% Plantation owned by organization (separate entities)
-    E25 -->|"P52 has current owner"| E74_ORG
+    %% Researched correspondence; ownership needs separate evidence
+    E25 -->|"stm:hasOrganizationalAssociation"| E74_ORG
+    E74_ORG -->|"stm:associatedPhysicalPlantation"| E25
 
     %% =============================================================
     %% STYLING

@@ -137,8 +137,9 @@ flowchart TB
     Q_qid -->|"researched organizational association
     (does not assert physical ownership)"| E74
 
-    Q_qid_alt -->|"P51 has former or current owner
-    (historical ownership before merger)"| E74_ALT
+    Q_qid_alt -->|"skos:closeMatch
+    (alternative authority hint;
+    no automatic ownership)"| E74_ALT
 
     Q_psur -->|"skos:closeMatch
     (researcher-assigned, flawed)"| E74
@@ -233,8 +234,9 @@ flowchart TB
 
     OBS -->|"P14 carried out by"| POBS
 
-    E74_ALT -->|"P99i was dissolved by
-    (E68 Dissolution)"| E74
+    OBS -->|"stm:reportedComponentOrganization /
+    stm:reportedCompositeOrganization /
+    stm:reportedOwnerOrganization"| E74_ALT
 
     %% =============================================================
     %% Q-ID LINKING KEY
