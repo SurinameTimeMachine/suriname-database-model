@@ -14,6 +14,7 @@ import {
   derivePlaceFunctionAssertions,
   placeFunctionLabels,
   PLACE_FUNCTION_SCHEME_URI,
+  relatedPlaceType,
   type PlaceFunctionSource,
 } from '../lib/place-functions';
 import {
@@ -45,6 +46,10 @@ const ORGANIZATION_OVERRIDES_PATH = join(
 const GAZETTEER_PATH = join(
   __dirname,
   '../../data/places-gazetteer.jsonld',
+);
+const THESAURUS_PATH = join(
+  __dirname,
+  '../../data/place-types-thesaurus.jsonld',
 );
 mkdirSync(LOD_DIR, { recursive: true });
 
@@ -688,6 +693,56 @@ function buildE55Types(): Record<string, unknown>[] {
   });
 }
 
+function languageValues(value: unknown): Array<Record<string, string>> {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return [];
+  return Object.entries(value as Record<string, unknown>).flatMap(
+    ([language, labels]) =>
+      (Array.isArray(labels) ? labels : [labels]).flatMap((label) =>
+        typeof label === 'string' && label.trim()
+          ? [{ '@value': label, '@language': language }]
+          : [],
+      ),
+  );
+}
+
+function expandStmUri(value: unknown): string | undefined {
+  if (typeof value !== 'string') return undefined;
+  return value.startsWith('stm:') ? `${BASE}${value.slice(4)}` : value;
+}
+
+function buildPlaceTypeVocabulary(): Record<string, unknown>[] {
+  if (!existsSync(THESAURUS_PATH)) return [];
+  const document = JSON.parse(readFileSync(THESAURUS_PATH, 'utf-8')) as {
+    '@graph'?: Array<Record<string, unknown>>;
+  };
+  return (document['@graph'] ?? []).flatMap((entry) => {
+    const id = expandStmUri(entry['@id']);
+    if (!id || !id.startsWith(`${BASE}vocabulary/place-type`)) return [];
+    const isScheme = id === `${BASE}vocabulary/place-type`;
+    const prefLabel = languageValues(entry.prefLabel);
+    const altLabel = languageValues(entry.altLabel);
+    const broader = expandStmUri(entry.broader);
+    return [
+      {
+        '@id': id,
+        '@type': isScheme
+          ? ['skos:ConceptScheme']
+          : ['skos:Concept', 'E55_Type'],
+        ...(prefLabel.length > 0 ? { 'skos:prefLabel': prefLabel } : {}),
+        ...(altLabel.length > 0 ? { 'skos:altLabel': altLabel } : {}),
+        ...(!isScheme
+          ? {
+              'skos:inScheme': {
+                '@id': `${BASE}vocabulary/place-type`,
+              },
+            }
+          : {}),
+        ...(broader ? { 'skos:broader': { '@id': broader } } : {}),
+      },
+    ];
+  });
+}
+
 function buildPlaceFunctionTypes(): Record<string, unknown>[] {
   const concepts = new Map<
     string,
@@ -745,6 +800,7 @@ function buildPlaceFunctionTypes(): Record<string, unknown>[] {
       .map(([functionId, concept]) => {
         const sourceLabels = [...concept.sourceLabels].sort();
         const labels = placeFunctionLabels(functionId, sourceLabels[0]);
+        const placeType = relatedPlaceType(functionId);
         return {
           '@id': `${PLACE_FUNCTION_SCHEME_URI}/${functionId}`,
           '@type': ['skos:Concept', 'E55_Type'],
@@ -754,6 +810,9 @@ function buildPlaceFunctionTypes(): Record<string, unknown>[] {
           ],
           'skos:altLabel': sourceLabels,
           'skos:inScheme': { '@id': PLACE_FUNCTION_SCHEME_URI },
+          ...(placeType
+            ? { 'skos:related': { '@id': placeType.uri } }
+            : {}),
           functionEvidenceKind: [...concept.evidenceKinds].sort(),
         };
       }),
@@ -1318,6 +1377,10 @@ function main() {
 
   const e55Types = buildE55Types();
   console.log(`  E55 Types:          ${e55Types.length}`);
+  const placeTypeVocabulary = buildPlaceTypeVocabulary();
+  console.log(
+    `  Place type concepts:${Math.max(0, placeTypeVocabulary.length - 1)}`,
+  );
   const placeFunctionTypes = buildPlaceFunctionTypes();
   console.log(
     `  Place functions:    ${Math.max(0, placeFunctionTypes.length - 1)}`,
@@ -1359,6 +1422,7 @@ function main() {
     ...e41All,
     ...e36Entities,
     ...e55Types,
+    ...placeTypeVocabulary,
     ...placeFunctionTypes,
     ...buildInferenceRules(),
     ...e52TimeSpans,

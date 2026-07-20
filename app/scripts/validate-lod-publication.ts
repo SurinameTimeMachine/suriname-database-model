@@ -8,6 +8,7 @@ import { join } from 'path';
 import jsonld from 'jsonld';
 import {
   derivePlaceFunctionAssertions,
+  relatedPlaceType,
   PLACE_FUNCTION_SCHEME_URI,
   type PlaceFunctionAssertion,
   type PlaceFunctionSource,
@@ -81,6 +82,7 @@ interface PlaceFunctionsDocument {
     uri?: string;
     placeCount?: number;
     assertionCount?: number;
+    relatedPlaceType?: { id?: string; uri?: string };
     places?: Array<{
       id?: string;
       usages?: Array<{ assertionId?: string }>;
@@ -533,6 +535,12 @@ async function main() {
           jsonLdId(term['skos:inScheme']) === PLACE_FUNCTION_SCHEME_URI,
         `Function assertion ${assignmentUri} has no local E55/SKOS concept`,
       );
+      const localRelatedType = relatedPlaceType(assertion.functionId);
+      assert(
+        localRelatedType == null ||
+          jsonLdId(term['skos:related']) === localRelatedType.uri,
+        `Function assertion ${assignmentUri} omits its related structural place type`,
+      );
       const places =
         expectedFunctions.get(assertion.functionId) ??
         new Map<string, PlaceFunctionAssertion[]>();
@@ -595,6 +603,22 @@ async function main() {
         ) &&
         jsonLdId(aggregateTerm['skos:inScheme']) === PLACE_FUNCTION_SCHEME_URI,
       `Aggregate JSON-LD has no canonical E55/SKOS function term ${term.id}`,
+    );
+    const expectedRelatedType = relatedPlaceType(term.id);
+    const aggregateRelatedType = expectedRelatedType
+      ? aggregateEntitiesById.get(expectedRelatedType.uri)
+      : undefined;
+    assert(
+      expectedRelatedType == null ||
+        (term.relatedPlaceType?.id === expectedRelatedType.id &&
+          term.relatedPlaceType.uri === expectedRelatedType.uri &&
+          jsonLdId(aggregateTerm?.['skos:related']) ===
+            expectedRelatedType.uri &&
+          aggregateRelatedType != null &&
+          toArray(
+            aggregateRelatedType['@type'] as string | string[],
+          ).includes('skos:Concept')),
+      `Function term ${term.id} omits its related structural place type`,
     );
   }
   assert(

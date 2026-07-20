@@ -14,6 +14,7 @@ import {
   derivePlaceFunctionAssertions,
   placeFunctionLabels,
   PLACE_FUNCTION_SCHEME_URI,
+  relatedPlaceType,
   type PlaceFunctionSource,
 } from '../lib/place-functions';
 import {
@@ -1209,6 +1210,7 @@ type FunctionPlace = {
 type FunctionConcept = {
   id: string;
   uri: string;
+  relatedPlaceType?: { id: string; uri: string };
   prefLabel: { nl: string; en: string };
   sourceLabels: string[];
   evidenceKinds: Array<'production' | 'recorded-function'>;
@@ -1298,8 +1300,10 @@ const placeFunctionVocabulary = {
         (sum, place) => sum + place.usages.length,
         0,
       );
+      const placeType = relatedPlaceType(concept.id);
       return {
         ...concept,
+        ...(placeType ? { relatedPlaceType: placeType } : {}),
         sourceLabels: concept.sourceLabels.sort(),
         evidenceKinds: concept.evidenceKinds.sort(),
         placeCount: concept.places.length,

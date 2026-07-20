@@ -42,6 +42,7 @@ type FunctionPlace = {
 type FunctionConcept = {
   id: string;
   uri: string;
+  relatedPlaceType?: { id: string; uri: string };
   prefLabel: { nl: string; en: string };
   sourceLabels: string[];
   evidenceKinds: Array<'production' | 'recorded-function'>;
@@ -376,7 +377,15 @@ export default function PlaceTypesVocabulary() {
                   />
                 )}
                 {selectedFunction && (
-                  <SelectedFunctionSummary functionConcept={selectedFunction} />
+                  <SelectedFunctionSummary
+                    functionConcept={selectedFunction}
+                    relatedType={concepts.find(
+                      (concept) =>
+                        concept.typeId ===
+                        selectedFunction.relatedPlaceType?.id,
+                    )}
+                    onSelectType={handleSelectConcept}
+                  />
                 )}
                 <PlacesForType
                   typeLabel={langEn(selected.prefLabel)}
@@ -514,8 +523,12 @@ function RelatedFunctions({
 
 function SelectedFunctionSummary({
   functionConcept,
+  relatedType,
+  onSelectType,
 }: {
   functionConcept: FunctionConcept;
+  relatedType?: PlaceTypeConcept;
+  onSelectType: (typeId: string) => void;
 }) {
   return (
     <section className="border-l-4 border-teal-strong bg-teal-soft/20 p-4">
@@ -545,6 +558,20 @@ function SelectedFunctionSummary({
       <p className="mt-3 break-all font-mono text-[10px] text-ink/40">
         {functionConcept.uri}
       </p>
+      {relatedType && (
+        <p className="mt-3 border-t border-ink/10 pt-3 text-xs text-ink/60">
+          Related structural type:{' '}
+          <button
+            type="button"
+            className="font-semibold text-teal-strong underline decoration-teal-strong/30 underline-offset-2 hover:decoration-teal-strong"
+            onClick={() => onSelectType(relatedType.typeId)}
+          >
+            {langEn(relatedType.prefLabel)}
+          </button>
+          . The dated function does not overwrite the place&apos;s structural
+          classification.
+        </p>
+      )}
     </section>
   );
 }

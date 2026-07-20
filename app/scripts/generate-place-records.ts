@@ -19,6 +19,7 @@ import {
   derivePlaceFunctionAssertions,
   placeFunctionLabels,
   PLACE_FUNCTION_SCHEME_URI,
+  relatedPlaceType,
 } from '../lib/place-functions';
 
 import { BASE, buildPlaceRecordContext } from './lod-context';
@@ -596,6 +597,7 @@ export function generatePlaceRecords() {
           assertion.functionId,
           assertion.sourceLabel,
         );
+        const placeType = relatedPlaceType(assertion.functionId);
         graph.push({
           '@id': assertion.functionUri,
           '@type': ['skos:Concept', 'crm:E55_Type'],
@@ -605,6 +607,9 @@ export function generatePlaceRecords() {
           ],
           'skos:altLabel': [assertion.sourceLabel],
           'skos:inScheme': { '@id': PLACE_FUNCTION_SCHEME_URI },
+          ...(placeType
+            ? { 'skos:related': { '@id': placeType.uri } }
+            : {}),
         });
       }
       evidenceUris.push(assertionUri);

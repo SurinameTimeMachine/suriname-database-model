@@ -34,6 +34,15 @@ row to E25 would turn a source transcription into a second source claim.
 - Retain `prov:hadPrimarySource` on every assignment. A date range summarizes
   source attestations and does not claim the function began or ended at those
   boundaries. Source absence is not evidence that a function ceased.
+- Link functions with an unambiguous structural counterpart using
+  `skos:related` (for example military post, church, quarantine station,
+  ironworks, quarry, central factory, and brickworks). This relationship aids
+  vocabulary navigation; it does not reclassify a place or erase earlier
+  functions. A future source-attested settlement function can use the same
+  pattern, but no settlement function is inferred from the Almanakken v2 data.
+- Publish the structural place-type scheme and its concepts in the aggregate
+  JSON-LD graph as well as the dedicated thesaurus document, so these related
+  concept links always resolve to defined canonical resources.
 - Derive assignments from the curated `productAssertions` and from the v2
   Almanakken `function` field. Composite production values are split into
   atomic functions so they can be browsed and linked independently.

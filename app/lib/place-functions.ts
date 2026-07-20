@@ -25,6 +25,11 @@ export interface PlaceFunctionLabels {
   en: string;
 }
 
+export interface RelatedPlaceType {
+  id: string;
+  uri: string;
+}
+
 export interface PlaceFunctionSource {
   productAssertions?: Array<{
     id?: string;
@@ -87,6 +92,18 @@ const labels: Record<string, PlaceFunctionLabels> = {
 
 const nonFunctionValues = new Set(['onbebouwd', 'onbekend']);
 
+const relatedPlaceTypeIds: Record<string, string> = {
+  'centraal-fabriek': 'central-factory',
+  'chirurgisch-etablissement': 'medical-facility',
+  'ijzersmelterij': 'ironworks',
+  kerk: 'church',
+  'militaire-post': 'military-post',
+  'quarantaine-etablissement': 'quarantine-station',
+  settlement: 'settlement',
+  steenfabriek: 'brickworks',
+  steenspringerij: 'quarry',
+};
+
 export function placeFunctionId(value: string): string {
   return value
     .toLowerCase()
@@ -99,6 +116,18 @@ export function placeFunctionId(value: string): string {
 
 export function placeFunctionUri(functionId: string): string {
   return `${PLACE_FUNCTION_SCHEME_URI}/${functionId}`;
+}
+
+export function relatedPlaceType(
+  functionId: string,
+): RelatedPlaceType | undefined {
+  const id = relatedPlaceTypeIds[functionId];
+  return id
+    ? {
+        id,
+        uri: `https://data.surinametijdmachine.org/vocabulary/place-type/${id}`,
+      }
+    : undefined;
 }
 
 export function placeFunctionLabels(
