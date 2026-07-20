@@ -19,5 +19,19 @@
   },
   "@id": "https://data.surinametijdmachine.org/dataset/organization-authority-overrides",
   "@type": "stm:OrganizationAuthorityOverrideDataset",
-  "@graph": []
+  "@graph": [
+    {
+      "@id": "https://data.surinametijdmachine.org/organization/Q819296#editorial-override",
+      "@type": "OrganizationAuthorityOverride",
+      "qid": "Q819296",
+      "reviewStatus": "unreviewed",
+      "modifiedAt": "2026-07-20",
+      "modifiedBy": "Thunnisvanoort",
+      "physicalLinkReviewStatus": "confirmed-multiple",
+      "reviewedPhysicalPlaceIds": [
+        "stm-01150",
+        "stm-01151"
+      ]
+    }
+  ]
 }
