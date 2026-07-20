@@ -14,7 +14,7 @@ import {
   buildVocabularyUrl,
 } from '@/lib/url';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 type PlaceRecordIndexEntry = {
@@ -69,14 +69,31 @@ async function fetchJson<T>(url: string): Promise<T> {
   return (await response.json()) as T;
 }
 
+function connectedTypeForFunction(
+  functionId: string,
+  functions: FunctionVocabulary,
+  records: PlaceRecordIndexEntry[],
+): string | undefined {
+  const functionConcept = functions.functions.find(
+    (concept) => concept.id === functionId,
+  );
+  return functionConcept?.places
+    .map((place) => records.find((record) => record.id === place.id)?.type)
+    .find((type): type is string => Boolean(type));
+}
+
 export default function PlaceTypesVocabulary() {
   const { canEdit } = useAuth();
+  const router = useRouter();
   const params = useParams<{ typeId?: string[] }>();
   const pathParts = params.typeId ?? [];
   const pathFunctionId =
     pathParts[0] === 'place-function' ? pathParts[1] : null;
   const pathTypeId =
-    pathParts[0] === 'place-function' ? 'plantation' : pathParts[0] || 'plantation';
+    pathParts[0] === 'place-function'
+      ? 'plantation'
+      : pathParts[0] || 'plantation';
+  const [initialFunctionId] = useState(pathFunctionId);
   const [scheme, setScheme] = useState<ThesaurusScheme | null>(null);
   const [concepts, setConcepts] = useState<PlaceTypeConcept[]>([]);
   const [placeRecords, setPlaceRecords] = useState<PlaceRecordIndexEntry[]>([]);
@@ -103,44 +120,45 @@ export default function PlaceTypesVocabulary() {
         setConcepts(parsed.concepts);
         setPlaceRecords(recordIndex);
         setFunctionVocabulary(functions);
+        if (initialFunctionId) {
+          const connectedType = connectedTypeForFunction(
+            initialFunctionId,
+            functions,
+            recordIndex,
+          );
+          if (connectedType) setSelectedConcept(connectedType);
+        }
       })
       .catch(() => setScheme(null))
       .finally(() => setLoading(false));
-  }, []);
+  }, [initialFunctionId]);
 
   const handleSelectConcept = useCallback((typeId: string) => {
     setSelectedConcept(typeId);
     setSelectedFunctionId(null);
     setPlaceSearch('');
     setVisiblePlaceCount(100);
-    window.history.replaceState(
-      null,
-      '',
-      buildVocabularyUrl(typeId),
-    );
-  }, []);
+    router.replace(buildVocabularyUrl(typeId), { scroll: false });
+  }, [router]);
 
   const handleSelectFunction = useCallback(
     (functionId: string) => {
-      const functionConcept = functionVocabulary?.functions.find(
-        (concept) => concept.id === functionId,
-      );
-      const connectedType = functionConcept?.places
-        .map((place) =>
-          placeRecords.find((record) => record.id === place.id)?.type,
-        )
-        .find((type): type is string => Boolean(type));
+      const connectedType = functionVocabulary
+        ? connectedTypeForFunction(
+            functionId,
+            functionVocabulary,
+            placeRecords,
+          )
+        : undefined;
       if (connectedType) setSelectedConcept(connectedType);
       setSelectedFunctionId(functionId);
       setPlaceSearch('');
       setVisiblePlaceCount(100);
-      window.history.replaceState(
-        null,
-        '',
-        buildPlaceFunctionVocabularyUrl(functionId),
-      );
+      router.replace(buildPlaceFunctionVocabularyUrl(functionId), {
+        scroll: false,
+      });
     },
-    [functionVocabulary, placeRecords],
+    [functionVocabulary, placeRecords, router],
   );
 
   const placeTypeById = useMemo(
@@ -280,7 +298,7 @@ export default function PlaceTypesVocabulary() {
 
         <div className="site-surface mb-6 p-4">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded bg-stm-sepia-100 px-2 py-0.5 text-xs font-medium text-stm-sepia-700">
+            <span className="bg-stm-sepia-100 px-2 py-0.5 text-xs font-medium text-stm-sepia-700">
               ConceptScheme
             </span>
             <h2 className="font-serif text-base font-semibold text-stm-warm-900">
@@ -438,7 +456,7 @@ function ConceptButton({
       } ${selected ? 'border-l-2 border-l-stm-sepia-500 bg-stm-sepia-50' : ''}`}
     >
       <span
-        className={`${nested ? 'h-2.5 w-2.5' : 'h-3 w-3'} shrink-0 rounded-sm`}
+        className={`${nested ? 'h-2.5 w-2.5' : 'h-3 w-3'} shrink-0`}
         style={{ backgroundColor: concept.color }}
       />
       <span className={nested ? 'text-stm-warm-600' : 'text-stm-warm-700'}>
@@ -662,13 +680,13 @@ function ConceptDetails({
     <div className="site-surface p-5">
       <div className="mb-3 flex items-center gap-2">
         <span
-          className="h-4 w-4 rounded-sm"
+          className="h-4 w-4"
           style={{ backgroundColor: selected.color }}
         />
-        <span className="rounded bg-stm-sepia-100 px-2 py-0.5 text-xs font-medium text-stm-sepia-700">
+        <span className="bg-stm-sepia-100 px-2 py-0.5 text-xs font-medium text-stm-sepia-700">
           skos:Concept
         </span>
-        <span className="rounded bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
+        <span className="bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
           crm:E55_Type
         </span>
         <h2 className="font-serif text-xl font-semibold text-stm-warm-900">
@@ -682,7 +700,7 @@ function ConceptDetails({
       </div>
 
       {langEn(selected.definition) && (
-        <div className="mb-4 rounded border border-stm-warm-200 bg-stm-warm-50 px-3 py-2">
+        <div className="mb-4 border border-stm-warm-200 bg-stm-warm-50 px-3 py-2">
           <span className="text-xs font-medium uppercase tracking-wide text-stm-warm-600">
             Definition
           </span>
@@ -690,7 +708,7 @@ function ConceptDetails({
         </div>
       )}
       {langEn(selected.editorialNote) && (
-        <div className="mb-4 rounded border border-amber-200 bg-amber-50 px-3 py-2">
+        <div className="mb-4 border border-amber-200 bg-amber-50 px-3 py-2">
           <span className="text-xs font-medium uppercase tracking-wide text-amber-700">
             Editorial note (colonial bias)
           </span>
@@ -735,11 +753,11 @@ function ConceptDetails({
                     key={`related-${uri}`}
                     type="button"
                     onClick={() => related && onSelect(related.typeId)}
-                    className="inline-flex items-center gap-1 rounded bg-stm-warm-100 px-2 py-0.5 text-xs text-stm-warm-600 hover:bg-stm-warm-200"
+                    className="inline-flex items-center gap-1 bg-stm-warm-100 px-2 py-0.5 text-xs text-stm-warm-600 hover:bg-stm-warm-200"
                   >
                     {related && (
                       <span
-                        className="h-2 w-2 rounded-sm"
+                        className="h-2 w-2"
                         style={{ backgroundColor: related.color }}
                       />
                     )}
@@ -823,7 +841,7 @@ function LangArrayLabels({ label, map }: { label: string; map: LangArrayMap }) {
           (values || []).map((value) => (
             <span
               key={`alt-label-${language}-${value}`}
-              className="inline-flex items-center gap-1 rounded bg-stm-warm-100 px-2 py-0.5 text-xs text-stm-warm-600"
+              className="inline-flex items-center gap-1 bg-stm-warm-100 px-2 py-0.5 text-xs text-stm-warm-600"
             >
               <span className="font-mono text-[9px] text-stm-warm-300">
                 {language}

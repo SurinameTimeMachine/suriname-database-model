@@ -324,7 +324,10 @@ export function generatePlaceRecords() {
     };
     const productTypeUris = new Set<string>();
     const functionTypeUris = new Set<string>();
-    const functionAssertions = derivePlaceFunctionAssertions(entry);
+    const functionAssertions =
+      entry.type === 'plantation'
+        ? derivePlaceFunctionAssertions(entry)
+        : [];
     const referencedSourceIds = new Set<string>(entry.sources ?? []);
     for (const name of names) if (name.source) referencedSourceIds.add(name.source);
     for (const assertion of [
@@ -600,8 +603,8 @@ export function generatePlaceRecords() {
             { '@value': labels.nl, '@language': 'nl' },
             { '@value': labels.en, '@language': 'en' },
           ],
-          'skos:altLabel': assertion.sourceLabel,
-          'skos:inScheme': PLACE_FUNCTION_SCHEME_URI,
+          'skos:altLabel': [assertion.sourceLabel],
+          'skos:inScheme': { '@id': PLACE_FUNCTION_SCHEME_URI },
         });
       }
       evidenceUris.push(assertionUri);

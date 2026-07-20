@@ -12,19 +12,6 @@ export function buildPlaceRecordContext(): Record<string, unknown> {
     E99_Product_Type: 'crm:E99_Product_Type',
     E17_Type_Assignment: 'crm:E17_Type_Assignment',
     describes: { '@id': 'stm:describes', '@type': '@id' },
-    hasEvidence: { '@id': 'stm:hasEvidence', '@type': '@id' },
-    hasOperationalSummary: {
-      '@id': 'stm:hasOperationalSummary',
-      '@type': '@id',
-    },
-    hasFunctionSummary: {
-      '@id': 'stm:hasFunctionSummary',
-      '@type': '@id',
-    },
-    hasFunctionAssignment: {
-      '@id': 'stm:hasFunctionAssignment',
-      '@type': '@id',
-    },
     hasOrganizationalAssociation: {
       '@id': 'stm:hasOrganizationalAssociation',
       '@type': '@id',
@@ -179,6 +166,19 @@ export function buildContext(): Record<string, unknown> {
     physicalLinkReviewStatus: 'stm:physicalLinkReviewStatus',
     reviewedPhysicalPlaceIds: 'stm:reviewedPhysicalPlaceId',
     functionEvidenceKind: 'stm:functionEvidenceKind',
+    hasEvidence: { '@id': 'stm:hasEvidence', '@type': '@id' },
+    hasOperationalSummary: {
+      '@id': 'stm:hasOperationalSummary',
+      '@type': '@id',
+    },
+    hasFunctionSummary: {
+      '@id': 'stm:hasFunctionSummary',
+      '@type': '@id',
+    },
+    hasFunctionAssignment: {
+      '@id': 'stm:hasFunctionAssignment',
+      '@type': '@id',
+    },
 
     P1_is_identified_by: { '@id': 'crm:P1_is_identified_by', '@type': '@id' },
     P1i_identifies: { '@id': 'crm:P1i_identifies', '@type': '@id' },

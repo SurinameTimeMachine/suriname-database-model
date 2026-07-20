@@ -704,7 +704,8 @@ export default function PlantationPanel({
     (event) => event.eventType === 'function-assignment' && event.assignedType,
   );
   const otherLifecycleEvents = lifecycleEvents.filter(
-    (event) => event.eventType !== 'function-assignment',
+    (event) =>
+      event.eventType !== 'function-assignment' || !event.assignedType,
   );
 
   // Sources used

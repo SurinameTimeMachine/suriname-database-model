@@ -96,6 +96,15 @@ function toArray<T>(value: T | T[] | undefined | null): T[] {
   return value == null ? [] : Array.isArray(value) ? value : [value];
 }
 
+function jsonLdId(value: unknown): string | undefined {
+  if (typeof value === 'string') return value;
+  if (value && typeof value === 'object' && !Array.isArray(value)) {
+    const id = (value as Record<string, unknown>)['@id'];
+    return typeof id === 'string' ? id : undefined;
+  }
+  return undefined;
+}
+
 function readArtifact(directory: string, name: string): Buffer {
   const path = join(directory, name);
   assert(existsSync(path), `Missing LOD artifact: ${path}`);
@@ -490,6 +499,10 @@ async function main() {
     );
 
     for (const assertion of assertions) {
+      assert(
+        knownSourceIds.has(assertion.source),
+        `Function assertion ${assertion.id} on ${entry.id} has an unknown source`,
+      );
       const assignmentUri = `${CANONICAL_BASE}place/${entry.id}#assertion-${assertion.id}`;
       const assignment = graph.find(
         (entity) => entity['@id'] === assignmentUri,
@@ -517,7 +530,7 @@ async function main() {
             'crm:E55_Type',
           ) &&
           toArray(term['@type'] as string | string[]).includes('skos:Concept') &&
-          term['skos:inScheme'] === PLACE_FUNCTION_SCHEME_URI,
+          jsonLdId(term['skos:inScheme']) === PLACE_FUNCTION_SCHEME_URI,
         `Function assertion ${assignmentUri} has no local E55/SKOS concept`,
       );
       const places =
@@ -580,7 +593,7 @@ async function main() {
         toArray(aggregateTerm['@type'] as string | string[]).includes(
           'skos:Concept',
         ) &&
-        aggregateTerm['skos:inScheme'] === PLACE_FUNCTION_SCHEME_URI,
+        jsonLdId(aggregateTerm['skos:inScheme']) === PLACE_FUNCTION_SCHEME_URI,
       `Aggregate JSON-LD has no canonical E55/SKOS function term ${term.id}`,
     );
   }

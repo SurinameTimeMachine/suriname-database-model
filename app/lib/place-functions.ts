@@ -163,16 +163,18 @@ function observedFunctionSpans(
     { sourceLabel: string; years: number[] }
   >();
   for (const observation of observations) {
-    const sourceLabel = observation.function?.trim();
-    if (!sourceLabel || observation.year == null) continue;
-    const functionId = placeFunctionId(sourceLabel);
-    if (!functionId || nonFunctionValues.has(functionId)) continue;
-    const current = observationsByFunction.get(functionId) ?? {
-      sourceLabel,
-      years: [],
-    };
-    current.years.push(observation.year);
-    observationsByFunction.set(functionId, current);
+    const sourceValue = observation.function?.trim();
+    if (!sourceValue || observation.year == null) continue;
+    for (const sourceLabel of splitProductionFunctions(sourceValue)) {
+      const functionId = placeFunctionId(sourceLabel);
+      if (!functionId || nonFunctionValues.has(functionId)) continue;
+      const current = observationsByFunction.get(functionId) ?? {
+        sourceLabel,
+        years: [],
+      };
+      current.years.push(observation.year);
+      observationsByFunction.set(functionId, current);
+    }
   }
 
   return [...observationsByFunction.entries()].flatMap(

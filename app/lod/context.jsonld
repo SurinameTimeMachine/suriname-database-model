@@ -45,6 +45,22 @@
     "physicalLinkReviewStatus": "stm:physicalLinkReviewStatus",
     "reviewedPhysicalPlaceIds": "stm:reviewedPhysicalPlaceId",
     "functionEvidenceKind": "stm:functionEvidenceKind",
+    "hasEvidence": {
+      "@id": "stm:hasEvidence",
+      "@type": "@id"
+    },
+    "hasOperationalSummary": {
+      "@id": "stm:hasOperationalSummary",
+      "@type": "@id"
+    },
+    "hasFunctionSummary": {
+      "@id": "stm:hasFunctionSummary",
+      "@type": "@id"
+    },
+    "hasFunctionAssignment": {
+      "@id": "stm:hasFunctionAssignment",
+      "@type": "@id"
+    },
     "P1_is_identified_by": {
       "@id": "crm:P1_is_identified_by",
       "@type": "@id"

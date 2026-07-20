@@ -753,7 +753,7 @@ function buildPlaceFunctionTypes(): Record<string, unknown>[] {
             { '@value': labels.en, '@language': 'en' },
           ],
           'skos:altLabel': sourceLabels,
-          'skos:inScheme': PLACE_FUNCTION_SCHEME_URI,
+          'skos:inScheme': { '@id': PLACE_FUNCTION_SCHEME_URI },
           functionEvidenceKind: [...concept.evidenceKinds].sort(),
         };
       }),

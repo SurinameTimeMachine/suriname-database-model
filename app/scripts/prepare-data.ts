@@ -625,6 +625,11 @@ const organizationOverrides = new Map(
 );
 const activePlantationsByQid = new Map<string, GazetteerEntry[]>();
 const activeGazetteerById = new Map<string, GazetteerEntry>();
+const functionAssertionsByEntryId = new Map<
+  string,
+  ReturnType<typeof derivePlaceFunctionAssertions>
+>();
+
 for (const entry of gazetteerEntries) {
   if (entry.deprecated || entry.mergedInto || !entry.id) continue;
   activeGazetteerById.set(entry.id, entry);
@@ -970,6 +975,9 @@ for (const entry of gazetteerEntries) {
   const id = entry.id;
   const type = entry.type;
   if (!id || !type) continue;
+  const functionAssertions =
+    type === 'plantation' ? derivePlaceFunctionAssertions(entry) : [];
+  functionAssertionsByEntryId.set(id, functionAssertions);
 
   const featureUri = featureUriForGazetteerEntry(entry);
   if (!featureUri) continue;
@@ -985,7 +993,6 @@ for (const entry of gazetteerEntries) {
   const statusAssertions = Array.isArray(entry.statusAssertions)
     ? entry.statusAssertions
     : [];
-  const functionAssertions = derivePlaceFunctionAssertions(entry);
   const genericEvents = Array.isArray(entry.lifecycleEvents)
     ? entry.lifecycleEvents
     : [];
@@ -1225,7 +1232,7 @@ for (const entry of gazetteerEntries) {
   ) {
     continue;
   }
-  for (const assertion of derivePlaceFunctionAssertions(entry)) {
+  for (const assertion of functionAssertionsByEntryId.get(entry.id) ?? []) {
     const concept = functionConceptsById.get(assertion.functionId) ?? {
       id: assertion.functionId,
       uri: assertion.functionUri,
