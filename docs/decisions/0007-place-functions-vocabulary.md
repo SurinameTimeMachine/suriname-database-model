@@ -46,8 +46,10 @@ row to E25 would turn a source transcription into a second source claim.
 
 ## Consequences
 
-- `/vocabulary` is a place-functions browser. Each function lists the physical
-  plantations to which it is assigned, with source terms and attested spans.
+- `/vocabulary` retains the geographical-feature thesaurus, including its
+  hierarchy, definitions, mappings, editorial notes, and editor. An adjacent
+  Place Functions view lists each function and the physical plantations to
+  which it is assigned, with source terms and attested spans.
 - Plantation pages and the Explore panel link their function assignments back
   to the canonical vocabulary term.
 - Organizations do not receive E17 place-function assignments. Their raw E13

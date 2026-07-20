@@ -1,6 +1,7 @@
 'use client';
 
-import { buildVocabularyUrl } from '@/lib/url';
+import PlaceTypesVocabulary from '@/components/PlaceTypesVocabulary';
+import { buildPlaceFunctionVocabularyUrl } from '@/lib/url';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -60,6 +61,7 @@ export default function VocabularyPage() {
   const pathParts = params.typeId ?? [];
   const pathFunctionId =
     pathParts[0] === 'place-function' ? pathParts[1] : pathParts[0];
+  const isFunctionVocabulary = pathParts[0] === 'place-function';
   const [data, setData] = useState<FunctionVocabulary | null>(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -68,6 +70,7 @@ export default function VocabularyPage() {
   );
 
   useEffect(() => {
+    if (!isFunctionVocabulary) return;
     void fetch('/data/place-functions.json')
       .then((response) => {
         if (!response.ok) {
@@ -78,14 +81,16 @@ export default function VocabularyPage() {
       .then((value: FunctionVocabulary) => setData(value))
       .catch(() => setData(null))
       .finally(() => setLoading(false));
-  }, []);
+  }, [isFunctionVocabulary]);
 
   const selectFunction = useCallback((functionId: string | null) => {
     setSelectedId(functionId);
     window.history.replaceState(
       null,
       '',
-      functionId ? buildVocabularyUrl(functionId) : '/vocabulary',
+      functionId
+        ? buildPlaceFunctionVocabularyUrl(functionId)
+        : '/vocabulary/place-function',
     );
   }, []);
 
@@ -101,6 +106,10 @@ export default function VocabularyPage() {
       ].some((label) => label.toLocaleLowerCase().includes(query)),
     );
   }, [data, search]);
+
+  if (!isFunctionVocabulary) {
+    return <PlaceTypesVocabulary />;
+  }
 
   if (loading) {
     return (
@@ -144,6 +153,17 @@ export default function VocabularyPage() {
             a place was used; they are not permanent plantation types and are
             not assigned to plantation organizations.
           </p>
+          <nav className="mt-5 flex gap-1 border-b border-ink/15">
+            <Link
+              href="/vocabulary"
+              className="px-4 py-2 text-sm font-medium text-ink/55 hover:text-ink"
+            >
+              Place types
+            </Link>
+            <span className="-mb-px border-b-2 border-teal-strong px-4 py-2 text-sm font-medium text-ink">
+              Place functions
+            </span>
+          </nav>
           <div className="mt-5 flex flex-wrap gap-2 text-xs text-ink/65">
             <span className="border border-ink/10 bg-white px-3 py-1.5">
               {data.functions.length} functions
