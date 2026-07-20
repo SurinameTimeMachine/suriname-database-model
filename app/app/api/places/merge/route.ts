@@ -49,9 +49,12 @@ async function authorize(): Promise<
   return { token };
 }
 
-function primaryWikidataQid(place: GazetteerPlace): string | null {
+function primaryWikidataQid(place: Partial<GazetteerPlace>): string | null {
+  const externalLinks = Array.isArray(place.externalLinks)
+    ? place.externalLinks
+    : [];
   return (
-    place.externalLinks.find(
+    externalLinks.find(
       (link) => link.authority === 'wikidata' && /^Q\d+$/.test(link.identifier),
     )?.identifier ?? null
   );
@@ -172,6 +175,15 @@ export async function POST(request: NextRequest) {
           {
             error:
               'Merging more than two records requires the same Wikidata organization QID on every selected place',
+          },
+          { status: 400 },
+        );
+      }
+      if (primaryWikidataQid(mergedPlace) !== primaryQid) {
+        return NextResponse.json(
+          {
+            error:
+              'The merged place must retain the shared Wikidata organization QID',
           },
           { status: 400 },
         );

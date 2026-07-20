@@ -122,6 +122,24 @@ function wikidataQid(place: GazetteerPlace): string | null {
   );
 }
 
+function mergeAssertions<T extends { id: string }>(
+  places: GazetteerPlace[],
+  select: (place: GazetteerPlace) => T[] | undefined,
+): T[] {
+  const result: T[] = [];
+  const assertionJsonById = new Map<string, string>();
+  for (const assertion of places.flatMap((place) => select(place) || [])) {
+    const json = JSON.stringify(assertion);
+    const existingJson = assertionJsonById.get(assertion.id);
+    if (existingJson === json) continue;
+    // Preserve conflicts as duplicate IDs so prepareEditorialPlace rejects the
+    // merge instead of silently choosing and discarding one assertion.
+    result.push(assertion);
+    assertionJsonById.set(assertion.id, json);
+  }
+  return result;
+}
+
 function computeMergedPlace(
   places: GazetteerPlace[],
   primaryId: string,
@@ -220,33 +238,21 @@ function computeMergedPlace(
     almanakkenObservations,
     sranantongoNames,
     lifecycleEvents,
-    statusAssertions: Array.from(
-      new Map(
-        places
-          .flatMap((place) => place.statusAssertions || [])
-          .map((assertion) => [assertion.id, assertion]),
-      ).values(),
+    statusAssertions: mergeAssertions(
+      places,
+      (place) => place.statusAssertions,
     ).filter((a) => !resolution.excludedStatusAssertions.has(a.id)),
-    productAssertions: Array.from(
-      new Map(
-        places
-          .flatMap((place) => place.productAssertions || [])
-          .map((assertion) => [assertion.id, assertion]),
-      ).values(),
+    productAssertions: mergeAssertions(
+      places,
+      (place) => place.productAssertions,
     ).filter((a) => !resolution.excludedProductAssertions.has(a.id)),
-    districtAssertions: Array.from(
-      new Map(
-        places
-          .flatMap((place) => place.districtAssertions || [])
-          .map((assertion) => [assertion.id, assertion]),
-      ).values(),
+    districtAssertions: mergeAssertions(
+      places,
+      (place) => place.districtAssertions,
     ).filter((a) => !resolution.excludedDistrictAssertions.has(a.id)),
-    locationAssertions: Array.from(
-      new Map(
-        places
-          .flatMap((place) => place.locationAssertions || [])
-          .map((assertion) => [assertion.id, assertion]),
-      ).values(),
+    locationAssertions: mergeAssertions(
+      places,
+      (place) => place.locationAssertions,
     ).filter((a) => !resolution.excludedLocationAssertions.has(a.id)),
   };
 }
@@ -535,6 +541,7 @@ export default function PlaceMergeView({
         orderedPlaces.unshift(primary);
       }
       setMergedNames(buildMergedNames(orderedPlaces));
+      setResolution(buildInitialResolution());
       setSelectedMergeIds(next);
     },
     [mergeCandidatePlaces, primaryId, selectedMergeIds],
