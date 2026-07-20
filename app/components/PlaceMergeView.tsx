@@ -39,7 +39,7 @@ interface MergeResolution {
 interface MergedName {
   name: PlaceName;
   included: boolean;
-  origin: 'a' | 'b' | 'both';
+  originIds: string[];
 }
 
 export interface PlaceMergeViewProps {
@@ -48,33 +48,44 @@ export interface PlaceMergeViewProps {
   organizationPeers: GazetteerPlace[];
   districts: GazetteerPlace[];
   canEdit: boolean;
-  onMerge: (merged: GazetteerPlace, retiredId: string) => Promise<void>;
+  onMerge: (merged: GazetteerPlace, retiredIds: string[]) => Promise<void>;
   onKeepBoth: (qid: string, placeIds: string[]) => Promise<void>;
   onCancel: () => void;
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-function buildMergedNames(
-  placeA: GazetteerPlace,
-  placeB: GazetteerPlace,
-): MergedName[] {
+function placeNameKey(name: PlaceName): string {
+  return JSON.stringify([
+    name.text.toLowerCase().trim(),
+    name.language,
+    name.type,
+    name.source ?? null,
+    name.sourceYear ?? null,
+  ]);
+}
+
+function buildMergedNames(places: GazetteerPlace[]): MergedName[] {
   const result: MergedName[] = [];
-  const indexByText = new Map<string, number>();
+  const indexByName = new Map<string, number>();
+  let hasPreferredName = false;
 
-  for (const name of placeA.names) {
-    const key = name.text.toLowerCase().trim();
-    indexByText.set(key, result.length);
-    result.push({ name: { ...name }, included: true, origin: 'a' });
-  }
-
-  for (const name of placeB.names) {
-    const key = name.text.toLowerCase().trim();
-    if (indexByText.has(key)) {
-      result[indexByText.get(key)!].origin = 'both';
-    } else {
-      indexByText.set(key, result.length);
-      result.push({ name: { ...name }, included: true, origin: 'b' });
+  for (const place of places) {
+    for (const name of place.names) {
+      const key = placeNameKey(name);
+      const existingIndex = indexByName.get(key);
+      if (existingIndex != null) {
+        result[existingIndex].originIds.push(place.id);
+        continue;
+      }
+      const isPreferred: boolean = name.isPreferred && !hasPreferredName;
+      if (isPreferred) hasPreferredName = true;
+      indexByName.set(key, result.length);
+      result.push({
+        name: { ...name, isPreferred },
+        included: true,
+        originIds: [place.id],
+      });
     }
   }
 
@@ -111,32 +122,48 @@ function wikidataQid(place: GazetteerPlace): string | null {
   );
 }
 
+function mergeAssertions<T extends { id: string }>(
+  places: GazetteerPlace[],
+  select: (place: GazetteerPlace) => T[] | undefined,
+): T[] {
+  const result: T[] = [];
+  const assertionJsonById = new Map<string, string>();
+  for (const assertion of places.flatMap((place) => select(place) || [])) {
+    const json = JSON.stringify(assertion);
+    const existingJson = assertionJsonById.get(assertion.id);
+    if (existingJson === json) continue;
+    // Preserve conflicts as duplicate IDs so prepareEditorialPlace rejects the
+    // merge instead of silently choosing and discarding one assertion.
+    result.push(assertion);
+    assertionJsonById.set(assertion.id, json);
+  }
+  return result;
+}
+
 function computeMergedPlace(
-  placeA: GazetteerPlace,
-  placeB: GazetteerPlace,
+  places: GazetteerPlace[],
   primaryId: string,
   mergedNames: MergedName[],
   resolution: MergeResolution,
+  usePairResolution: boolean,
 ): GazetteerPlace {
-  const primary = primaryId === placeA.id ? placeA : placeB;
+  const [placeA, placeB] = places;
+  const primary = places.find((place) => place.id === primaryId) ?? placeA;
   const pick = <T,>(choice: ScalarChoice, va: T, vb: T): T =>
     choice === 'a' ? va : vb;
 
   const sources = [
-    ...new Set([...(placeA.sources || []), ...(placeB.sources || [])]),
-  ].filter((s) => !resolution.excludedSources.has(s));
+    ...new Set(places.flatMap((place) => place.sources || [])),
+  ].filter((source) => !resolution.excludedSources.has(source));
 
   const psurIds = [
-    ...new Set([...(placeA.psurIds || []), ...(placeB.psurIds || [])]),
+    ...new Set(places.flatMap((place) => place.psurIds || [])),
   ].filter((id) => !resolution.excludedPsurIds.has(id));
 
   // Deduplicate only identical authority links; match type carries meaning.
   const seenLinks = new Set<string>();
   const externalLinks: ExternalLink[] = [];
-  for (const l of [
-    ...(placeA.externalLinks || []),
-    ...(placeB.externalLinks || []),
-  ]) {
+  for (const l of places.flatMap((place) => place.externalLinks || [])) {
     const dedupeKey = JSON.stringify([l.authority, l.identifier, l.matchType]);
     const jsonKey = JSON.stringify(l);
     if (
@@ -151,10 +178,7 @@ function computeMergedPlace(
   // Deduplicate dikland refs by JSON equality
   const seenDikland = new Set<string>();
   const diklandRefs: DiklandRef[] = [];
-  for (const r of [
-    ...(placeA.diklandRefs || []),
-    ...(placeB.diklandRefs || []),
-  ]) {
+  for (const r of places.flatMap((place) => place.diklandRefs || [])) {
     const key = JSON.stringify(r);
     if (!seenDikland.has(key) && !resolution.excludedDiklandRefs.has(key)) {
       seenDikland.add(key);
@@ -164,26 +188,22 @@ function computeMergedPlace(
 
   const almanakkenObservations = Array.from(
     new Map(
-      [
-        ...(placeA.almanakkenObservations || []),
-        ...(placeB.almanakkenObservations || []),
-      ].map((observation) => [observation.recordId, observation]),
+      places
+        .flatMap((place) => place.almanakkenObservations || [])
+        .map((observation) => [observation.recordId, observation]),
     ).values(),
   ).filter(
     (observation) =>
       !resolution.excludedAlmanakkenObservations.has(observation.recordId),
   );
   const sranantongoNames = [
-    ...new Set([
-      ...(placeA.sranantongoNames || []),
-      ...(placeB.sranantongoNames || []),
-    ]),
+    ...new Set(places.flatMap((place) => place.sranantongoNames || [])),
   ].filter((name) => !resolution.excludedSranantongoNames.has(name));
   const lifecycleEvents = Array.from(
     new Map(
-      [...(placeA.lifecycleEvents || []), ...(placeB.lifecycleEvents || [])].map(
-        (event) => [event['@id'], event],
-      ),
+      places
+        .flatMap((place) => place.lifecycleEvents || [])
+        .map((event) => [event['@id'], event]),
     ).values(),
   ).filter(
     (event) => !resolution.excludedLifecycleEvents.has(event['@id']),
@@ -193,16 +213,24 @@ function computeMergedPlace(
     ...primary,
     id: primary.id,
     names: mergedNames.filter((mn) => mn.included).map((mn) => mn.name),
-    type: pick(resolution.type, placeA.type, placeB.type),
-    description: pick(
-      resolution.description,
-      placeA.description,
-      placeB.description,
-    ),
-    location: pick(resolution.location, placeA.location, placeB.location),
-    fid: pick(resolution.fid, placeA.fid, placeB.fid),
-    broader: pick(resolution.broader, placeA.broader, placeB.broader),
-    district: pick(resolution.district, placeA.district, placeB.district),
+    type: usePairResolution
+      ? pick(resolution.type, placeA.type, placeB.type)
+      : primary.type,
+    description: usePairResolution
+      ? pick(resolution.description, placeA.description, placeB.description)
+      : primary.description,
+    location: usePairResolution
+      ? pick(resolution.location, placeA.location, placeB.location)
+      : primary.location,
+    fid: usePairResolution
+      ? pick(resolution.fid, placeA.fid, placeB.fid)
+      : primary.fid,
+    broader: usePairResolution
+      ? pick(resolution.broader, placeA.broader, placeB.broader)
+      : primary.broader,
+    district: usePairResolution
+      ? pick(resolution.district, placeA.district, placeB.district)
+      : primary.district,
     sources,
     psurIds,
     externalLinks,
@@ -210,22 +238,22 @@ function computeMergedPlace(
     almanakkenObservations,
     sranantongoNames,
     lifecycleEvents,
-    statusAssertions: [
-      ...(placeA.statusAssertions || []),
-      ...(placeB.statusAssertions || []),
-    ].filter((a) => !resolution.excludedStatusAssertions.has(a.id)),
-    productAssertions: [
-      ...(placeA.productAssertions || []),
-      ...(placeB.productAssertions || []),
-    ].filter((a) => !resolution.excludedProductAssertions.has(a.id)),
-    districtAssertions: [
-      ...(placeA.districtAssertions || []),
-      ...(placeB.districtAssertions || []),
-    ].filter((a) => !resolution.excludedDistrictAssertions.has(a.id)),
-    locationAssertions: [
-      ...(placeA.locationAssertions || []),
-      ...(placeB.locationAssertions || []),
-    ].filter((a) => !resolution.excludedLocationAssertions.has(a.id)),
+    statusAssertions: mergeAssertions(
+      places,
+      (place) => place.statusAssertions,
+    ).filter((a) => !resolution.excludedStatusAssertions.has(a.id)),
+    productAssertions: mergeAssertions(
+      places,
+      (place) => place.productAssertions,
+    ).filter((a) => !resolution.excludedProductAssertions.has(a.id)),
+    districtAssertions: mergeAssertions(
+      places,
+      (place) => place.districtAssertions,
+    ).filter((a) => !resolution.excludedDistrictAssertions.has(a.id)),
+    locationAssertions: mergeAssertions(
+      places,
+      (place) => place.locationAssertions,
+    ).filter((a) => !resolution.excludedLocationAssertions.has(a.id)),
   };
 }
 
@@ -428,12 +456,24 @@ export default function PlaceMergeView({
     () => confirmedPhysicalPlaces.map((place) => place.id),
     [confirmedPhysicalPlaces],
   );
+  const mergeCandidatePlaces = useMemo(() => {
+    const candidates = new Map<string, GazetteerPlace>([
+      [placeA.id, placeA],
+      [placeB.id, placeB],
+    ]);
+    for (const place of confirmedPhysicalPlaces) candidates.set(place.id, place);
+    return [...candidates.values()];
+  }, [confirmedPhysicalPlaces, placeA, placeB]);
   const [mergeAction, setMergeAction] = useState<
     'merge' | 'keep-both' | null
   >(sharedOrganizationQid ? null : 'merge');
+  const [selectedMergeIds, setSelectedMergeIds] = useState<string[]>([
+    placeA.id,
+    placeB.id,
+  ]);
   const [primaryId, setPrimaryId] = useState(placeA.id);
   const [mergedNames, setMergedNames] = useState<MergedName[]>(() =>
-    buildMergedNames(placeA, placeB),
+    buildMergedNames([placeA, placeB]),
   );
   const [resolution, setResolution] = useState<MergeResolution>(
     buildInitialResolution,
@@ -441,12 +481,70 @@ export default function PlaceMergeView({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const retiredId = primaryId === placeA.id ? placeB.id : placeA.id;
+  const selectedMergePlaces = useMemo(
+    () =>
+      selectedMergeIds.flatMap((id) => {
+        const place = mergeCandidatePlaces.find(
+          (candidate) => candidate.id === id,
+        );
+        return place ? [place] : [];
+      }),
+    [mergeCandidatePlaces, selectedMergeIds],
+  );
+  const retiredIds = useMemo(
+    () => selectedMergeIds.filter((id) => id !== primaryId),
+    [primaryId, selectedMergeIds],
+  );
+  const usesDetailedPairResolution =
+    selectedMergeIds.length === 2 &&
+    selectedMergeIds.includes(placeA.id) &&
+    selectedMergeIds.includes(placeB.id);
 
   const mergedPlace = useMemo(
     () =>
-      computeMergedPlace(placeA, placeB, primaryId, mergedNames, resolution),
-    [placeA, placeB, primaryId, mergedNames, resolution],
+      computeMergedPlace(
+        selectedMergePlaces,
+        primaryId,
+        mergedNames,
+        resolution,
+        usesDetailedPairResolution,
+      ),
+    [
+      selectedMergePlaces,
+      primaryId,
+      mergedNames,
+      resolution,
+      usesDetailedPairResolution,
+    ],
+  );
+
+  const toggleMergeCandidate = useCallback(
+    (placeId: string) => {
+      const isSelected = selectedMergeIds.includes(placeId);
+      if (isSelected && selectedMergeIds.length <= 2) return;
+      const next = isSelected
+        ? selectedMergeIds.filter((id) => id !== placeId)
+        : [...selectedMergeIds, placeId];
+      const nextPrimaryId = next.includes(primaryId) ? primaryId : next[0];
+      if (nextPrimaryId !== primaryId) setPrimaryId(nextPrimaryId);
+      const orderedPlaces = next.flatMap((id) => {
+        const place = mergeCandidatePlaces.find(
+          (candidate) => candidate.id === id,
+        );
+        return place ? [place] : [];
+      });
+      const primaryIndex = orderedPlaces.findIndex(
+        (place) => place.id === nextPrimaryId,
+      );
+      if (primaryIndex > 0) {
+        const [primary] = orderedPlaces.splice(primaryIndex, 1);
+        orderedPlaces.unshift(primary);
+      }
+      setMergedNames(buildMergedNames(orderedPlaces));
+      setResolution(buildInitialResolution());
+      setSelectedMergeIds(next);
+    },
+    [mergeCandidatePlaces, primaryId, selectedMergeIds],
   );
 
   const setScalar = useCallback(
@@ -499,7 +597,7 @@ export default function PlaceMergeView({
       if (mergeAction === 'keep-both' && sharedOrganizationQid) {
         await onKeepBoth(sharedOrganizationQid, confirmedPhysicalPlaceIds);
       } else if (mergeAction === 'merge') {
-        await onMerge(mergedPlace, retiredId);
+        await onMerge(mergedPlace, retiredIds);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to merge');
@@ -511,7 +609,7 @@ export default function PlaceMergeView({
     onKeepBoth,
     onMerge,
     confirmedPhysicalPlaceIds,
-    retiredId,
+    retiredIds,
     sharedOrganizationQid,
   ]);
 
@@ -647,7 +745,7 @@ export default function PlaceMergeView({
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-4xl mx-auto px-6 py-6 space-y-8">
           <section>
-            <SectionHeader>Decide what the two records represent</SectionHeader>
+            <SectionHeader>Decide what the suggested records represent</SectionHeader>
             <div className="grid gap-3 sm:grid-cols-2">
               <button
                 type="button"
@@ -672,8 +770,8 @@ export default function PlaceMergeView({
                       One physical plantation
                     </span>
                     <span className="mt-1 block text-xs leading-5 text-stm-warm-500">
-                      Combine both records. One ID survives and the other remains
-                      as a provenance redirect.
+                      Combine only the records you select. One ID survives and
+                      the others remain as provenance redirects.
                     </span>
                   </span>
                 </span>
@@ -740,27 +838,73 @@ export default function PlaceMergeView({
             </section>
           )}
 
+          {mergeAction === 'merge' && mergeCandidatePlaces.length > 2 && (
+            <section>
+              <SectionHeader>Select the records to merge</SectionHeader>
+              <p className="mb-3 text-xs leading-5 text-stm-warm-500">
+                Select at least two. Records you leave unchecked remain active
+                and are not changed by this merge.
+              </p>
+              <div className="space-y-2">
+                {mergeCandidatePlaces.map((place) => {
+                  const checked = selectedMergeIds.includes(place.id);
+                  return (
+                    <label
+                      key={place.id}
+                      className={`flex cursor-pointer items-start gap-3 border p-3 transition-colors ${
+                        checked
+                          ? 'border-stm-sepia-300 bg-stm-sepia-50'
+                          : 'border-stm-warm-200 bg-white hover:border-stm-warm-300'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        disabled={checked && selectedMergeIds.length === 2}
+                        onChange={() => toggleMergeCandidate(place.id)}
+                        className="mt-1 accent-stm-sepia-500"
+                      />
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-sm font-medium text-stm-warm-800">
+                          {getPreferredName(place)}
+                        </span>
+                        <span className="block font-mono text-xs text-stm-warm-400">
+                          {place.id}
+                        </span>
+                      </span>
+                      <span className="text-xs text-stm-warm-400">
+                        {place.fid != null ? `FID ${place.fid}` : 'no FID'}
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
+              <p className="mt-3 text-xs font-medium text-stm-sepia-700">
+                {selectedMergeIds.length} selected;{' '}
+                {mergeCandidatePlaces.length - selectedMergeIds.length} left
+                unchanged.
+              </p>
+            </section>
+          )}
+
           <div className={mergeAction === 'keep-both' ? 'hidden' : 'contents'}>
-          {/* Primary selection */}
-          <section>
-            <SectionHeader>
-              Choose primary place - its ID survives
-            </SectionHeader>
-            <div className="grid grid-cols-2 gap-4">
-              <PlaceCard
-                place={placeA}
-                label="A"
-                isPrimary={primaryId === placeA.id}
-                onSetPrimary={() => setPrimaryId(placeA.id)}
-              />
-              <PlaceCard
-                place={placeB}
-                label="B"
-                isPrimary={primaryId === placeB.id}
-                onSetPrimary={() => setPrimaryId(placeB.id)}
-              />
-            </div>
-          </section>
+            {/* Primary selection */}
+            <section>
+              <SectionHeader>
+                Choose primary place - its ID survives
+              </SectionHeader>
+              <div className="grid gap-4 sm:grid-cols-2">
+                {selectedMergePlaces.map((place, index) => (
+                  <PlaceCard
+                    key={place.id}
+                    place={place}
+                    label={String.fromCharCode(65 + index)}
+                    isPrimary={primaryId === place.id}
+                    onSetPrimary={() => setPrimaryId(place.id)}
+                  />
+                ))}
+              </div>
+            </section>
 
           {/* Names */}
           <section>
@@ -775,7 +919,9 @@ export default function PlaceMergeView({
             <div className="space-y-1.5">
               {mergedNames.map((mn, i) => {
                 const originBadge =
-                  mn.origin === 'both' ? 'A+B' : mn.origin === 'a' ? 'A' : 'B';
+                  mn.originIds.length === 1
+                    ? mn.originIds[0]
+                    : `${mn.originIds.length} records`;
                 return (
                   <div
                     key={i}
@@ -833,6 +979,28 @@ export default function PlaceMergeView({
             </div>
           </section>
 
+          {!usesDetailedPairResolution ? (
+            <section className="border border-stm-sepia-200 bg-stm-sepia-50 p-4">
+              <h3 className="text-sm font-semibold text-stm-sepia-900">
+                Multi-record merge summary
+              </h3>
+              <p className="mt-1 text-xs leading-5 text-stm-sepia-800">
+                The primary record supplies the surviving ID, description,
+                type, district, coordinates, and GIS polygon. Names, source
+                links, PSUR IDs, Dikland references, Almanakken observations,
+                lifecycle events, and source assertions are deduplicated and
+                preserved from all {selectedMergePlaces.length} selected records.
+              </p>
+              <p className="mt-2 text-xs leading-5 text-stm-sepia-800">
+                Retiring: {retiredIds.join(', ')}. Leaving unchanged:{' '}
+                {mergeCandidatePlaces
+                  .filter((place) => !selectedMergeIds.includes(place.id))
+                  .map((place) => place.id)
+                  .join(', ') || 'none'}.
+              </p>
+            </section>
+          ) : (
+          <>
           {/* Type */}
           <section>
             <SectionHeader>Type</SectionHeader>
@@ -1334,6 +1502,8 @@ export default function PlaceMergeView({
               />
             </section>
           )}
+          </>
+          )}
           </div>
         </div>
       </div>
@@ -1348,12 +1518,14 @@ export default function PlaceMergeView({
           </p>
         ) : mergeAction === 'keep-both' ? (
           <p className="text-sm text-stm-warm-500">
-            Keeping <span className="font-mono font-medium">{placeA.id}</span>{' '}
-            and <span className="font-mono font-medium">{placeB.id}</span>
+            Keeping all {confirmedPhysicalPlaceIds.length} reviewed records
           </p>
         ) : (
           <p className="text-sm text-stm-warm-500">
-            Merging <span className="font-mono font-medium">{retiredId}</span>{' '}
+            Merging{' '}
+            <span className="font-mono font-medium">
+              {retiredIds.join(', ')}
+            </span>{' '}
             into <span className="font-mono font-medium">{primaryId}</span>
           </p>
         )}
@@ -1370,6 +1542,7 @@ export default function PlaceMergeView({
             disabled={
               saving ||
               !mergeAction ||
+              (mergeAction === 'merge' && selectedMergeIds.length < 2) ||
               (mergeAction === 'merge' && includedNameCount === 0) ||
               !canEdit
             }
@@ -1381,8 +1554,8 @@ export default function PlaceMergeView({
                 ? 'Confirming...'
                 : 'Merging...'
               : mergeAction === 'keep-both'
-                ? 'Confirm Both Places'
-                : 'Confirm Merge'}
+                ? `Confirm ${confirmedPhysicalPlaceIds.length} Places`
+                : `Merge ${selectedMergeIds.length} Selected`}
           </button>
         </div>
       </div>

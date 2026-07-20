@@ -1036,6 +1036,32 @@ function PlacesPageInner() {
     [],
   );
 
+  const narrowReviewIssue = useCallback(
+    (reviewedPlaceIds: string[], remainingPlaceIds: string[], issueType: string) => {
+      const reviewedIds = new Set(reviewedPlaceIds);
+      const remainingIds = new Set(remainingPlaceIds);
+      setAlmanakkenReview((current) => {
+        if (!current) return current;
+        const byPlaceId = { ...current.byPlaceId };
+        for (const [placeId, review] of Object.entries(byPlaceId)) {
+          if (!reviewedIds.has(placeId)) continue;
+          byPlaceId[placeId] = {
+            ...review,
+            issues: remainingIds.has(placeId)
+              ? review.issues.map((issue) =>
+                  issue.type === issueType
+                    ? { ...issue, detail: remainingPlaceIds.join(', ') }
+                    : issue,
+                )
+              : review.issues.filter((issue) => issue.type !== issueType),
+          };
+        }
+        return { ...current, byPlaceId };
+      });
+    },
+    [],
+  );
+
   const handleMergeCheck = useCallback(
     (id: string, checked: boolean) => {
       setMergeCheckIds((prev) => {
@@ -1052,9 +1078,13 @@ function PlacesPageInner() {
   );
 
   const openMergeForPlaces = useCallback((placeIds: string[]) => {
-    if (placeIds.length < 2) return;
-    const placeA = places.find((p) => p.id === placeIds[0]);
-    const placeB = places.find((p) => p.id === placeIds[1]);
+    const activePlaceIds = placeIds.filter((id) => {
+      const place = places.find((candidate) => candidate.id === id);
+      return place && !place.deprecated && !place.mergedInto;
+    });
+    if (activePlaceIds.length < 2) return;
+    const placeA = places.find((p) => p.id === activePlaceIds[0]);
+    const placeB = places.find((p) => p.id === activePlaceIds[1]);
     if (placeA && placeB) {
       const qidA = placeA.externalLinks.find(
         (link) => link.authority === 'wikidata',
@@ -1088,13 +1118,13 @@ function PlacesPageInner() {
   }, [mergeCheckIds, openMergeForPlaces]);
 
   const handleMergeConfirm = useCallback(
-    async (merged: GazetteerPlace, retiredId: string) => {
+    async (merged: GazetteerPlace, retiredIds: string[]) => {
       const res = await fetch('/api/places/merge', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           primaryId: merged.id,
-          retiredId,
+          retiredIds,
           mergedPlace: merged,
         }),
       });
@@ -1103,21 +1133,33 @@ function PlacesPageInner() {
         throw new Error(data.error || 'Failed to merge');
       }
       const saved = data.place as GazetteerPlace | undefined;
-      const retired = data.retiredPlace as GazetteerPlace | undefined;
-      if (saved && retired) {
+      const retiredPlaces = (data.retiredPlaces || []) as GazetteerPlace[];
+      if (saved && retiredPlaces.length > 0) {
+        const retiredById = new Map(
+          retiredPlaces.map((place) => [place.id, place]),
+        );
         setPlaces((previous) =>
-          previous.map((place) =>
-            place.id === saved.id
-              ? saved
-              : place.id === retired.id
-                ? retired
-                : place,
-          ),
+          previous.map((place) => {
+            if (place.id === saved.id) return saved;
+            return retiredById.get(place.id) ?? place;
+          }),
         );
       }
-      if (mergeView?.organizationPeers.length === 2) {
+      const mergedAllOrganizationPeers =
+        mergeView != null &&
+        retiredIds.length + 1 === mergeView.organizationPeers.length;
+      if (mergedAllOrganizationPeers && mergeView) {
         clearReviewIssue(
           mergeView.organizationPeers.map((place) => place.id),
+          'shared-organization-link',
+        );
+      } else if (mergeView) {
+        const reviewedPlaceIds = mergeView.organizationPeers.map(
+          (place) => place.id,
+        );
+        narrowReviewIssue(
+          reviewedPlaceIds,
+          reviewedPlaceIds.filter((id) => !retiredIds.includes(id)),
           'shared-organization-link',
         );
       }
@@ -1128,12 +1170,12 @@ function PlacesPageInner() {
       setPublicationNotice({
         ...(data.publication ?? {}),
         message:
-          mergeView?.organizationPeers.length === 2
-            ? 'Merge and review saved. The duplicate record is retired and this item is no longer in the review queue; public data updates after deployment.'
-            : undefined,
+          mergedAllOrganizationPeers
+            ? 'Merge and review saved. The selected duplicate records are retired and this item is no longer in the review queue; public data updates after deployment.'
+            : 'Selective merge saved. Unselected records remain active and available for the remaining organization-link review; public data updates after deployment.',
       });
     },
-    [clearReviewIssue, mergeView, syncUrlToSelection],
+    [clearReviewIssue, mergeView, narrowReviewIssue, syncUrlToSelection],
   );
 
   const handleKeepBothPlaces = useCallback(

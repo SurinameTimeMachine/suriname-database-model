@@ -49,12 +49,29 @@ async function authorize(): Promise<
   return { token };
 }
 
+function primaryWikidataQid(place: Partial<GazetteerPlace>): string | null {
+  const externalLinks = Array.isArray(place.externalLinks)
+    ? place.externalLinks
+    : [];
+  return (
+    externalLinks.find(
+      (link) => link.authority === 'wikidata' && /^Q\d+$/.test(link.identifier),
+    )?.identifier ?? null
+  );
+}
+
 /**
- * Merge two gazetteer entries. The primary place is updated with the merged
- * data; the secondary (retired) place gets a `mergedInto` pointer and is kept
- * in the gazetteer for provenance.
+ * Merge two or more gazetteer entries atomically. The primary place is updated
+ * with the merged data; every retired place gets a `mergedInto` pointer and is
+ * kept in the gazetteer for provenance.
  *
- * Body: { primaryId: string, retiredId: string, mergedPlace: GazetteerPlace }
+ * Body: {
+ *   primaryId: string,
+ *   retiredIds: string[],
+ *   mergedPlace: GazetteerPlace
+ * }
+ *
+ * `retiredId` remains accepted for older clients.
  */
 export async function POST(request: NextRequest) {
   const auth = await authorize();
@@ -62,26 +79,39 @@ export async function POST(request: NextRequest) {
   const { token } = auth;
 
   const body = await request.json();
-  const {
-    primaryId,
-    retiredId,
-    mergedPlace: rawMergedPlace,
-  }: {
-    primaryId: string;
-    retiredId: string;
-    mergedPlace: GazetteerPlace & { wikidataQid?: unknown };
-  } = body;
-  const { wikidataQid: _legacyWikidataQid, ...mergedPlace } = rawMergedPlace || {};
+  const primaryId = body?.primaryId as unknown;
+  const retiredId = body?.retiredId as unknown;
+  const requestedRetiredIds = body?.retiredIds as unknown;
+  const rawMergedPlace = body?.mergedPlace as unknown;
+  const candidateRetiredIds: unknown[] = Array.isArray(requestedRetiredIds)
+    ? requestedRetiredIds
+    : typeof retiredId === 'string' && retiredId
+      ? [retiredId]
+      : [];
 
-  if (!primaryId || !retiredId || !rawMergedPlace || primaryId === retiredId) {
+  if (
+    typeof primaryId !== 'string' ||
+    !primaryId ||
+    !rawMergedPlace ||
+    typeof rawMergedPlace !== 'object' ||
+    Array.isArray(rawMergedPlace) ||
+    candidateRetiredIds.length === 0 ||
+    candidateRetiredIds.some(
+      (id) => typeof id !== 'string' || !id || id === primaryId,
+    ) ||
+    new Set(candidateRetiredIds).size !== candidateRetiredIds.length
+  ) {
     return NextResponse.json(
       {
         error:
-          'Invalid merge request: primaryId, retiredId and mergedPlace are required and must differ',
+          'Invalid merge request: primaryId, one or more unique retiredIds, and mergedPlace are required and must differ',
       },
       { status: 400 },
     );
   }
+  const { wikidataQid: _legacyWikidataQid, ...mergedPlace } =
+    rawMergedPlace as GazetteerPlace & { wikidataQid?: unknown };
+  const retiredIds = candidateRetiredIds as string[];
   if (mergedPlace.id !== primaryId) {
     return NextResponse.json(
       { error: 'mergedPlace.id must match primaryId' },
@@ -95,7 +125,9 @@ export async function POST(request: NextRequest) {
     const gazetteer: GazetteerPlace[] = jsonld['@graph'] || [];
 
     const primaryIdx = gazetteer.findIndex((p) => p.id === primaryId);
-    const retiredIdx = gazetteer.findIndex((p) => p.id === retiredId);
+    const retiredIndexes = retiredIds.map((retiredPlaceId) =>
+      gazetteer.findIndex((place) => place.id === retiredPlaceId),
+    );
 
     if (primaryIdx < 0) {
       return NextResponse.json(
@@ -103,9 +135,12 @@ export async function POST(request: NextRequest) {
         { status: 404 },
       );
     }
-    if (retiredIdx < 0) {
+    const missingRetiredId = retiredIds.find(
+      (retiredPlaceId, index) => retiredPlaceId && retiredIndexes[index] < 0,
+    );
+    if (missingRetiredId) {
       return NextResponse.json(
-        { error: `Secondary place "${retiredId}" not found` },
+        { error: `Secondary place "${missingRetiredId}" not found` },
         { status: 404 },
       );
     }
@@ -115,11 +150,44 @@ export async function POST(request: NextRequest) {
         { status: 400 },
       );
     }
-    if (gazetteer[retiredIdx].mergedInto) {
+    const alreadyRetiredId = retiredIds.find(
+      (retiredPlaceId, index) =>
+        retiredPlaceId && gazetteer[retiredIndexes[index]].mergedInto,
+    );
+    if (alreadyRetiredId) {
       return NextResponse.json(
-        { error: `Secondary place "${retiredId}" is already marked as merged` },
+        { error: `Secondary place "${alreadyRetiredId}" is already marked as merged` },
         { status: 400 },
       );
+    }
+
+    if (retiredIds.length > 1) {
+      const selectedPlaces = [
+        gazetteer[primaryIdx],
+        ...retiredIndexes.map((index) => gazetteer[index]),
+      ];
+      const primaryQid = primaryWikidataQid(selectedPlaces[0]);
+      if (
+        !primaryQid ||
+        selectedPlaces.some((place) => primaryWikidataQid(place) !== primaryQid)
+      ) {
+        return NextResponse.json(
+          {
+            error:
+              'Merging more than two records requires the same Wikidata organization QID on every selected place',
+          },
+          { status: 400 },
+        );
+      }
+      if (primaryWikidataQid(mergedPlace) !== primaryQid) {
+        return NextResponse.json(
+          {
+            error:
+              'The merged place must retain the shared Wikidata organization QID',
+          },
+          { status: 400 },
+        );
+      }
     }
 
     const now = new Date().toISOString().split('T')[0];
@@ -143,16 +211,17 @@ export async function POST(request: NextRequest) {
     // Update the primary entry
     gazetteer[primaryIdx] = prepared.place;
 
-    const { wikidataQid: _retiredLegacyWikidataQid, ...retiredPlace } =
-      gazetteer[retiredIdx] as GazetteerPlace & { wikidataQid?: unknown };
-
-    // Mark the retired entry
-    gazetteer[retiredIdx] = {
-      ...retiredPlace,
-      mergedInto: primaryId,
-      modifiedBy: login,
-      modifiedAt: now,
-    };
+    // Mark every selected secondary entry as retired in the same commit.
+    for (const retiredIdx of retiredIndexes) {
+      const { wikidataQid: _retiredLegacyWikidataQid, ...retiredPlace } =
+        gazetteer[retiredIdx] as GazetteerPlace & { wikidataQid?: unknown };
+      gazetteer[retiredIdx] = {
+        ...retiredPlace,
+        mergedInto: primaryId,
+        modifiedBy: login,
+        modifiedAt: now,
+      };
+    }
 
     sortGazetteer(gazetteer, getPreferredName);
 
@@ -164,15 +233,22 @@ export async function POST(request: NextRequest) {
       GAZETTEER_PATH,
       jsonStr,
       sha,
-      `Merge place ${retiredId} into ${primaryId}`,
+      `Merge places ${retiredIds.join(', ')} into ${primaryId}`,
     );
+
+    const retiredPlaces = retiredIds.flatMap((retiredPlaceId) => {
+      const place = gazetteer.find((entry) => entry.id === retiredPlaceId);
+      return place ? [place] : [];
+    });
 
     return NextResponse.json({
       ok: true,
       primaryId,
-      retiredId,
+      retiredIds,
       place: prepared.place,
-      retiredPlace: gazetteer.find((place) => place.id === retiredId),
+      retiredPlaces,
+      // Preserve the single-record response for older clients.
+      retiredPlace: retiredPlaces[0],
       publication: publication(commit, primaryId),
     });
   } catch (err) {
