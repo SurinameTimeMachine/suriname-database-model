@@ -129,6 +129,20 @@
       ]
     },
     {
+      "@id": "https://data.surinametijdmachine.org/organization/Q59115566#editorial-override",
+      "@type": "OrganizationAuthorityOverride",
+      "qid": "Q59115566",
+      "reviewStatus": "unreviewed",
+      "modifiedAt": "2026-07-20",
+      "modifiedBy": "Thunnisvanoort",
+      "physicalLinkReviewStatus": "confirmed-multiple",
+      "reviewedPhysicalPlaceIds": [
+        "stm-01309",
+        "stm-01469",
+        "stm-01470"
+      ]
+    },
+    {
       "@id": "https://data.surinametijdmachine.org/organization/Q124830445#editorial-override",
       "@type": "OrganizationAuthorityOverride",
       "qid": "Q124830445",
