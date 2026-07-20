@@ -75,6 +75,19 @@
         "stm-01535",
         "stm-01573"
       ]
+    },
+    {
+      "@id": "https://data.surinametijdmachine.org/organization/Q59115440#editorial-override",
+      "@type": "OrganizationAuthorityOverride",
+      "qid": "Q59115440",
+      "reviewStatus": "unreviewed",
+      "modifiedAt": "2026-07-20",
+      "modifiedBy": "Thunnisvanoort",
+      "physicalLinkReviewStatus": "confirmed-multiple",
+      "reviewedPhysicalPlaceIds": [
+        "stm-01520",
+        "stm-02313"
+      ]
     }
   ]
 }
