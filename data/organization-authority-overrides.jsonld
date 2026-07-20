@@ -88,6 +88,19 @@
         "stm-01520",
         "stm-02313"
       ]
+    },
+    {
+      "@id": "https://data.surinametijdmachine.org/organization/Q124830445#editorial-override",
+      "@type": "OrganizationAuthorityOverride",
+      "qid": "Q124830445",
+      "reviewStatus": "unreviewed",
+      "modifiedAt": "2026-07-20",
+      "modifiedBy": "Thunnisvanoort",
+      "physicalLinkReviewStatus": "confirmed-multiple",
+      "reviewedPhysicalPlaceIds": [
+        "stm-01477",
+        "stm-01933"
+      ]
     }
   ]
 }
