@@ -17,6 +17,14 @@ export function buildPlaceRecordContext(): Record<string, unknown> {
       '@id': 'stm:hasOperationalSummary',
       '@type': '@id',
     },
+    hasFunctionSummary: {
+      '@id': 'stm:hasFunctionSummary',
+      '@type': '@id',
+    },
+    hasFunctionAssignment: {
+      '@id': 'stm:hasFunctionAssignment',
+      '@type': '@id',
+    },
     hasOrganizationalAssociation: {
       '@id': 'stm:hasOrganizationalAssociation',
       '@type': '@id',
@@ -170,6 +178,7 @@ export function buildContext(): Record<string, unknown> {
     OrganizationAuthorityOverride: 'stm:OrganizationAuthorityOverride',
     physicalLinkReviewStatus: 'stm:physicalLinkReviewStatus',
     reviewedPhysicalPlaceIds: 'stm:reviewedPhysicalPlaceId',
+    functionEvidenceKind: 'stm:functionEvidenceKind',
 
     P1_is_identified_by: { '@id': 'crm:P1_is_identified_by', '@type': '@id' },
     P1i_identifies: { '@id': 'crm:P1i_identifies', '@type': '@id' },

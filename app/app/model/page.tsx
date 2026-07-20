@@ -329,7 +329,7 @@ const ENTITIES: EntityDef[] = [
     type: 'E55',
     label: 'Type',
     crmClass: 'E55 Type',
-    desc: 'Controlled vocabulary terms: products (sugar, coffee, cocoa, cotton), plantation status (abandoned/verlaten via E17 Type Assignment), source types (map/almanac/register), certainty levels for qualified links. Managed as an authority list (thesaurus/taxonomy TBD).',
+    desc: 'Controlled vocabulary terms include canonical place functions (such as sugar production, coffee cultivation, church, or military post), plantation status, source types, and certainty levels. Place functions are SKOS concepts assigned only to physical features through dated E17 Type Assignments.',
     color: CRM_COLORS.E55,
     cx: 500,
     cy: 660,
@@ -338,7 +338,7 @@ const ENTITIES: EntityDef[] = [
     properties: [
       { name: 'rdfs:label', range: 'string' },
       { name: 'P127 has broader term', range: 'E55 Type (hierarchy)' },
-      { name: 'P2i is type of', range: 'E25 / E74 / E22 (typed entity)' },
+      { name: 'P42i was assigned by', range: 'E17 dated place-function assignment' },
     ],
   },
   {
@@ -1179,11 +1179,11 @@ function SourcePatternSection() {
           {' (size in akkers)'}
         </div>
         <div>
-          <span className="text-ink/45">Types:</span>{' '}
-          <span style={{ color: CRM_COLORS.E13 }}>E13 Attr. Assign.</span>
-          {' -> P141 -> '}
+          <span className="text-ink/45">Place functions:</span>{' '}
+          <span style={{ color: CRM_COLORS.E17 }}>E17 Type Assignment</span>
+          {' -> P42 -> '}
           <span style={{ color: CRM_COLORS.E55 }}>E55 Type</span>
-          {' (product / deserted)'}
+          {' / SKOS concept + P41 -> physical place'}
         </div>
         <div>
           <span className="text-ink/45">Production:</span>{' '}
@@ -1886,8 +1886,8 @@ function ModelPageInner() {
             {[
               {
                 status: 'green' as const,
-                question: 'What products were grown at a plantation over time?',
-                path: 'E13 -> P141 assigned -> E55 Type (product) + P4 has time-span -> E52',
+                question: 'Which functions were attested at a plantation over time?',
+                path: 'E17 -> P41 classified -> E25 + P42 assigned -> E55/SKOS function + P4 -> E52',
               },
               {
                 status: 'red' as const,

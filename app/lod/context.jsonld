@@ -44,6 +44,7 @@
     "OrganizationAuthorityOverride": "stm:OrganizationAuthorityOverride",
     "physicalLinkReviewStatus": "stm:physicalLinkReviewStatus",
     "reviewedPhysicalPlaceIds": "stm:reviewedPhysicalPlaceId",
+    "functionEvidenceKind": "stm:functionEvidenceKind",
     "P1_is_identified_by": {
       "@id": "crm:P1_is_identified_by",
       "@type": "@id"

@@ -50,6 +50,17 @@ type PlaceProjection = {
     startYear?: number;
     endYear?: number;
   }>;
+  functionAssertions: Array<{
+    id: string;
+    functionId: string;
+    functionUri: string;
+    label: string;
+    sourceLabel: string;
+    evidenceKind: 'production' | 'recorded-function';
+    source: string;
+    startYear?: number;
+    endYear?: number;
+  }>;
   locationAssertions: Array<{
     id?: string;
     standardized?: string | null;
@@ -138,6 +149,7 @@ export default async function PlaceRecordPage({
     sources: place.sources ?? [],
     statusAssertions: place.statusAssertions ?? [],
     productAssertions: place.productAssertions ?? [],
+    functionAssertions: place.functionAssertions ?? [],
     locationAssertions: place.locationAssertions ?? [],
     diklandRefs: place.diklandRefs ?? [],
   };
@@ -283,16 +295,42 @@ export default async function PlaceRecordPage({
           )}
         </section>
 
-        <section className="mt-10 border-t border-ink/10 pt-6">
-          <h2 className="text-xl font-semibold">Cultivation evidence</h2>
-          <ul className="mt-3 space-y-2 text-sm">
-            {place.productAssertions.map((assertion, index) => (
-              <li key={assertion.id ?? index}>
-                {assertion.value} <span className="text-ink/65">{assertion.startYear}{assertion.endYear && assertion.endYear !== assertion.startYear ? `–${assertion.endYear}` : ''}{assertion.source ? ` · ${assertion.source}` : ''}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
+        {place.functionAssertions.length > 0 && (
+          <section className="mt-10 border-t border-ink/10 pt-6">
+            <h2 className="text-xl font-semibold">Place functions</h2>
+            <p className="mt-2 text-sm text-ink/65">
+              Source-qualified functions of this physical place. A date range
+              records when the function is attested, not necessarily its full
+              duration.
+            </p>
+            <ul className="mt-3 space-y-3 text-sm">
+              {place.functionAssertions.map((assertion) => (
+                <li
+                  key={assertion.id}
+                  className="border-l-2 border-teal-strong pl-3"
+                >
+                  <Link
+                    className="font-semibold underline decoration-teal-strong"
+                    href={`/vocabulary/place-function/${assertion.functionId}`}
+                  >
+                    {assertion.label}
+                  </Link>{' '}
+                  <span className="text-ink/65">
+                    {assertion.startYear ?? 'undated'}
+                    {assertion.endYear &&
+                    assertion.endYear !== assertion.startYear
+                      ? `–${assertion.endYear}`
+                      : ''}
+                    {assertion.source ? ` · ${assertion.source}` : ''}
+                  </span>
+                  <p className="mt-1 text-xs text-ink/55">
+                    Source term: {assertion.sourceLabel}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         {place.diklandRefs.length > 0 && (
           <section className="mt-10 border-t border-ink/10 pt-6">

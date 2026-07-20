@@ -21,7 +21,7 @@ stm:LocationShape
   sh:targetClass crm:E53_Place ;
   sh:property [ sh:path geo:hasGeometry ; sh:nodeKind sh:IRI ] .
 
-stm:StatusAssertionShape
+stm:OperationalAndFunctionAssignmentShape
   a sh:NodeShape ;
   sh:targetClass crm:E17_Type_Assignment ;
   sh:property [ sh:path crm:P41_classified ; sh:minCount 1 ] ;
@@ -33,7 +33,7 @@ stm:StatusAssertionShape
     sh:pattern "^https://data\\.surinametijdmachine\\.org/source/"
   ] .
 
-stm:CultivationEvidenceShape
+stm:SourceObservationShape
   a sh:NodeShape ;
   sh:targetClass crm:E13_Attribute_Assignment ;
   sh:property [

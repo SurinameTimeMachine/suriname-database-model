@@ -11,6 +11,12 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import {
+  derivePlaceFunctionAssertions,
+  placeFunctionLabels,
+  PLACE_FUNCTION_SCHEME_URI,
+  type PlaceFunctionSource,
+} from '../lib/place-functions';
+import {
   type AppellationRow,
   type ObservationRow,
   transformAlmanakken,
@@ -682,6 +688,78 @@ function buildE55Types(): Record<string, unknown>[] {
   });
 }
 
+function buildPlaceFunctionTypes(): Record<string, unknown>[] {
+  const concepts = new Map<
+    string,
+    { sourceLabels: Set<string>; evidenceKinds: Set<string> }
+  >();
+  if (existsSync(GAZETTEER_PATH)) {
+    const document = JSON.parse(readFileSync(GAZETTEER_PATH, 'utf-8')) as {
+      '@graph'?: Array<
+        PlaceFunctionSource & {
+          type?: string;
+          deprecated?: boolean;
+          mergedInto?: string;
+        }
+      >;
+    };
+    for (const entry of document['@graph'] ?? []) {
+      if (entry.type !== 'plantation' || entry.deprecated || entry.mergedInto) {
+        continue;
+      }
+      for (const assertion of derivePlaceFunctionAssertions(entry)) {
+        const concept = concepts.get(assertion.functionId) ?? {
+          sourceLabels: new Set<string>(),
+          evidenceKinds: new Set<string>(),
+        };
+        concept.sourceLabels.add(assertion.sourceLabel);
+        concept.evidenceKinds.add(assertion.evidenceKind);
+        concepts.set(assertion.functionId, concept);
+      }
+    }
+  }
+
+  return [
+    {
+      '@id': PLACE_FUNCTION_SCHEME_URI,
+      '@type': ['skos:ConceptScheme'],
+      'skos:prefLabel': [
+        { '@value': 'Vocabulaire van plaatsfuncties', '@language': 'nl' },
+        { '@value': 'Place functions vocabulary', '@language': 'en' },
+      ],
+      'skos:scopeNote': [
+        {
+          '@value':
+            'Time-scoped functions assigned only to physical place features from source-qualified evidence.',
+          '@language': 'en',
+        },
+        {
+          '@value':
+            'Tijdgebonden functies die uitsluitend op basis van brongebonden bewijs aan fysieke plaatsen zijn toegekend.',
+          '@language': 'nl',
+        },
+      ],
+    },
+    ...[...concepts.entries()]
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([functionId, concept]) => {
+        const sourceLabels = [...concept.sourceLabels].sort();
+        const labels = placeFunctionLabels(functionId, sourceLabels[0]);
+        return {
+          '@id': `${PLACE_FUNCTION_SCHEME_URI}/${functionId}`,
+          '@type': ['skos:Concept', 'E55_Type'],
+          'skos:prefLabel': [
+            { '@value': labels.nl, '@language': 'nl' },
+            { '@value': labels.en, '@language': 'en' },
+          ],
+          'skos:altLabel': sourceLabels,
+          'skos:inScheme': PLACE_FUNCTION_SCHEME_URI,
+          functionEvidenceKind: [...concept.evidenceKinds].sort(),
+        };
+      }),
+  ];
+}
+
 function buildInferenceRules(): Record<string, unknown>[] {
   return [
     {
@@ -1240,6 +1318,10 @@ function main() {
 
   const e55Types = buildE55Types();
   console.log(`  E55 Types:          ${e55Types.length}`);
+  const placeFunctionTypes = buildPlaceFunctionTypes();
+  console.log(
+    `  Place functions:    ${Math.max(0, placeFunctionTypes.length - 1)}`,
+  );
 
   const e52TimeSpans = buildE52TimeSpans(
     new Set([
@@ -1277,6 +1359,7 @@ function main() {
     ...e41All,
     ...e36Entities,
     ...e55Types,
+    ...placeFunctionTypes,
     ...buildInferenceRules(),
     ...e52TimeSpans,
     ...e12Productions,

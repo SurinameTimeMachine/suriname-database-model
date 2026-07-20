@@ -6,6 +6,12 @@
 import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
 import jsonld from 'jsonld';
+import {
+  derivePlaceFunctionAssertions,
+  PLACE_FUNCTION_SCHEME_URI,
+  type PlaceFunctionAssertion,
+  type PlaceFunctionSource,
+} from '../lib/place-functions';
 
 const LOD_DIR = join(__dirname, '../lod');
 const PUBLIC_DATA_DIR = join(__dirname, '../public/data');
@@ -66,6 +72,20 @@ interface AlmanakkenReviewDocument {
     }
   >;
   unlinkedRows?: Array<{ recordId?: string }>;
+}
+
+interface PlaceFunctionsDocument {
+  scheme?: { uri?: string };
+  functions?: Array<{
+    id?: string;
+    uri?: string;
+    placeCount?: number;
+    assertionCount?: number;
+    places?: Array<{
+      id?: string;
+      usages?: Array<{ assertionId?: string }>;
+    }>;
+  }>;
 }
 
 function assert(condition: unknown, message: string): asserts condition {
@@ -134,6 +154,9 @@ async function main() {
   const almanakkenReview = JSON.parse(
     readArtifact(PUBLIC_DATA_DIR, 'almanakken-review.json').toString('utf-8'),
   ) as AlmanakkenReviewDocument;
+  const placeFunctions = JSON.parse(
+    readArtifact(PUBLIC_DATA_DIR, 'place-functions.json').toString('utf-8'),
+  ) as PlaceFunctionsDocument;
   const organizationOverrides = JSON.parse(
     readArtifact(DATA_DIR, 'organization-authority-overrides.jsonld').toString(
       'utf-8',
@@ -400,6 +423,20 @@ async function main() {
   const aggregateEntitiesById = new Map(
     document['@graph'].map((entity) => [entity['@id'], entity]),
   );
+  assert(
+    placeFunctions.scheme?.uri === PLACE_FUNCTION_SCHEME_URI,
+    'Place-functions application data uses an unexpected concept scheme',
+  );
+  const aggregateFunctionScheme = aggregateEntitiesById.get(
+    PLACE_FUNCTION_SCHEME_URI,
+  );
+  assert(
+    aggregateFunctionScheme &&
+      toArray(aggregateFunctionScheme['@type'] as string | string[]).includes(
+        'skos:ConceptScheme',
+      ),
+    'Aggregate JSON-LD has no place-function concept scheme',
+  );
   const gazetteerPlantationsByFeatureUri = new Map(
     activeGazetteer
       .filter(
@@ -416,6 +453,179 @@ async function main() {
     'needs-physical-link-review',
     'needs-physical-plantation-link',
   ]);
+  const expectedFunctions = new Map<
+    string,
+    Map<string, PlaceFunctionAssertion[]>
+  >();
+  for (const entry of activeGazetteer) {
+    if (entry.type !== 'plantation' || typeof entry.id !== 'string') continue;
+    const assertions = derivePlaceFunctionAssertions(
+      entry as PlaceFunctionSource,
+    );
+    if (assertions.length === 0) continue;
+
+    const projection = JSON.parse(
+      readArtifact(PLACE_RECORDS_DIR, `${entry.id}.json`).toString('utf-8'),
+    ) as Record<string, unknown>;
+    const projectedAssertions = toArray(
+      projection.functionAssertions as Record<string, unknown>[] | undefined,
+    );
+    assert(
+      projectedAssertions.length === assertions.length,
+      `Authority-record projection ${entry.id} has incomplete function assertions`,
+    );
+
+    const record = JSON.parse(
+      readArtifact(PLACE_RECORDS_DIR, `${entry.id}.jsonld`).toString('utf-8'),
+    ) as JsonLdDocument;
+    const graph = record['@graph'] ?? [];
+    const featureUri = `${CANONICAL_BASE}place/${entry.id}#feature`;
+    const feature = graph.find((entity) => entity['@id'] === featureUri);
+    assert(
+      feature &&
+        toArray(feature['@type'] as string | string[]).includes(
+          'crm:E25_Human_Made_Feature',
+        ),
+      `Function-bearing authority record ${entry.id} has no E25 target`,
+    );
+
+    for (const assertion of assertions) {
+      const assignmentUri = `${CANONICAL_BASE}place/${entry.id}#assertion-${assertion.id}`;
+      const assignment = graph.find(
+        (entity) => entity['@id'] === assignmentUri,
+      );
+      assert(
+        assignment &&
+          toArray(assignment['@type'] as string | string[]).includes(
+            'crm:E17_Type_Assignment',
+          ) &&
+          assignment.P41_classified === featureUri &&
+          assignment.P42_assigned === assertion.functionUri,
+        `Function assertion ${assignmentUri} is not an E17 assignment to its physical place`,
+      );
+      assert(
+        assertion.startYear == null ||
+          typeof assignment.P4_has_time_span === 'string',
+        `Dated function assertion ${assignmentUri} has no E52 time-span`,
+      );
+      const term = graph.find(
+        (entity) => entity['@id'] === assertion.functionUri,
+      );
+      assert(
+        term &&
+          toArray(term['@type'] as string | string[]).includes(
+            'crm:E55_Type',
+          ) &&
+          toArray(term['@type'] as string | string[]).includes('skos:Concept') &&
+          term['skos:inScheme'] === PLACE_FUNCTION_SCHEME_URI,
+        `Function assertion ${assignmentUri} has no local E55/SKOS concept`,
+      );
+      const places =
+        expectedFunctions.get(assertion.functionId) ??
+        new Map<string, PlaceFunctionAssertion[]>();
+      const placeAssertions: PlaceFunctionAssertion[] =
+        places.get(entry.id) ?? [];
+      placeAssertions.push(assertion);
+      places.set(entry.id, placeAssertions);
+      expectedFunctions.set(assertion.functionId, places);
+    }
+  }
+
+  const publishedFunctionIds = new Set<string>();
+  for (const term of placeFunctions.functions ?? []) {
+    assert(
+      typeof term.id === 'string' && expectedFunctions.has(term.id),
+      `Place-functions application data contains an unexpected term ${String(term.id)}`,
+    );
+    assert(!publishedFunctionIds.has(term.id), `Duplicate function term ${term.id}`);
+    publishedFunctionIds.add(term.id);
+    assert(
+      term.uri === `${PLACE_FUNCTION_SCHEME_URI}/${term.id}`,
+      `Function term ${term.id} has a non-canonical URI`,
+    );
+    const expectedPlaces = expectedFunctions.get(term.id)!;
+    const expectedAssertionCount = [...expectedPlaces.values()].reduce(
+      (sum, assertions) => sum + assertions.length,
+      0,
+    );
+    assert(
+      term.placeCount === expectedPlaces.size &&
+        term.assertionCount === expectedAssertionCount,
+      `Function term ${term.id} has inconsistent place or assertion counts`,
+    );
+    const publishedPlaces = new Map(
+      (term.places ?? []).map((place) => [place.id, place]),
+    );
+    for (const [placeId, assertions] of expectedPlaces) {
+      const publishedPlace = publishedPlaces.get(placeId);
+      assert(
+        publishedPlace &&
+          new Set(
+            (publishedPlace.usages ?? []).map((usage) => usage.assertionId),
+          ).size === assertions.length &&
+          assertions.every((assertion) =>
+            (publishedPlace.usages ?? []).some(
+              (usage) => usage.assertionId === assertion.id,
+            ),
+          ),
+        `Function term ${term.id} has incomplete usage links for ${placeId}`,
+      );
+    }
+    const aggregateTerm = aggregateEntitiesById.get(term.uri);
+    assert(
+      aggregateTerm &&
+        toArray(aggregateTerm['@type'] as string | string[]).includes(
+          'E55_Type',
+        ) &&
+        toArray(aggregateTerm['@type'] as string | string[]).includes(
+          'skos:Concept',
+        ) &&
+        aggregateTerm['skos:inScheme'] === PLACE_FUNCTION_SCHEME_URI,
+      `Aggregate JSON-LD has no canonical E55/SKOS function term ${term.id}`,
+    );
+  }
+  assert(
+    publishedFunctionIds.size === expectedFunctions.size,
+    'Place-functions application data omits derived function terms',
+  );
+  const expectedFunctionAssignmentCount = [...expectedFunctions.values()]
+    .flatMap((places) => [...places.values()])
+    .reduce((sum, assertions) => sum + assertions.length, 0);
+  let serializedFunctionAssignmentCount = 0;
+  for (const recordEntry of recordIndex) {
+    const recordId = recordEntry.id as string;
+    const record = JSON.parse(
+      readArtifact(PLACE_RECORDS_DIR, `${recordId}.jsonld`).toString('utf-8'),
+    ) as JsonLdDocument;
+    const graph = record['@graph'] ?? [];
+    for (const assignment of graph.filter(
+      (entity) =>
+        typeof entity.P42_assigned === 'string' &&
+        entity.P42_assigned.startsWith(`${PLACE_FUNCTION_SCHEME_URI}/`),
+    )) {
+      serializedFunctionAssignmentCount++;
+      const target = graph.find(
+        (entity) => entity['@id'] === assignment.P41_classified,
+      );
+      assert(
+        toArray(assignment['@type'] as string | string[]).includes(
+          'crm:E17_Type_Assignment',
+        ) &&
+          target &&
+          toArray(target['@type'] as string | string[]).includes(
+            'crm:E25_Human_Made_Feature',
+          ) &&
+          !toArray(target['@type'] as string | string[]).includes(
+            'crm:E74_Group',
+          ),
+        `Place-function assignment ${String(assignment['@id'])} does not classify an E25 physical place`,
+      );
+    }
+  }
+  assert(
+    serializedFunctionAssignmentCount === expectedFunctionAssignmentCount,
+    'Serialized place-function assignment count differs from the derived application data',
+  );
   for (const entity of document['@graph'].filter((candidate) =>
     toArray(candidate['@type'] as string | string[]).includes('Plantation'),
   )) {

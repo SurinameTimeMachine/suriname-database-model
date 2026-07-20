@@ -8,7 +8,7 @@
  *
  * Path routes:
  *   /sources/{sourceId}     — map-1930
- *   /vocabulary/{typeId}    — plantation
+ *   /vocabulary/place-function/{functionId} — koffie
  */
 
 /* ─── Default map viewport ─────────────────────────────────────── */
@@ -29,7 +29,7 @@ export function buildSourceUrl(sourceId: string): string {
 }
 
 export function buildVocabularyUrl(typeId: string): string {
-  return `/vocabulary/${encodeURIComponent(typeId)}`;
+  return `/vocabulary/place-function/${encodeURIComponent(typeId)}`;
 }
 
 /* ─── Query-param URL builders ─────────────────────────────────── */

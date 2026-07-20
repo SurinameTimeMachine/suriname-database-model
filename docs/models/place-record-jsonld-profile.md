@@ -38,8 +38,9 @@ therefore distinguishes:
   evidence exists;
 - operational status — source-bound E17 Type Assignments such as cultivation
   attested, abandonment reported, and cultivation re-attested;
-- cultivation evidence — E13 Attribute Assignment to the physical feature,
-  assigning an E99 Product Type;
+- place functions — source-bound E17 Type Assignments to the physical E25
+  feature, assigning an E55/SKOS place-function concept and a time span when
+  the source provides one;
 - organisational relations — future E13 role assertions linking E25 and E74
   with a role, source, time span, and certainty.
 
@@ -68,13 +69,21 @@ details are preserved as JSON literals on the source observation. They are not
 claimed as CIDOC CRM statements. Acreage is likewise retained as an STM source
 field until it can be represented by an E54 Dimension with a value and unit.
 
+The raw `product` and `function` fields remain part of their E13 observation on
+the E74 organization. A separate, traceable E17 projection makes the attested
+function browsable on the corresponding physical plantation. Composite product
+values are split into atomic function terms. Their canonical concept scheme is
+`https://data.surinametijdmachine.org/vocabulary/place-function`. A derived
+range describes the years for which evidence is available; it is not an
+unsourced claim about the function's complete duration.
+
 ## Sources and geometry
 
 Names are E41 Appellations, identifiers are E42 Identifiers, source documents
 are E22/E31 nodes, and Dikland PDF references become structured E22/E31 nodes
 linked to the Dikland collection. Geometries use GeoSPARQL WKT in CRS84.
 
-Each editorial statement has a stable ID and a registry source. Product and
+Each editorial statement has a stable ID and a registry source. Function and
 operational-status statements also require a date or time span. District and
 location statements carry a time span when the source supplies one; an unknown
 date is left unknown rather than invented. Record-level `sources` describe

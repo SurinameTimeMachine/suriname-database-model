@@ -220,6 +220,9 @@ export interface FeatureLifecycleEvent {
   P123_resulted_in?: string;
   P124_transformed?: string | string[];
   assignedType?: string;
+  assignedLabel?: string;
+  sourceLabel?: string;
+  evidenceKind?: 'production' | 'recorded-function';
   status?: PlantationStatusType | string;
   note?: string | null;
 }

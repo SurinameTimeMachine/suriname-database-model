@@ -15,6 +15,11 @@ import {
 } from 'fs';
 import { join } from 'path';
 import type { AlmanakkenPlantationObservation } from '../lib/types';
+import {
+  derivePlaceFunctionAssertions,
+  placeFunctionLabels,
+  PLACE_FUNCTION_SCHEME_URI,
+} from '../lib/place-functions';
 
 import { BASE, buildPlaceRecordContext } from './lod-context';
 
@@ -318,6 +323,8 @@ export function generatePlaceRecords() {
       return uri;
     };
     const productTypeUris = new Set<string>();
+    const functionTypeUris = new Set<string>();
+    const functionAssertions = derivePlaceFunctionAssertions(entry);
     const referencedSourceIds = new Set<string>(entry.sources ?? []);
     for (const name of names) if (name.source) referencedSourceIds.add(name.source);
     for (const assertion of [
@@ -327,6 +334,9 @@ export function generatePlaceRecords() {
       ...asArray(entry.productAssertions),
     ]) {
       if (assertion.source) referencedSourceIds.add(assertion.source);
+    }
+    for (const assertion of functionAssertions) {
+      referencedSourceIds.add(assertion.source);
     }
     const sourceUris = [...referencedSourceIds].map((id) => sourceUri(id, sourceIds));
 
@@ -559,17 +569,17 @@ export function generatePlaceRecords() {
     }
     if (statusUris.length > 0) record.hasOperationalSummary = statusUris;
 
-    for (const assertion of entry.productAssertions ?? []) {
-      if (!assertion.id || !assertion.value) continue;
+    const functionAssignmentUris: string[] = [];
+    for (const assertion of functionAssertions) {
       const assertionUri = fragmentUri(pageUri, `assertion-${assertion.id}`);
       const spanUri = fragmentUri(pageUri, `assertion-${assertion.id}-time-span`);
       const span = timeSpan(spanUri, assertion.startYear, assertion.endYear);
       if (span) graph.push(span);
       graph.push({
         '@id': assertionUri,
-        '@type': ['crm:E13_Attribute_Assignment'],
-        P140_assigned_attribute_to: targetUri,
-        P141_assigned: `${BASE}type/product/${slug(assertion.value)}`,
+        '@type': ['crm:E17_Type_Assignment'],
+        P41_classified: targetUri,
+        P42_assigned: assertion.functionUri,
         ...(span ? { P4_has_time_span: spanUri } : {}),
         ...(assertion.source
           ? { 'prov:hadPrimarySource': sourceUri(assertion.source, sourceIds) }
@@ -577,16 +587,30 @@ export function generatePlaceRecords() {
         certainty: `${BASE}type/certainty/certain`,
         ...(assertion.note ? { P3_has_note: assertion.note } : {}),
       });
-      const productTypeUri = `${BASE}type/product/${slug(assertion.value)}`;
-      if (!productTypeUris.has(productTypeUri)) {
-        productTypeUris.add(productTypeUri);
+      if (!functionTypeUris.has(assertion.functionUri)) {
+        functionTypeUris.add(assertion.functionUri);
+        const labels = placeFunctionLabels(
+          assertion.functionId,
+          assertion.sourceLabel,
+        );
         graph.push({
-          '@id': productTypeUri,
-          '@type': ['crm:E99_Product_Type'],
-          'rdfs:label': assertion.value,
+          '@id': assertion.functionUri,
+          '@type': ['skos:Concept', 'crm:E55_Type'],
+          'skos:prefLabel': [
+            { '@value': labels.nl, '@language': 'nl' },
+            { '@value': labels.en, '@language': 'en' },
+          ],
+          'skos:altLabel': assertion.sourceLabel,
+          'skos:inScheme': PLACE_FUNCTION_SCHEME_URI,
         });
       }
       evidenceUris.push(assertionUri);
+      functionAssignmentUris.push(assertionUri);
+    }
+    if (functionAssignmentUris.length > 0) {
+      record.hasFunctionSummary = functionAssignmentUris;
+      const subject = graph.find((entity) => entity['@id'] === targetUri);
+      if (subject) subject.hasFunctionAssignment = functionAssignmentUris;
     }
     // Preserve saved Almanakken v2 rows as source-bound observations.
     // These rows are evidence for review; curated claims remain the assertions above.
@@ -753,6 +777,7 @@ export function generatePlaceRecords() {
       sources: asArray(entry.sources),
       statusAssertions: asArray(entry.statusAssertions),
       productAssertions: asArray(entry.productAssertions),
+      functionAssertions,
       districtAssertions: asArray(entry.districtAssertions),
       locationAssertions: asArray(entry.locationAssertions),
       almanakkenObservations,

@@ -784,7 +784,7 @@ export default function PlaceEditor({
     [applyDistrictAssertions, deriveDistrictLabelById, districtAssertions],
   );
 
-  // ── Product assertions ────────────────────────────────────────────────────
+  // ── Place-function assertions (stored in the legacy productAssertions key) ─
 
   const productAssertions = draft.productAssertions || [];
 
@@ -937,11 +937,11 @@ export default function PlaceEditor({
   );
 
   /**
-   * Computed lifecycle events — merges status assertions + product assertions
+   * Computed lifecycle events — merges status assertions + function assertions
    * into a flat sorted list for the read-only timeline display.
    */
   const computedLifecycleEvents = useMemo(() => {
-    type EventKind = 'status' | 'product-activity';
+    type EventKind = 'status' | 'function-assignment';
     interface LifecycleEvent {
       kind: EventKind;
       status?: PlantationStatusType;
@@ -965,7 +965,7 @@ export default function PlaceEditor({
 
     for (const a of (draft.productAssertions || []).filter((p) => p.value)) {
       events.push({
-        kind: 'product-activity',
+        kind: 'function-assignment',
         product: a.value,
         startYear: a.startYear,
         endYear: a.endYear,
@@ -1490,7 +1490,7 @@ export default function PlaceEditor({
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
               <div className="border border-black/10 bg-white/60 p-2">
                 <div className="text-[10px] uppercase tracking-[0.16em] opacity-60">
-                  Products
+                  Production functions
                 </div>
                 <div className="font-medium">
                   {almanakkenReview.productRows} rows
@@ -2573,11 +2573,11 @@ export default function PlaceEditor({
               ))}
             </div>
           </div>
-          {/* Product observations */}
+          {/* Place-function observations */}
           <div>
             <div className="flex items-center justify-between mb-1">
               <label className="block text-sm font-medium text-stm-warm-700">
-                Product (per year / source)
+                Place function (per year / source)
               </label>
               {canEdit && (
                 <button
@@ -2585,13 +2585,13 @@ export default function PlaceEditor({
                   onClick={addProductAssertion}
                   className="text-xs text-stm-sepia-600 hover:text-stm-sepia-800"
                 >
-                  + Add product observation
+                  + Add function observation
                 </button>
               )}
             </div>
             {productAssertions.length === 0 && (
               <p className="text-xs text-stm-warm-400 italic">
-                No product observations recorded.
+                No function observations recorded.
               </p>
             )}
             <div className="space-y-2">
@@ -2848,13 +2848,13 @@ export default function PlaceEditor({
                     present: 'bg-blue-50 text-blue-700 border-blue-200',
                     unknown:
                       'bg-stm-warm-50 text-stm-warm-500 border-stm-warm-200',
-                    'product-activity':
+                    'function-assignment':
                       'bg-stm-sepia-50 text-stm-sepia-700 border-stm-sepia-200',
                   };
 
                   const colorKey =
-                    ev.kind === 'product-activity'
-                      ? 'product-activity'
+                    ev.kind === 'function-assignment'
+                      ? 'function-assignment'
                       : (ev.status ?? 'unknown');
                   const colorClass =
                     statusColors[colorKey] ?? statusColors.unknown;
@@ -2867,7 +2867,7 @@ export default function PlaceEditor({
                       <span
                         className={`inline-block border px-1.5 py-0.5 text-[10px] font-medium shrink-0 ${colorClass}`}
                       >
-                        {ev.kind === 'product-activity'
+                        {ev.kind === 'function-assignment'
                           ? ev.product
                           : ev.status}
                       </span>
@@ -2876,9 +2876,9 @@ export default function PlaceEditor({
                           {yearSpan}
                         </span>
                       )}
-                      {ev.kind === 'product-activity' && (
+                      {ev.kind === 'function-assignment' && (
                         <span className="text-stm-warm-400 text-[10px]">
-                          (product)
+                          (place function)
                         </span>
                       )}
                     </div>
@@ -2890,7 +2890,7 @@ export default function PlaceEditor({
             {computedLifecycleEvents.length === 0 &&
               statusAssertions.length === 0 && (
                 <p className="text-xs text-stm-warm-400 italic">
-                  No lifecycle events recorded. Add product observations or
+                  No lifecycle events recorded. Add function observations or
                   status events to build the timeline.
                 </p>
               )}
