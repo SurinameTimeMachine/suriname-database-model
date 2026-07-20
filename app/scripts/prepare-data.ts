@@ -1057,7 +1057,9 @@ for (const entry of gazetteerEntries) {
       assignedType,
       assignedLabel: assertion.label,
       sourceLabel: assertion.sourceLabel,
-      evidenceKind: assertion.evidenceKind,
+      evidenceKinds: assertion.evidenceKinds,
+      sourceRows: assertion.sourceRows,
+      certainty: assertion.certainty,
       note: assertion.note ?? null,
     });
     lifecycleEventCount++;
@@ -1193,9 +1195,11 @@ for (const featureUri of Object.keys(lifecycleEventsByEntity)) {
 
 type FunctionUsage = {
   assertionId: string;
-  evidenceKind: 'production' | 'recorded-function';
+  evidenceKinds: Array<'production' | 'recorded-function'>;
   sourceLabel: string;
   source: string;
+  sourceRows: string[];
+  certainty: 'certain' | 'probable' | 'uncertain';
   startYear?: number;
   endYear?: number;
 };
@@ -1249,8 +1253,10 @@ for (const entry of gazetteerEntries) {
     if (!concept.sourceLabels.includes(assertion.sourceLabel)) {
       concept.sourceLabels.push(assertion.sourceLabel);
     }
-    if (!concept.evidenceKinds.includes(assertion.evidenceKind)) {
-      concept.evidenceKinds.push(assertion.evidenceKind);
+    for (const evidenceKind of assertion.evidenceKinds) {
+      if (!concept.evidenceKinds.includes(evidenceKind)) {
+        concept.evidenceKinds.push(evidenceKind);
+      }
     }
     let place = concept.places.find((candidate) => candidate.id === entry.id);
     if (!place) {
@@ -1264,9 +1270,11 @@ for (const entry of gazetteerEntries) {
     }
     place.usages.push({
       assertionId: assertion.id,
-      evidenceKind: assertion.evidenceKind,
+      evidenceKinds: assertion.evidenceKinds,
       sourceLabel: assertion.sourceLabel,
       source: assertion.source,
+      sourceRows: assertion.sourceRows,
+      certainty: assertion.certainty,
       startYear: assertion.startYear,
       endYear: assertion.endYear,
     });

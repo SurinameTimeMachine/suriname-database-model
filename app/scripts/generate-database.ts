@@ -206,11 +206,14 @@ function buildE25Plantations(
       '@type': ['E25_Human_Made_Feature', 'Plantation'],
       status: p.status,
       featureType: p.featureType,
+      P2_has_type: [`${BASE}vocabulary/place-type/plantation`],
     };
 
-    // CRM alignment: P2 has type -> E55 Type (plantation status)
+    // Retain the operational status type alongside the structural place type.
     if (p.status) {
-      entity.P2_has_type = `${BASE}type/plantation-status/${p.status.toLowerCase()}`;
+      (entity.P2_has_type as string[]).push(
+        `${BASE}type/plantation-status/${p.status.toLowerCase()}`,
+      );
     }
 
     if (p.prefLabel) entity.prefLabel = p.prefLabel;
@@ -454,7 +457,10 @@ function buildE26PhysicalFeatures(
       '@id': f.uri,
       '@type': ['E26_Physical_Feature'],
       featureType: f.featureType,
-      P2_has_type: `${VOCAB_BASE}/${f.featureType}`,
+      P2_has_type: [
+        `${BASE}vocabulary/place-type/${f.featureType}`,
+        `${VOCAB_BASE}/${f.featureType}`,
+      ],
     };
 
     if (f.prefLabel) entity.prefLabel = f.prefLabel;
@@ -768,7 +774,9 @@ function buildPlaceFunctionTypes(): Record<string, unknown>[] {
           evidenceKinds: new Set<string>(),
         };
         concept.sourceLabels.add(assertion.sourceLabel);
-        concept.evidenceKinds.add(assertion.evidenceKind);
+        for (const evidenceKind of assertion.evidenceKinds) {
+          concept.evidenceKinds.add(evidenceKind);
+        }
         concepts.set(assertion.functionId, concept);
       }
     }
@@ -821,6 +829,13 @@ function buildPlaceFunctionTypes(): Record<string, unknown>[] {
 
 function buildInferenceRules(): Record<string, unknown>[] {
   return [
+    {
+      '@id': `${BASE}rule/place-function-from-organization-observation`,
+      '@type': ['InferenceRule'],
+      prefLabel: 'Place function projected from organization observation',
+      'dcterms:description':
+        'An Almanakken product or function observation about an E74 plantation organization supports a probable, time-scoped function assignment to its uniquely associated E25 physical plantation. The assignment remains linked to every supporting source observation.',
+    },
     {
       '@id': `${BASE}rule/enslaved-population-presence-at-matched-plantation`,
       '@type': ['InferenceRule'],

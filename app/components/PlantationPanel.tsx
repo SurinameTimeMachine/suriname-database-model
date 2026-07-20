@@ -580,11 +580,15 @@ function FunctionEntry({
         </span>
       </div>
       <p className="mt-0.5 text-[10px] text-stm-warm-400">
-        {event.evidenceKind === 'recorded-function'
-          ? 'Recorded function'
-          : 'Production function'}
+        {event.evidenceKinds?.includes('recorded-function') &&
+        event.evidenceKinds.includes('production')
+          ? 'Recorded and production function'
+          : event.evidenceKinds?.includes('recorded-function')
+            ? 'Recorded function'
+            : 'Production function'}
         {event.sourceLabel ? `: ${event.sourceLabel}` : ''}
         {sourceLabel ? ` · ${sourceLabel}` : ''}
+        {event.certainty ? ` · ${event.certainty}` : ''}
       </p>
     </div>
   );

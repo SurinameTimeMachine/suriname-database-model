@@ -85,7 +85,12 @@ interface PlaceFunctionsDocument {
     relatedPlaceType?: { id?: string; uri?: string };
     places?: Array<{
       id?: string;
-      usages?: Array<{ assertionId?: string }>;
+      usages?: Array<{
+        assertionId?: string;
+        evidenceKinds?: string[];
+        sourceRows?: string[];
+        certainty?: string;
+      }>;
     }>;
   }>;
 }
@@ -434,6 +439,28 @@ async function main() {
   const aggregateEntitiesById = new Map(
     document['@graph'].map((entity) => [entity['@id'], entity]),
   );
+  for (const entity of document['@graph']) {
+    const featureType = entity.featureType;
+    if (
+      typeof featureType !== 'string' ||
+      !['plantation', 'river', 'creek'].includes(featureType)
+    ) {
+      continue;
+    }
+    const types = toArray(entity['@type'] as string | string[]);
+    if (
+      !types.includes('E25_Human_Made_Feature') &&
+      !types.includes('E26_Physical_Feature')
+    ) {
+      continue;
+    }
+    assert(
+      toArray(entity.P2_has_type as string | string[]).includes(
+        `${CANONICAL_BASE}vocabulary/place-type/${featureType}`,
+      ),
+      `Aggregate physical feature ${String(entity['@id'])} omits its canonical structural place type`,
+    );
+  }
   assert(
     placeFunctions.scheme?.uri === PLACE_FUNCTION_SCHEME_URI,
     'Place-functions application data uses an unexpected concept scheme',
@@ -523,6 +550,56 @@ async function main() {
           typeof assignment.P4_has_time_span === 'string',
         `Dated function assertion ${assignmentUri} has no E52 time-span`,
       );
+      if (assertion.startYear != null) {
+        const span = graph.find(
+          (entity) => entity['@id'] === assignment.P4_has_time_span,
+        );
+        assert(
+          span?.P82a_begin_of_the_begin === String(assertion.startYear) &&
+            span.P82b_end_of_the_end ===
+              String(assertion.endYear ?? assertion.startYear),
+          `Function assertion ${assignmentUri} has incomplete temporal boundaries`,
+        );
+        const context = record['@context'] ?? {};
+        for (const term of [
+          'P82a_begin_of_the_begin',
+          'P82b_end_of_the_end',
+        ]) {
+          const definition = context[term] as
+            | Record<string, unknown>
+            | undefined;
+          assert(
+            definition?.['@type'] === 'xsd:gYear',
+            `Authority record ${entry.id} does not type ${term} as xsd:gYear`,
+          );
+        }
+      }
+      const expectedObservationUris = assertion.sourceRows.map(
+        (recordId) =>
+          `${CANONICAL_BASE}place/${entry.id}#observation-almanakken-${recordId.toLowerCase().replace(/[^a-z0-9._:-]+/g, '-').replace(/^-+|-+$/g, '')}`,
+      );
+      const derivedFrom = toArray(
+        assignment['prov:wasDerivedFrom'] as string | string[] | undefined,
+      );
+      assert(
+        assertion.source !== 'almanakken' ||
+          (expectedObservationUris.length > 0 &&
+            expectedObservationUris.every((uri) => derivedFrom.includes(uri)) &&
+            derivedFrom.length === expectedObservationUris.length &&
+            expectedObservationUris.every((uri) =>
+              graph.some((entity) => entity['@id'] === uri),
+            )),
+        `Function assertion ${assignmentUri} is not traceable to its Almanakken source rows`,
+      );
+      assert(
+        assignment.certainty ===
+          `${CANONICAL_BASE}type/certainty/${assertion.certainty}` &&
+          (assertion.source !== 'almanakken' ||
+            (assertion.certainty === 'probable' &&
+              assignment.inferenceRule ===
+                `${CANONICAL_BASE}rule/place-function-from-organization-observation`)),
+        `Function assertion ${assignmentUri} has incorrect projection certainty`,
+      );
       const term = graph.find(
         (entity) => entity['@id'] === assertion.functionUri,
       );
@@ -591,6 +668,20 @@ async function main() {
           ),
         `Function term ${term.id} has incomplete usage links for ${placeId}`,
       );
+      for (const assertion of assertions) {
+        const usage = (publishedPlace?.usages ?? []).find(
+          (candidate) => candidate.assertionId === assertion.id,
+        );
+        assert(
+          usage &&
+            usage.certainty === assertion.certainty &&
+            JSON.stringify([...(usage.evidenceKinds ?? [])].sort()) ===
+              JSON.stringify([...assertion.evidenceKinds].sort()) &&
+            JSON.stringify([...(usage.sourceRows ?? [])].sort()) ===
+              JSON.stringify([...assertion.sourceRows].sort()),
+          `Function term ${term.id} loses provenance details for ${placeId}`,
+        );
+      }
     }
     const aggregateTerm = aggregateEntitiesById.get(term.uri);
     assert(
@@ -635,6 +726,30 @@ async function main() {
       readArtifact(PLACE_RECORDS_DIR, `${recordId}.jsonld`).toString('utf-8'),
     ) as JsonLdDocument;
     const graph = record['@graph'] ?? [];
+    const projection = JSON.parse(
+      readArtifact(PLACE_RECORDS_DIR, `${recordId}.json`).toString('utf-8'),
+    ) as { type?: string };
+    assert(
+      typeof projection.type === 'string',
+      `Authority record ${recordId} has no structural type projection`,
+    );
+    const structuralTypeUri = `${CANONICAL_BASE}vocabulary/place-type/${projection.type}`;
+    const typedSubject = graph.find((entity) =>
+      toArray(entity.P2_has_type as string | string[] | undefined).includes(
+        structuralTypeUri,
+      ),
+    );
+    assert(
+      typedSubject &&
+        toArray(typedSubject['@type'] as string | string[]).some((type) =>
+          [
+            'crm:E25_Human_Made_Feature',
+            'crm:E26_Physical_Feature',
+            'crm:E53_Place',
+          ].includes(type),
+        ),
+      `Authority record ${recordId} is not linked to canonical structural type ${structuralTypeUri}`,
+    );
     for (const assignment of graph.filter(
       (entity) =>
         typeof entity.P42_assigned === 'string' &&

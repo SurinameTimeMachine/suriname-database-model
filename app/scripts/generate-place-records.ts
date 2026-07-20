@@ -194,14 +194,17 @@ function isPhysicalFeature(type: string): boolean {
 }
 
 function timeSpan(id: string, startYear?: number, endYear?: number): JsonObject | null {
-  if (!startYear && !endYear) return null;
+  if (startYear == null && endYear == null) return null;
+  const firstYear = startYear ?? endYear!;
+  const lastYear = endYear ?? startYear!;
   const entity: JsonObject = {
     '@id': id,
     '@type': ['crm:E52_Time-Span'],
-    'rdfs:label': endYear && endYear !== startYear ? `${startYear}–${endYear}` : String(startYear ?? endYear),
+    'rdfs:label':
+      lastYear !== firstYear ? `${firstYear}–${lastYear}` : String(firstYear),
+    P82a_begin_of_the_begin: String(firstYear),
+    P82b_end_of_the_end: String(lastYear),
   };
-  if (startYear) entity.P82a_begin_of_the_begin = String(startYear);
-  if (endYear) entity.P82b_end_of_the_end = String(endYear);
   return entity;
 }
 
@@ -289,6 +292,7 @@ export function generatePlaceRecords() {
     const featureUri = fragmentUri(pageUri, 'feature');
     const locationUri = fragmentUri(pageUri, 'location');
     const hasFeature = isPhysicalFeature(placeClass);
+    const structuralTypeUri = `${BASE}vocabulary/place-type/${entry.type}`;
     const targetUri = hasFeature ? featureUri : locationUri;
     const names = namesFor(entry);
     const label = preferredName(names);
@@ -368,7 +372,7 @@ export function generatePlaceRecords() {
         '@id': featureUri,
         '@type': [`crm:${placeClass}`],
         'rdfs:label': label,
-        P2_has_type: `${BASE}type/place-type/${entry.type}`,
+        P2_has_type: structuralTypeUri,
         P53_has_location: locationUri,
         'prov:wasDerivedFrom': [...sourceUris],
       };
@@ -407,6 +411,7 @@ export function generatePlaceRecords() {
         ...(entry.locationPoint ? ['geo:Feature'] : []),
       ],
       'rdfs:label': entry.locationDescription ?? label,
+      ...(!hasFeature ? { P2_has_type: structuralTypeUri } : {}),
       'prov:wasDerivedFrom': [...sourceUris],
     };
     if (entry.broader) {
@@ -588,7 +593,22 @@ export function generatePlaceRecords() {
         ...(assertion.source
           ? { 'prov:hadPrimarySource': sourceUri(assertion.source, sourceIds) }
           : {}),
-        certainty: `${BASE}type/certainty/certain`,
+        ...(assertion.sourceRows.length > 0
+          ? {
+              'prov:wasDerivedFrom': assertion.sourceRows.map((recordId) =>
+                fragmentUri(
+                  pageUri,
+                  `observation-almanakken-${recordId}`,
+                ),
+              ),
+            }
+          : {}),
+        certainty: `${BASE}type/certainty/${assertion.certainty}`,
+        ...(assertion.source === 'almanakken'
+          ? {
+              inferenceRule: `${BASE}rule/place-function-from-organization-observation`,
+            }
+          : {}),
         ...(assertion.note ? { P3_has_note: assertion.note } : {}),
       });
       if (!functionTypeUris.has(assertion.functionUri)) {

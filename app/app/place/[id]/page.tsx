@@ -56,8 +56,10 @@ type PlaceProjection = {
     functionUri: string;
     label: string;
     sourceLabel: string;
-    evidenceKind: 'production' | 'recorded-function';
+    evidenceKinds: Array<'production' | 'recorded-function'>;
     source: string;
+    sourceRows: string[];
+    certainty: 'certain' | 'probable' | 'uncertain';
     startYear?: number;
     endYear?: number;
   }>;
@@ -322,9 +324,13 @@ export default async function PlaceRecordPage({
                       ? `–${assertion.endYear}`
                       : ''}
                     {assertion.source ? ` · ${assertion.source}` : ''}
+                    {` · ${assertion.certainty}`}
                   </span>
                   <p className="mt-1 text-xs text-ink/55">
                     Source term: {assertion.sourceLabel}
+                    {assertion.sourceRows.length > 0
+                      ? ` · ${assertion.sourceRows.length} supporting source ${assertion.sourceRows.length === 1 ? 'row' : 'rows'}`
+                      : ''}
                   </p>
                 </li>
               ))}

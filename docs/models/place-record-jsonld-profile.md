@@ -24,6 +24,10 @@ For `stm-00705` the public contract is:
 - `.../place/stm-00705#feature` — E25/E26 physical feature when applicable.
 - `.../place/stm-00705#location` — E53 Place.
 
+The feature or location receives `crm:P2_has_type` pointing to its canonical
+structural concept at `.../vocabulary/place-type/{typeId}`. The structural type
+is distinct from the dated place-function vocabulary.
+
 The HTTPS URL is canonical until an ARK name assigning authority issues ARKs.
 The generated identifier manifest is the only place future ARK redirects are
 configured; no provisional `ark:/` values are published.
@@ -75,7 +79,17 @@ function browsable on the corresponding physical plantation. Composite product
 values are split into atomic function terms. Their canonical concept scheme is
 `https://data.surinametijdmachine.org/vocabulary/place-function`. A derived
 range describes the years for which evidence is available; it is not an
-unsourced claim about the function's complete duration.
+unsourced claim about the function's complete duration. `P4` describes the
+attestation range of the E17 classification activity: exact-year assignments
+carry equal `P82a` and `P82b` `xsd:gYear` boundaries. Matching product and
+function evidence is merged into one assignment while retaining both evidence
+kinds and every source row.
+
+Every Almanakken-derived function assignment has `prov:wasDerivedFrom` links to
+the exact local E13 observations, cites the projection rule, and is marked
+`probable` because E74 organization evidence is projected onto the reviewed E25
+physical plantation. Only explicitly reviewed source terms can become function
+concepts; an unmapped value stops publication for vocabulary review.
 
 ## Sources and geometry
 
@@ -116,9 +130,12 @@ assert unresolved place links as facts.
 
 ## Validation
 
-The pipeline checks canonical IDs, per-record JSON-LD contexts, unique graph
-IDs, generated JSON projections, authority-link syntax, and publication
-consistency. The corresponding SHACL profile is
+The pipeline checks canonical IDs and structural P2 types, per-record JSON-LD
+contexts, unique graph IDs, complete temporal boundaries, function certainty
+and row-level provenance, generated JSON projections, authority-link syntax,
+and publication consistency. Focused derivation fixtures additionally test
+duplicate evidence, gaps, excluded non-functions, and controlled-term failures.
+The corresponding SHACL profile is
 `app/lod/place-record-profile.shacl.ttl`; pipeline checks enforce the supported
 record constraints until a general RDF/SHACL engine is added. The project does
 not claim full Linked Art conformance.

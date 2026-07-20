@@ -25,9 +25,11 @@ type PlaceRecordIndexEntry = {
 
 type FunctionUsage = {
   assertionId: string;
-  evidenceKind: 'production' | 'recorded-function';
+  evidenceKinds: Array<'production' | 'recorded-function'>;
   sourceLabel: string;
   source: string;
+  sourceRows: string[];
+  certainty: 'certain' | 'probable' | 'uncertain';
   startYear?: number;
   endYear?: number;
 };
@@ -93,7 +95,9 @@ export default function PlaceTypesVocabulary() {
   const pathTypeId =
     pathParts[0] === 'place-function'
       ? 'plantation'
-      : pathParts[0] || 'plantation';
+      : pathParts[0] === 'place-type'
+        ? pathParts[1] || 'plantation'
+        : pathParts[0] || 'plantation';
   const [initialFunctionId] = useState(pathFunctionId);
   const [scheme, setScheme] = useState<ThesaurusScheme | null>(null);
   const [concepts, setConcepts] = useState<PlaceTypeConcept[]>([]);
@@ -161,6 +165,12 @@ export default function PlaceTypesVocabulary() {
     },
     [functionVocabulary, placeRecords, router],
   );
+
+  const handleThesaurusChange = useCallback((data: Record<string, unknown>) => {
+    const parsed = parseThesaurus(data);
+    setScheme(parsed.scheme);
+    setConcepts(parsed.concepts);
+  }, []);
 
   const placeTypeById = useMemo(
     () => new Map(placeRecords.map((record) => [record.id, record.type])),
@@ -414,10 +424,18 @@ export default function PlaceTypesVocabulary() {
 
         {showEditor && (
           <div className="fixed inset-0 z-2000 flex items-start justify-center overflow-y-auto bg-black/40 p-4 sm:p-8">
-            <div className="w-full max-w-6xl bg-background p-5 shadow-2xl">
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="place-vocabulary-editor-title"
+              className="w-full max-w-6xl bg-background p-5 shadow-2xl"
+            >
               <div className="mb-4 flex items-center justify-between border-b border-ink/10 pb-3">
                 <div>
-                  <h2 className="text-xl font-semibold text-ink">
+                  <h2
+                    id="place-vocabulary-editor-title"
+                    className="text-xl font-semibold text-ink"
+                  >
                     Edit place vocabulary
                   </h2>
                   <p className="text-xs text-ink/55">
@@ -432,7 +450,10 @@ export default function PlaceTypesVocabulary() {
                   Close
                 </button>
               </div>
-              <ThesaurusEditor canEdit={canEdit} />
+              <ThesaurusEditor
+                canEdit={canEdit}
+                onChange={handleThesaurusChange}
+              />
             </div>
           </div>
         )}
@@ -655,8 +676,9 @@ function PlacesForType({
                         </span>{' '}
                         <span className="opacity-70">
                           {usages
-                            .map((usage) =>
-                              yearSpan(usage.startYear, usage.endYear),
+                            .map(
+                              (usage) =>
+                                `${yearSpan(usage.startYear, usage.endYear)} · ${usage.certainty}`,
                             )
                             .join(', ')}
                         </span>

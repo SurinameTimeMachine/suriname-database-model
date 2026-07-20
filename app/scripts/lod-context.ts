@@ -216,11 +216,11 @@ export function buildContext(): Record<string, unknown> {
     P72_has_language: { '@id': 'crm:P72_has_language', '@type': '@id' },
     P82a_begin_of_the_begin: {
       '@id': 'crm:P82a_begin_of_the_begin',
-      '@type': 'xsd:date',
+      '@type': 'xsd:gYear',
     },
     P82b_end_of_the_end: {
       '@id': 'crm:P82b_end_of_the_end',
-      '@type': 'xsd:date',
+      '@type': 'xsd:gYear',
     },
     P92i_was_brought_into_existence_by: {
       '@id': 'crm:P92i_was_brought_into_existence_by',

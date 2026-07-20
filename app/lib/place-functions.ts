@@ -13,8 +13,10 @@ export interface PlaceFunctionAssertion {
   functionUri: string;
   label: string;
   sourceLabel: string;
-  evidenceKind: PlaceFunctionEvidenceKind;
+  evidenceKinds: PlaceFunctionEvidenceKind[];
   source: string;
+  sourceRows: string[];
+  certainty: 'certain' | 'probable' | 'uncertain';
   startYear?: number;
   endYear?: number;
   note?: string | null;
@@ -38,6 +40,8 @@ export interface PlaceFunctionSource {
     startYear?: number;
     endYear?: number;
     note?: string | null;
+    certainty?: string;
+    sourceRows?: string[];
   }>;
   almanakkenObservations?: AlmanakkenPlantationObservation[];
 }
@@ -82,6 +86,7 @@ const labels: Record<string, PlaceFunctionLabels> = {
     en: 'Quarantine establishment',
   },
   rijst: { nl: 'Rijstteelt', en: 'Rice cultivation' },
+  settlement: { nl: 'Nederzettingsfunctie', en: 'Settlement function' },
   steen: { nl: 'Steenproductie', en: 'Stone production' },
   steenfabriek: { nl: 'Steenfabriek', en: 'Brickworks' },
   steenspringerij: { nl: 'Steenspringerij', en: 'Stone quarrying' },
@@ -141,6 +146,28 @@ export function placeFunctionLabels(
   return { nl: fallback, en: fallback };
 }
 
+function recognizedFunctionId(sourceLabel: string): string {
+  const functionId = placeFunctionId(sourceLabel);
+  if (!functionId || nonFunctionValues.has(functionId)) return '';
+  if (!Object.hasOwn(labels, functionId)) {
+    throw new Error(
+      `Unreviewed place-function source term "${sourceLabel}" (${functionId}). Add an explicit vocabulary mapping before publication.`,
+    );
+  }
+  return functionId;
+}
+
+function recognizedCertainty(
+  value: string | undefined,
+  fallback: PlaceFunctionAssertion['certainty'],
+): PlaceFunctionAssertion['certainty'] {
+  if (value == null) return fallback;
+  if (value === 'certain' || value === 'probable' || value === 'uncertain') {
+    return value;
+  }
+  throw new Error(`Unsupported place-function certainty "${value}".`);
+}
+
 export function splitProductionFunctions(value: string): string[] {
   return [
     ...new Set(
@@ -155,30 +182,41 @@ export function splitProductionFunctions(value: string): string[] {
 function contiguousSpans(years: number[]): Array<{
   startYear: number;
   endYear?: number;
+  observedYears: number[];
 }> {
   const sorted = [...new Set(years)].sort((a, b) => a - b);
-  const spans: Array<{ startYear: number; endYear?: number }> = [];
+  const spans: Array<{
+    startYear: number;
+    endYear?: number;
+    observedYears: number[];
+  }> = [];
   let start: number | undefined;
   let end: number | undefined;
+  let observedYears: number[] = [];
   for (const year of sorted) {
     if (start == null) {
       start = year;
       end = year;
+      observedYears = [year];
     } else if (end != null && year - end <= 2) {
       end = year;
+      observedYears.push(year);
     } else {
       spans.push({
         startYear: start,
         ...(end !== start ? { endYear: end } : {}),
+        observedYears,
       });
       start = year;
       end = year;
+      observedYears = [year];
     }
   }
   if (start != null) {
     spans.push({
       startYear: start,
       ...(end != null && end !== start ? { endYear: end } : {}),
+      observedYears,
     });
   }
   return spans;
@@ -189,37 +227,128 @@ function observedFunctionSpans(
 ): PlaceFunctionAssertion[] {
   const observationsByFunction = new Map<
     string,
-    { sourceLabel: string; years: number[] }
+    {
+      sourceLabel: string;
+      evidence: Array<{ year: number; recordId: string }>;
+    }
   >();
   for (const observation of observations) {
     const sourceValue = observation.function?.trim();
     if (!sourceValue || observation.year == null) continue;
     for (const sourceLabel of splitProductionFunctions(sourceValue)) {
-      const functionId = placeFunctionId(sourceLabel);
-      if (!functionId || nonFunctionValues.has(functionId)) continue;
+      const functionId = recognizedFunctionId(sourceLabel);
+      if (!functionId) continue;
       const current = observationsByFunction.get(functionId) ?? {
         sourceLabel,
-        years: [],
+        evidence: [],
       };
-      current.years.push(observation.year);
+      current.evidence.push({
+        year: observation.year,
+        recordId: observation.recordId,
+      });
       observationsByFunction.set(functionId, current);
     }
   }
 
   return [...observationsByFunction.entries()].flatMap(
     ([functionId, observation]) =>
-      contiguousSpans(observation.years).map((span) => ({
-        id: `function-almanakken-${functionId}-${span.startYear}`,
-        functionId,
-        functionUri: placeFunctionUri(functionId),
-        label: placeFunctionLabels(functionId, observation.sourceLabel).en,
-        sourceLabel: observation.sourceLabel,
-        evidenceKind: 'recorded-function' as const,
-        source: 'almanakken',
-        ...span,
-        note: 'Derived from the Almanakken function field.',
-      })),
+      contiguousSpans(observation.evidence.map((item) => item.year)).map(
+        ({ observedYears, ...span }) => ({
+          id: `function-almanakken-${functionId}-${span.startYear}`,
+          functionId,
+          functionUri: placeFunctionUri(functionId),
+          label: placeFunctionLabels(functionId, observation.sourceLabel).en,
+          sourceLabel: observation.sourceLabel,
+          evidenceKinds: ['recorded-function'] as PlaceFunctionEvidenceKind[],
+          source: 'almanakken',
+          sourceRows: [
+            ...new Set(
+              observation.evidence
+                .filter((item) => observedYears.includes(item.year))
+                .map((item) => item.recordId),
+            ),
+          ].sort(),
+          certainty: 'probable' as const,
+          ...span,
+          note: 'Derived from the Almanakken function field.',
+        }),
+      ),
   );
+}
+
+function supportingProductRows(
+  place: PlaceFunctionSource,
+  functionId: string,
+  startYear?: number,
+  endYear?: number,
+): string[] {
+  return [
+    ...new Set(
+      (place.almanakkenObservations ?? [])
+        .filter(
+          (observation) =>
+            !observation.deserted &&
+            observation.year != null &&
+            (startYear == null || observation.year >= startYear) &&
+            (endYear == null
+              ? startYear == null || observation.year === startYear
+              : observation.year <= endYear) &&
+            splitProductionFunctions(observation.product ?? '').some(
+              (sourceLabel) => placeFunctionId(sourceLabel) === functionId,
+            ),
+        )
+        .map((observation) => observation.recordId),
+    ),
+  ].sort();
+}
+
+function mergeDuplicateAssertions(
+  assertions: PlaceFunctionAssertion[],
+): PlaceFunctionAssertion[] {
+  const merged = new Map<string, PlaceFunctionAssertion>();
+  for (const assertion of assertions) {
+    const key = [
+      assertion.functionId,
+      assertion.source,
+      assertion.startYear ?? '',
+      assertion.endYear ?? '',
+    ].join('|');
+    const current = merged.get(key);
+    if (!current) {
+      merged.set(key, assertion);
+      continue;
+    }
+    if (
+      assertion.evidenceKinds.some((evidenceKind) =>
+        current.evidenceKinds.includes(evidenceKind),
+      )
+    ) {
+      merged.set(`${key}|${assertion.id}`, assertion);
+      continue;
+    }
+    const evidenceKinds = [
+      ...new Set([...current.evidenceKinds, ...assertion.evidenceKinds]),
+    ].sort() as PlaceFunctionEvidenceKind[];
+    merged.set(key, {
+      ...current,
+      ...(assertion.evidenceKinds.includes('recorded-function')
+        ? { id: assertion.id }
+        : {}),
+      evidenceKinds,
+      sourceRows: [...new Set([...current.sourceRows, ...assertion.sourceRows])].sort(),
+      certainty:
+        current.certainty === 'uncertain' || assertion.certainty === 'uncertain'
+          ? 'uncertain'
+          : current.certainty === 'probable' || assertion.certainty === 'probable'
+            ? 'probable'
+            : 'certain',
+      note:
+        evidenceKinds.length > 1
+          ? 'Derived from matching Almanakken product and function fields.'
+          : current.note,
+    });
+  }
+  return [...merged.values()];
 }
 
 export function derivePlaceFunctionAssertions(
@@ -228,8 +357,9 @@ export function derivePlaceFunctionAssertions(
   const productionAssertions = (place.productAssertions ?? []).flatMap(
     (assertion, assertionIndex) =>
       splitProductionFunctions(assertion.value ?? '').flatMap((sourceLabel) => {
-        const functionId = placeFunctionId(sourceLabel);
-        if (!functionId || nonFunctionValues.has(functionId)) return [];
+        const functionId = recognizedFunctionId(sourceLabel);
+        if (!functionId) return [];
+        const source = assertion.source || 'almanakken';
         return [
           {
             id: `${assertion.id || `production-${assertionIndex + 1}`}-${functionId}`,
@@ -237,8 +367,22 @@ export function derivePlaceFunctionAssertions(
             functionUri: placeFunctionUri(functionId),
             label: placeFunctionLabels(functionId, sourceLabel).en,
             sourceLabel,
-            evidenceKind: 'production' as const,
-            source: assertion.source || 'almanakken',
+            evidenceKinds: ['production'] as PlaceFunctionEvidenceKind[],
+            source,
+            sourceRows:
+              assertion.sourceRows ??
+              (source === 'almanakken'
+                ? supportingProductRows(
+                    place,
+                    functionId,
+                    assertion.startYear,
+                    assertion.endYear,
+                  )
+                : []),
+            certainty: recognizedCertainty(
+              assertion.certainty,
+              source === 'almanakken' ? 'probable' : 'certain',
+            ),
             startYear: assertion.startYear,
             endYear: assertion.endYear,
             note: assertion.note,
@@ -247,10 +391,10 @@ export function derivePlaceFunctionAssertions(
       }),
   );
 
-  return [
+  return mergeDuplicateAssertions([
     ...productionAssertions,
     ...observedFunctionSpans(place.almanakkenObservations ?? []),
-  ].sort(
+  ]).sort(
     (a, b) =>
       (a.startYear ?? Number.POSITIVE_INFINITY) -
         (b.startYear ?? Number.POSITIVE_INFINITY) ||
