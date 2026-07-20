@@ -9,48 +9,190 @@ import type {
   ThesaurusScheme,
 } from '@/lib/thesaurus';
 import { langEn, parseThesaurus } from '@/lib/thesaurus';
-import { buildVocabularyUrl } from '@/lib/url';
+import {
+  buildPlaceFunctionVocabularyUrl,
+  buildVocabularyUrl,
+} from '@/lib/url';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+
+type PlaceRecordIndexEntry = {
+  id: string;
+  label: string;
+  type: string;
+};
+
+type FunctionUsage = {
+  assertionId: string;
+  evidenceKind: 'production' | 'recorded-function';
+  sourceLabel: string;
+  source: string;
+  startYear?: number;
+  endYear?: number;
+};
+
+type FunctionPlace = {
+  id: string;
+  label: string;
+  recordUrl: string;
+  usages: FunctionUsage[];
+};
+
+type FunctionConcept = {
+  id: string;
+  uri: string;
+  prefLabel: { nl: string; en: string };
+  sourceLabels: string[];
+  evidenceKinds: Array<'production' | 'recorded-function'>;
+  placeCount: number;
+  assertionCount: number;
+  firstYear: number | null;
+  lastYear: number | null;
+  places: FunctionPlace[];
+};
+
+type FunctionVocabulary = {
+  functions: FunctionConcept[];
+};
+
+type PlaceFunctionConnection = {
+  concept: FunctionConcept;
+  usages: FunctionUsage[];
+};
+
+async function fetchJson<T>(url: string): Promise<T> {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Unable to load ${url} (${response.status})`);
+  }
+  return (await response.json()) as T;
+}
 
 export default function PlaceTypesVocabulary() {
   const { canEdit } = useAuth();
   const params = useParams<{ typeId?: string[] }>();
-  const pathTypeId = params.typeId?.[0] ?? null;
+  const pathParts = params.typeId ?? [];
+  const pathFunctionId =
+    pathParts[0] === 'place-function' ? pathParts[1] : null;
+  const pathTypeId =
+    pathParts[0] === 'place-function' ? 'plantation' : pathParts[0] || 'plantation';
   const [scheme, setScheme] = useState<ThesaurusScheme | null>(null);
   const [concepts, setConcepts] = useState<PlaceTypeConcept[]>([]);
+  const [placeRecords, setPlaceRecords] = useState<PlaceRecordIndexEntry[]>([]);
+  const [functionVocabulary, setFunctionVocabulary] =
+    useState<FunctionVocabulary | null>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedConcept, setSelectedConcept] = useState<string | null>(
-    pathTypeId,
+  const [selectedConcept, setSelectedConcept] = useState(pathTypeId);
+  const [selectedFunctionId, setSelectedFunctionId] = useState<string | null>(
+    pathFunctionId,
   );
-  const [activeView, setActiveView] = useState<'browser' | 'editor'>('browser');
+  const [placeSearch, setPlaceSearch] = useState('');
+  const [visiblePlaceCount, setVisiblePlaceCount] = useState(100);
+  const [showEditor, setShowEditor] = useState(false);
 
   useEffect(() => {
-    void fetch('/data/place-types-thesaurus.jsonld')
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`Unable to load place types (${response.status})`);
-        }
-        return response.json();
-      })
-      .then((data: unknown) => {
-        const parsed = parseThesaurus(data);
+    void Promise.all([
+      fetchJson<unknown>('/data/place-types-thesaurus.jsonld'),
+      fetchJson<PlaceRecordIndexEntry[]>('/data/place-records/index.json'),
+      fetchJson<FunctionVocabulary>('/data/place-functions.json'),
+    ])
+      .then(([thesaurusData, recordIndex, functions]) => {
+        const parsed = parseThesaurus(thesaurusData);
         setScheme(parsed.scheme);
         setConcepts(parsed.concepts);
+        setPlaceRecords(recordIndex);
+        setFunctionVocabulary(functions);
       })
       .catch(() => setScheme(null))
       .finally(() => setLoading(false));
   }, []);
 
-  const handleSelectConcept = useCallback((typeId: string | null) => {
+  const handleSelectConcept = useCallback((typeId: string) => {
     setSelectedConcept(typeId);
+    setSelectedFunctionId(null);
+    setPlaceSearch('');
+    setVisiblePlaceCount(100);
     window.history.replaceState(
       null,
       '',
-      typeId ? buildVocabularyUrl(typeId) : '/vocabulary',
+      buildVocabularyUrl(typeId),
     );
   }, []);
+
+  const handleSelectFunction = useCallback(
+    (functionId: string) => {
+      const functionConcept = functionVocabulary?.functions.find(
+        (concept) => concept.id === functionId,
+      );
+      const connectedType = functionConcept?.places
+        .map((place) =>
+          placeRecords.find((record) => record.id === place.id)?.type,
+        )
+        .find((type): type is string => Boolean(type));
+      if (connectedType) setSelectedConcept(connectedType);
+      setSelectedFunctionId(functionId);
+      setPlaceSearch('');
+      setVisiblePlaceCount(100);
+      window.history.replaceState(
+        null,
+        '',
+        buildPlaceFunctionVocabularyUrl(functionId),
+      );
+    },
+    [functionVocabulary, placeRecords],
+  );
+
+  const placeTypeById = useMemo(
+    () => new Map(placeRecords.map((record) => [record.id, record.type])),
+    [placeRecords],
+  );
+  const placeCountsByType = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const record of placeRecords) {
+      counts.set(record.type, (counts.get(record.type) ?? 0) + 1);
+    }
+    return counts;
+  }, [placeRecords]);
+  const functionsByPlace = useMemo(() => {
+    const byPlace = new Map<string, PlaceFunctionConnection[]>();
+    for (const concept of functionVocabulary?.functions ?? []) {
+      for (const place of concept.places) {
+        const connections = byPlace.get(place.id) ?? [];
+        connections.push({ concept, usages: place.usages });
+        byPlace.set(place.id, connections);
+      }
+    }
+    return byPlace;
+  }, [functionVocabulary]);
+  const selectedFunction = functionVocabulary?.functions.find(
+    (concept) => concept.id === selectedFunctionId,
+  );
+  const relatedFunctions = useMemo(
+    () =>
+      (functionVocabulary?.functions ?? []).filter((concept) =>
+        concept.places.some(
+          (place) => placeTypeById.get(place.id) === selectedConcept,
+        ),
+      ),
+    [functionVocabulary, placeTypeById, selectedConcept],
+  );
+  const filteredPlaces = useMemo(() => {
+    const functionPlaceIds = selectedFunction
+      ? new Set(selectedFunction.places.map((place) => place.id))
+      : null;
+    const query = placeSearch.trim().toLocaleLowerCase();
+    return placeRecords
+      .filter(
+        (record) =>
+          record.type === selectedConcept &&
+          (!functionPlaceIds || functionPlaceIds.has(record.id)) &&
+          (!query ||
+            record.label.toLocaleLowerCase().includes(query) ||
+            record.id.toLocaleLowerCase().includes(query)),
+      )
+      .sort((a, b) => a.label.localeCompare(b.label));
+  }, [placeRecords, placeSearch, selectedConcept, selectedFunction]);
 
   if (loading) {
     return (
@@ -109,146 +251,163 @@ export default function PlaceTypesVocabulary() {
 
   return (
     <div className="h-full overflow-y-auto bg-background">
-      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-10">
-        <header className="mb-8">
-          <div className="mb-3 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.35em] text-ink/70">
-            <span className="inline-flex h-3 w-3 -skew-x-12 bg-teal-strong" />
-            Controlled vocabulary
+      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-10">
+        <header className="mb-6 flex flex-wrap items-start justify-between gap-4">
+          <div className="max-w-4xl">
+            <div className="mb-3 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.35em] text-ink/70">
+              <span className="inline-flex h-3 w-3 -skew-x-12 bg-teal-strong" />
+              Controlled vocabulary
+            </div>
+            <h1 className="mb-2 text-3xl font-semibold text-ink">
+              Place vocabulary
+            </h1>
+            <p className="text-sm leading-6 text-ink/70">
+              Select one place type to see its definition, related functions,
+              and all classified places. Functions are dated source evidence;
+              they do not replace the structural type hierarchy.
+            </p>
           </div>
-          <h1 className="mb-2 text-3xl font-semibold text-ink">
-            Place types and functions
-          </h1>
-          <p className="text-sm text-ink/70">
-            The geographical-feature thesaurus describes structural place
-            types and their hierarchy. Place functions are dated,
-            source-qualified uses of physical places and have their own linked
-            vocabulary.
-          </p>
-          <nav className="mt-5 flex gap-1 border-b border-ink/15">
-            <span className="-mb-px border-b-2 border-teal-strong px-4 py-2 text-sm font-medium text-ink">
-              Place types
-            </span>
-            <Link
-              href="/vocabulary/place-function"
-              className="px-4 py-2 text-sm font-medium text-ink/55 hover:text-ink"
+          {canEdit && (
+            <button
+              type="button"
+              onClick={() => setShowEditor(true)}
+              className="border border-stm-sepia-600 bg-stm-sepia-600 px-4 py-2 text-sm font-medium text-white hover:bg-stm-sepia-700"
             >
-              Place functions
-            </Link>
-          </nav>
+              Edit vocabulary
+            </button>
+          )}
         </header>
 
-        <div className="mb-6 flex gap-1 border-b border-slate-200">
-          <button
-            type="button"
-            onClick={() => setActiveView('browser')}
-            className={`-mb-px px-4 py-2 text-sm font-medium transition-colors ${
-              activeView === 'browser'
-                ? 'border-b-2 border-teal-strong text-ink'
-                : 'text-ink/45 hover:text-ink/75'
-            }`}
-          >
-            Browse hierarchy
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveView('editor')}
-            className={`-mb-px px-4 py-2 text-sm font-medium transition-colors ${
-              activeView === 'editor'
-                ? 'border-b-2 border-teal-strong text-ink'
-                : 'text-ink/45 hover:text-ink/75'
-            }`}
-          >
-            Edit concepts
-          </button>
+        <div className="site-surface mb-6 p-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="rounded bg-stm-sepia-100 px-2 py-0.5 text-xs font-medium text-stm-sepia-700">
+              ConceptScheme
+            </span>
+            <h2 className="font-serif text-base font-semibold text-stm-warm-900">
+              {langEn(scheme.prefLabel)}
+            </h2>
+            <span className="ml-auto font-mono text-[10px] text-stm-warm-400">
+              {shortUri(scheme.id)}
+            </span>
+          </div>
+          {langEn(scheme.scopeNote) && (
+            <p className="mt-2 text-xs leading-5 text-stm-warm-600">
+              {langEn(scheme.scopeNote)}
+            </p>
+          )}
         </div>
 
-        {activeView === 'editor' ? (
-          <ThesaurusEditor canEdit={canEdit} />
-        ) : (
-          <>
-            <div className="site-surface mb-6 p-5">
-              <div className="mb-2 flex items-center gap-2">
-                <span className="rounded bg-stm-sepia-100 px-2 py-0.5 text-xs font-medium text-stm-sepia-700">
-                  ConceptScheme
-                </span>
-                <h2 className="font-serif text-lg font-semibold text-stm-warm-900">
-                  {langEn(scheme.prefLabel)}
-                </h2>
-              </div>
-              {langEn(scheme.scopeNote) && (
-                <p className="mb-3 text-sm text-stm-warm-600">
-                  {langEn(scheme.scopeNote)}
-                </p>
-              )}
-              <div className="break-all font-mono text-xs text-stm-warm-400">
-                {shortUri(scheme.id)}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-              <div className="lg:col-span-1">
-                <h3 className="mb-3 text-sm font-medium uppercase tracking-wider text-stm-warm-500">
-                  Hierarchy
-                </h3>
-                <div className="site-surface">
-                  {hierarchyGroups.map((group) => (
-                    <div key={`type-group-${group.broader}`}>
-                      <div className="border-b border-stm-warm-100 bg-stm-warm-50/50 px-4 py-3">
-                        <span className="text-sm font-medium text-stm-warm-800">
-                          {group.label}
-                        </span>
-                        <span className="ml-2 font-mono text-[10px] text-stm-warm-400">
-                          {group.crmClass}
-                        </span>
-                      </div>
-                      {getDirectChildren(group.broader).map((child) => {
-                        const subChildren = getDirectChildren(child.id);
-                        return (
-                          <div key={`type-${child.typeId}`}>
-                            <ConceptButton
-                              concept={child}
-                              selected={selectedConcept === child.typeId}
-                              onSelect={handleSelectConcept}
-                              count={subChildren.length}
-                            />
-                            {subChildren.map((sub) => (
-                              <ConceptButton
-                                key={`type-${sub.typeId}`}
-                                concept={sub}
-                                selected={selectedConcept === sub.typeId}
-                                onSelect={handleSelectConcept}
-                                nested
-                              />
-                            ))}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="lg:col-span-2">
-                <h3 className="mb-3 text-sm font-medium uppercase tracking-wider text-stm-warm-500">
-                  {selected ? 'Concept details' : 'Select a concept'}
-                </h3>
-                {selected ? (
-                  <ConceptDetails
-                    selected={selected}
-                    concepts={concepts}
-                    onSelect={handleSelectConcept}
-                  />
-                ) : (
-                  <div className="site-surface p-8 text-center">
-                    <p className="text-sm text-stm-warm-400">
-                      Click a concept in the hierarchy to view its labels,
-                      definition, description, mappings, and editorial notes.
-                    </p>
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[22rem_minmax(0,1fr)]">
+          <aside>
+            <h3 className="mb-3 text-sm font-medium uppercase tracking-wider text-stm-warm-500">
+              Type hierarchy
+            </h3>
+            <div className="site-surface max-h-[75vh] overflow-y-auto">
+              {hierarchyGroups.map((group) => (
+                <div key={`type-group-${group.broader}`}>
+                  <div className="border-b border-stm-warm-100 bg-stm-warm-50/50 px-4 py-3">
+                    <span className="text-sm font-medium text-stm-warm-800">
+                      {group.label}
+                    </span>
+                    <span className="ml-2 font-mono text-[10px] text-stm-warm-400">
+                      {group.crmClass}
+                    </span>
                   </div>
-                )}
-              </div>
+                  {getDirectChildren(group.broader).map((child) => {
+                    const subChildren = getDirectChildren(child.id);
+                    return (
+                      <div key={`type-${child.typeId}`}>
+                        <ConceptButton
+                          concept={child}
+                          selected={selectedConcept === child.typeId}
+                          onSelect={handleSelectConcept}
+                          childCount={subChildren.length}
+                          placeCount={placeCountsByType.get(child.typeId) ?? 0}
+                        />
+                        {subChildren.map((sub) => (
+                          <ConceptButton
+                            key={`type-${sub.typeId}`}
+                            concept={sub}
+                            selected={selectedConcept === sub.typeId}
+                            onSelect={handleSelectConcept}
+                            placeCount={placeCountsByType.get(sub.typeId) ?? 0}
+                            nested
+                          />
+                        ))}
+                      </div>
+                    );
+                  })}
+                </div>
+              ))}
             </div>
-          </>
+          </aside>
+
+          <main className="min-w-0 space-y-5">
+            {selected ? (
+              <>
+                <ConceptDetails
+                  selected={selected}
+                  concepts={concepts}
+                  onSelect={handleSelectConcept}
+                />
+                {relatedFunctions.length > 0 && (
+                  <RelatedFunctions
+                    functions={relatedFunctions}
+                    selectedFunctionId={selectedFunctionId}
+                    onSelect={handleSelectFunction}
+                  />
+                )}
+                {selectedFunction && (
+                  <SelectedFunctionSummary functionConcept={selectedFunction} />
+                )}
+                <PlacesForType
+                  typeLabel={langEn(selected.prefLabel)}
+                  places={filteredPlaces.slice(0, visiblePlaceCount)}
+                  totalCount={filteredPlaces.length}
+                  search={placeSearch}
+                  onSearch={(value) => {
+                    setPlaceSearch(value);
+                    setVisiblePlaceCount(100);
+                  }}
+                  functionsByPlace={functionsByPlace}
+                  selectedFunctionId={selectedFunctionId}
+                  onSelectFunction={handleSelectFunction}
+                  onLoadMore={() =>
+                    setVisiblePlaceCount((count) => count + 100)
+                  }
+                />
+              </>
+            ) : (
+              <div className="site-surface p-8 text-center text-sm text-stm-warm-400">
+                Select a type in the hierarchy.
+              </div>
+            )}
+          </main>
+        </div>
+
+        {showEditor && (
+          <div className="fixed inset-0 z-2000 flex items-start justify-center overflow-y-auto bg-black/40 p-4 sm:p-8">
+            <div className="w-full max-w-6xl bg-background p-5 shadow-2xl">
+              <div className="mb-4 flex items-center justify-between border-b border-ink/10 pb-3">
+                <div>
+                  <h2 className="text-xl font-semibold text-ink">
+                    Edit place vocabulary
+                  </h2>
+                  <p className="text-xs text-ink/55">
+                    Changes are saved through the existing vocabulary workflow.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowEditor(false)}
+                  className="border border-ink/15 px-3 py-1.5 text-sm text-ink/70 hover:bg-ink/5"
+                >
+                  Close
+                </button>
+              </div>
+              <ThesaurusEditor canEdit={canEdit} />
+            </div>
+          </div>
         )}
       </div>
     </div>
@@ -260,13 +419,15 @@ function ConceptButton({
   selected,
   onSelect,
   nested = false,
-  count,
+  childCount,
+  placeCount,
 }: {
   concept: PlaceTypeConcept;
   selected: boolean;
   onSelect: (typeId: string) => void;
   nested?: boolean;
-  count?: number;
+  childCount?: number;
+  placeCount: number;
 }) {
   return (
     <button
@@ -283,11 +444,209 @@ function ConceptButton({
       <span className={nested ? 'text-stm-warm-600' : 'text-stm-warm-700'}>
         {langEn(concept.prefLabel)}
       </span>
-      {count != null && count > 0 && (
-        <span className="ml-auto text-[10px] text-stm-warm-300">{count}</span>
-      )}
+      <span className="ml-auto shrink-0 text-[10px] text-stm-warm-400">
+        {placeCount > 0 ? placeCount : ''}
+        {childCount != null && childCount > 0 ? ` · ${childCount} types` : ''}
+      </span>
     </button>
   );
+}
+
+function RelatedFunctions({
+  functions,
+  selectedFunctionId,
+  onSelect,
+}: {
+  functions: FunctionConcept[];
+  selectedFunctionId: string | null;
+  onSelect: (functionId: string) => void;
+}) {
+  return (
+    <section className="site-surface p-5">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <div>
+          <h3 className="text-lg font-semibold text-ink">Related functions</h3>
+          <p className="mt-1 text-xs leading-5 text-ink/55">
+            Dated functions attested for places classified with this type.
+            Select one to filter the place list below.
+          </p>
+        </div>
+        <span className="text-xs text-ink/45">{functions.length} functions</span>
+      </div>
+      <div className="mt-3 flex flex-wrap gap-2">
+        {functions.map((concept) => (
+          <button
+            key={`related-function-${concept.id}`}
+            type="button"
+            onClick={() => onSelect(concept.id)}
+            className={`border px-2.5 py-1.5 text-left text-xs transition-colors ${
+              selectedFunctionId === concept.id
+                ? 'border-teal-strong bg-teal-strong text-white'
+                : 'border-ink/10 bg-ink/[0.025] text-ink/70 hover:border-teal-strong'
+            }`}
+          >
+            <span className="font-semibold">{concept.prefLabel.en}</span>
+            <span className="ml-1 opacity-70">({concept.placeCount})</span>
+          </button>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function SelectedFunctionSummary({
+  functionConcept,
+}: {
+  functionConcept: FunctionConcept;
+}) {
+  return (
+    <section className="border-l-4 border-teal-strong bg-teal-soft/20 p-4">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-ink/45">
+            Selected place function · crm:E55 Type / skos:Concept
+          </p>
+          <h3 className="mt-1 text-lg font-semibold text-ink">
+            {functionConcept.prefLabel.en}
+          </h3>
+          <p className="text-xs text-ink/55">
+            {functionConcept.prefLabel.nl} · source term{' '}
+            {functionConcept.sourceLabels.join(', ')}
+          </p>
+        </div>
+        <div className="text-right text-xs text-ink/55">
+          <p>{functionConcept.placeCount} connected places</p>
+          <p>
+            {yearSpan(
+              functionConcept.firstYear ?? undefined,
+              functionConcept.lastYear ?? undefined,
+            )}
+          </p>
+        </div>
+      </div>
+      <p className="mt-3 break-all font-mono text-[10px] text-ink/40">
+        {functionConcept.uri}
+      </p>
+    </section>
+  );
+}
+
+function PlacesForType({
+  typeLabel,
+  places,
+  totalCount,
+  search,
+  onSearch,
+  functionsByPlace,
+  selectedFunctionId,
+  onSelectFunction,
+  onLoadMore,
+}: {
+  typeLabel: string;
+  places: PlaceRecordIndexEntry[];
+  totalCount: number;
+  search: string;
+  onSearch: (value: string) => void;
+  functionsByPlace: Map<string, PlaceFunctionConnection[]>;
+  selectedFunctionId: string | null;
+  onSelectFunction: (functionId: string) => void;
+  onLoadMore: () => void;
+}) {
+  return (
+    <section className="site-surface p-5">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h3 className="text-lg font-semibold text-ink">
+            Places classified as {typeLabel}
+          </h3>
+          <p className="mt-1 text-xs text-ink/55">
+            {totalCount} public place {totalCount === 1 ? 'record' : 'records'}
+            {selectedFunctionId ? ' with the selected function' : ''}.
+          </p>
+        </div>
+        <label>
+          <span className="sr-only">Search connected places</span>
+          <input
+            value={search}
+            onChange={(event) => onSearch(event.target.value)}
+            placeholder="Search places…"
+            className="w-64 max-w-full border border-ink/15 bg-white px-3 py-2 text-sm outline-none focus:border-teal-strong"
+          />
+        </label>
+      </div>
+
+      {places.length > 0 ? (
+        <div className="mt-4 divide-y divide-ink/10 border-y border-ink/10">
+          {places.map((place) => {
+            const connections = functionsByPlace.get(place.id) ?? [];
+            return (
+              <article key={`connected-place-${place.id}`} className="py-3">
+                <div className="flex flex-wrap items-baseline gap-2">
+                  <Link
+                    href={`/place/${place.id}`}
+                    className="font-semibold text-teal-strong hover:underline"
+                  >
+                    {place.label}
+                  </Link>
+                  <span className="font-mono text-[10px] text-ink/35">
+                    {place.id}
+                  </span>
+                </div>
+                {connections.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {connections.map(({ concept, usages }) => (
+                      <button
+                        key={`place-function-${place.id}-${concept.id}`}
+                        type="button"
+                        onClick={() => onSelectFunction(concept.id)}
+                        className={`border px-2 py-1 text-left text-[10px] ${
+                          selectedFunctionId === concept.id
+                            ? 'border-teal-strong bg-teal-strong text-white'
+                            : 'border-ink/10 bg-ink/[0.025] text-ink/60 hover:border-teal-strong'
+                        }`}
+                      >
+                        <span className="font-semibold">
+                          {concept.prefLabel.en}
+                        </span>{' '}
+                        <span className="opacity-70">
+                          {usages
+                            .map((usage) =>
+                              yearSpan(usage.startYear, usage.endYear),
+                            )
+                            .join(', ')}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </article>
+            );
+          })}
+        </div>
+      ) : (
+        <p className="mt-4 border-y border-ink/10 py-6 text-center text-sm text-ink/45">
+          No connected places match this selection.
+        </p>
+      )}
+
+      {places.length < totalCount && (
+        <button
+          type="button"
+          onClick={onLoadMore}
+          className="mt-4 border border-ink/15 px-4 py-2 text-sm text-ink/70 hover:border-teal-strong"
+        >
+          Load more ({totalCount - places.length} remaining)
+        </button>
+      )}
+    </section>
+  );
+}
+
+function yearSpan(startYear?: number, endYear?: number): string {
+  if (startYear == null) return 'undated';
+  return endYear != null && endYear !== startYear
+    ? `${startYear}–${endYear}`
+    : String(startYear);
 }
 
 function ConceptDetails({

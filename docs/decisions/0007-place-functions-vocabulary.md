@@ -46,10 +46,11 @@ row to E25 would turn a source transcription into a second source claim.
 
 ## Consequences
 
-- `/vocabulary` retains the geographical-feature thesaurus, including its
-  hierarchy, definitions, mappings, editorial notes, and editor. An adjacent
-  Place Functions view lists each function and the physical plantations to
-  which it is assigned, with source terms and attested spans.
+- `/vocabulary` is one geographical-feature vocabulary interface containing
+  the hierarchy, definitions, mappings, editorial notes, and editor. Selecting
+  a structural type lists its public place records and any dated functions
+  attested for those places. A function identifier opens the same interface,
+  highlights that function, and filters the connected places.
 - Plantation pages and the Explore panel link their function assignments back
   to the canonical vocabulary term.
 - Organizations do not receive E17 place-function assignments. Their raw E13
