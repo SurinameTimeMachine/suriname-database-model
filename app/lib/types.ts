@@ -25,6 +25,7 @@ export interface E25Plantation {
   /** @deprecated Legacy aggregate field; the current pipeline does not emit it. */
   P51_has_former_or_current_owner?: string;
   P53_has_location?: string;
+  P2_has_type?: string | string[];
   P1_is_identified_by?: string | string[];
   depictedOnMap?: MapDepiction[]; // CRM: P138i has representation (via E36 Visual Item)
   lifecycleEvents?: string[]; // Event URIs: E12/E11/E6/E17/E81 etc.
@@ -38,7 +39,7 @@ export interface E26PhysicalFeature {
   prefLabel: string;
   status?: string;
   gazetteerId?: string;
-  P2_has_type?: string;
+  P2_has_type?: string | string[];
   P53_has_location?: string;
   P70i_is_documented_in?: string;
   P1_is_identified_by?: string | string[];
@@ -220,6 +221,11 @@ export interface FeatureLifecycleEvent {
   P123_resulted_in?: string;
   P124_transformed?: string | string[];
   assignedType?: string;
+  assignedLabel?: string;
+  sourceLabel?: string;
+  evidenceKinds?: Array<'production' | 'recorded-function'>;
+  sourceRows?: string[];
+  certainty?: 'certain' | 'probable' | 'uncertain';
   status?: PlantationStatusType | string;
   note?: string | null;
 }

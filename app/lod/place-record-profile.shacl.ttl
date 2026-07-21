@@ -14,18 +14,25 @@ stm:AuthorityRecordShape
 stm:FeatureShape
   a sh:NodeShape ;
   sh:targetClass crm:E25_Human-Made_Feature ;
+  sh:property [ sh:path crm:P2_has_type ; sh:minCount 1 ; sh:nodeKind sh:IRI ] ;
   sh:property [ sh:path crm:P53_has_former_or_current_location ; sh:minCount 1 ] .
+
+stm:PhysicalFeatureShape
+  a sh:NodeShape ;
+  sh:targetClass crm:E26_Physical_Feature ;
+  sh:property [ sh:path crm:P2_has_type ; sh:minCount 1 ; sh:nodeKind sh:IRI ] .
 
 stm:LocationShape
   a sh:NodeShape ;
   sh:targetClass crm:E53_Place ;
   sh:property [ sh:path geo:hasGeometry ; sh:nodeKind sh:IRI ] .
 
-stm:StatusAssertionShape
+stm:OperationalAndFunctionAssignmentShape
   a sh:NodeShape ;
   sh:targetClass crm:E17_Type_Assignment ;
   sh:property [ sh:path crm:P41_classified ; sh:minCount 1 ] ;
   sh:property [ sh:path crm:P42_assigned ; sh:minCount 1 ] ;
+  sh:property [ sh:path stm:certainty ; sh:minCount 1 ; sh:maxCount 1 ; sh:nodeKind sh:IRI ] ;
   sh:property [
     sh:path prov:hadPrimarySource ;
     sh:minCount 1 ;
@@ -33,7 +40,7 @@ stm:StatusAssertionShape
     sh:pattern "^https://data\\.surinametijdmachine\\.org/source/"
   ] .
 
-stm:CultivationEvidenceShape
+stm:SourceObservationShape
   a sh:NodeShape ;
   sh:targetClass crm:E13_Attribute_Assignment ;
   sh:property [

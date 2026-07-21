@@ -11,6 +11,13 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import {
+  derivePlaceFunctionAssertions,
+  placeFunctionLabels,
+  PLACE_FUNCTION_SCHEME_URI,
+  relatedPlaceType,
+  type PlaceFunctionSource,
+} from '../lib/place-functions';
+import {
   type AppellationRow,
   type ObservationRow,
   transformAlmanakken,
@@ -39,6 +46,10 @@ const ORGANIZATION_OVERRIDES_PATH = join(
 const GAZETTEER_PATH = join(
   __dirname,
   '../../data/places-gazetteer.jsonld',
+);
+const THESAURUS_PATH = join(
+  __dirname,
+  '../../data/place-types-thesaurus.jsonld',
 );
 mkdirSync(LOD_DIR, { recursive: true });
 
@@ -195,11 +206,14 @@ function buildE25Plantations(
       '@type': ['E25_Human_Made_Feature', 'Plantation'],
       status: p.status,
       featureType: p.featureType,
+      P2_has_type: [`${BASE}vocabulary/place-type/plantation`],
     };
 
-    // CRM alignment: P2 has type -> E55 Type (plantation status)
+    // Retain the operational status type alongside the structural place type.
     if (p.status) {
-      entity.P2_has_type = `${BASE}type/plantation-status/${p.status.toLowerCase()}`;
+      (entity.P2_has_type as string[]).push(
+        `${BASE}type/plantation-status/${p.status.toLowerCase()}`,
+      );
     }
 
     if (p.prefLabel) entity.prefLabel = p.prefLabel;
@@ -443,7 +457,10 @@ function buildE26PhysicalFeatures(
       '@id': f.uri,
       '@type': ['E26_Physical_Feature'],
       featureType: f.featureType,
-      P2_has_type: `${VOCAB_BASE}/${f.featureType}`,
+      P2_has_type: [
+        `${BASE}vocabulary/place-type/${f.featureType}`,
+        `${VOCAB_BASE}/${f.featureType}`,
+      ],
     };
 
     if (f.prefLabel) entity.prefLabel = f.prefLabel;
@@ -682,8 +699,143 @@ function buildE55Types(): Record<string, unknown>[] {
   });
 }
 
+function languageValues(value: unknown): Array<Record<string, string>> {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return [];
+  return Object.entries(value as Record<string, unknown>).flatMap(
+    ([language, labels]) =>
+      (Array.isArray(labels) ? labels : [labels]).flatMap((label) =>
+        typeof label === 'string' && label.trim()
+          ? [{ '@value': label, '@language': language }]
+          : [],
+      ),
+  );
+}
+
+function expandStmUri(value: unknown): string | undefined {
+  if (typeof value !== 'string') return undefined;
+  return value.startsWith('stm:') ? `${BASE}${value.slice(4)}` : value;
+}
+
+function buildPlaceTypeVocabulary(): Record<string, unknown>[] {
+  if (!existsSync(THESAURUS_PATH)) return [];
+  const document = JSON.parse(readFileSync(THESAURUS_PATH, 'utf-8')) as {
+    '@graph'?: Array<Record<string, unknown>>;
+  };
+  return (document['@graph'] ?? []).flatMap((entry) => {
+    const id = expandStmUri(entry['@id']);
+    if (!id || !id.startsWith(`${BASE}vocabulary/place-type`)) return [];
+    const isScheme = id === `${BASE}vocabulary/place-type`;
+    const prefLabel = languageValues(entry.prefLabel);
+    const altLabel = languageValues(entry.altLabel);
+    const broader = expandStmUri(entry.broader);
+    return [
+      {
+        '@id': id,
+        '@type': isScheme
+          ? ['skos:ConceptScheme']
+          : ['skos:Concept', 'E55_Type'],
+        ...(prefLabel.length > 0 ? { 'skos:prefLabel': prefLabel } : {}),
+        ...(altLabel.length > 0 ? { 'skos:altLabel': altLabel } : {}),
+        ...(!isScheme
+          ? {
+              'skos:inScheme': {
+                '@id': `${BASE}vocabulary/place-type`,
+              },
+            }
+          : {}),
+        ...(broader ? { 'skos:broader': { '@id': broader } } : {}),
+      },
+    ];
+  });
+}
+
+function buildPlaceFunctionTypes(): Record<string, unknown>[] {
+  const concepts = new Map<
+    string,
+    { sourceLabels: Set<string>; evidenceKinds: Set<string> }
+  >();
+  if (existsSync(GAZETTEER_PATH)) {
+    const document = JSON.parse(readFileSync(GAZETTEER_PATH, 'utf-8')) as {
+      '@graph'?: Array<
+        PlaceFunctionSource & {
+          type?: string;
+          deprecated?: boolean;
+          mergedInto?: string;
+        }
+      >;
+    };
+    for (const entry of document['@graph'] ?? []) {
+      if (entry.type !== 'plantation' || entry.deprecated || entry.mergedInto) {
+        continue;
+      }
+      for (const assertion of derivePlaceFunctionAssertions(entry)) {
+        const concept = concepts.get(assertion.functionId) ?? {
+          sourceLabels: new Set<string>(),
+          evidenceKinds: new Set<string>(),
+        };
+        concept.sourceLabels.add(assertion.sourceLabel);
+        for (const evidenceKind of assertion.evidenceKinds) {
+          concept.evidenceKinds.add(evidenceKind);
+        }
+        concepts.set(assertion.functionId, concept);
+      }
+    }
+  }
+
+  return [
+    {
+      '@id': PLACE_FUNCTION_SCHEME_URI,
+      '@type': ['skos:ConceptScheme'],
+      'skos:prefLabel': [
+        { '@value': 'Vocabulaire van plaatsfuncties', '@language': 'nl' },
+        { '@value': 'Place functions vocabulary', '@language': 'en' },
+      ],
+      'skos:scopeNote': [
+        {
+          '@value':
+            'Time-scoped functions assigned only to physical place features from source-qualified evidence.',
+          '@language': 'en',
+        },
+        {
+          '@value':
+            'Tijdgebonden functies die uitsluitend op basis van brongebonden bewijs aan fysieke plaatsen zijn toegekend.',
+          '@language': 'nl',
+        },
+      ],
+    },
+    ...[...concepts.entries()]
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([functionId, concept]) => {
+        const sourceLabels = [...concept.sourceLabels].sort();
+        const labels = placeFunctionLabels(functionId, sourceLabels[0]);
+        const placeType = relatedPlaceType(functionId);
+        return {
+          '@id': `${PLACE_FUNCTION_SCHEME_URI}/${functionId}`,
+          '@type': ['skos:Concept', 'E55_Type'],
+          'skos:prefLabel': [
+            { '@value': labels.nl, '@language': 'nl' },
+            { '@value': labels.en, '@language': 'en' },
+          ],
+          'skos:altLabel': sourceLabels,
+          'skos:inScheme': { '@id': PLACE_FUNCTION_SCHEME_URI },
+          ...(placeType
+            ? { 'skos:related': { '@id': placeType.uri } }
+            : {}),
+          functionEvidenceKind: [...concept.evidenceKinds].sort(),
+        };
+      }),
+  ];
+}
+
 function buildInferenceRules(): Record<string, unknown>[] {
   return [
+    {
+      '@id': `${BASE}rule/place-function-from-organization-observation`,
+      '@type': ['InferenceRule'],
+      prefLabel: 'Place function projected from organization observation',
+      'dcterms:description':
+        'An Almanakken product or function observation about an E74 plantation organization supports a probable, time-scoped function assignment to its uniquely associated E25 physical plantation. The assignment remains linked to every supporting source observation.',
+    },
     {
       '@id': `${BASE}rule/enslaved-population-presence-at-matched-plantation`,
       '@type': ['InferenceRule'],
@@ -1240,6 +1392,14 @@ function main() {
 
   const e55Types = buildE55Types();
   console.log(`  E55 Types:          ${e55Types.length}`);
+  const placeTypeVocabulary = buildPlaceTypeVocabulary();
+  console.log(
+    `  Place type concepts:${Math.max(0, placeTypeVocabulary.length - 1)}`,
+  );
+  const placeFunctionTypes = buildPlaceFunctionTypes();
+  console.log(
+    `  Place functions:    ${Math.max(0, placeFunctionTypes.length - 1)}`,
+  );
 
   const e52TimeSpans = buildE52TimeSpans(
     new Set([
@@ -1277,6 +1437,8 @@ function main() {
     ...e41All,
     ...e36Entities,
     ...e55Types,
+    ...placeTypeVocabulary,
+    ...placeFunctionTypes,
     ...buildInferenceRules(),
     ...e52TimeSpans,
     ...e12Productions,

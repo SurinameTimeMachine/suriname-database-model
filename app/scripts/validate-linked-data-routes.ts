@@ -65,6 +65,13 @@ async function main() {
   }
   samples.set('database', { '@id': database['@id'] });
 
+  for (const expectedId of [
+    `${canonicalBase}vocabulary/place-type/plantation`,
+    `${canonicalBase}vocabulary/place-function/koffie`,
+  ]) {
+    samples.set(expectedId, { '@id': expectedId });
+  }
+
   for (const entity of samples.values()) {
     const path = pathFor(entity['@id']);
     const html = await fetch(`${serverBase}/${path}`, { redirect: 'manual' });

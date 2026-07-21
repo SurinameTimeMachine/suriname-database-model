@@ -11,6 +11,13 @@ import {
 } from 'fs';
 import { join } from 'path';
 import {
+  derivePlaceFunctionAssertions,
+  placeFunctionLabels,
+  PLACE_FUNCTION_SCHEME_URI,
+  relatedPlaceType,
+  type PlaceFunctionSource,
+} from '../lib/place-functions';
+import {
   almanakkenField,
   isVerlaten,
   readAlmanakkenRows,
@@ -123,8 +130,8 @@ type GazetteerEntry = Record<string, unknown> & {
   fid?: number | null;
   description?: string;
   statusAssertions?: Array<Record<string, unknown>>;
-  productAssertions?: Array<Record<string, unknown>>;
-  almanakkenObservations?: Array<Record<string, unknown>>;
+  productAssertions?: PlaceFunctionSource['productAssertions'];
+  almanakkenObservations?: PlaceFunctionSource['almanakkenObservations'];
   lifecycleEvents?: Array<Record<string, unknown>>;
   deprecated?: true;
   mergedInto?: string;
@@ -619,6 +626,11 @@ const organizationOverrides = new Map(
 );
 const activePlantationsByQid = new Map<string, GazetteerEntry[]>();
 const activeGazetteerById = new Map<string, GazetteerEntry>();
+const functionAssertionsByEntryId = new Map<
+  string,
+  ReturnType<typeof derivePlaceFunctionAssertions>
+>();
+
 for (const entry of gazetteerEntries) {
   if (entry.deprecated || entry.mergedInto || !entry.id) continue;
   activeGazetteerById.set(entry.id, entry);
@@ -964,6 +976,9 @@ for (const entry of gazetteerEntries) {
   const id = entry.id;
   const type = entry.type;
   if (!id || !type) continue;
+  const functionAssertions =
+    type === 'plantation' ? derivePlaceFunctionAssertions(entry) : [];
+  functionAssertionsByEntryId.set(id, functionAssertions);
 
   const featureUri = featureUriForGazetteerEntry(entry);
   if (!featureUri) continue;
@@ -978,9 +993,6 @@ for (const entry of gazetteerEntries) {
   const mapYear = mapYearFromSources(sourceIds, sourceRegistryById);
   const statusAssertions = Array.isArray(entry.statusAssertions)
     ? entry.statusAssertions
-    : [];
-  const productAssertions = Array.isArray(entry.productAssertions)
-    ? entry.productAssertions
     : [];
   const genericEvents = Array.isArray(entry.lifecycleEvents)
     ? entry.lifecycleEvents
@@ -1021,31 +1033,20 @@ for (const entry of gazetteerEntries) {
     lifecycleEventCount++;
   }
 
-  for (const assertion of productAssertions) {
-    const value =
-      typeof assertion.value === 'string' && assertion.value
-        ? assertion.value
-        : null;
-    if (!value) continue;
-    const assertionId =
-      typeof assertion.id === 'string' && assertion.id
-        ? assertion.id
-        : `function-${slugify(value)}-${lifecycleEventCount + 1}`;
-    const sourceId =
-      typeof assertion.source === 'string' && assertion.source
-        ? assertion.source
-        : sourceIds[0];
+  for (const assertion of functionAssertions) {
+    const assertionId = assertion.id;
+    const sourceId = assertion.source || sourceIds[0];
     const sourceUri = sourceId ? ensureSource(sourceId) : primarySourceUri;
-    const startYear = assertion.startYear as number | undefined;
-    const endYear = assertion.endYear as number | undefined;
-    const assignedType = `${DATA_BASE}type/feature-function/${slugify(value)}`;
+    const startYear = assertion.startYear;
+    const endYear = assertion.endYear;
+    const assignedType = assertion.functionUri;
 
     addLifecycleEvent(featureUri, {
       '@id': `${DATA_BASE}event/${id}/${assertionId}`,
       '@type': [eventTypeToCrmType('E17')],
       crmClass: 'E17',
       eventType: 'function-assignment',
-      prefLabel: `${preferredName(entry) || id}: function ${value}`,
+      prefLabel: `${preferredName(entry) || id}: function ${assertion.label}`,
       featureUri,
       P41_classified: featureUri,
       P42_assigned: assignedType,
@@ -1054,6 +1055,11 @@ for (const entry of gazetteerEntries) {
       endYear,
       hadPrimarySource: sourceUri,
       assignedType,
+      assignedLabel: assertion.label,
+      sourceLabel: assertion.sourceLabel,
+      evidenceKinds: assertion.evidenceKinds,
+      sourceRows: assertion.sourceRows,
+      certainty: assertion.certainty,
       note: assertion.note ?? null,
     });
     lifecycleEventCount++;
@@ -1187,6 +1193,146 @@ for (const featureUri of Object.keys(lifecycleEventsByEntity)) {
   attachLifecycleEventsToEntity(featureUri);
 }
 
+type FunctionUsage = {
+  assertionId: string;
+  evidenceKinds: Array<'production' | 'recorded-function'>;
+  sourceLabel: string;
+  source: string;
+  sourceRows: string[];
+  certainty: 'certain' | 'probable' | 'uncertain';
+  startYear?: number;
+  endYear?: number;
+};
+
+type FunctionPlace = {
+  id: string;
+  label: string;
+  recordUrl: string;
+  usages: FunctionUsage[];
+};
+
+type FunctionConcept = {
+  id: string;
+  uri: string;
+  relatedPlaceType?: { id: string; uri: string };
+  prefLabel: { nl: string; en: string };
+  sourceLabels: string[];
+  evidenceKinds: Array<'production' | 'recorded-function'>;
+  placeCount: number;
+  assertionCount: number;
+  firstYear: number | null;
+  lastYear: number | null;
+  places: FunctionPlace[];
+};
+
+const functionConceptsById = new Map<
+  string,
+  Omit<FunctionConcept, 'placeCount' | 'assertionCount' | 'firstYear' | 'lastYear'>
+>();
+for (const entry of gazetteerEntries) {
+  if (
+    entry.type !== 'plantation' ||
+    entry.deprecated ||
+    entry.mergedInto ||
+    !entry.id
+  ) {
+    continue;
+  }
+  for (const assertion of functionAssertionsByEntryId.get(entry.id) ?? []) {
+    const concept = functionConceptsById.get(assertion.functionId) ?? {
+      id: assertion.functionId,
+      uri: assertion.functionUri,
+      prefLabel: placeFunctionLabels(
+        assertion.functionId,
+        assertion.sourceLabel,
+      ),
+      sourceLabels: [],
+      evidenceKinds: [],
+      places: [],
+    };
+    if (!concept.sourceLabels.includes(assertion.sourceLabel)) {
+      concept.sourceLabels.push(assertion.sourceLabel);
+    }
+    for (const evidenceKind of assertion.evidenceKinds) {
+      if (!concept.evidenceKinds.includes(evidenceKind)) {
+        concept.evidenceKinds.push(evidenceKind);
+      }
+    }
+    let place = concept.places.find((candidate) => candidate.id === entry.id);
+    if (!place) {
+      place = {
+        id: entry.id,
+        label: preferredName(entry) || entry.id,
+        recordUrl: `/place/${entry.id}`,
+        usages: [],
+      };
+      concept.places.push(place);
+    }
+    place.usages.push({
+      assertionId: assertion.id,
+      evidenceKinds: assertion.evidenceKinds,
+      sourceLabel: assertion.sourceLabel,
+      source: assertion.source,
+      sourceRows: assertion.sourceRows,
+      certainty: assertion.certainty,
+      startYear: assertion.startYear,
+      endYear: assertion.endYear,
+    });
+    functionConceptsById.set(assertion.functionId, concept);
+  }
+}
+
+const placeFunctionVocabulary = {
+  scheme: {
+    id: 'place-function',
+    uri: PLACE_FUNCTION_SCHEME_URI,
+    prefLabel: {
+      en: 'Place functions vocabulary',
+      nl: 'Vocabulaire van plaatsfuncties',
+    },
+    scopeNote: {
+      en: 'Time-scoped functions assigned only to physical place features from source-qualified evidence.',
+      nl: 'Tijdgebonden functies die uitsluitend op basis van brongebonden bewijs aan fysieke plaatsen zijn toegekend.',
+    },
+  },
+  functions: [...functionConceptsById.values()]
+    .map((concept): FunctionConcept => {
+      const years = concept.places.flatMap((place) =>
+        place.usages.flatMap((usage) =>
+          [usage.startYear, usage.endYear].filter(
+            (year): year is number => year != null,
+          ),
+        ),
+      );
+      const assertionCount = concept.places.reduce(
+        (sum, place) => sum + place.usages.length,
+        0,
+      );
+      const placeType = relatedPlaceType(concept.id);
+      return {
+        ...concept,
+        ...(placeType ? { relatedPlaceType: placeType } : {}),
+        sourceLabels: concept.sourceLabels.sort(),
+        evidenceKinds: concept.evidenceKinds.sort(),
+        placeCount: concept.places.length,
+        assertionCount,
+        firstYear: years.length > 0 ? Math.min(...years) : null,
+        lastYear: years.length > 0 ? Math.max(...years) : null,
+        places: concept.places
+          .map((place) => ({
+            ...place,
+            usages: place.usages.sort(
+              (a, b) =>
+                (a.startYear ?? Number.POSITIVE_INFINITY) -
+                (b.startYear ?? Number.POSITIVE_INFINITY),
+            ),
+          }))
+          .sort((a, b) => a.label.localeCompare(b.label)),
+      };
+    })
+    .sort((a, b) => a.prefLabel.en.localeCompare(b.prefLabel.en)),
+};
+
 console.log('\nBuilt lifecycle event index...');
 console.log(`  Features with events: ${Object.keys(lifecycleEventsByEntity).length}`);
 console.log(
@@ -1218,6 +1364,7 @@ writeJSON('appellations-by-entity.json', appellationsByEntity);
 writeJSON('observations-by-org.json', observationsByOrg);
 writeJSON('presence-inferences-by-plantation.json', presenceInferencesByPlantation);
 writeJSON('lifecycle-events.json', lifecycleEventsByEntity);
+writeJSON('place-functions.json', placeFunctionVocabulary);
 writeJSON('provenance.json', provenanceIndex);
 
 // Copy GeoJSON and merge gazetteer features

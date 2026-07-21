@@ -545,6 +545,55 @@ function LifecycleEntry({
   );
 }
 
+function FunctionEntry({
+  event,
+  sourceLabel,
+}: {
+  event: FeatureLifecycleEvent;
+  sourceLabel?: string;
+}) {
+  const functionId = event.assignedType?.split('/').pop() ?? '';
+  const label =
+    event.assignedLabel ||
+    functionId
+      .split('-')
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(' ');
+  const year =
+    event.startYear != null
+      ? event.endYear != null && event.endYear !== event.startYear
+        ? `${event.startYear}-${event.endYear}`
+        : String(event.startYear)
+      : 'undated';
+
+  return (
+    <div className="border-l-2 border-stm-teal-300 py-1 pl-3 text-xs">
+      <div className="flex items-baseline gap-2">
+        <Link
+          href={`/vocabulary/place-function/${encodeURIComponent(functionId)}`}
+          className="font-semibold text-stm-teal-700 hover:underline"
+        >
+          {label}
+        </Link>
+        <span className="ml-auto shrink-0 font-mono text-[10px] text-stm-warm-400">
+          {year}
+        </span>
+      </div>
+      <p className="mt-0.5 text-[10px] text-stm-warm-400">
+        {event.evidenceKinds?.includes('recorded-function') &&
+        event.evidenceKinds.includes('production')
+          ? 'Recorded and production function'
+          : event.evidenceKinds?.includes('recorded-function')
+            ? 'Recorded function'
+            : 'Production function'}
+        {event.sourceLabel ? `: ${event.sourceLabel}` : ''}
+        {sourceLabel ? ` · ${sourceLabel}` : ''}
+        {event.certainty ? ` · ${event.certainty}` : ''}
+      </p>
+    </div>
+  );
+}
+
 export default function PlantationPanel({
   feature,
   data,
@@ -561,6 +610,7 @@ export default function PlantationPanel({
     plantation: true,
     organization: true,
     place: true,
+    functions: true,
     lifecycle: true,
     sources: true,
     provenance: false,
@@ -654,6 +704,13 @@ export default function PlantationPanel({
   const lifecycleEvents = lifecycleTargetUri
     ? ([...(data.lifecycleEvents[lifecycleTargetUri] || [])] as FeatureLifecycleEvent[])
     : [];
+  const functionEvents = lifecycleEvents.filter(
+    (event) => event.eventType === 'function-assignment' && event.assignedType,
+  );
+  const otherLifecycleEvents = lifecycleEvents.filter(
+    (event) =>
+      event.eventType !== 'function-assignment' || !event.assignedType,
+  );
 
   // Sources used
   const sourceUris = new Set<string>();
@@ -1211,6 +1268,44 @@ export default function PlantationPanel({
               ))}
           </div>
 
+          {/* Functions — dated assignments to the physical place */}
+          {functionEvents.length > 0 && (
+            <div>
+              <SectionHeader
+                id="functions"
+                title="Functions"
+                badge="E17"
+                open={openSections.functions}
+                onToggle={() => toggle('functions')}
+                refs={sectionRefs}
+                count={functionEvents.length}
+              />
+              {openSections.functions && (
+                <div className="px-3 pb-3">
+                  <p className="mb-2 text-[10px] text-stm-warm-400">
+                    Functions attested for this physical place. A date range
+                    records the source evidence, not necessarily its full
+                    duration.
+                  </p>
+                  <div className="max-h-72 space-y-1 overflow-y-auto">
+                    {functionEvents.map((event) => (
+                      <FunctionEntry
+                        key={event['@id']}
+                        event={event}
+                        sourceLabel={
+                          event.hadPrimarySource
+                            ? data.sources[event.hadPrimarySource]?.prefLabel ||
+                              uriLabel(event.hadPrimarySource)
+                            : undefined
+                        }
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Lifecycle events — generalized for polygons, lines, and points */}
           <div>
             <SectionHeader
@@ -1220,17 +1315,17 @@ export default function PlantationPanel({
               open={openSections.lifecycle}
               onToggle={() => toggle('lifecycle')}
               refs={sectionRefs}
-              count={lifecycleEvents.length || undefined}
+              count={otherLifecycleEvents.length || undefined}
             />
             {openSections.lifecycle &&
-              (lifecycleEvents.length > 0 ? (
+              (otherLifecycleEvents.length > 0 ? (
                 <div className="px-3 pb-3">
                   <p className="text-[10px] text-stm-warm-400 mb-2">
                     Event hooks for source presence, status, function,
                     modification, destruction, or transformation.
                   </p>
                   <div className="space-y-0.5 max-h-96 overflow-y-auto">
-                    {lifecycleEvents.map((event) => (
+                    {otherLifecycleEvents.map((event) => (
                       <LifecycleEntry
                         key={event['@id']}
                         event={event}

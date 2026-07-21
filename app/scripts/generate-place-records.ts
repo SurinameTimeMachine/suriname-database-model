@@ -15,6 +15,12 @@ import {
 } from 'fs';
 import { join } from 'path';
 import type { AlmanakkenPlantationObservation } from '../lib/types';
+import {
+  derivePlaceFunctionAssertions,
+  placeFunctionLabels,
+  PLACE_FUNCTION_SCHEME_URI,
+  relatedPlaceType,
+} from '../lib/place-functions';
 
 import { BASE, buildPlaceRecordContext } from './lod-context';
 
@@ -188,14 +194,17 @@ function isPhysicalFeature(type: string): boolean {
 }
 
 function timeSpan(id: string, startYear?: number, endYear?: number): JsonObject | null {
-  if (!startYear && !endYear) return null;
+  if (startYear == null && endYear == null) return null;
+  const firstYear = startYear ?? endYear!;
+  const lastYear = endYear ?? startYear!;
   const entity: JsonObject = {
     '@id': id,
     '@type': ['crm:E52_Time-Span'],
-    'rdfs:label': endYear && endYear !== startYear ? `${startYear}–${endYear}` : String(startYear ?? endYear),
+    'rdfs:label':
+      lastYear !== firstYear ? `${firstYear}–${lastYear}` : String(firstYear),
+    P82a_begin_of_the_begin: String(firstYear),
+    P82b_end_of_the_end: String(lastYear),
   };
-  if (startYear) entity.P82a_begin_of_the_begin = String(startYear);
-  if (endYear) entity.P82b_end_of_the_end = String(endYear);
   return entity;
 }
 
@@ -283,6 +292,7 @@ export function generatePlaceRecords() {
     const featureUri = fragmentUri(pageUri, 'feature');
     const locationUri = fragmentUri(pageUri, 'location');
     const hasFeature = isPhysicalFeature(placeClass);
+    const structuralTypeUri = `${BASE}vocabulary/place-type/${entry.type}`;
     const targetUri = hasFeature ? featureUri : locationUri;
     const names = namesFor(entry);
     const label = preferredName(names);
@@ -318,6 +328,11 @@ export function generatePlaceRecords() {
       return uri;
     };
     const productTypeUris = new Set<string>();
+    const functionTypeUris = new Set<string>();
+    const functionAssertions =
+      entry.type === 'plantation'
+        ? derivePlaceFunctionAssertions(entry)
+        : [];
     const referencedSourceIds = new Set<string>(entry.sources ?? []);
     for (const name of names) if (name.source) referencedSourceIds.add(name.source);
     for (const assertion of [
@@ -327,6 +342,9 @@ export function generatePlaceRecords() {
       ...asArray(entry.productAssertions),
     ]) {
       if (assertion.source) referencedSourceIds.add(assertion.source);
+    }
+    for (const assertion of functionAssertions) {
+      referencedSourceIds.add(assertion.source);
     }
     const sourceUris = [...referencedSourceIds].map((id) => sourceUri(id, sourceIds));
 
@@ -354,7 +372,7 @@ export function generatePlaceRecords() {
         '@id': featureUri,
         '@type': [`crm:${placeClass}`],
         'rdfs:label': label,
-        P2_has_type: `${BASE}type/place-type/${entry.type}`,
+        P2_has_type: structuralTypeUri,
         P53_has_location: locationUri,
         'prov:wasDerivedFrom': [...sourceUris],
       };
@@ -393,6 +411,7 @@ export function generatePlaceRecords() {
         ...(entry.locationPoint ? ['geo:Feature'] : []),
       ],
       'rdfs:label': entry.locationDescription ?? label,
+      ...(!hasFeature ? { P2_has_type: structuralTypeUri } : {}),
       'prov:wasDerivedFrom': [...sourceUris],
     };
     if (entry.broader) {
@@ -559,34 +578,67 @@ export function generatePlaceRecords() {
     }
     if (statusUris.length > 0) record.hasOperationalSummary = statusUris;
 
-    for (const assertion of entry.productAssertions ?? []) {
-      if (!assertion.id || !assertion.value) continue;
+    const functionAssignmentUris: string[] = [];
+    for (const assertion of functionAssertions) {
       const assertionUri = fragmentUri(pageUri, `assertion-${assertion.id}`);
       const spanUri = fragmentUri(pageUri, `assertion-${assertion.id}-time-span`);
       const span = timeSpan(spanUri, assertion.startYear, assertion.endYear);
       if (span) graph.push(span);
       graph.push({
         '@id': assertionUri,
-        '@type': ['crm:E13_Attribute_Assignment'],
-        P140_assigned_attribute_to: targetUri,
-        P141_assigned: `${BASE}type/product/${slug(assertion.value)}`,
+        '@type': ['crm:E17_Type_Assignment'],
+        P41_classified: targetUri,
+        P42_assigned: assertion.functionUri,
         ...(span ? { P4_has_time_span: spanUri } : {}),
         ...(assertion.source
           ? { 'prov:hadPrimarySource': sourceUri(assertion.source, sourceIds) }
           : {}),
-        certainty: `${BASE}type/certainty/certain`,
+        ...(assertion.sourceRows.length > 0
+          ? {
+              'prov:wasDerivedFrom': assertion.sourceRows.map((recordId) =>
+                fragmentUri(
+                  pageUri,
+                  `observation-almanakken-${recordId}`,
+                ),
+              ),
+            }
+          : {}),
+        certainty: `${BASE}type/certainty/${assertion.certainty}`,
+        ...(assertion.source === 'almanakken'
+          ? {
+              inferenceRule: `${BASE}rule/place-function-from-organization-observation`,
+            }
+          : {}),
         ...(assertion.note ? { P3_has_note: assertion.note } : {}),
       });
-      const productTypeUri = `${BASE}type/product/${slug(assertion.value)}`;
-      if (!productTypeUris.has(productTypeUri)) {
-        productTypeUris.add(productTypeUri);
+      if (!functionTypeUris.has(assertion.functionUri)) {
+        functionTypeUris.add(assertion.functionUri);
+        const labels = placeFunctionLabels(
+          assertion.functionId,
+          assertion.sourceLabel,
+        );
+        const placeType = relatedPlaceType(assertion.functionId);
         graph.push({
-          '@id': productTypeUri,
-          '@type': ['crm:E99_Product_Type'],
-          'rdfs:label': assertion.value,
+          '@id': assertion.functionUri,
+          '@type': ['skos:Concept', 'crm:E55_Type'],
+          'skos:prefLabel': [
+            { '@value': labels.nl, '@language': 'nl' },
+            { '@value': labels.en, '@language': 'en' },
+          ],
+          'skos:altLabel': [assertion.sourceLabel],
+          'skos:inScheme': { '@id': PLACE_FUNCTION_SCHEME_URI },
+          ...(placeType
+            ? { 'skos:related': { '@id': placeType.uri } }
+            : {}),
         });
       }
       evidenceUris.push(assertionUri);
+      functionAssignmentUris.push(assertionUri);
+    }
+    if (functionAssignmentUris.length > 0) {
+      record.hasFunctionSummary = functionAssignmentUris;
+      const subject = graph.find((entity) => entity['@id'] === targetUri);
+      if (subject) subject.hasFunctionAssignment = functionAssignmentUris;
     }
     // Preserve saved Almanakken v2 rows as source-bound observations.
     // These rows are evidence for review; curated claims remain the assertions above.
@@ -753,6 +805,7 @@ export function generatePlaceRecords() {
       sources: asArray(entry.sources),
       statusAssertions: asArray(entry.statusAssertions),
       productAssertions: asArray(entry.productAssertions),
+      functionAssertions,
       districtAssertions: asArray(entry.districtAssertions),
       locationAssertions: asArray(entry.locationAssertions),
       almanakkenObservations,

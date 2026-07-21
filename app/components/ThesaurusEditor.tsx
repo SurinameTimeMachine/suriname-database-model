@@ -15,6 +15,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 interface ThesaurusEditorProps {
   canEdit: boolean;
+  onChange?: (data: Record<string, unknown>) => void;
 }
 
 const LANGS = [
@@ -119,7 +120,10 @@ function flatAlt(map: LangArrayMap): string[] {
   return Object.values(map).flat().filter(Boolean) as string[];
 }
 
-export default function ThesaurusEditor({ canEdit }: ThesaurusEditorProps) {
+export default function ThesaurusEditor({
+  canEdit,
+  onChange,
+}: ThesaurusEditorProps) {
   const [scheme, setScheme] = useState<ThesaurusScheme | null>(null);
   const [concepts, setConcepts] = useState<PlaceTypeConcept[]>([]);
   const [rawJsonLd, setRawJsonLd] = useState<Record<string, unknown> | null>(
@@ -269,6 +273,7 @@ export default function ThesaurusEditor({ canEdit }: ThesaurusEditorProps) {
       const parsed = parseThesaurus(updatedJsonLd);
       setConcepts(parsed.concepts);
       setScheme(parsed.scheme);
+      onChange?.(updatedJsonLd);
       invalidateThesaurusCache();
       setIsCreating(false);
       setCreateTypeId('');
@@ -280,7 +285,7 @@ export default function ThesaurusEditor({ canEdit }: ThesaurusEditorProps) {
     } finally {
       setSaving(false);
     }
-  }, [rawJsonLd, createTypeId, createDraft, concepts]);
+  }, [rawJsonLd, createTypeId, createDraft, concepts, onChange]);
 
   const saveConcept = useCallback(async () => {
     if (!draft || !rawJsonLd) return;
@@ -340,6 +345,7 @@ export default function ThesaurusEditor({ canEdit }: ThesaurusEditorProps) {
       const parsed = parseThesaurus(updatedJsonLd);
       setConcepts(parsed.concepts);
       setScheme(parsed.scheme);
+      onChange?.(updatedJsonLd);
       invalidateThesaurusCache();
       setEditingId(null);
       setDraft(null);
@@ -349,7 +355,7 @@ export default function ThesaurusEditor({ canEdit }: ThesaurusEditorProps) {
     } finally {
       setSaving(false);
     }
-  }, [draft, rawJsonLd]);
+  }, [draft, rawJsonLd, onChange]);
 
   const saveScopeNote = useCallback(async () => {
     if (!rawJsonLd) return;
@@ -390,6 +396,7 @@ export default function ThesaurusEditor({ canEdit }: ThesaurusEditorProps) {
       setRawJsonLd(updatedJsonLd);
       const parsed = parseThesaurus(updatedJsonLd);
       setScheme(parsed.scheme);
+      onChange?.(updatedJsonLd);
       invalidateThesaurusCache();
       setEditingScope(false);
       setSuccess('Scope note saved');
@@ -398,7 +405,7 @@ export default function ThesaurusEditor({ canEdit }: ThesaurusEditorProps) {
     } finally {
       setSaving(false);
     }
-  }, [rawJsonLd, scopeDraft]);
+  }, [rawJsonLd, scopeDraft, onChange]);
 
   if (!scheme) {
     return (
@@ -1264,6 +1271,7 @@ export default function ThesaurusEditor({ canEdit }: ThesaurusEditorProps) {
                               const parsed = parseThesaurus(updatedJsonLd);
                               setConcepts(parsed.concepts);
                               setScheme(parsed.scheme);
+                              onChange?.(updatedJsonLd);
                               invalidateThesaurusCache();
                               setEditingId(null);
                               setDraft(null);
