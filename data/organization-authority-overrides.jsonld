@@ -34,6 +34,45 @@
       ]
     },
     {
+      "@id": "https://data.surinametijdmachine.org/organization/Q2042290#editorial-override",
+      "@type": "OrganizationAuthorityOverride",
+      "qid": "Q2042290",
+      "reviewStatus": "unreviewed",
+      "modifiedAt": "2026-07-20",
+      "modifiedBy": "Thunnisvanoort",
+      "physicalLinkReviewStatus": "confirmed-multiple",
+      "reviewedPhysicalPlaceIds": [
+        "stm-01256",
+        "stm-01476"
+      ]
+    },
+    {
+      "@id": "https://data.surinametijdmachine.org/organization/Q2121376#editorial-override",
+      "@type": "OrganizationAuthorityOverride",
+      "qid": "Q2121376",
+      "reviewStatus": "unreviewed",
+      "modifiedAt": "2026-07-20",
+      "modifiedBy": "Thunnisvanoort",
+      "physicalLinkReviewStatus": "confirmed-multiple",
+      "reviewedPhysicalPlaceIds": [
+        "stm-01161",
+        "stm-01480"
+      ]
+    },
+    {
+      "@id": "https://data.surinametijdmachine.org/organization/Q4392658#editorial-override",
+      "@type": "OrganizationAuthorityOverride",
+      "qid": "Q4392658",
+      "reviewStatus": "unreviewed",
+      "modifiedAt": "2026-07-20",
+      "modifiedBy": "Thunnisvanoort",
+      "physicalLinkReviewStatus": "confirmed-multiple",
+      "reviewedPhysicalPlaceIds": [
+        "stm-01137",
+        "stm-02712"
+      ]
+    },
+    {
       "@id": "https://data.surinametijdmachine.org/organization/Q13457818#editorial-override",
       "@type": "OrganizationAuthorityOverride",
       "qid": "Q13457818",
@@ -74,6 +113,207 @@
         "stm-01534",
         "stm-01535",
         "stm-01573"
+      ]
+    },
+    {
+      "@id": "https://data.surinametijdmachine.org/organization/Q59115355#editorial-override",
+      "@type": "OrganizationAuthorityOverride",
+      "qid": "Q59115355",
+      "reviewStatus": "unreviewed",
+      "modifiedAt": "2026-07-20",
+      "modifiedBy": "Thunnisvanoort",
+      "physicalLinkReviewStatus": "confirmed-multiple",
+      "reviewedPhysicalPlaceIds": [
+        "stm-01348",
+        "stm-01349",
+        "stm-01850"
+      ]
+    },
+    {
+      "@id": "https://data.surinametijdmachine.org/organization/Q59115440#editorial-override",
+      "@type": "OrganizationAuthorityOverride",
+      "qid": "Q59115440",
+      "reviewStatus": "unreviewed",
+      "modifiedAt": "2026-07-20",
+      "modifiedBy": "Thunnisvanoort",
+      "physicalLinkReviewStatus": "confirmed-multiple",
+      "reviewedPhysicalPlaceIds": [
+        "stm-01520",
+        "stm-02313"
+      ]
+    },
+    {
+      "@id": "https://data.surinametijdmachine.org/organization/Q59115453#editorial-override",
+      "@type": "OrganizationAuthorityOverride",
+      "qid": "Q59115453",
+      "reviewStatus": "unreviewed",
+      "modifiedAt": "2026-07-20",
+      "modifiedBy": "Thunnisvanoort",
+      "physicalLinkReviewStatus": "confirmed-multiple",
+      "reviewedPhysicalPlaceIds": [
+        "stm-01355",
+        "stm-01774"
+      ]
+    },
+    {
+      "@id": "https://data.surinametijdmachine.org/organization/Q59115469#editorial-override",
+      "@type": "OrganizationAuthorityOverride",
+      "qid": "Q59115469",
+      "reviewStatus": "unreviewed",
+      "modifiedAt": "2026-07-20",
+      "modifiedBy": "Thunnisvanoort",
+      "physicalLinkReviewStatus": "confirmed-multiple",
+      "reviewedPhysicalPlaceIds": [
+        "stm-01543",
+        "stm-01959"
+      ]
+    },
+    {
+      "@id": "https://data.surinametijdmachine.org/organization/Q59115497#editorial-override",
+      "@type": "OrganizationAuthorityOverride",
+      "qid": "Q59115497",
+      "reviewStatus": "unreviewed",
+      "modifiedAt": "2026-07-20",
+      "modifiedBy": "Thunnisvanoort",
+      "physicalLinkReviewStatus": "confirmed-multiple",
+      "reviewedPhysicalPlaceIds": [
+        "stm-01462",
+        "stm-02602"
+      ]
+    },
+    {
+      "@id": "https://data.surinametijdmachine.org/organization/Q59115566#editorial-override",
+      "@type": "OrganizationAuthorityOverride",
+      "qid": "Q59115566",
+      "reviewStatus": "unreviewed",
+      "modifiedAt": "2026-07-20",
+      "modifiedBy": "Thunnisvanoort",
+      "physicalLinkReviewStatus": "confirmed-multiple",
+      "reviewedPhysicalPlaceIds": [
+        "stm-01309",
+        "stm-01469",
+        "stm-01470"
+      ]
+    },
+    {
+      "@id": "https://data.surinametijdmachine.org/organization/Q59115670#editorial-override",
+      "@type": "OrganizationAuthorityOverride",
+      "qid": "Q59115670",
+      "reviewStatus": "unreviewed",
+      "modifiedAt": "2026-07-20",
+      "modifiedBy": "Thunnisvanoort",
+      "physicalLinkReviewStatus": "confirmed-multiple",
+      "reviewedPhysicalPlaceIds": [
+        "stm-01705",
+        "stm-01835",
+        "stm-01836",
+        "stm-01837"
+      ]
+    },
+    {
+      "@id": "https://data.surinametijdmachine.org/organization/Q59115708#editorial-override",
+      "@type": "OrganizationAuthorityOverride",
+      "qid": "Q59115708",
+      "reviewStatus": "unreviewed",
+      "modifiedAt": "2026-07-20",
+      "modifiedBy": "Thunnisvanoort",
+      "physicalLinkReviewStatus": "confirmed-multiple",
+      "reviewedPhysicalPlaceIds": [
+        "stm-01519",
+        "stm-02356"
+      ]
+    },
+    {
+      "@id": "https://data.surinametijdmachine.org/organization/Q59115735#editorial-override",
+      "@type": "OrganizationAuthorityOverride",
+      "qid": "Q59115735",
+      "reviewStatus": "unreviewed",
+      "modifiedAt": "2026-07-20",
+      "modifiedBy": "Thunnisvanoort",
+      "physicalLinkReviewStatus": "confirmed-multiple",
+      "reviewedPhysicalPlaceIds": [
+        "stm-01537",
+        "stm-01544",
+        "stm-02273"
+      ]
+    },
+    {
+      "@id": "https://data.surinametijdmachine.org/organization/Q59115757#editorial-override",
+      "@type": "OrganizationAuthorityOverride",
+      "qid": "Q59115757",
+      "reviewStatus": "unreviewed",
+      "modifiedAt": "2026-07-20",
+      "modifiedBy": "Thunnisvanoort",
+      "physicalLinkReviewStatus": "confirmed-multiple",
+      "reviewedPhysicalPlaceIds": [
+        "stm-01540",
+        "stm-01578"
+      ]
+    },
+    {
+      "@id": "https://data.surinametijdmachine.org/organization/Q59116887#editorial-override",
+      "@type": "OrganizationAuthorityOverride",
+      "qid": "Q59116887",
+      "reviewStatus": "unreviewed",
+      "modifiedAt": "2026-07-20",
+      "modifiedBy": "Thunnisvanoort",
+      "physicalLinkReviewStatus": "confirmed-multiple",
+      "reviewedPhysicalPlaceIds": [
+        "stm-01553",
+        "stm-02560"
+      ]
+    },
+    {
+      "@id": "https://data.surinametijdmachine.org/organization/Q59116900#editorial-override",
+      "@type": "OrganizationAuthorityOverride",
+      "qid": "Q59116900",
+      "reviewStatus": "unreviewed",
+      "modifiedAt": "2026-07-20",
+      "modifiedBy": "Thunnisvanoort",
+      "physicalLinkReviewStatus": "confirmed-multiple",
+      "reviewedPhysicalPlaceIds": [
+        "stm-01464",
+        "stm-02609"
+      ]
+    },
+    {
+      "@id": "https://data.surinametijdmachine.org/organization/Q59133845#editorial-override",
+      "@type": "OrganizationAuthorityOverride",
+      "qid": "Q59133845",
+      "reviewStatus": "unreviewed",
+      "modifiedAt": "2026-07-20",
+      "modifiedBy": "Thunnisvanoort",
+      "physicalLinkReviewStatus": "confirmed-multiple",
+      "reviewedPhysicalPlaceIds": [
+        "stm-01461",
+        "stm-01468",
+        "stm-02600"
+      ]
+    },
+    {
+      "@id": "https://data.surinametijdmachine.org/organization/Q124830445#editorial-override",
+      "@type": "OrganizationAuthorityOverride",
+      "qid": "Q124830445",
+      "reviewStatus": "unreviewed",
+      "modifiedAt": "2026-07-20",
+      "modifiedBy": "Thunnisvanoort",
+      "physicalLinkReviewStatus": "confirmed-multiple",
+      "reviewedPhysicalPlaceIds": [
+        "stm-01477",
+        "stm-01933"
+      ]
+    },
+    {
+      "@id": "https://data.surinametijdmachine.org/organization/Q124830731#editorial-override",
+      "@type": "OrganizationAuthorityOverride",
+      "qid": "Q124830731",
+      "reviewStatus": "unreviewed",
+      "modifiedAt": "2026-07-20",
+      "modifiedBy": "Thunnisvanoort",
+      "physicalLinkReviewStatus": "confirmed-multiple",
+      "reviewedPhysicalPlaceIds": [
+        "stm-01551",
+        "stm-02546"
       ]
     }
   ]
