@@ -71,13 +71,73 @@ function parseWKTPoint(wkt: string): [number, number] | null {
   return Number.isFinite(lat) && Number.isFinite(lng) ? [lat, lng] : null;
 }
 
-function parseWKTMultiPolygon(wkt: string): [number, number][][] {
-  return [...wkt.matchAll(/\(\(([^()]*)\)\)/g)].map((match) =>
-    match[1].split(',').map((pair) => {
+type LatLng = [number, number];
+type MultiPolygonCoordinates = LatLng[][][];
+
+function stripOuterParentheses(value: string): string {
+  let result = value.trim();
+  while (result.startsWith('(') && result.endsWith(')')) {
+    let depth = 0;
+    let enclosesAll = true;
+    for (let index = 0; index < result.length; index++) {
+      if (result[index] === '(') depth++;
+      else if (result[index] === ')') depth--;
+      if (depth === 0 && index < result.length - 1) {
+        enclosesAll = false;
+        break;
+      }
+    }
+    if (!enclosesAll) break;
+    result = result.slice(1, -1).trim();
+  }
+  return result;
+}
+
+function stripOneOuterParentheses(value: string): string {
+  const result = value.trim();
+  if (!result.startsWith('(') || !result.endsWith(')')) return result;
+  let depth = 0;
+  for (let index = 0; index < result.length; index++) {
+    if (result[index] === '(') depth++;
+    else if (result[index] === ')') depth--;
+    if (depth === 0 && index < result.length - 1) return result;
+  }
+  return result.slice(1, -1).trim();
+}
+
+function splitTopLevel(value: string): string[] {
+  const parts: string[] = [];
+  let depth = 0;
+  let start = 0;
+  for (let index = 0; index < value.length; index++) {
+    if (value[index] === '(') depth++;
+    else if (value[index] === ')') depth--;
+    else if (value[index] === ',' && depth === 0) {
+      parts.push(value.slice(start, index).trim());
+      start = index + 1;
+    }
+  }
+  parts.push(value.slice(start).trim());
+  return parts.filter(Boolean);
+}
+
+function parseCoordinateRing(value: string): LatLng[] {
+  return stripOuterParentheses(value)
+    .split(',')
+    .map((pair) => {
       const [lng, lat] = pair.trim().split(/\s+/).map(Number);
-      return [lat, lng] as [number, number];
-    }),
-  );
+      return [lat, lng] as LatLng;
+    })
+    .filter(([lat, lng]) => Number.isFinite(lat) && Number.isFinite(lng));
+}
+
+function parseWKTMultiPolygon(wkt: string): MultiPolygonCoordinates {
+  const body = wkt.replace(/^MULTIPOLYGON\s*/i, '').trim();
+  return splitTopLevel(stripOneOuterParentheses(body))
+    .map((polygon) =>
+      splitTopLevel(stripOneOuterParentheses(polygon)).map(parseCoordinateRing),
+    )
+    .filter((polygon) => polygon.some((ring) => ring.length > 0));
 }
 
 /**
@@ -207,9 +267,10 @@ export default function PlaceMergeMap({
             bounds.push(pl.getBounds());
           }
         } else {
-          const coords = upper.startsWith('MULTIPOLYGON')
-            ? parseWKTMultiPolygon(loc.wkt)
-            : parseWKTPolygon(loc.wkt);
+          const coords: LatLng[][] | MultiPolygonCoordinates =
+            upper.startsWith('MULTIPOLYGON')
+              ? parseWKTMultiPolygon(loc.wkt)
+              : [parseWKTPolygon(loc.wkt)];
           if (coords.length > 0) {
             const poly = L.polygon(coords, {
               color: colors.stroke,
