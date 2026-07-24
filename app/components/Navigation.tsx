@@ -10,8 +10,7 @@ const NAV_ITEMS = [
   { href: '/places', label: 'Places' },
   { href: '/organizations', label: 'Organizations' },
   { href: '/sources', label: 'Sources' },
-  { href: '/model', label: 'Model' },
-        { href: '/vocabulary', label: 'Vocabulary' },
+  { href: '/vocabulary', label: 'Vocabulary' },
 ] as const;
 
 type DomainLink = {

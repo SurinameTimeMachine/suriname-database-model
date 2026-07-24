@@ -4,7 +4,6 @@
  * Query-param routes:
  *   /places?place={id}      — stm-00001
  *   /explore?place={id}&z={zoom}&lat={lat}&lng={lng}
- *   /model?entity={crmId}   — e25
  *
  * Path routes:
  *   /sources/{sourceId}     — map-1930
@@ -51,10 +50,6 @@ export function buildExploreUrl(opts?: {
   if (opts?.lng != null) params.set('lng', opts.lng.toFixed(4));
   const qs = params.toString();
   return qs ? `/explore?${qs}` : '/explore';
-}
-
-export function buildModelUrl(entityId: string): string {
-  return `/model?entity=${encodeURIComponent(entityId)}`;
 }
 
 /* ─── Parsers ──────────────────────────────────────────────────── */
