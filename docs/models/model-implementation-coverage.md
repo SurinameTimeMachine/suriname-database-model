@@ -1,8 +1,7 @@
 # Model implementation coverage
 
-`app/app/model/page.tsx` describes the intended CIDOC CRM model. It now marks
-each class by implementation status rather than treating every diagram node as
-currently serialized data.
+The CIDOC CRM model is documented here by implementation status rather than
+treating every diagram node as currently serialized data.
 
 ## Aggregate graph
 
