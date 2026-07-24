@@ -240,12 +240,13 @@ export default function PlaceMergeMap({
     ) => {
       const colors = COLORS[index % COLORS.length];
       const label = String.fromCharCode(65 + index);
+      let parsedPoint: LatLng | null = null;
 
       if (loc.wkt) {
         const upper = loc.wkt.trim().toUpperCase();
         if (upper.startsWith('POINT')) {
-          const point = parseWKTPoint(loc.wkt);
-          if (point) bounds.push([point]);
+          parsedPoint = parseWKTPoint(loc.wkt);
+          if (parsedPoint) bounds.push([parsedPoint]);
         } else if (
           upper.startsWith('LINESTRING') ||
           upper.startsWith('MULTILINESTRING')
@@ -289,8 +290,8 @@ export default function PlaceMergeMap({
         }
       }
 
-      if (loc.lat != null && loc.lng != null) {
-        const marker = L.marker([loc.lat, loc.lng], {
+      const addMarker = (point: LatLng) => {
+        const marker = L.marker(point, {
           icon: makeLabel(label, colors),
         })
           .bindTooltip(`${label}: ${name} (${id})`, {
@@ -298,7 +299,13 @@ export default function PlaceMergeMap({
           })
           .addTo(map);
         layersRef.current.push(marker);
+      };
+
+      if (loc.lat != null && loc.lng != null) {
+        addMarker([loc.lat, loc.lng]);
         if (!loc.wkt) bounds.push([[loc.lat, loc.lng]]);
+      } else if (parsedPoint) {
+        addMarker(parsedPoint);
       }
     };
 
