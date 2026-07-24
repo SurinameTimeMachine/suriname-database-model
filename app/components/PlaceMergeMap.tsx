@@ -35,11 +35,14 @@ function safelyRemove(target: { remove: () => unknown } | null) {
   }
 }
 
-// A = teal, B = sepia/brown
-const COLORS = {
-  a: { stroke: '#2a7abf', fill: '#4a88bf', label: '#1a5a9a' },
-  b: { stroke: '#8a5018', fill: '#a67830', label: '#6a3800' },
-};
+const COLORS = [
+  { stroke: '#2a7abf', fill: '#4a88bf' },
+  { stroke: '#8a5018', fill: '#a67830' },
+  { stroke: '#7b3f98', fill: '#9b69b5' },
+  { stroke: '#177245', fill: '#4e9b72' },
+  { stroke: '#b14d36', fill: '#c87862' },
+  { stroke: '#75621b', fill: '#a49345' },
+];
 
 interface PlaceLocation {
   lat: number | null;
@@ -48,10 +51,7 @@ interface PlaceLocation {
 }
 
 export interface PlaceMergeMapProps {
-  locationA: PlaceLocation;
-  locationB: PlaceLocation;
-  nameA: string;
-  nameB: string;
+  locations: Array<PlaceLocation & { id: string; name: string }>;
 }
 
 function parseWKTPolygon(wkt: string): [number, number][] {
@@ -61,6 +61,83 @@ function parseWKTPolygon(wkt: string): [number, number][] {
     const [lng, lat] = pair.trim().split(/\s+/).map(Number);
     return [lat, lng] as [number, number];
   });
+}
+
+function parseWKTPoint(wkt: string): [number, number] | null {
+  const match = wkt.match(/^POINT\s*\(\s*([-+\d.e]+)\s+([-+\d.e]+)\s*\)$/i);
+  if (!match) return null;
+  const lng = Number(match[1]);
+  const lat = Number(match[2]);
+  return Number.isFinite(lat) && Number.isFinite(lng) ? [lat, lng] : null;
+}
+
+type LatLng = [number, number];
+type MultiPolygonCoordinates = LatLng[][][];
+
+function stripOuterParentheses(value: string): string {
+  let result = value.trim();
+  while (result.startsWith('(') && result.endsWith(')')) {
+    let depth = 0;
+    let enclosesAll = true;
+    for (let index = 0; index < result.length; index++) {
+      if (result[index] === '(') depth++;
+      else if (result[index] === ')') depth--;
+      if (depth === 0 && index < result.length - 1) {
+        enclosesAll = false;
+        break;
+      }
+    }
+    if (!enclosesAll) break;
+    result = result.slice(1, -1).trim();
+  }
+  return result;
+}
+
+function stripOneOuterParentheses(value: string): string {
+  const result = value.trim();
+  if (!result.startsWith('(') || !result.endsWith(')')) return result;
+  let depth = 0;
+  for (let index = 0; index < result.length; index++) {
+    if (result[index] === '(') depth++;
+    else if (result[index] === ')') depth--;
+    if (depth === 0 && index < result.length - 1) return result;
+  }
+  return result.slice(1, -1).trim();
+}
+
+function splitTopLevel(value: string): string[] {
+  const parts: string[] = [];
+  let depth = 0;
+  let start = 0;
+  for (let index = 0; index < value.length; index++) {
+    if (value[index] === '(') depth++;
+    else if (value[index] === ')') depth--;
+    else if (value[index] === ',' && depth === 0) {
+      parts.push(value.slice(start, index).trim());
+      start = index + 1;
+    }
+  }
+  parts.push(value.slice(start).trim());
+  return parts.filter(Boolean);
+}
+
+function parseCoordinateRing(value: string): LatLng[] {
+  return stripOuterParentheses(value)
+    .split(',')
+    .map((pair) => {
+      const [lng, lat] = pair.trim().split(/\s+/).map(Number);
+      return [lat, lng] as LatLng;
+    })
+    .filter(([lat, lng]) => Number.isFinite(lat) && Number.isFinite(lng));
+}
+
+function parseWKTMultiPolygon(wkt: string): MultiPolygonCoordinates {
+  const body = wkt.replace(/^MULTIPOLYGON\s*/i, '').trim();
+  return splitTopLevel(stripOneOuterParentheses(body))
+    .map((polygon) =>
+      splitTopLevel(stripOneOuterParentheses(polygon)).map(parseCoordinateRing),
+    )
+    .filter((polygon) => polygon.some((ring) => ring.length > 0));
 }
 
 /**
@@ -111,10 +188,7 @@ function makeLabel(letter: string, colors: { stroke: string }) {
 }
 
 export default function PlaceMergeMap({
-  locationA,
-  locationB,
-  nameA,
-  nameB,
+  locations,
 }: PlaceMergeMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
@@ -158,12 +232,22 @@ export default function PlaceMergeMap({
 
     const bounds: L.LatLngBoundsExpression[] = [];
 
-    const addPlace = (loc: PlaceLocation, name: string, side: 'a' | 'b') => {
-      const colors = COLORS[side];
+    const addPlace = (
+      loc: PlaceLocation,
+      name: string,
+      index: number,
+      id: string,
+    ) => {
+      const colors = COLORS[index % COLORS.length];
+      const label = String.fromCharCode(65 + index);
+      let parsedPoint: LatLng | null = null;
 
       if (loc.wkt) {
         const upper = loc.wkt.trim().toUpperCase();
-        if (
+        if (upper.startsWith('POINT')) {
+          parsedPoint = parseWKTPoint(loc.wkt);
+          if (parsedPoint) bounds.push([parsedPoint]);
+        } else if (
           upper.startsWith('LINESTRING') ||
           upper.startsWith('MULTILINESTRING')
         ) {
@@ -175,7 +259,7 @@ export default function PlaceMergeMap({
               dashArray: '6 4',
               opacity: 0.85,
             })
-              .bindTooltip(`${side.toUpperCase()}: ${name}`, {
+              .bindTooltip(`${label}: ${name} (${id})`, {
                 sticky: true,
                 className: 'leaflet-tooltip-stm',
               })
@@ -184,7 +268,10 @@ export default function PlaceMergeMap({
             bounds.push(pl.getBounds());
           }
         } else {
-          const coords = parseWKTPolygon(loc.wkt);
+          const coords: LatLng[][] | MultiPolygonCoordinates =
+            upper.startsWith('MULTIPOLYGON')
+              ? parseWKTMultiPolygon(loc.wkt)
+              : [parseWKTPolygon(loc.wkt)];
           if (coords.length > 0) {
             const poly = L.polygon(coords, {
               color: colors.stroke,
@@ -192,7 +279,7 @@ export default function PlaceMergeMap({
               fillOpacity: 0.25,
               weight: 2.5,
             })
-              .bindTooltip(`${side.toUpperCase()}: ${name}`, {
+              .bindTooltip(`${label}: ${name} (${id})`, {
                 sticky: true,
                 className: 'leaflet-tooltip-stm',
               })
@@ -203,21 +290,28 @@ export default function PlaceMergeMap({
         }
       }
 
-      if (loc.lat != null && loc.lng != null) {
-        const marker = L.marker([loc.lat, loc.lng], {
-          icon: makeLabel(side.toUpperCase(), colors),
+      const addMarker = (point: LatLng) => {
+        const marker = L.marker(point, {
+          icon: makeLabel(label, colors),
         })
-          .bindTooltip(`${side.toUpperCase()}: ${name}`, {
+          .bindTooltip(`${label}: ${name} (${id})`, {
             className: 'leaflet-tooltip-stm',
           })
           .addTo(map);
         layersRef.current.push(marker);
+      };
+
+      if (loc.lat != null && loc.lng != null) {
+        addMarker([loc.lat, loc.lng]);
         if (!loc.wkt) bounds.push([[loc.lat, loc.lng]]);
+      } else if (parsedPoint) {
+        addMarker(parsedPoint);
       }
     };
 
-    addPlace(locationA, nameA, 'a');
-    addPlace(locationB, nameB, 'b');
+    locations.forEach((place, index) =>
+      addPlace(place, place.name, index, place.id),
+    );
 
     if (bounds.length > 0) {
       const combined = L.latLngBounds(
@@ -231,7 +325,7 @@ export default function PlaceMergeMap({
         map.fitBounds(combined, { padding: [24, 24] });
       }
     }
-  }, [locationA, locationB, nameA, nameB]);
+  }, [locations]);
 
   // 1930 map overlay
   useEffect(() => {
@@ -301,20 +395,20 @@ export default function PlaceMergeMap({
 
       {/* Legend */}
       <div className="absolute top-2 left-2 z-1000 flex flex-col gap-1 pointer-events-none">
-        <div className="flex items-center gap-1.5 bg-white/90 px-2 py-1 text-xs font-medium shadow-sm border border-stm-warm-100">
-          <span
-            className="inline-block w-3 h-3 border-2 border-white"
-            style={{ background: COLORS.a.stroke, borderRadius: '50%' }}
-          />
-          A: {nameA}
-        </div>
-        <div className="flex items-center gap-1.5 bg-white/90 px-2 py-1 text-xs font-medium shadow-sm border border-stm-warm-100">
-          <span
-            className="inline-block w-3 h-3 border-2 border-white"
-            style={{ background: COLORS.b.stroke, borderRadius: '50%' }}
-          />
-          B: {nameB}
-        </div>
+        {locations.map((place, index) => (
+          <div
+            key={place.id}
+            className="flex items-center gap-1.5 bg-white/90 px-2 py-1 text-xs font-medium shadow-sm border border-stm-warm-100"
+          >
+            <span
+              className="inline-flex h-3 w-3 items-center justify-center rounded-full border-2 border-white text-[7px] text-white"
+              style={{ background: COLORS[index % COLORS.length].stroke }}
+            >
+              {String.fromCharCode(65 + index)}
+            </span>
+            {String.fromCharCode(65 + index)}: {place.name}
+          </div>
+        ))}
       </div>
 
       {/* 1930 map toggle */}

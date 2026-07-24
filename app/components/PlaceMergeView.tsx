@@ -15,10 +15,11 @@ const PlaceMergeMap = dynamic(() => import('./PlaceMergeMap'), { ssr: false });
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type ScalarChoice = 'a' | 'b';
+type DescriptionChoice = ScalarChoice | 'both';
 
 interface MergeResolution {
   type: ScalarChoice;
-  description: ScalarChoice;
+  description: DescriptionChoice;
   location: ScalarChoice;
   fid: ScalarChoice;
   broader: ScalarChoice;
@@ -151,6 +152,12 @@ function computeMergedPlace(
   const primary = places.find((place) => place.id === primaryId) ?? placeA;
   const pick = <T,>(choice: ScalarChoice, va: T, vb: T): T =>
     choice === 'a' ? va : vb;
+  const description =
+    resolution.description === 'both'
+      ? [placeA.description, placeB.description]
+          .filter((value) => value.trim())
+          .join('\n\n')
+      : pick(resolution.description, placeA.description, placeB.description);
 
   const sources = [
     ...new Set(places.flatMap((place) => place.sources || [])),
@@ -216,9 +223,7 @@ function computeMergedPlace(
     type: usePairResolution
       ? pick(resolution.type, placeA.type, placeB.type)
       : primary.type,
-    description: usePairResolution
-      ? pick(resolution.description, placeA.description, placeB.description)
-      : primary.description,
+    description: usePairResolution ? description : primary.description,
     location: usePairResolution
       ? pick(resolution.location, placeA.location, placeB.location)
       : primary.location,
@@ -322,64 +327,84 @@ function MergeFieldRow({
   valueB,
   choice,
   onChange,
+  allowBoth = false,
 }: {
   valueA: ReactNode;
   valueB: ReactNode;
-  choice: ScalarChoice;
-  onChange: (c: ScalarChoice) => void;
+  choice: ScalarChoice | 'both';
+  onChange: (c: ScalarChoice | 'both') => void;
+  allowBoth?: boolean;
 }) {
   return (
-    <div className="grid grid-cols-[1fr_80px_1fr] gap-2 items-stretch">
-      <button
-        type="button"
-        onClick={() => onChange('a')}
-        className={`text-left p-3 border text-sm transition-colors ${
-          choice === 'a'
-            ? 'border-stm-sepia-400 bg-stm-sepia-50'
-            : 'border-stm-warm-200 bg-white hover:border-stm-warm-300'
-        }`}
-      >
-        {valueA ?? (
-          <span className="text-stm-warm-300 italic text-xs">empty</span>
-        )}
-      </button>
-      <div className="flex flex-col items-stretch justify-center gap-1.5 py-1">
+    <div className="space-y-2">
+      <div className="grid grid-cols-[1fr_80px_1fr] gap-2 items-stretch">
         <button
           type="button"
           onClick={() => onChange('a')}
-          className={`px-2 py-1 text-xs border transition-colors ${
+          className={`text-left p-3 border text-sm transition-colors ${
             choice === 'a'
-              ? 'bg-stm-sepia-500 text-white border-stm-sepia-500'
-              : 'bg-white text-stm-warm-600 border-stm-warm-300 hover:border-stm-sepia-400'
+              ? 'border-stm-sepia-400 bg-stm-sepia-50'
+              : 'border-stm-warm-200 bg-white hover:border-stm-warm-300'
           }`}
         >
-          ← A
+          {valueA ?? (
+            <span className="text-stm-warm-300 italic text-xs">empty</span>
+          )}
         </button>
+        <div className="flex flex-col items-stretch justify-center gap-1.5 py-1">
+          <button
+            type="button"
+            onClick={() => onChange('a')}
+            className={`px-2 py-1 text-xs border transition-colors ${
+              choice === 'a'
+                ? 'bg-stm-sepia-500 text-white border-stm-sepia-500'
+                : 'bg-white text-stm-warm-600 border-stm-warm-300 hover:border-stm-sepia-400'
+            }`}
+          >
+            ← A
+          </button>
+          <button
+            type="button"
+            onClick={() => onChange('b')}
+            className={`px-2 py-1 text-xs border transition-colors ${
+              choice === 'b'
+                ? 'bg-stm-sepia-500 text-white border-stm-sepia-500'
+                : 'bg-white text-stm-warm-600 border-stm-warm-300 hover:border-stm-sepia-400'
+            }`}
+          >
+            B →
+          </button>
+        </div>
         <button
           type="button"
           onClick={() => onChange('b')}
-          className={`px-2 py-1 text-xs border transition-colors ${
+          className={`text-left p-3 border text-sm transition-colors ${
             choice === 'b'
-              ? 'bg-stm-sepia-500 text-white border-stm-sepia-500'
-              : 'bg-white text-stm-warm-600 border-stm-warm-300 hover:border-stm-sepia-400'
+              ? 'border-stm-sepia-400 bg-stm-sepia-50'
+              : 'border-stm-warm-200 bg-white hover:border-stm-warm-300'
           }`}
         >
-          B →
+          {valueB ?? (
+            <span className="text-stm-warm-300 italic text-xs">empty</span>
+          )}
         </button>
       </div>
-      <button
-        type="button"
-        onClick={() => onChange('b')}
-        className={`text-left p-3 border text-sm transition-colors ${
-          choice === 'b'
-            ? 'border-stm-sepia-400 bg-stm-sepia-50'
-            : 'border-stm-warm-200 bg-white hover:border-stm-warm-300'
-        }`}
-      >
-        {valueB ?? (
-          <span className="text-stm-warm-300 italic text-xs">empty</span>
-        )}
-      </button>
+      {allowBoth && (
+        <button
+          type="button"
+          onClick={() => onChange('both')}
+          className={`w-full border px-3 py-2 text-left text-xs transition-colors ${
+            choice === 'both'
+              ? 'border-stm-teal-400 bg-stm-teal-50 text-stm-teal-900'
+              : 'border-stm-warm-200 bg-white text-stm-warm-600 hover:border-stm-teal-300'
+          }`}
+        >
+          <span className="font-semibold">Keep both descriptions</span>
+          <span className="ml-2 text-stm-warm-500">
+            Preserve both texts in the merged record, separated by a blank line.
+          </span>
+        </button>
+      )}
     </div>
   );
 }
@@ -490,6 +515,15 @@ export default function PlaceMergeView({
         return place ? [place] : [];
       }),
     [mergeCandidatePlaces, selectedMergeIds],
+  );
+  const mergeMapLocations = useMemo(
+    () =>
+      selectedMergePlaces.map((place) => ({
+        ...place.location,
+        id: place.id,
+        name: getPreferredName(place),
+      })),
+    [selectedMergePlaces],
   );
   const retiredIds = useMemo(
     () => selectedMergeIds.filter((id) => id !== primaryId),
@@ -984,6 +1018,11 @@ export default function PlaceMergeView({
               <h3 className="text-sm font-semibold text-stm-sepia-900">
                 Multi-record merge summary
               </h3>
+              <div className="my-4 -mx-1">
+                <PlaceMergeMap
+                  locations={mergeMapLocations}
+                />
+              </div>
               <p className="mt-1 text-xs leading-5 text-stm-sepia-800">
                 The primary record supplies the surviving ID, description,
                 type, district, coordinates, and GIS polygon. Names, source
@@ -1013,7 +1052,9 @@ export default function PlaceMergeView({
                 valueA={<span className="capitalize">{placeA.type}</span>}
                 valueB={<span className="capitalize">{placeB.type}</span>}
                 choice={resolution.type}
-                onChange={setScalar('type')}
+                onChange={(choice) => {
+                  if (choice !== 'both') setScalar('type')(choice);
+                }}
               />
             )}
           </section>
@@ -1049,7 +1090,13 @@ export default function PlaceMergeView({
                     ) : null
                   }
                   choice={resolution.description}
-                  onChange={setScalar('description')}
+                  onChange={(choice) =>
+                    setResolution((current) => ({
+                      ...current,
+                      description: choice as DescriptionChoice,
+                    }))
+                  }
+                  allowBoth
                 />
               )}
             </section>
@@ -1059,14 +1106,12 @@ export default function PlaceMergeView({
           <section>
             <SectionHeader>Location &amp; GIS polygon</SectionHeader>
             <p className="text-xs text-stm-warm-400 mb-3">
-              Only one GIS polygon can be kept after the merge. Choose which
-              place&apos;s coordinates and polygon to use.
+              The map shows every selected location, including points, lines,
+              polygons, and the historical map overlay. Choose which location
+              remains as the merged record&apos;s primary geometry.
             </p>
             <PlaceMergeMap
-              locationA={placeA.location}
-              locationB={placeB.location}
-              nameA={getPreferredName(placeA)}
-              nameB={getPreferredName(placeB)}
+              locations={mergeMapLocations}
             />
             <div className="mt-3">
               {JSON.stringify(placeA.location) ===
@@ -1119,7 +1164,9 @@ export default function PlaceMergeView({
                     ) : null
                   }
                   choice={resolution.location}
-                  onChange={setScalar('location')}
+                  onChange={(choice) => {
+                    if (choice !== 'both') setScalar('location')(choice);
+                  }}
                 />
               )}
             </div>
@@ -1148,7 +1195,9 @@ export default function PlaceMergeView({
                     ) : null
                   }
                   choice={resolution.fid}
-                  onChange={setScalar('fid')}
+                  onChange={(choice) => {
+                    if (choice !== 'both') setScalar('fid')(choice);
+                  }}
                 />
               )}
             </section>
@@ -1184,6 +1233,7 @@ export default function PlaceMergeView({
                   }
                   choice={resolution.broader}
                   onChange={(c) =>
+                    c !== 'both' &&
                     setResolution((r) => ({ ...r, broader: c, district: c }))
                   }
                 />
