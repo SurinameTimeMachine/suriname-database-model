@@ -516,6 +516,15 @@ export default function PlaceMergeView({
       }),
     [mergeCandidatePlaces, selectedMergeIds],
   );
+  const mergeMapLocations = useMemo(
+    () =>
+      selectedMergePlaces.map((place) => ({
+        ...place.location,
+        id: place.id,
+        name: getPreferredName(place),
+      })),
+    [selectedMergePlaces],
+  );
   const retiredIds = useMemo(
     () => selectedMergeIds.filter((id) => id !== primaryId),
     [primaryId, selectedMergeIds],
@@ -1011,11 +1020,7 @@ export default function PlaceMergeView({
               </h3>
               <div className="my-4 -mx-1">
                 <PlaceMergeMap
-                  locations={selectedMergePlaces.map((place) => ({
-                    ...place.location,
-                    id: place.id,
-                    name: getPreferredName(place),
-                  }))}
+                  locations={mergeMapLocations}
                 />
               </div>
               <p className="mt-1 text-xs leading-5 text-stm-sepia-800">
@@ -1106,11 +1111,7 @@ export default function PlaceMergeView({
               remains as the merged record&apos;s primary geometry.
             </p>
             <PlaceMergeMap
-              locations={selectedMergePlaces.map((place) => ({
-                ...place.location,
-                id: place.id,
-                name: getPreferredName(place),
-              }))}
+              locations={mergeMapLocations}
             />
             <div className="mt-3">
               {JSON.stringify(placeA.location) ===
