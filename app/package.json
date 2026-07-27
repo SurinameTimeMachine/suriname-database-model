@@ -11,6 +11,7 @@
     "derive-presence": "tsx scripts/derive-source-presence.ts",
     "derive-products": "tsx scripts/derive-product-assertions.ts",
     "dev": "next dev",
+    "export-data-dictionaries": "tsx scripts/export-data-dictionaries.ts",
     "generate": "tsx scripts/generate-database.ts",
     "generate-place-records": "tsx scripts/generate-place-records.ts",
     "import-address-points-1885": "tsx scripts/import-paramaribo-address-points-1885.ts --write",
