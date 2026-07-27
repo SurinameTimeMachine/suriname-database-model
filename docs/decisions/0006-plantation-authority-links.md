@@ -82,6 +82,21 @@ only when the source meaning, participants, and time interval have been
 reviewed. The source labels and original reference text remain available beside
 the linked local organizations.
 
+Consecutive annual rows in which the same plantation organization is reported
+with the same two or more `has_parts` organizations are additionally grouped as
+a `stm:PlantationCompositionPeriod` (E13). The period records the first and last
+attested years, every observed year, the composite and component E74 URIs, and
+the exact E13 source observations from which it was derived. A missing year
+breaks the period, so an unobserved interval is never filled implicitly.
+
+This makes temporary combinations queryable without retiring any E25 or E74
+identity. For example, the four consecutive rows for Waterland en Adrichem
+(Q59134062) yield an attested 1828-1831 composition with Waterland (Q59134059)
+and Adrichem (Q124812970) as components. Their later separate records remain
+active. The derived period is explicitly probable and does not assert an exact
+formation or dissolution date, permanent membership, or an E81 physical
+transformation.
+
 ### Shared names and projections
 
 CIDOC CRM P1 is many-to-many. Do not duplicate an E41 merely because the same

@@ -501,6 +501,7 @@ const places: Record<string, unknown>[] = [];
 const appellations: Record<string, unknown>[] = [];
 const sources: Record<string, unknown>[] = [];
 const observations: Record<string, unknown>[] = [];
+const compositionPeriods: Record<string, unknown>[] = [];
 const presenceInferences: Record<string, unknown>[] = [];
 const provenance: Record<string, unknown>[] = [];
 
@@ -522,6 +523,8 @@ for (const entity of graph) {
     appellations.push(entity);
   } else if (typeSet.has('E22_Human_Made_Object')) {
     sources.push(entity);
+  } else if (typeSet.has('PlantationCompositionPeriod')) {
+    compositionPeriods.push(entity);
   } else if (typeSet.has('E13_Attribute_Assignment')) {
     observations.push(entity);
   } else if (typeSet.has('PresenceInference')) {
@@ -538,6 +541,7 @@ console.log(`  Places: ${places.length}`);
 console.log(`  Appellations: ${appellations.length}`);
 console.log(`  Sources: ${sources.length}`);
 console.log(`  Observations: ${observations.length}`);
+console.log(`  Composition periods: ${compositionPeriods.length}`);
 console.log(`  Presence inferences: ${presenceInferences.length}`);
 console.log(`  Provenance: ${provenance.length}`);
 
@@ -601,6 +605,20 @@ for (const o of observations) {
       observationsByOrg[org] = [];
     }
     observationsByOrg[org].push(o);
+  }
+}
+
+const compositionPeriodsByOrg: Record<string, unknown[]> = {};
+for (const period of compositionPeriods) {
+  const participants = [
+    period.P140_assigned_attribute_to,
+    ...toArray(
+      period.reportedComponentOrganization as string | string[] | undefined,
+    ),
+  ].filter((uri): uri is string => typeof uri === 'string' && Boolean(uri));
+  for (const organizationUri of participants) {
+    compositionPeriodsByOrg[organizationUri] ??= [];
+    compositionPeriodsByOrg[organizationUri].push(period);
   }
 }
 
@@ -1371,6 +1389,7 @@ writeJSON('places.json', placeIndex);
 writeJSON('sources.json', sourceIndex);
 writeJSON('appellations-by-entity.json', appellationsByEntity);
 writeJSON('observations-by-org.json', observationsByOrg);
+writeJSON('organization-composition-periods.json', compositionPeriodsByOrg);
 writeJSON('presence-inferences-by-plantation.json', presenceInferencesByPlantation);
 writeJSON('lifecycle-events.json', lifecycleEventsByEntity);
 writeJSON('place-functions.json', placeFunctionVocabulary);

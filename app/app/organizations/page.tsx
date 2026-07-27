@@ -7,6 +7,7 @@ import type {
   E41Appellation,
   E74Organization,
   OrganizationObservation,
+  PlantationCompositionPeriod,
 } from '@/lib/types';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -21,6 +22,7 @@ type OrganizationDetails = {
   plantations: E25Plantation[];
   appellations: E41Appellation[];
   observations: OrganizationObservation[];
+  compositionPeriods: PlantationCompositionPeriod[];
   gazetteerPlantations: Array<{
     id: string;
     prefLabel: string;
@@ -236,6 +238,13 @@ function OrganizationsPageInner() {
   const observations = details
     ? [...details.observations].sort(
         (a, b) => Number(a.observationYear) - Number(b.observationYear),
+      )
+    : [];
+  const compositionPeriods = details
+    ? [...details.compositionPeriods].sort(
+        (a, b) =>
+          a.firstAttestedYear - b.firstAttestedYear ||
+          a['@id'].localeCompare(b['@id']),
       )
     : [];
   const appellations = details?.appellations ?? [];
@@ -455,6 +464,112 @@ function OrganizationsPageInner() {
                     </div>
                   )}
                 </section>
+
+                {compositionPeriods.length > 0 && (
+                  <section className="px-4 py-4 sm:px-5">
+                    <h3 className="mb-2 text-xs font-semibold uppercase text-ink/55">
+                      Time-based plantation compositions
+                    </h3>
+                    <p className="mb-3 text-xs leading-5 text-ink/55">
+                      Consecutive Almanakken rows report these organizations as
+                      one composite plantation during the shown years. The
+                      records remain distinct before and after the attested
+                      period; this evidence does not by itself assert a physical
+                      transformation.
+                    </p>
+                    <div className="divide-y divide-ink/10 border-y border-ink/10 bg-white">
+                      {compositionPeriods.map((period) => {
+                        const compositeQid =
+                          period.P140_assigned_attribute_to.split('/').pop() ??
+                          period.P140_assigned_attribute_to;
+                        const selectedIsComposite =
+                          period.P140_assigned_attribute_to === selected['@id'];
+                        return (
+                          <article
+                            key={period['@id']}
+                            className="grid gap-2 px-3 py-3 text-xs sm:grid-cols-[110px_minmax(0,1fr)]"
+                          >
+                            <div>
+                              <p className="font-semibold tabular-nums text-ink">
+                                {period.firstAttestedYear ===
+                                period.lastAttestedYear
+                                  ? period.firstAttestedYear
+                                  : `${period.firstAttestedYear}-${period.lastAttestedYear}`}
+                              </p>
+                              <p className="mt-0.5 text-[10px] uppercase text-ink/45">
+                                {selectedIsComposite
+                                  ? 'Composite'
+                                  : 'Component'}
+                              </p>
+                            </div>
+                            <div className="space-y-1 text-ink/65">
+                              <p>
+                                <span className="text-ink/45">Composite: </span>
+                                <Link
+                                  href={`/organizations?organization=${compositeQid}`}
+                                  className="text-teal-strong hover:underline"
+                                >
+                                  {data.organizations[
+                                    period.P140_assigned_attribute_to
+                                  ]?.prefLabel ?? compositeQid}
+                                </Link>
+                              </p>
+                              <p>
+                                <span className="text-ink/45">Components: </span>
+                                {period.reportedComponentOrganization.map(
+                                  (organizationUri, index) => {
+                                    const qid =
+                                      organizationUri.split('/').pop() ??
+                                      organizationUri;
+                                    return (
+                                      <span key={organizationUri}>
+                                        {index > 0 && ', '}
+                                        <Link
+                                          href={`/organizations?organization=${qid}`}
+                                          className="text-teal-strong hover:underline"
+                                        >
+                                          {data.organizations[organizationUri]
+                                            ?.prefLabel ?? qid}
+                                        </Link>
+                                      </span>
+                                    );
+                                  },
+                                )}
+                              </p>
+                              <p className="text-[10px] text-ink/45">
+                                {period.wasDerivedFrom.length} annual source{' '}
+                                {period.wasDerivedFrom.length === 1
+                                  ? 'observation'
+                                  : 'observations'}
+                                {' · '}probable interpretation
+                              </p>
+                              <p className="text-[10px] text-ink/45">
+                                <span>Sources: </span>
+                                {asArray(period.hadPrimarySource).map(
+                                  (sourceUri, index) => (
+                                    <span key={sourceUri}>
+                                      {index > 0 && ', '}
+                                      <a
+                                        href={sourceUri}
+                                        className="text-teal-strong hover:underline"
+                                      >
+                                        {sourceUri
+                                          .split('/')
+                                          .pop()
+                                          ?.replace('almanac-', '') ??
+                                          sourceUri}
+                                      </a>
+                                    </span>
+                                  ),
+                                )}
+                              </p>
+                            </div>
+                          </article>
+                        );
+                      })}
+                    </div>
+                  </section>
+                )}
 
                 {diklandRefs.length > 0 && (
                   <section className="px-4 py-4 sm:px-5">

@@ -167,6 +167,26 @@ export interface OrganizationObservation {
   wasDerivedFrom?: string; // prov:wasDerivedFrom
 }
 
+/**
+ * A source-attested period in which one plantation organization is reported
+ * as a composite of two or more component organizations. This does not by
+ * itself assert a physical E81 transformation or permanent membership.
+ */
+export interface PlantationCompositionPeriod {
+  '@id': string;
+  '@type': string[];
+  P140_assigned_attribute_to: string;
+  reportedComponentOrganization: string[];
+  P4_has_time_span: string;
+  firstAttestedYear: number;
+  lastAttestedYear: number;
+  observationYears: number[];
+  hadPrimarySource: string | string[];
+  wasDerivedFrom: string[];
+  certainty: string;
+  inferenceRule: string;
+}
+
 export interface PresenceInference {
   '@id': string;
   '@type': string[];

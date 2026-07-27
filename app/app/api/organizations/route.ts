@@ -15,6 +15,7 @@ type WorkspaceIndexes = {
   plantations: Record<string, Record<string, unknown>>;
   appellations: Record<string, Record<string, unknown>[]>;
   observations: Record<string, Record<string, unknown>[]>;
+  compositionPeriods: Record<string, Record<string, unknown>[]>;
   gazetteer: { '@graph'?: Array<Record<string, unknown>> };
   mapFeatures: {
     features?: Array<{ properties?: Record<string, unknown> }>;
@@ -34,12 +35,29 @@ function loadWorkspaceIndexes(): Promise<WorkspaceIndexes> {
       join(process.cwd(), 'public/data/observations-by-org.json'),
       'utf-8',
     ),
+    readFile(
+      join(
+        process.cwd(),
+        'public/data/organization-composition-periods.json',
+      ),
+      'utf-8',
+    ),
     readFile(join(process.cwd(), 'public/data/places-gazetteer.jsonld'), 'utf-8'),
     readFile(join(process.cwd(), 'public/data/map-features.geojson'), 'utf-8'),
-  ]).then(([plantations, appellations, observations, gazetteer, mapFeatures]) => ({
+  ]).then(([
+    plantations,
+    appellations,
+    observations,
+    compositionPeriods,
+    gazetteer,
+    mapFeatures,
+  ]) => ({
     plantations: JSON.parse(plantations) as WorkspaceIndexes['plantations'],
     appellations: JSON.parse(appellations) as WorkspaceIndexes['appellations'],
     observations: JSON.parse(observations) as WorkspaceIndexes['observations'],
+    compositionPeriods: JSON.parse(
+      compositionPeriods,
+    ) as WorkspaceIndexes['compositionPeriods'],
     gazetteer: JSON.parse(gazetteer) as WorkspaceIndexes['gazetteer'],
     mapFeatures: JSON.parse(mapFeatures) as WorkspaceIndexes['mapFeatures'],
   }));
@@ -141,6 +159,7 @@ export async function GET(request: NextRequest) {
     plantations,
     appellations: indexes.appellations[organizationUri] ?? [],
     observations: indexes.observations[organizationUri] ?? [],
+    compositionPeriods: indexes.compositionPeriods[organizationUri] ?? [],
     gazetteerPlantations,
     explorePlantations,
   });
