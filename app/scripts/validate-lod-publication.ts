@@ -739,6 +739,28 @@ async function main() {
       typeof projection.type === 'string',
       `Authority record ${recordId} has no structural type projection`,
     );
+    const recordUri = `${CANONICAL_BASE}place/${recordId}`;
+    for (const period of graph.filter((entity) =>
+      toArray(entity['@type'] as string | string[]).includes(
+        'stm:PlantationCompositionPeriod',
+      ),
+    )) {
+      const periodId = String(period['@id']);
+      const timeSpanId = String(period.P4_has_time_span);
+      const evidenceIds = toArray(
+        period['prov:wasDerivedFrom'] as string | string[],
+      );
+      assert(
+        periodId.startsWith(`${recordUri}#composition-`) &&
+          timeSpanId.startsWith(`${recordUri}#composition-`) &&
+          graph.some((entity) => entity['@id'] === timeSpanId) &&
+          evidenceIds.length > 0 &&
+          evidenceIds.every((id) =>
+            id.startsWith(`${recordUri}#observation-almanakken-`),
+          ),
+        `Authority record ${recordId} has a composition period with non-local identity or evidence`,
+      );
+    }
     const structuralTypeUri = `${CANONICAL_BASE}vocabulary/place-type/${projection.type}`;
     const typedSubject = graph.find((entity) =>
       toArray(entity.P2_has_type as string | string[] | undefined).includes(
@@ -1040,6 +1062,7 @@ async function main() {
     assert(
       components.length >= 2 &&
         new Set(components).size === components.length &&
+        !components.includes(String(composite)) &&
         components.every((uri) =>
           toArray(
             aggregateEntitiesById.get(uri)?.['@type'] as string | string[],
@@ -1100,7 +1123,7 @@ async function main() {
     }
   }
   const waterlandComposition = aggregateEntitiesById.get(
-    `${CANONICAL_BASE}organization-composition/q59134062-q124812970-q59134059-1828-1831`,
+    `${CANONICAL_BASE}organization-composition/q59134062-q124812970-q59134059-1828`,
   );
   assert(
     waterlandComposition &&

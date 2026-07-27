@@ -831,7 +831,17 @@ export function generatePlaceRecords() {
     );
     for (const period of compositionPeriods) {
       const compositionId = period.id.split('/').pop();
-      const spanUri = `${BASE}timespan/${compositionId}`;
+      // These are place-record projections of the aggregate organization
+      // period. Local fragment IDs prevent multiple place records from
+      // redefining the same canonical URI with different local evidence URIs.
+      const localPeriodUri = fragmentUri(
+        pageUri,
+        `composition-${compositionId}`,
+      );
+      const spanUri = fragmentUri(
+        pageUri,
+        `composition-${compositionId}-time-span`,
+      );
       graph.push({
         '@id': spanUri,
         '@type': ['crm:E52_Time-Span'],
@@ -843,7 +853,7 @@ export function generatePlaceRecords() {
         P82b_end_of_the_end: `${period.endYear}-12-31`,
       });
       graph.push({
-        '@id': period.id,
+        '@id': localPeriodUri,
         '@type': [
           'crm:E13_Attribute_Assignment',
           'stm:PlantationCompositionPeriod',
@@ -859,7 +869,7 @@ export function generatePlaceRecords() {
         certainty: `${BASE}type/certainty/probable`,
         inferenceRule: `${BASE}rule/consecutive-source-reported-plantation-composition`,
       });
-      evidenceUris.push(period.id);
+      evidenceUris.push(localPeriodUri);
     }
     if (evidenceUris.length > 0) record.hasEvidence = evidenceUris;
     for (const [position, ref] of (entry.diklandRefs ?? []).entries()) {

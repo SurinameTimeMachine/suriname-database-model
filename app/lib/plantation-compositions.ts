@@ -39,6 +39,7 @@ export function derivePlantationCompositionPeriods(
     if (
       !item.compositeOrganizationUri ||
       components.length < 2 ||
+      components.includes(item.compositeOrganizationUri) ||
       !Number.isInteger(item.year)
     ) {
       continue;
@@ -68,7 +69,7 @@ export function derivePlantationCompositionPeriods(
         .map(uriIdentifier)
         .join('-');
       periods.push({
-        id: `${base}organization-composition/${uriIdentifier(first.compositeOrganizationUri)}-${componentKey}-${startYear}-${endYear}`,
+        id: `${base}organization-composition/${uriIdentifier(first.compositeOrganizationUri)}-${componentKey}-${startYear}`,
         compositeOrganizationUri: first.compositeOrganizationUri,
         componentOrganizationUris: first.componentOrganizationUris,
         startYear,
