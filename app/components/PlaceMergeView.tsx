@@ -418,6 +418,47 @@ function SameValueRow({ value }: { value: ReactNode }) {
   );
 }
 
+function PlacePropertiesGrid({ places }: { places: GazetteerPlace[] }) {
+  return (
+    <div className="mt-3 grid gap-2 md:grid-cols-2">
+      {places.map((place) => (
+        <article
+          key={`place-${place.id}`}
+          className="border border-stm-warm-200 bg-white p-3"
+        >
+          <h4 className="text-sm font-semibold text-stm-warm-800">
+            {getPreferredName(place)}
+          </h4>
+          <p className="mt-0.5 font-mono text-[11px] text-stm-warm-400">
+            {place.id}
+          </p>
+          <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-xs">
+            <dt className="text-stm-warm-400">Type</dt>
+            <dd className="capitalize text-stm-warm-700">{place.type}</dd>
+            <dt className="text-stm-warm-400">Location</dt>
+            <dd className="font-mono text-stm-warm-700">
+              {place.location.lat != null && place.location.lng != null
+                ? `${place.location.lat.toFixed(4)}, ${place.location.lng.toFixed(4)}`
+                : 'no coordinates'}
+            </dd>
+            <dt className="text-stm-warm-400">District</dt>
+            <dd className="text-stm-warm-700">
+              {place.district || place.broader || 'not recorded'}
+            </dd>
+            <dt className="text-stm-warm-400">Sources</dt>
+            <dd className="text-stm-warm-700">{place.sources.length}</dd>
+          </dl>
+          {place.description && (
+            <p className="mt-2 text-xs leading-5 text-stm-warm-600">
+              {place.description}
+            </p>
+          )}
+        </article>
+      ))}
+    </div>
+  );
+}
+
 function MergeArraySection<T>({
   items,
   keyFn,
@@ -524,6 +565,15 @@ export default function PlaceMergeView({
         name: getPreferredName(place),
       })),
     [selectedMergePlaces],
+  );
+  const confirmedMapLocations = useMemo(
+    () =>
+      confirmedPhysicalPlaces.map((place) => ({
+        ...place.location,
+        id: place.id,
+        name: getPreferredName(place),
+      })),
+    [confirmedPhysicalPlaces],
   );
   const retiredIds = useMemo(
     () => selectedMergeIds.filter((id) => id !== primaryId),
@@ -864,11 +914,15 @@ export default function PlaceMergeView({
               </h3>
               <p className="mt-1 text-xs leading-5 text-stm-teal-800">
                 This records a reviewed physical-link decision for the exact
-                current set:{' '}
-                {confirmedPhysicalPlaceIds.join(', ')}. Almanakken observations
-                remain attached to organization {sharedOrganizationQid}; they
-                are not duplicated as source assertions on the physical places.
+                current set: {confirmedPhysicalPlaceIds.join(', ')}. Almanakken
+                observations remain attached to organization{' '}
+                {sharedOrganizationQid}; they are not duplicated as source
+                assertions on the physical places.
               </p>
+              <div className="mt-3">
+                <PlaceMergeMap locations={confirmedMapLocations} />
+              </div>
+              <PlacePropertiesGrid places={confirmedPhysicalPlaces} />
             </section>
           )}
 
@@ -918,6 +972,19 @@ export default function PlaceMergeView({
                 {mergeCandidatePlaces.length - selectedMergeIds.length} left
                 unchanged.
               </p>
+              <div className="mt-4 border border-stm-sepia-200 bg-stm-sepia-50 p-4">
+                <h3 className="text-sm font-semibold text-stm-sepia-900">
+                  Selected plantation properties and locations
+                </h3>
+                <p className="mt-1 text-xs leading-5 text-stm-sepia-800">
+                  Review the records that will be combined into one physical
+                  plantation.
+                </p>
+                <div className="mt-3">
+                  <PlaceMergeMap locations={mergeMapLocations} />
+                </div>
+                <PlacePropertiesGrid places={selectedMergePlaces} />
+              </div>
             </section>
           )}
 
@@ -1018,11 +1085,6 @@ export default function PlaceMergeView({
               <h3 className="text-sm font-semibold text-stm-sepia-900">
                 Multi-record merge summary
               </h3>
-              <div className="my-4 -mx-1">
-                <PlaceMergeMap
-                  locations={mergeMapLocations}
-                />
-              </div>
               <p className="mt-1 text-xs leading-5 text-stm-sepia-800">
                 The primary record supplies the surviving ID, description,
                 type, district, coordinates, and GIS polygon. Names, source
