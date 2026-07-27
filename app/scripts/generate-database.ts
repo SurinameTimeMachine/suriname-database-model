@@ -17,6 +17,7 @@ import {
   relatedPlaceType,
   type PlaceFunctionSource,
 } from '../lib/place-functions';
+import { derivePlantationCompositionPeriods } from '../lib/plantation-compositions';
 import {
   type ConfirmedPhysicalLinkReview,
   resolveConfirmedPhysicalLinkReviews,
@@ -843,7 +844,74 @@ function buildInferenceRules(): Record<string, unknown>[] {
       'dcterms:description':
         'A positive Almanakken enslaved-person count about a plantation organization supports probable presence at the uniquely matched physical plantation, unless the source states that the population was shared with another plantation.',
     },
+    {
+      '@id': `${BASE}rule/consecutive-source-reported-plantation-composition`,
+      '@type': ['InferenceRule'],
+      prefLabel: 'Consecutive source-reported plantation composition',
+      'dcterms:description':
+        'Consecutive annual Almanakken observations that report the same composite plantation and the same component organizations are grouped into a source-attested composition period. A gap starts a new period; the result does not assert an E81 physical transformation.',
+    },
   ];
+}
+
+function buildPlantationCompositionPeriods(
+  observations: ObservationRow[],
+  organizationUriByQid: Map<string, string>,
+): {
+  entities: Record<string, unknown>[];
+  timeSpans: Record<string, unknown>[];
+} {
+  const periods = derivePlantationCompositionPeriods(
+    observations.map((observation) => ({
+      observationUri: observation.uri,
+      compositeOrganizationUri:
+        organizationUriByQid.get(observation.plantation_qid) ?? '',
+      componentOrganizationUris: [
+        observation.has_parts1_id,
+        observation.has_parts2_id,
+        observation.has_parts3_id,
+        observation.has_parts4_id,
+      ].flatMap((qid) => {
+        const uri = organizationUriByQid.get(qid);
+        return uri ? [uri] : [];
+      }),
+      year: Number(observation.observation_year),
+      sourceUri: observation.source_uri || undefined,
+    })),
+  );
+
+  return {
+    entities: periods.map((period) => {
+      const timeSpanUri = `${BASE}timespan/${period.id.split('/').pop()}`;
+      return {
+        '@id': period.id,
+        '@type': [
+          'E13_Attribute_Assignment',
+          'PlantationCompositionPeriod',
+        ],
+        P140_assigned_attribute_to: period.compositeOrganizationUri,
+        reportedComponentOrganization: period.componentOrganizationUris,
+        P4_has_time_span: timeSpanUri,
+        firstAttestedYear: period.startYear,
+        lastAttestedYear: period.endYear,
+        observationYears: period.observationYears,
+        hadPrimarySource: period.sourceUris,
+        wasDerivedFrom: period.evidenceUris,
+        certainty: `${BASE}type/certainty/probable`,
+        inferenceRule: `${BASE}rule/consecutive-source-reported-plantation-composition`,
+      };
+    }),
+    timeSpans: periods.map((period) => ({
+      '@id': `${BASE}timespan/${period.id.split('/').pop()}`,
+      '@type': ['E52_Time_Span'],
+      prefLabel:
+        period.startYear === period.endYear
+          ? String(period.startYear)
+          : `${period.startYear}-${period.endYear}`,
+      P82a_begin_of_the_begin: `${period.startYear}-01-01`,
+      P82b_end_of_the_end: `${period.endYear}-12-31`,
+    })),
+  };
 }
 
 function buildE52TimeSpans(years: Set<string>): Record<string, unknown>[] {
@@ -1387,6 +1455,13 @@ function main() {
     `  Observations:       ${obsResult.entities.length} E13 (${obsResult.resolvedTargets} with local E74 targets)`,
   );
   console.log(`  Presence inferences:${obsResult.inferences.length}`);
+  const compositionResult = buildPlantationCompositionPeriods(
+    almResult.observations,
+    organizationResult.uriByQid,
+  );
+  console.log(
+    `  Composition periods:${compositionResult.entities.length} source-attested E13`,
+  );
 
   // Structural entities
   console.log(`  E36 Visual Items:   ${e36Entities.length}`);
@@ -1442,9 +1517,11 @@ function main() {
     ...placeFunctionTypes,
     ...buildInferenceRules(),
     ...e52TimeSpans,
+    ...compositionResult.timeSpans,
     ...e12Productions,
     ...e36Images,
     ...obsResult.entities,
+    ...compositionResult.entities,
     ...obsResult.inferences,
     ...allProv,
   ];

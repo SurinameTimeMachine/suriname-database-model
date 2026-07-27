@@ -21,6 +21,7 @@ import {
   PLACE_FUNCTION_SCHEME_URI,
   relatedPlaceType,
 } from '../lib/place-functions';
+import { derivePlantationCompositionPeriods } from '../lib/plantation-compositions';
 import {
   type PhysicalLinkReviewFields,
   resolveConfirmedPhysicalLinkReviews,
@@ -808,6 +809,57 @@ export function generatePlaceRecords() {
       }
       graph.push(observation);
       if (!evidenceUris.includes(evidenceUri)) evidenceUris.push(evidenceUri);
+    }
+    const compositionPeriods = derivePlantationCompositionPeriods(
+      almanakkenObservations.map((evidence) => ({
+        observationUri: fragmentUri(
+          pageUri,
+          `observation-almanakken-${evidence.recordId}`,
+        ),
+        compositeOrganizationUri: ensureOrganization(
+          evidence.qid,
+          evidence.plantationStandardized || evidence.plantationOriginal,
+        ),
+        componentOrganizationUris: (evidence.hasParts ?? []).map((part) =>
+          ensureOrganization(part.qid, part.label),
+        ),
+        year: evidence.year ?? Number.NaN,
+        sourceUri: evidence.year
+          ? sourceUri('almanakken', sourceIds)
+          : undefined,
+      })),
+    );
+    for (const period of compositionPeriods) {
+      const compositionId = period.id.split('/').pop();
+      const spanUri = `${BASE}timespan/${compositionId}`;
+      graph.push({
+        '@id': spanUri,
+        '@type': ['crm:E52_Time-Span'],
+        prefLabel:
+          period.startYear === period.endYear
+            ? String(period.startYear)
+            : `${period.startYear}-${period.endYear}`,
+        P82a_begin_of_the_begin: `${period.startYear}-01-01`,
+        P82b_end_of_the_end: `${period.endYear}-12-31`,
+      });
+      graph.push({
+        '@id': period.id,
+        '@type': [
+          'crm:E13_Attribute_Assignment',
+          'stm:PlantationCompositionPeriod',
+        ],
+        P140_assigned_attribute_to: period.compositeOrganizationUri,
+        reportedComponentOrganization: period.componentOrganizationUris,
+        P4_has_time_span: spanUri,
+        firstAttestedYear: period.startYear,
+        lastAttestedYear: period.endYear,
+        observationYears: period.observationYears,
+        'prov:hadPrimarySource': period.sourceUris,
+        'prov:wasDerivedFrom': period.evidenceUris,
+        certainty: `${BASE}type/certainty/probable`,
+        inferenceRule: `${BASE}rule/consecutive-source-reported-plantation-composition`,
+      });
+      evidenceUris.push(period.id);
     }
     if (evidenceUris.length > 0) record.hasEvidence = evidenceUris;
     for (const [position, ref] of (entry.diklandRefs ?? []).entries()) {
