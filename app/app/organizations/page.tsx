@@ -24,7 +24,10 @@ type OrganizationDetails = {
   gazetteerPlantations: Array<{
     id: string;
     prefLabel: string;
-    associationStatus: 'linked' | 'needs-physical-link-review';
+    associationStatus:
+      | 'linked'
+      | 'needs-organization-link'
+      | 'needs-physical-link-review';
     diklandRefs: DiklandRef[];
   }>;
   explorePlantations: Array<{
@@ -226,6 +229,10 @@ function OrganizationsPageInner() {
       ),
     [details],
   );
+  const linkedGazetteerPlantations =
+    details?.gazetteerPlantations.filter(
+      (plantation) => plantation.associationStatus === 'linked',
+    ) ?? [];
   const observations = details
     ? [...details.observations].sort(
         (a, b) => Number(a.observationYear) - Number(b.observationYear),
@@ -309,7 +316,7 @@ function OrganizationsPageInner() {
         <div>
           <h1 className="text-2xl font-semibold text-ink">Plantation organizations</h1>
           <p className="mt-1 text-xs text-ink/55">
-            {organizations.length.toLocaleString()} E74 groups | {linkedPlantations.length} mapped E25 and {details?.gazetteerPlantations.length ?? 0} Gazetteer records selected
+            {organizations.length.toLocaleString()} E74 groups | {linkedPlantations.length} mapped E25 and {linkedGazetteerPlantations.length} linked Gazetteer records
           </p>
         </div>
         <div className="flex items-center gap-2 text-xs">
@@ -398,7 +405,7 @@ function OrganizationsPageInner() {
               <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 text-xs sm:grid-cols-4">
                 <div><dt className="text-ink/45">Observations</dt><dd className="mt-0.5 font-semibold tabular-nums">{observations.length}</dd></div>
                 <div><dt className="text-ink/45">Years</dt><dd className="mt-0.5 font-semibold tabular-nums">{years.length ? `${Math.min(...years)}-${Math.max(...years)}` : '-'}</dd></div>
-                <div><dt className="text-ink/45">Physical plantations</dt><dd className="mt-0.5 font-semibold tabular-nums">{linkedPlantations.length + (details?.gazetteerPlantations.length ?? 0)}</dd></div>
+                <div><dt className="text-ink/45">Physical plantations</dt><dd className="mt-0.5 font-semibold tabular-nums">{linkedPlantations.length + linkedGazetteerPlantations.length}</dd></div>
                 <div><dt className="text-ink/45">Source names</dt><dd className="mt-0.5 font-semibold tabular-nums">{appellations.length}</dd></div>
               </dl>
             </div>
@@ -406,7 +413,7 @@ function OrganizationsPageInner() {
             <div className="grid gap-0 xl:grid-cols-[minmax(0,1fr)_340px]">
               <div className="min-w-0 divide-y divide-ink/10">
                 <section className="px-4 py-4 sm:px-5">
-                  <h3 className="mb-2 text-xs font-semibold uppercase text-ink/55">Linked physical plantations</h3>
+                  <h3 className="mb-2 text-xs font-semibold uppercase text-ink/55">Physical plantation associations</h3>
                   {linkedPlantations.length ? (
                     <div className="divide-y divide-ink/10 border-y border-ink/10 bg-white">
                       {linkedPlantations.map((plantation) => {

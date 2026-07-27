@@ -18,6 +18,10 @@ import {
   type PlaceFunctionSource,
 } from '../lib/place-functions';
 import {
+  type ConfirmedPhysicalLinkReview,
+  resolveConfirmedPhysicalLinkReviews,
+} from '../lib/physical-organization-links';
+import {
   type AppellationRow,
   type ObservationRow,
   transformAlmanakken,
@@ -61,6 +65,7 @@ type OrganizationOverride = {
   reviewStatus?: 'unreviewed' | 'reviewed' | 'disputed';
   physicalLinkReviewStatus?: 'confirmed-multiple';
   reviewedPhysicalPlaceIds?: string[];
+  associatedPhysicalPlaceIds?: string[];
   modifiedAt?: string;
   modifiedBy?: string;
 };
@@ -77,56 +82,21 @@ function readOrganizationOverrides(): Map<string, OrganizationOverride> {
   );
 }
 
-function confirmedPhysicalLinkQids(
-  overrides: Map<string, OrganizationOverride>,
-): Set<string> {
-  if (!existsSync(GAZETTEER_PATH)) return new Set();
-  const document = JSON.parse(readFileSync(GAZETTEER_PATH, 'utf-8')) as {
-    '@graph'?: Array<Record<string, unknown>>;
-  };
-  const activeIdsByQid = new Map<string, string[]>();
-  for (const entry of document['@graph'] ?? []) {
-    if (
-      entry.type !== 'plantation' ||
-      entry.deprecated ||
-      entry.mergedInto ||
-      typeof entry.id !== 'string'
-    ) {
-      continue;
-    }
-    const links = Array.isArray(entry.externalLinks)
-      ? (entry.externalLinks as Array<Record<string, unknown>>)
-      : [];
-    const qid = links.find(
-      (link) =>
-        link.authority === 'wikidata' &&
-        typeof link.identifier === 'string' &&
-        /^Q\d+$/.test(link.identifier),
-    )?.identifier as string | undefined;
-    if (!qid) continue;
-    activeIdsByQid.set(qid, [...(activeIdsByQid.get(qid) ?? []), entry.id]);
-  }
-  return new Set(
-    [...overrides.entries()]
-      .filter(([qid, override]) => {
-        const activeIds = [...(activeIdsByQid.get(qid) ?? [])].sort();
-        const reviewedIds = [...(override.reviewedPhysicalPlaceIds ?? [])].sort();
-        return (
-          override.physicalLinkReviewStatus === 'confirmed-multiple' &&
-          activeIds.length > 1 &&
-          activeIds.join('\u0000') === reviewedIds.join('\u0000')
-        );
-      })
-      .map(([qid]) => qid),
-  );
-}
+type GazetteerPlantationCandidate = {
+  id: string;
+  fid?: string | number | null;
+  uri: string;
+};
 
-function gazetteerPlantationUrisByQid(): Map<string, string[]> {
+function gazetteerPlantationsByQid(): Map<
+  string,
+  GazetteerPlantationCandidate[]
+> {
   if (!existsSync(GAZETTEER_PATH)) return new Map();
   const document = JSON.parse(readFileSync(GAZETTEER_PATH, 'utf-8')) as {
     '@graph'?: Array<Record<string, unknown>>;
   };
-  const urisByQid = new Map<string, string[]>();
+  const candidatesByQid = new Map<string, GazetteerPlantationCandidate[]>();
   for (const entry of document['@graph'] ?? []) {
     if (
       entry.type !== 'plantation' ||
@@ -146,12 +116,19 @@ function gazetteerPlantationUrisByQid(): Map<string, string[]> {
         /^Q\d+$/.test(link.identifier),
     )?.identifier as string | undefined;
     if (!qid) continue;
-    urisByQid.set(qid, [
-      ...(urisByQid.get(qid) ?? []),
-      `${BASE}place/${entry.id}#feature`,
+    candidatesByQid.set(qid, [
+      ...(candidatesByQid.get(qid) ?? []),
+      {
+        id: entry.id,
+        fid:
+          typeof entry.fid === 'string' || typeof entry.fid === 'number'
+            ? entry.fid
+            : null,
+        uri: `${BASE}place/${entry.id}#feature`,
+      },
     ]);
   }
-  return urisByQid;
+  return candidatesByQid;
 }
 
 // --- Entity builders ---
@@ -192,7 +169,7 @@ function buildE25Plantations(
   mapLinkIndex: Map<string, MapLink[]>,
   organizationUriByQid: Map<string, string>,
   plantationUrisByQid: Map<string, string[]>,
-  confirmedPhysicalLinks: Set<string>,
+  confirmedPhysicalLinks: Map<string, ConfirmedPhysicalLinkReview>,
 ): {
   entities: Record<string, unknown>[];
   provenance: Record<string, unknown>[];
@@ -230,13 +207,17 @@ function buildE25Plantations(
     if (p.p53_place_uri) entity.P53_has_location = p.p53_place_uri;
     const organizationUri = organizationUriByQid.get(p.wikidata_qid);
     if (organizationUri) {
-      entity.hasOrganizationalAssociation = organizationUri;
-      const physicalLinkConfirmed = confirmedPhysicalLinks.has(
-        p.wikidata_qid,
-      );
-      entity.organizationAssociationStatus =
-        (plantationUrisByQid.get(p.wikidata_qid)?.length ?? 0) > 1 &&
-        !physicalLinkConfirmed
+      const confirmedReview = confirmedPhysicalLinks.get(p.wikidata_qid);
+      const isAssociated =
+        !confirmedReview || confirmedReview.associatedFids.has(String(p.fid));
+      if (isAssociated) {
+        entity.hasOrganizationalAssociation = organizationUri;
+      }
+      entity.organizationAssociationStatus = confirmedReview
+        ? isAssociated
+          ? 'linked'
+          : 'needs-organization-link'
+        : (plantationUrisByQid.get(p.wikidata_qid)?.length ?? 0) > 1
           ? 'needs-physical-link-review'
           : 'linked';
     } else {
@@ -297,8 +278,8 @@ function buildE74Organizations(
   appellationIndex: Map<string, string[]>,
   overrides: Map<string, OrganizationOverride>,
   plantationUrisByQid: Map<string, string[]>,
-  gazetteerPlantationUris: Map<string, string[]>,
-  confirmedPhysicalLinks: Set<string>,
+  gazetteerPlantations: Map<string, GazetteerPlantationCandidate[]>,
+  confirmedPhysicalLinks: Map<string, ConfirmedPhysicalLinkReview>,
 ): {
   entities: Record<string, unknown>[];
   provenance: Record<string, unknown>[];
@@ -399,14 +380,33 @@ function buildE74Organizations(
     if (override?.reviewedPhysicalPlaceIds?.length) {
       entity.reviewedPhysicalPlaceIds = override.reviewedPhysicalPlaceIds;
     }
+    if (override?.associatedPhysicalPlaceIds?.length) {
+      entity.associatedPhysicalPlaceIds =
+        override.associatedPhysicalPlaceIds;
+    }
     if (identifiers.length > 0) {
       entity.psurId = identifiers.length === 1 ? identifiers[0] : identifiers;
     }
     if (appUris.length > 0) {
       entity.P1_is_identified_by = appUris.length === 1 ? appUris[0] : appUris;
     }
-    const mappedPlantations = plantationUrisByQid.get(qid) ?? [];
-    const curatedPlantations = gazetteerPlantationUris.get(qid) ?? [];
+    const confirmedReview = confirmedPhysicalLinks.get(qid);
+    const mappedPlantations = confirmedReview
+      ? plantations
+          .filter(
+            (plantation) =>
+              plantation.wikidata_qid === qid &&
+              confirmedReview.associatedFids.has(String(plantation.fid)),
+          )
+          .map((plantation) => plantation.uri)
+      : (plantationUrisByQid.get(qid) ?? []);
+    const curatedPlantations = (gazetteerPlantations.get(qid) ?? [])
+      .filter(
+        (plantation) =>
+          !confirmedReview ||
+          confirmedReview.associatedPlaceIds.has(plantation.id),
+      )
+      .map((plantation) => plantation.uri);
     const physicalPlantations = [
       ...new Set([...mappedPlantations, ...curatedPlantations]),
     ];
@@ -417,7 +417,7 @@ function buildE74Organizations(
           : physicalPlantations;
       entity.organizationAssociationStatus =
         (mappedPlantations.length > 1 || curatedPlantations.length > 1) &&
-        !confirmedPhysicalLinks.has(qid)
+        !confirmedReview
           ? 'needs-physical-link-review'
           : 'linked';
     } else {
@@ -1266,10 +1266,11 @@ function main() {
     [...organizationQids].map((qid) => [qid, `${BASE}organization/${qid}`]),
   );
   const organizationOverrides = readOrganizationOverrides();
-  const confirmedPhysicalLinks = confirmedPhysicalLinkQids(
+  const gazetteerPlantations = gazetteerPlantationsByQid();
+  const confirmedPhysicalLinks = resolveConfirmedPhysicalLinkReviews(
     organizationOverrides,
+    gazetteerPlantations,
   );
-  const gazetteerPlantationUris = gazetteerPlantationUrisByQid();
   const almanacAppellations = almResult.appellations.map((appellation) => {
     const authorityUri = Array.isArray(appellation.identifies_uri)
       ? appellation.identifies_uri[0] ?? ''
@@ -1368,7 +1369,7 @@ function main() {
     appellationIndex,
     organizationOverrides,
     plantationUrisByQid,
-    gazetteerPlantationUris,
+    gazetteerPlantations,
     confirmedPhysicalLinks,
   );
   console.log(`  E74 Organizations: ${organizationResult.entities.length}`);

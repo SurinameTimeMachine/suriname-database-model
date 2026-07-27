@@ -50,7 +50,11 @@ export interface PlaceMergeViewProps {
   districts: GazetteerPlace[];
   canEdit: boolean;
   onMerge: (merged: GazetteerPlace, retiredIds: string[]) => Promise<void>;
-  onKeepBoth: (qid: string, placeIds: string[]) => Promise<void>;
+  onKeepBoth: (
+    qid: string,
+    placeIds: string[],
+    reviewedPlaceIds: string[],
+  ) => Promise<void>;
   onCancel: () => void;
 }
 
@@ -537,6 +541,8 @@ export default function PlaceMergeView({
     placeA.id,
     placeB.id,
   ]);
+  const [selectedOrganizationIds, setSelectedOrganizationIds] =
+    useState<string[]>(confirmedPhysicalPlaceIds);
   const [primaryId, setPrimaryId] = useState(placeA.id);
   const [mergedNames, setMergedNames] = useState<MergedName[]>(() =>
     buildMergedNames([placeA, placeB]),
@@ -566,14 +572,23 @@ export default function PlaceMergeView({
       })),
     [selectedMergePlaces],
   );
-  const confirmedMapLocations = useMemo(
+  const selectedOrganizationMapLocations = useMemo(
     () =>
-      confirmedPhysicalPlaces.map((place) => ({
-        ...place.location,
-        id: place.id,
-        name: getPreferredName(place),
-      })),
-    [confirmedPhysicalPlaces],
+      confirmedPhysicalPlaces
+        .filter((place) => selectedOrganizationIds.includes(place.id))
+        .map((place) => ({
+          ...place.location,
+          id: place.id,
+          name: getPreferredName(place),
+        })),
+    [confirmedPhysicalPlaces, selectedOrganizationIds],
+  );
+  const selectedOrganizationPlaces = useMemo(
+    () =>
+      confirmedPhysicalPlaces.filter((place) =>
+        selectedOrganizationIds.includes(place.id),
+      ),
+    [confirmedPhysicalPlaces, selectedOrganizationIds],
   );
   const retiredIds = useMemo(
     () => selectedMergeIds.filter((id) => id !== primaryId),
@@ -631,6 +646,19 @@ export default function PlaceMergeView({
     [mergeCandidatePlaces, primaryId, selectedMergeIds],
   );
 
+  const toggleOrganizationCandidate = useCallback(
+    (placeId: string) => {
+      setSelectedOrganizationIds((current) => {
+        const isSelected = current.includes(placeId);
+        if (isSelected && current.length <= 2) return current;
+        return isSelected
+          ? current.filter((id) => id !== placeId)
+          : [...current, placeId];
+      });
+    },
+    [],
+  );
+
   const setScalar = useCallback(
     (
       field: keyof Pick<
@@ -679,7 +707,11 @@ export default function PlaceMergeView({
     setError(null);
     try {
       if (mergeAction === 'keep-both' && sharedOrganizationQid) {
-        await onKeepBoth(sharedOrganizationQid, confirmedPhysicalPlaceIds);
+        await onKeepBoth(
+          sharedOrganizationQid,
+          selectedOrganizationIds,
+          confirmedPhysicalPlaceIds,
+        );
       } else if (mergeAction === 'merge') {
         await onMerge(mergedPlace, retiredIds);
       }
@@ -694,6 +726,7 @@ export default function PlaceMergeView({
     onMerge,
     confirmedPhysicalPlaceIds,
     retiredIds,
+    selectedOrganizationIds,
     sharedOrganizationQid,
   ]);
 
@@ -894,9 +927,8 @@ export default function PlaceMergeView({
                       Multiple valid physical plantations
                     </span>
                     <span className="mt-1 block text-xs leading-5 text-stm-warm-500">
-                      Keep all {confirmedPhysicalPlaces.length} current records
-                      and confirm that their E25 features are linked to the same
-                      E74 organization
+                      Select which current E25 physical plantations are linked
+                      to the same E74 organization
                       {sharedOrganizationQid
                         ? ` (${sharedOrganizationQid}).`
                         : '. This requires the same organization QID on both records.'}
@@ -908,21 +940,61 @@ export default function PlaceMergeView({
           </section>
 
           {mergeAction === 'keep-both' && (
-            <section className="border border-stm-teal-200 bg-stm-teal-50 p-4">
-              <h3 className="text-sm font-semibold text-stm-teal-900">
-                All reviewed records will remain active
+            <section className="border border-stm-warm-200 bg-stm-warm-50 p-4">
+              <h3 className="text-sm font-semibold text-stm-warm-800">
+                Select plantations to connect
               </h3>
-              <p className="mt-1 text-xs leading-5 text-stm-teal-800">
-                This records a reviewed physical-link decision for the exact
-                current set: {confirmedPhysicalPlaceIds.join(', ')}. Almanakken
-                observations remain attached to organization{' '}
-                {sharedOrganizationQid}; they are not duplicated as source
-                assertions on the physical places.
+              <p className="mt-1 text-xs leading-5 text-stm-warm-700">
+                Select at least two. All records remain active, but only the
+                selected physical plantations will be connected to organization{' '}
+                {sharedOrganizationQid}.
+              </p>
+              <div className="mt-3 space-y-2">
+                {confirmedPhysicalPlaces.map((place) => {
+                  const checked = selectedOrganizationIds.includes(place.id);
+                  return (
+                    <label
+                      key={`organization-place-${place.id}`}
+                      className={`flex cursor-pointer items-start gap-3 border p-3 transition-colors ${
+                        checked
+                          ? 'border-stm-warm-400 bg-entity-e25 text-stm-warm-800'
+                          : 'border-stm-warm-200 bg-white hover:border-stm-warm-300'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        disabled={
+                          checked && selectedOrganizationIds.length === 2
+                        }
+                        onChange={() => toggleOrganizationCandidate(place.id)}
+                        className="mt-1 accent-stm-sepia-600"
+                      />
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-sm font-medium text-stm-warm-800">
+                          {getPreferredName(place)}
+                        </span>
+                        <span className="block font-mono text-xs text-stm-warm-400">
+                          {place.id}
+                        </span>
+                      </span>
+                      <span className="text-xs text-stm-warm-400">
+                        {place.fid != null ? `FID ${place.fid}` : 'no FID'}
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
+              <p className="mt-3 text-xs font-medium text-stm-warm-700">
+                {selectedOrganizationIds.length} connected;{' '}
+                {confirmedPhysicalPlaces.length -
+                  selectedOrganizationIds.length}{' '}
+                left unlinked.
               </p>
               <div className="mt-3">
-                <PlaceMergeMap locations={confirmedMapLocations} />
+                <PlaceMergeMap locations={selectedOrganizationMapLocations} />
               </div>
-              <PlacePropertiesGrid places={confirmedPhysicalPlaces} />
+              <PlacePropertiesGrid places={selectedOrganizationPlaces} />
             </section>
           )}
 
@@ -1630,7 +1702,8 @@ export default function PlaceMergeView({
           </p>
         ) : mergeAction === 'keep-both' ? (
           <p className="text-sm text-stm-warm-500">
-            Keeping all {confirmedPhysicalPlaceIds.length} reviewed records
+            Connecting {selectedOrganizationIds.length} of{' '}
+            {confirmedPhysicalPlaceIds.length} reviewed records
           </p>
         ) : (
           <p className="text-sm text-stm-warm-500">
@@ -1655,6 +1728,8 @@ export default function PlaceMergeView({
               saving ||
               !mergeAction ||
               (mergeAction === 'merge' && selectedMergeIds.length < 2) ||
+              (mergeAction === 'keep-both' &&
+                selectedOrganizationIds.length < 2) ||
               (mergeAction === 'merge' && includedNameCount === 0) ||
               !canEdit
             }
@@ -1666,7 +1741,7 @@ export default function PlaceMergeView({
                 ? 'Confirming...'
                 : 'Merging...'
               : mergeAction === 'keep-both'
-                ? `Confirm ${confirmedPhysicalPlaceIds.length} Places`
+                ? `Connect ${selectedOrganizationIds.length} Places`
                 : `Merge ${selectedMergeIds.length} Selected`}
           </button>
         </div>

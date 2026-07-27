@@ -17,6 +17,7 @@ import {
   relatedPlaceType,
   type PlaceFunctionSource,
 } from '../lib/place-functions';
+import { resolveConfirmedPhysicalLinkReview } from '../lib/physical-organization-links';
 import {
   almanakkenField,
   isVerlaten,
@@ -96,6 +97,7 @@ type OrganizationOverride = {
   qid?: string;
   physicalLinkReviewStatus?: 'confirmed-multiple';
   reviewedPhysicalPlaceIds?: string[];
+  associatedPhysicalPlaceIds?: string[];
 };
 
 type AlmanakkenMissingQid = {
@@ -653,13 +655,20 @@ function organizationAssociationStatus(
     .filter((id): id is string => Boolean(id))
     .sort();
   const override = organizationOverrides.get(qid);
-  const reviewedIds = [...(override?.reviewedPhysicalPlaceIds ?? [])].sort();
-  const confirmedMultiple =
-    override?.physicalLinkReviewStatus === 'confirmed-multiple' &&
-    activeIds.length > 1 &&
-    activeIds.join('\u0000') === reviewedIds.join('\u0000');
-  return activeIds.length > 1 && !confirmedMultiple
-    ? 'needs-physical-link-review'
+  const confirmedReview = resolveConfirmedPhysicalLinkReview(
+    override,
+    (activePlantationsByQid.get(qid) ?? []).map((plantation) => ({
+      id: plantation.id!,
+      fid: plantation.fid,
+    })),
+  );
+  if (activeIds.length > 1 && !confirmedReview) {
+    return 'needs-physical-link-review';
+  }
+  return confirmedReview && entry.id
+    ? confirmedReview.associatedPlaceIds.has(entry.id)
+      ? 'linked'
+      : 'needs-organization-link'
     : 'linked';
 }
 

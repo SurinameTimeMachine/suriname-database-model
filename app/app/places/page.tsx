@@ -1179,21 +1179,25 @@ function PlacesPageInner() {
   );
 
   const handleKeepBothPlaces = useCallback(
-    async (qid: string, placeIds: string[]) => {
+    async (
+      qid: string,
+      placeIds: string[],
+      reviewedPlaceIds: string[],
+    ) => {
       const res = await fetch('/api/organizations', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ qid, placeIds }),
+        body: JSON.stringify({ qid, placeIds, reviewedPlaceIds }),
       });
       const data = await res.json();
       if (!res.ok) {
         throw new Error(data.error || 'Failed to confirm both places');
       }
-      clearReviewIssue(placeIds, 'shared-organization-link');
+      clearReviewIssue(reviewedPlaceIds, 'shared-organization-link');
       setPublicationNotice({
         ...(data.publication ?? {}),
         message:
-          'Review saved. These records are no longer in the review queue; public data updates after deployment.',
+          'Organization links saved. Selected plantations will be connected after deployment; unselected records remain active and unlinked.',
       });
       setMergeView(null);
       setMergeCheckIds([]);

@@ -165,6 +165,7 @@ export function buildContext(): Record<string, unknown> {
     OrganizationAuthorityOverride: 'stm:OrganizationAuthorityOverride',
     physicalLinkReviewStatus: 'stm:physicalLinkReviewStatus',
     reviewedPhysicalPlaceIds: 'stm:reviewedPhysicalPlaceId',
+    associatedPhysicalPlaceIds: 'stm:associatedPhysicalPlaceId',
     functionEvidenceKind: 'stm:functionEvidenceKind',
     hasEvidence: { '@id': 'stm:hasEvidence', '@type': '@id' },
     hasOperationalSummary: {
