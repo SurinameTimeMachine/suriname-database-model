@@ -29,8 +29,12 @@ migrated by this document.
 
 ## Current evidence
 
-The generated inventory covers all 16 JSON-based tables under `data/` plus the
-merged temporal plantation-composition projection.
+The generated inventory presents the current files as six logical structures:
+one Places table, one Sources table, one place-type vocabulary, one
+organization-link table, one combined immutable source-snapshot schema, and the
+merged temporal plantation-composition projection. A separate distribution
+manifest retains the exact repository path and SHA-256 checksum of all 30
+structured source and editorial files.
 
 | Capability | Current evidence | Gap |
 | --- | --- | --- |
@@ -40,6 +44,10 @@ merged temporal plantation-composition projection.
 | Editorial provenance | The Gazetteer and organization overrides can record latest editor/time or review state. | Latest-state fields overwrite history; no append-only semantic change event exists. |
 | Dataset publication | Documentation mentions Dataverse/DOI deposits. | None of the current JSON tables records release version, exact file ID, checksum, retrieval time and license together. |
 | Vocabulary | One JSON-LD SKOS graph contains 45 scheme/concept records with labels, definitions and mappings. | Public concepts are not yet separately retrievable as Linked Art-shaped objects and do not have complete change/source provenance. |
+
+The Dikland collection is part of the Sources table. Its collection and child
+item keep their existing canonical URIs; the former standalone file was a
+duplicate storage boundary, not a separate authority domain.
 
 ## Structural review after temporal compositions
 
@@ -369,9 +377,10 @@ Existing concept identifiers remain stable even if storage filenames change.
 
 ## Migration sequence
 
-1. **Inventory (this change).** Keep one generated CSV dictionary per current
-   JSON table and generated entity structure, and fail review on undocumented
-   new paths.
+1. **Inventory (this change).** Keep one generated CSV dictionary per logical
+   table, one combined dictionary for immutable source-snapshot fields, and a
+   checksum manifest that preserves each physical source-file boundary. Fail
+   review on undocumented new paths.
 2. **Dataset releases.** Extend the source registry with deposited release and
    exact distribution-file entities; validate identifiers and checksums.
 3. **Editor contracts.** Define JSON Schemas for places, concepts, sources,

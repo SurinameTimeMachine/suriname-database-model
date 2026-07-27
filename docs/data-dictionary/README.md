@@ -7,28 +7,45 @@ field already follows the target semantic model.
 The inventory was introduced on 2026-07-27 and, after the temporal plantation
 composition model was merged, currently contains:
 
-- 17 current structures;
-- 5 editor-managed JSON-LD authority tables;
-- 11 immutable GeoJSON source snapshots;
+- 6 logical table dictionaries;
+- 4 editor-managed JSON-LD authority tables;
+- 11 immutable GeoJSON source snapshots grouped into one source-schema
+  dictionary;
 - 1 generated plantation-composition projection;
-- 392 distinct nested field paths; and
+- 385 observed field-path rows; and
 - a curated description and observed example for every current field path.
 
-[`tables.csv`](tables.csv) is the index. Each indexed table has its own CSV file
-in this directory.
+[`tables.csv`](tables.csv) is the logical table index. In particular,
+[`places.csv`](places.csv) is the only place-authority dictionary. The eleven
+historical GeoJSON files are evidence distributions, not eleven competing place
+tables. Their fields are retained in
+[`source-snapshot-fields.csv`](source-snapshot-fields.csv), where every row
+keeps the exact repository `source_file`.
 
 ## Scope
 
-The exporter includes `.json`, `.jsonld`, and `.geojson` files below `data/`.
-It deliberately excludes generated copies below `app/public`, because those are
-publication projections rather than additional editable tables.
+The field exporter includes `.json`, `.jsonld`, and `.geojson` files below
+`data/`. It deliberately excludes generated copies below `app/public`, because
+those are publication projections rather than additional editable tables.
 
 GeoJSON files are treated as source snapshots. Their original column names and
-values remain visible, but the inventory does not imply that editors should
-modify those files.
+values remain visible in one combined dictionary, but the inventory does not
+imply that editors should modify those files or merge their rows into the
+canonical Gazetteer.
+
+[`source-distributions.csv`](source-distributions.csv) inventories all 30
+structured files (`.csv`, `.tsv`, `.json`, `.jsonld`, and `.geojson`) below
+`data/`. It records repository path, media type, byte size, and a current
+SHA-256 checksum. Missing source-registry, deposited-release, and persistent
+file links are empty and explicitly marked unresolved; the exporter never
+invents those identifiers.
+
+Dikland is represented inside [`sources.csv`](sources.csv). The collection and
+its child source item retain their canonical source URIs; there is no separate
+Dikland authority table.
 
 One generated structure is included separately:
-[`generated-plantation-composition-periods.csv`](generated-plantation-composition-periods.csv).
+[`plantation-composition-periods.csv`](plantation-composition-periods.csv).
 It profiles the 202 `PlantationCompositionPeriod` records generated into
 `app/lod/database.jsonld` from the Almanakken v2 CSV. The CSV source itself is
 not yet exported as a table dictionary.
@@ -71,11 +88,11 @@ For example, `1885` in a filename does not make a GeoJSON table time-aware.
 
 | Test | Tables passing | Interpretation |
 | --- | ---: | --- |
-| Explicit spatial fields | 13 / 17 | Geometry is comparatively well represented, but the generated temporal compositions have no spatial relation. |
-| Explicit temporal fields | 6 / 17 | Time is uneven and absent from the GeoJSON source snapshots themselves. |
-| Explicit source/evidence fields | 4 / 17 | Most files depend on provenance held elsewhere. |
-| Latest-edit provenance | 2 / 17 | Only part of the editable data records even the latest editor/change time. |
-| Exact dataset release/version | 0 / 17 | No current structure closes the chain to a deposited release and exact file checksum. |
+| Explicit spatial fields | 3 / 6 | Geometry is comparatively well represented, but the generated temporal compositions have no spatial relation. |
+| Explicit temporal fields | 5 / 6 | Time is uneven and absent from the GeoJSON source snapshots themselves. |
+| Explicit source/evidence fields | 3 / 6 | Several logical tables still depend on provenance held elsewhere. |
+| Latest-edit provenance | 2 / 6 | Only part of the editable data records even the latest editor/change time. |
+| Exact dataset release/version | 0 / 6 | Local checksums now exist for 30 structured distributions, but no current structure closes the chain to a deposited release and persistent file ID. |
 
 This does not mean every table should contain every dimension. It means every
 published assertion must be able to reach its spatial target, temporal scope,

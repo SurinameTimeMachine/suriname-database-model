@@ -1,11 +1,13 @@
 /**
- * Export one field-level CSV data dictionary for every tracked JSON,
- * JSON-LD, and GeoJSON table under data/.
+ * Export one field-level CSV data dictionary for each logical JSON data table,
+ * plus a combined schema for immutable GeoJSON source snapshots.
  *
  * The dictionaries describe current storage, not a target ontology. Curated
  * descriptions are used where the field semantics are known; safe generated
- * descriptions make undocumented source columns visible without guessing.
+ * descriptions make undocumented source columns visible without guessing. A
+ * separate distribution manifest preserves physical file paths and checksums.
  */
+import { createHash } from 'node:crypto';
 import {
   mkdirSync,
   readFileSync,
@@ -43,13 +45,13 @@ const DATA_DIR = join(REPO_DIR, 'data');
 const OUTPUT_DIR = join(REPO_DIR, 'docs', 'data-dictionary');
 const CANONICAL_BASE = 'https://data.surinametijdmachine.org/';
 
-const EDITORIAL_TABLES = new Set([
-  'data/dikland-collection.jsonld',
-  'data/organization-authority-overrides.jsonld',
-  'data/place-types-thesaurus.jsonld',
-  'data/places-gazetteer.jsonld',
-  'data/sources-registry.jsonld',
-]);
+const LOGICAL_TABLE_IDS: Record<string, string> = {
+  'data/organization-authority-overrides.jsonld':
+    'organization-authority-links',
+  'data/place-types-thesaurus.jsonld': 'place-types',
+  'data/places-gazetteer.jsonld': 'places',
+  'data/sources-registry.jsonld': 'sources',
+};
 
 const DESCRIPTIONS: Record<string, string> = {
   '@id': 'Canonical or compact identifier for the described entity.',
@@ -706,11 +708,11 @@ function inspectTable(filePath: string): {
         ? features
         : [document]
   ) as unknown[];
-  const role = EDITORIAL_TABLES.has(sourceFile)
+  const role = LOGICAL_TABLE_IDS[sourceFile]
     ? 'editorial-authority'
     : 'source-snapshot';
   const metadata: TableMetadata = {
-    tableId: tableId(sourceFile),
+    tableId: LOGICAL_TABLE_IDS[sourceFile] ?? tableId(sourceFile),
     sourceFile,
     recordScope,
     recordCount: records.length,
@@ -724,6 +726,36 @@ function inspectTable(filePath: string): {
     document['@context'],
     filePath.endsWith('.geojson'),
   );
+}
+
+function combineSourceSnapshots(
+  sourceSnapshots: Array<{
+    metadata: TableMetadata;
+    rows: Array<Record<string, unknown>>;
+  }>,
+): {
+  metadata: TableMetadata;
+  rows: Array<Record<string, unknown>>;
+} {
+  return {
+    metadata: {
+      tableId: 'source-snapshot-fields',
+      sourceFile: `${sourceSnapshots.length} immutable GeoJSON files; see source_file in the dictionary`,
+      recordScope: 'features[]',
+      recordCount: sourceSnapshots.reduce(
+        (sum, table) => sum + table.metadata.recordCount,
+        0,
+      ),
+      role: 'source-snapshot',
+      editability: 'immutable-source',
+    },
+    rows: sourceSnapshots.flatMap((table) =>
+      table.rows.map((row) => ({
+        ...row,
+        table_id: 'source-snapshot-fields',
+      })),
+    ),
+  };
 }
 
 function inspectPlantationCompositionPeriods(): {
@@ -777,7 +809,7 @@ function inspectPlantationCompositionPeriods(): {
     };
   });
   const metadata: TableMetadata = {
-    tableId: 'generated-plantation-composition-periods',
+    tableId: 'plantation-composition-periods',
     sourceFile:
       'app/lod/database.jsonld#PlantationCompositionPeriod (generated from Almanakken v2 CSV)',
     recordScope: 'derived[]',
@@ -791,6 +823,61 @@ function inspectPlantationCompositionPeriods(): {
   return profileTable(metadata, periods, contextDocument['@context']);
 }
 
+function walkStructuredDataFiles(directory: string): string[] {
+  return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const path = join(directory, entry.name);
+    if (entry.isDirectory()) return walkStructuredDataFiles(path);
+    return /\.(?:csv|tsv|json|jsonld|geojson)$/.test(entry.name) ? [path] : [];
+  });
+}
+
+function mediaType(path: string): string {
+  if (path.endsWith('.csv')) return 'text/csv';
+  if (path.endsWith('.tsv')) return 'text/tab-separated-values';
+  if (path.endsWith('.geojson')) return 'application/geo+json';
+  if (path.endsWith('.jsonld')) return 'application/ld+json';
+  return 'application/json';
+}
+
+function sourceRegistryIds(sourceFile: string): string {
+  return sourceFile.startsWith(
+    'data/06-almanakken - Plantations Surinaamse Almanakken/',
+  ) && sourceFile.endsWith('.csv')
+    ? 'almanakken'
+    : '';
+}
+
+function distributionRows(): Array<Record<string, unknown>> {
+  return walkStructuredDataFiles(DATA_DIR)
+    .sort()
+    .map((path) => {
+      const sourceFile = relative(REPO_DIR, path);
+      const bytes = readFileSync(path);
+      const editorial = Boolean(LOGICAL_TABLE_IDS[sourceFile]);
+      const registryIds = sourceRegistryIds(sourceFile);
+      return {
+        distribution_id: `repo:${sourceFile}`,
+        source_file: sourceFile,
+        media_type: mediaType(path),
+        byte_size: bytes.byteLength,
+        checksum_algorithm: 'SHA-256',
+        checksum_value: createHash('sha256').update(bytes).digest('hex'),
+        role: editorial ? 'editorial-state' : 'source-distribution',
+        current_editability: editorial
+          ? 'editor-managed'
+          : 'immutable-source',
+        source_registry_ids: registryIds,
+        dataset_release_id: '',
+        release_file_id: '',
+        provenance_status: editorial
+          ? 'repository-path-and-checksum-recorded; deposited-release-unresolved'
+          : registryIds
+            ? 'source-linked; repository-path-and-checksum-recorded; deposited-release-unresolved'
+            : 'repository-path-and-checksum-recorded; source-and-deposited-release-unresolved',
+      };
+    });
+}
+
 function main() {
   mkdirSync(OUTPUT_DIR, { recursive: true });
   for (const entry of readdirSync(OUTPUT_DIR, { withFileTypes: true })) {
@@ -799,9 +886,18 @@ function main() {
     }
   }
 
-  const tables = walkJsonFiles(DATA_DIR)
+  const inspectedTables = walkJsonFiles(DATA_DIR)
     .sort()
     .map(inspectTable);
+  const sourceSnapshots = inspectedTables.filter(
+    (table) => table.metadata.role === 'source-snapshot',
+  );
+  const tables = inspectedTables.filter(
+    (table) => table.metadata.role === 'editorial-authority',
+  );
+  if (sourceSnapshots.length > 0) {
+    tables.push(combineSourceSnapshots(sourceSnapshots));
+  }
   tables.push(inspectPlantationCompositionPeriods());
   const dictionaryColumns = [
     'table_id',
@@ -891,6 +987,23 @@ function main() {
       'has_edit_provenance',
       'has_dataset_release_version',
       'dictionary_file',
+    ]),
+  );
+  writeFileSync(
+    join(OUTPUT_DIR, 'source-distributions.csv'),
+    csv(distributionRows(), [
+      'distribution_id',
+      'source_file',
+      'media_type',
+      'byte_size',
+      'checksum_algorithm',
+      'checksum_value',
+      'role',
+      'current_editability',
+      'source_registry_ids',
+      'dataset_release_id',
+      'release_file_id',
+      'provenance_status',
     ]),
   );
 
