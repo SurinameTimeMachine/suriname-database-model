@@ -87,6 +87,35 @@ async function expectGlobaliseVocabularyProfile() {
   );
 }
 
+async function expectGlobalisePlaceProfile(placeId: string) {
+  const path = `place/${placeId}.jsonld?profile=globalise`;
+  const placeUri = `${canonicalBase}place/${placeId}#location`;
+  const response = await fetch(`${serverBase}/${path}`, { redirect: 'manual' });
+  assert(response.status === 200, `${path} returned HTTP ${response.status}`);
+  assert(
+    response.headers.get('content-type')?.includes('application/ld+json'),
+    `${path} did not return JSON-LD`,
+  );
+  assert(
+    response.headers
+      .get('link')
+      ?.includes(
+        `${canonicalBase}place/${placeId}.jsonld?profile=globalise`,
+      ),
+    `${path} does not advertise its alternate profile`,
+  );
+  const body = (await response.json()) as Record<string, unknown>;
+  assert(body.id === placeUri, `${path} changed the canonical Place id`);
+  assert(body.type === 'Place', `${path} is not a compact Place object`);
+  assert(!('@graph' in body), `${path} returned an @graph wrapper`);
+  assert(
+    typeof body._label === 'string' &&
+      values(body.classified_as).length > 0 &&
+      values(body.identified_by).length > 0,
+    `${path} lost its label, structural type, or identifiers`,
+  );
+}
+
 async function main() {
   const database = JSON.parse(
     readFileSync(join(process.cwd(), 'public/data/database.jsonld'), 'utf-8'),
@@ -105,6 +134,13 @@ async function main() {
   ]) {
     samples.set(expectedId, { '@id': expectedId });
   }
+
+  const recordIndex = JSON.parse(
+    readFileSync(join(process.cwd(), 'public/data/place-records/index.json'), 'utf-8'),
+  ) as Array<{ id: string }>;
+  const placeId = recordIndex[0]?.id;
+  assert(placeId, 'No authority record available for route validation');
+  await expectGlobalisePlaceProfile(placeId);
 
   for (const entity of samples.values()) {
     const path = pathFor(entity['@id']);
@@ -126,11 +162,6 @@ async function main() {
     await expectRepresentation(`${path}.json`, entity['@id'], 'application/json');
   }
 
-  const recordIndex = JSON.parse(
-    readFileSync(join(process.cwd(), 'public/data/place-records/index.json'), 'utf-8'),
-  ) as Array<{ id: string }>;
-  const placeId = recordIndex[0]?.id;
-  assert(placeId, 'No authority record available for route validation');
   const placeUri = `${canonicalBase}place/${placeId}`;
   await expectRepresentation(
     `place/${placeId}`,
@@ -146,7 +177,7 @@ async function main() {
   assert(missing.status === 404, `Unknown resource returned HTTP ${missing.status}`);
 
   console.log(
-    `Linked-data routes OK at ${serverBase}: ${samples.size} resource families and place authority records serve HTML, JSON-LD, JSON, Accept negotiation, and the compact vocabulary profile.`,
+    `Linked-data routes OK at ${serverBase}: ${samples.size} resource families and place authority records serve HTML, JSON-LD, JSON, Accept negotiation, and the compact vocabulary and Place profiles.`,
   );
 }
 

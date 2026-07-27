@@ -7,6 +7,9 @@ from it as one authority-record document per place. The authority record is a
 stable STM document which describes, but is not identical to, the CRM entities
 within it.
 
+For a single-root, GLOBALISE-style interoperability view of the same records,
+see [Compact place object profile](place-object-profile.md).
+
 Editors change the concise Gazetteer fields and source-bound statements; they
 do not edit generated JSON-LD. A GitHub save is the canonical change. The next
 deployment runs the publication pipeline and updates the HTML, `.json`, and
@@ -19,6 +22,8 @@ For `stm-00705` the public contract is:
 
 - `https://data.surinametijdmachine.org/place/stm-00705` — authority record and HTML representation.
 - `.../place/stm-00705.jsonld` — JSON-LD representation.
+- `.../place/stm-00705.jsonld?profile=globalise` — compact single-root E53 Place
+  representation.
 - `.../place/stm-00705.json` — application JSON representation.
 - `.../place/stm-00705#record` — E31 authority-record node.
 - `.../place/stm-00705#feature` — E25/E26 physical feature when applicable.
