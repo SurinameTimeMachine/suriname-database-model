@@ -14,6 +14,10 @@ function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
 }
 
+function values(value: unknown): unknown[] {
+  return Array.isArray(value) ? value : value == null ? [] : [value];
+}
+
 function pathFor(uri: string): string {
   assert(uri.startsWith(canonicalBase), `Non-canonical STM URI: ${uri}`);
   return uri.slice(canonicalBase.length);
@@ -51,6 +55,36 @@ async function expectRepresentation(
       : []),
   ];
   assert(ids.includes(expectedId), `${path} does not describe ${expectedId}`);
+}
+
+async function expectGlobaliseVocabularyProfile() {
+  const path = 'vocabulary/place-type/plantation.jsonld?profile=globalise';
+  const expectedId = `${canonicalBase}vocabulary/place-type/plantation`;
+  const response = await fetch(`${serverBase}/${path}`, { redirect: 'manual' });
+  assert(response.status === 200, `${path} returned HTTP ${response.status}`);
+  assert(
+    response.headers.get('content-type')?.includes('application/ld+json'),
+    `${path} did not return JSON-LD`,
+  );
+  assert(
+    response.headers
+      .get('link')
+      ?.includes(`${expectedId}.jsonld?profile=globalise`),
+    `${path} does not advertise its alternate profile`,
+  );
+  const body = (await response.json()) as Record<string, unknown>;
+  assert(body.id === expectedId, `${path} changed the canonical concept id`);
+  assert(
+    values(body.type).includes('Concept'),
+    `${path} is not a compact Concept object`,
+  );
+  assert(
+    typeof body._label === 'string' &&
+      values(body.prefLabel).length > 0 &&
+      values(body.definition).length > 0 &&
+      values(body['skos:editorialNote']).length > 0,
+    `${path} lost its label, definition, or editorial note`,
+  );
 }
 
 async function main() {
@@ -106,12 +140,13 @@ async function main() {
   );
   await expectRepresentation(`place/${placeId}.jsonld`, placeUri, 'application/ld+json');
   await expectRepresentation(`place/${placeId}.json`, placeUri, 'application/json');
+  await expectGlobaliseVocabularyProfile();
 
   const missing = await fetch(`${serverBase}/type/not-a-real-resource`);
   assert(missing.status === 404, `Unknown resource returned HTTP ${missing.status}`);
 
   console.log(
-    `Linked-data routes OK at ${serverBase}: ${samples.size} resource families and place authority records serve HTML, JSON-LD, JSON, and Accept negotiation.`,
+    `Linked-data routes OK at ${serverBase}: ${samples.size} resource families and place authority records serve HTML, JSON-LD, JSON, Accept negotiation, and the compact vocabulary profile.`,
   );
 }
 

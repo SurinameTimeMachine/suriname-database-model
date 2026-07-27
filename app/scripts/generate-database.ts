@@ -717,36 +717,161 @@ function expandStmUri(value: unknown): string | undefined {
   return value.startsWith('stm:') ? `${BASE}${value.slice(4)}` : value;
 }
 
-function buildPlaceTypeVocabulary(): Record<string, unknown>[] {
+function expandReplacementUri(
+  value: unknown,
+  currentConceptId: string,
+): string | undefined {
+  const uri = expandStmUri(value);
+  if (!uri) return undefined;
+  return uri.includes(':')
+    ? uri
+    : `${currentConceptId.slice(0, currentConceptId.lastIndexOf('/') + 1)}${uri}`;
+}
+
+function uriValues(value: unknown): string[] {
+  return (Array.isArray(value) ? value : value == null ? [] : [value]).flatMap(
+    (item) => {
+      const uri = expandStmUri(item);
+      return uri ? [uri] : [];
+    },
+  );
+}
+
+function buildEditorialVocabularies(): Record<string, unknown>[] {
   if (!existsSync(THESAURUS_PATH)) return [];
   const document = JSON.parse(readFileSync(THESAURUS_PATH, 'utf-8')) as {
     '@graph'?: Array<Record<string, unknown>>;
   };
-  return (document['@graph'] ?? []).flatMap((entry) => {
+  const entries = (document['@graph'] ?? []).flatMap((entry) => {
     const id = expandStmUri(entry['@id']);
-    if (!id || !id.startsWith(`${BASE}vocabulary/place-type`)) return [];
-    const isScheme = id === `${BASE}vocabulary/place-type`;
+    return id?.startsWith(BASE) ? [{ entry, id }] : [];
+  });
+  const entriesById = new Map(entries.map(({ entry, id }) => [id, entry]));
+  const reference = (uri: string): Record<string, unknown> => {
+    const target = entriesById.get(uri);
+    const prefLabel = languageValues(target?.prefLabel);
+    const targetTypes = Array.isArray(target?.['@type'])
+      ? target['@type']
+      : target?.['@type']
+        ? [target['@type']]
+        : [];
+    return {
+      '@id': uri,
+      ...(targetTypes.includes('skos:ConceptScheme')
+        ? { '@type': ['skos:ConceptScheme'] }
+        : { '@type': ['skos:Concept', 'E55_Type'] }),
+      ...(prefLabel.length > 0
+        ? {
+            _label:
+              prefLabel.find((label) => label['@language'] === 'en')?.[
+                '@value'
+              ] ?? prefLabel[0]['@value'],
+            'skos:prefLabel': prefLabel,
+          }
+        : {}),
+    };
+  };
+  const references = (value: unknown) => uriValues(value).map(reference);
+  const externalUris = (value: unknown) => uriValues(value);
+  const optionalReferences = (value: unknown) => {
+    const values = references(value);
+    return values.length > 0 ? values : undefined;
+  };
+  const optionalUris = (value: unknown) => {
+    const values = externalUris(value);
+    return values.length > 0 ? values : undefined;
+  };
+
+  return entries.map(({ entry, id }) => {
+    const entryTypes = Array.isArray(entry['@type'])
+      ? entry['@type']
+      : [entry['@type']];
+    const isScheme = entryTypes.includes('skos:ConceptScheme');
     const prefLabel = languageValues(entry.prefLabel);
     const altLabel = languageValues(entry.altLabel);
-    const broader = expandStmUri(entry.broader);
-    return [
-      {
-        '@id': id,
-        '@type': isScheme
-          ? ['skos:ConceptScheme']
-          : ['skos:Concept', 'E55_Type'],
-        ...(prefLabel.length > 0 ? { 'skos:prefLabel': prefLabel } : {}),
-        ...(altLabel.length > 0 ? { 'skos:altLabel': altLabel } : {}),
-        ...(!isScheme
-          ? {
-              'skos:inScheme': {
-                '@id': `${BASE}vocabulary/place-type`,
-              },
-            }
-          : {}),
-        ...(broader ? { 'skos:broader': { '@id': broader } } : {}),
-      },
-    ];
+    const definition = languageValues(entry.definition);
+    const scopeNote = languageValues(entry.scopeNote);
+    const editorialNote = languageValues(entry.editorialNote);
+    const inScheme =
+      optionalReferences(entry.inScheme) ??
+      (!isScheme && id.startsWith(`${BASE}vocabulary/place-type/`)
+        ? [reference(`${BASE}vocabulary/place-type`)]
+        : undefined);
+    const topConceptOf = optionalReferences(entry.topConceptOf);
+    const hasTopConcept = optionalReferences(entry.hasTopConcept);
+    const broader = optionalReferences(entry.broader);
+    const narrower = optionalReferences(entry.narrower);
+    const related = optionalReferences(entry.related);
+    const exactMatch = optionalUris(entry.exactMatch);
+    const closeMatch = optionalUris(entry.closeMatch);
+    const broadMatch = optionalUris(entry.broadMatch);
+    const narrowMatch = optionalUris(entry.narrowMatch);
+    const relatedMatch = optionalUris(entry.relatedMatch);
+    const replacedBy = expandReplacementUri(entry.replacedBy, id);
+    const label =
+      prefLabel.find((value) => value['@language'] === 'en')?.['@value'] ??
+      prefLabel[0]?.['@value'];
+    return {
+      '@id': id,
+      '@type': isScheme
+        ? ['skos:ConceptScheme']
+        : ['skos:Concept', 'E55_Type'],
+      ...(label ? { _label: label } : {}),
+      ...(prefLabel.length > 0 ? { 'skos:prefLabel': prefLabel } : {}),
+      ...(altLabel.length > 0 ? { 'skos:altLabel': altLabel } : {}),
+      ...(definition.length > 0 ? { 'skos:definition': definition } : {}),
+      ...(scopeNote.length > 0 ? { 'skos:scopeNote': scopeNote } : {}),
+      ...(editorialNote.length > 0
+        ? { 'skos:editorialNote': editorialNote }
+        : {}),
+      ...(typeof entry.historyNote === 'string' && entry.historyNote
+        ? { 'skos:historyNote': entry.historyNote }
+        : {}),
+      ...(inScheme ? { 'skos:inScheme': inScheme } : {}),
+      ...(topConceptOf ? { 'skos:topConceptOf': topConceptOf } : {}),
+      ...(hasTopConcept ? { 'skos:hasTopConcept': hasTopConcept } : {}),
+      ...(broader ? { 'skos:broader': broader } : {}),
+      ...(narrower ? { 'skos:narrower': narrower } : {}),
+      ...(related ? { 'skos:related': related } : {}),
+      ...(exactMatch ? { 'skos:exactMatch': exactMatch } : {}),
+      ...(closeMatch ? { 'skos:closeMatch': closeMatch } : {}),
+      ...(broadMatch ? { 'skos:broadMatch': broadMatch } : {}),
+      ...(narrowMatch ? { 'skos:narrowMatch': narrowMatch } : {}),
+      ...(relatedMatch ? { 'skos:relatedMatch': relatedMatch } : {}),
+      ...(typeof entry.typeId === 'string'
+        ? {
+            typeId: entry.typeId,
+            'skos:notation': entry.typeId,
+          }
+        : {}),
+      ...(typeof entry.color === 'string' ? { color: entry.color } : {}),
+      ...(typeof entry.crmClass === 'string'
+        ? { crmClass: entry.crmClass }
+        : {}),
+      ...(typeof entry.crmBadge === 'string'
+        ? { crmBadge: entry.crmBadge }
+        : {}),
+      ...(typeof entry.sortOrder === 'number'
+        ? { sortOrder: entry.sortOrder }
+        : {}),
+      ...(typeof entry.created === 'string'
+        ? { 'dcterms:created': entry.created }
+        : {}),
+      ...(typeof entry.modified === 'string'
+        ? { 'dcterms:modified': entry.modified }
+        : {}),
+      ...(entry.deprecated === true ? { 'owl:deprecated': true } : {}),
+      ...(typeof entry.deprecatedAt === 'string'
+        ? { 'prov:invalidatedAtTime': entry.deprecatedAt }
+        : {}),
+      ...(typeof entry.deprecatedBy === 'string'
+        ? { deprecatedBy: entry.deprecatedBy }
+        : {}),
+      ...(replacedBy ? { 'dcterms:isReplacedBy': replacedBy } : {}),
+      ...(typeof entry.deprecationNote === 'string'
+        ? { deprecationNote: entry.deprecationNote }
+        : {}),
+    };
   });
 }
 
@@ -1468,9 +1593,9 @@ function main() {
 
   const e55Types = buildE55Types();
   console.log(`  E55 Types:          ${e55Types.length}`);
-  const placeTypeVocabulary = buildPlaceTypeVocabulary();
+  const editorialVocabularies = buildEditorialVocabularies();
   console.log(
-    `  Place type concepts:${Math.max(0, placeTypeVocabulary.length - 1)}`,
+    `  Editorial vocabulary entries: ${editorialVocabularies.length}`,
   );
   const placeFunctionTypes = buildPlaceFunctionTypes();
   console.log(
@@ -1513,7 +1638,7 @@ function main() {
     ...e41All,
     ...e36Entities,
     ...e55Types,
-    ...placeTypeVocabulary,
+    ...editorialVocabularies,
     ...placeFunctionTypes,
     ...buildInferenceRules(),
     ...e52TimeSpans,
