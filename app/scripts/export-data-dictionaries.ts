@@ -14,16 +14,18 @@ import {
   writeFileSync,
 } from 'node:fs';
 import { join, relative } from 'node:path';
+import { derivePlantationCompositionPeriods } from '../lib/plantation-compositions';
+import { almanakkenField, readAlmanakkenRows } from './almanakken';
 
 type JsonObject = Record<string, unknown>;
 
 interface TableMetadata {
   tableId: string;
   sourceFile: string;
-  recordScope: '@graph[]' | 'features[]' | 'document';
+  recordScope: '@graph[]' | 'features[]' | 'derived[]' | 'document';
   recordCount: number;
-  role: 'editorial-authority' | 'source-snapshot';
-  editability: 'editor-managed' | 'immutable-source';
+  role: 'editorial-authority' | 'source-snapshot' | 'generated-projection';
+  editability: 'editor-managed' | 'immutable-source' | 'generated-read-only';
 }
 
 interface FieldProfile {
@@ -39,6 +41,7 @@ const APP_DIR = join(__dirname, '..');
 const REPO_DIR = join(APP_DIR, '..');
 const DATA_DIR = join(REPO_DIR, 'data');
 const OUTPUT_DIR = join(REPO_DIR, 'docs', 'data-dictionary');
+const CANONICAL_BASE = 'https://data.surinametijdmachine.org/';
 
 const EDITORIAL_TABLES = new Set([
   'data/dikland-collection.jsonld',
@@ -126,7 +129,7 @@ const DESCRIPTIONS: Record<string, string> = {
   original: 'Unchanged transcription of a source value.',
   startYear: 'First year covered by the statement or interval.',
   endYear: 'Last year covered by the statement or interval.',
-  certainty: 'Editorial certainty assigned to an interpretation.',
+  certainty: 'Certainty level assigned to an editorial or derived interpretation.',
   note: 'Optional explanatory note about this value or assertion.',
   notes: 'Human-readable notes supplied by a source or editor.',
   lifecycleEvents: 'Source-qualified events affecting a physical feature over time.',
@@ -191,6 +194,15 @@ const DESCRIPTIONS: Record<string, string> = {
   formsPartOf: 'Larger collection or source of which this item forms part.',
   sourcePath: 'Repository-relative path of the source file used by a transformation.',
   geometryType: 'GeoJSON geometry type used by the source feature.',
+  P140_assigned_attribute_to: 'Organization to which this derived composition assertion is assigned.',
+  reportedComponentOrganization: 'Component plantation organizations reported for the composite organization.',
+  P4_has_time_span: 'Time-span node covering the consecutive attested observation years.',
+  firstAttestedYear: 'First consecutive year in which this exact composition is attested.',
+  lastAttestedYear: 'Last consecutive year in which this exact composition is attested.',
+  observationYears: 'Every annual source-observation year supporting the derived period.',
+  hadPrimarySource: 'Source entities supporting this assertion.',
+  wasDerivedFrom: 'Exact source-observation entities from which this assertion was derived.',
+  inferenceRule: 'Documented deterministic rule used to derive this assertion.',
   P2_has_type: 'CIDOC CRM type assigned to this source registry entity.',
   created: 'Date on which this vocabulary record was created.',
   modified: 'Date of the latest change to this vocabulary record.',
@@ -282,6 +294,15 @@ const LINKED_ART_PATTERNS: Record<string, string> = {
   source: 'referred_to_by + assertion provenance',
   sources: 'referred_to_by + assertion provenance',
   sourceRow: 'referred_to_by (source record locator)',
+  P140_assigned_attribute_to: 'assigned property / assertion subject',
+  reportedComponentOrganization: 'assertion value (STM extension)',
+  P4_has_time_span: 'timespan',
+  firstAttestedYear: 'timespan boundary / STM convenience field',
+  lastAttestedYear: 'timespan boundary / STM convenience field',
+  observationYears: 'assertion evidence chronology (STM extension)',
+  hadPrimarySource: 'referred_to_by / provenance extension',
+  wasDerivedFrom: 'provenance extension',
+  inferenceRule: 'provenance method extension',
   modifiedAt: 'prov:Activity (editorial extension)',
   modifiedBy: 'prov:Activity carried_out_by (editorial extension)',
   deprecatedAt: 'prov:invalidatedAtTime (editorial extension)',
@@ -427,6 +448,10 @@ function dimensions(path: string): string {
     'deprecatedat',
     'lifecycleevents',
     'eventtype',
+    'firstattestedyear',
+    'lastattestedyear',
+    'observationyears',
+    'p4_has_time_span',
   ])) {
     matched.add('time');
   }
@@ -451,6 +476,8 @@ function dimensions(path: string): string {
     'iiifinfourl',
     'collectionurl',
     'formspartof',
+    'hadprimarysource',
+    'wasderivedfrom',
   ])) {
     matched.add('source');
   }
@@ -473,6 +500,8 @@ function dimensions(path: string): string {
     'notes',
     'editorialnote',
     'matchtype',
+    'wasderivedfrom',
+    'inferencerule',
   ])) {
     matched.add('provenance');
   }
@@ -602,44 +631,20 @@ function csv(rows: Array<Record<string, unknown>>, columns: string[]): string {
   ].join('\n') + '\n';
 }
 
-function inspectTable(filePath: string): {
+function profileTable(
+  metadata: TableMetadata,
+  records: unknown[],
+  context: unknown,
+  isGeoJson = false,
+): {
   metadata: TableMetadata;
   rows: Array<Record<string, unknown>>;
 } {
-  const sourceFile = relative(REPO_DIR, filePath);
-  const document = JSON.parse(readFileSync(filePath, 'utf-8')) as JsonObject;
-  const graph = document['@graph'];
-  const features = document.features;
-  const recordScope = Array.isArray(graph)
-    ? '@graph[]'
-    : document.type === 'FeatureCollection' && Array.isArray(features)
-      ? 'features[]'
-      : 'document';
-  const records = (
-    recordScope === '@graph[]'
-      ? graph
-      : recordScope === 'features[]'
-        ? features
-        : [document]
-  ) as unknown[];
-  const role = EDITORIAL_TABLES.has(sourceFile)
-    ? 'editorial-authority'
-    : 'source-snapshot';
-  const metadata: TableMetadata = {
-    tableId: tableId(sourceFile),
-    sourceFile,
-    recordScope,
-    recordCount: records.length,
-    role,
-    editability:
-      role === 'editorial-authority' ? 'editor-managed' : 'immutable-source',
-  };
   const profiles = new Map<string, FieldProfile>();
   records.forEach((record, index) =>
     profileValue(record, '', index, profiles),
   );
-  const contexts = contextObjects(document['@context']);
-  const isGeoJson = filePath.endsWith('.geojson');
+  const contexts = contextObjects(context);
 
   return {
     metadata,
@@ -681,6 +686,111 @@ function inspectTable(filePath: string): {
   };
 }
 
+function inspectTable(filePath: string): {
+  metadata: TableMetadata;
+  rows: Array<Record<string, unknown>>;
+} {
+  const sourceFile = relative(REPO_DIR, filePath);
+  const document = JSON.parse(readFileSync(filePath, 'utf-8')) as JsonObject;
+  const graph = document['@graph'];
+  const features = document.features;
+  const recordScope = Array.isArray(graph)
+    ? '@graph[]'
+    : document.type === 'FeatureCollection' && Array.isArray(features)
+      ? 'features[]'
+      : 'document';
+  const records = (
+    recordScope === '@graph[]'
+      ? graph
+      : recordScope === 'features[]'
+        ? features
+        : [document]
+  ) as unknown[];
+  const role = EDITORIAL_TABLES.has(sourceFile)
+    ? 'editorial-authority'
+    : 'source-snapshot';
+  const metadata: TableMetadata = {
+    tableId: tableId(sourceFile),
+    sourceFile,
+    recordScope,
+    recordCount: records.length,
+    role,
+    editability:
+      role === 'editorial-authority' ? 'editor-managed' : 'immutable-source',
+  };
+  return profileTable(
+    metadata,
+    records,
+    document['@context'],
+    filePath.endsWith('.geojson'),
+  );
+}
+
+function inspectPlantationCompositionPeriods(): {
+  metadata: TableMetadata;
+  rows: Array<Record<string, unknown>>;
+} {
+  const { rows } = readAlmanakkenRows();
+  const evidence = rows.map((row) => {
+    const recordId = almanakkenField(row, 'recordid');
+    const qid = almanakkenField(row, 'plantation_id');
+    const year = Number(almanakkenField(row, 'year'));
+    const componentQids = [
+      almanakkenField(row, 'has_parts1_id'),
+      almanakkenField(row, 'has_parts2_id'),
+      almanakkenField(row, 'has_parts3_id'),
+      almanakkenField(row, 'has_parts4_id'),
+    ].filter(Boolean);
+    return {
+      observationUri: recordId ? `${CANONICAL_BASE}obs/${recordId}` : '',
+      compositeOrganizationUri: qid
+        ? `${CANONICAL_BASE}organization/${qid}`
+        : '',
+      componentOrganizationUris: componentQids.map(
+        (componentQid) => `${CANONICAL_BASE}organization/${componentQid}`,
+      ),
+      year,
+      sourceUri: Number.isInteger(year)
+        ? `${CANONICAL_BASE}source/almanac-${year}`
+        : undefined,
+    };
+  });
+  const periods = derivePlantationCompositionPeriods(evidence).map((period) => {
+    const identifier = period.id.split('/').pop();
+    return {
+      '@id': period.id,
+      '@type': [
+        'E13_Attribute_Assignment',
+        'PlantationCompositionPeriod',
+      ],
+      P140_assigned_attribute_to: period.compositeOrganizationUri,
+      reportedComponentOrganization: period.componentOrganizationUris,
+      P4_has_time_span: `${CANONICAL_BASE}timespan/${identifier}`,
+      firstAttestedYear: period.startYear,
+      lastAttestedYear: period.endYear,
+      observationYears: period.observationYears,
+      hadPrimarySource: period.sourceUris,
+      wasDerivedFrom: period.evidenceUris,
+      certainty: `${CANONICAL_BASE}type/certainty/probable`,
+      inferenceRule:
+        `${CANONICAL_BASE}rule/consecutive-source-reported-plantation-composition`,
+    };
+  });
+  const metadata: TableMetadata = {
+    tableId: 'generated-plantation-composition-periods',
+    sourceFile:
+      'app/lod/database.jsonld#PlantationCompositionPeriod (generated from Almanakken v2 CSV)',
+    recordScope: 'derived[]',
+    recordCount: periods.length,
+    role: 'generated-projection',
+    editability: 'generated-read-only',
+  };
+  const contextDocument = JSON.parse(
+    readFileSync(join(APP_DIR, 'lod', 'context.jsonld'), 'utf-8'),
+  ) as JsonObject;
+  return profileTable(metadata, periods, contextDocument['@context']);
+}
+
 function main() {
   mkdirSync(OUTPUT_DIR, { recursive: true });
   for (const entry of readdirSync(OUTPUT_DIR, { withFileTypes: true })) {
@@ -692,6 +802,7 @@ function main() {
   const tables = walkJsonFiles(DATA_DIR)
     .sort()
     .map(inspectTable);
+  tables.push(inspectPlantationCompositionPeriods());
   const dictionaryColumns = [
     'table_id',
     'source_file',

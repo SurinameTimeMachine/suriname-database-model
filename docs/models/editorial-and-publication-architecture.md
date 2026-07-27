@@ -29,7 +29,8 @@ migrated by this document.
 
 ## Current evidence
 
-The generated inventory covers all 16 JSON-based tables under `data/`.
+The generated inventory covers all 16 JSON-based tables under `data/` plus the
+merged temporal plantation-composition projection.
 
 | Capability | Current evidence | Gap |
 | --- | --- | --- |
@@ -39,6 +40,100 @@ The generated inventory covers all 16 JSON-based tables under `data/`.
 | Editorial provenance | The Gazetteer and organization overrides can record latest editor/time or review state. | Latest-state fields overwrite history; no append-only semantic change event exists. |
 | Dataset publication | Documentation mentions Dataverse/DOI deposits. | None of the current JSON tables records release version, exact file ID, checksum, retrieval time and license together. |
 | Vocabulary | One JSON-LD SKOS graph contains 45 scheme/concept records with labels, definitions and mappings. | Public concepts are not yet separately retrievable as Linked Art-shaped objects and do not have complete change/source provenance. |
+
+## Structural review after temporal compositions
+
+The temporal-composition work is a useful, evidence-preserving projection, but
+it also demonstrates why the current files should not be treated as one
+coherent canonical model.
+
+### What is stored where
+
+| Layer | Current location | Current responsibility |
+| --- | --- | --- |
+| Raw evidence | `data/06-almanakken.../*.csv` | 22,482 immutable Almanakken rows and their source columns. |
+| Editor aggregate | `data/places-gazetteer.jsonld` | Place authority state plus names, geometry, assertions and 19,483 materialized Almanakken observations. |
+| Organization review | `data/organization-authority-overrides.jsonld` | Latest reviewed E74-to-E25 association choices without a temporal interval. |
+| Aggregate publication | generated `app/lod/database.jsonld` | Full CSV-derived E13 observations, E74 organizations and 202 composition periods. |
+| Per-place publication | generated `app/public/data/place-records/*` | Local projections of evidence attached to one place authority record. |
+| Application index | generated `organization-composition-periods.json` | The same period indexed under every participating organization for UI lookup. |
+
+The aggregate publication is generated from all 22,482 CSV rows. The editor
+Gazetteer contains 19,483 unique materialized rows across 975 place records.
+Consequently, only 198 of the 202 published composition periods can be
+reconstructed from the editor JSON. The four missing periods all describe the
+same composite organization, Q20967226, which is present in the source-derived
+organization graph but not attached through the Gazetteer's physical-place
+materialization.
+
+This is a split source of truth:
+
+- the aggregate can publish organization history that the place editor cannot
+  inspect or correct;
+- a change to the Gazetteer does not necessarily represent all source rows used
+  by publication; and
+- a JSON-only audit cannot reproduce the public graph.
+
+The correct response is not to copy every CSV row into every place record. Raw
+observations should be canonical source entities, while places and
+organizations link to them. The editor can then review any organization
+assertion even when no E25 physical place has been reconciled yet.
+
+### Temporal composition: what is sound
+
+The merged implementation:
+
+- derives 202 organization-level composition periods from exact Almanakken
+  `recordid` observations;
+- requires one composite E74 and at least two distinct component E74
+  organizations;
+- groups only identical compositions in consecutive observed years;
+- breaks a period when a year is missing;
+- records every observation year and evidence URI;
+- records source URIs, a deterministic inference rule and `probable`
+  certainty;
+- does not infer an E81 physical transformation, merger date or dissolution
+  date; and
+- uses local fragment identities for per-place projections so they do not
+  redefine the canonical aggregate period with different evidence URIs.
+
+Using `has_parts` as active composition evidence is conservative and supported
+by the current source. `part_of` also occurs on separate-plantation rows before
+and after a combined period, so treating every `part_of` value as evidence that
+the combination was active would produce false temporal claims.
+
+### Temporal composition: what remains inadequate
+
+| Severity | Problem | Required direction |
+| --- | --- | --- |
+| Critical | The 202 composition periods relate E74 organizations but contain no E25 physical-place or geometry assertion. They are temporal, not spatio-temporal. | Add independently time-scoped organization-to-physical-place associations, then join to time-scoped geometry assertions. |
+| Critical | The editor aggregate cannot reconstruct four published periods and offers no organization-level review workflow for them. | Make source observations addressable independently of the Gazetteer and expose organization assertions in the editor. |
+| High | `organization-authority-overrides.jsonld` stores current E74-to-E25 choices as timeless arrays. | Replace or supplement them with association assertions carrying interval, source, certainty and review provenance. |
+| High | Composition periods are generated summaries with no accept, reject, correct or supersede record. | Add an editorial decision/override entity while retaining the generated candidate and its evidence. |
+| High | Source links stop at generated annual almanac entities or the generic registry entry. | Connect each observation to the exact deposited dataset release and distribution checksum. |
+| Medium | A period URI is derived from participants and first attested year. Backfilling an earlier observation can still change it. | Persist accepted assertion IDs independently of mutable interval boundaries. |
+| Medium | 83 Almanakken rows report only one `has_parts` organization and are conservatively excluded without a dedicated review output. | Publish them as incomplete composition candidates with an explicit exclusion reason. |
+| Medium | The Gazetteer combines authority state, source-row copies, derived summaries, UI fields and latest-edit metadata in one 9,138-record graph with 163 observed field paths. | Separate source observations, editorial assertions and generated projections behind compatibility loaders. |
+
+PR #46 therefore makes time-based organization composition queryable, but it
+does not yet make plantation history fully space–time–source queryable.
+
+### Required spatio-temporal join
+
+The target query path is:
+
+```text
+source observation
+  -> organization composition assertion valid at time T
+  -> organization-place association valid at time T
+  -> E25 physical plantation
+  -> geometry assertion valid at time T
+  -> exact map/source file and dataset release
+```
+
+These are different assertions. A source-reported organizational composition
+must never silently merge E25 identities or geometries. A physical
+transformation or boundary change requires its own evidence and event model.
 
 ## Layered architecture
 
@@ -275,20 +370,24 @@ Existing concept identifiers remain stable even if storage filenames change.
 ## Migration sequence
 
 1. **Inventory (this change).** Keep one generated CSV dictionary per current
-   JSON table and fail review on undocumented new paths.
+   JSON table and generated entity structure, and fail review on undocumented
+   new paths.
 2. **Dataset releases.** Extend the source registry with deposited release and
    exact distribution-file entities; validate identifiers and checksums.
 3. **Editor contracts.** Define JSON Schemas for places, concepts, sources,
    assertions and changes; validate all saves at the API boundary.
 4. **Edit events.** Append semantic change records while retaining
    `modifiedBy`/`modifiedAt` as derived convenience fields.
-5. **Per-object editorial storage.** Split aggregates behind a compatibility
+5. **Temporal associations.** Add reviewed, time-scoped E74-to-E25 association
+   assertions and geometry assertions; expose incomplete composition evidence
+   for review.
+6. **Per-object editorial storage.** Split aggregates behind a compatibility
    loader without changing canonical public IDs.
-6. **Semantic projection.** Generate Linked Art-shaped place and vocabulary
+7. **Semantic projection.** Generate Linked Art-shaped place and vocabulary
    objects alongside the current profile; add fixture and SHACL/profile checks.
-7. **Versioned publication.** Publish build manifests and immutable object-store
+8. **Versioned publication.** Publish build manifests and immutable object-store
    snapshots whose checksums link back to the build.
-8. **Editor cutover.** Move editing to the selected editor host, preserve GitHub
+9. **Editor cutover.** Move editing to the selected editor host, preserve GitHub
    OAuth callback correctness, and keep `data.surinametijdmachine.org` public.
 
 Each phase must be reversible and must preserve old identifiers and evidence.
@@ -304,3 +403,7 @@ Each phase must be reversible and must preserve old identifiers and evidence.
 5. Decide which statement types require first-class assertion records.
 6. Define retention and access rules for editor identities and sensitive change
    history.
+7. Decide whether raw source observations are served from the editor database,
+   immutable object storage, or a generated source-record service.
+8. Define the temporal semantics and review workflow for E74-to-E25
+   organization-place associations.

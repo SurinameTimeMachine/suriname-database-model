@@ -4,12 +4,14 @@ This directory is a reproducible inventory of the JSON data currently stored
 under `data/`. It describes the data as it exists; it is not a claim that every
 field already follows the target semantic model.
 
-The inventory was introduced on 2026-07-27 and currently contains:
+The inventory was introduced on 2026-07-27 and, after the temporal plantation
+composition model was merged, currently contains:
 
-- 16 data tables;
+- 17 current structures;
 - 5 editor-managed JSON-LD authority tables;
 - 11 immutable GeoJSON source snapshots;
-- 375 distinct nested field paths; and
+- 1 generated plantation-composition projection;
+- 392 distinct nested field paths; and
 - a curated description and observed example for every current field path.
 
 [`tables.csv`](tables.csv) is the index. Each indexed table has its own CSV file
@@ -19,12 +21,24 @@ in this directory.
 
 The exporter includes `.json`, `.jsonld`, and `.geojson` files below `data/`.
 It deliberately excludes generated copies below `app/public`, because those are
-publication projections of the same data, and excludes CSV source datasets
-because this inventory is specifically about the current JSON model.
+publication projections rather than additional editable tables.
 
 GeoJSON files are treated as source snapshots. Their original column names and
 values remain visible, but the inventory does not imply that editors should
 modify those files.
+
+One generated structure is included separately:
+[`generated-plantation-composition-periods.csv`](generated-plantation-composition-periods.csv).
+It profiles the 202 `PlantationCompositionPeriod` records generated into
+`app/lod/database.jsonld` from the Almanakken v2 CSV. The CSV source itself is
+not yet exported as a table dictionary.
+
+This exception is necessary: the raw Almanakken file has 22,482 rows, while the
+Gazetteer's materialized JSON retains 19,483 of those observations. Only 198 of
+the 202 generated composition periods can be reconstructed from the Gazetteer
+JSON. A JSON-only inventory would therefore incorrectly omit four published
+periods and hide the fact that the editor and aggregate publication use
+different projections of the source.
 
 ## Dictionary columns
 
@@ -57,11 +71,11 @@ For example, `1885` in a filename does not make a GeoJSON table time-aware.
 
 | Test | Tables passing | Interpretation |
 | --- | ---: | --- |
-| Explicit spatial fields | 13 / 16 | Geometry is comparatively well represented. |
-| Explicit temporal fields | 5 / 16 | Time is uneven and absent from the source snapshots themselves. |
-| Explicit source/evidence fields | 3 / 16 | Most files depend on provenance held elsewhere. |
-| Latest-edit provenance | 2 / 16 | Only part of the editable data records even the latest editor/change time. |
-| Exact dataset release/version | 0 / 16 | No current table closes the chain to a deposited release and exact file checksum. |
+| Explicit spatial fields | 13 / 17 | Geometry is comparatively well represented, but the generated temporal compositions have no spatial relation. |
+| Explicit temporal fields | 6 / 17 | Time is uneven and absent from the GeoJSON source snapshots themselves. |
+| Explicit source/evidence fields | 4 / 17 | Most files depend on provenance held elsewhere. |
+| Latest-edit provenance | 2 / 17 | Only part of the editable data records even the latest editor/change time. |
+| Exact dataset release/version | 0 / 17 | No current structure closes the chain to a deposited release and exact file checksum. |
 
 This does not mean every table should contain every dimension. It means every
 published assertion must be able to reach its spatial target, temporal scope,
