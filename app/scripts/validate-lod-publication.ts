@@ -173,6 +173,12 @@ async function main() {
   const placeFunctions = JSON.parse(
     readArtifact(PUBLIC_DATA_DIR, 'place-functions.json').toString('utf-8'),
   ) as PlaceFunctionsDocument;
+  const organizationCompositionPeriods = JSON.parse(
+    readArtifact(
+      PUBLIC_DATA_DIR,
+      'organization-composition-periods.json',
+    ).toString('utf-8'),
+  ) as Record<string, Array<Record<string, unknown>>>;
   const organizationOverrides = JSON.parse(
     readArtifact(DATA_DIR, 'organization-authority-overrides.jsonld').toString(
       'utf-8',
@@ -733,6 +739,28 @@ async function main() {
       typeof projection.type === 'string',
       `Authority record ${recordId} has no structural type projection`,
     );
+    const recordUri = `${CANONICAL_BASE}place/${recordId}`;
+    for (const period of graph.filter((entity) =>
+      toArray(entity['@type'] as string | string[]).includes(
+        'stm:PlantationCompositionPeriod',
+      ),
+    )) {
+      const periodId = String(period['@id']);
+      const timeSpanId = String(period.P4_has_time_span);
+      const evidenceIds = toArray(
+        period['prov:wasDerivedFrom'] as string | string[],
+      );
+      assert(
+        periodId.startsWith(`${recordUri}#composition-`) &&
+          timeSpanId.startsWith(`${recordUri}#composition-`) &&
+          graph.some((entity) => entity['@id'] === timeSpanId) &&
+          evidenceIds.length > 0 &&
+          evidenceIds.every((id) =>
+            id.startsWith(`${recordUri}#observation-almanakken-`),
+          ),
+        `Authority record ${recordId} has a composition period with non-local identity or evidence`,
+      );
+    }
     const structuralTypeUri = `${CANONICAL_BASE}vocabulary/place-type/${projection.type}`;
     const typedSubject = graph.find((entity) =>
       toArray(entity.P2_has_type as string | string[] | undefined).includes(
@@ -1003,6 +1031,106 @@ async function main() {
       `Aggregate Almanakken observation targets a non-E74 entity ${targetId}`,
     );
   }
+  const compositionPeriods = document['@graph'].filter((entity) =>
+    toArray(entity['@type'] as string | string[]).includes(
+      'PlantationCompositionPeriod',
+    ),
+  );
+  assert(
+    compositionPeriods.length > 0,
+    'Aggregate JSON-LD has no time-based plantation composition periods',
+  );
+  for (const period of compositionPeriods) {
+    const periodId = String(period['@id']);
+    const composite = period.P140_assigned_attribute_to;
+    const components = toArray(
+      period.reportedComponentOrganization as string | string[],
+    );
+    const evidenceUris = toArray(period.wasDerivedFrom as string | string[]);
+    const observationYears = toArray(
+      period.observationYears as number | number[],
+    );
+    assert(
+      typeof composite === 'string' &&
+        toArray(
+          aggregateEntitiesById.get(composite)?.['@type'] as
+            | string
+            | string[],
+        ).includes('E74_Group'),
+      `${periodId} has no valid composite E74 organization`,
+    );
+    assert(
+      components.length >= 2 &&
+        new Set(components).size === components.length &&
+        !components.includes(String(composite)) &&
+        components.every((uri) =>
+          toArray(
+            aggregateEntitiesById.get(uri)?.['@type'] as string | string[],
+          ).includes('E74_Group'),
+        ),
+      `${periodId} must identify at least two distinct component E74 organizations`,
+    );
+    assert(
+      Number.isInteger(period.firstAttestedYear) &&
+        Number.isInteger(period.lastAttestedYear) &&
+        Number(period.firstAttestedYear) <= Number(period.lastAttestedYear) &&
+        observationYears[0] === period.firstAttestedYear &&
+        observationYears.at(-1) === period.lastAttestedYear &&
+        observationYears.every(
+          (year, index) =>
+            index === 0 || year === Number(observationYears[index - 1]) + 1,
+        ),
+      `${periodId} has an invalid or non-consecutive attested interval`,
+    );
+    assert(
+      evidenceUris.length >= observationYears.length &&
+        evidenceUris.every((uri) => {
+          const observation = aggregateEntitiesById.get(uri);
+          return (
+            observation?.P140_assigned_attribute_to === composite &&
+            components.every((component) =>
+              toArray(
+                observation.reportedComponentOrganization as
+                  | string
+                  | string[],
+              ).includes(component),
+            )
+          );
+        }) &&
+        observationYears.every((year) =>
+          evidenceUris.some(
+            (uri) =>
+              Number(aggregateEntitiesById.get(uri)?.observationYear) === year,
+          ),
+        ),
+      `${periodId} is not backed by matching annual source observations`,
+    );
+    assert(
+      period.P123_resulted_in == null &&
+        period.P124_transformed == null &&
+        !toArray(period['@type'] as string | string[]).includes(
+          'E81_Transformation',
+        ),
+      `${periodId} incorrectly asserts a physical transformation`,
+    );
+    for (const participant of [composite, ...components]) {
+      assert(
+        (organizationCompositionPeriods[String(participant)] ?? []).some(
+          (indexedPeriod) => indexedPeriod['@id'] === period['@id'],
+        ),
+        `${periodId} is missing from a participant organization index`,
+      );
+    }
+  }
+  const waterlandComposition = aggregateEntitiesById.get(
+    `${CANONICAL_BASE}organization-composition/q59134062-q124812970-q59134059-1828`,
+  );
+  assert(
+    waterlandComposition &&
+      waterlandComposition.firstAttestedYear === 1828 &&
+      waterlandComposition.lastAttestedYear === 1831,
+    'Waterland and Adrichem 1828-1831 composition period is missing',
+  );
   const inferredPresence = document['@graph'].filter((entity) =>
     toArray(entity['@type'] as string | string[]).includes('PresenceInference'),
   );
