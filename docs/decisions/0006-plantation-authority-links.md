@@ -152,7 +152,10 @@ when substantial physical continuity and replacement are documented.
   merge review workflow distinguishes duplicate E25 records from multiple valid
   physical plantations associated with the same E74. A reviewer may merge the
   former or persist `confirmed-multiple` with the exact reviewed Gazetteer IDs
-  for the latter. The decision becomes stale when that active ID set changes.
+  for the latter. `associatedPhysicalPlaceIds` records which reviewed E25
+  records are connected to the E74; unchecked records retain their source QID
+  as matching evidence but are not published as organization associations. The
+  decision becomes stale when the active reviewed ID set changes.
 - Almanakken v2 is the sole source dataset. Its QIDs drive E74 observation
   targets but never silently rewrite curated Gazetteer authority links; the old
   cross-version comparison is not a research review task.

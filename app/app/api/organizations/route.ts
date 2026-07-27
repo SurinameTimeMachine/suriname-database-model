@@ -1,4 +1,5 @@
 import { hasRepoAccess, readRepoFile, writeRepoFile } from '@/lib/github';
+import { normalizePhysicalPlaceIds } from '@/lib/physical-organization-links';
 import { getSessionToken } from '@/lib/session';
 import type { OrganizationAuthorityOverride } from '@/lib/types';
 import { NextRequest, NextResponse } from 'next/server';
@@ -56,6 +57,20 @@ export async function GET(request: NextRequest) {
     (plantation) =>
       plantation.hasOrganizationalAssociation === organizationUri,
   );
+  const associationStatusByPlaceId = new Map(
+    (indexes.mapFeatures.features ?? []).flatMap((feature) => {
+      const properties = feature.properties ?? {};
+      return typeof properties.stmId === 'string' &&
+        typeof properties.organizationAssociationStatus === 'string'
+        ? [
+            [
+              properties.stmId,
+              properties.organizationAssociationStatus,
+            ] as const,
+          ]
+        : [];
+    }),
+  );
   const gazetteerPlantations = (indexes.gazetteer['@graph'] ?? [])
     .filter((entry) => {
       if (entry.type !== 'plantation' || entry.deprecated || entry.mergedInto) {
@@ -82,7 +97,8 @@ export async function GET(request: NextRequest) {
       return {
         id: entry.id,
         prefLabel: String(preferred ?? qid),
-        associationStatus: 'linked',
+        associationStatus:
+          associationStatusByPlaceId.get(String(entry.id)) ?? 'linked',
         diklandRefs: Array.isArray(entry.diklandRefs)
           ? entry.diklandRefs
           : [],
@@ -210,6 +226,9 @@ export async function POST(request: NextRequest) {
     if (existing?.reviewedPhysicalPlaceIds?.length) {
       entry.reviewedPhysicalPlaceIds = existing.reviewedPhysicalPlaceIds;
     }
+    if (existing?.associatedPhysicalPlaceIds?.length) {
+      entry.associatedPhysicalPlaceIds = existing.associatedPhysicalPlaceIds;
+    }
     if (existingIndex >= 0) entries[existingIndex] = entry;
     else entries.push(entry);
     entries.sort((a, b) => a.qid.localeCompare(b.qid, undefined, { numeric: true }));
@@ -255,9 +274,11 @@ export async function PATCH(request: NextRequest) {
   if (auth.error) return auth.error;
   const raw = (await request.json()) as Record<string, unknown>;
   const qid = typeof raw.qid === 'string' ? raw.qid.trim().toUpperCase() : '';
-  const requestedPlaceIds = Array.isArray(raw.placeIds)
-    ? [...new Set(raw.placeIds.map(String).map((id) => id.trim()).filter(Boolean))].sort()
-    : [];
+  const requestedPlaceIds = normalizePhysicalPlaceIds(raw.placeIds);
+  const reviewedPlaceIds =
+    raw.reviewedPlaceIds == null
+      ? requestedPlaceIds
+      : normalizePhysicalPlaceIds(raw.reviewedPlaceIds);
   if (!/^Q\d+$/.test(qid) || requestedPlaceIds.length < 2) {
     return NextResponse.json(
       {
@@ -289,13 +310,22 @@ export async function PATCH(request: NextRequest) {
       )
       .map((entry) => String(entry.id))
       .sort();
-    if (activePlaceIds.join('\u0000') !== requestedPlaceIds.join('\u0000')) {
+    if (activePlaceIds.join('\u0000') !== reviewedPlaceIds.join('\u0000')) {
       return NextResponse.json(
         {
           error:
-            'The selected records no longer match all active physical plantations for this organization. Reload and review the current set.',
+            'The reviewed records no longer match all active physical plantations for this organization. Reload and review the current set.',
         },
         { status: 409 },
+      );
+    }
+    if (requestedPlaceIds.some((id) => !activePlaceIds.includes(id))) {
+      return NextResponse.json(
+        {
+          error:
+            'Every selected plantation must belong to the reviewed organization set.',
+        },
+        { status: 400 },
       );
     }
 
@@ -318,6 +348,7 @@ export async function PATCH(request: NextRequest) {
     };
     entry.physicalLinkReviewStatus = 'confirmed-multiple';
     entry.reviewedPhysicalPlaceIds = activePlaceIds;
+    entry.associatedPhysicalPlaceIds = requestedPlaceIds;
     if (existingIndex >= 0) entries[existingIndex] = entry;
     else entries.push(entry);
     entries.sort((a, b) => a.qid.localeCompare(b.qid, undefined, { numeric: true }));
@@ -328,7 +359,7 @@ export async function PATCH(request: NextRequest) {
       overridesPath,
       JSON.stringify(document, null, 2),
       overrideFile.sha,
-      `Confirm multiple physical plantations for ${qid}`,
+      `Select physical plantations for ${qid}`,
     );
     return NextResponse.json({
       ok: true,

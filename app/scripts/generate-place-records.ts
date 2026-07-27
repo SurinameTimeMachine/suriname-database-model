@@ -21,12 +21,20 @@ import {
   PLACE_FUNCTION_SCHEME_URI,
   relatedPlaceType,
 } from '../lib/place-functions';
+import {
+  type PhysicalLinkReviewFields,
+  resolveConfirmedPhysicalLinkReviews,
+} from '../lib/physical-organization-links';
 
 import { BASE, buildPlaceRecordContext } from './lod-context';
 
 const DATA_DIR = join(__dirname, '../../data');
 const OUT_DIR = join(__dirname, '../public/data/place-records');
 const GAZETTEER_PATH = join(DATA_DIR, 'places-gazetteer.jsonld');
+const ORGANIZATION_OVERRIDES_PATH = join(
+  DATA_DIR,
+  'organization-authority-overrides.jsonld',
+);
 const THESAURUS_PATH = join(DATA_DIR, 'place-types-thesaurus.jsonld');
 const SOURCES_PATH = join(DATA_DIR, 'sources-registry.jsonld');
 
@@ -257,6 +265,42 @@ function statusCertainty(status: string): string {
 
 export function generatePlaceRecords() {
   const gazetteer = readGraph(GAZETTEER_PATH) as GazetteerEntry[];
+  const organizationOverrides = new Map(
+    (
+      (existsSync(ORGANIZATION_OVERRIDES_PATH)
+        ? readGraph(ORGANIZATION_OVERRIDES_PATH)
+        : []) as Array<PhysicalLinkReviewFields & { qid?: string }>
+    )
+      .filter((entry) => typeof entry.qid === 'string')
+      .map((entry) => [entry.qid!, entry]),
+  );
+  const plantationCandidatesByQid = new Map<string, GazetteerEntry[]>();
+  for (const entry of gazetteer) {
+    if (!entry.id || entry.deprecated || entry.mergedInto) continue;
+    const qid =
+      entry.type === 'plantation'
+        ? entry.externalLinks?.find(
+            (link) =>
+              link.authority === 'wikidata' &&
+              typeof link.identifier === 'string' &&
+              /^Q\d+$/.test(link.identifier),
+          )?.identifier
+        : undefined;
+    if (!qid) continue;
+    plantationCandidatesByQid.set(qid, [
+      ...(plantationCandidatesByQid.get(qid) ?? []),
+      entry,
+    ]);
+  }
+  const confirmedPhysicalLinks = resolveConfirmedPhysicalLinkReviews(
+    organizationOverrides,
+    new Map(
+      [...plantationCandidatesByQid.entries()].map(([qid, entries]) => [
+        qid,
+        entries.map((entry) => ({ id: entry.id!, fid: entry.fid })),
+      ]),
+    ),
+  );
   const thesaurus = readGraph(THESAURUS_PATH);
   const sources = readGraph(SOURCES_PATH);
   const crmByPlaceType = new Map(
@@ -302,6 +346,9 @@ export function generatePlaceRecords() {
       qid: string,
       organizationLabel?: string,
       physicalPlantationUri?: string,
+      associationStatus:
+        | 'linked'
+        | 'needs-physical-link-review' = 'linked',
     ): string => {
       const uri = organizationUri(qid);
       let organization = organizationNodes.get(qid);
@@ -323,7 +370,7 @@ export function generatePlaceRecords() {
       }
       if (physicalPlantationUri) {
         organization.associatedPhysicalPlantation = physicalPlantationUri;
-        organization.organizationAssociationStatus = 'linked';
+        organization.organizationAssociationStatus = associationStatus;
       }
       return uri;
     };
@@ -377,12 +424,24 @@ export function generatePlaceRecords() {
         'prov:wasDerivedFrom': [...sourceUris],
       };
       if (plantationQid) {
-        feature.hasOrganizationalAssociation = ensureOrganization(
-          plantationQid,
-          label,
-          featureUri,
-        );
-        feature.organizationAssociationStatus = 'linked';
+        const confirmedReview = confirmedPhysicalLinks.get(plantationQid);
+        const associationStatus =
+          confirmedReview && entry.id
+            ? confirmedReview.associatedPlaceIds.has(entry.id)
+              ? 'linked'
+              : 'needs-organization-link'
+            : (plantationCandidatesByQid.get(plantationQid)?.length ?? 0) > 1
+              ? 'needs-physical-link-review'
+              : 'linked';
+        if (associationStatus !== 'needs-organization-link') {
+          feature.hasOrganizationalAssociation = ensureOrganization(
+            plantationQid,
+            label,
+            featureUri,
+            associationStatus,
+          );
+        }
+        feature.organizationAssociationStatus = associationStatus;
       } else if (entry.type === 'plantation') {
         feature.organizationAssociationStatus = 'needs-organization-link';
       }

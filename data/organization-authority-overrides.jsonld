@@ -11,6 +11,7 @@
     "reviewStatus": "stm:authorityReviewStatus",
     "physicalLinkReviewStatus": "stm:physicalLinkReviewStatus",
     "reviewedPhysicalPlaceIds": "stm:reviewedPhysicalPlaceId",
+    "associatedPhysicalPlaceIds": "stm:associatedPhysicalPlaceId",
     "modifiedAt": {
       "@id": "dcterms:modified",
       "@type": "xsd:date"

@@ -881,9 +881,8 @@ async function main() {
       `Explore plantation ${String(properties.stmId)} has no association review status`,
     );
     assert(
-      typeof properties.wikidataQid === 'string'
-        ? status !== 'needs-organization-link'
-        : status === 'needs-organization-link',
+      typeof properties.wikidataQid === 'string' ||
+        status === 'needs-organization-link',
       `Explore plantation ${String(properties.stmId)} has inconsistent QID and association status`,
     );
   }
@@ -923,6 +922,18 @@ async function main() {
           (id) => typeof id === 'string' && /^stm-[a-z0-9-]+$/.test(id),
         ),
         `Organization override ${qid} has an invalid reviewed place ID`,
+      );
+      const associatedIds =
+        override.associatedPhysicalPlaceIds == null
+          ? reviewedIds
+          : Array.isArray(override.associatedPhysicalPlaceIds)
+            ? override.associatedPhysicalPlaceIds
+            : [];
+      assert(
+        associatedIds.length >= 2 &&
+          new Set(associatedIds).size === associatedIds.length &&
+          associatedIds.every((id) => reviewedIds.includes(id)),
+        `Organization override ${qid} has an invalid associated place selection`,
       );
     }
     overrideQids.add(qid);
@@ -1111,6 +1122,11 @@ async function main() {
             organization.associatedPhysicalPlantation as string | string[],
           ).includes(feature['@id'] as string),
         `Authority record ${id} has a non-reciprocal E25-E74 association`,
+      );
+      assert(
+        organization.organizationAssociationStatus ===
+          feature.organizationAssociationStatus,
+        `Authority record ${id} has inconsistent E25-E74 association status`,
       );
     }
   }
