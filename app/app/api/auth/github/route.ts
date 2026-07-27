@@ -11,11 +11,14 @@ export async function GET(request: NextRequest) {
   }
 
   const returnTo = request.nextUrl.searchParams.get('returnTo') || '/places';
+  const baseUrl = (
+    process.env.NEXT_PUBLIC_BASE_URL || request.nextUrl.origin
+  ).replace(/\/+$/, '');
 
   const params = new URLSearchParams({
     client_id: clientId,
     scope: 'repo',
-    redirect_uri: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/auth/callback`,
+    redirect_uri: `${baseUrl}/api/auth/callback`,
     state: returnTo,
   });
 
