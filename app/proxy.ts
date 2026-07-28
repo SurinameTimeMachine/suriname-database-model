@@ -38,6 +38,8 @@ export function proxy(request: NextRequest) {
     if (extension || wantsJsonLd) {
       const url = new URL(`/api/resource/${path}`, request.url);
       url.searchParams.set('format', extension === 'json' ? 'json' : 'jsonld');
+      const profile = request.nextUrl.searchParams.get('profile');
+      if (profile) url.searchParams.set('profile', profile);
       return NextResponse.rewrite(url);
     }
   }

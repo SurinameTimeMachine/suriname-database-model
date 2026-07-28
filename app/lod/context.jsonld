@@ -12,6 +12,7 @@
     "sdo": "https://schema.org/",
     "xsd": "http://www.w3.org/2001/XMLSchema#",
     "dcterms": "http://purl.org/dc/terms/",
+    "owl": "http://www.w3.org/2002/07/owl#",
     "oa": "http://www.w3.org/ns/oa#",
     "picom": "https://personsincontext.org/model#",
     "picot": "https://personsincontext.org/thesaurus#",
@@ -20,6 +21,11 @@
     "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
     "hdsc": "https://data.colonialheritage.nl/ontology/",
     "ed": "https://lod.enslaved.org/wiki/",
+    "id": "@id",
+    "type": "@type",
+    "_label": "rdfs:label",
+    "Concept": "skos:Concept",
+    "ConceptScheme": "skos:ConceptScheme",
     "Plantation": "crm:E25_Human-Made_Feature",
     "OrganizationObservation": "crm:E13_Attribute_Assignment",
     "ProvenanceRecord": "prov:Entity",
@@ -192,6 +198,36 @@
     },
     "prefLabel": "skos:prefLabel",
     "altLabel": "skos:altLabel",
+    "definition": "skos:definition",
+    "example": "skos:example",
+    "hiddenLabel": "skos:hiddenLabel",
+    "scopeNote": "skos:scopeNote",
+    "historyNote": "skos:historyNote",
+    "broader": {
+      "@id": "skos:broader",
+      "@type": "@id"
+    },
+    "narrower": {
+      "@id": "skos:narrower",
+      "@type": "@id"
+    },
+    "related": {
+      "@id": "skos:related",
+      "@type": "@id"
+    },
+    "inScheme": {
+      "@id": "skos:inScheme",
+      "@type": "@id"
+    },
+    "topConceptOf": {
+      "@id": "skos:topConceptOf",
+      "@type": "@id"
+    },
+    "hasTopConcept": {
+      "@id": "skos:hasTopConcept",
+      "@type": "@id"
+    },
+    "notation": "skos:notation",
     "closeMatch": {
       "@id": "skos:closeMatch",
       "@type": "@id"
@@ -211,6 +247,54 @@
     "relatedMatch": {
       "@id": "skos:relatedMatch",
       "@type": "@id"
+    },
+    "typeId": {
+      "@id": "stm:typeId",
+      "@type": "xsd:string"
+    },
+    "color": {
+      "@id": "stm:color",
+      "@type": "xsd:string"
+    },
+    "crmClass": {
+      "@id": "stm:crmClass",
+      "@type": "xsd:string"
+    },
+    "crmBadge": {
+      "@id": "stm:crmBadge",
+      "@type": "xsd:string"
+    },
+    "sortOrder": {
+      "@id": "stm:sortOrder",
+      "@type": "xsd:integer"
+    },
+    "created": {
+      "@id": "dcterms:created",
+      "@type": "xsd:date"
+    },
+    "modified": {
+      "@id": "dcterms:modified",
+      "@type": "xsd:date"
+    },
+    "deprecated": {
+      "@id": "owl:deprecated",
+      "@type": "xsd:boolean"
+    },
+    "deprecatedAt": {
+      "@id": "prov:invalidatedAtTime",
+      "@type": "xsd:date"
+    },
+    "deprecatedBy": {
+      "@id": "stm:deprecatedBy",
+      "@type": "xsd:string"
+    },
+    "replacedBy": {
+      "@id": "dcterms:isReplacedBy",
+      "@type": "@id"
+    },
+    "deprecationNote": {
+      "@id": "stm:deprecationNote",
+      "@type": "xsd:string"
     },
     "hasOrganizationalAssociation": {
       "@id": "stm:hasOrganizationalAssociation",
