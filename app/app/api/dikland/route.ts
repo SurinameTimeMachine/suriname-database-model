@@ -2,7 +2,17 @@ import { hasRepoAccess, readRepoFile, writeRepoFile } from '@/lib/github';
 import { getSessionToken } from '@/lib/session';
 import { NextRequest, NextResponse } from 'next/server';
 
-const DIKLAND_PATH = 'data/dikland-collection.jsonld';
+const REGISTRY_PATH = 'data/sources-registry.jsonld';
+const DIKLAND_COLLECTION =
+  'https://data.surinametijdmachine.org/source/dikland-collection';
+
+function isDiklandItem(entry: Record<string, unknown>): boolean {
+  return (
+    entry.formsPartOf === DIKLAND_COLLECTION &&
+    typeof entry.sourceId === 'string' &&
+    entry.sourceId.startsWith('dikland/')
+  );
+}
 
 async function authorize(): Promise<
   | { token: string; error?: undefined }
@@ -49,14 +59,14 @@ export async function DELETE(request: NextRequest) {
   }
 
   try {
-    const { content, sha } = await readRepoFile(token, DIKLAND_PATH);
+    const { content, sha } = await readRepoFile(token, REGISTRY_PATH);
     const jsonld = JSON.parse(content);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const graph: any[] = jsonld['@graph'] || [];
 
     const idx = graph.findIndex(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (e: any) => e.sourceId === sourceId,
+      (e: any) => e.sourceId === sourceId && isDiklandItem(e),
     );
 
     if (idx < 0) {
@@ -93,7 +103,7 @@ export async function DELETE(request: NextRequest) {
 
     await writeRepoFile(
       token,
-      DIKLAND_PATH,
+      REGISTRY_PATH,
       JSON.stringify(jsonld, null, 2) + '\n',
       sha,
       `Deprecate Dikland entry: ${label} (id: ${sourceId})`,
