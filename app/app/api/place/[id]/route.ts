@@ -1,5 +1,9 @@
 import { readFile } from 'fs/promises';
 import { join } from 'path';
+import {
+  buildGlobalisePlaceObject,
+  type PlaceRecordDocument,
+} from '@/lib/place-profile';
 import { NextRequest, NextResponse } from 'next/server';
 
 const PLACE_ID = /^stm-[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -23,6 +27,13 @@ export async function GET(
     return NextResponse.json({ error: 'Unknown place identifier' }, { status: 404 });
   }
 
+  const profile = request.nextUrl.searchParams.get('profile');
+  if (profile && profile !== 'globalise') {
+    return NextResponse.json(
+      { error: `Unknown linked-data profile: ${profile}` },
+      { status: 400 },
+    );
+  }
   const requestedUrl = request.url;
   const format =
     request.nextUrl.searchParams.get('format') === 'json' ||
@@ -42,23 +53,39 @@ export async function GET(
     mergedInto = undefined;
   }
   if (mergedInto && PLACE_ID.test(mergedInto)) {
-    return NextResponse.redirect(new URL(`/place/${mergedInto}.${format}`, request.url), 308);
+    const redirectUrl = new URL(`/place/${mergedInto}.${format}`, request.url);
+    if (profile) redirectUrl.searchParams.set('profile', profile);
+    return NextResponse.redirect(redirectUrl, 308);
   }
 
   try {
+    const sourceFormat = profile === 'globalise' ? 'jsonld' : format;
     const recordResponse = await fetch(
-      new URL(`/data/place-records/${id}.${format}`, request.url),
+      new URL(`/data/place-records/${id}.${sourceFormat}`, request.url),
       { signal: AbortSignal.timeout(10_000) },
     );
     if (!recordResponse.ok) throw new Error('Record not found');
-    const body = await recordResponse.text();
+    const sourceBody = await recordResponse.text();
+    const body =
+      profile === 'globalise'
+        ? `${JSON.stringify(
+            buildGlobalisePlaceObject(
+              JSON.parse(sourceBody) as PlaceRecordDocument,
+            ),
+            null,
+            2,
+          )}\n`
+        : sourceBody;
     return new NextResponse(body, {
       headers: {
         'Content-Type':
           format === 'jsonld'
             ? 'application/ld+json; charset=utf-8'
             : 'application/json; charset=utf-8',
-        Link: `<${CANONICAL_BASE}/place/${id}>; rel="canonical"`,
+        Link: [
+          `<${CANONICAL_BASE}/place/${id}>; rel="canonical"`,
+          `<${CANONICAL_BASE}/place/${id}.jsonld?profile=globalise>; rel="alternate"; type="application/ld+json"`,
+        ].join(', '),
         Vary: 'Accept',
       },
     });

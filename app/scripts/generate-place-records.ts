@@ -553,6 +553,7 @@ export function generatePlaceRecords() {
     if (nameUris.length > 0) {
       const subject = graph.find((entity) => entity['@id'] === targetUri);
       if (subject) subject.P1_is_identified_by = nameUris;
+      if (hasFeature) location.P1_is_identified_by = nameUris;
     }
 
     const evidenceUris: string[] = [];

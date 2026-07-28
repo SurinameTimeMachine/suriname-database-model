@@ -18,6 +18,8 @@ export function proxy(request: NextRequest) {
     const [, id, extension] = extensionMatch;
     const url = new URL(`/api/place/${id}`, request.url);
     url.searchParams.set('format', extension === 'json' ? 'json' : 'jsonld');
+    const profile = request.nextUrl.searchParams.get('profile');
+    if (profile) url.searchParams.set('profile', profile);
     return NextResponse.rewrite(url);
   }
 
@@ -26,7 +28,10 @@ export function proxy(request: NextRequest) {
     request.headers.get('accept')?.includes('application/ld+json')
   ) {
     const id = pathname.split('/').pop()!;
-    return NextResponse.rewrite(new URL(`/api/place/${id}`, request.url));
+    const url = new URL(`/api/place/${id}`, request.url);
+    const profile = request.nextUrl.searchParams.get('profile');
+    if (profile) url.searchParams.set('profile', profile);
+    return NextResponse.rewrite(url);
   }
 
   const resourceMatch = pathname.match(RESOURCE_PATH);
