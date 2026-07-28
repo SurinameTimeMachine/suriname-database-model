@@ -1,5 +1,5 @@
 export const placeProfileContext =
-  'https://data.surinametijdmachine.org/data/context.jsonld';
+  'https://data.surinametijdmachine.org/data/context/stm-v1.jsonld';
 
 type JsonObject = Record<string, unknown>;
 
@@ -90,12 +90,12 @@ function assignment(
     ...(typeValue(node['@type']) ? { type: typeValue(node['@type']) } : {}),
   };
   const classification = references(node.P2_has_type, nodeById, 'Type');
-  const assignedAttribute = references(node.P141_assigned, nodeById);
+  const assigned = references(node.P141_assigned, nodeById);
   const assignedType = references(node.P42_assigned, nodeById, 'Type');
   const evidence = references(node['prov:hadPrimarySource'], nodeById);
   const derivedFrom = references(node['prov:wasDerivedFrom'], nodeById);
   if (classification.length > 0) result.classified_as = classification;
-  if (assignedAttribute.length > 0) result.assigned_attribute = assignedAttribute;
+  if (assigned.length > 0) result.assigned = assigned;
   if (assignedType.length > 0) result.assigned_type = assignedType;
   if (spanId) {
     result.timespan = {
@@ -232,14 +232,14 @@ function compactFeature(
  * Project a generated STM authority-record graph to a single-root Place
  * object. All nested entities retain their existing identifiers.
  */
-export function buildGlobalisePlaceObject(
+export function buildReadablePlaceObject(
   document: PlaceRecordDocument,
   context = placeProfileContext,
 ): JsonObject {
   const pageId = firstString(document['@id']);
   const graph = document['@graph'] ?? [];
   if (!pageId || graph.length === 0) {
-    throw new Error('The GLOBALISE place profile requires a place record graph');
+    throw new Error('The readable Place profile requires a place record graph');
   }
 
   const nodeById = new Map(
@@ -296,17 +296,26 @@ export function buildGlobalisePlaceObject(
       firstString(feature?.['rdfs:label']) ??
       firstString(record?.['rdfs:label']) ??
       pageId,
-    documented_by: {
-      id: `${pageId}#record`,
-      type: 'AuthorityRecord',
-      ...(firstString(record?.['rdfs:label'])
-        ? { _label: firstString(record?.['rdfs:label']) }
-        : {}),
-    },
+    documented_by: [
+      {
+        id: `${pageId}#record`,
+        type: 'AuthorityRecord',
+        ...(firstString(record?.['rdfs:label'])
+          ? { _label: firstString(record?.['rdfs:label']) }
+          : {}),
+      },
+    ],
   };
   if (structuralTypes.length > 0) result.classified_as = structuralTypes;
   if (names.length + identifiers.length > 0) {
     result.identified_by = [...names, ...identifiers];
+  }
+  const descriptions = strings(location.P3_has_note);
+  if (descriptions.length > 0) {
+    result.referred_to_by = descriptions.map((content) => ({
+      type: 'LinguisticObject',
+      content,
+    }));
   }
   const geometryWkt = wkt(geometryId ? nodeById.get(geometryId) : undefined);
   if (geometryWkt) result.defined_by = geometryWkt;

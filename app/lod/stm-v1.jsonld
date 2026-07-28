@@ -1,0 +1,230 @@
+{
+  "@context": [
+    "https://linked.art/ns/v1/linked-art.json",
+    {
+      "@version": 1.1,
+      "stm": {
+        "@id": "https://data.surinametijdmachine.org/",
+        "@prefix": true
+      },
+      "crm": {
+        "@id": "http://www.cidoc-crm.org/cidoc-crm/",
+        "@prefix": true
+      },
+      "dcterms": {
+        "@id": "http://purl.org/dc/terms/",
+        "@prefix": true
+      },
+      "geo": {
+        "@id": "http://www.opengis.net/ont/geosparql#",
+        "@prefix": true
+      },
+      "owl": {
+        "@id": "http://www.w3.org/2002/07/owl#",
+        "@prefix": true
+      },
+      "prov": {
+        "@id": "http://www.w3.org/ns/prov#",
+        "@prefix": true
+      },
+      "skos": {
+        "@id": "http://www.w3.org/2004/02/skos/core#",
+        "@prefix": true
+      },
+      "xsd": {
+        "@id": "http://www.w3.org/2001/XMLSchema#",
+        "@prefix": true
+      },
+      "AuthorityRecord": "stm:AuthorityRecord",
+      "Concept": "skos:Concept",
+      "ConceptScheme": "skos:ConceptScheme",
+      "Geometry": "geo:Geometry",
+      "HumanMadeFeature": "crm:E25_Human-Made_Feature",
+      "PhysicalFeature": "crm:E26_Physical_Feature",
+      "documented_by": {
+        "@id": "crm:P70i_is_documented_in",
+        "@type": "@id",
+        "@container": "@set"
+      },
+      "centroid": {
+        "@id": "geo:hasCentroid",
+        "@type": "@id"
+      },
+      "as_wkt": {
+        "@id": "geo:asWKT",
+        "@type": "geo:wktLiteral"
+      },
+      "related_features": {
+        "@id": "crm:P53i_is_former_or_current_location_of",
+        "@type": "@id",
+        "@container": "@set"
+      },
+      "derived_from": {
+        "@id": "prov:wasDerivedFrom",
+        "@type": "@id",
+        "@container": "@set"
+      },
+      "evidence": {
+        "@id": "prov:hadPrimarySource",
+        "@type": "@id",
+        "@container": "@set"
+      },
+      "associated_organizations": {
+        "@id": "stm:hasOrganizationalAssociation",
+        "@type": "@id",
+        "@container": "@set"
+      },
+      "organization_association_status": {
+        "@id": "stm:organizationAssociationStatus"
+      },
+      "certainty": {
+        "@id": "stm:certainty",
+        "@type": "@id"
+      },
+      "begin_of_the_begin": {
+        "@id": "crm:P82a_begin_of_the_begin",
+        "@type": "xsd:gYear"
+      },
+      "end_of_the_end": {
+        "@id": "crm:P82b_end_of_the_end",
+        "@type": "xsd:gYear"
+      },
+      "standardized_content": "stm:standardizedContent",
+      "source_content": "stm:sourceContent",
+      "source_row": "dcterms:identifier",
+      "exact_match": {
+        "@id": "skos:exactMatch",
+        "@type": "@id",
+        "@container": "@set"
+      },
+      "close_match": {
+        "@id": "skos:closeMatch",
+        "@type": "@id",
+        "@container": "@set"
+      },
+      "broad_match": {
+        "@id": "skos:broadMatch",
+        "@type": "@id",
+        "@container": "@set"
+      },
+      "narrow_match": {
+        "@id": "skos:narrowMatch",
+        "@type": "@id",
+        "@container": "@set"
+      },
+      "related_match": {
+        "@id": "skos:relatedMatch",
+        "@type": "@id",
+        "@container": "@set"
+      },
+      "prefLabel": {
+        "@id": "skos:prefLabel",
+        "@container": "@set"
+      },
+      "altLabel": {
+        "@id": "skos:altLabel",
+        "@container": "@set"
+      },
+      "definition": {
+        "@id": "skos:definition",
+        "@container": "@set"
+      },
+      "editorialNote": {
+        "@id": "skos:editorialNote",
+        "@container": "@set"
+      },
+      "example": {
+        "@id": "skos:example",
+        "@container": "@set"
+      },
+      "hiddenLabel": {
+        "@id": "skos:hiddenLabel",
+        "@container": "@set"
+      },
+      "scopeNote": {
+        "@id": "skos:scopeNote",
+        "@container": "@set"
+      },
+      "historyNote": {
+        "@id": "skos:historyNote",
+        "@container": "@set"
+      },
+      "broader": {
+        "@id": "skos:broader",
+        "@type": "@id",
+        "@container": "@set"
+      },
+      "narrower": {
+        "@id": "skos:narrower",
+        "@type": "@id",
+        "@container": "@set"
+      },
+      "related": {
+        "@id": "skos:related",
+        "@type": "@id",
+        "@container": "@set"
+      },
+      "inScheme": {
+        "@id": "skos:inScheme",
+        "@type": "@id",
+        "@container": "@set"
+      },
+      "topConceptOf": {
+        "@id": "skos:topConceptOf",
+        "@type": "@id",
+        "@container": "@set"
+      },
+      "hasTopConcept": {
+        "@id": "skos:hasTopConcept",
+        "@type": "@id",
+        "@container": "@set"
+      },
+      "exactMatch": {
+        "@id": "skos:exactMatch",
+        "@type": "@id",
+        "@container": "@set"
+      },
+      "closeMatch": {
+        "@id": "skos:closeMatch",
+        "@type": "@id",
+        "@container": "@set"
+      },
+      "broadMatch": {
+        "@id": "skos:broadMatch",
+        "@type": "@id",
+        "@container": "@set"
+      },
+      "narrowMatch": {
+        "@id": "skos:narrowMatch",
+        "@type": "@id",
+        "@container": "@set"
+      },
+      "relatedMatch": {
+        "@id": "skos:relatedMatch",
+        "@type": "@id",
+        "@container": "@set"
+      },
+      "notation": "skos:notation",
+      "created": {
+        "@id": "dcterms:created",
+        "@type": "xsd:date"
+      },
+      "modified": {
+        "@id": "dcterms:modified",
+        "@type": "xsd:date"
+      },
+      "replacedBy": {
+        "@id": "dcterms:isReplacedBy",
+        "@type": "@id"
+      },
+      "deprecated": {
+        "@id": "owl:deprecated",
+        "@type": "xsd:boolean"
+      },
+      "deprecatedAt": {
+        "@id": "prov:invalidatedAtTime",
+        "@type": "xsd:date"
+      }
+    }
+  ]
+}

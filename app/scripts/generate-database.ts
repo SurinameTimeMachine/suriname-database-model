@@ -41,7 +41,13 @@ import {
   type E26Row,
   transformRivers,
 } from './transform-rivers';
-import { BASE, WD, buildContext, buildContextDocument } from './lod-context';
+import {
+  BASE,
+  WD,
+  buildContext,
+  buildContextDocument,
+  buildPlaceRecordContext,
+} from './lod-context';
 
 const LOD_DIR = join(__dirname, '../lod');
 const ORGANIZATION_OVERRIDES_PATH = join(
@@ -1678,6 +1684,13 @@ function main() {
     'utf-8',
   );
   console.log(`Wrote ${contextPath}`);
+  const placeRecordContextPath = join(LOD_DIR, 'place-record-v1.jsonld');
+  writeFileSync(
+    placeRecordContextPath,
+    `${JSON.stringify({ '@context': buildPlaceRecordContext() }, null, 2)}\n`,
+    'utf-8',
+  );
+  console.log(`Wrote ${placeRecordContextPath}`);
 
   // Build name text indexes for GeoJSON allNames
   // plantationNames: plantation URI -> all E41 name texts

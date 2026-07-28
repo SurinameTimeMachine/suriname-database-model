@@ -4,7 +4,7 @@ const PLACE_ID = 'stm-[a-z0-9]+(?:-[a-z0-9]+)*';
 const RECORD_PATH = new RegExp(`^/place/(${PLACE_ID})\\.(jsonld|json)$`);
 const HTML_RECORD_PATH = new RegExp(`^/place/(${PLACE_ID})$`);
 const RESOURCE_PREFIX =
-  '(?:appellation|database|feature|image|inference|obs|organization|place|plantation|production|provenance|rule|source|timespan|type|visual-item|vocabulary)';
+  '(?:appellation|database|feature|image|inference|obs|organization|organization-composition|place|plantation|production|provenance|rule|source|timespan|type|visual-item|vocabulary)';
 const RESOURCE_PATH = new RegExp(`^/(${RESOURCE_PREFIX}(?:/[^.?#]+)*?)(?:\\.(jsonld|json))?$`);
 
 export function proxy(request: NextRequest) {
@@ -63,6 +63,7 @@ export const config = {
     '/inference/:path*',
     '/obs/:path*',
     '/organization/:path*',
+    '/organization-composition/:path*',
     '/plantation/:path*',
     '/production/:path*',
     '/provenance/:path*',

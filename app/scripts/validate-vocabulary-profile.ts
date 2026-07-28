@@ -1,7 +1,10 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import jsonld from 'jsonld';
-import { buildGlobaliseVocabularyObject } from '../lib/vocabulary-profile';
+import {
+  buildReadableVocabularyObject,
+  vocabularyProfileContext,
+} from '../lib/vocabulary-profile';
 import { BASE, buildContext } from './lod-context';
 
 type JsonObject = Record<string, unknown>;
@@ -198,7 +201,11 @@ async function main() {
     }
 
     assertNoSameAs(published, id);
-    const profile = buildGlobaliseVocabularyObject(published);
+    const profile = buildReadableVocabularyObject(published);
+    assert(
+      profile['@context'] === vocabularyProfileContext,
+      `${id} profile does not use the versioned STM context`,
+    );
     assert(profile.id === id, `${id} profile changed the canonical identifier`);
     const expectedCompactType = values(published['@type']).includes(
       'skos:ConceptScheme',
@@ -212,6 +219,13 @@ async function main() {
     assert(
       typeof profile._label === 'string' && profile._label.length > 0,
       `${id} profile has no display label`,
+    );
+    assert(
+      sameValues(
+        values(profile.editorialNote),
+        values(published['skos:editorialNote']),
+      ),
+      `${id} profile does not preserve editorial notes`,
     );
     const expanded = (await jsonld.expand({
       ...profile,
@@ -231,7 +245,7 @@ async function main() {
   );
 
   console.log(
-    `Vocabulary profile OK: ${publishedEntries.length} stable concept objects preserve editorial labels, notes, hierarchy, mappings, dates, and metadata; every compact profile expands as JSON-LD.`,
+    `Vocabulary profile OK: ${publishedEntries.length} stable concept objects preserve editorial labels, notes, hierarchy, mappings, dates, and metadata; every readable profile expands as JSON-LD.`,
   );
 }
 

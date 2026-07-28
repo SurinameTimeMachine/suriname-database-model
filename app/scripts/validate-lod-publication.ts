@@ -34,9 +34,17 @@ const SKOS_MATCH_TYPES = new Set([
   'narrowMatch',
   'relatedMatch',
 ]);
+const jsonLdKeywords = new Set([
+  '@context',
+  '@graph',
+  '@id',
+  '@language',
+  '@type',
+  '@value',
+]);
 
 interface JsonLdDocument {
-  '@context'?: Record<string, unknown>;
+  '@context'?: unknown;
   '@graph'?: Array<Record<string, unknown>>;
   '@id'?: string;
   '@type'?: string | string[];
@@ -150,11 +158,62 @@ function collectCanonicalReferences(value: unknown, references: Set<string>) {
   }
 }
 
+function collectUnmappedTerms(
+  value: unknown,
+  context: Record<string, unknown>,
+  missing: Set<string>,
+) {
+  if (Array.isArray(value)) {
+    value.forEach((item) => collectUnmappedTerms(item, context, missing));
+    return;
+  }
+  if (!value || typeof value !== 'object') return;
+
+  for (const [key, child] of Object.entries(value)) {
+    if (key === '@type') {
+      for (const type of toArray(child as string | string[])) {
+        if (type.startsWith('http://') || type.startsWith('https://')) continue;
+        const prefix = type.includes(':') ? type.split(':')[0] : null;
+        if (prefix ? !(prefix in context) : !(type in context)) {
+          missing.add(type);
+        }
+      }
+      continue;
+    }
+    if (jsonLdKeywords.has(key)) {
+      collectUnmappedTerms(child, context, missing);
+      continue;
+    }
+
+    const prefix = key.includes(':') ? key.split(':')[0] : null;
+    if (prefix ? !(prefix in context) : !(key in context)) {
+      missing.add(key);
+    }
+    const definition = context[key];
+    const isJsonLiteral =
+      definition &&
+      typeof definition === 'object' &&
+      !Array.isArray(definition) &&
+      (definition as Record<string, unknown>)['@type'] === '@json';
+    if (!isJsonLiteral) collectUnmappedTerms(child, context, missing);
+  }
+}
+
 async function main() {
   const database = readArtifact(LOD_DIR, 'database.jsonld');
   const context = readArtifact(LOD_DIR, 'context.jsonld');
+  const stmV1Context = readArtifact(LOD_DIR, 'stm-v1.jsonld');
+  const placeRecordContext = readArtifact(LOD_DIR, 'place-record-v1.jsonld');
   const publishedDatabase = readArtifact(PUBLIC_DATA_DIR, 'database.jsonld');
   const publishedContext = readArtifact(PUBLIC_DATA_DIR, 'context.jsonld');
+  const publishedStmV1Context = readArtifact(
+    join(PUBLIC_DATA_DIR, 'context'),
+    'stm-v1.jsonld',
+  );
+  const publishedPlaceRecordContext = readArtifact(
+    join(PUBLIC_DATA_DIR, 'context'),
+    'place-record-v1.jsonld',
+  );
   const gazetteer = JSON.parse(
     readArtifact(DATA_DIR, 'places-gazetteer.jsonld').toString('utf-8'),
   ) as JsonLdDocument;
@@ -193,11 +252,35 @@ async function main() {
     context.equals(publishedContext),
     'public/data/context.jsonld differs from the generated context',
   );
+  assert(
+    stmV1Context.equals(publishedStmV1Context),
+    'public/data/context/stm-v1.jsonld differs from the versioned context',
+  );
+  assert(
+    placeRecordContext.equals(publishedPlaceRecordContext),
+    'public/data/context/place-record-v1.jsonld differs from the versioned context',
+  );
 
   const document = JSON.parse(database.toString('utf-8')) as JsonLdDocument;
   assert(
     document['@context'] && typeof document['@context'] === 'object',
     'database.jsonld has no object @context',
+  );
+  const completeContextDocument = JSON.parse(
+    placeRecordContext.toString('utf-8'),
+  ) as { '@context'?: Record<string, unknown> };
+  const completeContext = completeContextDocument['@context'];
+  assert(completeContext, 'place-record-v1.jsonld has no object @context');
+  const stmV1ContextDocument = JSON.parse(
+    stmV1Context.toString('utf-8'),
+  ) as { '@context'?: unknown[] };
+  const stmV1Layers = stmV1ContextDocument['@context'];
+  assert(
+    Array.isArray(stmV1Layers) &&
+      stmV1Layers[0] === 'https://linked.art/ns/v1/linked-art.json' &&
+      stmV1Layers.length === 2 &&
+      typeof stmV1Layers[1] === 'object',
+    'stm-v1 context must layer one STM extension over Linked Art 1.0',
   );
   assert(Array.isArray(document['@graph']), 'database.jsonld has no @graph');
   assert(
@@ -419,12 +502,29 @@ async function main() {
     'No generated public authority records were found',
   );
   const recordIds = new Set<string>();
+  const unmappedPlaceRecordTerms = new Set<string>();
   for (const record of recordIndex) {
     const id = record.id;
     assert(typeof id === 'string', 'Authority-record index contains an invalid id');
     assert(!recordIds.has(id), `Authority-record index contains duplicate id ${id}`);
     recordIds.add(id);
+    const jsonldRecord = JSON.parse(
+      readArtifact(PLACE_RECORDS_DIR, `${id}.jsonld`).toString('utf-8'),
+    ) as JsonLdDocument;
+    collectUnmappedTerms(
+      jsonldRecord['@graph'] ?? [],
+      completeContext,
+      unmappedPlaceRecordTerms,
+    );
   }
+  assert(
+    unmappedPlaceRecordTerms.size === 0,
+    `Complete Place-record context has unmapped terms: ${[
+      ...unmappedPlaceRecordTerms,
+    ]
+      .sort()
+      .join(', ')}`,
+  );
   const activeGazetteer = gazetteer['@graph'].filter(
     (entry) => !entry.deprecated && !entry.mergedInto,
   );
@@ -566,12 +666,11 @@ async function main() {
               String(assertion.endYear ?? assertion.startYear),
           `Function assertion ${assignmentUri} has incomplete temporal boundaries`,
         );
-        const context = record['@context'] ?? {};
         for (const term of [
           'P82a_begin_of_the_begin',
           'P82b_end_of_the_end',
         ]) {
-          const definition = context[term] as
+          const definition = completeContext[term] as
             | Record<string, unknown>
             | undefined;
           assert(
@@ -1418,22 +1517,36 @@ async function main() {
   ].filter((record, index, values) => values.indexOf(record) === index);
   for (const record of recordSamples) {
     const id = record.id as string;
-    const jsonld = JSON.parse(
+    const recordDocument = JSON.parse(
       readArtifact(PLACE_RECORDS_DIR, `${id}.jsonld`).toString('utf-8'),
     ) as JsonLdDocument;
     assert(
-      jsonld['@id'] === `${CANONICAL_BASE}place/${id}`,
+      recordDocument['@id'] === `${CANONICAL_BASE}place/${id}`,
       `Authority record ${id} has a non-canonical @id`,
     );
     assert(
-      jsonld['@context'] && typeof jsonld['@context'] === 'object',
-      `Authority record ${id} has no JSON-LD context`,
+      recordDocument['@context'] ===
+        `${CANONICAL_BASE}data/context/place-record-v1.jsonld`,
+      `Authority record ${id} does not use the shared complete-graph context`,
     );
     assert(
-      Array.isArray(jsonld['@graph']) && jsonld['@graph'].length > 0,
+      Array.isArray(recordDocument['@graph']) &&
+        recordDocument['@graph'].length > 0,
       `Authority record ${id} has no graph`,
     );
-    const recordNode = jsonld['@graph'].find(
+    const expandedRecord = (await jsonld.expand({
+      ...recordDocument,
+      '@context': completeContext,
+    } as jsonld.JsonLdDocument)) as unknown as Array<
+      Record<string, unknown>
+    >;
+    assert(
+      expandedRecord.length === 1 &&
+        Array.isArray(expandedRecord[0]['@graph']) &&
+        expandedRecord[0]['@graph'].length === recordDocument['@graph'].length,
+      `Authority record ${id} does not expand with its versioned context`,
+    );
+    const recordNode = recordDocument['@graph'].find(
       (entity) => entity['@id'] === `${CANONICAL_BASE}place/${id}#record`,
     );
     assert(recordNode, `Authority record ${id} has no record node`);
@@ -1452,7 +1565,7 @@ async function main() {
       `Authority record ${id} does not describe an entity`,
     );
     const graphIds = new Set<string>();
-    for (const entity of jsonld['@graph']) {
+    for (const entity of recordDocument['@graph']) {
       const entityId = entity['@id'];
       assert(
         typeof entityId === 'string' && entityId.startsWith(CANONICAL_BASE),

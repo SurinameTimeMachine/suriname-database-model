@@ -13,19 +13,26 @@ The editorial source remains:
 
 - `data/place-types-thesaurus.jsonld`
 
-The normal resource route and JSON-LD wrapper remain unchanged; their concept
-content is now complete:
+The default JSON-LD route returns the readable, single-root concept:
 
 - `/vocabulary/place-type/plantation.jsonld`
 
-The compact per-object representation is opt-in:
+The lossless graph wrapper remains available explicitly:
 
-- `/vocabulary/place-type/plantation.jsonld?profile=globalise`
+- `/vocabulary/place-type/plantation.jsonld?profile=complete`
 
-The alternate profile uses a root `id`, `type`, and `_label`, followed by
+The previous `/vocabulary/place-type/plantation.jsonld?profile=globalise`
+address remains a compatibility alias for the readable object.
+
+The readable representation uses a root `id`, `type`, and `_label`, followed by
 multilingual labels and SKOS relationships. This follows the recognizable
 object shape of the [GLOBALISE thesaurus example](https://objectstore.surf.nl/87435b768620494e8e911c83d1997f24:globalise-data/objects/thesaurus/00caf575-0d33-49f0-83d7-3f550c681355.json)
 without adopting its identifiers or project-specific ontology classes.
+
+Place and vocabulary objects share the versioned
+`https://data.surinametijdmachine.org/data/context/stm-v1.jsonld` context. It
+layers Linked Art 1.0 with only the STM and SKOS additions required by these
+profiles. Ontology definitions are not embedded in each concept.
 
 ## Projection
 
@@ -36,7 +43,7 @@ without adopting its identifiers or project-specific ontology classes.
 | preferred display label | `rdfs:label` | `_label` |
 | `prefLabel`, `altLabel` | `skos:prefLabel`, `skos:altLabel` | same short names |
 | `definition`, `scopeNote` | corresponding SKOS properties | same short names |
-| `editorialNote` | `skos:editorialNote` | `skos:editorialNote` |
+| `editorialNote` | `skos:editorialNote` | `editorialNote` |
 | hierarchy and related concepts | SKOS relationship properties | same short names with labeled objects |
 | vocabulary mappings | SKOS match properties | same short names |
 | `typeId` | `stm:typeId` and `skos:notation` | `typeId` and `notation` |
