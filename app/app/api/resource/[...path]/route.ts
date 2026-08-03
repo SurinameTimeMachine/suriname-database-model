@@ -3,7 +3,7 @@ import {
   resourceJsonLd,
 } from '@/lib/lod-resource';
 import {
-  buildGlobaliseVocabularyObject,
+  buildReadableVocabularyObject,
   isVocabularyEntity,
 } from '@/lib/vocabulary-profile';
 import { NextRequest, NextResponse } from 'next/server';
@@ -18,7 +18,7 @@ export async function GET(
     return NextResponse.json({ error: 'Unknown linked-data resource' }, { status: 404 });
   }
   const profile = request.nextUrl.searchParams.get('profile');
-  if (profile && profile !== 'globalise') {
+  if (profile && profile !== 'globalise' && profile !== 'complete') {
     return NextResponse.json(
       { error: `Unknown linked-data profile: ${profile}` },
       { status: 400 },
@@ -26,7 +26,10 @@ export async function GET(
   }
   if (profile === 'globalise' && !isVocabularyEntity(resource.entity)) {
     return NextResponse.json(
-      { error: 'The GLOBALISE profile is only available for vocabulary resources' },
+      {
+        error:
+          'The legacy GLOBALISE alias is only available for vocabulary resources',
+      },
       { status: 406 },
     );
   }
@@ -36,17 +39,20 @@ export async function GET(
     requestedUrl.includes('.json?') ||
     requestedUrl.endsWith('.json');
   const jsonld = !json;
+  const vocabulary = isVocabularyEntity(resource.entity);
+  const readableJsonLd = jsonld && vocabulary && profile !== 'complete';
   const body =
-    profile === 'globalise'
-      ? buildGlobaliseVocabularyObject(resource.entity)
+    readableJsonLd
+      ? buildReadableVocabularyObject(resource.entity)
       : jsonld
         ? resourceJsonLd(resource)
         : resource.entity;
   const links = [
     `<${resource.uri}>; rel="canonical"`,
-    ...(isVocabularyEntity(resource.entity)
+    ...(vocabulary
       ? [
-          `<${resource.uri}.jsonld?profile=globalise>; rel="alternate"; type="application/ld+json"`,
+          `<${resource.uri}.jsonld>; rel="alternate"; type="application/ld+json"`,
+          `<${resource.uri}.jsonld?profile=complete>; rel="alternate"; type="application/ld+json"`,
         ]
       : []),
   ];

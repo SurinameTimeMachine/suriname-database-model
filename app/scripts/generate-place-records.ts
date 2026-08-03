@@ -27,7 +27,7 @@ import {
   resolveConfirmedPhysicalLinkReviews,
 } from '../lib/physical-organization-links';
 
-import { BASE, buildPlaceRecordContext } from './lod-context';
+import { BASE } from './lod-context';
 
 const DATA_DIR = join(__dirname, '../../data');
 const OUT_DIR = join(__dirname, '../public/data/place-records');
@@ -38,6 +38,7 @@ const ORGANIZATION_OVERRIDES_PATH = join(
 );
 const THESAURUS_PATH = join(DATA_DIR, 'place-types-thesaurus.jsonld');
 const SOURCES_PATH = join(DATA_DIR, 'sources-registry.jsonld');
+const COMPLETE_CONTEXT = `${BASE}data/context/place-record-v1.jsonld`;
 
 type JsonObject = Record<string, unknown>;
 
@@ -893,7 +894,7 @@ export function generatePlaceRecords() {
     record['prov:wasDerivedFrom'] = [...sourceUris];
 
     const document: JsonObject = {
-      '@context': buildPlaceRecordContext(),
+      '@context': COMPLETE_CONTEXT,
       '@id': pageUri,
       '@type': ['stm:AuthorityRecord'],
       '@graph': graph,

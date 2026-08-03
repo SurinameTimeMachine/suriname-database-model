@@ -4,6 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 export const canonicalBase = 'https://data.surinametijdmachine.org/';
+export const completeContextUri = `${canonicalBase}data/context.jsonld`;
 export const resourcePrefixes = new Set([
   'appellation',
   'database',
@@ -12,6 +13,7 @@ export const resourcePrefixes = new Set([
   'inference',
   'obs',
   'organization',
+  'organization-composition',
   'place',
   'plantation',
   'production',
@@ -80,7 +82,7 @@ export function resourceJsonLd(resource: {
   uri: string;
 }): JsonObject {
   return {
-    '@context': resource.context,
+    '@context': completeContextUri,
     '@id': resource.uri,
     '@graph': [resource.entity],
   };
