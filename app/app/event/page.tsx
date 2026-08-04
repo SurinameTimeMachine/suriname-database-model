@@ -53,6 +53,8 @@ type PlaceOption = {
   id: string;
   name: string;
   type: string;
+  districtHint?: string;
+  wikidataQid?: string;
 };
 
 const STORAGE_KEY = 'stm_event_participant';
@@ -88,6 +90,13 @@ function pickLowestBandwidthHls(manifestText: string, baseUrl: string): string {
   }
 
   return bestUrl;
+}
+
+function formatPlaceOptionLabel(option: PlaceOption): string {
+  if (option.type === 'plantation' && option.districtHint) {
+    return `${option.name} (${option.districtHint})`;
+  }
+  return `${option.name} (${option.type})`;
 }
 
 export default function EventPage() {
@@ -138,13 +147,17 @@ export default function EventPage() {
       });
   }, []);
 
-  const placeOptionNames = useMemo(() => placeOptions.map((opt) => opt.name), [placeOptions]);
   const matchingPlaceOptions = useMemo(() => {
     const query = placeInput.trim().toLowerCase();
     if (!query) return placeOptions.slice(0, 8);
     return placeOptions.filter((option) => {
-      const display = `${option.name} (${option.type})`.toLowerCase();
-      return option.name.toLowerCase().includes(query) || option.type.toLowerCase().includes(query) || display.includes(query);
+      const display = formatPlaceOptionLabel(option).toLowerCase();
+      return (
+        option.name.toLowerCase().includes(query) ||
+        option.type.toLowerCase().includes(query) ||
+        (option.districtHint || '').toLowerCase().includes(query) ||
+        display.includes(query)
+      );
     }).slice(0, 8);
   }, [placeOptions, placeInput]);
   const avHlsUrl = useMemo(() => (task?.playableUrl ? toHlsUrl(task.playableUrl) : ''), [task]);
@@ -601,7 +614,7 @@ export default function EventPage() {
               />
               <datalist id="place-options">
                 {placeOptions.map((option) => (
-                  <option key={option.id} value={option.name} label={`${option.name} (${option.type})`} />
+                  <option key={option.id} value={option.name} label={formatPlaceOptionLabel(option)} />
                 ))}
               </datalist>
               <button onClick={addPlaceTerm} disabled={locationUnknown} className="mt-2 bg-stm-warm-200 px-3 py-1 text-xs disabled:opacity-50">
@@ -618,7 +631,10 @@ export default function EventPage() {
                       <div key={option.id} className="flex items-center justify-between gap-3 border border-stm-warm-200 bg-stm-warm-50 px-3 py-2">
                         <div>
                           <p className="font-medium text-stm-warm-800">
-                            {option.name} <span className="text-stm-warm-500">({option.type})</span>
+                            {option.name}{' '}
+                            <span className="text-stm-warm-500">
+                              ({option.type === 'plantation' && option.districtHint ? option.districtHint : option.type})
+                            </span>
                           </p>
                           <p className="text-[11px] text-stm-warm-500">ID: {option.id}</p>
                         </div>
@@ -639,6 +655,16 @@ export default function EventPage() {
                           >
                             Controleer
                           </a>
+                          {option.wikidataQid ? (
+                            <a
+                              href={`https://www.wikidata.org/wiki/${encodeURIComponent(option.wikidataQid)}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="underline text-stm-sepia-700"
+                            >
+                              Wikidata
+                            </a>
+                          ) : null}
                         </div>
                       </div>
                     ))}
