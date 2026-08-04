@@ -94,6 +94,7 @@ export type EventSubmissionPayload = {
   selectedPlaceIds: string[];
   selectedPlaceNames: string[];
   addedPlaces: string[];
+  addedDates: string[];
   selectedPersons: string[];
   addedPersons: string[];
   notes: string;
@@ -506,7 +507,7 @@ export async function submitTask(
   taskId: string,
   claimId: string,
   payload: EventSubmissionPayload,
-): Promise<{ ok: true; stats: ReturnType<typeof getStatsFromState> }> {
+): Promise<{ ok: true; completed: boolean; reason?: 'missing_location'; stats: ReturnType<typeof getStatsFromState> }> {
   return withLock(async () => {
     const state = loadState();
     const participant = state.participants[participantId];
@@ -523,6 +524,9 @@ export async function submitTask(
       throw new Error('Claim mismatch. Refresh and claim a new task.');
     }
 
+    const hasAnyLocation = payload.locationUnknown || payload.selectedPlaceIds.length > 0 || payload.selectedPlaceNames.length > 0 || payload.addedPlaces.length > 0;
+    const missingLocationOnConfirm = payload.decision === 'confirm' && !hasAnyLocation;
+
     const submittedAt = nowIso();
     state.submissions.push({
       submissionId: randomUUID(),
@@ -532,6 +536,23 @@ export async function submitTask(
       submittedAt,
       payload,
     });
+
+    if (missingLocationOnConfirm) {
+      task.currentClaim = null;
+      task.status = 'assigned';
+      task.completedAt = null;
+      task.completedBy = null;
+      task.finalSubmission = null;
+      participant.lastSeenAt = submittedAt;
+      saveState(state);
+
+      return {
+        ok: true,
+        completed: false,
+        reason: 'missing_location',
+        stats: getStatsFromState(state),
+      };
+    }
 
     task.status = 'completed';
     task.completedAt = submittedAt;
@@ -544,6 +565,7 @@ export async function submitTask(
 
     return {
       ok: true,
+      completed: true,
       stats: getStatsFromState(state),
     };
   });

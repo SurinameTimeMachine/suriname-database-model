@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import Hls from 'hls.js';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 type PlaceSuggestion = {
   gazetteerId: string;
@@ -102,13 +103,18 @@ export default function EventPage() {
   const [selectedPlaceIds, setSelectedPlaceIds] = useState<string[]>([]);
   const [selectedPlaceNames, setSelectedPlaceNames] = useState<string[]>([]);
   const [addedPlaces, setAddedPlaces] = useState<string[]>([]);
+  const [addedDates, setAddedDates] = useState<string[]>([]);
   const [selectedPersons, setSelectedPersons] = useState<string[]>([]);
   const [addedPersons, setAddedPersons] = useState<string[]>([]);
   const [locationUnknown, setLocationUnknown] = useState(false);
   const [notes, setNotes] = useState('');
   const [placeInput, setPlaceInput] = useState('');
+  const [dateInput, setDateInput] = useState('');
   const [personInput, setPersonInput] = useState('');
   const [avPlaybackUrl, setAvPlaybackUrl] = useState('');
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const hlsRef = useRef<Hls | null>(null);
 
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -133,8 +139,68 @@ export default function EventPage() {
   }, []);
 
   const placeOptionNames = useMemo(() => placeOptions.map((opt) => opt.name), [placeOptions]);
+  const matchingPlaceOptions = useMemo(() => {
+    const query = placeInput.trim().toLowerCase();
+    if (!query) return placeOptions.slice(0, 8);
+    return placeOptions.filter((option) => {
+      const display = `${option.name} (${option.type})`.toLowerCase();
+      return option.name.toLowerCase().includes(query) || option.type.toLowerCase().includes(query) || display.includes(query);
+    }).slice(0, 8);
+  }, [placeOptions, placeInput]);
   const avHlsUrl = useMemo(() => (task?.playableUrl ? toHlsUrl(task.playableUrl) : ''), [task]);
   const isAudioTask = task?.mediaType === 'audio' || task?.documentType.toLowerCase().includes('audio');
+
+  useEffect(() => {
+    const media = isAudioTask ? audioRef.current : videoRef.current;
+    const currentHls = hlsRef.current;
+
+    if (currentHls) {
+      currentHls.destroy();
+      hlsRef.current = null;
+    }
+
+    if (!task || task.mode !== 'av' || !avPlaybackUrl || !media) {
+      return;
+    }
+
+    media.removeAttribute('src');
+    media.load();
+
+    const canPlayNative = media.canPlayType('application/vnd.apple.mpegurl');
+    if (canPlayNative) {
+      media.src = avPlaybackUrl;
+      media.load();
+      return;
+    }
+
+    if (!Hls.isSupported()) {
+      media.src = avPlaybackUrl;
+      media.load();
+      return;
+    }
+
+    const hls = new Hls({
+      enableWorker: true,
+      lowLatencyMode: false,
+      capLevelToPlayerSize: true,
+      startLevel: 0,
+    });
+    hlsRef.current = hls;
+    hls.loadSource(avPlaybackUrl);
+    hls.attachMedia(media);
+    hls.on(Hls.Events.ERROR, (_, data) => {
+      if (data.fatal) {
+        setStatus('AV-stream laadt niet goed. Probeer de mobiele link of laad opnieuw.');
+      }
+    });
+
+    return () => {
+      hls.destroy();
+      if (hlsRef.current === hls) {
+        hlsRef.current = null;
+      }
+    };
+  }, [task, avPlaybackUrl, isAudioTask]);
 
   useEffect(() => {
     let cancelled = false;
@@ -171,7 +237,9 @@ export default function EventPage() {
       setSelectedPlaceNames([]);
       setSelectedPersons([]);
       setAddedPlaces([]);
+      setAddedDates([]);
       setAddedPersons([]);
+      setDateInput('');
       setLocationUnknown(false);
       setNotes('');
       return;
@@ -185,7 +253,9 @@ export default function EventPage() {
     setSelectedPlaceNames([...new Set(initialPlaceNames)]);
     setSelectedPersons([...new Set(nextTask.suggestedPersons)]);
     setAddedPlaces([]);
+    setAddedDates([]);
     setAddedPersons([]);
+    setDateInput('');
     setLocationUnknown(false);
     setNotes('');
   }
@@ -296,6 +366,28 @@ export default function EventPage() {
     setPlaceInput('');
   }
 
+  function chooseGazetteerOption(option: PlaceOption) {
+    const suggestion = {
+      gazetteerId: option.id,
+      label: option.name,
+      category: option.type,
+      source: 'gazetteer',
+    };
+    togglePlaceSuggestion(suggestion);
+    setPlaceInput('');
+  }
+
+  function addDateTerm() {
+    const term = dateInput.trim();
+    if (!term) return;
+    if (addedDates.includes(term)) {
+      setDateInput('');
+      return;
+    }
+    setAddedDates((prev) => [...prev, term]);
+    setDateInput('');
+  }
+
   function addPersonTerm() {
     const term = personInput.trim();
     if (!term) return;
@@ -322,6 +414,7 @@ export default function EventPage() {
         selectedPlaceIds,
         selectedPlaceNames,
         addedPlaces,
+        addedDates,
         selectedPersons,
         addedPersons,
         notes: notes.trim(),
@@ -341,9 +434,13 @@ export default function EventPage() {
       if (!res.ok) throw new Error(data.error || 'Kon taak niet indienen.');
 
       setStats(data.stats || null);
+      if (data.completed === false && data.reason === 'missing_location') {
+        setStatus('Locatie ontbreekt. De taak blijft open en komt later opnieuw langs.');
+      } else {
+        setStatus('Taak opgeslagen. Volgende taak laden...');
+      }
       setTask(null);
       resetFormForTask(null);
-      setStatus('Taak opgeslagen. Volgende taak laden...');
       await claimNextTask();
     } catch (error) {
       setStatus(error instanceof Error ? error.message : 'Onbekende fout bij submit.');
@@ -356,9 +453,9 @@ export default function EventPage() {
     <div className="h-full overflow-y-auto bg-stm-warm-50">
       <div className="max-w-xl mx-auto p-4 sm:p-6 space-y-4">
         <header className="border border-stm-warm-200 bg-white p-4">
-          <h1 className="text-xl font-semibold text-stm-warm-900">STM Event Review</h1>
+          <h1 className="text-xl font-semibold text-stm-warm-900">NAS Mediabank in de Suriname Time Machine</h1>
           <p className="text-sm text-stm-warm-600 mt-1">
-            Smartphone workflow voor beeld- en AV-verrijking.
+            Smartphone toepassing voor verrijking beeldmateriaal.
           </p>
           {stats ? (
             <p className="text-xs text-stm-warm-500 mt-2">
@@ -426,11 +523,11 @@ export default function EventPage() {
 
             {task.mode === 'av' && avPlaybackUrl ? (
               isAudioTask ? (
-                <audio controls preload="none" className="w-full">
+                <audio ref={audioRef} controls preload="metadata" className="w-full">
                   <source src={avPlaybackUrl} type="application/vnd.apple.mpegurl" />
                 </audio>
               ) : (
-                <video controls preload="none" className="w-full border border-stm-warm-200">
+                <video ref={videoRef} controls preload="metadata" playsInline className="w-full border border-stm-warm-200">
                   <source src={avPlaybackUrl} type="application/vnd.apple.mpegurl" />
                 </video>
               )
@@ -468,12 +565,15 @@ export default function EventPage() {
                 <span>Locatie onbekend of niet zinvol voor dit item</span>
               </label>
               <div className="space-y-1">
-                {task.suggestedPlaces.map((suggestion) => {
+                {task.suggestedPlaces.map((suggestion, index) => {
                   const checked = suggestion.gazetteerId
                     ? selectedPlaceIds.includes(suggestion.gazetteerId)
                     : selectedPlaceNames.includes(suggestion.label);
                   return (
-                    <label key={`${suggestion.gazetteerId}-${suggestion.label}`} className="flex gap-2 text-sm">
+                    <label
+                      key={suggestion.gazetteerId ? `${suggestion.gazetteerId}-${index}` : `${suggestion.label}-${index}`}
+                      className="flex gap-2 text-sm"
+                    >
                       <input
                         type="checkbox"
                         checked={checked}
@@ -500,8 +600,8 @@ export default function EventPage() {
                 className="w-full border border-stm-warm-300 px-3 py-2 text-sm"
               />
               <datalist id="place-options">
-                {placeOptionNames.map((name) => (
-                  <option key={name} value={name} />
+                {placeOptions.map((option) => (
+                  <option key={option.id} value={option.name} label={`${option.name} (${option.type})`} />
                 ))}
               </datalist>
               <button onClick={addPlaceTerm} disabled={locationUnknown} className="mt-2 bg-stm-warm-200 px-3 py-1 text-xs disabled:opacity-50">
@@ -510,13 +610,66 @@ export default function EventPage() {
               {addedPlaces.length > 0 ? (
                 <p className="text-xs text-stm-warm-600 mt-2">Nieuw: {addedPlaces.join(' | ')}</p>
               ) : null}
+              {matchingPlaceOptions.length > 0 ? (
+                <div className="mt-3 space-y-2 text-xs text-stm-warm-700">
+                  <p className="font-medium text-stm-warm-800">Mogelijke matches</p>
+                  <div className="space-y-2">
+                    {matchingPlaceOptions.map((option) => (
+                      <div key={option.id} className="flex items-center justify-between gap-3 border border-stm-warm-200 bg-stm-warm-50 px-3 py-2">
+                        <div>
+                          <p className="font-medium text-stm-warm-800">
+                            {option.name} <span className="text-stm-warm-500">({option.type})</span>
+                          </p>
+                          <p className="text-[11px] text-stm-warm-500">ID: {option.id}</p>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => chooseGazetteerOption(option)}
+                            disabled={locationUnknown}
+                            className="bg-stm-sepia-700 text-white px-2 py-1 disabled:opacity-50"
+                          >
+                            Kies
+                          </button>
+                          <a
+                            href={`/places?id=${encodeURIComponent(option.id)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="underline text-stm-sepia-700"
+                          >
+                            Controleer
+                          </a>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-stm-warm-800 mb-1">Datum toevoegen</label>
+              <div className="flex gap-2">
+                <input
+                  value={dateInput}
+                  onChange={(e) => setDateInput(e.target.value)}
+                  placeholder="Bijv. 15 juli 1975"
+                  className="w-full border border-stm-warm-300 px-3 py-2 text-sm"
+                />
+                <button onClick={addDateTerm} className="bg-stm-warm-200 px-3 py-1 text-xs">
+                  Voeg datum toe
+                </button>
+              </div>
+              {addedDates.length > 0 ? (
+                <p className="text-xs text-stm-warm-600 mt-2">Nieuw: {addedDates.join(' | ')}</p>
+              ) : null}
             </div>
 
             <div>
               <h3 className="text-sm font-semibold text-stm-warm-900 mb-2">Persoonsuggesties</h3>
               <div className="space-y-1">
-                {task.suggestedPersons.map((name) => (
-                  <label key={name} className="flex gap-2 text-sm">
+                {task.suggestedPersons.map((name, index) => (
+                  <label key={`${name}-${index}`} className="flex gap-2 text-sm">
                     <input type="checkbox" checked={selectedPersons.includes(name)} onChange={() => togglePersonSuggestion(name)} />
                     <span>{name}</span>
                   </label>
