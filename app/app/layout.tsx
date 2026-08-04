@@ -19,9 +19,8 @@ const sans = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'Suriname Time Machine',
-  description:
-    'Explore historical plantations of Suriname through linked open data and interactive maps',
+  title: 'NAS Mediabank in de Suriname Time Machine',
+  description: 'smartphone toepassing voor verrijking beeldmateriaal',
 };
 
 export default function RootLayout({
@@ -30,7 +29,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${serif.variable} ${sans.variable}`}>
+    <html lang="nl" className={`${serif.variable} ${sans.variable}`}>
       <body className="antialiased font-sans bg-stm-warm-50 text-stm-warm-900 flex flex-col h-screen overflow-hidden">
         <a href="#main-content" className="skip-link">
           Skip to main content

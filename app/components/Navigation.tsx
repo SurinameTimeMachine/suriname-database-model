@@ -55,10 +55,10 @@ export default function Navigation() {
             <Link
               href="/"
               className="flex items-center gap-2.5 shrink-0"
-              aria-label="Suriname Time Machine - Home"
+              aria-label="NAS Mediabank in de Suriname Time Machine - Home"
             >
               <span className="text-stm-sepia-300 font-bold text-lg tracking-tight font-serif">
-                Suriname Time Machine
+                NAS Mediabank in de Suriname Time Machine
               </span>
             </Link>
 
@@ -88,19 +88,9 @@ export default function Navigation() {
                   <span className="text-xs text-stm-warm-500">...</span>
                 ) : user ? (
                   <>
-                    <img
-                      src={user.avatar_url}
-                      alt={user.login}
-                      className="w-6 h-6 rounded-full"
-                    />
-                    <span className="text-xs text-stm-warm-300">
-                      {user.name || user.login}
+                    <span className="text-[10px] bg-stm-teal-800/60 text-stm-teal-300 px-1.5 py-0.5 rounded">
+                      Editor
                     </span>
-                    {canEdit && (
-                      <span className="text-[10px] bg-stm-teal-800/60 text-stm-teal-300 px-1.5 py-0.5 rounded">
-                        Editor
-                      </span>
-                    )}
                     <button
                       onClick={signOut}
                       className="text-[10px] text-stm-warm-500 hover:text-stm-warm-300 underline"
