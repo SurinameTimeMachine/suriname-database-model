@@ -11,6 +11,7 @@ import { usePlaceTypes } from '@/lib/thesaurus';
 import type { GazetteerPlace } from '@/lib/types';
 import { getPreferredName } from '@/lib/types';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 type SortKey =
   | 'name'
@@ -196,6 +197,7 @@ const PlaceRow = memo(function PlaceRow({
 
 export default function PlacesPage() {
   const { labels, colors, allTypes } = usePlaceTypes();
+  const searchParams = useSearchParams();
   const typeFilters = useMemo(
     () => [
       { value: 'all', label: 'All' },
@@ -260,6 +262,13 @@ export default function PlacesPage() {
     setSelectedId(id);
     setIsCreating(false);
   }, []);
+
+  useEffect(() => {
+    const id = searchParams.get('id');
+    if (!id) return;
+    setSelectedId(id);
+    setIsCreating(false);
+  }, [searchParams]);
 
   // Filter, search, and sort
   const filtered = useMemo(() => {
