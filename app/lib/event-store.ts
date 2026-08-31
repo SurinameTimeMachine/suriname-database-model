@@ -97,9 +97,14 @@ const DATA_DIR = join(process.cwd(), '..', 'data', 'nas-mediabank');
 const RECORDS_PATH = join(DATA_DIR, 'nas-mediabank-records.json');
 const STATE_PATH = join(DATA_DIR, 'event-state.json');
 
-const LEASE_MINUTES = Number(process.env.EVENT_TASK_LEASE_MINUTES || '15');
+const LEASE_MINUTES_RAW = Number(process.env.EVENT_TASK_LEASE_MINUTES || '15');
+const LEASE_MINUTES =
+  Number.isFinite(LEASE_MINUTES_RAW) && LEASE_MINUTES_RAW > 0 ? LEASE_MINUTES_RAW : 15;
 
 let lock: Promise<void> = Promise.resolve();
+
+// This JSON store is intentionally scoped to the local, single-process review tool.
+// Use a transactional persistent store before deploying across workers or containers.
 
 async function withLock<T>(fn: () => Promise<T>): Promise<T> {
   let release!: () => void;
@@ -127,6 +132,33 @@ function splitDetailUrl(value: string): string {
 function makeLowResUrl(mediaId: string): string {
   if (!mediaId) return '';
   return `https://images.memorix.nl/nas/thumb/350x350crop/${mediaId}.jpg`;
+}
+
+function toStringArray(value: unknown, maxItems = 50, maxLength = 200): string[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .filter((entry): entry is string => typeof entry === 'string')
+    .map((entry) => entry.trim().slice(0, maxLength))
+    .filter(Boolean)
+    .slice(0, maxItems);
+}
+
+function normalizePayload(value: unknown): EventSubmissionPayload {
+  const raw = (value ?? {}) as Partial<Record<keyof EventSubmissionPayload, unknown>>;
+  if (raw.decision !== 'confirm' && raw.decision !== 'skip') {
+    throw new Error('payload.decision must be "confirm" or "skip".');
+  }
+  return {
+    decision: raw.decision,
+    locationUnknown: raw.locationUnknown === true,
+    selectedPlaceIds: toStringArray(raw.selectedPlaceIds),
+    selectedPlaceNames: toStringArray(raw.selectedPlaceNames),
+    addedPlaces: toStringArray(raw.addedPlaces),
+    addedDates: toStringArray(raw.addedDates),
+    selectedPersons: toStringArray(raw.selectedPersons),
+    addedPersons: toStringArray(raw.addedPersons),
+    notes: typeof raw.notes === 'string' ? raw.notes.trim().slice(0, 2000) : '',
+  };
 }
 
 function initializeStateFromData(): EventState {
@@ -371,8 +403,13 @@ export async function submitTask(
       throw new Error('Claim mismatch. Refresh and claim a new task.');
     }
 
-    const hasAnyLocation = payload.locationUnknown || payload.selectedPlaceIds.length > 0 || payload.selectedPlaceNames.length > 0 || payload.addedPlaces.length > 0;
-    const missingLocationOnConfirm = payload.decision === 'confirm' && !hasAnyLocation;
+    const safePayload = normalizePayload(payload);
+    const hasAnyLocation =
+      safePayload.locationUnknown ||
+      safePayload.selectedPlaceIds.length > 0 ||
+      safePayload.selectedPlaceNames.length > 0 ||
+      safePayload.addedPlaces.length > 0;
+    const missingLocationOnConfirm = safePayload.decision === 'confirm' && !hasAnyLocation;
 
     const submittedAt = nowIso();
     state.submissions.push({
@@ -381,12 +418,12 @@ export async function submitTask(
       participantId,
       claimId,
       submittedAt,
-      payload,
+      payload: safePayload,
     });
 
     if (missingLocationOnConfirm) {
       task.currentClaim = null;
-      task.status = 'assigned';
+      task.status = 'unoffered';
       task.completedAt = null;
       task.completedBy = null;
       task.finalSubmission = null;
@@ -404,7 +441,7 @@ export async function submitTask(
     task.status = 'completed';
     task.completedAt = submittedAt;
     task.completedBy = participantId;
-    task.finalSubmission = payload;
+    task.finalSubmission = safePayload;
     task.currentClaim = null;
 
     participant.lastSeenAt = submittedAt;

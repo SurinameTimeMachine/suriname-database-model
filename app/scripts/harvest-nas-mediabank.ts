@@ -60,7 +60,8 @@ async function fetchJson<T>(url: string): Promise<T> {
       await sleep(700 * attempt);
     }
   }
-  throw new Error(`Failed to fetch ${url}: ${lastError || 'unknown error'}`);
+  const safeUrl = url.replace(/([?&]apiKey=)[^&]+/i, '$1[redacted]');
+  throw new Error(`Failed to fetch ${safeUrl}: ${lastError || 'unknown error'}`);
 }
 
 type MemorixMetaField = {
@@ -97,15 +98,6 @@ function metadataMap(row: MemorixMediaRow): Map<string, string> {
     }
   }
   return map;
-}
-
-function firstPlayableUri(assets: MemorixAsset[]): string {
-  for (const asset of assets) {
-    for (const stream of asset.streams || []) {
-      if (stream.url) return stream.url;
-    }
-  }
-  return '';
 }
 
 function parseDurationToSeconds(raw: string): number | null {
@@ -176,7 +168,7 @@ function parseRecord(row: MemorixMediaRow, listingPage: number): NasRecord {
     detailId,
     mediaId,
     recordKey,
-    detailUrl: `${detailUrl} | ${firstPlayableUri(row.asset || [])}`,
+    detailUrl,
     listingPage,
     title,
     description,
