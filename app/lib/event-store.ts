@@ -26,19 +26,6 @@ type NasHit = {
   matchSource: string;
 };
 
-type PlaceOption = {
-  id: string;
-  name: string;
-  type: string;
-  districtHint?: string;
-  wikidataQid?: string;
-};
-
-type ObservationByOrg = {
-  observationYear?: string;
-  locationStd?: string;
-};
-
 type TaskSuggestionPlace = {
   gazetteerId: string;
   label: string;
@@ -128,8 +115,6 @@ const DATA_DIR = join(process.cwd(), '..', 'data', 'nas-mediabank');
 const RECORDS_PATH = join(DATA_DIR, 'nas-mediabank-records.json');
 const HITS_HIGH_PATH = join(DATA_DIR, 'nas-place-person-hits.high-precision.json');
 const STATE_PATH = join(DATA_DIR, 'event-state.json');
-const PLACE_OPTIONS_PATH = join(process.cwd(), 'public', 'data', 'places-gazetteer.jsonld');
-const OBSERVATIONS_BY_ORG_PATH = join(process.cwd(), 'public', 'data', 'observations-by-org.json');
 
 const LEASE_MINUTES = Number(process.env.EVENT_TASK_LEASE_MINUTES || '15');
 
@@ -207,48 +192,6 @@ function dedupe<T>(values: T[], keyFn: (value: T) => string): T[] {
     if (!map.has(key)) map.set(key, value);
   }
   return [...map.values()];
-}
-
-function normalizeQid(value: string | undefined): string {
-  if (!value) return '';
-  const trimmed = value.trim();
-  if (!trimmed) return '';
-  const slash = trimmed.lastIndexOf('/');
-  const candidate = slash >= 0 ? trimmed.slice(slash + 1) : trimmed;
-  return candidate.toUpperCase();
-}
-
-function loadRecentAlmanakDistrictByQid(): Map<string, string> {
-  try {
-    const observations = readJsonFile<Record<string, ObservationByOrg[]>>(OBSERVATIONS_BY_ORG_PATH);
-    const out = new Map<string, string>();
-
-    for (const [qidRaw, rows] of Object.entries(observations)) {
-      const qid = normalizeQid(qidRaw);
-      if (!qid || !Array.isArray(rows)) continue;
-
-      let bestYear = Number.NEGATIVE_INFINITY;
-      let bestLocation = '';
-
-      for (const row of rows) {
-        const year = Number(row?.observationYear || '');
-        const location = (row?.locationStd || '').trim();
-        if (!Number.isFinite(year) || year > 1861 || !location) continue;
-        if (year >= bestYear) {
-          bestYear = year;
-          bestLocation = location;
-        }
-      }
-
-      if (bestLocation) {
-        out.set(qid, bestLocation);
-      }
-    }
-
-    return out;
-  } catch {
-    return new Map<string, string>();
-  }
 }
 
 function initializeStateFromData(): EventState {
@@ -552,36 +495,4 @@ export async function getEventStatus(): Promise<ReturnType<typeof getStatsFromSt
     const state = loadState();
     return getStatsFromState(state);
   });
-}
-
-export async function getPlaceOptions(): Promise<PlaceOption[]> {
-  const raw = readJsonFile<{ '@graph'?: Array<{ id?: string; type?: string; wikidataQid?: string | null; district?: string | null; names?: Array<{ text?: string }> }> }>(
-    PLACE_OPTIONS_PATH,
-  );
-  const districtByQid = loadRecentAlmanakDistrictByQid();
-  const graph = raw['@graph'] || [];
-  const out: PlaceOption[] = [];
-  for (const place of graph) {
-    const type = place.type || '';
-    const qid = normalizeQid(place.wikidataQid || '');
-    const districtHint =
-      type === 'plantation'
-        ? districtByQid.get(qid) || (place.district || '').trim() || undefined
-        : undefined;
-
-    for (const name of place.names || []) {
-      const text = (name.text || '').trim();
-      if (!text) continue;
-      out.push({
-        id: place.id || '',
-        name: text,
-        type,
-        districtHint,
-        wikidataQid: qid || undefined,
-      });
-    }
-  }
-  return dedupe(out, (value) => `${value.id}::${value.name}`)
-    .sort((a, b) => a.name.localeCompare(b.name))
-    .slice(0, 12000);
 }
