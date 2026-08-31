@@ -17,15 +17,6 @@ type NasRecord = {
   mediaType: 'image' | 'video' | 'audio' | 'unknown';
 };
 
-type NasHit = {
-  recordKey: string;
-  hitType: 'place' | 'person';
-  canonicalName: string;
-  stmGazetteerId: string;
-  category: string;
-  matchSource: string;
-};
-
 export type EventTask = {
   taskId: string;
   mode: 'image';
@@ -40,7 +31,6 @@ export type EventTask = {
   documentType: string;
   sourceUrl: string;
   lowResUrl: string;
-  suggestedPersons: string[];
   round1Offered: boolean;
   assignmentCount: number;
   status: 'unoffered' | 'assigned' | 'completed';
@@ -105,7 +95,6 @@ type ClaimResponse = {
 
 const DATA_DIR = join(process.cwd(), '..', 'data', 'nas-mediabank');
 const RECORDS_PATH = join(DATA_DIR, 'nas-mediabank-records.json');
-const HITS_HIGH_PATH = join(DATA_DIR, 'nas-place-person-hits.high-precision.json');
 const STATE_PATH = join(DATA_DIR, 'event-state.json');
 
 const LEASE_MINUTES = Number(process.env.EVENT_TASK_LEASE_MINUTES || '15');
@@ -140,44 +129,12 @@ function makeLowResUrl(mediaId: string): string {
   return `https://images.memorix.nl/nas/thumb/350x350crop/${mediaId}.jpg`;
 }
 
-function buildSuggestionMaps(hits: NasHit[]): {
-  peopleByRecord: Map<string, string[]>;
-} {
-  const peopleByRecord = new Map<string, string[]>();
-
-  for (const hit of hits) {
-    if (hit.hitType === 'person') {
-      const current = peopleByRecord.get(hit.recordKey) || [];
-      current.push(hit.canonicalName);
-      peopleByRecord.set(hit.recordKey, current);
-    }
-  }
-
-  for (const [key, values] of peopleByRecord.entries()) {
-    peopleByRecord.set(key, [...new Set(values)]);
-  }
-
-  return { peopleByRecord };
-}
-
-function dedupe<T>(values: T[], keyFn: (value: T) => string): T[] {
-  const map = new Map<string, T>();
-  for (const value of values) {
-    const key = keyFn(value);
-    if (!map.has(key)) map.set(key, value);
-  }
-  return [...map.values()];
-}
-
 function initializeStateFromData(): EventState {
   const records = readJsonFile<NasRecord[]>(RECORDS_PATH);
-  const hits = readJsonFile<NasHit[]>(HITS_HIGH_PATH);
-  const { peopleByRecord } = buildSuggestionMaps(hits);
 
   const tasks: EventTask[] = [];
   for (const record of records) {
     const sourceUrl = splitDetailUrl(record.detailUrl || '');
-    const suggestedPersons = peopleByRecord.get(record.recordKey) || [];
 
     if (record.mediaType === 'image') {
       tasks.push({
@@ -194,7 +151,6 @@ function initializeStateFromData(): EventState {
         documentType: record.documentType,
         sourceUrl,
         lowResUrl: makeLowResUrl(record.mediaId),
-        suggestedPersons,
         round1Offered: false,
         assignmentCount: 0,
         status: 'unoffered',

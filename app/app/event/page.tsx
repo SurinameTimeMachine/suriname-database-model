@@ -16,7 +16,6 @@ type EventTask = {
   documentType: string;
   sourceUrl: string;
   lowResUrl: string;
-  suggestedPersons: string[];
   currentClaim: {
     claimId: string;
     participantId: string;
@@ -48,7 +47,6 @@ export default function EventPage() {
   const [done, setDone] = useState(false);
   const [addedPlaces, setAddedPlaces] = useState<string[]>([]);
   const [addedDates, setAddedDates] = useState<string[]>([]);
-  const [selectedPersons, setSelectedPersons] = useState<string[]>([]);
   const [addedPersons, setAddedPersons] = useState<string[]>([]);
   const [locationUnknown, setLocationUnknown] = useState(true);
   const [notes, setNotes] = useState('');
@@ -73,7 +71,6 @@ export default function EventPage() {
 
   function resetFormForTask(nextTask: EventTask | null) {
     if (!nextTask) {
-      setSelectedPersons([]);
       setAddedPlaces([]);
       setAddedDates([]);
       setAddedPersons([]);
@@ -86,7 +83,6 @@ export default function EventPage() {
       return;
     }
 
-    setSelectedPersons([...new Set(nextTask.suggestedPersons)]);
     setAddedPlaces([]);
     setAddedDates([]);
     setAddedPersons([]);
@@ -183,13 +179,6 @@ export default function EventPage() {
     setStatus('Kies een nickname om te beginnen.');
   }
 
-  function togglePersonSuggestion(name: string) {
-    const selected = selectedPersons.includes(name);
-    setSelectedPersons((prev) =>
-      selected ? prev.filter((value) => value !== name) : [...prev, name],
-    );
-  }
-
   function addDateTerm() {
     const term = dateInput.trim();
     if (!term) return;
@@ -212,7 +201,7 @@ export default function EventPage() {
   function addPersonTerm() {
     const term = personInput.trim();
     if (!term) return;
-    if (!selectedPersons.includes(term) && !addedPersons.includes(term)) {
+    if (!addedPersons.includes(term)) {
       setAddedPersons((prev) => [...prev, term]);
     }
     setPersonInput('');
@@ -234,7 +223,7 @@ export default function EventPage() {
         selectedPlaceNames: [],
         addedPlaces,
         addedDates,
-        selectedPersons,
+        selectedPersons: [],
         addedPersons,
         notes: notes.trim(),
       };
@@ -352,15 +341,6 @@ export default function EventPage() {
                     </div>
                     {addedPlaces.length > 0 ? <p className="mt-1 text-xs text-stm-warm-600">{addedPlaces.join(' · ')}</p> : null}
                   </details>
-
-                  {task.suggestedPersons.length > 0 ? (
-                    <details className="border-t border-stm-warm-200 pt-3">
-                      <summary className="flex min-h-11 cursor-pointer items-center text-sm font-semibold text-stm-warm-700">Personen ({task.suggestedPersons.length})</summary>
-                      <div className="mt-2 space-y-1">
-                        {task.suggestedPersons.map((name) => <label key={`person-${name}`} className="flex min-h-11 items-center gap-3 text-base"><input type="checkbox" checked={selectedPersons.includes(name)} onChange={() => togglePersonSuggestion(name)} className="h-5 w-5" /><span>{name}</span></label>)}
-                      </div>
-                    </details>
-                  ) : null}
 
                   <details className="border-t border-stm-warm-200 pt-3">
                     <summary className="flex min-h-11 cursor-pointer items-center text-sm font-semibold text-stm-warm-700">Persoon toevoegen</summary>
