@@ -1,13 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-
-type PlaceSuggestion = {
-  gazetteerId: string;
-  label: string;
-  category: string;
-  source: string;
-};
+import { useEffect, useState } from 'react';
 
 type EventTask = {
   taskId: string;
@@ -23,7 +16,6 @@ type EventTask = {
   documentType: string;
   sourceUrl: string;
   lowResUrl: string;
-  suggestedPlaces: PlaceSuggestion[];
   suggestedPersons: string[];
   currentClaim: {
     claimId: string;
@@ -44,22 +36,7 @@ type Stats = {
   round: 1 | 2;
 };
 
-type PlaceOption = {
-  id: string;
-  name: string;
-  type: string;
-  districtHint?: string;
-  wikidataQid?: string;
-};
-
 const STORAGE_KEY = 'stm_event_participant';
-
-function formatPlaceOptionLabel(option: PlaceOption): string {
-  if (option.type === 'plantation' && option.districtHint) {
-    return `${option.name} (${option.districtHint})`;
-  }
-  return `${option.name} (${option.type})`;
-}
 
 export default function EventPage() {
   const [nickname, setNickname] = useState('');
@@ -69,19 +46,11 @@ export default function EventPage() {
   const [task, setTask] = useState<EventTask | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
   const [done, setDone] = useState(false);
-  const [placeOptions, setPlaceOptions] = useState<PlaceOption[]>([]);
-
-  const [selectedPlaceIds, setSelectedPlaceIds] = useState<string[]>([]);
-  const [selectedPlaceNames, setSelectedPlaceNames] = useState<string[]>([]);
-  const [addedPlaces, setAddedPlaces] = useState<string[]>([]);
   const [addedDates, setAddedDates] = useState<string[]>([]);
   const [selectedPersons, setSelectedPersons] = useState<string[]>([]);
-  const [addedPersons, setAddedPersons] = useState<string[]>([]);
-  const [locationUnknown, setLocationUnknown] = useState(false);
   const [notes, setNotes] = useState('');
-  const [placeInput, setPlaceInput] = useState('');
   const [dateInput, setDateInput] = useState('');
-  const [personInput, setPersonInput] = useState('');
+  const [metadataExpanded, setMetadataExpanded] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -96,56 +65,21 @@ export default function EventPage() {
     }
   }, []);
 
-  useEffect(() => {
-    fetch('/api/event/options')
-      .then((res) => res.json())
-      .then((data) => setPlaceOptions(data.places || []))
-      .catch(() => {
-        setPlaceOptions([]);
-      });
-  }, []);
-
-  const matchingPlaceOptions = useMemo(() => {
-    const query = placeInput.trim().toLowerCase();
-    if (!query) return placeOptions.slice(0, 8);
-    return placeOptions.filter((option) => {
-      const display = formatPlaceOptionLabel(option).toLowerCase();
-      return (
-        option.name.toLowerCase().includes(query) ||
-        option.type.toLowerCase().includes(query) ||
-        (option.districtHint || '').toLowerCase().includes(query) ||
-        display.includes(query)
-      );
-    }).slice(0, 8);
-  }, [placeOptions, placeInput]);
-
   function resetFormForTask(nextTask: EventTask | null) {
     if (!nextTask) {
-      setSelectedPlaceIds([]);
-      setSelectedPlaceNames([]);
       setSelectedPersons([]);
-      setAddedPlaces([]);
       setAddedDates([]);
-      setAddedPersons([]);
       setDateInput('');
-      setLocationUnknown(false);
       setNotes('');
+      setMetadataExpanded(false);
       return;
     }
 
-    const initialPlaceIds = nextTask.suggestedPlaces
-      .map((entry) => entry.gazetteerId)
-      .filter(Boolean);
-    const initialPlaceNames = nextTask.suggestedPlaces.map((entry) => entry.label);
-    setSelectedPlaceIds([...new Set(initialPlaceIds)]);
-    setSelectedPlaceNames([...new Set(initialPlaceNames)]);
     setSelectedPersons([...new Set(nextTask.suggestedPersons)]);
-    setAddedPlaces([]);
     setAddedDates([]);
-    setAddedPersons([]);
     setDateInput('');
-    setLocationUnknown(false);
     setNotes('');
+    setMetadataExpanded(false);
   }
 
   async function startSession() {
@@ -216,53 +150,11 @@ export default function EventPage() {
     }
   }
 
-  function togglePlaceSuggestion(suggestion: PlaceSuggestion) {
-    const id = suggestion.gazetteerId;
-    if (!id) {
-      const exists = selectedPlaceNames.includes(suggestion.label);
-      setSelectedPlaceNames((prev) =>
-        exists ? prev.filter((value) => value !== suggestion.label) : [...prev, suggestion.label],
-      );
-      return;
-    }
-
-    const selected = selectedPlaceIds.includes(id);
-    if (selected) {
-      setSelectedPlaceIds((prev) => prev.filter((value) => value !== id));
-      setSelectedPlaceNames((prev) => prev.filter((value) => value !== suggestion.label));
-    } else {
-      setSelectedPlaceIds((prev) => [...prev, id]);
-      setSelectedPlaceNames((prev) => [...new Set([...prev, suggestion.label])]);
-    }
-  }
-
   function togglePersonSuggestion(name: string) {
     const selected = selectedPersons.includes(name);
     setSelectedPersons((prev) =>
       selected ? prev.filter((value) => value !== name) : [...prev, name],
     );
-  }
-
-  function addPlaceTerm() {
-    const term = placeInput.trim();
-    if (!term) return;
-    if (selectedPlaceNames.includes(term) || addedPlaces.includes(term)) {
-      setPlaceInput('');
-      return;
-    }
-    setAddedPlaces((prev) => [...prev, term]);
-    setPlaceInput('');
-  }
-
-  function chooseGazetteerOption(option: PlaceOption) {
-    const suggestion = {
-      gazetteerId: option.id,
-      label: option.name,
-      category: option.type,
-      source: 'gazetteer',
-    };
-    togglePlaceSuggestion(suggestion);
-    setPlaceInput('');
   }
 
   function addDateTerm() {
@@ -276,17 +168,6 @@ export default function EventPage() {
     setDateInput('');
   }
 
-  function addPersonTerm() {
-    const term = personInput.trim();
-    if (!term) return;
-    if (selectedPersons.includes(term) || addedPersons.includes(term)) {
-      setPersonInput('');
-      return;
-    }
-    setAddedPersons((prev) => [...prev, term]);
-    setPersonInput('');
-  }
-
   async function submitCurrentTask(decision: 'confirm' | 'skip') {
     if (!task || !task.currentClaim) {
       setStatus('Geen actieve taak om in te dienen.');
@@ -298,13 +179,13 @@ export default function EventPage() {
     try {
       const payload = {
         decision,
-        locationUnknown,
-        selectedPlaceIds,
-        selectedPlaceNames,
-        addedPlaces,
+        locationUnknown: true,
+        selectedPlaceIds: [],
+        selectedPlaceNames: [],
+        addedPlaces: [],
         addedDates,
         selectedPersons,
-        addedPersons,
+        addedPersons: [],
         notes: notes.trim(),
       };
 
@@ -338,274 +219,106 @@ export default function EventPage() {
   }
 
   return (
-    <div className="h-full overflow-y-auto bg-stm-warm-50">
-      <div className="max-w-xl mx-auto p-4 sm:p-6 space-y-4">
-        <header className="border border-stm-warm-200 bg-white p-4">
-          <h1 className="text-xl font-semibold text-stm-warm-900">NAS Mediabank in de Suriname Time Machine</h1>
-          <p className="text-sm text-stm-warm-600 mt-1">
-            Smartphone toepassing voor verrijking beeldmateriaal.
-          </p>
-          {stats ? (
-            <p className="text-xs text-stm-warm-500 mt-2">
-              Totaal {stats.total} | Afgerond {stats.completed} | Open taken {stats.unresolved} | Ronde {stats.round}
-            </p>
-          ) : null}
-        </header>
-
-        {!participantId ? (
-          <section className="border border-stm-warm-200 bg-white p-4 space-y-3">
-            <label className="block text-sm font-medium text-stm-warm-800">Nickname</label>
-            <input
-              value={nickname}
-              onChange={(e) => setNickname(e.target.value)}
-              placeholder="Bijv. Team-12"
-              className="w-full border border-stm-warm-300 px-3 py-2 text-sm"
-            />
-            <button
-              onClick={startSession}
-              disabled={busy}
-              className="w-full bg-stm-sepia-600 text-white py-2 text-sm font-medium disabled:opacity-50"
-            >
-              Start
-            </button>
-          </section>
+    <main className="h-full min-h-0 overflow-hidden bg-stm-warm-50 text-stm-warm-900">
+      <div className="mx-auto flex h-full w-full max-w-xl flex-col">
+        {!task ? (
+          <header className="shrink-0 border-b border-stm-warm-200 bg-white px-4 py-3">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-sm font-semibold">NAS foto-review</p>
+              {stats ? <p className="text-xs text-stm-warm-500">{stats.completed}/{stats.total} afgerond</p> : null}
+            </div>
+          </header>
         ) : null}
 
-        {participantId && !task && !done ? (
-          <section className="border border-stm-warm-200 bg-white p-4">
-            <button
-              onClick={claimNextTask}
-              disabled={busy}
-              className="w-full bg-stm-warm-900 text-white py-2 text-sm font-medium disabled:opacity-50"
-            >
-              Volgende taak ophalen
-            </button>
-          </section>
-        ) : null}
-
-        {done ? (
-          <section className="border border-stm-warm-200 bg-white p-4 text-sm text-stm-warm-700">
-            Geen taken meer beschikbaar op dit moment.
-          </section>
-        ) : null}
-
-        {task ? (
-          <section className="border border-stm-warm-200 bg-white p-4 space-y-4">
-            <div>
-              <p className="text-xs text-stm-warm-500">Fototaak</p>
-              <h2 className="text-lg font-semibold text-stm-warm-900">{task.title || '(zonder titel)'}</h2>
-              <p className="text-sm text-stm-warm-700 mt-1">{task.description || '(geen beschrijving)'}</p>
-              <p className="text-xs text-stm-warm-500 mt-2">
-                Datum: {task.yearRaw || 'onbekend'} | Inventaris: {task.inventoryNumber || 'onbekend'}
-              </p>
-            </div>
-
-            {task.lowResUrl ? (
-              <img src={task.lowResUrl} alt={task.title || 'preview'} className="w-full border border-stm-warm-200" />
-            ) : null}
-
-            <div className="flex gap-2">
-              {task.sourceUrl ? (
-                <a href={task.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-xs underline text-stm-sepia-700">
-                  Open bron
-                </a>
-              ) : null}
-            </div>
-
-            <div>
-              <h3 className="text-sm font-semibold text-stm-warm-900 mb-2">Locatiesuggesties</h3>
-              <label className="flex gap-2 text-sm mb-2">
-                <input
-                  type="checkbox"
-                  checked={locationUnknown}
-                  onChange={(e) => {
-                    const checked = e.target.checked;
-                    setLocationUnknown(checked);
-                    if (checked) {
-                      setSelectedPlaceIds([]);
-                      setSelectedPlaceNames([]);
-                      setAddedPlaces([]);
-                    }
-                  }}
-                />
-                <span>Locatie onbekend of niet zinvol voor dit item</span>
-              </label>
-              <div className="space-y-1">
-                {task.suggestedPlaces.map((suggestion, index) => {
-                  const checked = suggestion.gazetteerId
-                    ? selectedPlaceIds.includes(suggestion.gazetteerId)
-                    : selectedPlaceNames.includes(suggestion.label);
-                  return (
-                    <label
-                      key={suggestion.gazetteerId ? `${suggestion.gazetteerId}-${index}` : `${suggestion.label}-${index}`}
-                      className="flex gap-2 text-sm"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={checked}
-                        disabled={locationUnknown}
-                        onChange={() => togglePlaceSuggestion(suggestion)}
-                      />
-                      <span>
-                        {suggestion.label} <span className="text-stm-warm-500">({suggestion.category})</span>
-                      </span>
-                    </label>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-stm-warm-800 mb-1">Locatie toevoegen</label>
-              <input
-                list="place-options"
-                value={placeInput}
-                onChange={(e) => setPlaceInput(e.target.value)}
-                placeholder="Zoek of typ nieuwe term"
-                disabled={locationUnknown}
-                className="w-full border border-stm-warm-300 px-3 py-2 text-sm"
-              />
-              <datalist id="place-options">
-                {placeOptions.map((option) => (
-                  <option key={option.id} value={option.name} label={formatPlaceOptionLabel(option)} />
-                ))}
-              </datalist>
-              <button onClick={addPlaceTerm} disabled={locationUnknown} className="mt-2 bg-stm-warm-200 px-3 py-1 text-xs disabled:opacity-50">
-                Voeg locatie toe
-              </button>
-              {addedPlaces.length > 0 ? (
-                <p className="text-xs text-stm-warm-600 mt-2">Nieuw: {addedPlaces.join(' | ')}</p>
-              ) : null}
-              {matchingPlaceOptions.length > 0 ? (
-                <div className="mt-3 space-y-2 text-xs text-stm-warm-700">
-                  <p className="font-medium text-stm-warm-800">Mogelijke matches</p>
-                  <div className="space-y-2">
-                    {matchingPlaceOptions.map((option) => (
-                      <div key={option.id} className="flex items-center justify-between gap-3 border border-stm-warm-200 bg-stm-warm-50 px-3 py-2">
-                        <div>
-                          <p className="font-medium text-stm-warm-800">
-                            {option.name}{' '}
-                            <span className="text-stm-warm-500">
-                              ({option.type === 'plantation' && option.districtHint ? option.districtHint : option.type})
-                            </span>
-                          </p>
-                          <p className="text-[11px] text-stm-warm-500">ID: {option.id}</p>
-                        </div>
-                        <div className="flex items-center gap-2 shrink-0">
-                          <button
-                            type="button"
-                            onClick={() => chooseGazetteerOption(option)}
-                            disabled={locationUnknown}
-                            className="bg-stm-sepia-700 text-white px-2 py-1 disabled:opacity-50"
-                          >
-                            Kies
-                          </button>
-                          <a
-                            href={`/places?place=${encodeURIComponent(option.id)}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="underline text-stm-sepia-700"
-                          >
-                            Controleer
-                          </a>
-                          {option.wikidataQid ? (
-                            <a
-                              href={`https://www.wikidata.org/wiki/${encodeURIComponent(option.wikidataQid)}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="underline text-stm-sepia-700"
-                            >
-                              Wikidata
-                            </a>
-                          ) : null}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-stm-warm-800 mb-1">Datum toevoegen</label>
+        <div className="flex min-h-0 flex-1 flex-col">
+          {!participantId ? (
+            <section className="m-3 border border-stm-warm-200 bg-white p-4">
+              <p className="mb-3 text-sm text-stm-warm-700">Kies een nickname om te beginnen.</p>
               <div className="flex gap-2">
                 <input
-                  value={dateInput}
-                  onChange={(e) => setDateInput(e.target.value)}
-                  placeholder="Bijv. 15 juli 1975"
-                  className="w-full border border-stm-warm-300 px-3 py-2 text-sm"
+                  value={nickname}
+                  onChange={(e) => setNickname(e.target.value)}
+                  placeholder="Bijv. Team-12"
+                  className="min-w-0 flex-1 border border-stm-warm-300 px-3 py-2 text-sm"
                 />
-                <button onClick={addDateTerm} className="bg-stm-warm-200 px-3 py-1 text-xs">
-                  Voeg datum toe
+                <button onClick={startSession} disabled={busy} className="bg-stm-sepia-700 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">
+                  Start
                 </button>
               </div>
-              {addedDates.length > 0 ? (
-                <p className="text-xs text-stm-warm-600 mt-2">Nieuw: {addedDates.join(' | ')}</p>
-              ) : null}
-            </div>
+            </section>
+          ) : null}
 
-            <div>
-              <h3 className="text-sm font-semibold text-stm-warm-900 mb-2">Persoonsuggesties</h3>
-              <div className="space-y-1">
-                {task.suggestedPersons.map((name, index) => (
-                  <label key={`${name}-${index}`} className="flex gap-2 text-sm">
-                    <input type="checkbox" checked={selectedPersons.includes(name)} onChange={() => togglePersonSuggestion(name)} />
-                    <span>{name}</span>
-                  </label>
-                ))}
+          {participantId && !task && !done ? (
+            <section className="m-3 border border-stm-warm-200 bg-white p-3">
+              <button onClick={claimNextTask} disabled={busy} className="w-full bg-stm-warm-900 py-3 text-sm font-semibold text-white disabled:opacity-50">
+                Volgende foto
+              </button>
+            </section>
+          ) : null}
+
+          {done ? <p className="m-3 border border-stm-warm-200 bg-white p-4 text-sm text-stm-warm-700">Geen foto&apos;s meer beschikbaar.</p> : null}
+
+          {task ? (
+            <section className="flex min-h-0 flex-1 flex-col bg-white">
+              <div className="min-h-0 flex-1 overflow-y-auto">
+                {task.lowResUrl ? (
+                  <div className="flex min-h-[38vh] items-center justify-center bg-stm-warm-900">
+                    <img src={task.lowResUrl} alt={task.title || 'Foto'} className="max-h-[52vh] w-full object-contain" />
+                  </div>
+                ) : <div className="flex min-h-[30vh] items-center justify-center bg-stm-warm-100 text-sm text-stm-warm-500">Geen preview beschikbaar</div>}
+
+                <div className="space-y-3 p-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-stm-warm-500">Foto</p>
+                    {task.sourceUrl ? <a href={task.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-stm-sepia-700 underline">Bron</a> : null}
+                  </div>
+
+                  <div className={metadataExpanded ? '' : 'line-clamp-3'}>
+                    <h1 className="text-base font-semibold leading-tight">{task.title || '(zonder titel)'}</h1>
+                    <p className="mt-1 text-sm leading-snug text-stm-warm-700">{task.description || '(geen beschrijving)'}</p>
+                    <p className="mt-1 text-xs text-stm-warm-500">{task.yearRaw || 'Datum onbekend'} · {task.inventoryNumber || 'Inventaris onbekend'}</p>
+                  </div>
+                  <button type="button" onClick={() => setMetadataExpanded((expanded) => !expanded)} className="text-xs font-semibold text-stm-sepia-700 underline">
+                    {metadataExpanded ? 'Minder metadata' : 'Meer metadata'}
+                  </button>
+
+                  {!task.yearRaw.trim() ? (
+                    <div className="border-t border-stm-warm-200 pt-3">
+                      <label htmlFor="event-date" className="mb-1 block text-xs font-semibold text-stm-warm-700">Datum toevoegen (optioneel)</label>
+                      <div className="flex gap-2">
+                        <input id="event-date" value={dateInput} onChange={(e) => setDateInput(e.target.value)} placeholder="Bijv. 15 juli 1975" className="min-w-0 flex-1 border border-stm-warm-300 px-3 py-2 text-sm" />
+                        <button onClick={addDateTerm} className="bg-stm-warm-200 px-3 py-2 text-xs font-semibold">Toevoegen</button>
+                      </div>
+                      {addedDates.length > 0 ? <p className="mt-1 text-xs text-stm-warm-600">{addedDates.join(' · ')}</p> : null}
+                    </div>
+                  ) : null}
+
+                  {task.suggestedPersons.length > 0 ? (
+                    <details className="border-t border-stm-warm-200 pt-3">
+                      <summary className="cursor-pointer text-xs font-semibold text-stm-warm-700">Personen ({task.suggestedPersons.length})</summary>
+                      <div className="mt-2 space-y-1">
+                        {task.suggestedPersons.map((name) => <label key={name} className="flex gap-2 text-sm"><input type="checkbox" checked={selectedPersons.includes(name)} onChange={() => togglePersonSuggestion(name)} /><span>{name}</span></label>)}
+                      </div>
+                    </details>
+                  ) : null}
+
+                  <details className="border-t border-stm-warm-200 pt-3">
+                    <summary className="cursor-pointer text-xs font-semibold text-stm-warm-700">Notitie toevoegen</summary>
+                    <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} className="mt-2 w-full border border-stm-warm-300 px-3 py-2 text-sm" placeholder="Optioneel" />
+                  </details>
+                </div>
               </div>
-            </div>
 
-            <div>
-              <label className="block text-sm font-medium text-stm-warm-800 mb-1">Persoon toevoegen</label>
-              <input
-                value={personInput}
-                onChange={(e) => setPersonInput(e.target.value)}
-                placeholder="Typ naam"
-                className="w-full border border-stm-warm-300 px-3 py-2 text-sm"
-              />
-              <button onClick={addPersonTerm} className="mt-2 bg-stm-warm-200 px-3 py-1 text-xs">
-                Voeg persoon toe
-              </button>
-              {addedPersons.length > 0 ? (
-                <p className="text-xs text-stm-warm-600 mt-2">Nieuw: {addedPersons.join(' | ')}</p>
-              ) : null}
-            </div>
+              <div className="grid shrink-0 grid-cols-2 gap-2 border-t border-stm-warm-200 bg-white p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+                <button onClick={() => submitCurrentTask('skip')} disabled={busy} className="border border-stm-warm-300 py-3 text-sm font-semibold text-stm-warm-800 disabled:opacity-50">Overslaan</button>
+                <button onClick={() => submitCurrentTask('confirm')} disabled={busy} className="bg-stm-sepia-700 py-3 text-sm font-semibold text-white disabled:opacity-50">Bevestigen</button>
+              </div>
+            </section>
+          ) : null}
+        </div>
 
-            <div>
-              <label className="block text-sm font-medium text-stm-warm-800 mb-1">Notitie</label>
-              <textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                rows={3}
-                className="w-full border border-stm-warm-300 px-3 py-2 text-sm"
-                placeholder="Optioneel"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                onClick={() => submitCurrentTask('confirm')}
-                disabled={busy}
-                className="bg-stm-sepia-700 text-white py-2 text-sm font-semibold disabled:opacity-50"
-              >
-                Bevestigen
-              </button>
-              <button
-                onClick={() => submitCurrentTask('skip')}
-                disabled={busy}
-                className="bg-stm-warm-300 text-stm-warm-900 py-2 text-sm font-semibold disabled:opacity-50"
-              >
-                Overslaan
-              </button>
-            </div>
-          </section>
-        ) : null}
-
-        {status ? (
-          <section className="border border-stm-warm-200 bg-white p-3 text-xs text-stm-warm-700">{status}</section>
-        ) : null}
+        {status ? <p className="shrink-0 border-t border-stm-warm-200 bg-white px-3 py-2 text-xs text-stm-warm-700">{status}</p> : null}
       </div>
-    </div>
+    </main>
   );
 }
