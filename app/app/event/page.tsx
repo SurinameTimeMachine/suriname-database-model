@@ -36,7 +36,7 @@ type Stats = {
   round: 1 | 2;
 };
 
-const STORAGE_KEY = 'stm_event_participant';
+const STORAGE_KEY = 'stm_annotate_participant_v1';
 
 export default function EventPage() {
   const [nickname, setNickname] = useState('');
@@ -58,6 +58,7 @@ export default function EventPage() {
   const [metadataExpanded, setMetadataExpanded] = useState(false);
 
   useEffect(() => {
+    localStorage.removeItem('stm_event_participant');
     const saved = localStorage.getItem(STORAGE_KEY);
     if (!saved) return;
     try {
@@ -159,10 +160,27 @@ export default function EventPage() {
       resetFormForTask(data.task);
       setStatus('');
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : 'Onbekende fout bij claim.');
+      if (error instanceof Error && error.message.toLowerCase().includes('unknown participant')) {
+        localStorage.removeItem(STORAGE_KEY);
+        setParticipantId('');
+        setTask(null);
+        setStatus('Deze sessie is verlopen. Kies opnieuw een nickname.');
+      } else {
+        setStatus(error instanceof Error ? error.message : 'Onbekende fout bij claim.');
+      }
     } finally {
       setBusy(false);
     }
+  }
+
+  function resetSession() {
+    localStorage.removeItem(STORAGE_KEY);
+    setParticipantId('');
+    setTask(null);
+    setDone(false);
+    setStats(null);
+    resetFormForTask(null);
+    setStatus('Kies een nickname om te beginnen.');
   }
 
   function togglePersonSuggestion(name: string) {
@@ -257,7 +275,10 @@ export default function EventPage() {
           <header className="shrink-0 border-b border-stm-warm-200 bg-white px-4 py-3">
             <div className="flex items-center justify-between gap-3">
               <p className="text-sm font-semibold">NAS foto-review</p>
-              {stats ? <p className="text-xs text-stm-warm-500">{stats.completed}/{stats.total} afgerond</p> : null}
+              <div className="flex items-center gap-3">
+                {stats ? <p className="text-xs text-stm-warm-500">{stats.completed}/{stats.total} afgerond</p> : null}
+                {participantId ? <button type="button" onClick={resetSession} className="text-xs text-stm-warm-500 underline">Andere gebruiker</button> : null}
+              </div>
             </div>
           </header>
         ) : null}
