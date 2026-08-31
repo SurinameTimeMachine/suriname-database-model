@@ -26,13 +26,6 @@ type NasHit = {
   matchSource: string;
 };
 
-type TaskSuggestionPlace = {
-  gazetteerId: string;
-  label: string;
-  category: string;
-  source: string;
-};
-
 export type EventTask = {
   taskId: string;
   mode: 'image';
@@ -47,7 +40,6 @@ export type EventTask = {
   documentType: string;
   sourceUrl: string;
   lowResUrl: string;
-  suggestedPlaces: TaskSuggestionPlace[];
   suggestedPersons: string[];
   round1Offered: boolean;
   assignmentCount: number;
@@ -149,24 +141,11 @@ function makeLowResUrl(mediaId: string): string {
 }
 
 function buildSuggestionMaps(hits: NasHit[]): {
-  placesByRecord: Map<string, TaskSuggestionPlace[]>;
   peopleByRecord: Map<string, string[]>;
 } {
-  const placesByRecord = new Map<string, TaskSuggestionPlace[]>();
   const peopleByRecord = new Map<string, string[]>();
 
   for (const hit of hits) {
-    if (hit.hitType === 'place') {
-      const current = placesByRecord.get(hit.recordKey) || [];
-      current.push({
-        gazetteerId: hit.stmGazetteerId || '',
-        label: hit.canonicalName,
-        category: hit.category,
-        source: hit.matchSource,
-      });
-      placesByRecord.set(hit.recordKey, current);
-    }
-
     if (hit.hitType === 'person') {
       const current = peopleByRecord.get(hit.recordKey) || [];
       current.push(hit.canonicalName);
@@ -174,15 +153,11 @@ function buildSuggestionMaps(hits: NasHit[]): {
     }
   }
 
-  for (const [key, values] of placesByRecord.entries()) {
-    const deduped = dedupe(values, (entry) => `${entry.gazetteerId}::${entry.label}`);
-    placesByRecord.set(key, deduped);
-  }
   for (const [key, values] of peopleByRecord.entries()) {
     peopleByRecord.set(key, [...new Set(values)]);
   }
 
-  return { placesByRecord, peopleByRecord };
+  return { peopleByRecord };
 }
 
 function dedupe<T>(values: T[], keyFn: (value: T) => string): T[] {
@@ -197,12 +172,11 @@ function dedupe<T>(values: T[], keyFn: (value: T) => string): T[] {
 function initializeStateFromData(): EventState {
   const records = readJsonFile<NasRecord[]>(RECORDS_PATH);
   const hits = readJsonFile<NasHit[]>(HITS_HIGH_PATH);
-  const { placesByRecord, peopleByRecord } = buildSuggestionMaps(hits);
+  const { peopleByRecord } = buildSuggestionMaps(hits);
 
   const tasks: EventTask[] = [];
   for (const record of records) {
     const sourceUrl = splitDetailUrl(record.detailUrl || '');
-    const suggestedPlaces = placesByRecord.get(record.recordKey) || [];
     const suggestedPersons = peopleByRecord.get(record.recordKey) || [];
 
     if (record.mediaType === 'image') {
@@ -220,7 +194,6 @@ function initializeStateFromData(): EventState {
         documentType: record.documentType,
         sourceUrl,
         lowResUrl: makeLowResUrl(record.mediaId),
-        suggestedPlaces,
         suggestedPersons,
         round1Offered: false,
         assignmentCount: 0,
@@ -259,7 +232,7 @@ function loadState(): EventState {
   const state = readJsonFile<EventState>(STATE_PATH);
   const photoTaskIds = new Set(
     state.tasks
-      .filter((task) => task.mode === 'image' && task.mediaType === 'image')
+      .filter((task) => task.mediaType === 'image')
       .map((task) => task.taskId),
   );
   state.tasks = state.tasks.filter((task) => photoTaskIds.has(task.taskId));
@@ -365,12 +338,11 @@ export async function claimTask(participantId: string): Promise<ClaimResponse> {
 
     if (round === 1) {
       candidates = state.tasks.filter(
-        (task) => task.mode === 'image' && task.mediaType === 'image' && !task.round1Offered,
+        (task) => task.mediaType === 'image' && !task.round1Offered,
       );
     } else {
       candidates = state.tasks.filter(
         (task) =>
-          task.mode === 'image' &&
           task.mediaType === 'image' &&
           task.status !== 'completed' &&
           (!task.currentClaim || !isLeaseActive(task, now)),

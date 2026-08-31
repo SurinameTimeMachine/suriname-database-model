@@ -81,10 +81,7 @@ const PLANTATIONS_DATASET_PATH = join(
 
 const OUTPUT_DIR = join(__dirname, '../..', 'data', 'nas-mediabank');
 const OUTPUT_JSON = join(OUTPUT_DIR, 'nas-place-person-hits.json');
-const OUTPUT_CSV = join(OUTPUT_DIR, 'nas-place-person-hits.csv');
 const OUTPUT_HIGH_JSON = join(OUTPUT_DIR, 'nas-place-person-hits.high-precision.json');
-const OUTPUT_HIGH_CSV = join(OUTPUT_DIR, 'nas-place-person-hits.high-precision.csv');
-const OUTPUT_SUMMARY = join(OUTPUT_DIR, 'nas-place-person-hits-summary.md');
 
 const BLOCKLIST_NORMALIZED = new Set([
   'suriname',
@@ -107,13 +104,6 @@ function normalize(value: string): string {
     .replace(/[^a-z0-9\s-]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
-}
-
-function csvEscape(value: string): string {
-  if (value.includes('"') || value.includes(',') || value.includes('\n')) {
-    return `"${value.replace(/"/g, '""')}"`;
-  }
-  return value;
 }
 
 function dedupe<T>(values: T[], keyFn: (value: T) => string): T[] {
@@ -372,77 +362,6 @@ function scan(nasRows: NasRow[], dictionary: PlaceDictionaryEntry[]): HitRow[] {
   );
 }
 
-function toCsv(rows: HitRow[]): string {
-  const headers: Array<keyof HitRow> = [
-    'recordKey',
-    'detailId',
-    'mediaId',
-    'mediaType',
-    'inventoryNumber',
-    'yearRaw',
-    'field',
-    'hitType',
-    'category',
-    'matchedTerm',
-    'matchedTermNormalized',
-    'canonicalName',
-    'matchSource',
-    'stmGazetteerId',
-    'ambiguityCount',
-    'title',
-    'snippet',
-    'lowHangingSpecific',
-    'reviewBucket',
-  ];
-
-  const lines = [headers.join(',')];
-  for (const row of rows) {
-    lines.push(headers.map((header) => csvEscape(String(row[header]))).join(','));
-  }
-  return lines.join('\n');
-}
-
-function buildSummary(recordsScanned: number, hits: HitRow[]): string {
-  const byHitType = new Map<string, number>();
-  const byCategory = new Map<string, number>();
-  const byBucket = new Map<string, number>();
-  const bySource = new Map<string, number>();
-  const recordIds = new Set<string>();
-
-  for (const hit of hits) {
-    recordIds.add(hit.recordKey);
-    byHitType.set(hit.hitType, (byHitType.get(hit.hitType) || 0) + 1);
-    byCategory.set(hit.category, (byCategory.get(hit.category) || 0) + 1);
-    byBucket.set(hit.reviewBucket, (byBucket.get(hit.reviewBucket) || 0) + 1);
-    bySource.set(hit.matchSource, (bySource.get(hit.matchSource) || 0) + 1);
-  }
-
-  return [
-    '# NAS Place/Person Hits Summary',
-    '',
-    `- NAS records scanned: ${recordsScanned}`,
-    `- Total hit rows: ${hits.length}`,
-    `- NAS records with >=1 hit: ${recordIds.size}`,
-    `- High-precision rows: ${hits.filter((hit) => hit.reviewBucket === 'high-precision').length}`,
-    '',
-    '## By hit type',
-    ...[...byHitType.entries()].sort((a, b) => b[1] - a[1]).map(([k, v]) => `- ${k}: ${v}`),
-    '',
-    '## By category',
-    ...[...byCategory.entries()].sort((a, b) => b[1] - a[1]).map(([k, v]) => `- ${k}: ${v}`),
-    '',
-    '## By review bucket',
-    ...[...byBucket.entries()].sort((a, b) => b[1] - a[1]).map(([k, v]) => `- ${k}: ${v}`),
-    '',
-    '## By source',
-    ...[...bySource.entries()].sort((a, b) => b[1] - a[1]).map(([k, v]) => `- ${k}: ${v}`),
-    '',
-    '## Notes',
-    '- Place hits use exact normalized phrase matching against STM + street dictionaries.',
-    '- Person hits use explicit NAS persons field (high-precision) plus a conservative name heuristic.',
-  ].join('\n');
-}
-
 function main() {
   mkdirSync(OUTPUT_DIR, { recursive: true });
 
@@ -461,17 +380,11 @@ function main() {
   const highPrecision = hits.filter((hit) => hit.reviewBucket === 'high-precision');
 
   writeFileSync(OUTPUT_JSON, JSON.stringify(hits, null, 2), 'utf8');
-  writeFileSync(OUTPUT_CSV, toCsv(hits), 'utf8');
   writeFileSync(OUTPUT_HIGH_JSON, JSON.stringify(highPrecision, null, 2), 'utf8');
-  writeFileSync(OUTPUT_HIGH_CSV, toCsv(highPrecision), 'utf8');
-  writeFileSync(OUTPUT_SUMMARY, buildSummary(nasRows.length, hits), 'utf8');
 
   console.log(`Wrote ${hits.length} NAS place/person hits to:`);
   console.log(`- ${OUTPUT_JSON}`);
-  console.log(`- ${OUTPUT_CSV}`);
   console.log(`- ${OUTPUT_HIGH_JSON}`);
-  console.log(`- ${OUTPUT_HIGH_CSV}`);
-  console.log(`- ${OUTPUT_SUMMARY}`);
 }
 
 main();
