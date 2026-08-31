@@ -326,61 +326,61 @@ export default function EventPage() {
                     <p className="mt-1 text-sm leading-snug text-stm-warm-700">{task.description || '(geen beschrijving)'}</p>
                     <p className="mt-1 text-xs text-stm-warm-500">{task.yearRaw || 'Datum onbekend'} · {task.inventoryNumber || 'Inventaris onbekend'}</p>
                   </div>
-                  <button type="button" onClick={() => setMetadataExpanded((expanded) => !expanded)} className="text-xs font-semibold text-stm-sepia-700 underline">
+                  <button type="button" onClick={() => setMetadataExpanded((expanded) => !expanded)} className="min-h-11 text-sm font-semibold text-stm-sepia-700 underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stm-sepia-700">
                     {metadataExpanded ? 'Minder metadata' : 'Meer metadata'}
                   </button>
                   {metadataExpanded && task.sourceUrl ? (
-                    <a href={task.sourceUrl} target="_blank" rel="noopener noreferrer" className="block border-t border-stm-warm-200 pt-3 text-xs font-semibold text-stm-sepia-700 underline">
-                      Bekijk in de NAS-collectie
+                    <a href={task.sourceUrl} target="_blank" rel="noopener noreferrer" className="block border-t border-stm-warm-200 pt-3 text-sm font-semibold text-stm-sepia-700 underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stm-sepia-700">
+                      Bekijk in de NAS-collectie (opent nieuw tabblad)
                     </a>
                   ) : null}
 
                   <div className="border-t border-stm-warm-200 pt-3">
-                    <label htmlFor="event-date" className="mb-1 block text-xs font-semibold text-stm-warm-700">Datum</label>
+                    <label htmlFor="event-date" className="mb-1 block text-sm font-semibold text-stm-warm-700">Datum</label>
                     <div className="flex gap-2">
-                      <input id="event-date" value={dateInput} onChange={(e) => setDateInput(e.target.value)} readOnly={Boolean(task.yearRaw.trim())} placeholder="Bijv. 15 juli 1975" className="min-w-0 flex-1 border border-stm-warm-300 px-3 py-2 text-sm read-only:bg-stm-warm-100 read-only:text-stm-warm-600" />
-                      {!task.yearRaw.trim() ? <button onClick={addDateTerm} className="bg-stm-warm-200 px-3 py-2 text-xs font-semibold">Toevoegen</button> : null}
+                      <input id="event-date" value={dateInput} onChange={(e) => setDateInput(e.target.value)} readOnly={Boolean(task.yearRaw.trim())} placeholder="Bijv. 15 juli 1975" className="min-h-11 min-w-0 flex-1 border border-stm-warm-300 px-3 py-2 text-base read-only:bg-stm-warm-100 read-only:text-stm-warm-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stm-sepia-700" />
+                      {!task.yearRaw.trim() ? <button onClick={addDateTerm} className="min-h-11 bg-stm-warm-200 px-3 py-2 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stm-sepia-700">Toevoegen</button> : null}
                     </div>
                     {addedDates.length > 0 ? <p className="mt-1 text-xs text-stm-warm-600">{addedDates.join(' · ')}</p> : null}
                   </div>
 
                   <details className="border-t border-stm-warm-200 pt-3">
-                    <summary className="cursor-pointer text-xs font-semibold text-stm-warm-700">Locatie toevoegen</summary>
+                    <summary className="flex min-h-11 cursor-pointer items-center text-sm font-semibold text-stm-warm-700">Locatie toevoegen</summary>
                     <div className="mt-2 flex gap-2">
-                      <input value={placeInput} onChange={(e) => setPlaceInput(e.target.value)} placeholder="Bijv. Paramaribo" className="min-w-0 flex-1 border border-stm-warm-300 px-3 py-2 text-sm" />
-                      <button onClick={addPlaceTerm} className="bg-stm-warm-200 px-3 py-2 text-xs font-semibold">Toevoegen</button>
+                      <input aria-label="Locatie" value={placeInput} onChange={(e) => setPlaceInput(e.target.value)} placeholder="Bijv. Paramaribo" className="min-h-11 min-w-0 flex-1 border border-stm-warm-300 px-3 py-2 text-base focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stm-sepia-700" />
+                      <button onClick={addPlaceTerm} className="min-h-11 bg-stm-warm-200 px-3 py-2 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stm-sepia-700">Toevoegen</button>
                     </div>
                     {addedPlaces.length > 0 ? <p className="mt-1 text-xs text-stm-warm-600">{addedPlaces.join(' · ')}</p> : null}
                   </details>
 
                   {task.suggestedPersons.length > 0 ? (
                     <details className="border-t border-stm-warm-200 pt-3">
-                      <summary className="cursor-pointer text-xs font-semibold text-stm-warm-700">Personen ({task.suggestedPersons.length})</summary>
+                      <summary className="flex min-h-11 cursor-pointer items-center text-sm font-semibold text-stm-warm-700">Personen ({task.suggestedPersons.length})</summary>
                       <div className="mt-2 space-y-1">
-                        {task.suggestedPersons.map((name) => <label key={`person-${name}`} className="flex gap-2 text-sm"><input type="checkbox" checked={selectedPersons.includes(name)} onChange={() => togglePersonSuggestion(name)} /><span>{name}</span></label>)}
+                        {task.suggestedPersons.map((name) => <label key={`person-${name}`} className="flex min-h-11 items-center gap-3 text-base"><input type="checkbox" checked={selectedPersons.includes(name)} onChange={() => togglePersonSuggestion(name)} className="h-5 w-5" /><span>{name}</span></label>)}
                       </div>
                     </details>
                   ) : null}
 
                   <details className="border-t border-stm-warm-200 pt-3">
-                    <summary className="cursor-pointer text-xs font-semibold text-stm-warm-700">Persoon toevoegen</summary>
+                    <summary className="flex min-h-11 cursor-pointer items-center text-sm font-semibold text-stm-warm-700">Persoon toevoegen</summary>
                     <div className="mt-2 flex gap-2">
-                      <input value={personInput} onChange={(e) => setPersonInput(e.target.value)} placeholder="Typ naam" className="min-w-0 flex-1 border border-stm-warm-300 px-3 py-2 text-sm" />
-                      <button onClick={addPersonTerm} className="bg-stm-warm-200 px-3 py-2 text-xs font-semibold">Toevoegen</button>
+                      <input aria-label="Persoon" value={personInput} onChange={(e) => setPersonInput(e.target.value)} placeholder="Typ naam" className="min-h-11 min-w-0 flex-1 border border-stm-warm-300 px-3 py-2 text-base focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stm-sepia-700" />
+                      <button onClick={addPersonTerm} className="min-h-11 bg-stm-warm-200 px-3 py-2 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stm-sepia-700">Toevoegen</button>
                     </div>
                     {addedPersons.length > 0 ? <p className="mt-1 text-xs text-stm-warm-600">{addedPersons.join(' · ')}</p> : null}
                   </details>
 
                   <details className="border-t border-stm-warm-200 pt-3">
-                    <summary className="cursor-pointer text-xs font-semibold text-stm-warm-700">Notitie toevoegen</summary>
-                    <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} className="mt-2 w-full border border-stm-warm-300 px-3 py-2 text-sm" placeholder="Optioneel" />
+                    <summary className="flex min-h-11 cursor-pointer items-center text-sm font-semibold text-stm-warm-700">Notitie toevoegen</summary>
+                    <textarea aria-label="Notitie" value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} className="mt-2 w-full border border-stm-warm-300 px-3 py-2 text-base focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stm-sepia-700" placeholder="Optioneel" />
                   </details>
                 </div>
               </div>
 
               <div className="grid shrink-0 grid-cols-2 gap-2 border-t border-stm-warm-200 bg-white p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
-                <button onClick={() => submitCurrentTask('skip')} disabled={busy} className="border border-stm-warm-300 py-3 text-sm font-semibold text-stm-warm-800 disabled:opacity-50">Overslaan</button>
-                <button onClick={() => submitCurrentTask('confirm')} disabled={busy} className="bg-stm-sepia-700 py-3 text-sm font-semibold text-white disabled:opacity-50">Bevestigen</button>
+                <button onClick={() => submitCurrentTask('skip')} disabled={busy} className="min-h-12 border border-stm-warm-300 py-3 text-base font-semibold text-stm-warm-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stm-sepia-700 disabled:opacity-50">Overslaan</button>
+                <button onClick={() => submitCurrentTask('confirm')} disabled={busy} className="min-h-12 bg-stm-sepia-700 py-3 text-base font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stm-sepia-700 disabled:opacity-50">Bevestigen</button>
               </div>
             </section>
           ) : null}
