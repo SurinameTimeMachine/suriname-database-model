@@ -4,25 +4,13 @@ import { useEffect, useState } from 'react';
 
 type EventTask = {
   taskId: string;
-  mode: 'image';
-  recordKey: string;
-  detailId: string;
-  mediaId: string;
-  mediaType: string;
   title: string;
   description: string;
   yearRaw: string;
   inventoryNumber: string;
-  documentType: string;
   sourceUrl: string;
   lowResUrl: string;
-  currentClaim: {
-    claimId: string;
-    participantId: string;
-    assignedAt: string;
-    leaseUntil: string;
-    round: 1 | 2;
-  } | null;
+  currentClaim: { claimId: string } | null;
 };
 
 type Stats = {
@@ -70,24 +58,11 @@ export default function EventPage() {
   }, []);
 
   function resetFormForTask(nextTask: EventTask | null) {
-    if (!nextTask) {
-      setAddedPlaces([]);
-      setAddedDates([]);
-      setAddedPersons([]);
-      setLocationUnknown(true);
-      setDateInput('');
-      setPlaceInput('');
-      setPersonInput('');
-      setNotes('');
-      setMetadataExpanded(false);
-      return;
-    }
-
     setAddedPlaces([]);
     setAddedDates([]);
     setAddedPersons([]);
     setLocationUnknown(true);
-    setDateInput(nextTask.yearRaw || '');
+    setDateInput(nextTask?.yearRaw || '');
     setPlaceInput('');
     setPersonInput('');
     setNotes('');
@@ -219,11 +194,8 @@ export default function EventPage() {
       const payload = {
         decision,
         locationUnknown,
-        selectedPlaceIds: [],
-        selectedPlaceNames: [],
         addedPlaces,
         addedDates,
-        selectedPersons: [],
         addedPersons,
         notes: notes.trim(),
       };
