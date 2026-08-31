@@ -321,11 +321,6 @@ export default function EventPage() {
                 ) : <div className="flex min-h-[30vh] items-center justify-center bg-stm-warm-100 text-sm text-stm-warm-500">Geen preview beschikbaar</div>}
 
                 <div className="space-y-3 p-3">
-                  <div className="flex items-start justify-between gap-3">
-                    <span aria-hidden="true" />
-                    {task.sourceUrl ? <a href={task.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-stm-sepia-700 underline">Bron</a> : null}
-                  </div>
-
                   <div className={metadataExpanded ? '' : 'line-clamp-3'}>
                     <h1 className="text-base font-semibold leading-tight">{task.title || '(zonder titel)'}</h1>
                     <p className="mt-1 text-sm leading-snug text-stm-warm-700">{task.description || '(geen beschrijving)'}</p>
@@ -334,6 +329,11 @@ export default function EventPage() {
                   <button type="button" onClick={() => setMetadataExpanded((expanded) => !expanded)} className="text-xs font-semibold text-stm-sepia-700 underline">
                     {metadataExpanded ? 'Minder metadata' : 'Meer metadata'}
                   </button>
+                  {metadataExpanded && task.sourceUrl ? (
+                    <a href={task.sourceUrl} target="_blank" rel="noopener noreferrer" className="block border-t border-stm-warm-200 pt-3 text-xs font-semibold text-stm-sepia-700 underline">
+                      Bekijk in de NAS-collectie
+                    </a>
+                  ) : null}
 
                   <div className="border-t border-stm-warm-200 pt-3">
                     <label htmlFor="event-date" className="mb-1 block text-xs font-semibold text-stm-warm-700">Datum</label>
