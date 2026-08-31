@@ -91,7 +91,7 @@ export default function EventPage() {
     setAddedDates([]);
     setAddedPersons([]);
     setLocationUnknown(true);
-    setDateInput('');
+    setDateInput(nextTask.yearRaw || '');
     setPlaceInput('');
     setPersonInput('');
     setNotes('');
@@ -335,16 +335,14 @@ export default function EventPage() {
                     {metadataExpanded ? 'Minder metadata' : 'Meer metadata'}
                   </button>
 
-                  {!task.yearRaw.trim() ? (
-                    <div className="border-t border-stm-warm-200 pt-3">
-                      <label htmlFor="event-date" className="mb-1 block text-xs font-semibold text-stm-warm-700">Datum toevoegen (optioneel)</label>
-                      <div className="flex gap-2">
-                        <input id="event-date" value={dateInput} onChange={(e) => setDateInput(e.target.value)} placeholder="Bijv. 15 juli 1975" className="min-w-0 flex-1 border border-stm-warm-300 px-3 py-2 text-sm" />
-                        <button onClick={addDateTerm} className="bg-stm-warm-200 px-3 py-2 text-xs font-semibold">Toevoegen</button>
-                      </div>
-                      {addedDates.length > 0 ? <p className="mt-1 text-xs text-stm-warm-600">{addedDates.join(' · ')}</p> : null}
+                  <div className="border-t border-stm-warm-200 pt-3">
+                    <label htmlFor="event-date" className="mb-1 block text-xs font-semibold text-stm-warm-700">Datum</label>
+                    <div className="flex gap-2">
+                      <input id="event-date" value={dateInput} onChange={(e) => setDateInput(e.target.value)} readOnly={Boolean(task.yearRaw.trim())} placeholder="Bijv. 15 juli 1975" className="min-w-0 flex-1 border border-stm-warm-300 px-3 py-2 text-sm read-only:bg-stm-warm-100 read-only:text-stm-warm-600" />
+                      {!task.yearRaw.trim() ? <button onClick={addDateTerm} className="bg-stm-warm-200 px-3 py-2 text-xs font-semibold">Toevoegen</button> : null}
                     </div>
-                  ) : null}
+                    {addedDates.length > 0 ? <p className="mt-1 text-xs text-stm-warm-600">{addedDates.join(' · ')}</p> : null}
+                  </div>
 
                   <details className="border-t border-stm-warm-200 pt-3">
                     <summary className="cursor-pointer text-xs font-semibold text-stm-warm-700">Locatie toevoegen</summary>
