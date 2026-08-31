@@ -1,7 +1,7 @@
 {
   "eventId": "59ed182e-27d6-477b-ba56-18bc1eca290f",
   "createdAt": "2026-08-04T08:44:03.467Z",
-  "updatedAt": "2026-08-31T14:29:52Z",
+  "updatedAt": "2026-08-31T15:55:19.363Z",
   "tasks": [
     {
       "taskId": "img:00105e9a-9958-01c9-99ac-3a179338ba24::0cbe6200-9ef4-6f72-dd1c-185a749ec0f2",
@@ -25,14 +25,24 @@
       "endSeconds": null,
       "suggestedPlaces": [],
       "suggestedPersons": [],
-      "round1Offered": false,
-      "assignmentCount": 0,
-      "status": "unoffered",
-      "lastAssignedAt": null,
+      "round1Offered": true,
+      "assignmentCount": 1,
+      "status": "completed",
+      "lastAssignedAt": "2026-08-31T15:46:04.164Z",
       "currentClaim": null,
-      "completedAt": null,
-      "completedBy": null,
-      "finalSubmission": null
+      "completedAt": "2026-08-31T15:46:15.879Z",
+      "completedBy": "64ac90dc-8555-4e82-832f-910c80b13a95",
+      "finalSubmission": {
+        "decision": "confirm",
+        "locationUnknown": true,
+        "selectedPlaceIds": [],
+        "selectedPlaceNames": [],
+        "addedPlaces": [],
+        "addedDates": [],
+        "selectedPersons": [],
+        "addedPersons": [],
+        "notes": ""
+      }
     },
     {
       "taskId": "img:00a51b89-7b29-aa5c-6533-6e1ae11e1d05::ef44d023-089e-1bfa-94f0-14c3a5a7bb1a",
@@ -56,14 +66,24 @@
       "endSeconds": null,
       "suggestedPlaces": [],
       "suggestedPersons": [],
-      "round1Offered": false,
-      "assignmentCount": 0,
-      "status": "unoffered",
-      "lastAssignedAt": null,
+      "round1Offered": true,
+      "assignmentCount": 1,
+      "status": "completed",
+      "lastAssignedAt": "2026-08-31T15:46:21.871Z",
       "currentClaim": null,
-      "completedAt": null,
-      "completedBy": null,
-      "finalSubmission": null
+      "completedAt": "2026-08-31T15:46:34.115Z",
+      "completedBy": "64ac90dc-8555-4e82-832f-910c80b13a95",
+      "finalSubmission": {
+        "decision": "skip",
+        "locationUnknown": true,
+        "selectedPlaceIds": [],
+        "selectedPlaceNames": [],
+        "addedPlaces": [],
+        "addedDates": [],
+        "selectedPersons": [],
+        "addedPersons": [],
+        "notes": ""
+      }
     },
     {
       "taskId": "img:011a9a79-9f7e-31f6-f89b-5c67c302899d::f776e074-064c-0df9-d319-fc61084f2dea",
@@ -87,11 +107,17 @@
       "endSeconds": null,
       "suggestedPlaces": [],
       "suggestedPersons": [],
-      "round1Offered": false,
-      "assignmentCount": 0,
-      "status": "unoffered",
-      "lastAssignedAt": null,
-      "currentClaim": null,
+      "round1Offered": true,
+      "assignmentCount": 1,
+      "status": "assigned",
+      "lastAssignedAt": "2026-08-31T15:48:18.027Z",
+      "currentClaim": {
+        "claimId": "a54e245f-0749-487d-9846-f55f792a9294",
+        "participantId": "64ac90dc-8555-4e82-832f-910c80b13a95",
+        "assignedAt": "2026-08-31T15:48:18.027Z",
+        "leaseUntil": "2026-08-31T16:03:18.027Z",
+        "round": 1
+      },
       "completedAt": null,
       "completedBy": null,
       "finalSubmission": null
@@ -31246,14 +31272,24 @@
       "endSeconds": null,
       "suggestedPlaces": [],
       "suggestedPersons": [],
-      "round1Offered": false,
-      "assignmentCount": 0,
-      "status": "unoffered",
-      "lastAssignedAt": null,
+      "round1Offered": true,
+      "assignmentCount": 1,
+      "status": "completed",
+      "lastAssignedAt": "2026-08-31T15:46:15.919Z",
       "currentClaim": null,
-      "completedAt": null,
-      "completedBy": null,
-      "finalSubmission": null
+      "completedAt": "2026-08-31T15:46:21.831Z",
+      "completedBy": "64ac90dc-8555-4e82-832f-910c80b13a95",
+      "finalSubmission": {
+        "decision": "skip",
+        "locationUnknown": true,
+        "selectedPlaceIds": [],
+        "selectedPlaceNames": [],
+        "addedPlaces": [],
+        "addedDates": [],
+        "selectedPersons": [],
+        "addedPersons": [],
+        "notes": ""
+      }
     },
     {
       "taskId": "img:00c6a9e6-eb42-47fe-e7eb-f337cddfa3af::b0d57d53-f767-7304-98f0-12bcc31c249f",
@@ -31277,14 +31313,26 @@
       "endSeconds": null,
       "suggestedPlaces": [],
       "suggestedPersons": [],
-      "round1Offered": false,
-      "assignmentCount": 0,
-      "status": "unoffered",
-      "lastAssignedAt": null,
+      "round1Offered": true,
+      "assignmentCount": 1,
+      "status": "completed",
+      "lastAssignedAt": "2026-08-31T15:46:34.166Z",
       "currentClaim": null,
-      "completedAt": null,
-      "completedBy": null,
-      "finalSubmission": null
+      "completedAt": "2026-08-31T15:48:17.979Z",
+      "completedBy": "64ac90dc-8555-4e82-832f-910c80b13a95",
+      "finalSubmission": {
+        "decision": "skip",
+        "locationUnknown": false,
+        "selectedPlaceIds": [],
+        "selectedPlaceNames": [],
+        "addedPlaces": [
+          "Paramaribo"
+        ],
+        "addedDates": [],
+        "selectedPersons": [],
+        "addedPersons": [],
+        "notes": ""
+      }
     },
     {
       "taskId": "img:018dd909-ba72-f190-5562-fe01da284ce4::a9541803-ca3c-a592-312c-c95528d55d38",
@@ -35586,11 +35634,17 @@
       "endSeconds": null,
       "suggestedPlaces": [],
       "suggestedPersons": [],
-      "round1Offered": false,
-      "assignmentCount": 0,
-      "status": "unoffered",
-      "lastAssignedAt": null,
-      "currentClaim": null,
+      "round1Offered": true,
+      "assignmentCount": 1,
+      "status": "assigned",
+      "lastAssignedAt": "2026-08-31T15:55:19.362Z",
+      "currentClaim": {
+        "claimId": "b451ab9c-b528-405a-a6df-d12c8e37ae88",
+        "participantId": "7aaac799-c9c2-457f-a70a-03bd9f3c919f",
+        "assignedAt": "2026-08-31T15:55:19.362Z",
+        "leaseUntil": "2026-08-31T16:10:19.363Z",
+        "round": 1
+      },
       "completedAt": null,
       "completedBy": null,
       "finalSubmission": null
@@ -35789,6 +35843,94 @@
       "finalSubmission": null
     }
   ],
-  "participants": {},
-  "submissions": []
+  "participants": {
+    "64ac90dc-8555-4e82-832f-910c80b13a95": {
+      "participantId": "64ac90dc-8555-4e82-832f-910c80b13a95",
+      "nickname": "j",
+      "startedAt": "2026-08-31T15:46:02.679Z",
+      "lastSeenAt": "2026-08-31T15:48:18.027Z"
+    },
+    "7aaac799-c9c2-457f-a70a-03bd9f3c919f": {
+      "participantId": "7aaac799-c9c2-457f-a70a-03bd9f3c919f",
+      "nickname": "j",
+      "startedAt": "2026-08-31T15:55:18.064Z",
+      "lastSeenAt": "2026-08-31T15:55:19.362Z"
+    }
+  },
+  "submissions": [
+    {
+      "submissionId": "0d0ac1b7-c3ab-4f51-a4db-5c2d45ae27c2",
+      "taskId": "img:00105e9a-9958-01c9-99ac-3a179338ba24::0cbe6200-9ef4-6f72-dd1c-185a749ec0f2",
+      "participantId": "64ac90dc-8555-4e82-832f-910c80b13a95",
+      "claimId": "668edddf-d8c9-4897-bfd0-e03e99614360",
+      "submittedAt": "2026-08-31T15:46:15.879Z",
+      "payload": {
+        "decision": "confirm",
+        "locationUnknown": true,
+        "selectedPlaceIds": [],
+        "selectedPlaceNames": [],
+        "addedPlaces": [],
+        "addedDates": [],
+        "selectedPersons": [],
+        "addedPersons": [],
+        "notes": ""
+      }
+    },
+    {
+      "submissionId": "b591c7db-8759-4af9-b465-7102f59e56c1",
+      "taskId": "img:006b13f2-43bd-219c-7709-63cbaaebf323::b1b55e2a-1f9d-22d6-f2fc-323b634fdf3a",
+      "participantId": "64ac90dc-8555-4e82-832f-910c80b13a95",
+      "claimId": "7d789d27-bd4f-41e6-835f-929b26145430",
+      "submittedAt": "2026-08-31T15:46:21.831Z",
+      "payload": {
+        "decision": "skip",
+        "locationUnknown": true,
+        "selectedPlaceIds": [],
+        "selectedPlaceNames": [],
+        "addedPlaces": [],
+        "addedDates": [],
+        "selectedPersons": [],
+        "addedPersons": [],
+        "notes": ""
+      }
+    },
+    {
+      "submissionId": "d45937be-efbf-4c93-b025-4816d37022bb",
+      "taskId": "img:00a51b89-7b29-aa5c-6533-6e1ae11e1d05::ef44d023-089e-1bfa-94f0-14c3a5a7bb1a",
+      "participantId": "64ac90dc-8555-4e82-832f-910c80b13a95",
+      "claimId": "ab7fdf09-9c2d-4811-bc01-167df9e03bde",
+      "submittedAt": "2026-08-31T15:46:34.115Z",
+      "payload": {
+        "decision": "skip",
+        "locationUnknown": true,
+        "selectedPlaceIds": [],
+        "selectedPlaceNames": [],
+        "addedPlaces": [],
+        "addedDates": [],
+        "selectedPersons": [],
+        "addedPersons": [],
+        "notes": ""
+      }
+    },
+    {
+      "submissionId": "8005e84b-a2b4-40a1-b394-37b763945607",
+      "taskId": "img:00c6a9e6-eb42-47fe-e7eb-f337cddfa3af::b0d57d53-f767-7304-98f0-12bcc31c249f",
+      "participantId": "64ac90dc-8555-4e82-832f-910c80b13a95",
+      "claimId": "d45c4650-d6da-43ed-b8d9-a974bcb6e5bb",
+      "submittedAt": "2026-08-31T15:48:17.979Z",
+      "payload": {
+        "decision": "skip",
+        "locationUnknown": false,
+        "selectedPlaceIds": [],
+        "selectedPlaceNames": [],
+        "addedPlaces": [
+          "Paramaribo"
+        ],
+        "addedDates": [],
+        "selectedPersons": [],
+        "addedPersons": [],
+        "notes": ""
+      }
+    }
+  ]
 }
