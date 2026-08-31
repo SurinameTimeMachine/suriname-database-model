@@ -648,7 +648,7 @@ export default function EventPage() {
                             Kies
                           </button>
                           <a
-                            href={`/places?id=${encodeURIComponent(option.id)}`}
+                            href={`/places?place=${encodeURIComponent(option.id)}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="underline text-stm-sepia-700"
