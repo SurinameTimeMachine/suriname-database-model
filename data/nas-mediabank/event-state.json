@@ -1,7 +1,7 @@
 {
   "eventId": "59ed182e-27d6-477b-ba56-18bc1eca290f",
   "createdAt": "2026-08-04T08:44:03.467Z",
-  "updatedAt": "2026-08-04T18:13:49.359Z",
+  "updatedAt": "2026-08-31T13:09:48.233Z",
   "tasks": [
     {
       "taskId": "av:000fe37b-954e-bb37-c9c5-0ef7b2df0190::d0a6021c-c94b-476d-be61-01806cb788f5:seg:1",
@@ -1000,11 +1000,17 @@
         "DNA-voorzitter Ram Sardjoe",
         "Otmar Rodgers"
       ],
-      "round1Offered": false,
-      "assignmentCount": 0,
-      "status": "unoffered",
-      "lastAssignedAt": null,
-      "currentClaim": null,
+      "round1Offered": true,
+      "assignmentCount": 1,
+      "status": "assigned",
+      "lastAssignedAt": "2026-08-31T13:09:48.231Z",
+      "currentClaim": {
+        "claimId": "47b9ecbf-da04-4de1-8bb0-5d216439c2e1",
+        "participantId": "da3fea94-addd-49c3-9407-50176ba9351d",
+        "assignedAt": "2026-08-31T13:09:48.231Z",
+        "leaseUntil": "2026-08-31T13:24:48.233Z",
+        "round": 1
+      },
       "completedAt": null,
       "completedBy": null,
       "finalSubmission": null
@@ -84232,7 +84238,7 @@
       "participantId": "da3fea94-addd-49c3-9407-50176ba9351d",
       "nickname": "teunis",
       "startedAt": "2026-08-04T08:48:23.675Z",
-      "lastSeenAt": "2026-08-04T13:02:04.640Z"
+      "lastSeenAt": "2026-08-31T13:09:48.231Z"
     },
     "5898a6b7-e8bc-4000-b3bc-176141bb38da": {
       "participantId": "5898a6b7-e8bc-4000-b3bc-176141bb38da",
