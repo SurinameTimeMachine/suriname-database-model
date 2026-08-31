@@ -6,7 +6,7 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
 const NAV_ITEMS = [
-  { href: '/explore', label: 'Map' },
+  { href: '/annotate', label: 'Image review' },
   { href: '/places', label: 'Places' },
   { href: '/organizations', label: 'Organizations' },
   { href: '/sources', label: 'Sources' },

@@ -46,10 +46,15 @@ export default function EventPage() {
   const [task, setTask] = useState<EventTask | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
   const [done, setDone] = useState(false);
+  const [addedPlaces, setAddedPlaces] = useState<string[]>([]);
   const [addedDates, setAddedDates] = useState<string[]>([]);
   const [selectedPersons, setSelectedPersons] = useState<string[]>([]);
+  const [addedPersons, setAddedPersons] = useState<string[]>([]);
+  const [locationUnknown, setLocationUnknown] = useState(true);
   const [notes, setNotes] = useState('');
+  const [placeInput, setPlaceInput] = useState('');
   const [dateInput, setDateInput] = useState('');
+  const [personInput, setPersonInput] = useState('');
   const [metadataExpanded, setMetadataExpanded] = useState(false);
 
   useEffect(() => {
@@ -68,16 +73,26 @@ export default function EventPage() {
   function resetFormForTask(nextTask: EventTask | null) {
     if (!nextTask) {
       setSelectedPersons([]);
+      setAddedPlaces([]);
       setAddedDates([]);
+      setAddedPersons([]);
+      setLocationUnknown(true);
       setDateInput('');
+      setPlaceInput('');
+      setPersonInput('');
       setNotes('');
       setMetadataExpanded(false);
       return;
     }
 
     setSelectedPersons([...new Set(nextTask.suggestedPersons)]);
+    setAddedPlaces([]);
     setAddedDates([]);
+    setAddedPersons([]);
+    setLocationUnknown(true);
     setDateInput('');
+    setPlaceInput('');
+    setPersonInput('');
     setNotes('');
     setMetadataExpanded(false);
   }
@@ -142,7 +157,7 @@ export default function EventPage() {
       setDone(false);
       setTask(data.task);
       resetFormForTask(data.task);
-      setStatus(data.reused ? 'Je hebt nog een actieve taak.' : 'Nieuwe taak toegewezen.');
+      setStatus('');
     } catch (error) {
       setStatus(error instanceof Error ? error.message : 'Onbekende fout bij claim.');
     } finally {
@@ -168,6 +183,23 @@ export default function EventPage() {
     setDateInput('');
   }
 
+  function addPlaceTerm() {
+    const term = placeInput.trim();
+    if (!term) return;
+    if (!addedPlaces.includes(term)) setAddedPlaces((prev) => [...prev, term]);
+    setLocationUnknown(false);
+    setPlaceInput('');
+  }
+
+  function addPersonTerm() {
+    const term = personInput.trim();
+    if (!term) return;
+    if (!selectedPersons.includes(term) && !addedPersons.includes(term)) {
+      setAddedPersons((prev) => [...prev, term]);
+    }
+    setPersonInput('');
+  }
+
   async function submitCurrentTask(decision: 'confirm' | 'skip') {
     if (!task || !task.currentClaim) {
       setStatus('Geen actieve taak om in te dienen.');
@@ -179,13 +211,13 @@ export default function EventPage() {
     try {
       const payload = {
         decision,
-        locationUnknown: true,
+        locationUnknown,
         selectedPlaceIds: [],
         selectedPlaceNames: [],
-        addedPlaces: [],
+        addedPlaces,
         addedDates,
         selectedPersons,
-        addedPersons: [],
+        addedPersons,
         notes: notes.trim(),
       };
 
@@ -269,7 +301,7 @@ export default function EventPage() {
 
                 <div className="space-y-3 p-3">
                   <div className="flex items-start justify-between gap-3">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-stm-warm-500">Foto</p>
+                    <span aria-hidden="true" />
                     {task.sourceUrl ? <a href={task.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-stm-sepia-700 underline">Bron</a> : null}
                   </div>
 
@@ -293,14 +325,32 @@ export default function EventPage() {
                     </div>
                   ) : null}
 
+                  <details className="border-t border-stm-warm-200 pt-3">
+                    <summary className="cursor-pointer text-xs font-semibold text-stm-warm-700">Locatie toevoegen</summary>
+                    <div className="mt-2 flex gap-2">
+                      <input value={placeInput} onChange={(e) => setPlaceInput(e.target.value)} placeholder="Bijv. Paramaribo" className="min-w-0 flex-1 border border-stm-warm-300 px-3 py-2 text-sm" />
+                      <button onClick={addPlaceTerm} className="bg-stm-warm-200 px-3 py-2 text-xs font-semibold">Toevoegen</button>
+                    </div>
+                    {addedPlaces.length > 0 ? <p className="mt-1 text-xs text-stm-warm-600">{addedPlaces.join(' · ')}</p> : null}
+                  </details>
+
                   {task.suggestedPersons.length > 0 ? (
                     <details className="border-t border-stm-warm-200 pt-3">
                       <summary className="cursor-pointer text-xs font-semibold text-stm-warm-700">Personen ({task.suggestedPersons.length})</summary>
                       <div className="mt-2 space-y-1">
-                        {task.suggestedPersons.map((name) => <label key={name} className="flex gap-2 text-sm"><input type="checkbox" checked={selectedPersons.includes(name)} onChange={() => togglePersonSuggestion(name)} /><span>{name}</span></label>)}
+                        {task.suggestedPersons.map((name) => <label key={`person-${name}`} className="flex gap-2 text-sm"><input type="checkbox" checked={selectedPersons.includes(name)} onChange={() => togglePersonSuggestion(name)} /><span>{name}</span></label>)}
                       </div>
                     </details>
                   ) : null}
+
+                  <details className="border-t border-stm-warm-200 pt-3">
+                    <summary className="cursor-pointer text-xs font-semibold text-stm-warm-700">Persoon toevoegen</summary>
+                    <div className="mt-2 flex gap-2">
+                      <input value={personInput} onChange={(e) => setPersonInput(e.target.value)} placeholder="Typ naam" className="min-w-0 flex-1 border border-stm-warm-300 px-3 py-2 text-sm" />
+                      <button onClick={addPersonTerm} className="bg-stm-warm-200 px-3 py-2 text-xs font-semibold">Toevoegen</button>
+                    </div>
+                    {addedPersons.length > 0 ? <p className="mt-1 text-xs text-stm-warm-600">{addedPersons.join(' · ')}</p> : null}
+                  </details>
 
                   <details className="border-t border-stm-warm-200 pt-3">
                     <summary className="cursor-pointer text-xs font-semibold text-stm-warm-700">Notitie toevoegen</summary>
