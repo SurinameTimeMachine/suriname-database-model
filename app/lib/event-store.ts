@@ -17,17 +17,6 @@ type NasRecord = {
   mediaType: 'image' | 'video' | 'audio' | 'unknown';
 };
 
-type NasSegment = {
-  recordKey: string;
-  detailId: string;
-  mediaId: string;
-  segmentIndex: number;
-  tcStart: string;
-  tcEnd: string;
-  startSeconds: number;
-  endSeconds: number | null;
-};
-
 type NasHit = {
   recordKey: string;
   hitType: 'place' | 'person';
@@ -59,7 +48,7 @@ type TaskSuggestionPlace = {
 
 export type EventTask = {
   taskId: string;
-  mode: 'image' | 'av';
+  mode: 'image';
   recordKey: string;
   detailId: string;
   mediaId: string;
@@ -70,13 +59,7 @@ export type EventTask = {
   inventoryNumber: string;
   documentType: string;
   sourceUrl: string;
-  playableUrl: string;
   lowResUrl: string;
-  segmentIndex: number;
-  tcStart: string;
-  tcEnd: string;
-  startSeconds: number;
-  endSeconds: number | null;
   suggestedPlaces: TaskSuggestionPlace[];
   suggestedPersons: string[];
   round1Offered: boolean;
@@ -143,7 +126,6 @@ type ClaimResponse = {
 
 const DATA_DIR = join(process.cwd(), '..', 'data', 'nas-mediabank');
 const RECORDS_PATH = join(DATA_DIR, 'nas-mediabank-records.json');
-const SEGMENTS_PATH = join(DATA_DIR, 'nas-mediabank-segments.json');
 const HITS_HIGH_PATH = join(DATA_DIR, 'nas-place-person-hits.high-precision.json');
 const STATE_PATH = join(DATA_DIR, 'event-state.json');
 const PLACE_OPTIONS_PATH = join(process.cwd(), 'public', 'data', 'places-gazetteer.jsonld');
@@ -172,12 +154,8 @@ function readJsonFile<T>(path: string): T {
   return JSON.parse(readFileSync(path, 'utf8')) as T;
 }
 
-function splitDetailUrl(value: string): { sourceUrl: string; playableUrl: string } {
-  const [sourceUrl, playableUrl] = value.split('|').map((v) => v.trim());
-  return {
-    sourceUrl: sourceUrl || '',
-    playableUrl: playableUrl || '',
-  };
+function splitDetailUrl(value: string): string {
+  return value.split('|')[0]?.trim() || '';
 }
 
 function makeLowResUrl(mediaId: string): string {
@@ -275,20 +253,12 @@ function loadRecentAlmanakDistrictByQid(): Map<string, string> {
 
 function initializeStateFromData(): EventState {
   const records = readJsonFile<NasRecord[]>(RECORDS_PATH);
-  const segments = readJsonFile<NasSegment[]>(SEGMENTS_PATH);
   const hits = readJsonFile<NasHit[]>(HITS_HIGH_PATH);
   const { placesByRecord, peopleByRecord } = buildSuggestionMaps(hits);
 
-  const segmentsByRecord = new Map<string, NasSegment[]>();
-  for (const segment of segments) {
-    const current = segmentsByRecord.get(segment.recordKey) || [];
-    current.push(segment);
-    segmentsByRecord.set(segment.recordKey, current);
-  }
-
   const tasks: EventTask[] = [];
   for (const record of records) {
-    const link = splitDetailUrl(record.detailUrl || '');
+    const sourceUrl = splitDetailUrl(record.detailUrl || '');
     const suggestedPlaces = placesByRecord.get(record.recordKey) || [];
     const suggestedPersons = peopleByRecord.get(record.recordKey) || [];
 
@@ -305,14 +275,8 @@ function initializeStateFromData(): EventState {
         yearRaw: record.yearRaw,
         inventoryNumber: record.inventoryNumber,
         documentType: record.documentType,
-        sourceUrl: link.sourceUrl,
-        playableUrl: link.playableUrl,
+        sourceUrl,
         lowResUrl: makeLowResUrl(record.mediaId),
-        segmentIndex: 1,
-        tcStart: '00:00:00.000',
-        tcEnd: '',
-        startSeconds: 0,
-        endSeconds: null,
         suggestedPlaces,
         suggestedPersons,
         round1Offered: false,
@@ -327,58 +291,8 @@ function initializeStateFromData(): EventState {
       continue;
     }
 
-    const recordSegments = (segmentsByRecord.get(record.recordKey) || []).sort(
-      (a, b) => a.segmentIndex - b.segmentIndex,
-    );
-    const effectiveSegments =
-      recordSegments.length > 0
-        ? recordSegments
-        : [
-            {
-              recordKey: record.recordKey,
-              detailId: record.detailId,
-              mediaId: record.mediaId,
-              segmentIndex: 1,
-              tcStart: '00:00:00.000',
-              tcEnd: '',
-              startSeconds: 0,
-              endSeconds: null,
-            },
-          ];
-
-    for (const segment of effectiveSegments) {
-      tasks.push({
-        taskId: `av:${record.recordKey}:seg:${segment.segmentIndex}`,
-        mode: 'av',
-        recordKey: record.recordKey,
-        detailId: record.detailId,
-        mediaId: record.mediaId,
-        mediaType: record.mediaType,
-        title: record.title,
-        description: record.description,
-        yearRaw: record.yearRaw,
-        inventoryNumber: record.inventoryNumber,
-        documentType: record.documentType,
-        sourceUrl: link.sourceUrl,
-        playableUrl: link.playableUrl,
-        lowResUrl: makeLowResUrl(record.mediaId),
-        segmentIndex: segment.segmentIndex,
-        tcStart: segment.tcStart,
-        tcEnd: segment.tcEnd,
-        startSeconds: segment.startSeconds,
-        endSeconds: segment.endSeconds,
-        suggestedPlaces,
-        suggestedPersons,
-        round1Offered: false,
-        assignmentCount: 0,
-        status: 'unoffered',
-        lastAssignedAt: null,
-        currentClaim: null,
-        completedAt: null,
-        completedBy: null,
-        finalSubmission: null,
-      });
-    }
+    // The current event intentionally reviews photographs only.
+    continue;
   }
 
   const now = new Date().toISOString();
@@ -399,7 +313,15 @@ function loadState(): EventState {
     writeFileSync(STATE_PATH, JSON.stringify(initial, null, 2), 'utf8');
     return initial;
   }
-  return readJsonFile<EventState>(STATE_PATH);
+  const state = readJsonFile<EventState>(STATE_PATH);
+  const photoTaskIds = new Set(
+    state.tasks
+      .filter((task) => task.mode === 'image' && task.mediaType === 'image')
+      .map((task) => task.taskId),
+  );
+  state.tasks = state.tasks.filter((task) => photoTaskIds.has(task.taskId));
+  state.submissions = state.submissions.filter((submission) => photoTaskIds.has(submission.taskId));
+  return state;
 }
 
 function saveState(state: EventState): void {
@@ -499,10 +421,14 @@ export async function claimTask(participantId: string): Promise<ClaimResponse> {
     let candidates: EventTask[] = [];
 
     if (round === 1) {
-      candidates = state.tasks.filter((task) => !task.round1Offered);
+      candidates = state.tasks.filter(
+        (task) => task.mode === 'image' && task.mediaType === 'image' && !task.round1Offered,
+      );
     } else {
       candidates = state.tasks.filter(
         (task) =>
+          task.mode === 'image' &&
+          task.mediaType === 'image' &&
           task.status !== 'completed' &&
           (!task.currentClaim || !isLeaseActive(task, now)),
       );

@@ -28,33 +28,14 @@ type NasRecord = {
   scrapeTimestamp: string;
 };
 
-type NasSegment = {
-  recordKey: string;
-  detailId: string;
-  mediaId: string;
-  segmentIndex: number;
-  tcStart: string;
-  tcEnd: string;
-  startSeconds: number;
-  endSeconds: number | null;
-  segmentLabel: string;
-  transcriptSnippet: string;
-  personMentions: string;
-  placeMentions: string;
-  confidence: string;
-  reviewedBy: string;
-};
-
 const BASE_URL = 'https://nationaalarchief.sr';
 const MEMORIX_URL = 'https://webservices.memorix.nl/mediabank';
-const API_KEY = process.env.NAS_API_KEY || '0bdf78cd-6a2a-4c64-b74b-ddc66124df75';
+const API_KEY = process.env.NAS_API_KEY;
 const ENTITY_ID = process.env.NAS_ENTITY_ID || 'fb953082-397a-912a-90b0-b9a6227b532c';
 const ROWS = Number(process.env.NAS_ROWS || '100');
 const OUTPUT_DIR = join(__dirname, '../..', 'data', 'nas-mediabank');
 const OUTPUT_RECORDS_JSON = join(OUTPUT_DIR, 'nas-mediabank-records.json');
 const OUTPUT_RECORDS_CSV = join(OUTPUT_DIR, 'nas-mediabank-records.csv');
-const OUTPUT_SEGMENTS_JSON = join(OUTPUT_DIR, 'nas-mediabank-segments.json');
-const OUTPUT_SEGMENTS_CSV = join(OUTPUT_DIR, 'nas-mediabank-segments.csv');
 const OUTPUT_SUMMARY = join(OUTPUT_DIR, 'nas-mediabank-summary.md');
 
 const DELAY_MS = Number(process.env.NAS_DELAY_MS || '400');
@@ -261,50 +242,6 @@ function toRecordsCsv(rows: NasRecord[]): string {
   ].join('\n');
 }
 
-function toSegmentsCsv(rows: NasSegment[]): string {
-  const headers: Array<keyof NasSegment> = [
-    'recordKey',
-    'detailId',
-    'mediaId',
-    'segmentIndex',
-    'tcStart',
-    'tcEnd',
-    'startSeconds',
-    'endSeconds',
-    'segmentLabel',
-    'transcriptSnippet',
-    'personMentions',
-    'placeMentions',
-    'confidence',
-    'reviewedBy',
-  ];
-  return [
-    headers.join(','),
-    ...rows.map((row) => headers.map((header) => csvEscape(String(row[header] ?? ''))).join(',')),
-  ].join('\n');
-}
-
-function toSegments(rows: NasRecord[]): NasSegment[] {
-  return rows
-    .filter((row) => row.hasTimeAxis)
-    .map((row) => ({
-      recordKey: row.recordKey,
-      detailId: row.detailId,
-      mediaId: row.mediaId,
-      segmentIndex: 1,
-      tcStart: '00:00:00.000',
-      tcEnd: row.tcEndDefault,
-      startSeconds: 0,
-      endSeconds: row.durationSeconds,
-      segmentLabel: 'full item',
-      transcriptSnippet: '',
-      personMentions: '',
-      placeMentions: '',
-      confidence: '',
-      reviewedBy: '',
-    }));
-}
-
 function buildSummary(records: NasRecord[], totalTarget: number): string {
   const byType = new Map<string, number>();
   let downloadable = 0;
@@ -331,15 +268,15 @@ function buildSummary(records: NasRecord[], totalTarget: number): string {
 }
 
 function writeAll(records: NasRecord[], totalTarget: number): void {
-  const segments = toSegments(records);
   writeFileSync(OUTPUT_RECORDS_JSON, JSON.stringify(records, null, 2), 'utf8');
   writeFileSync(OUTPUT_RECORDS_CSV, toRecordsCsv(records), 'utf8');
-  writeFileSync(OUTPUT_SEGMENTS_JSON, JSON.stringify(segments, null, 2), 'utf8');
-  writeFileSync(OUTPUT_SEGMENTS_CSV, toSegmentsCsv(segments), 'utf8');
   writeFileSync(OUTPUT_SUMMARY, buildSummary(records, totalTarget), 'utf8');
 }
 
 async function main(): Promise<void> {
+  if (!API_KEY) {
+    throw new Error('NAS_API_KEY is required to harvest the NAS Mediabank.');
+  }
   mkdirSync(OUTPUT_DIR, { recursive: true });
 
   const records: NasRecord[] = [];
@@ -387,8 +324,6 @@ async function main(): Promise<void> {
   console.log(`Wrote ${records.length} NAS records to:`);
   console.log(`- ${OUTPUT_RECORDS_JSON}`);
   console.log(`- ${OUTPUT_RECORDS_CSV}`);
-  console.log(`- ${OUTPUT_SEGMENTS_JSON}`);
-  console.log(`- ${OUTPUT_SEGMENTS_CSV}`);
   console.log(`- ${OUTPUT_SUMMARY}`);
 }
 

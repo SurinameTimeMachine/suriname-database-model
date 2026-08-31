@@ -1,7 +1,6 @@
 'use client';
 
-import Hls from 'hls.js';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 type PlaceSuggestion = {
   gazetteerId: string;
@@ -12,7 +11,7 @@ type PlaceSuggestion = {
 
 type EventTask = {
   taskId: string;
-  mode: 'image' | 'av';
+  mode: 'image';
   recordKey: string;
   detailId: string;
   mediaId: string;
@@ -23,11 +22,7 @@ type EventTask = {
   inventoryNumber: string;
   documentType: string;
   sourceUrl: string;
-  playableUrl: string;
   lowResUrl: string;
-  segmentIndex: number;
-  tcStart: string;
-  tcEnd: string;
   suggestedPlaces: PlaceSuggestion[];
   suggestedPersons: string[];
   currentClaim: {
@@ -59,39 +54,6 @@ type PlaceOption = {
 
 const STORAGE_KEY = 'stm_event_participant';
 
-function toHlsUrl(url: string): string {
-  if (!url) return '';
-  if (url.includes('.m3u8')) return url;
-  return url.replace('.mpd', '.m3u8');
-}
-
-function pickLowestBandwidthHls(manifestText: string, baseUrl: string): string {
-  const lines = manifestText
-    .split('\n')
-    .map((line) => line.trim())
-    .filter(Boolean);
-
-  let bestUrl = '';
-  let bestBandwidth = Number.POSITIVE_INFINITY;
-
-  for (let i = 0; i < lines.length - 1; i += 1) {
-    const line = lines[i];
-    if (!line.startsWith('#EXT-X-STREAM-INF:')) continue;
-
-    const match = line.match(/BANDWIDTH=(\d+)/i);
-    const bandwidth = match ? Number(match[1]) : Number.POSITIVE_INFINITY;
-    const nextLine = lines[i + 1];
-    if (!nextLine || nextLine.startsWith('#')) continue;
-
-    if (bandwidth < bestBandwidth) {
-      bestBandwidth = bandwidth;
-      bestUrl = new URL(nextLine, baseUrl).toString();
-    }
-  }
-
-  return bestUrl;
-}
-
 function formatPlaceOptionLabel(option: PlaceOption): string {
   if (option.type === 'plantation' && option.districtHint) {
     return `${option.name} (${option.districtHint})`;
@@ -120,10 +82,6 @@ export default function EventPage() {
   const [placeInput, setPlaceInput] = useState('');
   const [dateInput, setDateInput] = useState('');
   const [personInput, setPersonInput] = useState('');
-  const [avPlaybackUrl, setAvPlaybackUrl] = useState('');
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const hlsRef = useRef<Hls | null>(null);
 
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -160,89 +118,6 @@ export default function EventPage() {
       );
     }).slice(0, 8);
   }, [placeOptions, placeInput]);
-  const avHlsUrl = useMemo(() => (task?.playableUrl ? toHlsUrl(task.playableUrl) : ''), [task]);
-  const isAudioTask = task?.mediaType === 'audio' || task?.documentType.toLowerCase().includes('audio');
-
-  useEffect(() => {
-    const media = isAudioTask ? audioRef.current : videoRef.current;
-    const currentHls = hlsRef.current;
-
-    if (currentHls) {
-      currentHls.destroy();
-      hlsRef.current = null;
-    }
-
-    if (!task || task.mode !== 'av' || !avPlaybackUrl || !media) {
-      return;
-    }
-
-    media.removeAttribute('src');
-    media.load();
-
-    const canPlayNative = media.canPlayType('application/vnd.apple.mpegurl');
-    if (canPlayNative) {
-      media.src = avPlaybackUrl;
-      media.load();
-      return;
-    }
-
-    if (!Hls.isSupported()) {
-      media.src = avPlaybackUrl;
-      media.load();
-      return;
-    }
-
-    const hls = new Hls({
-      enableWorker: true,
-      lowLatencyMode: false,
-      capLevelToPlayerSize: true,
-      startLevel: 0,
-    });
-    hlsRef.current = hls;
-    hls.loadSource(avPlaybackUrl);
-    hls.attachMedia(media);
-    hls.on(Hls.Events.ERROR, (_, data) => {
-      if (data.fatal) {
-        setStatus('AV-stream laadt niet goed. Probeer de mobiele link of laad opnieuw.');
-      }
-    });
-
-    return () => {
-      hls.destroy();
-      if (hlsRef.current === hls) {
-        hlsRef.current = null;
-      }
-    };
-  }, [task, avPlaybackUrl, isAudioTask]);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function prepareLowBandwidthPlaybackUrl() {
-      if (!task || task.mode !== 'av' || !avHlsUrl) {
-        setAvPlaybackUrl('');
-        return;
-      }
-
-      try {
-        const response = await fetch(avHlsUrl);
-        if (!response.ok) throw new Error('Cannot read HLS manifest');
-        const manifestText = await response.text();
-        if (cancelled) return;
-
-        const lowestVariant = pickLowestBandwidthHls(manifestText, avHlsUrl);
-        setAvPlaybackUrl(lowestVariant || avHlsUrl);
-      } catch {
-        if (!cancelled) setAvPlaybackUrl(avHlsUrl);
-      }
-    }
-
-    void prepareLowBandwidthPlaybackUrl();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [task, avHlsUrl]);
 
   function resetFormForTask(nextTask: EventTask | null) {
     if (!nextTask) {
@@ -517,44 +392,22 @@ export default function EventPage() {
         {task ? (
           <section className="border border-stm-warm-200 bg-white p-4 space-y-4">
             <div>
-              <p className="text-xs text-stm-warm-500">{task.mode === 'av' ? 'AV-taak' : 'Beeldtaak'}</p>
+              <p className="text-xs text-stm-warm-500">Fototaak</p>
               <h2 className="text-lg font-semibold text-stm-warm-900">{task.title || '(zonder titel)'}</h2>
               <p className="text-sm text-stm-warm-700 mt-1">{task.description || '(geen beschrijving)'}</p>
               <p className="text-xs text-stm-warm-500 mt-2">
                 Datum: {task.yearRaw || 'onbekend'} | Inventaris: {task.inventoryNumber || 'onbekend'}
               </p>
-              {task.mode === 'av' ? (
-                <p className="text-xs text-stm-warm-500 mt-1">
-                  Segment {task.segmentIndex} | {task.tcStart} - {task.tcEnd || 'einde onbekend'}
-                </p>
-              ) : null}
             </div>
 
             {task.lowResUrl ? (
               <img src={task.lowResUrl} alt={task.title || 'preview'} className="w-full border border-stm-warm-200" />
             ) : null}
 
-            {task.mode === 'av' && avPlaybackUrl ? (
-              isAudioTask ? (
-                <audio ref={audioRef} controls preload="metadata" className="w-full">
-                  <source src={avPlaybackUrl} type="application/vnd.apple.mpegurl" />
-                </audio>
-              ) : (
-                <video ref={videoRef} controls preload="metadata" playsInline className="w-full border border-stm-warm-200">
-                  <source src={avPlaybackUrl} type="application/vnd.apple.mpegurl" />
-                </video>
-              )
-            ) : null}
-
             <div className="flex gap-2">
               {task.sourceUrl ? (
                 <a href={task.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-xs underline text-stm-sepia-700">
                   Open bron
-                </a>
-              ) : null}
-              {avPlaybackUrl ? (
-                <a href={avPlaybackUrl} target="_blank" rel="noopener noreferrer" className="text-xs underline text-stm-sepia-700">
-                  Open AV stream (mobiel)
                 </a>
               ) : null}
             </div>
