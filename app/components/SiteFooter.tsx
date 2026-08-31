@@ -1,6 +1,12 @@
+'use client';
+
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 export default function SiteFooter() {
+  const pathname = usePathname();
+  if (pathname.startsWith('/annotate')) return null;
+
   return (
     <footer
       id="site-footer"

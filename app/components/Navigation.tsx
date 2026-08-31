@@ -27,6 +27,7 @@ const DOMAIN_LINKS: DomainLink[] = [
 
 export default function Navigation() {
   const pathname = usePathname();
+  const isAnnotationApp = pathname.startsWith('/annotate');
   const searchParams = useSearchParams();
   const [mobileOpen, setMobileOpen] = useState(false);
   const { user, canEdit, loading: authLoading } = useAuth();
@@ -52,6 +53,8 @@ export default function Navigation() {
     clearAuthCache();
     window.location.href = '/api/auth/logout';
   }, []);
+
+  if (isAnnotationApp) return null;
 
   return (
     <>
