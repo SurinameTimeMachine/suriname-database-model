@@ -5,12 +5,12 @@ import { usePathname } from 'next/navigation';
 
 export default function SiteFooter() {
   const pathname = usePathname();
-  if (pathname.startsWith('/annotate')) return null;
+  const isAnnotationApp = pathname.startsWith('/annotate');
 
   return (
     <footer
       id="site-footer"
-      className="shrink-0 border-t border-ink/10 bg-cream"
+      className={`${isAnnotationApp ? 'hidden md:block ' : ''}shrink-0 border-t border-ink/10 bg-cream`}
     >
       <div className="mx-auto max-w-6xl px-4 py-3 sm:px-6 lg:px-10">
         <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[11px] text-ink/65">

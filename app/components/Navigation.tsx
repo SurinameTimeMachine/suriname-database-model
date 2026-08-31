@@ -54,10 +54,8 @@ export default function Navigation() {
     window.location.href = '/api/auth/logout';
   }, []);
 
-  if (isAnnotationApp) return null;
-
   return (
-    <>
+    <div className={isAnnotationApp ? 'hidden md:block' : undefined}>
       <header
         id="site-header"
         className="sticky top-0 z-50 border-b border-ink/10 bg-cream/95 font-sans shadow-[0_10px_28px_rgba(0,30,24,0.05)] backdrop-blur-sm"
@@ -324,6 +322,6 @@ export default function Navigation() {
           </p>
         </div>
       )}
-    </>
+    </div>
   );
 }
