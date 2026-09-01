@@ -1,9 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { LOCATION_TYPES, type AddedPlace, type LocationType } from '@/lib/event-types';
 
 type EventTask = {
   taskId: string;
+  detailId: string;
+  mediaId: string;
   title: string;
   description: string;
   yearRaw: string;
@@ -13,12 +16,22 @@ type EventTask = {
   currentClaim: { claimId: string } | null;
 };
 
+const NAS_MEDIABANK_BASE_URL = 'https://nationaalarchief.sr/onderzoeken/mediabank/detail';
+
+// Domain may change; update here only.
+const STM_EXPLORE_URL = 'https://data.surinametijdmachine.org/explore';
+
+function nasMediabankUrl(current: EventTask): string {
+  if (!current.detailId || !current.mediaId) return '';
+  return `${NAS_MEDIABANK_BASE_URL}/${current.detailId}/media/${current.mediaId}?mode=detail`;
+}
+
 type Stats = {
   total: number;
   completed: number;
   assigned: number;
   unoffered: number;
-  unresolved: number;
+  pendingRound2: number;
   participants: number;
   round: 1 | 2;
 };
@@ -33,7 +46,7 @@ export default function EventPage() {
   const [task, setTask] = useState<EventTask | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
   const [done, setDone] = useState(false);
-  const [addedPlaces, setAddedPlaces] = useState<string[]>([]);
+  const [addedPlaces, setAddedPlaces] = useState<AddedPlace[]>([]);
   const [addedDates, setAddedDates] = useState<string[]>([]);
   const [addedPersons, setAddedPersons] = useState<string[]>([]);
   const [locationUnknown, setLocationUnknown] = useState(true);
@@ -41,7 +54,9 @@ export default function EventPage() {
   const [placeInput, setPlaceInput] = useState('');
   const [dateInput, setDateInput] = useState('');
   const [personInput, setPersonInput] = useState('');
-  const [metadataExpanded, setMetadataExpanded] = useState(false);
+  const [descriptionExpanded, setDescriptionExpanded] = useState(false);
+  const [descriptionTruncated, setDescriptionTruncated] = useState(false);
+  const descriptionRef = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
     localStorage.removeItem('stm_event_participant');
@@ -66,8 +81,15 @@ export default function EventPage() {
     setPlaceInput('');
     setPersonInput('');
     setNotes('');
-    setMetadataExpanded(false);
+    setDescriptionExpanded(false);
   }
+
+  // Measure against the clamped (collapsed) layout so the toggle only appears when needed.
+  useLayoutEffect(() => {
+    const el = descriptionRef.current;
+    if (!el || descriptionExpanded) return;
+    setDescriptionTruncated(el.scrollHeight > el.clientHeight + 1);
+  }, [task?.taskId, task?.description, descriptionExpanded]);
 
   async function startSession() {
     if (!nickname.trim()) {
@@ -168,9 +190,13 @@ export default function EventPage() {
   function addPlaceTerm() {
     const term = placeInput.trim();
     if (!term) return;
-    if (!addedPlaces.includes(term)) setAddedPlaces((prev) => [...prev, term]);
+    setAddedPlaces((prev) => (prev.some((place) => place.text === term) ? prev : [...prev, { text: term, type: '' }]));
     setLocationUnknown(false);
     setPlaceInput('');
+  }
+
+  function setPlaceType(text: string, type: LocationType) {
+    setAddedPlaces((prev) => prev.map((place) => (place.text === text ? { ...place, type } : place)));
   }
 
   function addPersonTerm() {
@@ -238,6 +264,7 @@ export default function EventPage() {
               <p className="text-sm font-semibold">NAS foto-review</p>
               <div className="flex items-center gap-3">
                 {stats ? <p className="text-xs text-stm-warm-500">{stats.completed}/{stats.total} afgerond</p> : null}
+                <a href={STM_EXPLORE_URL} target="_blank" rel="noopener noreferrer" className="text-xs text-stm-sepia-700 underline">STM-kaart</a>
                 {participantId ? <button type="button" onClick={resetSession} className="text-xs text-stm-warm-500 underline">Andere gebruiker</button> : null}
               </div>
             </div>
@@ -282,36 +309,82 @@ export default function EventPage() {
                 ) : <div className="flex min-h-[30vh] items-center justify-center bg-stm-warm-100 text-sm text-stm-warm-500">Geen preview beschikbaar</div>}
 
                 <div className="space-y-3 p-3">
-                  <div className={metadataExpanded ? '' : 'line-clamp-3'}>
+                  <div>
                     <h1 className="text-base font-semibold leading-tight">{task.title || '(zonder titel)'}</h1>
-                    <p className="mt-1 text-sm leading-snug text-stm-warm-700">{task.description || '(geen beschrijving)'}</p>
+                    <p
+                      ref={descriptionRef}
+                      className={`mt-1 text-sm leading-snug text-stm-warm-700 ${descriptionExpanded ? '' : 'line-clamp-5'}`}
+                    >
+                      {task.description || '(geen beschrijving)'}
+                    </p>
+                    {descriptionTruncated || descriptionExpanded ? (
+                      <button
+                        type="button"
+                        onClick={() => setDescriptionExpanded((expanded) => !expanded)}
+                        className="min-h-11 text-sm font-semibold text-stm-sepia-700 underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stm-sepia-700"
+                      >
+                        {descriptionExpanded ? 'Minder' : 'Meer'}
+                      </button>
+                    ) : null}
                     <p className="mt-1 text-xs text-stm-warm-500">{task.yearRaw || 'Datum onbekend'} · {task.inventoryNumber || 'Inventaris onbekend'}</p>
                   </div>
-                  <button type="button" onClick={() => setMetadataExpanded((expanded) => !expanded)} className="min-h-11 text-sm font-semibold text-stm-sepia-700 underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stm-sepia-700">
-                    {metadataExpanded ? 'Minder metadata' : 'Meer metadata'}
-                  </button>
-                  {metadataExpanded && task.sourceUrl ? (
-                    <a href={task.sourceUrl} target="_blank" rel="noopener noreferrer" className="block border-t border-stm-warm-200 pt-3 text-sm font-semibold text-stm-sepia-700 underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stm-sepia-700">
-                      Bekijk in de NAS-collectie (opent nieuw tabblad)
+                  {nasMediabankUrl(task) ? (
+                    <a
+                      href={nasMediabankUrl(task)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block min-h-11 border-t border-stm-warm-200 pt-3 text-sm font-semibold text-stm-sepia-700 underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stm-sepia-700"
+                    >
+                      Volledige metadata op de NAS-website (opent nieuw tabblad)
                     </a>
                   ) : null}
 
                   <div className="border-t border-stm-warm-200 pt-3">
-                    <label htmlFor="event-date" className="mb-1 block text-sm font-semibold text-stm-warm-700">Datum</label>
-                    <div className="flex gap-2">
-                      <input id="event-date" value={dateInput} onChange={(e) => setDateInput(e.target.value)} readOnly={Boolean(task.yearRaw.trim())} placeholder="Bijv. 15 juli 1975" className="min-h-11 min-w-0 flex-1 border border-stm-warm-300 px-3 py-2 text-base read-only:bg-stm-warm-100 read-only:text-stm-warm-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stm-sepia-700" />
-                      {!task.yearRaw.trim() ? <button onClick={addDateTerm} className="min-h-11 bg-stm-warm-200 px-3 py-2 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stm-sepia-700">Toevoegen</button> : null}
-                    </div>
-                    {addedDates.length > 0 ? <p className="mt-1 text-xs text-stm-warm-600">{addedDates.join(' · ')}</p> : null}
+                    <label className="mb-1 block text-sm font-semibold text-stm-warm-700">Datum</label>
+                    <p className="min-h-11 flex items-center border border-stm-warm-300 bg-stm-warm-100 px-3 py-2 text-base text-stm-warm-600">
+                      {task.yearRaw.trim() || 'Onbekend'}
+                    </p>
                   </div>
 
                   <details className="border-t border-stm-warm-200 pt-3">
+                    <summary className="flex min-h-11 cursor-pointer items-center text-sm font-semibold text-stm-warm-700">Datum toevoegen</summary>
+                    <div className="mt-2 flex gap-2">
+                      <input id="event-date" aria-label="Datum" value={dateInput} onChange={(e) => setDateInput(e.target.value)} placeholder="Bijv. 15 juli 1975" className="min-h-11 min-w-0 flex-1 border border-stm-warm-300 px-3 py-2 text-base focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stm-sepia-700" />
+                      <button onClick={addDateTerm} className="min-h-11 bg-stm-warm-200 px-3 py-2 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stm-sepia-700">Toevoegen</button>
+                    </div>
+                    {addedDates.length > 0 ? <p className="mt-1 text-xs text-stm-warm-600">{addedDates.join(' · ')}</p> : null}
+                  </details>
+
+                  <details className="border-t border-stm-warm-200 pt-3">
                     <summary className="flex min-h-11 cursor-pointer items-center text-sm font-semibold text-stm-warm-700">Locatie toevoegen</summary>
+                    <a href={STM_EXPLORE_URL} target="_blank" rel="noopener noreferrer" className="mt-2 block text-xs font-semibold text-stm-sepia-700 underline">Open STM-kaart (nieuw tabblad)</a>
                     <div className="mt-2 flex gap-2">
                       <input aria-label="Locatie" value={placeInput} onChange={(e) => setPlaceInput(e.target.value)} placeholder="Bijv. Paramaribo" className="min-h-11 min-w-0 flex-1 border border-stm-warm-300 px-3 py-2 text-base focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stm-sepia-700" />
                       <button onClick={addPlaceTerm} className="min-h-11 bg-stm-warm-200 px-3 py-2 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stm-sepia-700">Toevoegen</button>
                     </div>
-                    {addedPlaces.length > 0 ? <p className="mt-1 text-xs text-stm-warm-600">{addedPlaces.join(' · ')}</p> : null}
+                    {addedPlaces.map((place) => (
+                      <div key={place.text} className="mt-2 border-t border-stm-warm-100 pt-2 first:border-t-0 first:pt-0">
+                        {place.type ? (
+                          <p className="text-xs text-stm-warm-600">{place.text} <span className="text-stm-warm-500">({place.type})</span></p>
+                        ) : (
+                          <div>
+                            <p className="text-xs font-semibold text-stm-warm-700">{place.text} — kies type:</p>
+                            <div className="mt-1 flex flex-wrap gap-1">
+                              {LOCATION_TYPES.map((locationType) => (
+                                <button
+                                  key={locationType}
+                                  type="button"
+                                  onClick={() => setPlaceType(place.text, locationType)}
+                                  className="min-h-8 border border-stm-warm-300 px-2 py-1 text-xs font-semibold text-stm-warm-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stm-sepia-700"
+                                >
+                                  {locationType}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
                   </details>
 
                   <details className="border-t border-stm-warm-200 pt-3">
