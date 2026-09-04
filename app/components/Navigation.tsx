@@ -6,7 +6,7 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
 const NAV_ITEMS = [
-  { href: '/explore', label: 'Map' },
+  { href: '/annotate', label: 'Image review' },
   { href: '/places', label: 'Places' },
   { href: '/organizations', label: 'Organizations' },
   { href: '/sources', label: 'Sources' },
@@ -27,6 +27,7 @@ const DOMAIN_LINKS: DomainLink[] = [
 
 export default function Navigation() {
   const pathname = usePathname();
+  const isAnnotationApp = pathname.startsWith('/annotate');
   const searchParams = useSearchParams();
   const [mobileOpen, setMobileOpen] = useState(false);
   const { user, canEdit, loading: authLoading } = useAuth();
@@ -54,7 +55,7 @@ export default function Navigation() {
   }, []);
 
   return (
-    <>
+    <div className={isAnnotationApp ? 'hidden md:block' : undefined}>
       <header
         id="site-header"
         className="sticky top-0 z-50 border-b border-ink/10 bg-cream/95 font-sans shadow-[0_10px_28px_rgba(0,30,24,0.05)] backdrop-blur-sm"
@@ -321,6 +322,6 @@ export default function Navigation() {
           </p>
         </div>
       )}
-    </>
+    </div>
   );
 }

@@ -35,7 +35,7 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
       className={`${geistSans.variable} ${geistMono.variable} scroll-smooth`}
     >
-      <body className="site-shell flex h-dvh flex-col overflow-hidden bg-background text-foreground antialiased">
+      <body suppressHydrationWarning className="site-shell flex h-dvh flex-col overflow-hidden bg-background text-foreground antialiased">
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>

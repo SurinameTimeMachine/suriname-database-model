@@ -16,6 +16,8 @@
     "generate-place-records": "tsx scripts/generate-place-records.ts",
     "import-address-points-1885": "tsx scripts/import-paramaribo-address-points-1885.ts --write",
     "import-streets-1916": "tsx scripts/import-streets-paramaribo-1916.ts",
+    "harvest-nas-mediabank": "tsx scripts/harvest-nas-mediabank.ts",
+    "cache-nas-thumbnails": "tsx scripts/cache-nas-thumbnails.ts",
     "lint": "eslint .",
     "materialize-almanakken": "tsx scripts/materialize-almanakken-v2-observations.ts",
     "migrate-almanakken-v2": "node --import tsx scripts/migrate-almanakken-v2.ts --write && node --import tsx scripts/derive-product-assertions.ts && node --import tsx scripts/derive-lifecycle-status.ts && node --import tsx scripts/materialize-almanakken-v2-observations.ts",
