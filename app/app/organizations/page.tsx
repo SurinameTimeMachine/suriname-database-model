@@ -1,6 +1,7 @@
 'use client';
 
 import { useAuth } from '@/lib/auth';
+import LinkedImagesSection from '@/components/LinkedImagesSection';
 import type {
   DiklandRef,
   E25Plantation,
@@ -23,6 +24,17 @@ type OrganizationDetails = {
   appellations: E41Appellation[];
   observations: OrganizationObservation[];
   compositionPeriods: PlantationCompositionPeriod[];
+  linkedImages: Array<{
+    id: string;
+    label?: string;
+    objectNumber?: string;
+    year?: number | null;
+    thumbnailUrl?: string | null;
+    contentUrl?: string | null;
+    sameAs?: string;
+    isPublicDomain?: boolean;
+    licenseLabel?: string;
+  }>;
   gazetteerPlantations: Array<{
     id: string;
     prefLabel: string;
@@ -464,6 +476,10 @@ function OrganizationsPageInner() {
                     </div>
                   )}
                 </section>
+
+                {(details?.linkedImages.length ?? 0) > 0 && (
+                  <LinkedImagesSection images={details!.linkedImages} />
+                )}
 
                 {compositionPeriods.length > 0 && (
                   <section className="px-4 py-4 sm:px-5">
