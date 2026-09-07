@@ -683,7 +683,7 @@
       "@type": "xsd:string"
     },
     "sourceRow": {
-      "@id": "dcterms:identifier",
+      "@id": "stm:sourceRow",
       "@type": "xsd:string"
     },
     "transformedBy": {
@@ -749,6 +749,118 @@
     "sourcePlantationQid": {
       "@id": "stm:sourcePlantationQid",
       "@type": "xsd:string"
+    },
+    "E31_Document": "crm:E31_Document",
+    "E42_Identifier": "crm:E42_Identifier",
+    "E99_Product_Type": "crm:E99_Product_Type",
+    "E17_Type_Assignment": "crm:E17_Type_Assignment",
+    "describes": {
+      "@id": "stm:describes",
+      "@type": "@id"
+    },
+    "reportedOperationalStatus": {
+      "@id": "stm:reportedOperationalStatus",
+      "@type": "@id"
+    },
+    "sourcePath": {
+      "@id": "stm:sourcePath",
+      "@type": "xsd:string"
+    },
+    "sourceUrl": {
+      "@id": "sdo:url",
+      "@type": "@id"
+    },
+    "standardizedContent": {
+      "@id": "stm:standardizedContent",
+      "@type": "xsd:string"
+    },
+    "sourceVersion": {
+      "@id": "stm:sourceVersion",
+      "@type": "xsd:string"
+    },
+    "standardizedName": {
+      "@id": "stm:standardizedName",
+      "@type": "xsd:string"
+    },
+    "littera": {
+      "@id": "stm:littera",
+      "@type": "xsd:string"
+    },
+    "districtOrDivision": {
+      "@id": "stm:districtOrDivision",
+      "@type": "xsd:string"
+    },
+    "riverOrRoad": {
+      "@id": "stm:riverOrRoad",
+      "@type": "xsd:string"
+    },
+    "direction": {
+      "@id": "stm:direction",
+      "@type": "xsd:string"
+    },
+    "psurIds": {
+      "@id": "stm:psurIds",
+      "@type": "xsd:string"
+    },
+    "referenceOriginal": {
+      "@id": "stm:referenceOriginal",
+      "@type": "xsd:string"
+    },
+    "function": {
+      "@id": "stm:function",
+      "@type": "xsd:string"
+    },
+    "additionalInfo": {
+      "@id": "stm:additionalInfo",
+      "@type": "xsd:string"
+    },
+    "lot": {
+      "@id": "stm:lot",
+      "@type": "xsd:string"
+    },
+    "population": {
+      "@id": "stm:population",
+      "@type": "@json"
+    },
+    "mill": {
+      "@id": "stm:mill",
+      "@type": "@json"
+    },
+    "rawManagement": {
+      "@id": "stm:rawManagement",
+      "@type": "@json"
+    },
+    "sourceContent": {
+      "@id": "stm:sourceContent",
+      "@type": "xsd:string"
+    },
+    "P3_has_note": {
+      "@id": "crm:P3_has_note",
+      "@type": "xsd:string"
+    },
+    "P41_classified": {
+      "@id": "crm:P41_classified",
+      "@type": "@id"
+    },
+    "P42_assigned": {
+      "@id": "crm:P42_assigned",
+      "@type": "@id"
+    },
+    "P48_has_preferred_identifier": {
+      "@id": "crm:P48_has_preferred_identifier",
+      "@type": "@id"
+    },
+    "P81a_end_of_the_begin": {
+      "@id": "crm:P81a_end_of_the_begin",
+      "@type": "xsd:gYear"
+    },
+    "P81b_begin_of_the_end": {
+      "@id": "crm:P81b_begin_of_the_end",
+      "@type": "xsd:gYear"
+    },
+    "P89_falls_within": {
+      "@id": "crm:P89_falls_within",
+      "@type": "@id"
     }
   }
 }

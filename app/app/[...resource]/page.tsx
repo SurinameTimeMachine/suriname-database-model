@@ -1,4 +1,5 @@
 import { canonicalBase, loadResource, resourcePath } from '@/lib/lod-resource';
+import { isVocabularyEntity } from '@/lib/vocabulary-profile';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
@@ -37,6 +38,7 @@ export default async function LinkedDataResourcePage({
   if (!resource) notFound();
 
   const entries = Object.entries(resource.entity).filter(([key]) => key !== '@id');
+  const vocabulary = isVocabularyEntity(resource.entity);
   return (
     <article className="mx-auto w-full max-w-5xl px-4 py-10 text-ink sm:px-6">
       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-strong">
@@ -49,6 +51,14 @@ export default async function LinkedDataResourcePage({
         <a className="border border-ink/20 px-3 py-2" href={`${resource.uri}.jsonld`}>
           JSON-LD
         </a>
+        {vocabulary && (
+          <a
+            className="border border-ink/20 px-3 py-2"
+            href={`${resource.uri}.jsonld?profile=complete`}
+          >
+            Complete JSON-LD
+          </a>
+        )}
         <a className="border border-ink/20 px-3 py-2" href={`${resource.uri}.json`}>
           JSON
         </a>

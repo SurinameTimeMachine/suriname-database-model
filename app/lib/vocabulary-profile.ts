@@ -1,5 +1,5 @@
 export const vocabularyProfileContext =
-  'https://data.surinametijdmachine.org/data/context.jsonld';
+  'https://data.surinametijdmachine.org/data/context/stm-v1.jsonld';
 
 type JsonObject = Record<string, unknown>;
 
@@ -7,6 +7,7 @@ const conceptFields: Record<string, string> = {
   'skos:prefLabel': 'prefLabel',
   'skos:altLabel': 'altLabel',
   'skos:definition': 'definition',
+  'skos:editorialNote': 'editorialNote',
   'skos:example': 'example',
   'skos:hiddenLabel': 'hiddenLabel',
   'skos:scopeNote': 'scopeNote',
@@ -36,6 +37,7 @@ const arrayFields = new Set([
   'broader',
   'closeMatch',
   'definition',
+  'editorialNote',
   'example',
   'exactMatch',
   'hasTopConcept',
@@ -90,15 +92,15 @@ export function isVocabularyEntity(entity: JsonObject): boolean {
 }
 
 /**
- * Build the compact per-concept representation used by GLOBALISE object
- * exports, while preserving STM identifiers and STM-specific editorial data.
+ * Build the readable per-concept representation while preserving STM
+ * identifiers and STM-specific editorial data.
  */
-export function buildGlobaliseVocabularyObject(
+export function buildReadableVocabularyObject(
   entity: JsonObject,
   context = vocabularyProfileContext,
 ): JsonObject {
   if (!isVocabularyEntity(entity)) {
-    throw new Error('The GLOBALISE vocabulary profile only supports concepts');
+    throw new Error('The readable vocabulary profile only supports concepts');
   }
 
   const compact = compactValue(entity) as JsonObject;
@@ -115,6 +117,7 @@ export function buildGlobaliseVocabularyObject(
     'broader',
     'closeMatch',
     'definition',
+    'editorialNote',
     'example',
     'exactMatch',
     'hiddenLabel',

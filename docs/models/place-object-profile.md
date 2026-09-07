@@ -1,41 +1,51 @@
-# Compact place object profile
+# Readable place object profile
 
 ## Purpose
 
-The compact place profile provides one predictable JSON-LD object shape for
+The readable place profile provides one predictable JSON-LD object shape for
 every active Gazetteer record: address points, creeks, districts, Indigenous
 and Maroon villages, military posts, plantations, railroads, rivers, roads,
 settlements, stations, and towns. It follows the single-root object style used
 by GLOBALISE and the core Linked Art Place API without claiming full
 conformance to either profile.
 
-This is an additive publication view. It does not replace the Gazetteer editor
-record, the application JSON projection, or the complete STM authority-record
-JSON-LD graph.
+It is the default public JSON-LD representation. It does not replace the
+Gazetteer editor record, the application JSON projection, or the lossless STM
+authority-record graph.
 
 ## Endpoint and identity
 
 For `stm-00705`:
 
 - `/place/stm-00705` remains the canonical authority-record page.
-- `/place/stm-00705.jsonld` remains the complete authority-record graph.
-- `/place/stm-00705.jsonld?profile=globalise` returns the compact Place object.
-- The compact root keeps the existing
+- `/place/stm-00705.jsonld` returns the readable Place object.
+- `/place/stm-00705.jsonld?profile=complete` returns the complete
+  authority-record graph.
+- `/place/stm-00705.jsonld?profile=globalise` remains a compatibility alias for
+  the readable object.
+- The readable root keeps the existing
   `https://data.surinametijdmachine.org/place/stm-00705#location` identifier.
 
-The profile never wraps the result in `@graph`. Nested names, identifiers,
+The readable representation never wraps the result in `@graph`. Nested names, identifiers,
 features, assignments, time spans, and geometry references retain their
 existing IDs, so their identity does not depend on the JSON nesting.
+
+Its only visible schema declaration is the versioned
+`https://data.surinametijdmachine.org/data/context/stm-v1.jsonld` context. That
+context layers a small STM extension over Linked Art 1.0. The complete graph
+uses the versioned `/data/context/place-record-v1.jsonld` context by URL
+instead of embedding its definitions in every record.
 
 ## Symmetric place structure
 
 Every record has the same E53 Place root:
 
-| Compact field | Meaning |
+| Readable field | Meaning |
 | --- | --- |
 | `id`, `type`, `_label` | Stable E53 Place identity and display label |
 | `classified_as` | Canonical STM structural place-type concept |
 | `identified_by` | Existing E41 names and E42 identifiers |
+| `referred_to_by` | Human-readable location descriptions |
 | `defined_by` | Authoritative GeoSPARQL WKT, when present |
 | `centroid` | Existing centroid geometry; never promoted to a boundary |
 | `part_of` | Link to a containing E53 Place |
@@ -72,7 +82,7 @@ E53 Place
 ```
 
 Organization links remain properties of the physical feature rather than the
-spatial Place. The compact profile publishes an organization target only when
+spatial Place. The readable profile publishes an organization target only when
 the existing association status is `linked`. It retains
 `organization_association_status` for review, but does not turn
 `needs-physical-link-review` or `needs-organization-link` candidates into
@@ -110,9 +120,8 @@ relations on the physical feature. The profile does not introduce `sameAs`.
 - Editors continue to save concise Gazetteer records and source-bound
   assertions.
 - The normal JSON representation remains the application/editor projection.
-- The complete JSON-LD representation remains the lossless authority-record
-  graph.
-- The compact profile is a generated interoperability view.
+- The default JSON-LD representation is the readable interoperability view.
+- The `complete` JSON-LD profile remains the lossless authority-record graph.
 
 Future independent files for Place, physical feature, organization, source,
 assertion, and change entities can reuse the IDs already exposed here. That

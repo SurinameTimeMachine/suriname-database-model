@@ -42,6 +42,8 @@ const organizationOverridesSrc = join(
 );
 const databaseSrc = join(LOD_DIR, 'database.jsonld');
 const contextSrc = join(LOD_DIR, 'context.jsonld');
+const stmV1ContextSrc = join(LOD_DIR, 'stm-v1.jsonld');
+const placeRecordContextSrc = join(LOD_DIR, 'place-record-v1.jsonld');
 
 type GazetteerLocation = {
   lat?: number | null;
@@ -1732,5 +1734,23 @@ for (const [source, name] of [
   copyFileSync(source, join(OUT_DIR, name));
   console.log(`  Published ${name}`);
 }
+
+const versionedContextDir = join(OUT_DIR, 'context');
+mkdirSync(versionedContextDir, { recursive: true });
+if (!existsSync(stmV1ContextSrc)) {
+  throw new Error(`Missing versioned JSON-LD context: ${stmV1ContextSrc}`);
+}
+copyFileSync(stmV1ContextSrc, join(versionedContextDir, 'stm-v1.jsonld'));
+console.log('  Published context/stm-v1.jsonld');
+if (!existsSync(placeRecordContextSrc)) {
+  throw new Error(
+    `Missing versioned Place-record context: ${placeRecordContextSrc}`,
+  );
+}
+copyFileSync(
+  placeRecordContextSrc,
+  join(versionedContextDir, 'place-record-v1.jsonld'),
+);
+console.log('  Published context/place-record-v1.jsonld');
 
 console.log('\nDone! Data files ready in public/data/');

@@ -3,7 +3,10 @@
 This project generates a CIDOC-CRM-informed JSON-LD graph. The data pipeline publishes the complete graph and its JSON-LD context with the application assets:
 
 - `/data/database.jsonld` — complete generated graph
-- `/data/context.jsonld` — shared JSON-LD context
+- `/data/context.jsonld` — shared complete-graph JSON-LD context
+- `/data/context/stm-v1.jsonld` — versioned Linked Art + STM readable context
+- `/data/context/place-record-v1.jsonld` — versioned complete Place-record
+  context
 
 The Next.js application explicitly serves `.jsonld` files as `application/ld+json`.
 
@@ -30,11 +33,18 @@ The canonical identifier base is `https://data.surinametijdmachine.org/`. Before
 4. redirects or persistent aliases if URI patterns change.
 
 Place-record routes use `https://data.surinametijdmachine.org/place/{stm-id}`
-as the canonical browser URI. JSON-LD and application JSON are available at
-`/place/{stm-id}.jsonld` and `/place/{stm-id}.json`. Entities that are only
+as the canonical browser URI. Readable JSON-LD and application JSON are
+available at `/place/{stm-id}.jsonld` and `/place/{stm-id}.json`; the complete
+authority graph is available with `?profile=complete`. Entities that are only
 defined inside one place record use URI fragments, for example
 `/place/stm-02085#feature` and `/place/stm-02085#location`, so the identifier
 dereferences to the same record page and representation set.
+
+The readable Place and vocabulary representations use a single root object and
+the immutable `stm-v1` context. The context imports Linked Art 1.0 and defines
+only STM, GeoSPARQL, PROV-O, and SKOS additions used by the public profiles.
+Future incompatible term changes require a new context URI rather than edits to
+the published `stm-v1` contract.
 
 ## Semantic conformance work
 

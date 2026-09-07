@@ -21,9 +21,11 @@ deployment has completed.
 For `stm-00705` the public contract is:
 
 - `https://data.surinametijdmachine.org/place/stm-00705` — authority record and HTML representation.
-- `.../place/stm-00705.jsonld` — JSON-LD representation.
-- `.../place/stm-00705.jsonld?profile=globalise` — compact single-root E53 Place
-  representation.
+- `.../place/stm-00705.jsonld` — readable single-root E53 Place representation.
+- `.../place/stm-00705.jsonld?profile=complete` — complete authority-record
+  graph.
+- `.../place/stm-00705.jsonld?profile=globalise` — compatibility alias for the
+  readable representation.
 - `.../place/stm-00705.json` — application JSON representation.
 - `.../place/stm-00705#record` — E31 authority-record node.
 - `.../place/stm-00705#feature` — E25/E26 physical feature when applicable.

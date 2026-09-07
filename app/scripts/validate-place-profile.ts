@@ -2,7 +2,8 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import jsonld from 'jsonld';
 import {
-  buildGlobalisePlaceObject,
+  buildReadablePlaceObject,
+  placeProfileContext,
   type PlaceRecordDocument,
 } from '../lib/place-profile';
 import { BASE, buildContext } from './lod-context';
@@ -25,9 +26,11 @@ function strings(value: unknown): string[] {
 }
 
 function profileIds(value: unknown): string[] {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) return [];
-  const id = (value as JsonObject).id;
-  return typeof id === 'string' ? [id] : [];
+  return values(value).flatMap((item) => {
+    if (!item || typeof item !== 'object' || Array.isArray(item)) return [];
+    const id = (item as JsonObject).id;
+    return typeof id === 'string' ? [id] : [];
+  });
 }
 
 function sourceWkt(node: JsonObject | undefined): string | undefined {
@@ -81,8 +84,12 @@ async function main() {
     const feature = nodeById.get(featureId);
     assert(location, `${entry.id} source record has no location`);
 
-    const profile = buildGlobalisePlaceObject(document);
+    const profile = buildReadablePlaceObject(document);
     assertNoGraphOrSameAs(profile, entry.id);
+    assert(
+      profile['@context'] === placeProfileContext,
+      `${entry.id} profile does not use the versioned STM context`,
+    );
     assert(profile.id === locationId, `${entry.id} changed its Place identifier`);
     assert(profile.type === 'Place', `${entry.id} profile root is not a Place`);
     assert(
@@ -111,6 +118,17 @@ async function main() {
         actualIdentifierIds,
       ),
       `${entry.id} profile does not preserve names and identifiers`,
+    );
+    const expectedDescriptions = strings(location.P3_has_note);
+    const actualDescriptions = values(profile.referred_to_by).flatMap(
+      (item) =>
+        item && typeof item === 'object' && !Array.isArray(item)
+          ? strings((item as JsonObject).content)
+          : [],
+    );
+    assert(
+      sameValues(expectedDescriptions, actualDescriptions),
+      `${entry.id} profile does not preserve Place descriptions`,
     );
 
     const geometryId = strings(location['geo:hasGeometry'])[0];

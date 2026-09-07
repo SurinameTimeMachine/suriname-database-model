@@ -25,9 +25,10 @@ function pathFor(uri: string): string {
 
 async function expectRepresentation(
   path: string,
-  expectedId: string,
+  expectedCanonicalId: string,
   contentType: string,
   accept?: string,
+  expectedBodyId = expectedCanonicalId,
 ) {
   const response = await fetch(`${serverBase}/${path}`, {
     headers: accept ? { Accept: accept } : undefined,
@@ -39,8 +40,10 @@ async function expectRepresentation(
     `${path} returned ${response.headers.get('content-type')}, expected ${contentType}`,
   );
   assert(
-    response.headers.get('link')?.includes(`<${expectedId}>; rel="canonical"`),
-    `${path} has no canonical Link header for ${expectedId}`,
+    response.headers
+      .get('link')
+      ?.includes(`<${expectedCanonicalId}>; rel="canonical"`),
+    `${path} has no canonical Link header for ${expectedCanonicalId}`,
   );
   const body = (await response.json()) as Record<string, unknown>;
   const recordUrl =
@@ -49,16 +52,21 @@ async function expectRepresentation(
       : body.recordUrl;
   const ids = [
     body['@id'],
+    body.id,
     recordUrl,
     ...(Array.isArray(body['@graph'])
       ? body['@graph'].map((entity) => (entity as Entity)['@id'])
       : []),
   ];
-  assert(ids.includes(expectedId), `${path} does not describe ${expectedId}`);
+  assert(
+    ids.includes(expectedBodyId),
+    `${path} does not describe ${expectedBodyId}`,
+  );
 }
 
-async function expectGlobaliseVocabularyProfile() {
-  const path = 'vocabulary/place-type/plantation.jsonld?profile=globalise';
+async function expectReadableVocabularyProfile(
+  path = 'vocabulary/place-type/plantation.jsonld',
+) {
   const expectedId = `${canonicalBase}vocabulary/place-type/plantation`;
   const response = await fetch(`${serverBase}/${path}`, { redirect: 'manual' });
   assert(response.status === 200, `${path} returned HTTP ${response.status}`);
@@ -69,26 +77,28 @@ async function expectGlobaliseVocabularyProfile() {
   assert(
     response.headers
       .get('link')
-      ?.includes(`${expectedId}.jsonld?profile=globalise`),
-    `${path} does not advertise its alternate profile`,
+      ?.includes(`${expectedId}.jsonld?profile=complete`),
+    `${path} does not advertise its complete profile`,
   );
   const body = (await response.json()) as Record<string, unknown>;
   assert(body.id === expectedId, `${path} changed the canonical concept id`);
   assert(
     values(body.type).includes('Concept'),
-    `${path} is not a compact Concept object`,
+    `${path} is not a readable Concept object`,
   );
   assert(
     typeof body._label === 'string' &&
       values(body.prefLabel).length > 0 &&
       values(body.definition).length > 0 &&
-      values(body['skos:editorialNote']).length > 0,
+      values(body.editorialNote).length > 0,
     `${path} lost its label, definition, or editorial note`,
   );
 }
 
-async function expectGlobalisePlaceProfile(placeId: string) {
-  const path = `place/${placeId}.jsonld?profile=globalise`;
+async function expectReadablePlaceProfile(
+  placeId: string,
+  path = `place/${placeId}.jsonld`,
+) {
   const placeUri = `${canonicalBase}place/${placeId}#location`;
   const response = await fetch(`${serverBase}/${path}`, { redirect: 'manual' });
   assert(response.status === 200, `${path} returned HTTP ${response.status}`);
@@ -100,13 +110,13 @@ async function expectGlobalisePlaceProfile(placeId: string) {
     response.headers
       .get('link')
       ?.includes(
-        `${canonicalBase}place/${placeId}.jsonld?profile=globalise`,
+        `${canonicalBase}place/${placeId}.jsonld?profile=complete`,
       ),
-    `${path} does not advertise its alternate profile`,
+    `${path} does not advertise its complete profile`,
   );
   const body = (await response.json()) as Record<string, unknown>;
   assert(body.id === placeUri, `${path} changed the canonical Place id`);
-  assert(body.type === 'Place', `${path} is not a compact Place object`);
+  assert(body.type === 'Place', `${path} is not a readable Place object`);
   assert(!('@graph' in body), `${path} returned an @graph wrapper`);
   assert(
     typeof body._label === 'string' &&
@@ -140,7 +150,11 @@ async function main() {
   ) as Array<{ id: string }>;
   const placeId = recordIndex[0]?.id;
   assert(placeId, 'No authority record available for route validation');
-  await expectGlobalisePlaceProfile(placeId);
+  await expectReadablePlaceProfile(placeId);
+  await expectReadablePlaceProfile(
+    placeId,
+    `place/${placeId}.jsonld?profile=globalise`,
+  );
 
   for (const entity of samples.values()) {
     const path = pathFor(entity['@id']);
@@ -163,21 +177,42 @@ async function main() {
   }
 
   const placeUri = `${canonicalBase}place/${placeId}`;
+  const locationUri = `${placeUri}#location`;
   await expectRepresentation(
     `place/${placeId}`,
     placeUri,
     'application/ld+json',
     'application/ld+json',
+    locationUri,
   );
-  await expectRepresentation(`place/${placeId}.jsonld`, placeUri, 'application/ld+json');
+  await expectRepresentation(
+    `place/${placeId}.jsonld`,
+    placeUri,
+    'application/ld+json',
+    undefined,
+    locationUri,
+  );
+  await expectRepresentation(
+    `place/${placeId}.jsonld?profile=complete`,
+    placeUri,
+    'application/ld+json',
+  );
   await expectRepresentation(`place/${placeId}.json`, placeUri, 'application/json');
-  await expectGlobaliseVocabularyProfile();
+  await expectReadableVocabularyProfile();
+  await expectReadableVocabularyProfile(
+    'vocabulary/place-type/plantation.jsonld?profile=globalise',
+  );
+  await expectRepresentation(
+    'vocabulary/place-type/plantation.jsonld?profile=complete',
+    `${canonicalBase}vocabulary/place-type/plantation`,
+    'application/ld+json',
+  );
 
   const missing = await fetch(`${serverBase}/type/not-a-real-resource`);
   assert(missing.status === 404, `Unknown resource returned HTTP ${missing.status}`);
 
   console.log(
-    `Linked-data routes OK at ${serverBase}: ${samples.size} resource families and place authority records serve HTML, JSON-LD, JSON, Accept negotiation, and the compact vocabulary and Place profiles.`,
+    `Linked-data routes OK at ${serverBase}: ${samples.size} resource families and place authority records serve HTML, readable JSON-LD, complete JSON-LD, application JSON, Accept negotiation, and legacy GLOBALISE aliases.`,
   );
 }
 

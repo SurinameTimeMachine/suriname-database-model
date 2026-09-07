@@ -1,7 +1,7 @@
 import { readFile } from 'fs/promises';
 import { join } from 'path';
 import {
-  buildGlobalisePlaceObject,
+  buildReadablePlaceObject,
   type PlaceRecordDocument,
 } from '@/lib/place-profile';
 import { NextRequest, NextResponse } from 'next/server';
@@ -28,7 +28,7 @@ export async function GET(
   }
 
   const profile = request.nextUrl.searchParams.get('profile');
-  if (profile && profile !== 'globalise') {
+  if (profile && profile !== 'globalise' && profile !== 'complete') {
     return NextResponse.json(
       { error: `Unknown linked-data profile: ${profile}` },
       { status: 400 },
@@ -59,7 +59,8 @@ export async function GET(
   }
 
   try {
-    const sourceFormat = profile === 'globalise' ? 'jsonld' : format;
+    const readableJsonLd = format === 'jsonld' && profile !== 'complete';
+    const sourceFormat = readableJsonLd ? 'jsonld' : format;
     const recordResponse = await fetch(
       new URL(`/data/place-records/${id}.${sourceFormat}`, request.url),
       { signal: AbortSignal.timeout(10_000) },
@@ -67,9 +68,9 @@ export async function GET(
     if (!recordResponse.ok) throw new Error('Record not found');
     const sourceBody = await recordResponse.text();
     const body =
-      profile === 'globalise'
+      readableJsonLd
         ? `${JSON.stringify(
-            buildGlobalisePlaceObject(
+            buildReadablePlaceObject(
               JSON.parse(sourceBody) as PlaceRecordDocument,
             ),
             null,
@@ -84,7 +85,9 @@ export async function GET(
             : 'application/json; charset=utf-8',
         Link: [
           `<${CANONICAL_BASE}/place/${id}>; rel="canonical"`,
-          `<${CANONICAL_BASE}/place/${id}.jsonld?profile=globalise>; rel="alternate"; type="application/ld+json"`,
+          `<${CANONICAL_BASE}/place/${id}.jsonld>; rel="alternate"; type="application/ld+json"`,
+          `<${CANONICAL_BASE}/place/${id}.jsonld?profile=complete>; rel="alternate"; type="application/ld+json"`,
+          `<${CANONICAL_BASE}/place/${id}.json>; rel="alternate"; type="application/json"`,
         ].join(', '),
         Vary: 'Accept',
       },

@@ -170,13 +170,13 @@ export default async function PlaceRecordPage({
             Edit in Gazetteer
           </Link>
           <a className="border border-ink/20 px-3 py-2 hover:border-teal-strong" href={place.jsonldUrl}>
-            Complete JSON-LD
+            JSON-LD
           </a>
           <a
             className="border border-ink/20 px-3 py-2 hover:border-teal-strong"
-            href={`${place.jsonldUrl}?profile=globalise`}
+            href={`${place.jsonldUrl}?profile=complete`}
           >
-            Compact JSON-LD
+            Complete JSON-LD
           </a>
           <a className="border border-ink/20 px-3 py-2 hover:border-teal-strong" href={place.jsonUrl}>
             JSON

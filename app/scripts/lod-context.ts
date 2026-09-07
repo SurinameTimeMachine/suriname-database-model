@@ -157,6 +157,7 @@ export function buildContext(): Record<string, unknown> {
     AttributeAssignment: 'crm:E13_Attribute_Assignment',
     TypeAssignment: 'crm:E17_Type_Assignment',
     TimeSpan: 'crm:E52_Time-Span',
+    LinguisticObject: 'crm:E33_Linguistic_Object',
     Concept: 'skos:Concept',
     ConceptScheme: 'skos:ConceptScheme',
     Plantation: 'crm:E25_Human-Made_Feature',
@@ -294,6 +295,7 @@ export function buildContext(): Record<string, unknown> {
     language: { '@id': 'crm:P72_has_language', '@type': '@id' },
     carried_by: { '@id': 'crm:P128i_is_carried_by', '@type': '@id' },
     documented_by: { '@id': 'crm:P70i_is_documented_in', '@type': '@id' },
+    referred_to_by: { '@id': 'crm:P67i_is_referred_to_by', '@type': '@id' },
     defined_by: {
       '@id': 'crm:P168_place_is_defined_by',
       '@type': 'geo:wktLiteral',
@@ -322,6 +324,7 @@ export function buildContext(): Record<string, unknown> {
       '@type': '@id',
     },
     assigned_attribute: { '@id': 'crm:P141_assigned', '@type': '@id' },
+    assigned: { '@id': 'crm:P141_assigned', '@type': '@id' },
     assigned_type: { '@id': 'crm:P42_assigned', '@type': '@id' },
     timespan: { '@id': 'crm:P4_has_time-span', '@type': '@id' },
     begin_of_the_begin: {
