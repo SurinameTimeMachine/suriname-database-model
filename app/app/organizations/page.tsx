@@ -1,6 +1,7 @@
 'use client';
 
 import { useAuth } from '@/lib/auth';
+import LinkedPersonsSection from '@/components/LinkedPersonsSection';
 import type {
   DiklandRef,
   E25Plantation,
@@ -23,6 +24,38 @@ type OrganizationDetails = {
   appellations: E41Appellation[];
   observations: OrganizationObservation[];
   compositionPeriods: PlantationCompositionPeriod[];
+  linkedPersons: Array<{
+    id: string;
+    label: string;
+    sex?: string;
+    dayBirth?: string;
+    monthBirth?: string;
+    yearBirth?: string;
+    dayDeath?: string;
+    monthDeath?: string;
+    yearDeath?: string;
+    nameMother?: string;
+    observations: Array<{
+      id: string;
+      nameEnslaved?: string;
+      sex?: string;
+      age?: string;
+      plantationText?: string;
+      ownerName?: string;
+      startDay?: string;
+      startMonth?: string;
+      startYear?: string;
+      startEvent?: string;
+      startInfo?: string;
+      endDay?: string;
+      endMonth?: string;
+      endYear?: string;
+      endEvent?: string;
+      endEventDetailed?: string;
+      endInfo?: string;
+      registerType?: string;
+    }>;
+  }>;
   gazetteerPlantations: Array<{
     id: string;
     prefLabel: string;
@@ -464,6 +497,12 @@ function OrganizationsPageInner() {
                     </div>
                   )}
                 </section>
+
+                {(details?.linkedPersons.length ?? 0) > 0 && (
+                  <div className="px-4 sm:px-5">
+                    <LinkedPersonsSection persons={details!.linkedPersons} />
+                  </div>
+                )}
 
                 {compositionPeriods.length > 0 && (
                   <section className="px-4 py-4 sm:px-5">

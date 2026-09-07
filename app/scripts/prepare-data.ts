@@ -608,6 +608,93 @@ for (const o of observations) {
   }
 }
 
+// Person index: persons.jsonld PersonObservation rows grouped by person, then
+// by the E74 organization they resolved to (isEnslavedBy). Persons are linked
+// through organizations, not places directly (see transform-persons.ts).
+const personsByOrg: Record<string, Record<string, unknown>[]> = {};
+const personsPath = join(LOD_DIR, 'persons.jsonld');
+if (existsSync(personsPath)) {
+  const personsGraph =
+    (
+      JSON.parse(readFileSync(personsPath, 'utf-8')) as {
+        '@graph'?: Record<string, unknown>[];
+      }
+    )['@graph'] ?? [];
+  const personEntityById = new Map<string, Record<string, unknown>>();
+  for (const entity of personsGraph) {
+    if (
+      toArray(entity['@type'] as string | string[]).includes('E21_Person') &&
+      typeof entity['@id'] === 'string'
+    ) {
+      personEntityById.set(entity['@id'], entity);
+    }
+  }
+  const groupedByOrg = new Map<
+    string,
+    Map<string, Record<string, unknown>>
+  >();
+  for (const entity of personsGraph) {
+    if (
+      !toArray(entity['@type'] as string | string[]).includes(
+        'PersonObservation',
+      )
+    ) {
+      continue;
+    }
+    const organizationUri = entity['isEnslavedBy'] as string | undefined;
+    const personUri = entity['P140_assigned_attribute_to'] as
+      | string
+      | undefined;
+    if (!organizationUri || !personUri) continue;
+    const person = personEntityById.get(personUri);
+    const idPerson =
+      (person?.idPerson as string | undefined) ?? personUri.split('/').pop()!;
+    const group =
+      groupedByOrg.get(organizationUri) ??
+      new Map<string, Record<string, unknown>>();
+    groupedByOrg.set(organizationUri, group);
+    const linked = group.get(idPerson) ?? {
+      id: idPerson,
+      label: person?.prefLabel ?? idPerson,
+      sex: person?.sex,
+      dayBirth: person?.dayBirth,
+      monthBirth: person?.monthBirth,
+      yearBirth: person?.yearBirth,
+      dayDeath: person?.dayDeath,
+      monthDeath: person?.monthDeath,
+      yearDeath: person?.yearDeath,
+      nameMother: person?.nameMother,
+      observations: [],
+    };
+    group.set(idPerson, linked);
+    (linked.observations as Record<string, unknown>[]).push({
+      id: entity['@id'],
+      nameEnslaved: entity['prefLabel'],
+      sex: entity['sex'],
+      age: entity['age'],
+      plantationText: entity['plantationText'],
+      ownerName: entity['ownerName'],
+      startDay: entity['startDay'],
+      startMonth: entity['startMonth'],
+      startYear: entity['startYear'],
+      startEvent: entity['startEvent'],
+      startInfo: entity['startInfo'],
+      endDay: entity['endDay'],
+      endMonth: entity['endMonth'],
+      endYear: entity['endYear'],
+      endEvent: entity['endEvent'],
+      endEventDetailed: entity['endEventDetailed'],
+      endInfo: entity['endInfo'],
+      registerType: entity['registerType'],
+    });
+  }
+  for (const [organizationUri, group] of groupedByOrg) {
+    personsByOrg[organizationUri] = [...group.values()].sort((a, b) =>
+      String(a.label).localeCompare(String(b.label)),
+    );
+  }
+}
+
 const compositionPeriodsByOrg: Record<string, unknown[]> = {};
 for (const period of compositionPeriods) {
   const participants = [
@@ -1389,6 +1476,7 @@ writeJSON('places.json', placeIndex);
 writeJSON('sources.json', sourceIndex);
 writeJSON('appellations-by-entity.json', appellationsByEntity);
 writeJSON('observations-by-org.json', observationsByOrg);
+writeJSON('persons-by-org.json', personsByOrg);
 writeJSON('organization-composition-periods.json', compositionPeriodsByOrg);
 writeJSON('presence-inferences-by-plantation.json', presenceInferencesByPlantation);
 writeJSON('lifecycle-events.json', lifecycleEventsByEntity);
