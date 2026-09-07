@@ -16,6 +16,7 @@ type WorkspaceIndexes = {
   appellations: Record<string, Record<string, unknown>[]>;
   observations: Record<string, Record<string, unknown>[]>;
   compositionPeriods: Record<string, Record<string, unknown>[]>;
+  images: Record<string, Record<string, unknown>[]>;
   gazetteer: { '@graph'?: Array<Record<string, unknown>> };
   mapFeatures: {
     features?: Array<{ properties?: Record<string, unknown> }>;
@@ -42,6 +43,7 @@ function loadWorkspaceIndexes(): Promise<WorkspaceIndexes> {
       ),
       'utf-8',
     ),
+    readFile(join(process.cwd(), 'public/data/images-by-org.json'), 'utf-8'),
     readFile(join(process.cwd(), 'public/data/places-gazetteer.jsonld'), 'utf-8'),
     readFile(join(process.cwd(), 'public/data/map-features.geojson'), 'utf-8'),
   ]).then(([
@@ -49,6 +51,7 @@ function loadWorkspaceIndexes(): Promise<WorkspaceIndexes> {
     appellations,
     observations,
     compositionPeriods,
+    images,
     gazetteer,
     mapFeatures,
   ]) => ({
@@ -58,6 +61,7 @@ function loadWorkspaceIndexes(): Promise<WorkspaceIndexes> {
     compositionPeriods: JSON.parse(
       compositionPeriods,
     ) as WorkspaceIndexes['compositionPeriods'],
+    images: JSON.parse(images) as WorkspaceIndexes['images'],
     gazetteer: JSON.parse(gazetteer) as WorkspaceIndexes['gazetteer'],
     mapFeatures: JSON.parse(mapFeatures) as WorkspaceIndexes['mapFeatures'],
   }));
@@ -160,6 +164,7 @@ export async function GET(request: NextRequest) {
     appellations: indexes.appellations[organizationUri] ?? [],
     observations: indexes.observations[organizationUri] ?? [],
     compositionPeriods: indexes.compositionPeriods[organizationUri] ?? [],
+    linkedImages: indexes.images[organizationUri] ?? [],
     gazetteerPlantations,
     explorePlantations,
   });

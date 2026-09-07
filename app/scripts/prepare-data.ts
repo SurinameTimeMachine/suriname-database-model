@@ -608,6 +608,24 @@ for (const o of observations) {
   }
 }
 
+const imagesByOrg: Record<string, Record<string, unknown>[]> = {};
+const rijksmuseumImagesPath = join(DATA_DIR, 'rijksmuseum-images.jsonld');
+if (existsSync(rijksmuseumImagesPath)) {
+  const imagesGraph = (JSON.parse(readFileSync(rijksmuseumImagesPath, 'utf-8')) as {
+    '@graph'?: Record<string, unknown>[];
+  })['@graph'] ?? [];
+  for (const entity of imagesGraph) {
+    const organizationUri = entity.P138_represents as string | undefined;
+    if (!organizationUri) continue;
+    imagesByOrg[organizationUri] ??= [];
+    imagesByOrg[organizationUri].push({
+      id: entity['@id'], label: entity.prefLabel, objectNumber: entity.objectNumber,
+      year: entity.year, thumbnailUrl: entity.thumbnailUrl, contentUrl: entity.contentUrl,
+      sameAs: entity.sameAs, isPublicDomain: entity.isPublicDomain, licenseLabel: entity.licenseLabel,
+    });
+  }
+}
+
 const compositionPeriodsByOrg: Record<string, unknown[]> = {};
 for (const period of compositionPeriods) {
   const participants = [
@@ -1389,6 +1407,7 @@ writeJSON('places.json', placeIndex);
 writeJSON('sources.json', sourceIndex);
 writeJSON('appellations-by-entity.json', appellationsByEntity);
 writeJSON('observations-by-org.json', observationsByOrg);
+writeJSON('images-by-org.json', imagesByOrg);
 writeJSON('organization-composition-periods.json', compositionPeriodsByOrg);
 writeJSON('presence-inferences-by-plantation.json', presenceInferencesByPlantation);
 writeJSON('lifecycle-events.json', lifecycleEventsByEntity);
