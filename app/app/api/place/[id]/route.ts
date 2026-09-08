@@ -60,10 +60,13 @@ export async function GET(
 
   try {
     const sourceFormat = profile === 'globalise' ? 'jsonld' : format;
-    const recordResponse = await fetch(
-      new URL(`/data/place-records/${id}.${sourceFormat}`, request.url),
-      { signal: AbortSignal.timeout(10_000) },
-    );
+    const recordPath =
+      sourceFormat === 'json'
+        ? `/data/place-projections/${id}.json`
+        : `/data/place-records/${id}.jsonld`;
+    const recordResponse = await fetch(new URL(recordPath, request.url), {
+      signal: AbortSignal.timeout(10_000),
+    });
     if (!recordResponse.ok) throw new Error('Record not found');
     const sourceBody = await recordResponse.text();
     const body =
