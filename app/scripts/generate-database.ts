@@ -512,6 +512,7 @@ function buildPersons(
     const organizationUri = qid ? organizationUriByQid.get(qid) : undefined;
     if (organizationUri) {
       entity.isEnslavedBy = organizationUri;
+      entity.certainty = `${BASE}type/certainty/probable`;
       resolvedTargets++;
     }
     if (o.ownerName) entity.ownerName = o.ownerName;

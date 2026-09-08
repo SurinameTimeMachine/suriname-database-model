@@ -70,7 +70,7 @@ function PersonRow({ person }: { person: LinkedPerson }) {
         className="flex w-full flex-wrap items-baseline gap-x-2 gap-y-0.5 text-left text-sm"
         aria-expanded={open}
       >
-        <span className="font-semibold">{person.label}</span>
+        <span className="bg-entity-e21 font-semibold text-stm-warm-800">{person.label}</span>
         {person.sex && <span className="text-ink/55">({person.sex})</span>}
         {birth && <span className="text-ink/65">b. {birth}</span>}
         {death && <span className="text-ink/65">d. {death}</span>}
@@ -168,7 +168,7 @@ export default function LinkedPersonsSection({
           <PersonRow key={person.id} person={person} />
         ))}
         {filtered.length === 0 && (
-          <p className="text-sm text-ink/55">No matches.</p>
+          <li className="text-sm text-ink/55">No matches.</li>
         )}
       </ul>
     </section>
