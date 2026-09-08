@@ -31,6 +31,7 @@ import { BASE, buildPlaceRecordContext } from './lod-context';
 
 const DATA_DIR = join(__dirname, '../../data');
 const OUT_DIR = join(__dirname, '../public/data/place-records');
+const PROJECTIONS_DIR = join(__dirname, '../public/data/place-projections');
 const GAZETTEER_PATH = join(DATA_DIR, 'places-gazetteer.jsonld');
 const ORGANIZATION_OVERRIDES_PATH = join(
   DATA_DIR,
@@ -318,10 +319,18 @@ export function generatePlaceRecords() {
       .map((entry) => [entry.sourceId as string, entry['@id'] as string]),
   );
   mkdirSync(OUT_DIR, { recursive: true });
+  mkdirSync(PROJECTIONS_DIR, { recursive: true });
   if (existsSync(OUT_DIR)) {
     for (const fileName of readdirSync(OUT_DIR)) {
       if (/\.json(?:ld)?$/.test(fileName)) {
         unlinkSync(join(OUT_DIR, fileName));
+      }
+    }
+  }
+  if (existsSync(PROJECTIONS_DIR)) {
+    for (const fileName of readdirSync(PROJECTIONS_DIR)) {
+      if (/\.json$/.test(fileName)) {
+        unlinkSync(join(PROJECTIONS_DIR, fileName));
       }
     }
   }
@@ -933,13 +942,13 @@ export function generatePlaceRecords() {
       almanakkenObservations,
       diklandRefs: asArray(entry.diklandRefs),
     };
-    writeFileSync(join(OUT_DIR, `${entry.id}.jsonld`), `${JSON.stringify(document, null, 2)}\n`);
-    writeFileSync(join(OUT_DIR, `${entry.id}.json`), `${JSON.stringify(projection, null, 2)}\n`);
+    writeFileSync(join(OUT_DIR, `${entry.id}.jsonld`), `${JSON.stringify(document)}\n`);
+    writeFileSync(join(PROJECTIONS_DIR, `${entry.id}.json`), `${JSON.stringify(projection)}\n`);
     index.push({ id: entry.id, label, type: entry.type, recordUri: pageUri });
     records++;
   }
 
-  writeFileSync(join(OUT_DIR, 'index.json'), `${JSON.stringify(index, null, 2)}\n`);
+  writeFileSync(join(OUT_DIR, 'index.json'), `${JSON.stringify(index)}\n`);
   console.log(`Generated ${records} public authority records in ${OUT_DIR}`);
 }
 

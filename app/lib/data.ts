@@ -152,6 +152,7 @@ export const CRM_COLORS: Record<string, string> = {
   E41: '#fef3ba', // E41 Appellation (yellow)
   E13: '#82ddff', // E13 Attribute Assignment (blue)
   E39: '#ffe6eb', // E39 Actor -- person roles (light pink)
+  E21: '#ffbdca', // E21 Person (pink, same family as E39/E74 -- subclass of E39 Actor)
   E55: '#d4edda', // E55 Type (light green)
   E52: '#cce5ff', // E52 Time-Span (light blue)
   E54: '#e2d9f3', // E54 Dimension (light purple)
@@ -178,6 +179,7 @@ export const CRM_CLASS_NAMES: Record<string, string> = {
   E41: 'E41 Appellation',
   E13: 'E13 Attribute Assignment',
   E39: 'E39 Actor',
+  E21: 'E21 Person',
   E55: 'E55 Type',
   E52: 'E52 Time-Span',
   E54: 'E54 Dimension',

@@ -57,6 +57,8 @@
     "E55_Type": "crm:E55_Type",
     "E74_Group": "crm:E74_Group",
     "E12_Production": "crm:E12_Production",
+    "E21_Person": "crm:E21_Person",
+    "PersonObservation": "picom:PersonObservation",
     "PresenceInference": "stm:PresenceInference",
     "PlantationCompositionPeriod": "stm:PlantationCompositionPeriod",
     "InferenceRule": "prov:Plan",
@@ -652,6 +654,114 @@
     "isEnslaverOf": {
       "@id": "hdsc:isEnslaverOf",
       "@type": "@id"
+    },
+    "idPerson": {
+      "@id": "dcterms:identifier",
+      "@type": "xsd:string"
+    },
+    "idSource": {
+      "@id": "dcterms:identifier",
+      "@type": "xsd:string"
+    },
+    "sex": {
+      "@id": "stm:sex",
+      "@type": "xsd:string"
+    },
+    "dayBirth": {
+      "@id": "stm:dayBirth",
+      "@type": "xsd:integer"
+    },
+    "monthBirth": {
+      "@id": "stm:monthBirth",
+      "@type": "xsd:integer"
+    },
+    "yearBirth": {
+      "@id": "stm:yearBirth",
+      "@type": "xsd:gYear"
+    },
+    "dayDeath": {
+      "@id": "stm:dayDeath",
+      "@type": "xsd:integer"
+    },
+    "monthDeath": {
+      "@id": "stm:monthDeath",
+      "@type": "xsd:integer"
+    },
+    "yearDeath": {
+      "@id": "stm:yearDeath",
+      "@type": "xsd:gYear"
+    },
+    "nameMother": {
+      "@id": "stm:nameMother",
+      "@type": "xsd:string"
+    },
+    "age": {
+      "@id": "stm:age",
+      "@type": "xsd:string"
+    },
+    "plantationText": {
+      "@id": "stm:plantationText",
+      "@type": "xsd:string"
+    },
+    "ownerName": {
+      "@id": "stm:ownerName",
+      "@type": "xsd:string"
+    },
+    "startDay": {
+      "@id": "stm:startDay",
+      "@type": "xsd:integer"
+    },
+    "startMonth": {
+      "@id": "stm:startMonth",
+      "@type": "xsd:integer"
+    },
+    "startYear": {
+      "@id": "stm:startYear",
+      "@type": "xsd:gYear"
+    },
+    "startEvent": {
+      "@id": "stm:startEvent",
+      "@type": "xsd:string"
+    },
+    "startInfo": {
+      "@id": "stm:startInfo",
+      "@type": "xsd:string"
+    },
+    "endDay": {
+      "@id": "stm:endDay",
+      "@type": "xsd:integer"
+    },
+    "endMonth": {
+      "@id": "stm:endMonth",
+      "@type": "xsd:integer"
+    },
+    "endYear": {
+      "@id": "stm:endYear",
+      "@type": "xsd:gYear"
+    },
+    "endEvent": {
+      "@id": "stm:endEvent",
+      "@type": "xsd:string"
+    },
+    "endEventDetailed": {
+      "@id": "stm:endEventDetailed",
+      "@type": "xsd:string"
+    },
+    "endInfo": {
+      "@id": "stm:endInfo",
+      "@type": "xsd:string"
+    },
+    "registerType": {
+      "@id": "stm:registerType",
+      "@type": "xsd:string"
+    },
+    "inventoryNumber": {
+      "@id": "stm:inventoryNumber",
+      "@type": "xsd:string"
+    },
+    "folioNumber": {
+      "@id": "stm:folioNumber",
+      "@type": "xsd:string"
     },
     "wasDerivedFrom": {
       "@id": "prov:wasDerivedFrom",

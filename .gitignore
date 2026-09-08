@@ -8,6 +8,7 @@ build/
 
 # generated outputs (rebuilt by: pnpm --filter app pipeline)
 app/lod/database.jsonld
+app/lod/persons.jsonld
 app/lod/map-features.geojson
 app/public/data/
 
