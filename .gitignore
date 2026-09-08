@@ -11,6 +11,8 @@ app/lod/database.jsonld
 app/lod/persons.jsonld
 app/lod/map-features.geojson
 app/public/data/
+# Synced by scripts/sync-nas-records.ts so the event API functions can bundle it
+app/lib/nas-mediabank-records.json
 
 # misc
 .DS_Store
