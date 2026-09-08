@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { randomUUID } from 'crypto';
+import { kv } from '@vercel/kv';
 import { LOCATION_TYPES, type AddedPlace } from './event-types';
 
 type NasRecord = {
@@ -100,8 +101,24 @@ type ClaimResponse = {
 };
 
 const DATA_DIR = join(process.cwd(), '..', 'data', 'nas-mediabank');
-const RECORDS_PATH = join(DATA_DIR, 'nas-mediabank-records.json');
+const RECORDS_CANDIDATES = [
+  // In-tree copy produced by scripts/sync-nas-records.ts (runs in the
+  // pipeline). Lives inside app/ so the file tracer can bundle it into the
+  // serverless functions used on Vercel.
+  join(process.cwd(), 'lib', 'nas-mediabank-records.json'),
+  // Original location for local development when running scripts directly.
+  join(DATA_DIR, 'nas-mediabank-records.json'),
+];
 const STATE_PATH = join(DATA_DIR, 'event-state.json');
+
+// Persistent event state lives in Vercel KV when KV_REST_API_URL is set (i.e. on Vercel).
+// The local file-based store remains the default for `pnpm dev` on a venue laptop.
+const KV_URL = process.env.KV_REST_API_URL;
+const KV_TOKEN = process.env.KV_REST_API_TOKEN;
+const USING_KV = Boolean(KV_URL && KV_TOKEN);
+const STATE_KEY = 'stm:event:state';
+const LOCK_KEY = 'stm:event:lock';
+const LOCK_TTL_MS = 15_000;
 
 const LEASE_MINUTES_RAW = Number(process.env.EVENT_TASK_LEASE_MINUTES || '15');
 const LEASE_MINUTES_MAX = 240;
@@ -112,22 +129,47 @@ const LEASE_MINUTES =
 
 let lock: Promise<void> = Promise.resolve();
 
+// Cross-process mutual exclusion. The in-process `lock` is enough for the
+// single-process venue-laptop deployment (see the note below); on Vercel,
+// the @vercel/kv-backed Redis lock serialises claim/submit across all
+// serverless instances so two reviewers can never read-modify-write the
+// same state document at once.
+//
 // This JSON store is intentionally scoped to the local, single-process review tool.
 // Use a transactional persistent store before deploying across workers or containers.
 
 async function withLock<T>(fn: () => Promise<T>): Promise<T> {
-  let release!: () => void;
-  const next = new Promise<void>((resolve) => {
-    release = resolve;
-  });
-  const prev = lock;
-  lock = prev.then(() => next);
-  await prev;
-  try {
-    return await fn();
-  } finally {
-    release();
+  if (!USING_KV) {
+    let release!: () => void;
+    const next = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const prev = lock;
+    lock = prev.then(() => next);
+    await prev;
+    try {
+      return await fn();
+    } finally {
+      release();
+    }
   }
+  const token = randomUUID();
+  const deadline = Date.now() + LOCK_TTL_MS;
+  while (Date.now() < deadline) {
+    const acquired = await kv.set(LOCK_KEY, token, { nx: true, px: LOCK_TTL_MS });
+    if (acquired === 'OK') {
+      try {
+        return await fn();
+      } finally {
+        const current = await kv.get<string>(LOCK_KEY);
+        if (current === token) {
+          await kv.del(LOCK_KEY);
+        }
+      }
+    }
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+  throw new Error('Could not acquire event-state lock; please retry.');
 }
 
 function readJsonFile<T>(path: string): T {
@@ -197,7 +239,13 @@ function normalizePayload(value: unknown): EventSubmissionPayload {
 }
 
 function initializeStateFromData(): EventState {
-  const records = readJsonFile<NasRecord[]>(RECORDS_PATH);
+  const recordsPath = RECORDS_CANDIDATES.find((candidate) => existsSync(candidate));
+  if (!recordsPath) {
+    throw new Error(
+      `nas-mediabank-records.json not found in any of: ${RECORDS_CANDIDATES.join(', ')}`,
+    );
+  }
+  const records = readJsonFile<NasRecord[]>(recordsPath);
 
   const tasks: EventTask[] = [];
   for (const record of records) {
@@ -272,7 +320,23 @@ function migrateLegacyTasks(state: EventState): void {
   }
 }
 
-function loadState(): EventState {
+function loadState(): Promise<EventState> {
+  if (!USING_KV) {
+    return Promise.resolve(loadStateFromFile());
+  }
+  return loadStateFromKv();
+}
+
+function saveState(state: EventState): Promise<void> {
+  state.updatedAt = new Date().toISOString();
+  if (!USING_KV) {
+    writeFileSync(STATE_PATH, JSON.stringify(state, null, 2), 'utf8');
+    return Promise.resolve();
+  }
+  return Promise.resolve(kv.set(STATE_KEY, state)).then(() => undefined);
+}
+
+function loadStateFromFile(): EventState {
   mkdirSync(DATA_DIR, { recursive: true });
   if (!existsSync(STATE_PATH)) {
     const initial = initializeStateFromData();
@@ -280,6 +344,23 @@ function loadState(): EventState {
     return initial;
   }
   const state = readJsonFile<EventState>(STATE_PATH);
+  return finalizeState(state);
+}
+
+async function loadStateFromKv(): Promise<EventState> {
+  const stored = await kv.get<EventState>(STATE_KEY);
+  if (stored) {
+    return finalizeState(stored);
+  }
+  const initial = initializeStateFromData();
+  // Set NX so a concurrent first request can't clobber the seed with an
+  // empty document if both invocations race the cold start.
+  await kv.set(STATE_KEY, initial, { nx: true });
+  const reread = await kv.get<EventState>(STATE_KEY);
+  return finalizeState(reread ?? initial);
+}
+
+function finalizeState(state: EventState): EventState {
   const photoTaskIds = new Set(
     state.tasks
       .filter((task) => task.mediaType === 'image')
@@ -294,11 +375,6 @@ function loadState(): EventState {
     task.lowResUrl = makeLowResUrl(task.mediaId);
   }
   return state;
-}
-
-function saveState(state: EventState): void {
-  state.updatedAt = new Date().toISOString();
-  writeFileSync(STATE_PATH, JSON.stringify(state, null, 2), 'utf8');
 }
 
 function nowIso(): string {
@@ -338,7 +414,7 @@ export async function startParticipant(nickname: string): Promise<{
   stats: ReturnType<typeof getStatsFromState>;
 }> {
   return withLock(async () => {
-    const state = loadState();
+    const state = await loadState();
     const participantId = randomUUID();
     state.participants[participantId] = {
       participantId,
@@ -346,7 +422,7 @@ export async function startParticipant(nickname: string): Promise<{
       startedAt: nowIso(),
       lastSeenAt: nowIso(),
     };
-    saveState(state);
+    await saveState(state);
     return {
       participantId,
       nickname,
@@ -357,7 +433,7 @@ export async function startParticipant(nickname: string): Promise<{
 
 export async function claimTask(participantId: string): Promise<ClaimResponse> {
   return withLock(async () => {
-    const state = loadState();
+    const state = await loadState();
     const participant = state.participants[participantId];
     if (!participant) {
       throw new Error('Unknown participantId. Start a session first.');
@@ -374,7 +450,7 @@ export async function claimTask(participantId: string): Promise<ClaimResponse> {
     );
 
     if (activeOwned) {
-      saveState(state);
+      await saveState(state);
       return {
         ok: true,
         round: activeOwned.currentClaim!.round,
@@ -406,7 +482,7 @@ export async function claimTask(participantId: string): Promise<ClaimResponse> {
     }
 
     if (candidates.length === 0) {
-      saveState(state);
+      await saveState(state);
       return {
         ok: true,
         round,
@@ -435,7 +511,7 @@ export async function claimTask(participantId: string): Promise<ClaimResponse> {
       round,
     };
 
-    saveState(state);
+    await saveState(state);
 
     return {
       ok: true,
@@ -455,7 +531,7 @@ export async function submitTask(
   payload: EventSubmissionPayload,
 ): Promise<{ ok: true; completed: boolean; reason?: 'missing_location'; stats: ReturnType<typeof getStatsFromState> }> {
   return withLock(async () => {
-    const state = loadState();
+    const state = await loadState();
     const participant = state.participants[participantId];
     if (!participant) throw new Error('Unknown participantId. Start a session first.');
 
@@ -493,7 +569,7 @@ export async function submitTask(
       task.currentClaim = null;
       task.status = round === 2 ? 'pending-round-2' : 'unoffered';
       participant.lastSeenAt = submittedAt;
-      saveState(state);
+      await saveState(state);
 
       return {
         ok: true,
@@ -514,7 +590,7 @@ export async function submitTask(
     task.currentClaim = null;
 
     participant.lastSeenAt = submittedAt;
-    saveState(state);
+    await saveState(state);
 
     return {
       ok: true,
@@ -526,7 +602,7 @@ export async function submitTask(
 
 export async function getEventStatus(): Promise<ReturnType<typeof getStatsFromState>> {
   return withLock(async () => {
-    const state = loadState();
+    const state = await loadState();
     return getStatsFromState(state);
   });
 }
