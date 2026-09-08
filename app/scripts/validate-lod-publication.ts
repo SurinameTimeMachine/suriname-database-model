@@ -1488,7 +1488,7 @@ async function main() {
       }
     }
     assert(
-      existsSync(join(PLACE_RECORDS_DIR, `${id}.json`)),
+      existsSync(join(PROJECTIONS_DIR, `${id}.json`)),
       `Authority record ${id} has no JSON projection`,
     );
   }
