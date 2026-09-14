@@ -1,4 +1,6 @@
 {
+  "private": true,
+  "packageManager": "pnpm@10.19.0",
   "scripts": {
     "dev": "pnpm --dir app dev",
     "build": "pnpm --dir app build",
