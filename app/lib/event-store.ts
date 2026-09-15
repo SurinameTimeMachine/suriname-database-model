@@ -1,5 +1,3 @@
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
 import postgres, { type ISql, type Sql } from 'postgres';
 import { LOCATION_TYPES, type AddedPlace } from './event-types';
 
@@ -75,19 +73,12 @@ const LEASE_MINUTES =
     ? LEASE_MINUTES_RAW
     : 15;
 
+// Server-side only: DATABASE_URL must come from the environment. There is no
+// filesystem fallback, because the runtime filesystem is read-only on Vercel.
 function resolveDatabaseUrl(): string {
   const fromEnv = process.env.DATABASE_URL?.trim();
   if (fromEnv) return fromEnv;
-  for (const file of ['.env.local', '.env']) {
-    try {
-      const content = readFileSync(join(process.cwd(), file), 'utf8');
-      const match = content.match(/^DATABASE_URL\s*=\s*(.+?)\s*$/m);
-      if (match) return match[1].replace(/^['"]|['"]$/g, '');
-    } catch {
-      continue;
-    }
-  }
-  throw new Error('DATABASE_URL is not configured. Set it in the environment or app/.env.local.');
+  throw new Error('DATABASE_URL is not configured. Set it in the deployment environment or app/.env.local.');
 }
 
 let sql: Sql | null = null;
