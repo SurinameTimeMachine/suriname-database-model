@@ -11,11 +11,11 @@ const GAZETTEER_PATH = join(
   'data',
   'places-gazetteer.jsonld',
 );
-const PLACE_RECORDS_DIR = join(
+const PROJECTIONS_DIR = join(
   process.cwd(),
   'public',
   'data',
-  'place-records',
+  'place-projections',
 );
 const PLACE_ID = /^stm-[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
@@ -100,7 +100,7 @@ async function readMergedInto(id: string): Promise<string | undefined> {
 async function loadPlaceProjection(id: string): Promise<PlaceProjection | null> {
   try {
     return JSON.parse(
-      await readFile(join(PLACE_RECORDS_DIR, `${id}.json`), 'utf-8'),
+      await readFile(join(PROJECTIONS_DIR, `${id}.json`), 'utf-8'),
     ) as PlaceProjection;
   } catch {
     return null;

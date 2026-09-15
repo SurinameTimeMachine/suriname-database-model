@@ -24,6 +24,7 @@ const ADDRESS_POINTS_PATH = join(
   'locatiepunten1885.geojson',
 );
 const PLACE_RECORDS_DIR = join(PUBLIC_DATA_DIR, 'place-records');
+const PROJECTIONS_DIR = join(PUBLIC_DATA_DIR, 'place-projections');
 const ABSOLUTE_HTTP_IRI = /^https?:\/\//;
 const CANONICAL_BASE = 'https://data.surinametijdmachine.org/';
 const WIKIDATA_QID = /^Q\d+$/;
@@ -509,7 +510,7 @@ async function main() {
     if (assertions.length === 0) continue;
 
     const projection = JSON.parse(
-      readArtifact(PLACE_RECORDS_DIR, `${entry.id}.json`).toString('utf-8'),
+      readArtifact(PROJECTIONS_DIR, `${entry.id}.json`).toString('utf-8'),
     ) as Record<string, unknown>;
     const projectedAssertions = toArray(
       projection.functionAssertions as Record<string, unknown>[] | undefined,
@@ -733,7 +734,7 @@ async function main() {
     ) as JsonLdDocument;
     const graph = record['@graph'] ?? [];
     const projection = JSON.parse(
-      readArtifact(PLACE_RECORDS_DIR, `${recordId}.json`).toString('utf-8'),
+      readArtifact(PROJECTIONS_DIR, `${recordId}.json`).toString('utf-8'),
     ) as { type?: string };
     assert(
       typeof projection.type === 'string',
@@ -1487,7 +1488,7 @@ async function main() {
       }
     }
     assert(
-      existsSync(join(PLACE_RECORDS_DIR, `${id}.json`)),
+      existsSync(join(PROJECTIONS_DIR, `${id}.json`)),
       `Authority record ${id} has no JSON projection`,
     );
   }

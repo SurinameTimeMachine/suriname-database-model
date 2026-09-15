@@ -63,7 +63,8 @@ coherent canonical model.
 | Editor aggregate | `data/places-gazetteer.jsonld` | Place authority state plus names, geometry, assertions and 19,483 materialized Almanakken observations. |
 | Organization review | `data/organization-authority-overrides.jsonld` | Latest reviewed E74-to-E25 association choices without a temporal interval. |
 | Aggregate publication | generated `app/lod/database.jsonld` | Full CSV-derived E13 observations, E74 organizations and 202 composition periods. |
-| Per-place publication | generated `app/public/data/place-records/*` | Local projections of evidence attached to one place authority record. |
+| Per-place publication | generated `app/public/data/place-records/*` | JSON-LD authority-record graph for one place (`*.jsonld`) plus the `index.json` of published records. |
+| Place projections | generated `app/public/data/place-projections/*` | Compact application JSON projection of one place authority record for the UI. |
 | Application index | generated `organization-composition-periods.json` | The same period indexed under every participating organization for UI lookup. |
 
 The aggregate publication is generated from all 22,482 CSV rows. The editor

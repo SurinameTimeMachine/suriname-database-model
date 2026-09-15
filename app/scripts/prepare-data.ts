@@ -608,6 +608,11 @@ for (const o of observations) {
   }
 }
 
+// Rijksmuseum images index: E36 Visual Items grouped by the E74 organization
+// their depicted E25 plantation resolves to (via hasOrganizationalAssociation).
+// Underlying model: E22 Source -> P128 carries -> E36 Visual Item
+//   -> P138 represents -> E25 Plantation.
+// The organization keying here is a derived UI index only.
 const imagesByOrg: Record<string, Record<string, unknown>[]> = {};
 const rijksmuseumImagesPath = join(DATA_DIR, 'rijksmuseum-images.jsonld');
 if (existsSync(rijksmuseumImagesPath)) {
@@ -615,7 +620,49 @@ if (existsSync(rijksmuseumImagesPath)) {
     '@graph'?: Record<string, unknown>[];
   })['@graph'] ?? [];
   for (const entity of imagesGraph) {
-    const organizationUri = entity.P138_represents as string | undefined;
+    const depicts = entity.P138_represents as string | undefined;
+    if (!depicts) continue;
+    // P138_represents targets the depicted E25 plantation; resolve the
+    // organization UI grouping via its hasOrganizationalAssociation link.
+    // (Legacy snapshots pointed P138_represents directly at the organization.)
+    let organizationUri: string | undefined;
+    const plantation = plantationIndex[depicts] as
+      | Record<string, unknown>
+      | undefined;
+    if (
+      plantation &&
+      typeof plantation.hasOrganizationalAssociation === 'string'
+    ) {
+      organizationUri = plantation.hasOrganizationalAssociation;
+    } else if (depicts.includes('/organization/')) {
+      organizationUri = depicts;
+    } else {
+      // No direct E25 match (e.g. plantation URI keyed by label rather than
+      // Q-ID): fall back to wikidata Q-ID matches via closeMatch, preferring
+      // PSUR-registered plantations (same eligibility rule as the import).
+      const depictsQid = depicts.includes('/entity/')
+        ? depicts.split('/').pop()?.toUpperCase()
+        : null;
+      if (depictsQid) {
+        const cands = plantations.filter(
+          (p) =>
+            toArray(p.closeMatch as string | string[] | undefined).some(
+              (match) =>
+                typeof match === 'string' &&
+                match.split('/').pop()?.toUpperCase() === depictsQid,
+            ),
+        );
+        const picked =
+          cands.find((p) => p.psurId != null) ??
+          (cands.length === 1 ? cands[0] : undefined);
+        if (
+          picked &&
+          typeof picked.hasOrganizationalAssociation === 'string'
+        ) {
+          organizationUri = picked.hasOrganizationalAssociation;
+        }
+      }
+    }
     if (!organizationUri) continue;
     imagesByOrg[organizationUri] ??= [];
     imagesByOrg[organizationUri].push({
@@ -623,6 +670,92 @@ if (existsSync(rijksmuseumImagesPath)) {
       year: entity.year, thumbnailUrl: entity.thumbnailUrl, contentUrl: entity.contentUrl,
       sameAs: entity.sameAs, isPublicDomain: entity.isPublicDomain, licenseLabel: entity.licenseLabel,
     });
+  }
+}
+// Person index: persons.jsonld PersonObservation rows grouped by person, then
+// by the E74 organization they resolved to (isEnslavedBy). Persons are linked
+// through organizations, not places directly (see transform-persons.ts).
+const personsByOrg: Record<string, Record<string, unknown>[]> = {};
+const personsPath = join(LOD_DIR, 'persons.jsonld');
+if (existsSync(personsPath)) {
+  const personsGraph =
+    (
+      JSON.parse(readFileSync(personsPath, 'utf-8')) as {
+        '@graph'?: Record<string, unknown>[];
+      }
+    )['@graph'] ?? [];
+  const personEntityById = new Map<string, Record<string, unknown>>();
+  for (const entity of personsGraph) {
+    if (
+      toArray(entity['@type'] as string | string[]).includes('E21_Person') &&
+      typeof entity['@id'] === 'string'
+    ) {
+      personEntityById.set(entity['@id'], entity);
+    }
+  }
+  const groupedByOrg = new Map<
+    string,
+    Map<string, Record<string, unknown>>
+  >();
+  for (const entity of personsGraph) {
+    if (
+      !toArray(entity['@type'] as string | string[]).includes(
+        'PersonObservation',
+      )
+    ) {
+      continue;
+    }
+    const organizationUri = entity['isEnslavedBy'] as string | undefined;
+    const personUri = entity['P140_assigned_attribute_to'] as
+      | string
+      | undefined;
+    if (!organizationUri || !personUri) continue;
+    const person = personEntityById.get(personUri);
+    const idPerson =
+      (person?.idPerson as string | undefined) ?? personUri.split('/').pop()!;
+    const group =
+      groupedByOrg.get(organizationUri) ??
+      new Map<string, Record<string, unknown>>();
+    groupedByOrg.set(organizationUri, group);
+    const linked = group.get(idPerson) ?? {
+      id: idPerson,
+      label: person?.prefLabel ?? idPerson,
+      sex: person?.sex,
+      dayBirth: person?.dayBirth,
+      monthBirth: person?.monthBirth,
+      yearBirth: person?.yearBirth,
+      dayDeath: person?.dayDeath,
+      monthDeath: person?.monthDeath,
+      yearDeath: person?.yearDeath,
+      nameMother: person?.nameMother,
+      observations: [],
+    };
+    group.set(idPerson, linked);
+    (linked.observations as Record<string, unknown>[]).push({
+      id: entity['@id'],
+      nameEnslaved: entity['prefLabel'],
+      sex: entity['sex'],
+      age: entity['age'],
+      plantationText: entity['plantationText'],
+      ownerName: entity['ownerName'],
+      startDay: entity['startDay'],
+      startMonth: entity['startMonth'],
+      startYear: entity['startYear'],
+      startEvent: entity['startEvent'],
+      startInfo: entity['startInfo'],
+      endDay: entity['endDay'],
+      endMonth: entity['endMonth'],
+      endYear: entity['endYear'],
+      endEvent: entity['endEvent'],
+      endEventDetailed: entity['endEventDetailed'],
+      endInfo: entity['endInfo'],
+      registerType: entity['registerType'],
+    });
+  }
+  for (const [organizationUri, group] of groupedByOrg) {
+    personsByOrg[organizationUri] = [...group.values()].sort((a, b) =>
+      String(a.label).localeCompare(String(b.label)),
+    );
   }
 }
 
@@ -1408,6 +1541,7 @@ writeJSON('sources.json', sourceIndex);
 writeJSON('appellations-by-entity.json', appellationsByEntity);
 writeJSON('observations-by-org.json', observationsByOrg);
 writeJSON('images-by-org.json', imagesByOrg);
+writeJSON('persons-by-org.json', personsByOrg);
 writeJSON('organization-composition-periods.json', compositionPeriodsByOrg);
 writeJSON('presence-inferences-by-plantation.json', presenceInferencesByPlantation);
 writeJSON('lifecycle-events.json', lifecycleEventsByEntity);

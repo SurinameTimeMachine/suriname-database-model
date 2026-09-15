@@ -1,24 +1,6 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
-import { join } from 'path';
-import { randomUUID } from 'crypto';
+import postgres, { type ISql, type Sql } from 'postgres';
 import { LOCATION_TYPES, type AddedPlace } from './event-types';
 
-type NasRecord = {
-  detailId: string;
-  mediaId: string;
-  recordKey: string;
-  detailUrl: string;
-  title: string;
-  description: string;
-  documentType: string;
-  inventoryNumber: string;
-  yearRaw: string;
-  personsRaw: string;
-  keywordsRaw: string;
-  mediaType: 'image' | 'video' | 'audio' | 'unknown';
-};
-
-// One entry per completed review round; the full answer payload lives in state.submissions.
 export type RoundCompletion = {
   participantId: string;
   nickname: string;
@@ -65,29 +47,14 @@ export type EventSubmissionPayload = {
   notes: string;
 };
 
-type Participant = {
-  participantId: string;
-  nickname: string;
-  startedAt: string;
-  lastSeenAt: string;
-};
-
-type SubmissionRecord = {
-  submissionId: string;
-  taskId: string;
-  participantId: string;
-  claimId: string;
-  submittedAt: string;
-  payload: EventSubmissionPayload;
-};
-
-type EventState = {
-  eventId: string;
-  createdAt: string;
-  updatedAt: string;
-  tasks: EventTask[];
-  participants: Record<string, Participant>;
-  submissions: SubmissionRecord[];
+type Stats = {
+  total: number;
+  completed: number;
+  assigned: number;
+  unoffered: number;
+  pendingRound2: number;
+  participants: number;
+  round: 1 | 2;
 };
 
 type ClaimResponse = {
@@ -96,12 +63,8 @@ type ClaimResponse = {
   reused: boolean;
   done: boolean;
   task: EventTask | null;
-  stats: ReturnType<typeof getStatsFromState>;
+  stats: Stats;
 };
-
-const DATA_DIR = join(process.cwd(), '..', 'data', 'nas-mediabank');
-const RECORDS_PATH = join(DATA_DIR, 'nas-mediabank-records.json');
-const STATE_PATH = join(DATA_DIR, 'event-state.json');
 
 const LEASE_MINUTES_RAW = Number(process.env.EVENT_TASK_LEASE_MINUTES || '15');
 const LEASE_MINUTES_MAX = 240;
@@ -110,44 +73,182 @@ const LEASE_MINUTES =
     ? LEASE_MINUTES_RAW
     : 15;
 
-let lock: Promise<void> = Promise.resolve();
+// Server-side only: DATABASE_URL must come from the environment. There is no
+// filesystem fallback, because the runtime filesystem is read-only on Vercel.
+function resolveDatabaseUrl(): string {
+  const fromEnv = process.env.DATABASE_URL?.trim();
+  if (fromEnv) return fromEnv;
+  throw new Error('DATABASE_URL is not configured. Set it in the deployment environment or app/.env.local.');
+}
 
-// This JSON store is intentionally scoped to the local, single-process review tool.
-// Use a transactional persistent store before deploying across workers or containers.
+let sql: Sql | null = null;
 
-async function withLock<T>(fn: () => Promise<T>): Promise<T> {
-  let release!: () => void;
-  const next = new Promise<void>((resolve) => {
-    release = resolve;
-  });
-  const prev = lock;
-  lock = prev.then(() => next);
-  await prev;
-  try {
-    return await fn();
-  } finally {
-    release();
+export function getSql(): Sql {
+  if (!sql) {
+    sql = postgres(resolveDatabaseUrl(), {
+      max: 2,
+      prepare: false,
+      idle_timeout: 20,
+      connect_timeout: 10,
+    });
   }
+  return sql;
 }
 
-function readJsonFile<T>(path: string): T {
-  return JSON.parse(readFileSync(path, 'utf8')) as T;
-}
+type TaskJoinRow = {
+  task_id: string;
+  record_key: string;
+  detail_id: string;
+  media_id: string;
+  media_type: string;
+  title: string;
+  description: string;
+  year_raw: string;
+  inventory_number: string;
+  document_type: string;
+  source_url: string;
+  low_res_url: string;
+  assignment_count: number;
+  status: EventTask['status'];
+  last_assigned_at: Date | null;
+  round1_participant: string | null;
+  round1_submitted_at: Date | null;
+  round1_nickname: string | null;
+  round2_participant: string | null;
+  round2_submitted_at: Date | null;
+  round2_nickname: string | null;
+  claim_id: string | null;
+  claim_participant_id: string | null;
+  claim_round: number | null;
+  claim_assigned_at: Date | null;
+  claim_lease_until: Date | null;
+};
 
-function splitDetailUrl(value: string): string {
-  return value.split('|')[0]?.trim() || '';
-}
+type TaskIdRow = { task_id: string };
 
-const THUMBNAIL_DIR = join(process.cwd(), 'public', 'data', 'nas-thumbnails');
+type ClaimIdRow = { claim_id: string };
 
-// Prefers the locally cached copy (see scripts/cache-nas-thumbnails.ts) so review devices
-// never depend on venue wifi reaching images.memorix.nl during the event.
-function makeLowResUrl(mediaId: string): string {
+type ParticipantIdRow = { participant_id: string };
+
+type LockedTaskRow = {
+  status: EventTask['status'];
+  current_claim_id: string | null;
+  claim_round: number | null;
+  claim_participant_id: string | null;
+};
+
+type SubmittedAtRow = { submitted_at: Date };
+
+type StatsRow = {
+  total: number;
+  completed: number;
+  assigned: number;
+  unoffered: number;
+  pending_round2: number;
+  participants: number;
+};
+
+// Public Memorix CDN thumbnail. Local /data/nas-thumbnails files exist only on
+// dev machines (app/public/data is gitignored), so tasks synced with a local
+// path are resolved to the CDN URL at response time instead.
+function resolveCdnThumbnailUrl(mediaId: string): string {
   if (!mediaId) return '';
-  if (existsSync(join(THUMBNAIL_DIR, `${mediaId}.jpg`))) {
-    return `/data/nas-thumbnails/${mediaId}.jpg`;
-  }
   return `https://images.memorix.nl/nas/thumb/350x350crop/${mediaId}.jpg`;
+}
+
+function mapRoundCompletion(  participantId: string | null,
+  nickname: string | null,
+  submittedAt: Date | null,
+): RoundCompletion | null {
+  if (!participantId) return null;
+  return {
+    participantId,
+    nickname: nickname || 'onbekend',
+    submittedAt: submittedAt ? submittedAt.toISOString() : '',
+  };
+}
+
+function mapTask(row: TaskJoinRow): EventTask {
+  let currentClaim: EventTask['currentClaim'] = null;
+  if (
+    row.claim_id &&
+    row.claim_participant_id &&
+    row.claim_round !== null &&
+    row.claim_assigned_at &&
+    row.claim_lease_until
+  ) {
+    currentClaim = {
+      claimId: row.claim_id,
+      participantId: row.claim_participant_id,
+      assignedAt: row.claim_assigned_at.toISOString(),
+      leaseUntil: row.claim_lease_until.toISOString(),
+      round: row.claim_round === 1 ? 1 : 2,
+    };
+  }
+  return {
+    taskId: row.task_id,
+    mode: 'image',
+    recordKey: row.record_key,
+    detailId: row.detail_id,
+    mediaId: row.media_id,
+    mediaType: row.media_type,
+    title: row.title,
+    description: row.description,
+    yearRaw: row.year_raw,
+    inventoryNumber: row.inventory_number,
+    documentType: row.document_type,
+    sourceUrl: row.source_url,
+    // Local /data thumbnails are never deployed (app/public/data is gitignored),
+    // so resolve to the public Memorix CDN thumbnail as a runtime fallback.
+    lowResUrl: row.low_res_url.startsWith('/data/') ? resolveCdnThumbnailUrl(row.media_id) : row.low_res_url,
+    assignmentCount: row.assignment_count,
+    status: row.status,
+    lastAssignedAt: row.last_assigned_at ? row.last_assigned_at.toISOString() : null,
+    currentClaim,
+    round1: mapRoundCompletion(row.round1_participant, row.round1_nickname, row.round1_submitted_at),
+    round2: mapRoundCompletion(row.round2_participant, row.round2_nickname, row.round2_submitted_at),
+  };
+}
+
+async function loadTask(db: ISql, taskId: string): Promise<EventTask | null> {
+  const rows = await db<TaskJoinRow[]>`
+    select
+      t.task_id, t.record_key, t.detail_id, t.media_id, t.media_type, t.title, t.description,
+      t.year_raw, t.inventory_number, t.document_type, t.source_url, t.low_res_url,
+      t.assignment_count, t.status, t.last_assigned_at,
+      t.round1_participant, t.round1_submitted_at, p1.nickname as round1_nickname,
+      t.round2_participant, t.round2_submitted_at, p2.nickname as round2_nickname,
+      c.claim_id, c.participant_id as claim_participant_id, c.round as claim_round,
+      c.assigned_at as claim_assigned_at, c.lease_until as claim_lease_until
+    from tasks t
+    left join participants p1 on p1.participant_id = t.round1_participant
+    left join participants p2 on p2.participant_id = t.round2_participant
+    left join claims c on c.claim_id = t.current_claim_id
+    where t.task_id = ${taskId}`;
+  if (rows.length === 0) return null;
+  return mapTask(rows[0]);
+}
+
+async function getStats(db: ISql): Promise<Stats> {
+  const rows = await db<StatsRow[]>`
+    select
+      count(*)::int as total,
+      count(*) filter (where status = 'completed')::int as completed,
+      count(*) filter (where status = 'assigned')::int as assigned,
+      count(*) filter (where status = 'unoffered')::int as unoffered,
+      count(*) filter (where status = 'pending-round-2')::int as pending_round2,
+      (select count(*)::int from participants) as participants
+    from tasks`;
+  const row = rows[0];
+  return {
+    total: row.total,
+    completed: row.completed,
+    assigned: row.assigned,
+    unoffered: row.unoffered,
+    pendingRound2: row.pending_round2,
+    participants: row.participants,
+    round: row.unoffered > 0 ? 1 : 2,
+  };
 }
 
 function toStringArray(value: unknown, maxItems = 50, maxLength = 200): string[] {
@@ -159,7 +260,7 @@ function toStringArray(value: unknown, maxItems = 50, maxLength = 200): string[]
     .slice(0, maxItems);
 }
 
-const LOCATION_TYPE_SET = new Set<string>(LOCATION_TYPES);
+const locationTypeSet = new Set<string>(LOCATION_TYPES);
 
 function toPlaceEntries(value: unknown, maxItems = 50, maxLength = 200): AddedPlace[] {
   if (!Array.isArray(value)) return [];
@@ -170,7 +271,7 @@ function toPlaceEntries(value: unknown, maxItems = 50, maxLength = 200): AddedPl
     const entry = raw as Partial<AddedPlace>;
     const text = typeof entry.text === 'string' ? entry.text.trim().slice(0, maxLength) : '';
     if (!text || seen.has(text)) continue;
-    const type = typeof entry.type === 'string' && LOCATION_TYPE_SET.has(entry.type) ? (entry.type as AddedPlace['type']) : '';
+    const type = typeof entry.type === 'string' && locationTypeSet.has(entry.type) ? entry.type : '';
     seen.add(text);
     entries.push({ text, type });
     if (entries.length >= maxItems) break;
@@ -196,254 +297,131 @@ function normalizePayload(value: unknown): EventSubmissionPayload {
   };
 }
 
-function initializeStateFromData(): EventState {
-  const records = readJsonFile<NasRecord[]>(RECORDS_PATH);
-
-  const tasks: EventTask[] = [];
-  for (const record of records) {
-    const sourceUrl = splitDetailUrl(record.detailUrl || '');
-
-    if (record.mediaType === 'image') {
-      tasks.push({
-        taskId: `img:${record.recordKey}`,
-        mode: 'image',
-        recordKey: record.recordKey,
-        detailId: record.detailId,
-        mediaId: record.mediaId,
-        mediaType: record.mediaType,
-        title: record.title,
-        description: record.description,
-        yearRaw: record.yearRaw,
-        inventoryNumber: record.inventoryNumber,
-        documentType: record.documentType,
-        sourceUrl,
-        lowResUrl: makeLowResUrl(record.mediaId),
-        assignmentCount: 0,
-        status: 'unoffered',
-        lastAssignedAt: null,
-        currentClaim: null,
-        round1: null,
-        round2: null,
-      });
-      continue;
-    }
-
-    // The current event intentionally reviews photographs only.
-    continue;
-  }
-
-  const now = new Date().toISOString();
-  return {
-    eventId: randomUUID(),
-    createdAt: now,
-    updatedAt: now,
-    tasks,
-    participants: {},
-    submissions: [],
-  };
-}
-
-// Upgrades tasks written by the older single-review schema (completedBy/completedAt/finalSubmission)
-// to the round1/round2 shape, without losing already-collected test-phase reviews.
-function migrateLegacyTasks(state: EventState): void {
-  for (const task of state.tasks as unknown as Array<EventTask & Record<string, unknown>>) {
-    if (task.round1 !== undefined && task.round2 !== undefined) continue;
-
-    const legacyCompletedBy = typeof task.completedBy === 'string' ? task.completedBy : null;
-    const legacyCompletedAt = typeof task.completedAt === 'string' ? task.completedAt : null;
-    delete task.completedAt;
-    delete task.completedBy;
-    delete task.finalSubmission;
-    delete task.round1Offered;
-
-    if (legacyCompletedBy && legacyCompletedAt) {
-      task.round1 = {
-        participantId: legacyCompletedBy,
-        nickname: state.participants[legacyCompletedBy]?.nickname || 'onbekend',
-        submittedAt: legacyCompletedAt,
-      };
-      task.round2 = null;
-      task.status = 'pending-round-2';
-    } else {
-      task.round1 = null;
-      task.round2 = null;
-      if (task.status !== 'assigned') task.status = 'unoffered';
-    }
-  }
-}
-
-function loadState(): EventState {
-  mkdirSync(DATA_DIR, { recursive: true });
-  if (!existsSync(STATE_PATH)) {
-    const initial = initializeStateFromData();
-    writeFileSync(STATE_PATH, JSON.stringify(initial, null, 2), 'utf8');
-    return initial;
-  }
-  const state = readJsonFile<EventState>(STATE_PATH);
-  const photoTaskIds = new Set(
-    state.tasks
-      .filter((task) => task.mediaType === 'image')
-      .map((task) => task.taskId),
-  );
-  state.tasks = state.tasks.filter((task) => photoTaskIds.has(task.taskId));
-  state.submissions = state.submissions.filter((submission) => photoTaskIds.has(submission.taskId));
-  migrateLegacyTasks(state);
-  // Re-resolve on every load so newly cached thumbnails (scripts/cache-nas-thumbnails.ts)
-  // take effect for tasks created before the cache existed, without a one-off migration flag.
-  for (const task of state.tasks) {
-    task.lowResUrl = makeLowResUrl(task.mediaId);
-  }
-  return state;
-}
-
-function saveState(state: EventState): void {
-  state.updatedAt = new Date().toISOString();
-  writeFileSync(STATE_PATH, JSON.stringify(state, null, 2), 'utf8');
-}
-
-function nowIso(): string {
-  return new Date().toISOString();
-}
-
-function leaseUntilIso(): string {
-  return new Date(Date.now() + LEASE_MINUTES * 60_000).toISOString();
-}
-
-function isLeaseActive(task: EventTask, now: string): boolean {
-  if (!task.currentClaim) return false;
-  return task.currentClaim.leaseUntil > now;
-}
-
-function getStatsFromState(state: EventState) {
-  const total = state.tasks.length;
-  const completed = state.tasks.filter((task) => task.status === 'completed').length;
-  const assigned = state.tasks.filter((task) => task.status === 'assigned').length;
-  const unoffered = state.tasks.filter((task) => task.status === 'unoffered').length;
-  const pendingRound2 = state.tasks.filter((task) => task.status === 'pending-round-2').length;
-
-  return {
-    total,
-    completed,
-    assigned,
-    unoffered,
-    pendingRound2,
-    participants: Object.keys(state.participants).length,
-    round: unoffered > 0 ? (1 as const) : (2 as const),
-  };
-}
-
 export async function startParticipant(nickname: string): Promise<{
   participantId: string;
   nickname: string;
-  stats: ReturnType<typeof getStatsFromState>;
+  stats: Stats;
 }> {
-  return withLock(async () => {
-    const state = loadState();
-    const participantId = randomUUID();
-    state.participants[participantId] = {
-      participantId,
-      nickname,
-      startedAt: nowIso(),
-      lastSeenAt: nowIso(),
-    };
-    saveState(state);
+  return await getSql().begin(async (db) => {
+    const inserted = await db<Array<{ participant_id: string; nickname: string }>>`
+      insert into participants (nickname)
+      values (${nickname})
+      returning participant_id, nickname`;
+    const participant = inserted[0];
+    const stats = await getStats(db);
     return {
-      participantId,
-      nickname,
-      stats: getStatsFromState(state),
+      participantId: participant.participant_id,
+      nickname: participant.nickname,
+      stats,
     };
   });
 }
 
 export async function claimTask(participantId: string): Promise<ClaimResponse> {
-  return withLock(async () => {
-    const state = loadState();
-    const participant = state.participants[participantId];
-    if (!participant) {
+  return await getSql().begin(async (db) => {
+    const participants = await db<ParticipantIdRow[]>`
+      update participants
+      set last_seen_at = now()
+      where participant_id = ${participantId}
+      returning participant_id`;
+    if (participants.length === 0) {
       throw new Error('Unknown participantId. Start a session first.');
     }
-    participant.lastSeenAt = nowIso();
 
-    const now = nowIso();
-
-    const activeOwned = state.tasks.find(
-      (task) =>
-        task.status === 'assigned' &&
-        task.currentClaim?.participantId === participantId &&
-        isLeaseActive(task, now),
-    );
-
-    if (activeOwned) {
-      saveState(state);
-      return {
-        ok: true,
-        round: activeOwned.currentClaim!.round,
-        reused: true,
-        done: false,
-        task: activeOwned,
-        stats: getStatsFromState(state),
-      };
+    const owned = await db<TaskIdRow[]>`
+      select t.task_id
+      from tasks t
+      join claims c on c.claim_id = t.current_claim_id
+      where t.status = 'assigned'
+        and c.participant_id = ${participantId}
+        and c.lease_until > now()
+      limit 1`;
+    if (owned.length > 0) {
+      const task = await loadTask(db, owned[0].task_id);
+      if (task?.currentClaim) {
+        return {
+          ok: true,
+          round: task.currentClaim.round,
+          reused: true,
+          done: false,
+          task,
+          stats: await getStats(db),
+        };
+      }
     }
 
     // Round 1: hand out every task once before any task is offered a second time.
     let round: 1 | 2 = 1;
-    let candidates = state.tasks.filter(
-      (task) =>
-        task.status === 'unoffered' ||
-        (task.status === 'assigned' && task.currentClaim?.round === 1 && !isLeaseActive(task, now)),
-    );
+    let candidates = await db<TaskIdRow[]>`
+      select t.task_id
+      from tasks t
+      left join claims c on c.claim_id = t.current_claim_id
+      where t.status = 'unoffered'
+         or (t.status = 'assigned' and c.round = 1 and c.lease_until <= now())
+      order by t.task_id asc
+      limit 1
+      for update of t skip locked`;
 
     if (candidates.length === 0) {
       // Round 2: re-review the same tasks, but never assign one back to its round-1 reviewer.
       round = 2;
-      candidates = state.tasks.filter((task) => {
-        if (task.round1?.nickname === participant.nickname) return false;
-        return (
-          task.status === 'pending-round-2' ||
-          (task.status === 'assigned' && task.currentClaim?.round === 2 && !isLeaseActive(task, now))
-        );
-      });
+      candidates = await db<TaskIdRow[]>`
+        select t.task_id
+        from tasks t
+        left join claims c on c.claim_id = t.current_claim_id
+        where t.round1_participant is distinct from ${participantId}
+          and (
+            t.status = 'pending-round-2'
+            or (t.status = 'assigned' and c.round = 2 and c.lease_until <= now())
+          )
+        order by t.assignment_count asc, t.last_assigned_at asc nulls first
+        limit 1
+        for update of t skip locked`;
     }
 
     if (candidates.length === 0) {
-      saveState(state);
       return {
         ok: true,
         round,
         reused: false,
         done: true,
         task: null,
-        stats: getStatsFromState(state),
+        stats: await getStats(db),
       };
     }
 
-    candidates = [...candidates].sort((a, b) => {
-      if (round === 1) return a.taskId.localeCompare(b.taskId);
-      if (a.assignmentCount !== b.assignmentCount) return a.assignmentCount - b.assignmentCount;
-      return (a.lastAssignedAt || '').localeCompare(b.lastAssignedAt || '');
-    });
+    const taskId = candidates[0].task_id;
+    const insertedClaims = await db<ClaimIdRow[]>`
+      insert into claims (task_id, participant_id, round, assigned_at, lease_until)
+      values (
+        ${taskId},
+        ${participantId},
+        ${round},
+        now(),
+        now() + make_interval(mins => ${LEASE_MINUTES}::int)
+      )
+      returning claim_id`;
+    const claimId = insertedClaims[0].claim_id;
 
-    const selected = candidates[0];
-    selected.status = 'assigned';
-    selected.assignmentCount += 1;
-    selected.lastAssignedAt = now;
-    selected.currentClaim = {
-      claimId: randomUUID(),
-      participantId,
-      assignedAt: now,
-      leaseUntil: leaseUntilIso(),
-      round,
-    };
+    await db`
+      update tasks
+      set status = 'assigned',
+          assignment_count = assignment_count + 1,
+          last_assigned_at = now(),
+          current_claim_id = ${claimId},
+          updated_at = now()
+      where task_id = ${taskId}`;
 
-    saveState(state);
+    const task = await loadTask(db, taskId);
+    if (!task) throw new Error(`Task not found: ${taskId}`);
 
     return {
       ok: true,
       round,
       reused: false,
       done: false,
-      task: selected,
-      stats: getStatsFromState(state),
+      task,
+      stats: await getStats(db),
     };
   });
 }
@@ -453,20 +431,31 @@ export async function submitTask(
   taskId: string,
   claimId: string,
   payload: EventSubmissionPayload,
-): Promise<{ ok: true; completed: boolean; reason?: 'missing_location'; stats: ReturnType<typeof getStatsFromState> }> {
-  return withLock(async () => {
-    const state = loadState();
-    const participant = state.participants[participantId];
-    if (!participant) throw new Error('Unknown participantId. Start a session first.');
+): Promise<{ ok: true; completed: boolean; reason?: 'missing_location'; stats: Stats }> {
+  return await getSql().begin(async (db) => {
+    const participants = await db<ParticipantIdRow[]>`
+      update participants
+      set last_seen_at = now()
+      where participant_id = ${participantId}
+      returning participant_id`;
+    if (participants.length === 0) {
+      throw new Error('Unknown participantId. Start a session first.');
+    }
 
-    const task = state.tasks.find((entry) => entry.taskId === taskId);
-    if (!task) throw new Error(`Task not found: ${taskId}`);
+    const locked = await db<LockedTaskRow[]>`
+      select t.status, t.current_claim_id, c.round as claim_round, c.participant_id as claim_participant_id
+      from tasks t
+      left join claims c on c.claim_id = t.current_claim_id
+      where t.task_id = ${taskId}
+      for update of t`;
+    if (locked.length === 0) throw new Error(`Task not found: ${taskId}`);
+    const task = locked[0];
     if (task.status === 'completed') throw new Error('Task is already completed.');
-    if (!task.currentClaim) throw new Error('Task has no active claim.');
-    if (task.currentClaim.participantId !== participantId) {
+    if (!task.current_claim_id) throw new Error('Task has no active claim.');
+    if (task.claim_participant_id !== participantId) {
       throw new Error('Task is currently assigned to a different participant.');
     }
-    if (task.currentClaim.claimId !== claimId) {
+    if (task.current_claim_id !== claimId) {
       throw new Error('Claim mismatch. Refresh and claim a new task.');
     }
 
@@ -477,56 +466,68 @@ export async function submitTask(
       safePayload.selectedPlaceNames.length > 0 ||
       safePayload.addedPlaces.length > 0;
     const missingLocationOnConfirm = safePayload.decision === 'confirm' && !hasAnyLocation;
-    const round = task.currentClaim.round;
+    const round: 1 | 2 = task.claim_round === 2 ? 2 : 1;
 
-    const submittedAt = nowIso();
-    state.submissions.push({
-      submissionId: randomUUID(),
-      taskId,
-      participantId,
-      claimId,
-      submittedAt,
-      payload: safePayload,
-    });
+    const insertedSubmissions = await db<SubmittedAtRow[]>`
+      insert into submissions (
+        task_id, participant_id, claim_id, round, decision, location_unknown,
+        added_places, added_dates, added_persons, notes, payload
+      )
+      values (
+        ${taskId}, ${participantId}, ${claimId}, ${round}, ${safePayload.decision},
+        ${safePayload.locationUnknown},
+        ${JSON.stringify(safePayload.addedPlaces)}::jsonb,
+        ${JSON.stringify(safePayload.addedDates)}::jsonb,
+        ${JSON.stringify(safePayload.addedPersons)}::jsonb,
+        ${safePayload.notes},
+        ${JSON.stringify(safePayload)}::jsonb
+      )
+      returning submitted_at`;
+    const submittedAt = insertedSubmissions[0].submitted_at;
 
     if (missingLocationOnConfirm) {
-      task.currentClaim = null;
-      task.status = round === 2 ? 'pending-round-2' : 'unoffered';
-      participant.lastSeenAt = submittedAt;
-      saveState(state);
-
+      await db`
+        update tasks
+        set status = ${round === 2 ? 'pending-round-2' : 'unoffered'},
+            current_claim_id = null,
+            updated_at = now()
+        where task_id = ${taskId}`;
       return {
         ok: true,
         completed: false,
-        reason: 'missing_location',
-        stats: getStatsFromState(state),
+        reason: 'missing_location' as const,
+        stats: await getStats(db),
       };
     }
 
-    const completion: RoundCompletion = { participantId, nickname: participant.nickname, submittedAt };
     if (round === 1) {
-      task.round1 = completion;
-      task.status = 'pending-round-2';
+      await db`
+        update tasks
+        set round1_participant = ${participantId},
+            round1_submitted_at = ${submittedAt},
+            status = 'pending-round-2',
+            current_claim_id = null,
+            updated_at = now()
+        where task_id = ${taskId}`;
     } else {
-      task.round2 = completion;
-      task.status = 'completed';
+      await db`
+        update tasks
+        set round2_participant = ${participantId},
+            round2_submitted_at = ${submittedAt},
+            status = 'completed',
+            current_claim_id = null,
+            updated_at = now()
+        where task_id = ${taskId}`;
     }
-    task.currentClaim = null;
-
-    participant.lastSeenAt = submittedAt;
-    saveState(state);
 
     return {
       ok: true,
-      completed: task.status === 'completed',
-      stats: getStatsFromState(state),
+      completed: round === 2,
+      stats: await getStats(db),
     };
   });
 }
 
-export async function getEventStatus(): Promise<ReturnType<typeof getStatsFromState>> {
-  return withLock(async () => {
-    const state = loadState();
-    return getStatsFromState(state);
-  });
+export async function getEventStatus(): Promise<Stats> {
+  return await getStats(getSql());
 }

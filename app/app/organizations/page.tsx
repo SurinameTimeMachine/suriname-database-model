@@ -2,11 +2,13 @@
 
 import { useAuth } from '@/lib/auth';
 import LinkedImagesSection from '@/components/LinkedImagesSection';
+import LinkedPersonsSection from '@/components/LinkedPersonsSection';
 import type {
   DiklandRef,
   E25Plantation,
   E41Appellation,
   E74Organization,
+  LinkedImage,
   OrganizationObservation,
   PlantationCompositionPeriod,
 } from '@/lib/types';
@@ -24,16 +26,38 @@ type OrganizationDetails = {
   appellations: E41Appellation[];
   observations: OrganizationObservation[];
   compositionPeriods: PlantationCompositionPeriod[];
-  linkedImages: Array<{
+  linkedImages: LinkedImage[];
+  linkedPersons: Array<{
     id: string;
-    label?: string;
-    objectNumber?: string;
-    year?: number | null;
-    thumbnailUrl?: string | null;
-    contentUrl?: string | null;
-    sameAs?: string;
-    isPublicDomain?: boolean;
-    licenseLabel?: string;
+    label: string;
+    sex?: string;
+    dayBirth?: string;
+    monthBirth?: string;
+    yearBirth?: string;
+    dayDeath?: string;
+    monthDeath?: string;
+    yearDeath?: string;
+    nameMother?: string;
+    observations: Array<{
+      id: string;
+      nameEnslaved?: string;
+      sex?: string;
+      age?: string;
+      plantationText?: string;
+      ownerName?: string;
+      startDay?: string;
+      startMonth?: string;
+      startYear?: string;
+      startEvent?: string;
+      startInfo?: string;
+      endDay?: string;
+      endMonth?: string;
+      endYear?: string;
+      endEvent?: string;
+      endEventDetailed?: string;
+      endInfo?: string;
+      registerType?: string;
+    }>;
   }>;
   gazetteerPlantations: Array<{
     id: string;
@@ -189,7 +213,7 @@ function OrganizationsPageInner() {
 
   useEffect(() => {
     if (selected) setEdit(editStateFor(selected));
-  }, [selected]);
+  }, [selected, selectedQid]);
 
   useEffect(() => {
     if (!selected) return;
@@ -274,7 +298,7 @@ function OrganizationsPageInner() {
   function selectOrganization(organization: E74Organization) {
     const params = new URLSearchParams(searchParams.toString());
     params.set('organization', qidFor(organization));
-    router.replace(`/organizations?${params.toString()}`);
+    router.push(`/organizations?${params.toString()}`);
     setNotice(null);
     setError(null);
   }
@@ -479,6 +503,12 @@ function OrganizationsPageInner() {
 
                 {(details?.linkedImages.length ?? 0) > 0 && (
                   <LinkedImagesSection images={details!.linkedImages} />
+                )}
+
+                {(details?.linkedPersons.length ?? 0) > 0 && (
+                  <div className="px-4 sm:px-5">
+                    <LinkedPersonsSection persons={details!.linkedPersons} />
+                  </div>
                 )}
 
                 {compositionPeriods.length > 0 && (

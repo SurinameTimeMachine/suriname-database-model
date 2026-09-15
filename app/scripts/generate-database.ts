@@ -41,6 +41,11 @@ import {
   type E26Row,
   transformRivers,
 } from './transform-rivers';
+import {
+  type E21Row,
+  type PersonObservationRow,
+  transformPersons,
+} from './transform-persons';
 import { BASE, WD, buildContext, buildContextDocument } from './lod-context';
 
 const LOD_DIR = join(__dirname, '../lod');
@@ -440,6 +445,121 @@ function buildE74Organizations(
   });
 
   return { entities, provenance, uriByQid };
+}
+
+const SLAVE_REGISTER_SOURCE_URI = `${BASE}source/slave-registers`;
+
+/** PSUR id -> wikidata qid, derived from the already generated E25 plantation rows. */
+function buildQidByPsurId(plantations: E25Row[]): Map<string, string> {
+  const map = new Map<string, string>();
+  for (const plantation of plantations) {
+    if (!plantation.wikidata_qid) continue;
+    for (const psurId of plantation.psur_ids) {
+      if (psurId) map.set(psurId, plantation.wikidata_qid);
+    }
+  }
+  return map;
+}
+
+function buildPersons(
+  persons: E21Row[],
+  observations: PersonObservationRow[],
+  qidByPsurId: Map<string, string>,
+  organizationUriByQid: Map<string, string>,
+): {
+  entities: Record<string, unknown>[];
+  sourceEntity: Record<string, unknown>;
+  provenance: Record<string, unknown>[];
+  resolvedTargets: number;
+} {
+  const provId = `${BASE}provenance/slave-registers`;
+  const entities: Record<string, unknown>[] = persons.map((p) => {
+    const entity: Record<string, unknown> = {
+      '@id': p.uri,
+      '@type': ['E21_Person'],
+      idPerson: p.idPerson,
+      hadPrimarySource: SLAVE_REGISTER_SOURCE_URI,
+      wasDerivedFrom: provId,
+    };
+    if (p.prefLabel) entity.prefLabel = p.prefLabel;
+    if (p.sex) entity.sex = p.sex;
+    if (p.dayBirth) entity.dayBirth = p.dayBirth;
+    if (p.monthBirth) entity.monthBirth = p.monthBirth;
+    if (p.yearBirth) entity.yearBirth = p.yearBirth;
+    if (p.dayDeath) entity.dayDeath = p.dayDeath;
+    if (p.monthDeath) entity.monthDeath = p.monthDeath;
+    if (p.yearDeath) entity.yearDeath = p.yearDeath;
+    if (p.nameMother) entity.nameMother = p.nameMother;
+    return entity;
+  });
+
+  let resolvedTargets = 0;
+  for (const o of observations) {
+    const entity: Record<string, unknown> = {
+      '@id': o.uri,
+      '@type': ['PersonObservation'],
+      idSource: o.idSource,
+      P140_assigned_attribute_to: o.personUri,
+      hadPrimarySource: SLAVE_REGISTER_SOURCE_URI,
+      wasDerivedFrom: provId,
+    };
+    if (o.nameEnslaved) entity.prefLabel = o.nameEnslaved;
+    if (o.sex) entity.sex = o.sex;
+    if (o.age) entity.age = o.age;
+    if (o.plantationText) entity.plantationText = o.plantationText;
+    if (o.psurId) entity.psurId = o.psurId;
+    const qid = o.psurId ? qidByPsurId.get(o.psurId) : undefined;
+    const organizationUri = qid ? organizationUriByQid.get(qid) : undefined;
+    if (organizationUri) {
+      entity.isEnslavedBy = organizationUri;
+      entity.certainty = `${BASE}type/certainty/probable`;
+      resolvedTargets++;
+    }
+    if (o.ownerName) entity.ownerName = o.ownerName;
+    if (o.startDay) entity.startDay = o.startDay;
+    if (o.startMonth) entity.startMonth = o.startMonth;
+    if (o.startYear) entity.startYear = o.startYear;
+    if (o.startEvent) entity.startEvent = o.startEvent;
+    if (o.startInfo) entity.startInfo = o.startInfo;
+    if (o.endDay) entity.endDay = o.endDay;
+    if (o.endMonth) entity.endMonth = o.endMonth;
+    if (o.endYear) entity.endYear = o.endYear;
+    if (o.endEvent) entity.endEvent = o.endEvent;
+    if (o.endEventDetailed) entity.endEventDetailed = o.endEventDetailed;
+    if (o.endInfo) entity.endInfo = o.endInfo;
+    if (o.registerType) entity.registerType = o.registerType;
+    if (o.inventoryNumber) entity.inventoryNumber = o.inventoryNumber;
+    if (o.folioNumber) entity.folioNumber = o.folioNumber;
+    entities.push(entity);
+  }
+
+  const sourceEntity: Record<string, unknown> = {
+    '@id': SLAVE_REGISTER_SOURCE_URI,
+    '@type': ['E22_Human_Made_Object'],
+    prefLabel: 'Suriname Slave and Emancipation Registers (1830-1863)',
+    P2_has_type: `${BASE}type/source-type/register`,
+    mapId: 'slave-registers',
+    mapYear: '1830',
+  };
+
+  const provenance: Record<string, unknown>[] = [
+    {
+      '@id': provId,
+      '@type': ['ProvenanceRecord'],
+      sourceFile:
+        'data/05-slave-emancipation - Suriname Slave and Emancipation Registers Dataset Version 1.1/Dataset Suriname Slave and Emancipation Registers Version 1.1.csv',
+      sourceColumn:
+        'Id_person, Plantation, Name_enslaved, Sex, Age, Year_birth, Year_death, Name_mother, StartEntry*, EndEntry*',
+      sourceRow: 'all rows',
+      transformedBy: 'scripts/transform-persons.ts',
+      modelEntity: 'E21_Person / PersonObservation',
+      schemaTable: 'persons',
+      linkedVia:
+        'Plantation (name) -> Suriname Plantation Dataset Name_plantation -> PSUR id -> local E74 organization',
+    },
+  ];
+
+  return { entities, sourceEntity, provenance, resolvedTargets };
 }
 
 function buildE26PhysicalFeatures(
@@ -1407,6 +1527,8 @@ function main() {
   const riverResult = transformRivers();
   console.log('\n--- Transform: Almanakken ---');
   const almResult = transformAlmanakken();
+  console.log('\n--- Transform: Persons (Slave & Emancipation Register) ---');
+  const personResult = transformPersons();
 
   // Merge sources
   const allSources = [...plantResult.sources, ...almResult.sources];
@@ -1567,6 +1689,17 @@ function main() {
   );
   console.log(`  E74 Organizations: ${organizationResult.entities.length}`);
 
+  const qidByPsurId = buildQidByPsurId(plantResult.e25);
+  const personResultEntities = buildPersons(
+    personResult.e21,
+    personResult.observations,
+    qidByPsurId,
+    organizationResult.uriByQid,
+  );
+  console.log(
+    `  E21 Persons:        ${personResult.e21.length} (${personResultEntities.resolvedTargets}/${personResult.observations.length} observations linked to E74)`,
+  );
+
   const e41All = buildE41Appellations(allAppellations);
   console.log(`  E41 Appellations:   ${e41All.length}`);
 
@@ -1678,6 +1811,33 @@ function main() {
     'utf-8',
   );
   console.log(`Wrote ${contextPath}`);
+
+  // Persons (Slave & Emancipation Register) are written to a separate
+  // JSON-LD document, not merged into the core CIDOC-CRM graph: at ~288k
+  // entities (95k persons + 192k observations) they would otherwise bloat
+  // database.jsonld ~25x. Kept as valid, self-contained linked data with its
+  // own @context; place-records index the relevant subset per plantation.
+  const personsDatabase = {
+    '@context': buildContext(),
+    '@id': `${BASE}database/persons`,
+    '@type': 'sdo:Dataset',
+    'sdo:name':
+      'Suriname Time Machine - Enslaved & Emancipated Persons (Slave & Emancipation Registers)',
+    'sdo:description':
+      'Person and person-observation entities derived from the Suriname Slave and Emancipation Registers (1830-1863), linked to E74 plantation organizations where a PSUR id resolves.',
+    'sdo:dateModified': new Date().toISOString(),
+    'sdo:license': 'https://creativecommons.org/licenses/by/4.0/',
+    '@graph': [
+      personResultEntities.sourceEntity,
+      ...personResultEntities.entities,
+      ...personResultEntities.provenance,
+    ],
+  };
+  const personsPath = join(LOD_DIR, 'persons.jsonld');
+  const personsStr = JSON.stringify(personsDatabase, null, 2);
+  writeFileSync(personsPath, personsStr, 'utf-8');
+  const personsMB = (Buffer.byteLength(personsStr) / 1024 / 1024).toFixed(1);
+  console.log(`Wrote ${personsPath} (${personsMB} MB)`);
 
   // Build name text indexes for GeoJSON allNames
   // plantationNames: plantation URI -> all E41 name texts
