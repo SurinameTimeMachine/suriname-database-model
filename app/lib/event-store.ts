@@ -148,8 +148,15 @@ type StatsRow = {
   participants: number;
 };
 
-function mapRoundCompletion(
-  participantId: string | null,
+// Public Memorix CDN thumbnail. Local /data/nas-thumbnails files exist only on
+// dev machines (app/public/data is gitignored), so tasks synced with a local
+// path are resolved to the CDN URL at response time instead.
+function resolveCdnThumbnailUrl(mediaId: string): string {
+  if (!mediaId) return '';
+  return `https://images.memorix.nl/nas/thumb/350x350crop/${mediaId}.jpg`;
+}
+
+function mapRoundCompletion(  participantId: string | null,
   nickname: string | null,
   submittedAt: Date | null,
 ): RoundCompletion | null {
@@ -191,7 +198,9 @@ function mapTask(row: TaskJoinRow): EventTask {
     inventoryNumber: row.inventory_number,
     documentType: row.document_type,
     sourceUrl: row.source_url,
-    lowResUrl: row.low_res_url,
+    // Local /data thumbnails are never deployed (app/public/data is gitignored),
+    // so resolve to the public Memorix CDN thumbnail as a runtime fallback.
+    lowResUrl: row.low_res_url.startsWith('/data/') ? resolveCdnThumbnailUrl(row.media_id) : row.low_res_url,
     assignmentCount: row.assignment_count,
     status: row.status,
     lastAssignedAt: row.last_assigned_at ? row.last_assigned_at.toISOString() : null,

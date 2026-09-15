@@ -40,12 +40,19 @@ function splitDetailUrl(value: string): string {
   return value.split('|')[0]?.trim() || '';
 }
 
+// CDN-first: Memorix thumbnails are public and hotlinkable; local files are a
+// dev-only fallback that never exists on Vercel (app/public/data is gitignored).
+// Set FORCE_CDN_URLS=1 to rewrite tasks whose stored URL points at a local path.
+const nasThumbnailUrl = (mediaId: string) => `https://images.memorix.nl/nas/thumb/350x350crop/${mediaId}.jpg`;
+
+const FORCE_CDN_URLS = process.env.FORCE_CDN_URLS === '1';
+
 function makeLowResUrl(mediaId: string): string {
   if (!mediaId) return '';
-  if (existsSync(join(THUMBNAIL_DIR, `${mediaId}.jpg`))) {
+  if (!FORCE_CDN_URLS && existsSync(join(THUMBNAIL_DIR, `${mediaId}.jpg`))) {
     return `/data/nas-thumbnails/${mediaId}.jpg`;
   }
-  return `https://images.memorix.nl/nas/thumb/350x350crop/${mediaId}.jpg`;
+  return nasThumbnailUrl(mediaId);
 }
 
 type TaskMetadataRow = {
@@ -66,8 +73,13 @@ type TaskMetadataRow = {
 async function main() {
   const records = JSON.parse(readFileSync(RECORDS_PATH, 'utf8')) as NasRecord[];
   const rows: TaskMetadataRow[] = [];
+  let skippedNoMedia = 0;
   for (const record of records) {
     if (record.mediaType !== 'image' || !record.recordKey) continue;
+    if (!record.mediaId) {
+      skippedNoMedia += 1;
+      continue;
+    }
     rows.push({
       task_id: `img:${record.recordKey}`,
       record_key: record.recordKey,
@@ -107,7 +119,7 @@ async function main() {
     console.log(`${synced}/${rows.length} tasks upserted`);
   }
 
-  console.log(`Done. ${synced} image tasks synced to Supabase.`);
+  console.log(`Done. ${synced} image tasks synced to Supabase (skipped ${skippedNoMedia} without mediaId).`);
   await sql.end({ timeout: 5 });
 }
 
