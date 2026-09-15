@@ -1,4 +1,18 @@
-import baseConfig from 'eslint-config-upleveled';
+// SafeQL (via eslint-config-upleveled) needs a reachable Postgres for SQL tag
+// checks. Lint must still work without a database, so only enable the rule when
+// the PG* variables are actually configured.
+const safeqlConfigured = Boolean(
+  process.env.PGHOST && process.env.PGUSERNAME && process.env.PGPASSWORD && process.env.PGDATABASE,
+);
+
+if (!safeqlConfigured) {
+  process.env.PGHOST = process.env.PGHOST || 'localhost';
+  process.env.PGUSERNAME = process.env.PGUSERNAME || 'postgres';
+  process.env.PGPASSWORD = process.env.PGPASSWORD || 'postgres';
+  process.env.PGDATABASE = process.env.PGDATABASE || 'postgres';
+}
+
+const { default: baseConfig } = await import('eslint-config-upleveled');
 
 export default [
   ...baseConfig,
@@ -8,6 +22,7 @@ export default [
   {
     files: ['**/*.{js,jsx,ts,tsx,mjs,cjs}'],
     rules: {
+      ...(safeqlConfigured ? {} : { '@ts-safeql/check-sql': 'off' }),
       // Start strict config adoption gradually by reporting these as warnings first.
       '@next/next/no-html-link-for-pages': 'warn',
       '@typescript-eslint/no-redundant-type-constituents': 'warn',
