@@ -328,6 +328,21 @@ export interface ExternalLink {
   matchType: SkosMatchType;
 }
 
+/** Rijksmuseum image linked to an organization via the depicted E25 plantation.
+ * CRM: E22 Source -> P128 carries -> E36 Visual Item -> P138 represents -> E25.
+ * The organization grouping is a derived UI index, not part of the model. */
+export interface LinkedImage {
+  id: string;
+  label?: string;
+  objectNumber?: string;
+  year?: number | null;
+  thumbnailUrl?: string | null;
+  contentUrl?: string | null;
+  sameAs?: string;
+  isPublicDomain?: boolean;
+  licenseLabel?: string;
+}
+
 /** Reference to a plantation description PDF in the Dikland (Suriname Heritage Guide) collection */
 export interface DiklandRef {
   folderPath: string; // path within the Drive collection, e.g. "erfgoed - geschiedenis/.../Voorburg 2004-01 geschiedenis.pdf"

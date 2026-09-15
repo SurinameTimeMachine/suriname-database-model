@@ -114,7 +114,7 @@
       "sourceId": "rijksmuseum-collection",
       "prefLabel": "Rijksmuseum collection",
       "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/research-collection",
-      "linkedToGazetteer": false,
+      "linkedToGazetteer": true,
       "description": "Online image collection of Rijksmuseum at https://www.rijksmuseum.nl/nl/collectie"
     },
     {

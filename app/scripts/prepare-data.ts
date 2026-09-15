@@ -608,6 +608,70 @@ for (const o of observations) {
   }
 }
 
+// Rijksmuseum images index: E36 Visual Items grouped by the E74 organization
+// their depicted E25 plantation resolves to (via hasOrganizationalAssociation).
+// Underlying model: E22 Source -> P128 carries -> E36 Visual Item
+//   -> P138 represents -> E25 Plantation.
+// The organization keying here is a derived UI index only.
+const imagesByOrg: Record<string, Record<string, unknown>[]> = {};
+const rijksmuseumImagesPath = join(DATA_DIR, 'rijksmuseum-images.jsonld');
+if (existsSync(rijksmuseumImagesPath)) {
+  const imagesGraph = (JSON.parse(readFileSync(rijksmuseumImagesPath, 'utf-8')) as {
+    '@graph'?: Record<string, unknown>[];
+  })['@graph'] ?? [];
+  for (const entity of imagesGraph) {
+    const depicts = entity.P138_represents as string | undefined;
+    if (!depicts) continue;
+    // P138_represents targets the depicted E25 plantation; resolve the
+    // organization UI grouping via its hasOrganizationalAssociation link.
+    // (Legacy snapshots pointed P138_represents directly at the organization.)
+    let organizationUri: string | undefined;
+    const plantation = plantationIndex[depicts] as
+      | Record<string, unknown>
+      | undefined;
+    if (
+      plantation &&
+      typeof plantation.hasOrganizationalAssociation === 'string'
+    ) {
+      organizationUri = plantation.hasOrganizationalAssociation;
+    } else if (depicts.includes('/organization/')) {
+      organizationUri = depicts;
+    } else {
+      // No direct E25 match (e.g. plantation URI keyed by label rather than
+      // Q-ID): fall back to wikidata Q-ID matches via closeMatch, preferring
+      // PSUR-registered plantations (same eligibility rule as the import).
+      const depictsQid = depicts.includes('/entity/')
+        ? depicts.split('/').pop()?.toUpperCase()
+        : null;
+      if (depictsQid) {
+        const cands = plantations.filter(
+          (p) =>
+            toArray(p.closeMatch as string | string[] | undefined).some(
+              (match) =>
+                typeof match === 'string' &&
+                match.split('/').pop()?.toUpperCase() === depictsQid,
+            ),
+        );
+        const picked =
+          cands.find((p) => p.psurId != null) ??
+          (cands.length === 1 ? cands[0] : undefined);
+        if (
+          picked &&
+          typeof picked.hasOrganizationalAssociation === 'string'
+        ) {
+          organizationUri = picked.hasOrganizationalAssociation;
+        }
+      }
+    }
+    if (!organizationUri) continue;
+    imagesByOrg[organizationUri] ??= [];
+    imagesByOrg[organizationUri].push({
+      id: entity['@id'], label: entity.prefLabel, objectNumber: entity.objectNumber,
+      year: entity.year, thumbnailUrl: entity.thumbnailUrl, contentUrl: entity.contentUrl,
+      sameAs: entity.sameAs, isPublicDomain: entity.isPublicDomain, licenseLabel: entity.licenseLabel,
+    });
+  }
+}
 // Person index: persons.jsonld PersonObservation rows grouped by person, then
 // by the E74 organization they resolved to (isEnslavedBy). Persons are linked
 // through organizations, not places directly (see transform-persons.ts).
@@ -1476,6 +1540,7 @@ writeJSON('places.json', placeIndex);
 writeJSON('sources.json', sourceIndex);
 writeJSON('appellations-by-entity.json', appellationsByEntity);
 writeJSON('observations-by-org.json', observationsByOrg);
+writeJSON('images-by-org.json', imagesByOrg);
 writeJSON('persons-by-org.json', personsByOrg);
 writeJSON('organization-composition-periods.json', compositionPeriodsByOrg);
 writeJSON('presence-inferences-by-plantation.json', presenceInferencesByPlantation);
