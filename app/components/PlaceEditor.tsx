@@ -230,6 +230,8 @@ function normalizeLocationAssertions(
         endYear: a.endYear,
         note: a.note ?? null,
         sourceRow: a.sourceRow,
+        eraKey: a.eraKey,
+        parcelComponents: a.parcelComponents,
       }))
       .filter((a) => Boolean(a.standardized || a.original));
   }
@@ -246,6 +248,52 @@ function normalizeLocationAssertions(
       note: null,
     },
   ];
+}
+
+const CONCORDANS_ERA_YEARS: Record<string, number> = {
+  wijk1782: 1782,
+  ow1817: 1817,
+  nw1837: 1837,
+  nw1885: 1885,
+  volkstelling1921: 1921,
+  modern2022: 2022,
+};
+
+const CONCORDANS_ERA_LABELS: Record<string, string> = {
+  wijk1782: '1782',
+  ow1817: '1817 (Oude Wijk)',
+  nw1837: '1837 (Nieuwe Wijk)',
+  nw1885: '1885 (Nieuwe Wijk)',
+  volkstelling1921: '1921',
+  modern2022: '2022',
+};
+
+const CONCORDANS_PARCEL_LABELS: Record<string, string> = {
+  code: 'wijkcode',
+  districtNumber: 'wijknr.',
+  districtCode: 'district',
+  outerDistrict: 'buitendistrict',
+  buurtLetter: 'buurt',
+  buurtNumber: 'buurtnr.',
+  parcelLetter: 'perceel',
+  parcelNumber: 'perceelnr.',
+  parcelPlus: 'perceel+',
+  parcelSuffix: 'toevoeging',
+  zone: 'zone',
+  side: 'zijde',
+};
+
+export interface HistoricalAddress {
+  id: string;
+  sourceRow: string | null;
+  key1885: string | null;
+  certainty: 'certain' | 'probable' | 'unresolved';
+  eras: Record<string, { address: string | null; parcel?: Record<string, string> }>;
+  splitMarker?: string | null;
+  newMarker?: string | null;
+  project?: { code?: string | null; number?: string | null; suffix?: string | null } | null;
+  note?: string | null;
+  source: string | null;
 }
 
 const VALID_STATUSES: PlantationStatusType[] = [
@@ -609,12 +657,26 @@ export default function PlaceEditor({
       }),
     [registryCategories],
   );
-  const [draft, setDraft] = useState<GazetteerPlace>({
+  const [draft, setDraft] = useState<
+    GazetteerPlace & { historicalAddresses?: HistoricalAddress[] }
+  >({
     ...place,
     districtAssertions: normalizeDistrictAssertions(place),
     productAssertions: normalizeProductAssertions(place),
     locationAssertions: normalizeLocationAssertions(place),
     statusAssertions: normalizeStatusAssertions(place),
+    ...(Array.isArray(
+      (place as GazetteerPlace & { historicalAddresses?: unknown })
+        .historicalAddresses,
+    )
+      ? {
+          historicalAddresses: (
+            place as GazetteerPlace & {
+              historicalAddresses?: HistoricalAddress[];
+            }
+          ).historicalAddresses,
+        }
+      : {}),
   });
   const hydratedFromAppellations = useRef(false);
   const [saving, setSaving] = useState(false);
@@ -892,6 +954,90 @@ export default function PlaceEditor({
     [applyLocationAssertions, locationAssertions],
   );
 
+  // ── Concordans address history (read-only derived observations) ──────────
+  // Linked via historicalAddresses carried on the gazetteer/projection
+  // record; each attested era becomes one adoptable location observation.
+
+  type ConcordansCandidate = {
+      key: string;
+      eraKey: string;
+      year: number;
+      eraLabel: string;
+      address: string;
+      parcelComponents: Record<string, string>;
+      certainty: HistoricalAddress['certainty'];
+      sourceRow: string | null;
+      note: string | null;
+    };
+
+  const concordansObservationCandidates: ConcordansCandidate[] = useMemo(() => {
+    const links = draft.historicalAddresses ?? [];
+    const candidates: ConcordansCandidate[] = [];
+    for (const link of links) {
+      if (link.certainty === 'unresolved') continue;
+      for (const [eraKey, detail] of Object.entries(link.eras ?? {})) {
+        const year = CONCORDANS_ERA_YEARS[eraKey];
+        if (year == null) continue;
+        if (!detail.address && !detail.parcel) continue;
+        const existing = draft.locationAssertions?.some(
+          (assertion) =>
+            assertion.source === 'concordans-paramaribo' &&
+            assertion.eraKey === eraKey &&
+            assertion.sourceRow === link.sourceRow,
+        );
+        if (existing) continue;
+        candidates.push({
+          key: `${link.id}::${eraKey}`,
+          eraKey,
+          year,
+          eraLabel: CONCORDANS_ERA_LABELS[eraKey] ?? eraKey,
+          address: detail.address ?? 'Not recorded',
+          parcelComponents: detail.parcel ?? {},
+          certainty: link.certainty,
+          sourceRow: link.sourceRow,
+          note:
+            [link.splitMarker ? `Gesplitst in: ${link.splitMarker}` : null,
+             link.newMarker ? `Nieuw in: ${link.newMarker}` : null]
+              .filter(Boolean)
+              .join(' · ') || null,
+        });
+      }
+    }
+    return candidates.sort((a, b) => a.year - b.year);
+  }, [draft, draft.locationAssertions]);
+
+  const adoptConcordansObservation = useCallback(
+    (candidate: ConcordansCandidate) => {
+      const next: LocationAssertion[] = [
+        ...locationAssertions,
+        {
+          id: `location-assertion-${Date.now()}`,
+          standardized:
+            candidate.address === 'Not recorded' ? null : candidate.address,
+          original: null,
+          source: 'concordans-paramaribo',
+          startYear: candidate.year,
+          endYear: candidate.year,
+          note: [
+            `Concordans ${candidate.eraLabel} (${candidate.certainty})`,
+            ...Object.entries(candidate.parcelComponents).map(
+              ([component, value]) =>
+                `${CONCORDANS_PARCEL_LABELS[component] ?? component}: ${value}`,
+            ),
+          ].join(' · '),
+          sourceRow:
+            candidate.sourceRow != null
+              ? `concordans-${candidate.sourceRow}`
+              : null,
+          eraKey: candidate.eraKey,
+          parcelComponents: candidate.parcelComponents,
+        },
+      ];
+      applyLocationAssertions(next);
+    },
+    [applyLocationAssertions, locationAssertions],
+  );
+
   // ── Status assertions (lifecycle) ─────────────────────────────────────────
 
   const statusAssertions = draft.statusAssertions || [];
@@ -938,17 +1084,23 @@ export default function PlaceEditor({
 
   /**
    * Computed lifecycle events — merges status assertions + function assertions
-   * into a flat sorted list for the read-only timeline display.
+   * + Concordans address attestations into a flat sorted list for the
+   * read-only timeline display.
    */
   const computedLifecycleEvents = useMemo(() => {
-    type EventKind = 'status' | 'function-assignment';
+    type EventKind = 'status' | 'function-assignment' | 'address-attestation';
     interface LifecycleEvent {
       kind: EventKind;
       status?: PlantationStatusType;
       product?: string;
+      address?: string;
       startYear?: number;
       endYear?: number;
       source?: string;
+      eraLabel?: string;
+      certainty?: HistoricalAddress['certainty'];
+      parcelDetail?: string;
+      splitMergeDetail?: string | null;
     }
 
     const events: LifecycleEvent[] = [];
@@ -973,13 +1125,32 @@ export default function PlaceEditor({
       });
     }
 
+    for (const candidate of concordansObservationCandidates) {
+      events.push({
+        kind: 'address-attestation',
+        address: candidate.address,
+        startYear: candidate.year,
+        endYear: candidate.year,
+        source: 'concordans-paramaribo',
+        eraLabel: candidate.eraLabel,
+        certainty: candidate.certainty,
+        parcelDetail: Object.entries(candidate.parcelComponents)
+          .map(
+            ([component, value]) =>
+              `${CONCORDANS_PARCEL_LABELS[component] ?? component}: ${value}`,
+          )
+          .join(' · '),
+        splitMergeDetail: candidate.note,
+      });
+    }
+
     // Sort by startYear ascending (undefined years go to end)
     events.sort(
       (a, b) => (a.startYear ?? Infinity) - (b.startYear ?? Infinity),
     );
 
     return events;
-  }, [statusAssertions, draft.productAssertions]);
+  }, [statusAssertions, draft.productAssertions, concordansObservationCandidates]);
 
   /** Earliest year recorded across all assertions */
   const firstMentionYear = useMemo(() => {
@@ -2792,9 +2963,82 @@ export default function PlaceEditor({
                       )}
                     </div>
                   </div>
+                  {(assertion.eraKey || assertion.parcelComponents) && (
+                    <p className="text-[10px] text-stm-sepia-600">
+                      Concordans era: {assertion.eraKey ?? '—'}
+                      {assertion.parcelComponents &&
+                        Object.keys(assertion.parcelComponents).length > 0 &&
+                        ` · ${Object.entries(assertion.parcelComponents)
+                          .map(
+                            ([component, value]) =>
+                              `${CONCORDANS_PARCEL_LABELS[component] ?? component}: ${value}`,
+                          )
+                          .join(' · ')}`}
+                    </p>
+                  )}
                 </div>
               ))}
             </div>
+            {concordansObservationCandidates.length > 0 && (
+              <div className="mt-3 space-y-2">
+                <p className="text-[10px] text-stm-sepia-600 uppercase tracking-wider">
+                  Concordans observations (read-only)
+                </p>
+                {concordansObservationCandidates.map((candidate) => (
+                  <div
+                    key={candidate.key}
+                    className="border border-stm-sepia-200 bg-stm-sepia-50 p-2"
+                  >
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="font-mono font-semibold text-stm-sepia-800 shrink-0">
+                        {candidate.year}
+                      </span>
+                      <span className="text-stm-warm-700 truncate">
+                        {candidate.address}
+                      </span>
+                      <span
+                        className={`ml-auto px-1.5 py-0.5 text-[10px] font-medium shrink-0 ${
+                          candidate.certainty === 'certain'
+                            ? 'bg-stm-sepia-600 text-white'
+                            : 'bg-stm-sepia-200 text-stm-warm-800'
+                        }`}
+                      >
+                        {candidate.certainty}
+                      </span>
+                    </div>
+                    <p className="mt-1 text-[10px] text-stm-warm-500">
+                      Concordans {candidate.eraLabel} · concordans-paramaribo
+                      {candidate.sourceRow != null &&
+                        ` · rij ${candidate.sourceRow}`}
+                    </p>
+                    {Object.keys(candidate.parcelComponents).length > 0 && (
+                      <p className="mt-1 text-[10px] text-stm-warm-600">
+                        {Object.entries(candidate.parcelComponents)
+                          .map(
+                            ([component, value]) =>
+                              `${CONCORDANS_PARCEL_LABELS[component] ?? component}: ${value}`,
+                          )
+                          .join(' · ')}
+                      </p>
+                    )}
+                    {candidate.note && (
+                      <p className="mt-1 text-[10px] font-medium text-stm-warm-700">
+                        {candidate.note}
+                      </p>
+                    )}
+                    {canEdit && (
+                      <button
+                        type="button"
+                        onClick={() => adoptConcordansObservation(candidate)}
+                        className="mt-1.5 text-xs text-stm-sepia-600 hover:text-stm-sepia-800 underline"
+                      >
+                        Adopt into editable assertions
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
@@ -2861,36 +3105,51 @@ export default function PlaceEditor({
                       'bg-stm-warm-50 text-stm-warm-500 border-stm-warm-200',
                     'function-assignment':
                       'bg-stm-sepia-50 text-stm-sepia-700 border-stm-sepia-200',
+                    'address-attestation':
+                      'bg-stm-sepia-200 text-stm-sepia-800 border-stm-sepia-400',
                   };
 
                   const colorKey =
                     ev.kind === 'function-assignment'
                       ? 'function-assignment'
-                      : (ev.status ?? 'unknown');
+                      : ev.kind === 'address-attestation'
+                        ? 'address-attestation'
+                        : (ev.status ?? 'unknown');
                   const colorClass =
                     statusColors[colorKey] ?? statusColors.unknown;
 
                   return (
-                    <div
-                      key={i}
-                      className="flex items-center gap-2 px-2 py-1.5 text-xs"
-                    >
-                      <span
-                        className={`inline-block border px-1.5 py-0.5 text-[10px] font-medium shrink-0 ${colorClass}`}
-                      >
-                        {ev.kind === 'function-assignment'
-                          ? ev.product
-                          : ev.status}
-                      </span>
-                      {yearSpan && (
-                        <span className="text-stm-warm-500 font-mono shrink-0">
-                          {yearSpan}
+                    <div key={i} className="px-2 py-1.5 text-xs">
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`inline-block border px-1.5 py-0.5 text-[10px] font-medium shrink-0 ${colorClass}`}
+                        >
+                          {ev.kind === 'function-assignment'
+                            ? ev.product
+                            : ev.kind === 'address-attestation'
+                              ? (ev.address ?? 'address')
+                              : ev.status}
                         </span>
-                      )}
-                      {ev.kind === 'function-assignment' && (
-                        <span className="text-stm-warm-400 text-[10px]">
-                          (place function)
-                        </span>
+                        {yearSpan && (
+                          <span className="text-stm-warm-500 font-mono shrink-0">
+                            {yearSpan}
+                          </span>
+                        )}
+                        {ev.kind === 'function-assignment' && (
+                          <span className="text-stm-warm-400 text-[10px]">
+                            (place function)
+                          </span>
+                        )}
+                      </div>
+                      {ev.kind === 'address-attestation' && (
+                        <p className="mt-0.5 pl-0.5 text-stm-sepia-600 text-[10px] leading-relaxed">
+                          (Concordans {ev.eraLabel}
+                          {ev.certainty ? ` · ${ev.certainty}` : ''})
+                          {ev.parcelDetail ? ` · ${ev.parcelDetail}` : ''}
+                          {ev.splitMergeDetail
+                            ? ` · ${ev.splitMergeDetail}`
+                            : ''}
+                        </p>
                       )}
                     </div>
                   );
@@ -2899,7 +3158,8 @@ export default function PlaceEditor({
             )}
 
             {computedLifecycleEvents.length === 0 &&
-              statusAssertions.length === 0 && (
+              statusAssertions.length === 0 &&
+              concordansObservationCandidates.length === 0 && (
                 <p className="text-xs text-stm-warm-400 italic">
                   No lifecycle events recorded. Add function observations or
                   status events to build the timeline.

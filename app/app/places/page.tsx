@@ -348,6 +348,14 @@ function normalizeLocationAssertionsFromLegacy(
           typeof a.sourceRow === 'string' && a.sourceRow.trim()
             ? a.sourceRow
             : undefined,
+        eraKey:
+          typeof a.eraKey === 'string' && a.eraKey.trim()
+            ? a.eraKey
+            : undefined,
+        parcelComponents:
+          a.parcelComponents && typeof a.parcelComponents === 'object'
+            ? (a.parcelComponents as Record<string, string>)
+            : undefined,
       }))
       .filter((a) => Boolean(a.standardized || a.original));
   }

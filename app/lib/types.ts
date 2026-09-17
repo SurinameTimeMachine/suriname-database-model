@@ -386,7 +386,11 @@ export interface LocationAssertion {
   endYear?: number;
   note?: string | null;
   /** Stable feature/row locator in the original source dataset. */
-  sourceRow?: string;
+  sourceRow?: string | null;
+  /** Concordans era key (e.g. nw1885, ow1817) used for derived address rows. */
+  eraKey?: string;
+  /** Regime parcel components keyed by component name (perceel, zone, ...). */
+  parcelComponents?: Record<string, string>;
 }
 
 /**
