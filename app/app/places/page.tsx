@@ -943,6 +943,8 @@ function PlacesPageInner() {
     lastAppliedPlace.current = placeId;
     if (placeId && places.some((p) => p.id === placeId)) {
       setSelectedIds([placeId]);
+    } else {
+      setSelectedIds([]);
     }
   }, [places, searchParams]);
 

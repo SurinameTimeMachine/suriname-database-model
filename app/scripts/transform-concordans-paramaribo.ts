@@ -74,15 +74,7 @@ function deriveAddress2022(row: ConcordansRow): string {
 
   if (!street && !number && !suffix) return '';
 
-  const numberPadding = number
-    ? number.length === 1
-      ? '  '
-      : number.length === 2
-        ? ' '
-        : ''
-    : '';
-
-  return normalizeSpaces(`${street} ${numberPadding}${number}${suffix}`);
+  return normalizeSpaces(`${street} ${number}${suffix}`.trim());
 }
 
 function deriveAddress1885(row: ConcordansRow): string {
@@ -442,4 +434,9 @@ function main() {
   console.log(`Derived CSV written to: ${csvPath}`);
 }
 
-main();
+try {
+  main();
+} catch (error) {
+  console.error(error);
+  process.exitCode = 1;
+}

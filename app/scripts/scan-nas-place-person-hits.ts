@@ -27,6 +27,7 @@ type NasRow = {
 type GazetteerPlace = {
   id: string;
   type: string;
+  prefLabel?: string | null;
   names: Array<{ text: string; isPreferred?: boolean }>;
 };
 
@@ -62,7 +63,7 @@ type HitRow = {
 };
 
 const NAS_PATH = join(__dirname, '../..', 'data', 'nas-mediabank', 'nas-mediabank-records.json');
-const GAZETTEER_PATH = join(__dirname, '../..', 'data', 'places-gazetteer.json');
+const GAZETTEER_PATH = join(__dirname, '../..', 'data', 'places-gazetteer.jsonld');
 const STREETS_PATH = join(
   __dirname,
   '../..',
@@ -130,7 +131,10 @@ function readNasRows(): NasRow[] {
 }
 
 function readGazetteer(): GazetteerPlace[] {
-  return JSON.parse(readFileSync(GAZETTEER_PATH, 'utf8')) as GazetteerPlace[];
+  const raw = JSON.parse(readFileSync(GAZETTEER_PATH, 'utf8')) as
+    | GazetteerPlace[]
+    | { '@graph'?: GazetteerPlace[] };
+  return Array.isArray(raw) ? raw : (raw['@graph'] ?? []);
 }
 
 function splitKeywords(value: string): string[] {
@@ -186,8 +190,12 @@ function buildStreetDictionary(): PlaceDictionaryEntry[] {
 function buildGazetteerDictionary(places: GazetteerPlace[]): PlaceDictionaryEntry[] {
   const out: PlaceDictionaryEntry[] = [];
   for (const place of places) {
-    for (const name of place.names || []) {
-      const text = (name.text || '').trim();
+    const nameTexts = [
+      ...(place.names || []).map((name) => name.text),
+      ...(place.prefLabel ? [place.prefLabel] : []),
+    ];
+    for (const rawText of nameTexts) {
+      const text = (rawText || '').trim();
       const normalized = normalize(text);
       if (!normalized || normalized.length < 4) continue;
       if (BLOCKLIST_NORMALIZED.has(normalized)) continue;
@@ -474,4 +482,9 @@ function main() {
   console.log(`- ${OUTPUT_SUMMARY}`);
 }
 
-main();
+try {
+  main();
+} catch (error) {
+  console.error(error);
+  process.exitCode = 1;
+}

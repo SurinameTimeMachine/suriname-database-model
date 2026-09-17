@@ -303,4 +303,9 @@ function main() {
   console.log(`- ${OUTPUT_SUMMARY}`);
 }
 
-main();
+try {
+  main();
+} catch (error) {
+  console.error(error);
+  process.exitCode = 1;
+}

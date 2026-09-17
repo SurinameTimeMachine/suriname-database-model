@@ -4,6 +4,7 @@ import path from 'path';
 interface Place {
   id: string;
   type: string;
+  prefLabel?: string;
   names: Array<{
     text: string;
     language?: string;
@@ -27,6 +28,10 @@ interface PlantationDuplicate {
 
 const DATA_DIR = path.join(__dirname, '../../data');
 const LOD_DIR = path.join(__dirname, '../lod');
+
+function escapeCsv(value?: string): string {
+  return `"${(value || '').replace(/"/g, '""')}"`;
+}
 
 function normalizeText(value?: string): string {
   return (value || '').trim().toLowerCase().replace(/\s+/g, ' ');
@@ -55,24 +60,27 @@ function hasDifferentKnownLocations(
 }
 
 async function generateDuplicateReport() {
-  // Read gazetteer
-  const gazeteerPath = path.join(DATA_DIR, 'places-gazetteer.json');
-  const gazeteerData = JSON.parse(fs.readFileSync(gazeteerPath, 'utf-8'));
+  // Read gazetteer (canonical: data/places-gazetteer.jsonld @graph)
+  const gazetteerPath = path.join(DATA_DIR, 'places-gazetteer.jsonld');
+  const gazetteerRaw = JSON.parse(fs.readFileSync(gazetteerPath, 'utf-8'));
+  const gazetteerEntries: Place[] = Array.isArray(gazetteerRaw)
+    ? gazetteerRaw
+    : (gazetteerRaw['@graph'] as Place[]);
 
-  // Filter for plantages only
-  const plantages: Place[] = gazeteerData.filter(
+  // Filter for plantations only
+  const plantations: Place[] = gazetteerEntries.filter(
     (place: Place) => place.type === 'plantation'
   );
 
-  console.log(`Total plantages in gazetteer: ${plantages.length}`);
+  console.log(`Total plantations in gazetteer: ${plantations.length}`);
 
-  // Group by preferred name
+  // Group by preferred name (supports legacy prefLabel and names[] shapes)
   const nameMap = new Map<string, Place[]>();
 
-  for (const plantation of plantages) {
-    const preferredName = plantation.names?.find(
-      (n) => n.isPreferred === true
-    )?.text;
+  for (const plantation of plantations) {
+    const preferredName =
+      plantation.names?.find((n) => n.isPreferred === true)?.text ||
+      (plantation as unknown as { prefLabel?: string }).prefLabel;
 
     if (preferredName) {
       if (!nameMap.has(preferredName)) {
@@ -123,11 +131,13 @@ async function generateDuplicateReport() {
 
   for (const dup of exactDuplicates) {
     for (const plant of dup.plantations) {
-      const locDesc = plant.locationDescription
-        ? plant.locationDescription.replace(/"/g, '""')
-        : '';
-      const dist = plant.district || '';
-      csvContent += `"${dup.name}",${dup.count},${plant.id},"${locDesc}","${dist}"\n`;
+      csvContent += [
+        escapeCsv(dup.name),
+        String(dup.count),
+        escapeCsv(plant.id),
+        escapeCsv(plant.locationDescription),
+        escapeCsv(plant.district),
+      ].join(',') + '\n';
     }
   }
 
@@ -136,7 +146,7 @@ async function generateDuplicateReport() {
   // Print summary
   console.log(`\n===== EXACT DUPLICATES REPORT =====\n`);
   console.log('Manual baseline: only groups with different known locations are included.');
-  console.log(`Total plantages with duplicate names: ${exactDuplicates.length}`);
+  console.log(`Total plantations with duplicate names: ${exactDuplicates.length}`);
   console.log(`Total duplicate entries: ${exactDuplicates.reduce((sum, d) => sum + d.count, 0)}`);
   console.log('\nTop 20 most duplicated names:');
   console.log('================================');
@@ -158,4 +168,7 @@ async function generateDuplicateReport() {
   console.log(`  - ${csvPath} (CSV)`);
 }
 
-generateDuplicateReport().catch(console.error);
+generateDuplicateReport().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});

@@ -16,6 +16,7 @@ type EuropeanaRow = {
 type GazetteerPlace = {
   id: string;
   type: string;
+  prefLabel?: string | null;
   names: Array<{ text: string; isPreferred?: boolean }>;
 };
 
@@ -58,7 +59,7 @@ const EUROPEANA_PATH = join(
   'europeana',
   'suriname-av-image-linkable-metadata.json',
 );
-const GAZETTEER_PATH = join(__dirname, '../..', 'data', 'places-gazetteer.json');
+const GAZETTEER_PATH = join(__dirname, '../..', 'data', 'places-gazetteer.jsonld');
 const STREETS_PATH = join(
   __dirname,
   '../..',
@@ -142,7 +143,10 @@ function readEuropeanaRows(): EuropeanaRow[] {
 }
 
 function readGazetteer(): GazetteerPlace[] {
-  return JSON.parse(readFileSync(GAZETTEER_PATH, 'utf8')) as GazetteerPlace[];
+  const raw = JSON.parse(readFileSync(GAZETTEER_PATH, 'utf8')) as
+    | GazetteerPlace[]
+    | { '@graph'?: GazetteerPlace[] };
+  return Array.isArray(raw) ? raw : (raw['@graph'] ?? []);
 }
 
 function buildStreetDictionary(): NameDictionaryEntry[] {
@@ -179,8 +183,12 @@ function buildPlantationDictionary(gazetteer: GazetteerPlace[]): NameDictionaryE
 
   for (const place of gazetteer) {
     if (place.type !== 'plantation') continue;
-    for (const name of place.names || []) {
-      const text = (name.text || '').trim();
+    const nameTexts = [
+      ...(place.names || []).map((name) => name.text),
+      ...(place.prefLabel ? [place.prefLabel] : []),
+    ];
+    for (const rawText of nameTexts) {
+      const text = (rawText || '').trim();
       const normalized = normalize(text);
       if (!normalized || normalized.length < 4) continue;
       if (BLOCKLIST_NORMALIZED.has(normalized)) continue;
@@ -526,4 +534,9 @@ function main() {
   console.log(`- ${OUTPUT_SUMMARY}`);
 }
 
-main();
+try {
+  main();
+} catch (error) {
+  console.error(error);
+  process.exitCode = 1;
+}

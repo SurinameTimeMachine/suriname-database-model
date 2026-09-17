@@ -110,13 +110,13 @@ function normalizeRow(row: Record<string, string | undefined>): AlmanakRow {
 
 function parseCsv(filePath: string, delimiter: string): AlmanakRow[] {
   const content = readFileSync(filePath, 'latin1');
-  return parse(content, {
+  return (parse(content, {
     delimiter,
     columns: true,
     skip_empty_lines: true,
     relax_column_count: true,
     trim: true,
-  }).map((row: Record<string, string | undefined>) => normalizeRow(row));
+  }) as Array<Record<string, string | undefined>>).map((row) => normalizeRow(row));
 }
 
 function loadRowMap(rows: AlmanakRow[]): Map<string, AlmanakRow> {
@@ -166,7 +166,7 @@ function reconcileV2Rows(v1Rows: AlmanakRow[], v2Rows: AlmanakRow[]): Enrichment
         const originalName = sourceNames[index];
         const normalizedName = normalizeName(originalName);
         const isNew = v1Values.length === 0 && v2Values.length > 0;
-        const isSplit = v2Values.length > 1 || (v1Values.length > 1 && v2Values.length <= 1);
+        const isSplit = v2Values.length > 1;
         const isFusion = v1Values.length > 1 && v2Values.length <= 1;
 
         let matchType: EnrichmentRow['match_type'] = 'matched';
@@ -273,19 +273,30 @@ function buildWorkbook(rows: EnrichmentRow[]) {
 }
 
 function main() {
-  console.log('Reading v1.0 and v2.0 almanak CSVs...');
-  const v1Rows = parseCsv(ALMANAC_V1_CSV, ',');
-  const v2Rows = parseCsv(ALMANAC_V2_CSV, ';');
-  console.log(`Loaded ${v1Rows.length} v1 rows and ${v2Rows.length} v2 rows`);
+  try {
+    console.log('Reading v1.0 and v2.0 almanak CSVs...');
+    const v1Rows = parseCsv(ALMANAC_V1_CSV, ',');
+    const v2Rows = parseCsv(ALMANAC_V2_CSV, ';');
+    console.log(`Loaded ${v1Rows.length} v1 rows and ${v2Rows.length} v2 rows`);
 
-  const rows = reconcileV2Rows(v1Rows, v2Rows);
-  console.log(`Generated ${rows.length} enrichment rows`);
+    const rows = reconcileV2Rows(v1Rows, v2Rows);
+    console.log(`Generated ${rows.length} enrichment rows`);
 
-  mkdirSync(OUTPUT_DIR, { recursive: true });
-  const workbook = buildWorkbook(rows);
-  workbook.xlsx.writeFile(OUTPUT_FILE).then(() => {
-    console.log(`Workbook written to ${OUTPUT_FILE}`);
-  });
+    mkdirSync(OUTPUT_DIR, { recursive: true });
+    const workbook = buildWorkbook(rows);
+    workbook.xlsx.writeFile(OUTPUT_FILE).then(
+      () => {
+        console.log(`Workbook written to ${OUTPUT_FILE}`);
+      },
+      (error: unknown) => {
+        console.error(error);
+        process.exitCode = 1;
+      },
+    );
+  } catch (error) {
+    console.error(error);
+    process.exitCode = 1;
+  }
 }
 
 main();

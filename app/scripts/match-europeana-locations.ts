@@ -11,6 +11,7 @@ type GazetteerName = {
 type GazetteerPlace = {
   id: string;
   type: string;
+  prefLabel?: string | null;
   names: GazetteerName[];
   district?: string | null;
   locationDescription?: string | null;
@@ -53,7 +54,7 @@ const EUROPEANA_PATH = join(
   'europeana',
   'suriname-av-image-linkable-metadata.json',
 );
-const GAZETTEER_PATH = join(__dirname, '../..', 'data', 'places-gazetteer.json');
+const GAZETTEER_PATH = join(__dirname, '../..', 'data', 'places-gazetteer.jsonld');
 const OUTPUT_DIR = join(__dirname, '../..', 'data', 'europeana');
 const OUTPUT_JSON = join(OUTPUT_DIR, 'suriname-location-match-candidates.json');
 const OUTPUT_CSV = join(OUTPUT_DIR, 'suriname-location-match-candidates.csv');
@@ -171,7 +172,19 @@ function loadEuropeanaRows(): EuropeanaRow[] {
 }
 
 function loadGazetteerPlaces(): GazetteerPlace[] {
-  return JSON.parse(readFileSync(GAZETTEER_PATH, 'utf8')) as GazetteerPlace[];
+  const raw = JSON.parse(readFileSync(GAZETTEER_PATH, 'utf8')) as
+    | GazetteerPlace[]
+    | { '@graph'?: GazetteerPlace[] };
+  return Array.isArray(raw) ? raw : (raw['@graph'] ?? []);
+}
+
+function getPreferredName(place: GazetteerPlace): string {
+  return (
+    place.names.find((name) => name.isPreferred)?.text ||
+    place.names[0]?.text ||
+    place.prefLabel ||
+    ''
+  );
 }
 
 function buildGazetteerNameIndex(places: GazetteerPlace[]): Map<string, GazetteerPlace[]> {
@@ -181,8 +194,7 @@ function buildGazetteerNameIndex(places: GazetteerPlace[]): Map<string, Gazettee
     if (!GAZETTEER_TYPES.has(place.type)) continue;
 
     const nameValues = place.names.map((name) => name.text);
-    if (place.locationDescription) nameValues.push(place.locationDescription);
-    if (place.district) nameValues.push(place.district);
+    if (place.prefLabel) nameValues.push(place.prefLabel);
 
     for (const value of nameValues) {
       const key = normalize(value);
@@ -211,7 +223,7 @@ function addCandidates(
 
     const places = index.get(key) || [];
     for (const place of places) {
-      const primaryName = place.names.find((name) => name.isPreferred)?.text || place.names[0]?.text || '';
+      const primaryName = getPreferredName(place);
       out.push({
         europeanaId: row.id,
         europeanaGuid: row.guid,
@@ -354,4 +366,9 @@ function main() {
   console.log(`- ${OUTPUT_SUMMARY}`);
 }
 
-main();
+try {
+  main();
+} catch (error) {
+  console.error(error);
+  process.exitCode = 1;
+}

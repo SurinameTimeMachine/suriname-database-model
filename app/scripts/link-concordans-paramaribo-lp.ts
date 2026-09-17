@@ -564,4 +564,9 @@ function main() {
   console.log(`Link report written to: ${reportOut}`);
 }
 
-main();
+try {
+  main();
+} catch (error) {
+  console.error(error);
+  process.exitCode = 1;
+}

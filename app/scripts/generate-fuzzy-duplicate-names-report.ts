@@ -4,6 +4,7 @@ import path from 'path';
 interface Place {
   id: string;
   type: string;
+  prefLabel?: string;
   names: Array<{
     text: string;
     language?: string;
@@ -116,18 +117,21 @@ function levenshteinSimilarity(a: string, b: string): number {
 }
 
 async function generateFuzzyDuplicateReport() {
-  // Read gazetteer
-  const gazeteerPath = path.join(DATA_DIR, 'places-gazetteer.json');
-  const gazeteerData = JSON.parse(fs.readFileSync(gazeteerPath, 'utf-8'));
+  // Read gazetteer (canonical: data/places-gazetteer.jsonld @graph)
+  const gazetteerPath = path.join(DATA_DIR, 'places-gazetteer.jsonld');
+  const gazetteerRaw = JSON.parse(fs.readFileSync(gazetteerPath, 'utf-8'));
+  const gazetteerEntries: Place[] = Array.isArray(gazetteerRaw)
+    ? gazetteerRaw
+    : (gazetteerRaw['@graph'] as Place[]);
 
-  // Filter for plantages only
-  const plantages: Place[] = gazeteerData.filter(
+  // Filter for plantations only
+  const plantations: Place[] = gazetteerEntries.filter(
     (place: Place) => place.type === 'plantation'
   );
 
-  console.log(`Total plantages in gazetteer: ${plantages.length}`);
+  console.log(`Total plantations in gazetteer: ${plantations.length}`);
 
-  // Extract all unique plantage names with their places
+  // Extract all unique plantation names with their places
   const nameToPlaces = new Map<
     string,
     Array<{
@@ -139,12 +143,13 @@ async function generateFuzzyDuplicateReport() {
   >();
   const idToKnownSpellings = new Map<string, string[]>();
 
-  for (const plantation of plantages) {
+  for (const plantation of plantations) {
+    const legacyPrefLabel = (plantation as { prefLabel?: string }).prefLabel;
     const knownSpellings = Array.from(
       new Set(
-        (plantation.names || [])
-          .map((n) => (n.text || '').trim())
-          .filter((text) => text.length > 0)
+        [...(plantation.names || []).map((n) => (n.text || '').trim()),
+         ...(legacyPrefLabel ? [legacyPrefLabel.trim()] : []),
+        ].filter((text) => text.length > 0)
       )
     ).sort((a, b) => a.localeCompare(b));
 
@@ -152,9 +157,9 @@ async function generateFuzzyDuplicateReport() {
       idToKnownSpellings.set(plantation.id, knownSpellings);
     }
 
-    const preferredName = plantation.names?.find(
-      (n) => n.isPreferred === true
-    )?.text;
+    const preferredName =
+      plantation.names?.find((n) => n.isPreferred === true)?.text ||
+      legacyPrefLabel?.trim();
 
     if (preferredName) {
       if (!nameToPlaces.has(preferredName)) {
@@ -170,7 +175,7 @@ async function generateFuzzyDuplicateReport() {
   }
 
   const uniqueNames = Array.from(nameToPlaces.keys());
-  console.log(`Total unique plantage names: ${uniqueNames.length}`);
+  console.log(`Total unique plantation names: ${uniqueNames.length}`);
 
   // Find fuzzy duplicates (similarity 0.8 or higher, but not identical)
   const fuzzyDuplicates: PlantationCluster[] = [];
@@ -232,11 +237,16 @@ async function generateFuzzyDuplicateReport() {
 
   for (const dup of fuzzyDuplicates) {
     for (const plant of dup.plantations) {
-      const locDesc = plant.locationDescription
-        ? plant.locationDescription.replace(/"/g, '""')
-        : '';
-      const dist = plant.district || '';
-      csvContent += `${dup.similarity.toFixed(3)},"${dup.name1}","${dup.name2}",${dup.count},${plant.id},"${plant.name}","${locDesc}","${dist}"\n`;
+      csvContent += [
+        dup.similarity.toFixed(3),
+        escapeCsv(dup.name1),
+        escapeCsv(dup.name2),
+        String(dup.count),
+        escapeCsv(plant.id),
+        escapeCsv(plant.name),
+        escapeCsv(plant.locationDescription || ''),
+        escapeCsv(plant.district || ''),
+      ].join(',') + '\n';
     }
   }
 
@@ -402,12 +412,14 @@ async function generateFuzzyDuplicateReport() {
 
   const wideCsvPath = path.join(LOD_DIR, 'fuzzy-duplicate-names-wide.csv');
   fs.writeFileSync(wideCsvPath, wideCsvContent);
+  const wideExcelCsvPath = path.join(LOD_DIR, 'fuzzy-duplicate-names-wide-excel.csv');
+  fs.writeFileSync(wideExcelCsvPath, `﻿${wideCsvContent}`);
 
   // Print summary
   console.log(`\n===== FUZZY DUPLICATES REPORT =====\n`);
   console.log('Manual baseline: only pairs with different known locations are included.');
   console.log(
-    `Plantage name pairs with similarity >= 80%: ${fuzzyDuplicates.length}`
+    `Plantation name pairs with similarity >= 80%: ${fuzzyDuplicates.length}`
   );
   console.log(`\nTop 30 closest name matches:\n`);
 
@@ -429,6 +441,10 @@ async function generateFuzzyDuplicateReport() {
   console.log(`  - ${reportPath} (JSON)`);
   console.log(`  - ${csvPath} (CSV)`);
   console.log(`  - ${wideCsvPath} (CSV, wide table for manual review)`);
+  console.log(`  - ${wideExcelCsvPath} (CSV with BOM for Excel)`);
 }
 
-generateFuzzyDuplicateReport().catch(console.error);
+generateFuzzyDuplicateReport().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});
