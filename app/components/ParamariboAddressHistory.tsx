@@ -103,9 +103,17 @@ export default function ParamariboAddressHistory({
       <h2 className="text-xl font-semibold">Paramaribo address history</h2>
       <p className="mt-2 text-sm text-ink/65">
         Historical address designations for this location point, linked through
-        the Concordans ({rows.length}{' '}
-        {rows.length === 1 ? 'entry' : 'entries'}). Expand an entry to see the
-        chronological address and regime parcel components.
+        the{' '}
+        <a
+          href="https://www.concordansparamaribo.info/concordans/concordans-2022"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-stm-sepia-700 underline decoration-stm-sepia-300 underline-offset-2 hover:text-stm-sepia-800"
+        >
+          Paramaribo Concordans by Dr. Muntjewerff (version 2022)
+        </a>{' '}
+        ({rows.length} {rows.length === 1 ? 'entry' : 'entries'}). Expand an
+        entry to see the chronological address and regime parcel components.
       </p>
       <div className="mt-3 space-y-2">
         {rows.map((address) => {
