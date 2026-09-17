@@ -93,10 +93,9 @@ export default function ParamariboAddressHistory({
     return `Registry source: ${registrySources.join(', ')}`;
   }, [rows]);
 
-  const attribution = useMemo(() => {
-    if (sourceAttribution) return sourceAttribution;
-    return null;
-  }, [sourceAttribution]);
+  const attributionUrl =
+    sourceAttribution?.url ??
+    'https://www.concordansparamaribo.info/concordans/concordans-2022';
 
   return (
     <section className="mt-10 border-t border-ink/10 pt-6">
@@ -105,7 +104,7 @@ export default function ParamariboAddressHistory({
         Historical address designations for this location point, linked through
         the{' '}
         <a
-          href="https://www.concordansparamaribo.info/concordans/concordans-2022"
+          href={attributionUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="text-stm-sepia-700 underline decoration-stm-sepia-300 underline-offset-2 hover:text-stm-sepia-800"
@@ -217,17 +216,15 @@ export default function ParamariboAddressHistory({
           </>
         )}
         For historical addresses in Paramaribo we are grateful for the{' '}
-        {attribution ? (
-          <>
-            <a
-              href={attribution.url}
-              target="_blank"
-              rel="noreferrer"
-              className="underline"
-            >
-              {attribution.name}
-            </a>
-          </>
+        {sourceAttribution ? (
+          <a
+            href={attributionUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline"
+          >
+            {sourceAttribution.name}
+          </a>
         ) : (
           <>Concordans by Dr. Muntjewerff</>
         )}
