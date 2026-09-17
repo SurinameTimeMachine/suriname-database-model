@@ -147,6 +147,7 @@ function asArray<T>(value: T | T[] | undefined | null): T[] {
 type HistoricalAddressLink = {
   id: string;
   sourceRow: string | null;
+  source: string;
   key1885: string | null;
   certainty: 'certain' | 'probable' | 'unresolved';
   eras: Record<string, unknown>;
@@ -161,6 +162,10 @@ type HistoricalAddressLink = {
  * Index a `links[]` dataset by gazetteer place id. Each link may reference
  * multiple place ids and a place may be referenced by multiple links, so the
  * result is a many-to-many map of place id -> linked records.
+ *
+ * Certainty is relationship-level: one shared link record can hold a
+ * different certainty per place, so each indexed entry is narrowed to the
+ * certainty of that (link, place) relationship.
  */
 function readHistoricalAddressLinks(): Map<string, HistoricalAddressLink[]> {
   if (!existsSync(PARAMARIBO_CONCORDANCE_PATH)) return new Map();
@@ -169,12 +174,27 @@ function readHistoricalAddressLinks(): Map<string, HistoricalAddressLink[]> {
   ) as { links?: HistoricalAddressLink[] };
   const result = new Map<string, HistoricalAddressLink[]>();
   for (const link of document.links ?? []) {
+    const certaintyByPlace = (
+      link as HistoricalAddressLink & {
+        certaintyByPlace?: Record<string, unknown>;
+      }
+    ).certaintyByPlace;
     for (const placeId of link.placeIds ?? []) {
+      const relationshipCertainty =
+        certaintyByPlace?.[placeId] === 'certain' ||
+        certaintyByPlace?.[placeId] === 'probable' ||
+        certaintyByPlace?.[placeId] === 'unresolved'
+          ? certaintyByPlace[placeId]
+          : (link.certainty ?? 'probable');
+      const narrowed: HistoricalAddressLink = {
+        ...link,
+        certainty: relationshipCertainty,
+      };
       const bucket = result.get(placeId);
       if (bucket) {
-        bucket.push(link);
+        bucket.push(narrowed);
       } else {
-        result.set(placeId, [link]);
+        result.set(placeId, [narrowed]);
       }
     }
   }
@@ -433,7 +453,6 @@ export function generatePlaceRecords() {
         ? derivePlaceFunctionAssertions(entry)
         : [];
     const referencedSourceIds = new Set<string>(entry.sources ?? []);
-    for (const name of names) if (name.source) referencedSourceIds.add(name.source);
     for (const assertion of [
       ...asArray(entry.districtAssertions),
       ...asArray(entry.locationAssertions),
@@ -981,6 +1000,11 @@ export function generatePlaceRecords() {
       functionAssertions,
       districtAssertions: asArray(entry.districtAssertions),
       locationAssertions: asArray(entry.locationAssertions),
+      concordansSourceAttribution: {
+        sourceId: 'concordans-paramaribo',
+        name: 'Concordans Paramaribo (Dr. Muntjewerff)',
+        url: 'https://www.concordansparamaribo.info/',
+      },
       historicalAddresses:
         entry.type === 'historical-address'
           ? (historicalAddressesByPlace.get(entry.id) ?? [])

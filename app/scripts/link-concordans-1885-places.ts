@@ -38,6 +38,11 @@ const OUT_PATH = join(__dirname, '../../data/paramaribo-address-concordance.json
 
 const STM = 'https://data.surinametijdmachine.org/';
 
+/** Registry source authority for the Concordans Paramaribo (Muntjewerff).
+ * Stored on every link so downstream projections and UI attribution read
+ * from data instead of a hardcoded URL. */
+export const CONCORDANS_SOURCE_ID = 'concordans-paramaribo';
+
 export const MUNTJEWERFF_ATTRIBUTION =
   'For historical addresses in Paramaribo we are grateful for the Concordans by Dr. Muntjewerff, see https://www.concordansparamaribo.info/. This is a pilot version and can contain mistakes that are not attributable to Dr. Muntjewerff.';
 
@@ -61,15 +66,28 @@ type LinkCertainty = 'certain' | 'probable' | 'unresolved';
 type AddressLink = {
   id: string;
   sourceRow: string | null;
+  source: string;
   key1885: string | null;
   placeIds: string[];
-  certainty: LinkCertainty;
+  certaintyByPlace: Record<string, LinkCertainty>;
   eras: Record<string, EraDetail>;
   splitMarker: string | null;
   newMarker: string | null;
   project: { code: string; number: string; suffix: string } | null;
   note?: string;
 };
+
+/**
+ * Per-place certainty accessor. The certainty of a link holds for the
+ * (sourceRow, place) relationship, since a concordans row may match one
+ * LP exactly (certain) and another LP only by core number (probable).
+ */
+function linkCertaintyForPlace(
+  link: AddressLink,
+  placeId: string,
+): LinkCertainty {
+  return link.certaintyByPlace[placeId] ?? 'probable';
+}
 
 /** Build one era entry; omit when neither an address nor parcel components
  * are recorded so the UI only renders attested regimes. */
@@ -166,10 +184,13 @@ function main() {
     });
   }
 
-  // Many-to-many index: concordans source row -> matched LP ids, plus the
-  // best match layer observed for that row (exact beats fallback).
+  // Many-to-many index: concordans source row -> matched LP ids, tracking
+  // the certainty of each (sourceRow, place) relationship separately. A
+  // source row may match one LP exactly (certain) and another LP only by
+  // core number (probable); a row-level flag would wrongly promote the
+  // fallback match, so exactness is recorded per relationship.
+  const certaintyByPlaceAndSourceRow = new Map<string, LinkCertainty>();
   const placeIdsBySourceRow = new Map<string, Set<string>>();
-  const exactBySourceRow = new Map<string, boolean>();
   for (const candidate of candidateRows) {
     const sourceRow = clean(candidate.concordansSourceRow);
     const lpId = clean(candidate.lpId);
@@ -184,12 +205,16 @@ function main() {
         `Candidate references unknown or non-linkable LP id: ${lpId}`,
       );
     }
-    const placeIds = placeIdsBySourceRow.get(sourceRow) ?? new Set<string>();
-    placeIds.add(placeIdForLp(lpId));
-    placeIdsBySourceRow.set(sourceRow, placeIds);
-    if (clean(candidate.matchLayer) === 'exact-components') {
-      exactBySourceRow.set(sourceRow, true);
+    const placeId = placeIdForLp(lpId);
+    const relationshipCertainty =
+      clean(candidate.matchLayer) === 'exact-components' ? 'certain' : 'probable';
+    const key = `${sourceRow}${placeId}`;
+    if (certaintyByPlaceAndSourceRow.get(key) !== 'certain') {
+      certaintyByPlaceAndSourceRow.set(key, relationshipCertainty);
     }
+    const placeIds = placeIdsBySourceRow.get(sourceRow) ?? new Set<string>();
+    placeIds.add(placeId);
+    placeIdsBySourceRow.set(sourceRow, placeIds);
   }
 
   const links: AddressLink[] = [];
@@ -197,12 +222,18 @@ function main() {
   for (const [sourceRow, row] of rowBySourceRow) {
     const placeIds = placeIdsBySourceRow.get(sourceRow);
     if (!placeIds || placeIds.size === 0) continue;
+    const certaintyByPlace: Record<string, LinkCertainty> = {};
+    for (const placeId of [...placeIds].sort()) {
+      certaintyByPlace[placeId] =
+        certaintyByPlaceAndSourceRow.get(`${sourceRow}${placeId}`) ?? 'probable';
+    }
     links.push({
       id: `concordans-${sourceRow}`,
       sourceRow,
+      source: CONCORDANS_SOURCE_ID,
       key1885: clean(row.address1885Derived) || clean(row.address1885Cell) || clean(row.address1837) || null,
       placeIds: [...placeIds].sort(),
-      certainty: exactBySourceRow.get(sourceRow) ? 'certain' : 'probable',
+      certaintyByPlace,
       eras: eraAddresses(row),
       splitMarker: clean(row.splitMarker) || null,
       newMarker: clean(row.newMarker) || null,
@@ -228,9 +259,10 @@ function main() {
     links.push({
       id: `unresolved-${placeId}`,
       sourceRow: null,
+      source: CONCORDANS_SOURCE_ID,
       key1885: lp.lpAdres1885 || null,
       placeIds: [placeId],
-      certainty: 'unresolved',
+      certaintyByPlace: { [placeId]: 'unresolved' },
       eras: {},
       splitMarker: null,
       newMarker: null,
@@ -252,14 +284,23 @@ function main() {
   const rowsWithMultiplePlaces = links.filter(
     (link) => link.placeIds.length > 1,
   ).length;
-  const certainCount = links.filter((link) => link.certainty === 'certain').length;
-  const probableCount = links.filter((link) => link.certainty === 'probable').length;
-  const unresolvedCount = links.filter((link) => link.certainty === 'unresolved').length;
+  const relationshipCertainties = links.flatMap((link) =>
+    link.placeIds.map((placeId) => linkCertaintyForPlace(link, placeId)),
+  );
+  const certainCount = relationshipCertainties.filter(
+    (certainty) => certainty === 'certain',
+  ).length;
+  const probableCount = relationshipCertainties.filter(
+    (certainty) => certainty === 'probable',
+  ).length;
+  const unresolvedCount = relationshipCertainties.filter(
+    (certainty) => certainty === 'unresolved',
+  ).length;
 
   console.log(`Links: ${links.length}`);
-  console.log(`  certain (exact component match): ${certainCount}`);
-  console.log(`  probable (core-number fallback): ${probableCount}`);
-  console.log(`  unresolved (no candidate):       ${unresolvedCount}`);
+  console.log(`  relationship-certain (exact component match): ${certainCount}`);
+  console.log(`  relationship-probable (core-number fallback): ${probableCount}`);
+  console.log(`  relationship-unresolved (no candidate):       ${unresolvedCount}`);
   console.log(`Place points matched by >1 concordans row: ${placesWithMultipleRows}`);
   console.log(`Concordans rows matching >1 place point: ${rowsWithMultiplePlaces}`);
 

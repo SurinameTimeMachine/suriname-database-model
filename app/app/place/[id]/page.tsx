@@ -77,6 +77,11 @@ type PlaceProjection = {
     sourceRow?: string;
   }>;
   historicalAddresses?: Array<HistoricalAddress>;
+  concordansSourceAttribution?: {
+    sourceId: string;
+    name: string;
+    url: string;
+  } | null;
   diklandRefs: Array<{
     folderPath?: string;
     driveUrl?: string;
@@ -158,6 +163,7 @@ export default async function PlaceRecordPage({
     functionAssertions: place.functionAssertions ?? [],
     locationAssertions: place.locationAssertions ?? [],
     historicalAddresses: place.historicalAddresses ?? [],
+    concordansSourceAttribution: place.concordansSourceAttribution ?? null,
     diklandRefs: place.diklandRefs ?? [],
   };
   const canonicalUri = `${CANONICAL_BASE}/place/${id}`;
@@ -290,6 +296,7 @@ export default async function PlaceRecordPage({
         {(place.historicalAddresses?.length ?? 0) > 0 && (
           <ParamariboAddressHistory
             historicalAddresses={place.historicalAddresses ?? []}
+            sourceAttribution={place.concordansSourceAttribution ?? undefined}
           />
         )}
 

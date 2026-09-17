@@ -17,6 +17,7 @@ export type HistoricalAddress = {
   newMarker?: string | null;
   project?: { code?: string | null; number?: string | null; suffix?: string | null } | null;
   note?: string | null;
+  source: string | null;
 };
 
 const ERA_ORDER = [
@@ -53,15 +54,18 @@ const PARCEL_LABELS: Record<string, string> = {
 };
 
 function certaintyClass(certainty: HistoricalAddress['certainty']) {
-  if (certainty === 'certain') return 'bg-green-100 text-green-800';
-  if (certainty === 'probable') return 'bg-orange-100 text-orange-800';
-  return 'bg-red-100 text-red-800';
+  if (certainty === 'certain') return 'bg-stm-sepia-600 text-white';
+  if (certainty === 'probable')
+    return 'bg-stm-sepia-200 text-stm-warm-800';
+  return 'border border-stm-warm-300 bg-stm-warm-100 text-stm-warm-700';
 }
 
 export default function ParamariboAddressHistory({
   historicalAddresses,
+  sourceAttribution,
 }: {
   historicalAddresses: HistoricalAddress[];
+  sourceAttribution?: { name: string; url: string } | null;
 }) {
   const rows = useMemo(() => {
     const unique = new Map<string, HistoricalAddress>();
@@ -79,6 +83,21 @@ export default function ParamariboAddressHistory({
 
   if (rows.length === 0) return null;
 
+  const sourceAttributionText = useMemo(() => {
+    const registrySources = [
+      ...new Set(
+        rows.map((row) => row.source).filter((source) => Boolean(source)),
+      ),
+    ];
+    if (registrySources.length === 0) return null;
+    return `Registry source: ${registrySources.join(', ')}`;
+  }, [rows]);
+
+  const attribution = useMemo(() => {
+    if (sourceAttribution) return sourceAttribution;
+    return null;
+  }, [sourceAttribution]);
+
   return (
     <section className="mt-10 border-t border-ink/10 pt-6">
       <h2 className="text-xl font-semibold">Paramaribo address history</h2>
@@ -94,7 +113,7 @@ export default function ParamariboAddressHistory({
           return (
             <details
               key={address.id}
-              className="border border-ink/10 bg-white/70 p-3"
+              className="border border-ink/10 bg-stm-sepia-100 p-3"
             >
               <summary className="cursor-pointer text-sm font-semibold">
                 <span className="inline-flex flex-wrap items-baseline gap-x-2 gap-y-1">
@@ -110,12 +129,12 @@ export default function ParamariboAddressHistory({
                     </span>
                   )}
                   {address.splitMarker && (
-                    <span className="bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-amber-800">
+                    <span className="bg-stm-warm-200 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-stm-warm-800">
                       gesplitst in: {address.splitMarker}
                     </span>
                   )}
                   {address.newMarker && (
-                    <span className="bg-sky-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-sky-800">
+                    <span className="bg-stm-sepia-200 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-stm-sepia-700">
                       nieuw in: {address.newMarker}
                     </span>
                   )}
@@ -183,15 +202,27 @@ export default function ParamariboAddressHistory({
         })}
       </div>
       <p className="mt-5 text-xs leading-relaxed text-ink/50">
-        For historical addresses in Paramaribo we are grateful for the Concordans by Dr. Muntjewerff, see{' '}
-        <a
-          href="https://www.concordansparamaribo.info/"
-          target="_blank"
-          rel="noreferrer"
-          className="underline"
-        >
-          concordansparamaribo.info
-        </a>
+        {sourceAttributionText && (
+          <>
+            {sourceAttributionText}
+            <br />
+          </>
+        )}
+        For historical addresses in Paramaribo we are grateful for the{' '}
+        {attribution ? (
+          <>
+            <a
+              href={attribution.url}
+              target="_blank"
+              rel="noreferrer"
+              className="underline"
+            >
+              {attribution.name}
+            </a>
+          </>
+        ) : (
+          <>Concordans by Dr. Muntjewerff</>
+        )}
         . This is a pilot version and can contain mistakes that are not attributable to Dr. Muntjewerff.
       </p>
     </section>
