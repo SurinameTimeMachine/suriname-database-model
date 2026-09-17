@@ -169,8 +169,8 @@ export default async function PlaceRecordPage({
   const canonicalUri = `${CANONICAL_BASE}/place/${id}`;
 
   return (
-    <main className="min-h-screen bg-background px-4 py-10 text-ink sm:px-6 lg:px-10">
-      <article id="record" className="mx-auto max-w-4xl">
+    <main className="bg-background px-4 py-10 text-ink sm:px-6 lg:px-10">
+      <article id="record" className="mx-auto max-w-4xl pb-16">
         <p className="mb-3 text-xs font-semibold uppercase tracking-[0.28em] text-teal-strong">
           Authority record · {place.id}
         </p>
