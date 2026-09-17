@@ -27,6 +27,13 @@ export function buildPlaceRecordContext(): Record<string, unknown> {
     },
     sourcePath: { '@id': 'stm:sourcePath', '@type': 'xsd:string' },
     sourceRow: { '@id': 'stm:sourceRow', '@type': 'xsd:string' },
+    eraKey: { '@id': 'stm:eraKey', '@type': 'xsd:string' },
+    parcelComponents: { '@id': 'stm:parcelComponents', '@type': '@json' },
+    parcelComponentsLabel: {
+      '@id': 'stm:parcelComponentsLabel',
+      '@type': 'xsd:string',
+    },
+    sourceYear: { '@id': 'stm:sourceYear', '@type': 'xsd:gYear' },
     sourceUrl: { '@id': 'sdo:url', '@type': '@id' },
     standardizedContent: {
       '@id': 'stm:standardizedContent',

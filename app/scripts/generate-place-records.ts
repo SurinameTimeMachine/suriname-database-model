@@ -76,6 +76,8 @@ type Assertion = {
   certainty?: string;
   note?: string | null;
   sourceRow?: string;
+  eraKey?: string;
+  parcelComponents?: Record<string, unknown>;
 };
 
 type DiklandRef = {
@@ -411,6 +413,44 @@ export function generatePlaceRecords() {
     const structuralTypeUri = `${BASE}vocabulary/place-type/${entry.type}`;
     const targetUri = hasFeature ? featureUri : locationUri;
     const names = namesFor(entry);
+    const locationObservations = asArray(entry.locationAssertions);
+    // Saved concordans-era location assertions carry their own dated address;
+    // project them as E41 appellations instead of reusing the imported 1885
+    // name for every era.
+    const concordansAppellations: Array<
+      PlaceName & { eraKey?: string; year?: number }
+    > = [];
+    for (const assertion of locationObservations) {
+      if (assertion.source !== 'concordans-paramaribo') continue;
+      const address =
+        assertion.standardized ?? assertion.original ?? null;
+      if (!address || !address.trim()) continue;
+      const eraKey =
+        typeof assertion.eraKey === 'string' ? assertion.eraKey : null;
+      const year = assertion.startYear ?? assertion.endYear;
+      const exists =
+        names.some(
+          (name) =>
+            (name.text ?? '').toLowerCase().trim() ===
+            address.toLowerCase().trim(),
+        ) ||
+        concordansAppellations.some(
+          (appellation) =>
+            (appellation.text ?? '').toLowerCase().trim() ===
+            address.toLowerCase().trim(),
+        );
+      if (exists) continue;
+      concordansAppellations.push({
+        text: address,
+        language: 'nl',
+        type: 'historical-address',
+        isPreferred: false,
+        ...(eraKey ? { eraKey } : {}),
+        ...(year != null ? { year } : {}),
+        ...(assertion.source ? { source: assertion.source } : {}),
+      });
+    }
+    for (const appellation of concordansAppellations) names.push(appellation);
     const label = preferredName(names);
     const graph: JsonObject[] = [];
     const organizationNodes = new Map<string, JsonObject>();
@@ -550,7 +590,6 @@ export function generatePlaceRecords() {
         'location',
       );
     }
-    const locationObservations = asArray(entry.locationAssertions);
     const notes = (locationObservations.length > 0
       ? locationObservations.flatMap((assertion) => [
           assertion.standardized,
@@ -561,6 +600,33 @@ export function generatePlaceRecords() {
       (note): note is string => Boolean(note),
     );
     if (notes.length > 0) location.P3_has_note = notes;
+    // Era parcel-key labels shared with the place-page Concordans component.
+    const eraParcelLabels: Record<string, string> = {
+      code: 'wijkcode',
+      districtNumber: 'wijknr.',
+      districtCode: 'district',
+      outerDistrict: 'buitendistrict',
+      buurtLetter: 'buurt',
+      buurtNumber: 'buurtnr.',
+      parcelLetter: 'perceel',
+      parcelNumber: 'perceelnr.',
+      parcelPlus: 'perceel+',
+      parcelSuffix: 'toevoeging',
+      zone: 'zone',
+      side: 'zijde',
+    };
+    const parcelComponentsOf = (assertion: Assertion): Record<string, string> => {
+      const raw = assertion.parcelComponents;
+      if (!raw || typeof raw !== 'object') return {};
+      return Object.fromEntries(
+        Object.entries(raw)
+          .filter(
+            (pair): pair is [string, string] =>
+              typeof pair[1] === 'string' && pair[1].trim().length > 0,
+          )
+          .map(([key, value]) => [key, value]),
+      );
+    };
     if (entry.location?.wkt) {
       const geometryUri = fragmentUri(
         pageUri,
@@ -600,11 +666,17 @@ export function generatePlaceRecords() {
     }
     graph.push(location);
 
+    type PlaceNameWithEra = PlaceName & { eraKey?: string; year?: number };
     const nameUris: string[] = [];
+    const concordansNameIndexByText = new Map<string, number>();
     names.forEach((name, position) => {
       if (!name.text) return;
       const nameUri = fragmentUri(pageUri, `name-${position + 1}`);
       nameUris.push(nameUri);
+      const tagged = name as PlaceNameWithEra;
+      if (tagged.eraKey) {
+        concordansNameIndexByText.set(name.text.toLowerCase().trim(), position);
+      }
       graph.push({
         '@id': nameUri,
         '@type': ['crm:E41_Appellation'],
@@ -618,6 +690,8 @@ export function generatePlaceRecords() {
         ...(name.source
           ? { P128i_is_carried_by: sourceUri(name.source, sourceIds) }
           : {}),
+        ...(tagged.eraKey ? { eraKey: tagged.eraKey } : {}),
+        ...(tagged.year != null ? { sourceYear: tagged.year } : {}),
       });
     });
     if (nameUris.length > 0) {
@@ -658,18 +732,43 @@ export function generatePlaceRecords() {
     }
 
     for (const assertion of locationObservations) {
-      if (!assertion.id || (!assertion.standardized && !assertion.original)) continue;
+      if (
+        !assertion.id ||
+        (!assertion.standardized &&
+          !assertion.original &&
+          !assertion.eraKey &&
+          Object.keys(parcelComponentsOf(assertion)).length === 0)
+      )
+        continue;
       const assertionUri = fragmentUri(pageUri, `assertion-${assertion.id}`);
       const spanUri = fragmentUri(pageUri, `assertion-${assertion.id}-time-span`);
       const span = timeSpan(spanUri, assertion.startYear, assertion.endYear);
       if (span) graph.push(span);
+      // Address observations point at the dated concordans appellation for
+      // their own address text; only fall back to the imported 1885 name
+      // when the era minted no appellation of its own.
+      const addressText = (
+        assertion.standardized ??
+        assertion.original ??
+        ''
+      )
+        .toLowerCase()
+        .trim();
+      const concordansNamePosition =
+        assertion.source === 'concordans-paramaribo' && addressText
+          ? concordansNameIndexByText.get(addressText)
+          : undefined;
+      const assignedNameUri =
+        concordansNamePosition != null
+          ? nameUris[concordansNamePosition]
+          : entry.type === 'historical-address' && nameUris[0]
+            ? nameUris[0]
+            : undefined;
       graph.push({
         '@id': assertionUri,
         '@type': ['crm:E13_Attribute_Assignment'],
         P140_assigned_attribute_to: locationUri,
-        ...(entry.type === 'historical-address' && nameUris[0]
-          ? { P141_assigned: nameUris[0] }
-          : {}),
+        ...(assignedNameUri ? { P141_assigned: assignedNameUri } : {}),
         P2_has_type:
           entry.type === 'historical-address'
             ? `${BASE}type/relationship/address-observation`
@@ -680,6 +779,20 @@ export function generatePlaceRecords() {
           : {}),
         ...(assertion.standardized ? { standardizedContent: assertion.standardized } : {}),
         ...(assertion.original ? { sourceContent: assertion.original } : {}),
+        ...(typeof assertion.eraKey === 'string' && assertion.eraKey
+          ? { eraKey: assertion.eraKey }
+          : {}),
+        ...(Object.keys(parcelComponentsOf(assertion)).length > 0
+          ? {
+              parcelComponents: parcelComponentsOf(assertion),
+              parcelComponentsLabel: Object.entries(parcelComponentsOf(assertion))
+                .map(
+                  ([component, value]) =>
+                    `${eraParcelLabels[component] ?? component}: ${value}`,
+                )
+                .join(' · '),
+            }
+          : {}),
         ...(assertion.sourceRow ? { sourceRow: assertion.sourceRow } : {}),
         ...(assertion.note ? { P3_has_note: assertion.note } : {}),
       });

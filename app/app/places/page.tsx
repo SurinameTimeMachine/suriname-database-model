@@ -16,10 +16,12 @@ import type {
   DistrictAssertion,
   E41Appellation,
   GazetteerPlace,
+  HistoricalAddressLink,
   LocationAssertion,
   PlantationStatusType,
   ProductAssertion,
   PlaceName,
+  SourceAttribution,
   StatusAssertion,
 } from '@/lib/types';
 import { getPreferredName } from '@/lib/types';
@@ -307,6 +309,22 @@ function normalizeProductAssertionsFromLegacy(
   ];
 }
 
+/** Keep assertions that carry content — text, or a Concordans era/parcel
+ * payload (parcel-only eras have no address string). */
+function hasLegacyLocationAssertionContent(assertion: {
+  standardized?: string | null;
+  original?: string | null;
+  eraKey?: string;
+  parcelComponents?: Record<string, string>;
+}): boolean {
+  if (assertion.standardized || assertion.original) return true;
+  if (assertion.eraKey) return true;
+  return (
+    assertion.parcelComponents != null &&
+    Object.keys(assertion.parcelComponents).length > 0
+  );
+}
+
 function normalizeLocationAssertionsFromLegacy(
   entry: Record<string, unknown>,
 ): LocationAssertion[] {
@@ -348,8 +366,16 @@ function normalizeLocationAssertionsFromLegacy(
           typeof a.sourceRow === 'string' && a.sourceRow.trim()
             ? a.sourceRow
             : undefined,
+        eraKey:
+          typeof a.eraKey === 'string' && a.eraKey.trim()
+            ? a.eraKey
+            : undefined,
+        parcelComponents:
+          a.parcelComponents && typeof a.parcelComponents === 'object'
+            ? (a.parcelComponents as Record<string, string>)
+            : undefined,
       }))
-      .filter((a) => Boolean(a.standardized || a.original));
+      .filter(hasLegacyLocationAssertionContent);
   }
 
   const locationDescription =
@@ -866,6 +892,15 @@ function PlacesPageInner() {
     [allTypes, labels],
   );
   const [places, setPlaces] = useState<GazetteerPlace[]>([]);
+  const [historicalAddressesByPlace, setHistoricalAddressesByPlace] = useState<
+    Map<
+      string,
+      {
+        historicalAddresses?: HistoricalAddressLink[];
+        concordansSourceAttribution?: SourceAttribution | null;
+      }
+    >
+  >(new Map());
   const [allData, setAllData] = useState<AllData | null>(null);
   const [almanakkenReview, setAlmanakkenReview] =
     useState<AlmanakkenReviewData | null>(null);
@@ -947,6 +982,35 @@ function PlacesPageInner() {
       setSelectedIds([]);
     }
   }, [places, searchParams]);
+
+  // Keep derived Concordans links available for whichever record is
+  // selected: fetch that record's projection on selection change. The gazetteer
+  // payload itself never carries derived data, so the editor would otherwise
+  // show no candidates on exactly the records that have them.
+  const selectedIdForConcordans = selectedIds[0] ?? null;
+  useEffect(() => {
+    const placeId = selectedIdForConcordans;
+    if (!placeId || !/^stm-1885-address-\d{4}$/.test(placeId)) return;
+    let cancelled = false;
+    fetch(`/data/place-projections/${placeId}.json`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((projection) => {
+        if (cancelled || !projection || projection.id !== placeId) return;
+        setHistoricalAddressesByPlace((previous) => {
+          const next = new Map(previous);
+          next.set(placeId, {
+            historicalAddresses: projection.historicalAddresses ?? [],
+            concordansSourceAttribution:
+              projection.concordansSourceAttribution ?? null,
+          });
+          return next;
+        });
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedIdForConcordans]);
 
   useEffect(() => {
     const requestedMode = searchParams.get('mode');
@@ -2096,6 +2160,14 @@ function PlacesPageInner() {
                       almanakkenReview?.byPlaceId[selectedPlace.id]
                     }
                     organizationContext={selectedOrganizationContext}
+                    historicalAddresses={
+                      historicalAddressesByPlace.get(selectedPlace.id)
+                        ?.historicalAddresses ?? []
+                    }
+                    concordansSourceAttribution={
+                      historicalAddressesByPlace.get(selectedPlace.id)
+                        ?.concordansSourceAttribution ?? null
+                    }
                     canEdit={canEdit}
                     onSave={handleSave}
                     onCancel={handleCancel}
@@ -2118,6 +2190,14 @@ function PlacesPageInner() {
                       almanakkenReview?.byPlaceId[selectedPlace.id]
                     }
                     organizationContext={selectedOrganizationContext}
+                    historicalAddresses={
+                      historicalAddressesByPlace.get(selectedPlace.id)
+                        ?.historicalAddresses ?? []
+                    }
+                    concordansSourceAttribution={
+                      historicalAddressesByPlace.get(selectedPlace.id)
+                        ?.concordansSourceAttribution ?? null
+                    }
                     canEdit={canEdit}
                     onSave={handleSave}
                     onCancel={handleCancel}
