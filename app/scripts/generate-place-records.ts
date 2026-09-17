@@ -39,6 +39,10 @@ const ORGANIZATION_OVERRIDES_PATH = join(
 );
 const THESAURUS_PATH = join(DATA_DIR, 'place-types-thesaurus.jsonld');
 const SOURCES_PATH = join(DATA_DIR, 'sources-registry.jsonld');
+const PARAMARIBO_CONCORDANCE_PATH = join(
+  DATA_DIR,
+  'paramaribo-address-concordance.json',
+);
 
 type JsonObject = Record<string, unknown>;
 
@@ -138,6 +142,38 @@ function fragmentUri(pageUri: string, fragment: string): string {
 
 function asArray<T>(value: T | T[] | undefined | null): T[] {
   return value == null ? [] : Array.isArray(value) ? value : [value];
+}
+
+type HistoricalAddressLink = {
+  id: string;
+  sourceRow: string | null;
+  key1885: string | null;
+  certainty: 'certain' | 'probable' | 'unresolved';
+  eras: Record<string, unknown>;
+  placeIds: string[];
+  splitMarker?: string | null;
+  newMarker?: string | null;
+  project?: Record<string, unknown> | null;
+  note?: string | null;
+};
+
+/**
+ * Index a `links[]` dataset by gazetteer place id. Each link may reference
+ * multiple place ids and a place may be referenced by multiple links, so the
+ * result is a many-to-many map of place id -> linked records.
+ */
+function readHistoricalAddressLinks(): Map<string, HistoricalAddressLink[]> {
+  if (!existsSync(PARAMARIBO_CONCORDANCE_PATH)) return new Map();
+  const document = JSON.parse(
+    readFileSync(PARAMARIBO_CONCORDANCE_PATH, 'utf-8'),
+  ) as { links?: HistoricalAddressLink[] };
+  const result = new Map<string, HistoricalAddressLink[]>();
+  for (const link of document.links ?? []) {
+    for (const placeId of link.placeIds ?? []) {
+      result.set(placeId, [...(result.get(placeId) ?? []), link]);
+    }
+  }
+  return result;
 }
 
 function sourceUri(sourceId: string, sourceIds: Map<string, string>): string {
@@ -318,6 +354,7 @@ export function generatePlaceRecords() {
       )
       .map((entry) => [entry.sourceId as string, entry['@id'] as string]),
   );
+  const historicalAddressesByPlace = readHistoricalAddressLinks();
   mkdirSync(OUT_DIR, { recursive: true });
   mkdirSync(PROJECTIONS_DIR, { recursive: true });
   if (existsSync(OUT_DIR)) {
@@ -939,6 +976,10 @@ export function generatePlaceRecords() {
       functionAssertions,
       districtAssertions: asArray(entry.districtAssertions),
       locationAssertions: asArray(entry.locationAssertions),
+      historicalAddresses:
+        entry.type === 'historical-address'
+          ? (historicalAddressesByPlace.get(entry.id) ?? [])
+          : [],
       almanakkenObservations,
       diklandRefs: asArray(entry.diklandRefs),
     };
