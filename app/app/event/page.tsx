@@ -63,10 +63,22 @@ export default function EventPage() {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (!saved) return;
     try {
-      const parsed = JSON.parse(saved) as { participantId: string; nickname: string };
-      setParticipantId(parsed.participantId);
-      setNickname(parsed.nickname);
-      setStatus(`Welkom terug, ${parsed.nickname}.`);
+      const parsed = JSON.parse(saved) as unknown;
+      if (
+        !parsed ||
+        typeof parsed !== 'object' ||
+        typeof (parsed as { participantId?: unknown }).participantId !== 'string' ||
+        typeof (parsed as { nickname?: unknown }).nickname !== 'string' ||
+        !(parsed as { participantId: string }).participantId.trim() ||
+        !(parsed as { nickname: string }).nickname.trim()
+      ) {
+        localStorage.removeItem(STORAGE_KEY);
+        return;
+      }
+      const session = parsed as { participantId: string; nickname: string };
+      setParticipantId(session.participantId);
+      setNickname(session.nickname);
+      setStatus(`Welkom terug, ${session.nickname}.`);
     } catch {
       localStorage.removeItem(STORAGE_KEY);
     }

@@ -485,6 +485,20 @@ export async function submitTask(
       returning submitted_at`;
     const submittedAt = insertedSubmissions[0].submitted_at;
 
+    if (safePayload.decision === 'skip') {
+      await db`
+        update tasks
+        set status = ${round === 2 ? 'pending-round-2' : 'unoffered'},
+            current_claim_id = null,
+            updated_at = now()
+        where task_id = ${taskId}`;
+      return {
+        ok: true,
+        completed: false,
+        stats: await getStats(db),
+      };
+    }
+
     if (missingLocationOnConfirm) {
       await db`
         update tasks

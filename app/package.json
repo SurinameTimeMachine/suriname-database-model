@@ -32,7 +32,17 @@
     "validate-vocabulary-profile": "tsx scripts/validate-vocabulary-profile.ts",
     "validate-links:live": "node --import tsx scripts/validate-external-links.ts",
     "validate-almanakken-v2": "node --import tsx scripts/migrate-almanakken-v2.ts",
-    "validate-routes": "node --import tsx scripts/validate-linked-data-routes.ts"
+    "validate-routes": "node --import tsx scripts/validate-linked-data-routes.ts",
+    "transform-concordans-paramaribo": "tsx scripts/transform-concordans-paramaribo.ts",
+    "link-concordans-paramaribo-lp": "tsx scripts/link-concordans-paramaribo-lp.ts",
+    "export-europeana-metadata": "tsx scripts/export-europeana-metadata.ts",
+    "scan-nas-place-person-hits": "tsx scripts/scan-nas-place-person-hits.ts",
+    "match-europeana-locations": "tsx scripts/match-europeana-locations.ts",
+    "scan-europeana-title-description-placehits": "tsx scripts/scan-europeana-title-description-placehits.ts",
+    "build-europeana-review-form": "tsx scripts/build-europeana-review-form.ts",
+    "reconcile-almanakken-persons": "tsx scripts/reconcile-almanakken-persons.ts",
+    "generate-duplicate-names-report": "tsx scripts/generate-duplicate-names-report.ts",
+    "generate-fuzzy-duplicate-names-report": "tsx scripts/generate-fuzzy-duplicate-names-report.ts"
   },
   "dependencies": {
     "@allmaps/leaflet": "1.0.0-beta.54",
@@ -40,6 +50,8 @@
     "csv-parse": "^7.0.0",
     "d3-force": "^3.0.0",
     "d3-selection": "^3.0.0",
+    "exceljs": "4.4.0",
+    "hls.js": "^1.6.16",
     "leaflet": "^1.9.4",
     "next": "^16.2.9",
     "postgres": "^3.4.7",
