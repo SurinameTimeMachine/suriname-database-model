@@ -138,7 +138,11 @@ export default function ParamariboAddressHistory({
                         <dt className="text-xs font-semibold uppercase tracking-wide text-ink/55">
                           {ERA_LABELS[era] ?? era}
                         </dt>
-                        <dd className="mt-0.5">{detail.address}</dd>
+                        <dd className="mt-0.5">
+                          {detail.address || (
+                            <span className="text-ink/45">Not recorded</span>
+                          )}
+                        </dd>
                         {detail.parcel && (
                           <dd className="mt-1 flex flex-wrap gap-1.5">
                             {Object.entries(detail.parcel).map(

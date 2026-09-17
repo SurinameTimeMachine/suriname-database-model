@@ -170,7 +170,12 @@ function readHistoricalAddressLinks(): Map<string, HistoricalAddressLink[]> {
   const result = new Map<string, HistoricalAddressLink[]>();
   for (const link of document.links ?? []) {
     for (const placeId of link.placeIds ?? []) {
-      result.set(placeId, [...(result.get(placeId) ?? []), link]);
+      const bucket = result.get(placeId);
+      if (bucket) {
+        bucket.push(link);
+      } else {
+        result.set(placeId, [link]);
+      }
     }
   }
   return result;
