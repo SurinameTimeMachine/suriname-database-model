@@ -11,6 +11,7 @@ import type {
   E74Organization,
   ExternalLink,
   GazetteerPlace,
+  HistoricalAddressLink,
   LanguageCode,
   LocationAssertion,
   NameType,
@@ -20,6 +21,7 @@ import type {
   PlantationStatusType,
   ProductAssertion,
   SkosMatchType,
+  SourceAttribution,
   StatusAssertion,
 } from '@/lib/types';
 import { getPreferredName } from '@/lib/types';
@@ -36,6 +38,9 @@ interface PlaceEditorProps {
   sourceAppellations?: SourceAppellationHint[];
   almanakkenReview?: AlmanakkenReviewEntry;
   organizationContext?: PlaceOrganizationContext;
+  /** Derived Concordans links for this record; kept out of the save payload. */
+  historicalAddresses?: HistoricalAddressLink[];
+  concordansSourceAttribution?: SourceAttribution | null;
   canEdit: boolean;
   onSave: (place: GazetteerPlace) => Promise<void>;
   onCancel: () => void;
@@ -233,7 +238,7 @@ function normalizeLocationAssertions(
         eraKey: a.eraKey,
         parcelComponents: a.parcelComponents,
       }))
-      .filter((a) => Boolean(a.standardized || a.original));
+      .filter(hasLocationAssertionContent);
   }
   if (!place.locationDescription && !place.locationDescriptionOriginal)
     return [];
@@ -283,17 +288,32 @@ const CONCORDANS_PARCEL_LABELS: Record<string, string> = {
   side: 'zijde',
 };
 
-export interface HistoricalAddress {
-  id: string;
-  sourceRow: string | null;
-  key1885: string | null;
-  certainty: 'certain' | 'probable' | 'unresolved';
-  eras: Record<string, { address: string | null; parcel?: Record<string, string> }>;
-  splitMarker?: string | null;
-  newMarker?: string | null;
-  project?: { code?: string | null; number?: string | null; suffix?: string | null } | null;
-  note?: string | null;
-  source: string | null;
+// The shared HistoricalAddressLink shape (lib/types) is the projection
+// shape consumed here; the HistoricalAddress alias below preserves the
+// previous component export consumed by /place/[id].
+export type PlaceHistoricalAddressLink = HistoricalAddressLink;
+export type HistoricalAddress = HistoricalAddressLink;
+
+/** Canonical locator for a Concordans row adopted into an editable
+ * assertion — shared by the candidate filter and the adopt action. */
+function concordansSourceRowFor(link: { sourceRow: string | null }): string | null {
+  return link.sourceRow != null ? `concordans-${link.sourceRow}` : null;
+}
+
+/** Keep assertions that carry content — text, or a Concordans era/parcel
+ * payload (parcel-only eras have no address string). */
+function hasLocationAssertionContent(assertion: {
+  standardized?: string | null;
+  original?: string | null;
+  eraKey?: string;
+  parcelComponents?: Record<string, string>;
+}): boolean {
+  if (assertion.standardized || assertion.original) return true;
+  if (assertion.eraKey) return true;
+  return (
+    assertion.parcelComponents != null &&
+    Object.keys(assertion.parcelComponents).length > 0
+  );
 }
 
 const VALID_STATUSES: PlantationStatusType[] = [
@@ -635,6 +655,8 @@ export default function PlaceEditor({
   sourceAppellations = [],
   almanakkenReview,
   organizationContext,
+  historicalAddresses = [],
+  concordansSourceAttribution = null,
   canEdit,
   onSave,
   onCancel,
@@ -657,26 +679,12 @@ export default function PlaceEditor({
       }),
     [registryCategories],
   );
-  const [draft, setDraft] = useState<
-    GazetteerPlace & { historicalAddresses?: HistoricalAddress[] }
-  >({
+  const [draft, setDraft] = useState<GazetteerPlace>({
     ...place,
     districtAssertions: normalizeDistrictAssertions(place),
     productAssertions: normalizeProductAssertions(place),
     locationAssertions: normalizeLocationAssertions(place),
     statusAssertions: normalizeStatusAssertions(place),
-    ...(Array.isArray(
-      (place as GazetteerPlace & { historicalAddresses?: unknown })
-        .historicalAddresses,
-    )
-      ? {
-          historicalAddresses: (
-            place as GazetteerPlace & {
-              historicalAddresses?: HistoricalAddress[];
-            }
-          ).historicalAddresses,
-        }
-      : {}),
   });
   const hydratedFromAppellations = useRef(false);
   const [saving, setSaving] = useState(false);
@@ -955,8 +963,8 @@ export default function PlaceEditor({
   );
 
   // ── Concordans address history (read-only derived observations) ──────────
-  // Linked via historicalAddresses carried on the gazetteer/projection
-  // record; each attested era becomes one adoptable location observation.
+  // Derived links arrive via the historicalAddresses prop (never in draft);
+  // each attested era becomes one adoptable location observation.
 
   type ConcordansCandidate = {
       key: string;
@@ -965,16 +973,16 @@ export default function PlaceEditor({
       eraLabel: string;
       address: string;
       parcelComponents: Record<string, string>;
-      certainty: HistoricalAddress['certainty'];
+      certainty: HistoricalAddressLink['certainty'];
       sourceRow: string | null;
       note: string | null;
     };
 
   const concordansObservationCandidates: ConcordansCandidate[] = useMemo(() => {
-    const links = draft.historicalAddresses ?? [];
     const candidates: ConcordansCandidate[] = [];
-    for (const link of links) {
+    for (const link of historicalAddresses) {
       if (link.certainty === 'unresolved') continue;
+      const adoptedSourceRow = concordansSourceRowFor(link);
       for (const [eraKey, detail] of Object.entries(link.eras ?? {})) {
         const year = CONCORDANS_ERA_YEARS[eraKey];
         if (year == null) continue;
@@ -983,7 +991,7 @@ export default function PlaceEditor({
           (assertion) =>
             assertion.source === 'concordans-paramaribo' &&
             assertion.eraKey === eraKey &&
-            assertion.sourceRow === link.sourceRow,
+            assertion.sourceRow === adoptedSourceRow,
         );
         if (existing) continue;
         candidates.push({
@@ -1004,7 +1012,52 @@ export default function PlaceEditor({
       }
     }
     return candidates.sort((a, b) => a.year - b.year);
-  }, [draft, draft.locationAssertions]);
+  }, [historicalAddresses, draft.locationAssertions]);
+
+  const adoptedConcordansRows = useMemo(() => {
+    const rows: Array<{
+      key: string;
+      eraKey: string;
+      year: number;
+      eraLabel: string;
+      address: string;
+      certainty: ConcordansCandidate['certainty'];
+      parcelDetail: string;
+      splitMergeDetail: string | null;
+    }> = [];
+    for (const assertion of draft.locationAssertions ?? []) {
+      if (assertion.source !== 'concordans-paramaribo') continue;
+      const eraKey = assertion.eraKey;
+      const year =
+        (eraKey != null ? CONCORDANS_ERA_YEARS[eraKey] : undefined) ??
+        assertion.startYear ??
+        assertion.endYear;
+      if (year == null) continue;
+      rows.push({
+        key: `adopted-${assertion.id}`,
+        eraKey: eraKey ?? 'adopted',
+        year,
+        eraLabel:
+          (eraKey != null ? CONCORDANS_ERA_LABELS[eraKey] : undefined) ??
+          'adopted',
+        address:
+          assertion.standardized ?? assertion.original ?? 'Not recorded',
+        certainty:
+          draft.locationAssertions != null &&
+          assertion.sourceRow?.startsWith('concordans-')
+            ? 'certain'
+            : 'probable',
+        parcelDetail: Object.entries(assertion.parcelComponents ?? {})
+          .map(
+            ([component, value]) =>
+              `${CONCORDANS_PARCEL_LABELS[component] ?? component}: ${value}`,
+          )
+          .join(' · '),
+        splitMergeDetail: null,
+      });
+    }
+    return rows.sort((a, b) => a.year - b.year);
+  }, [draft.locationAssertions]);
 
   const adoptConcordansObservation = useCallback(
     (candidate: ConcordansCandidate) => {
@@ -1025,10 +1078,7 @@ export default function PlaceEditor({
                 `${CONCORDANS_PARCEL_LABELS[component] ?? component}: ${value}`,
             ),
           ].join(' · '),
-          sourceRow:
-            candidate.sourceRow != null
-              ? `concordans-${candidate.sourceRow}`
-              : null,
+          sourceRow: concordansSourceRowFor(candidate),
           eraKey: candidate.eraKey,
           parcelComponents: candidate.parcelComponents,
         },
@@ -1098,9 +1148,10 @@ export default function PlaceEditor({
       endYear?: number;
       source?: string;
       eraLabel?: string;
-      certainty?: HistoricalAddress['certainty'];
+      certainty?: HistoricalAddressLink['certainty'];
       parcelDetail?: string;
       splitMergeDetail?: string | null;
+      dedupeKey?: string;
     }
 
     const events: LifecycleEvent[] = [];
@@ -1141,6 +1192,31 @@ export default function PlaceEditor({
           )
           .join(' · '),
         splitMergeDetail: candidate.note,
+        dedupeKey: `candidate:${candidate.key}`,
+      });
+    }
+
+    // Keep adopted Concordans assertions on the timeline after the
+    // candidate disappears — build from adopted location assertions,
+    // skipping eras still present as candidates to avoid duplicates.
+    const candidateYearsByEra = new Set(
+      concordansObservationCandidates.map(
+        (candidate) => `${candidate.eraKey}:${candidate.year}`,
+      ),
+    );
+    for (const adopted of adoptedConcordansRows) {
+      if (candidateYearsByEra.has(`${adopted.eraKey}:${adopted.year}`)) continue;
+      events.push({
+        kind: 'address-attestation',
+        address: adopted.address,
+        startYear: adopted.year,
+        endYear: adopted.year,
+        source: 'concordans-paramaribo',
+        eraLabel: adopted.eraLabel,
+        certainty: adopted.certainty,
+        parcelDetail: adopted.parcelDetail,
+        splitMergeDetail: adopted.splitMergeDetail,
+        dedupeKey: `adopted:${adopted.key}`,
       });
     }
 
@@ -1150,7 +1226,12 @@ export default function PlaceEditor({
     );
 
     return events;
-  }, [statusAssertions, draft.productAssertions, concordansObservationCandidates]);
+  }, [
+    statusAssertions,
+    draft.productAssertions,
+    concordansObservationCandidates,
+    adoptedConcordansRows,
+  ]);
 
   /** Earliest year recorded across all assertions */
   const firstMentionYear = useMemo(() => {
@@ -1357,7 +1438,13 @@ export default function PlaceEditor({
     setSaving(true);
     setError(null);
     try {
-      await onSave({ ...draft });
+      // historicalAddresses is derived-only (regenerated by
+      // link-concordans-1885-places.ts); never persist it back to the
+      // gazetteer. Adopted eras travel as locationAssertions instead.
+      const { historicalAddresses: _derived, ...payload } = draft as GazetteerPlace & {
+        historicalAddresses?: unknown;
+      };
+      await onSave(payload);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save');
     } finally {
