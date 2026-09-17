@@ -107,6 +107,18 @@
       "description": "Community and researcher-compiled document collections containing historical descriptions of Surinamese plantations, places, and persons."
     },
     {
+      "@id": "https://data.surinametijdmachine.org/source/concordans-paramaribo",
+      "@type": [
+        "crm:E22_Human-Made_Object"
+      ],
+      "sourceId": "concordans-paramaribo",
+      "prefLabel": "Concordans Paramaribo (Dr. Muntjewerff)",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/research-collection",
+      "sameAs": "https://www.concordansparamaribo.info/",
+      "linkedToGazetteer": true,
+      "description": "Historical address concordance for Paramaribo by Dr. Muntjewerff (concordansparamaribo.info), used as the registry-backed authority for per-regime address designations and parcel components linked to 1885 location points. STM publishes derived address values only. This is a pilot version and can contain mistakes that are not attributable to Dr. Muntjewerff."
+    },
+    {
       "@id": "https://data.surinametijdmachine.org/source/rijksmuseum-collection",
       "@type": [
         "crm:E22_Human-Made_Object"

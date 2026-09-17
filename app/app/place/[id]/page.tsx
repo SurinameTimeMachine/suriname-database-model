@@ -3,6 +3,9 @@ import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { join } from 'path';
 import type { Metadata } from 'next';
+import ParamariboAddressHistory, {
+  type HistoricalAddress,
+} from '@/components/ParamariboAddressHistory';
 
 const CANONICAL_BASE = 'https://data.surinametijdmachine.org';
 const GAZETTEER_PATH = join(
@@ -73,6 +76,12 @@ type PlaceProjection = {
     note?: string | null;
     sourceRow?: string;
   }>;
+  historicalAddresses?: Array<HistoricalAddress>;
+  concordansSourceAttribution?: {
+    sourceId: string;
+    name: string;
+    url: string;
+  } | null;
   diklandRefs: Array<{
     folderPath?: string;
     driveUrl?: string;
@@ -153,6 +162,8 @@ export default async function PlaceRecordPage({
     productAssertions: place.productAssertions ?? [],
     functionAssertions: place.functionAssertions ?? [],
     locationAssertions: place.locationAssertions ?? [],
+    historicalAddresses: place.historicalAddresses ?? [],
+    concordansSourceAttribution: place.concordansSourceAttribution ?? null,
     diklandRefs: place.diklandRefs ?? [],
   };
   const canonicalUri = `${CANONICAL_BASE}/place/${id}`;
@@ -280,6 +291,13 @@ export default async function PlaceRecordPage({
               ))}
             </ul>
           </section>
+        )}
+
+        {(place.historicalAddresses?.length ?? 0) > 0 && (
+          <ParamariboAddressHistory
+            historicalAddresses={place.historicalAddresses ?? []}
+            sourceAttribution={place.concordansSourceAttribution ?? undefined}
+          />
         )}
 
         <section className="mt-10 border-t border-ink/10 pt-6">
