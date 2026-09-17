@@ -1723,7 +1723,7 @@ function PlacesPageInner() {
   }
 
   return (
-    <div className="relative h-full min-h-0 flex flex-col overflow-hidden">
+    <div className="relative flex h-dvh min-h-0 flex-col overflow-hidden">
       {/* Top bar */}
       <div className="border-b border-ink/10 bg-cream">
         <div className="px-4 py-3 sm:px-6 lg:px-8">
@@ -2149,8 +2149,8 @@ function PlacesPageInner() {
 
             {/* Detail panel */}
             {selectedPlace && (
-              <aside className="absolute inset-y-0 right-0 z-40 hidden w-[clamp(34rem,52vw,58rem)] flex-col overflow-hidden border-l border-ink/10 bg-background shadow-[-20px_0_50px_rgba(0,30,24,0.16)] lg:flex">
-                <div className="min-h-0 flex-1 overflow-hidden">
+              <aside className="absolute inset-y-0 right-0 z-40 hidden w-[clamp(34rem,52vw,58rem)] flex-col border-l border-ink/10 bg-background shadow-[-20px_0_50px_rgba(0,30,24,0.16)] lg:flex">
+                <div className="min-h-0 flex-1 overflow-y-auto">
                   <PlaceEditor
                     key={selectedPlace.id}
                     place={selectedPlace}
@@ -2179,8 +2179,8 @@ function PlacesPageInner() {
             )}
 
             {selectedPlace && (
-              <div className="fixed inset-0 z-50 flex w-screen max-w-full flex-col overflow-hidden bg-background lg:hidden">
-                <div className="min-h-0 flex-1 overflow-hidden">
+              <div className="fixed inset-0 z-50 flex w-screen max-w-full flex-col bg-background lg:hidden">
+                <div className="min-h-0 flex-1 overflow-y-auto">
                   <PlaceEditor
                     key={selectedPlace.id}
                     place={selectedPlace}

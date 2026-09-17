@@ -3069,7 +3069,7 @@ export default function PlaceEditor({
             {concordansObservationCandidates.length > 0 && (
               <div className="mt-3 space-y-2">
                 <p className="text-[10px] text-stm-sepia-600 tracking-wider">
-                  Concordans observations (read-only) —{' '}
+                  Muntjewerff Concordans observations (read-only) —{' '}
                   <a
                     href="https://www.concordansparamaribo.info/concordans/concordans-2022"
                     target="_blank"
