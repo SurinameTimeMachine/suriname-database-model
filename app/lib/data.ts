@@ -5,6 +5,7 @@ import type {
   E41Appellation,
   E53Place,
   E74Organization,
+  FeatureLifecycleEvent,
   GeoJSONCollection,
   OrganizationObservation,
   ProvenanceRecord,
@@ -24,6 +25,7 @@ let _places: Record<string, E53Place> | null = null;
 let _sources: Record<string, E22Source> | null = null;
 let _appellationsByEntity: Record<string, E41Appellation[]> | null = null;
 let _observationsByOrg: Record<string, OrganizationObservation[]> | null = null;
+let _lifecycleEvents: Record<string, FeatureLifecycleEvent[]> | null = null;
 let _provenance: Record<string, ProvenanceRecord> | null = null;
 let _geojson: GeoJSONCollection | null = null;
 
@@ -65,6 +67,12 @@ export async function getObservationsByOrg() {
   return _observationsByOrg!;
 }
 
+export async function getLifecycleEvents() {
+  if (!_lifecycleEvents)
+    _lifecycleEvents = await fetchJSON('lifecycle-events.json');
+  return _lifecycleEvents!;
+}
+
 export async function getProvenance() {
   if (!_provenance) _provenance = await fetchJSON('provenance.json');
   return _provenance!;
@@ -85,6 +93,7 @@ export async function loadAllData() {
     sources,
     appellations,
     observations,
+    lifecycleEvents,
     provenance,
     geojson,
   ] = await Promise.all([
@@ -95,6 +104,7 @@ export async function loadAllData() {
     getSources(),
     getAppellationsByEntity(),
     getObservationsByOrg(),
+    getLifecycleEvents(),
     getProvenance(),
     getGeoJSON(),
   ]);
@@ -106,6 +116,7 @@ export async function loadAllData() {
     sources,
     appellations,
     observations,
+    lifecycleEvents,
     provenance,
     geojson,
   };
@@ -118,6 +129,9 @@ export function uriLabel(uri: string): string {
   if (uri.includes('wikidata.org/entity/')) return uri.split('/').pop()!;
   if (uri.includes('suriname-timemachine.org/ontology/')) {
     return uri.replace('https://suriname-timemachine.org/ontology/', '');
+  }
+  if (uri.includes('data.surinametijdmachine.org/')) {
+    return uri.replace('https://data.surinametijdmachine.org/', '');
   }
   return uri;
 }
@@ -138,9 +152,17 @@ export const CRM_COLORS: Record<string, string> = {
   E41: '#fef3ba', // E41 Appellation (yellow)
   E13: '#82ddff', // E13 Attribute Assignment (blue)
   E39: '#ffe6eb', // E39 Actor -- person roles (light pink)
+  E21: '#ffbdca', // E21 Person (pink, same family as E39/E74 -- subclass of E39 Actor)
   E55: '#d4edda', // E55 Type (light green)
   E52: '#cce5ff', // E52 Time-Span (light blue)
   E54: '#e2d9f3', // E54 Dimension (light purple)
+  E12: '#f0c87a', // E12 Production (warm gold)
+  E17: '#f0a0a0', // E17 Type Assignment (muted red)
+  E42: '#b8c9e0', // E42 Identifier (steel blue)
+  E81: '#f0a0a0', // E81 Transformation (muted red)
+  E11: '#c8a86e', // E11 Modification (warm tan) -- road/feature re-routing
+  E6: '#b06060', // E6 Destruction (muted brick red) -- road removal
+  E68: '#e0b0b0', // E68 Dissolution (dusty rose)
   PROV: '#d4c4fb', // Provenance (lavender)
   Provenance: '#d4c4fb',
 };
@@ -157,9 +179,15 @@ export const CRM_CLASS_NAMES: Record<string, string> = {
   E41: 'E41 Appellation',
   E13: 'E13 Attribute Assignment',
   E39: 'E39 Actor',
+  E21: 'E21 Person',
   E55: 'E55 Type',
   E52: 'E52 Time-Span',
   E54: 'E54 Dimension',
+  E12: 'E12 Production',
+  E17: 'E17 Type Assignment',
+  E42: 'E42 Identifier',
+  E81: 'E81 Transformation',
+  E68: 'E68 Dissolution',
   PROV: 'prov:ProvenanceRecord',
 };
 

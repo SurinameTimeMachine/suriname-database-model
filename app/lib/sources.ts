@@ -45,7 +45,7 @@ function toArray(val: any): string[] {
   return Array.isArray(val) ? val : [val];
 }
 
-const BASE = 'https://data.suriname-timemachine.org/';
+const BASE = 'https://data.surinametijdmachine.org/';
 
 function extractCategoryId(uri: string): string {
   return uri.replace(`${BASE}type/source-type/`, '');

@@ -6,7 +6,7 @@ import { parse } from 'csv-parse/sync';
  * CRS: EPSG:31170 (Suriname Old TM / Zanderij datum) -> EPSG:4326 (WGS84) via proj4
  *
  * Produces in-memory entity arrays (no intermediate CSVs):
- *   E25 plantations (human-made features), E74 organizations, E53 places,
+ *   E25 plantations (human-made features), E53 places,
  *   E41 appellations, E22 sources, plantation-map links
  */
 import { readFileSync } from 'fs';
@@ -26,8 +26,54 @@ const GIS_CSV = join(
   'data/07-gis-plantation-map-1930/plantation_polygons_1930.csv',
 );
 
-const STM = 'https://suriname-timemachine.org/ontology/';
-const WD = 'http://www.wikidata.org/entity/';
+const STM = 'https://data.surinametijdmachine.org/';
+
+/**
+ * The supplied 1930 QGIS CSV contains U+FFFD replacement characters in a
+ * small number of name fields. Keep that source file unchanged, but repair
+ * only transcriptions that are verified by the record's existing closeMatch
+ * or by the surrounding source spelling. The map FID remains the provenance
+ * key for every correction.
+ */
+const VERIFIED_NAME_TRANSCRIPTIONS: Record<
+  string,
+  Partial<Record<'plantation_label' | 'label_1930' | 'label_1860-79', string>>
+> = {
+  '1660': {
+    plantation_label: 'Mon Trésor',
+    label_1930: 'Mon trésor',
+    'label_1860-79': 'Mon trésor',
+  },
+  '1702': {
+    plantation_label: 'La Liberté',
+    label_1930: 'La Liberté',
+    'label_1860-79': 'La Liberté',
+  },
+  '1749': {
+    plantation_label: 'La Singularité',
+    label_1930: 'La Singularité',
+    'label_1860-79': 'La Singularité',
+  },
+  '2423': {
+    plantation_label: 'Klein Curaçao',
+    'label_1860-79': 'Klein Curaçao',
+  },
+  '2585': {
+    plantation_label: 'La Prospérité',
+    label_1930: 'La Prospérité',
+    'label_1860-79': 'La Prospérité',
+  },
+  '2961': {
+    plantation_label: 'Rac à Rac',
+    label_1930: 'Rac à Rac',
+    'label_1860-79': 'Rac à Rac',
+  },
+  '3002': { 'label_1860-79': 'Maltanaïm' },
+  '3032': {
+    plantation_label: 'Sühlen',
+    'label_1860-79': 'Sühlen',
+  },
+};
 
 // --- Types ---
 
@@ -38,19 +84,10 @@ export interface E25Row {
   prefLabel: string;
   status: string;
   featureType: string;
-  p52_owner_qid: string;
-  p51_former_owner_qid: string;
+  wikidata_qid: string;
+  wikidata_alt_qid: string;
+  psur_ids: string[];
   p53_place_uri: string;
-}
-
-export interface E74Row {
-  qid: string;
-  uri: string;
-  prefLabel: string;
-  psur_id: string;
-  psur_id2: string;
-  psur_id3: string;
-  absorbed_into_qid: string;
 }
 
 export interface E53Row {
@@ -102,7 +139,6 @@ export interface SourceRow {
 
 export interface PlantationTransformResult {
   e25: E25Row[];
-  e74: E74Row[];
   e53: E53Row[];
   e41: E41Row[];
   mapLinks: MapLink[];
@@ -155,20 +191,19 @@ export function transformPlantations(): PlantationTransformResult {
   );
 
   const e25: E25Row[] = [];
-  const e74: E74Row[] = [];
   const e53: E53Row[] = [];
   const e41: E41Row[] = [];
   const mapLinks: MapLink[] = [];
-  const seenQids = new Set<string>();
   const seenSlugs = new Set<string>();
 
   for (const p of rows) {
     const fid = (p.fid ?? '').trim();
+    const corrected = VERIFIED_NAME_TRANSCRIPTIONS[fid];
     const qid = (p.qid ?? '').trim();
     const qidAlt = (p.qid_alt ?? '').trim();
-    const label = (p.plantation_label ?? '').trim();
-    const label1930 = (p.label_1930 ?? '').trim();
-    const label1860 = (p['label_1860-79'] ?? '').trim();
+    const label = (corrected?.plantation_label ?? p.plantation_label ?? '').trim();
+    const label1930 = (corrected?.label_1930 ?? p.label_1930 ?? '').trim();
+    const label1860 = (corrected?.['label_1860-79'] ?? p['label_1860-79'] ?? '').trim();
     const coordsUtm = (p.coords ?? '').trim();
     const psurId = (p.psur_id ?? '').trim();
     const psurId2 = (p.psur_id2 ?? '').trim();
@@ -194,36 +229,11 @@ export function transformPlantations(): PlantationTransformResult {
       prefLabel: label,
       status,
       featureType: 'plantation',
-      p52_owner_qid: qid,
-      p51_former_owner_qid: qidAlt,
+      wikidata_qid: qid,
+      wikidata_alt_qid: qidAlt,
+      psur_ids: [psurId, psurId2, psurId3].filter(Boolean),
       p53_place_uri: coordsUtm ? `${STM}place/1930/fid-${fid}` : '',
     });
-
-    // E74 Organization (deduplicated by Q-ID)
-    if (qid && !seenQids.has(qid)) {
-      seenQids.add(qid);
-      e74.push({
-        qid,
-        uri: `${WD}${qid}`,
-        prefLabel: label,
-        psur_id: psurId,
-        psur_id2: psurId2,
-        psur_id3: psurId3,
-        absorbed_into_qid: qidAlt,
-      });
-    }
-    if (qidAlt && !seenQids.has(qidAlt)) {
-      seenQids.add(qidAlt);
-      e74.push({
-        qid: qidAlt,
-        uri: `${WD}${qidAlt}`,
-        prefLabel: '',
-        psur_id: '',
-        psur_id2: '',
-        psur_id3: '',
-        absorbed_into_qid: '',
-      });
-    }
 
     // E53 Place
     if (coordsUtm) {
@@ -243,7 +253,9 @@ export function transformPlantations(): PlantationTransformResult {
     // E41 Appellations
     let e41_1930_uri = '';
     if (label1930) {
-      e41_1930_uri = `${STM}appellation/${slugify(label1930)}-map1930`;
+      // `slug` is unique per mapped feature. A label alone may occur on
+      // multiple plantations, so it cannot identify an E41 assertion.
+      e41_1930_uri = `${STM}appellation/${slug}-map1930`;
       e41.push({
         uri: e41_1930_uri,
         symbolic_content: label1930,
@@ -256,7 +268,7 @@ export function transformPlantations(): PlantationTransformResult {
     }
 
     if (label1860) {
-      const e41_1860_uri = `${STM}appellation/${slugify(label1860)}-map1860`;
+      const e41_1860_uri = `${STM}appellation/${slug}-map1860`;
       e41.push({
         uri: e41_1860_uri,
         symbolic_content: label1860,
@@ -271,7 +283,7 @@ export function transformPlantations(): PlantationTransformResult {
 
     if (label && label !== label1930 && label !== label1860) {
       e41.push({
-        uri: `${STM}appellation/${slugify(label)}-canonical`,
+        uri: `${STM}appellation/${slug}-canonical`,
         symbolic_content: label,
         language: 'nl',
         carried_by: '',
@@ -344,7 +356,6 @@ export function transformPlantations(): PlantationTransformResult {
   ];
 
   console.log(`  E25 Plantations:  ${e25.length}`);
-  console.log(`  E74 Organizations: ${e74.length}`);
   console.log(`  E53 Places:       ${e53.length}`);
   console.log(`  E41 Appellations: ${e41.length}`);
   console.log(`  Map depictions:   ${mapLinks.length}`);
@@ -364,7 +375,7 @@ export function transformPlantations(): PlantationTransformResult {
     }
   }
 
-  return { e25, e74, e53, e41, mapLinks, sources };
+  return { e25, e53, e41, mapLinks, sources };
 }
 
 // Run standalone

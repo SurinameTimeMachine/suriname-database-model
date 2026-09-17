@@ -327,18 +327,19 @@ The CRM deliberately makes P1 neutral about provenance --- it just says "this na
 > **CRM Scope Note (P139 has alternative form):**
 > _"This property associates an instance of E41 Appellation with another instance of E41 Appellation that constitutes a derivative or variant of the former and that may also be used for identifying items identified by the former, in suitable contexts, independent from the particular item to be identified."_
 
-P139 links "Geijersvlijt" (map label) to "Geyers-Vlijt" (almanac name) as alternative forms of each other. This does _not_ mean E25 and E74 are the same entity. It means: these two names, despite their different spellings and different referent types, ultimately trace back to the same real-world referent complex. The plantation (E25) and the organization (E74) are connected through ownership (P52, in the next layer), and their names are connected through P139.
+P139 links "Geijersvlijt" (map label) to "Geyers-Vlijt" (almanac name) as alternative forms of each other. This does _not_ mean E25 and E74 are the same entity. It means: these two names, despite their different spellings and different referent types, ultimately trace back to the same real-world referent complex. The plantation (E25) and organization (E74) have a researched QID association, while their names are connected through P139.
 
 This is the mechanism that makes cross-source reconciliation possible without conflating things that are ontologically distinct.
 
 ---
 
-## Layer 7 --- Space and Ownership
+## Layer 7 --- Space and Organizational Association
 
 **Relationships:**
 
 - `E25 Human-Made Feature --P53 has former or current location--> E53 Place`
-- `E25 Human-Made Feature --P52 has current owner--> E74 Group`
+- `E25 Human-Made Feature --stm:hasOrganizationalAssociation--> E74 Group`
+- `E74 Group --stm:associatedPhysicalPlantation--> E25 Human-Made Feature`
 
 ```mermaid
 %%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#e8f4ea'}}}%%
@@ -353,7 +354,8 @@ flowchart LR
     wd:Q4392658"]
 
     E25 -->|"P53 has location"| E53
-    E25 -->|"P52 has current owner"| E74_ORG
+    E25 -->|"has organizational association"| E74_ORG
+    E74_ORG -->|"associated physical plantation"| E25
 
     classDef crm_E18_Physical_Thing fill:#c78e66,stroke:#000000,color:#000000
     classDef crm_E53_Place fill:#94cc7d,stroke:#000000,color:#000000
@@ -364,7 +366,8 @@ flowchart LR
     class E74_ORG crm_E39_Actor
 ```
 
-The final layer grounds the model in space and in social relations.
+The final layer grounds the model in space and connects the distinct physical
+and organizational records without turning the correspondence into ownership.
 
 ### P53: The plantation has a location
 
@@ -380,22 +383,21 @@ E53 is purely spatial --- it is a piece of the Earth's surface, nothing more. It
 
 This is why the model routes location through E25 rather than attaching it to E36 or E22 directly. The map (E22) depicts the plantation (E25), and the plantation occupies a location (E53). Remove the map from the picture, and the plantation is still there, still occupying that same piece of land. Location is a property of the real-world thing, not of the document that depicted it.
 
-### P52: The plantation has an owner
+### The QID association
 
-> **CRM Scope Note (P52 has current owner):**
-> _"This property identifies the instance of E21 Person or E74 Group that was the owner of an instance of E18 Physical Thing at the time of validity of the record or database containing the statement that uses this property."_
->
-> _"This property is a shortcut for the more detailed path from E18 Physical Thing through P24i changed ownership through, E8 Acquisition, P22 transferred title to, to E39 Actor, if and only if this acquisition event is the most recent."_
-
-P52 connects the physical plantation to the organization that owns or operates it. This is the relationship that makes E25 and E74 separate entities rather than one dual-typed entity (a key modeling decision, number 2 in our decisions list).
+The paired STM properties connect the physical plantation to the organization
+identified by the same researched QID. This is the relationship that makes E25
+and E74 discoverable without treating them as one dual-typed entity.
 
 Why separate them? Because they change independently:
 
-- A plantation can change owners. The land, the buildings, the canals --- the E25 --- remain the same. But the E74 connected through P52 changes.
-- An organization can be dissolved when absorbed by another organization (`P99i was dissolved by` -> E68 Dissolution). The E74 entities merge, but the E25 might keep its physical boundaries.
+- A plantation can change owners while the land and fixed works remain the same.
+- An organization can merge or dissolve while the E25 keeps its physical boundaries.
 - A plantation can be abandoned. The E25 still exists (you can still see its remains), but no E74 currently operates it.
 
-The Q-ID (Wikidata identifier) lives on the E74, serving as the linking key between our different data sources --- the same `wd:Q4392658` appears in both the QGIS CSV and the Almanakken dataset, connecting them through the organization they both describe.
+The QID is an exact authority match for the E74 and a close match for the E25.
+P51/P52 ownership and E68/E81 change events are added only from reviewed,
+dated evidence.
 
 ---
 
@@ -480,10 +482,11 @@ flowchart TB
     E41_ALM -->|"P1i identifies"| E74_ORG
     E41_MAP ---|"P139 has alt form"| E41_ALM
 
-    %% Layer 7: Location and ownership
+    %% Layer 7: Location and organizational association
     E25 -->|"P53 has location"| E53
     E26 -->|"P53 has location"| E53
-    E25 -->|"P52 has current owner"| E74_ORG
+    E25 -->|"stm:hasOrganizationalAssociation"| E74_ORG
+    E74_ORG -->|"stm:associatedPhysicalPlantation"| E25
 
     classDef crm_E18_Physical_Thing fill:#c78e66,stroke:#000000,color:#000000
     classDef crm_E28_Conceptual_Object fill:#fddc34,stroke:#000000,color:#000000
@@ -529,7 +532,8 @@ Every link exists for a reason. Every separation between entities preserves a di
 | P139 has alternative form          | E41 Appellation     | E41 Appellation        | Links variant name spellings across sources      |
 | P190 has symbolic content          | E90 Symbolic Object | E62 String             | The actual text of a name                        |
 | P53 has former or current location | E18 Physical Thing  | E53 Place              | Where the plantation is                          |
-| P52 has current owner              | E18 Physical Thing  | E39 Actor              | Who owns the plantation                          |
+| stm:hasOrganizationalAssociation   | E25                 | E74                    | Researched QID correspondence                    |
+| stm:associatedPhysicalPlantation   | E74                 | E25                    | Reciprocal QID correspondence                    |
 
 ---
 

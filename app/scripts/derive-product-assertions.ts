@@ -1,0 +1,271 @@
+/**
+ * Derive ProductAssertion entries from the Almanakken CSV and patch
+ * them into places-gazetteer.jsonld for all plantation entries.
+ *
+ * CRM alignment:
+ *   ProductAssertion → E13 Attribute Assignment
+ *     P140 assigned attribute to → E25 Plantation
+ *     P141 assigned → E55 Type (product vocabulary term, e.g. "koffie")
+ *     P4 has time-span → E52 Time-Span (startYear / endYear)
+ *     prov:hadPrimarySource → E22 almanakken
+ *
+ * Derivation rules (per plantation, grouped by Wikidata Q-ID):
+ *   - Only rows where deserted != 'verlaten' and product_std is non-empty
+ *   - Consecutive years (or gap of at most 1 missing almanakken year) with
+ *     the same product_std value → single ProductAssertion with startYear/endYear
+ *   - Product change OR gap > 1 year → new ProductAssertion
+ *
+ * Existing Almanakken-derived assertions are replaced deterministically.
+ * Assertions from every other source are preserved.
+ *
+ * Run with:
+ *   pnpm derive-products
+ */
+
+import { readFileSync, writeFileSync } from 'fs';
+import { join } from 'path';
+import type { GazetteerPlace, ProductAssertion } from '../lib/types';
+import { getPrimaryAuthorityLink } from '../lib/types';
+import { almanakkenField, isVerlaten, readAlmanakkenRows } from './almanakken';
+
+// ── Paths ──────────────────────────────────────────────────────────────────
+
+const DATA_DIR = join(__dirname, '../../data');
+const GAZETTEER_PATH = join(DATA_DIR, 'places-gazetteer.jsonld');
+const PUBLIC_GAZETTEER = join(
+  __dirname,
+  '../public/data/places-gazetteer.jsonld',
+);
+
+// ── Config ─────────────────────────────────────────────────────────────────
+
+const INCLUDE_DUPLICATE_QIDS = process.argv.includes(
+  '--include-duplicate-qids',
+);
+const SOURCE_ID = 'almanakken'; // registry sourceId (prov:hadPrimarySource)
+
+// ── Validate SOURCE_ID against sources-registry.jsonld ─────────────────────
+
+{
+  const registryPath = join(DATA_DIR, 'sources-registry.jsonld');
+  let registry: { '@graph': Array<{ '@type'?: string[]; sourceId?: string }> };
+  try {
+    registry = JSON.parse(readFileSync(registryPath, 'utf-8'));
+  } catch {
+    console.error(`Error: could not read sources registry at ${registryPath}`);
+    process.exit(1);
+  }
+  const entry = (registry['@graph'] ?? []).find(
+    (n) =>
+      n.sourceId === SOURCE_ID &&
+      Array.isArray(n['@type']) &&
+      n['@type'].includes('crm:E22_Human-Made_Object'),
+  );
+  if (!entry) {
+    console.error(
+      `Error: SOURCE_ID "${SOURCE_ID}" not found as an E22 entry in sources registry.`,
+    );
+    process.exit(1);
+  }
+}
+
+// ── Types ──────────────────────────────────────────────────────────────────
+
+interface AlmanakRow {
+  qid: string;
+  year: number;
+  product: string;
+}
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+
+/** Convert a product label to a URL-safe slug for use in assertion IDs. */
+function slugify(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+// ── Read and parse canonical v2 CSV ────────────────────────────────────────
+
+console.log('Reading almanakken CSV...');
+const { rows: rawRows } = readAlmanakkenRows();
+
+// Keep only rows with a Q-ID, valid year, a product value, and NOT verlaten.
+// Verlaten rows are excluded because a plantation being abandoned implies no
+// active product — even if the CSV has a stale product_std on that row.
+const rows: AlmanakRow[] = rawRows
+  .filter((r) => {
+    const qid = almanakkenField(r, 'plantation_id');
+    const year = parseInt(almanakkenField(r, 'year'), 10);
+    const product = almanakkenField(r, 'product_std');
+    const verlaten = isVerlaten(r.deserted);
+    return qid && !isNaN(year) && product && !verlaten;
+  })
+  .map((r) => ({
+    qid: almanakkenField(r, 'plantation_id'),
+    year: parseInt(almanakkenField(r, 'year'), 10),
+    product: almanakkenField(r, 'product_std'),
+  }));
+
+const uniqueQids = new Set(rows.map((r) => r.qid));
+console.log(
+  `  ${rows.length} usable product rows across ${uniqueQids.size} Q-IDs`,
+);
+
+// ── Group by Q-ID and sort by year ─────────────────────────────────────────
+
+const byQid = new Map<string, AlmanakRow[]>();
+for (const row of rows) {
+  const list = byQid.get(row.qid) ?? [];
+  list.push(row);
+  byQid.set(row.qid, list);
+}
+for (const list of byQid.values()) {
+  list.sort((a, b) => a.year - b.year);
+}
+
+// ── Derive product assertions per Q-ID ────────────────────────────────────
+
+/**
+ * Walk the sorted year-by-year product observations for one plantation and
+ * collapse them into contiguous ProductAssertion spans.
+ *
+ * Consecutive observations of the same product_std value are merged into one
+ * assertion. A gap of at most 1 missing almanakken year between two same-product
+ * observations is bridged (since not all almanakken editions are in the dataset).
+ *
+ * A different product value always starts a new assertion, regardless of the
+ * gap — even a single intervening year with a different product value breaks
+ * the current span.
+ */
+function deriveProductAssertions(
+  plantationRows: AlmanakRow[],
+): ProductAssertion[] {
+  if (plantationRows.length === 0) return [];
+
+  // De-duplicate year→product. If a year appears twice with different products
+  // (edge case), keep the first one encountered (rows are already sorted by year).
+  const yearProduct = new Map<number, string>();
+  for (const r of plantationRows) {
+    if (!yearProduct.has(r.year)) {
+      yearProduct.set(r.year, r.product);
+    }
+  }
+
+  const sortedYears = [...yearProduct.keys()].sort((a, b) => a - b);
+
+  type Phase = { product: string; startYear: number; endYear: number };
+  const phases: Phase[] = [];
+  let current: Phase | null = null;
+
+  for (const year of sortedYears) {
+    const product = yearProduct.get(year)!;
+
+    if (current === null) {
+      current = { product, startYear: year, endYear: year };
+    } else if (current.product === product && year - current.endYear <= 2) {
+      // Same product and gap of at most 1 missing year → extend span
+      current.endYear = year;
+    } else {
+      // Different product OR gap > 1 year → close current span, start new
+      phases.push(current);
+      current = { product, startYear: year, endYear: year };
+    }
+  }
+  if (current) phases.push(current);
+
+  return phases.map((phase) => ({
+    id: `product-almanakken-${slugify(phase.product)}-${phase.startYear}`,
+    value: phase.product,
+    source: SOURCE_ID,
+    startYear: phase.startYear,
+    endYear: phase.endYear !== phase.startYear ? phase.endYear : undefined,
+    note: null,
+  }));
+}
+
+// Build lookup: Q-ID → derived ProductAssertion[]
+const derivedByQid = new Map<string, ProductAssertion[]>();
+for (const [qid, plantationRows] of byQid) {
+  const derived = deriveProductAssertions(plantationRows);
+  if (derived.length > 0) {
+    derivedByQid.set(qid, derived);
+  }
+}
+
+console.log(
+  `  Derived product assertions for ${derivedByQid.size} plantations`,
+);
+
+// ── Read gazetteer and patch ───────────────────────────────────────────────
+
+console.log('Reading gazetteer...');
+const gazetteerRaw = readFileSync(GAZETTEER_PATH, 'utf-8');
+const gazetteerJsonld = JSON.parse(gazetteerRaw);
+const graph: GazetteerPlace[] = gazetteerJsonld['@graph'] || [];
+
+const activePlaceCountByQid = new Map<string, number>();
+for (const entry of graph) {
+  if (entry.type !== 'plantation' || entry.deprecated || entry.mergedInto) {
+    continue;
+  }
+  const qid = getPrimaryAuthorityLink(entry, 'wikidata')?.identifier;
+  if (!qid) continue;
+  activePlaceCountByQid.set(qid, (activePlaceCountByQid.get(qid) ?? 0) + 1);
+}
+
+let patched = 0;
+let duplicateQidSkipped = 0;
+let noMatch = 0;
+
+for (const entry of graph) {
+  if (entry.type !== 'plantation') continue;
+
+  const existing = entry.productAssertions ?? [];
+  const preserved = existing.filter((assertion) => assertion.source !== SOURCE_ID);
+  const qid = getPrimaryAuthorityLink(entry, 'wikidata')?.identifier;
+  let derived: ProductAssertion[] = [];
+
+  if (!qid || !derivedByQid.has(qid)) {
+    noMatch++;
+  } else if (
+    !INCLUDE_DUPLICATE_QIDS &&
+    (activePlaceCountByQid.get(qid) ?? 0) > 1
+  ) {
+    duplicateQidSkipped++;
+  } else {
+    derived = derivedByQid.get(qid) ?? [];
+  }
+
+  const next = [...preserved, ...derived];
+  if (JSON.stringify(existing) !== JSON.stringify(next)) {
+    if (next.length > 0) entry.productAssertions = next;
+    else delete entry.productAssertions;
+    patched++;
+  }
+}
+
+console.log(
+  `  Updated: ${patched}  Skipped duplicate QIDs: ${duplicateQidSkipped}  No Almanakken match: ${noMatch}`,
+);
+
+// ── Write out ──────────────────────────────────────────────────────────────
+
+const outStr = JSON.stringify(gazetteerJsonld, null, 2);
+writeFileSync(GAZETTEER_PATH, outStr, 'utf-8');
+console.log(`  Wrote ${GAZETTEER_PATH}`);
+
+try {
+  writeFileSync(PUBLIC_GAZETTEER, outStr, 'utf-8');
+  console.log(`  Wrote public copy: ${PUBLIC_GAZETTEER}`);
+} catch (err) {
+  console.error(
+    `Error: could not write public copy at ${PUBLIC_GAZETTEER}`,
+    err,
+  );
+  process.exit(1);
+}
+
+console.log('Done.');

@@ -1,0 +1,146 @@
+# Place record JSON-LD profile
+
+## Purpose
+
+The Gazetteer is an editorial working record. Public Linked Data is generated
+from it as one authority-record document per place. The authority record is a
+stable STM document which describes, but is not identical to, the CRM entities
+within it.
+
+For a single-root, GLOBALISE-style interoperability view of the same records,
+see [Compact place object profile](place-object-profile.md).
+
+Editors change the concise Gazetteer fields and source-bound statements; they
+do not edit generated JSON-LD. A GitHub save is the canonical change. The next
+deployment runs the publication pipeline and updates the HTML, `.json`, and
+`.jsonld` representations together. The editor shows this as pending until the
+deployment has completed.
+
+## Stable identifiers and representations
+
+For `stm-00705` the public contract is:
+
+- `https://data.surinametijdmachine.org/place/stm-00705` — authority record and HTML representation.
+- `.../place/stm-00705.jsonld` — JSON-LD representation.
+- `.../place/stm-00705.jsonld?profile=globalise` — compact single-root E53 Place
+  representation.
+- `.../place/stm-00705.json` — application JSON representation.
+- `.../place/stm-00705#record` — E31 authority-record node.
+- `.../place/stm-00705#feature` — E25/E26 physical feature when applicable.
+- `.../place/stm-00705#location` — E53 Place.
+
+The feature or location receives `crm:P2_has_type` pointing to its canonical
+structural concept at `.../vocabulary/place-type/{typeId}`. The structural type
+is distinct from the dated place-function vocabulary.
+
+The HTTPS URL is canonical until an ARK name assigning authority issues ARKs.
+The generated identifier manifest is the only place future ARK redirects are
+configured; no provisional `ark:/` values are published.
+
+## Evidence model
+
+An Almanakken row is retained as a source-bound E13 observation, not treated as
+proof that a building was constructed or destroyed. The generated record
+therefore distinguishes:
+
+- physical feature lifecycle — E25/E26 claims only when direct physical
+  evidence exists;
+- operational status — source-bound E17 Type Assignments such as cultivation
+  attested, abandonment reported, and cultivation re-attested;
+- place functions — source-bound E17 Type Assignments to the physical E25
+  feature, assigning an E55/SKOS place-function concept and a time span when
+  the source provides one;
+- organisational relations — future E13 role assertions linking E25 and E74
+  with a role, source, time span, and certainty.
+
+Derived periods are marked `probable` where they summarize multiple source
+assertions. A source statement such as a reported abandonment is `certain` as
+a statement by that source, not as an unqualified historical fact. The raw
+Almanakken record ID remains on each observation so summaries are reproducible.
+
+`plantation_id` is retained as a source matching key. When it contains a valid
+QID, the observation receives `P140 assigned attribute to` pointing to the
+local E74 plantation organization. This remains valid when more than one E25
+physical plantation is associated with that organization. Rows without QIDs
+remain published as unresolved evidence and are listed in the editorial review
+artifact. The E25-E74 association is separately published in both directions
+and carries an editorial status; it is not an ownership assertion.
+
+The v2 ownership and component/composite QIDs also resolve to local E74 records.
+They remain properties of the dated E13 observation using the
+`stm:reportedOwnerOrganization`, `stm:reportedComponentOrganization`, and
+`stm:reportedCompositeOrganization` profile terms. The publication does not
+derive a static P51/P52, merger, dissolution, membership, or transformation
+claim from these references alone.
+
+Compound v2 transcription fields such as population, mill, and raw management
+details are preserved as JSON literals on the source observation. They are not
+claimed as CIDOC CRM statements. Acreage is likewise retained as an STM source
+field until it can be represented by an E54 Dimension with a value and unit.
+
+The raw `product` and `function` fields remain part of their E13 observation on
+the E74 organization. A separate, traceable E17 projection makes the attested
+function browsable on the corresponding physical plantation. Composite product
+values are split into atomic function terms. Their canonical concept scheme is
+`https://data.surinametijdmachine.org/vocabulary/place-function`. A derived
+range describes the years for which evidence is available; it is not an
+unsourced claim about the function's complete duration. `P4` describes the
+attestation range of the E17 classification activity: exact-year assignments
+carry equal `P82a` and `P82b` `xsd:gYear` boundaries. Matching product and
+function evidence is merged into one assignment while retaining both evidence
+kinds and every source row.
+
+Every Almanakken-derived function assignment has `prov:wasDerivedFrom` links to
+the exact local E13 observations, cites the projection rule, and is marked
+`probable` because E74 organization evidence is projected onto the reviewed E25
+physical plantation. Only explicitly reviewed source terms can become function
+concepts; an unmapped value stops publication for vocabulary review.
+
+## Sources and geometry
+
+Names are E41 Appellations, identifiers are E42 Identifiers, source documents
+are E22/E31 nodes, and Dikland PDF references become structured E22/E31 nodes
+linked to the Dikland collection. Geometries use GeoSPARQL WKT in CRS84.
+
+Each editorial statement has a stable ID and a registry source. Function and
+operational-status statements also require a date or time span. District and
+location statements carry a time span when the source supplies one; an unknown
+date is left unknown rather than invented. Record-level `sources` describe
+evidence for the overall record or geometry, while statement sources describe
+the individual claim. They are different scopes, not duplicate claims.
+
+## Historical address points
+
+The 1885 Paramaribo point layer is imported as editable `historical-address`
+records whose location node is typed as `crm:E53_Place` and `geo:Feature`: a
+persistent coordinate anchor for future source observations. This follows the
+HisGIS / Amsterdam Time Machine space-time-prism pattern at profile level: the
+point is the fixed control point, while each dated address statement is a
+source-bound observation attached to that point.
+
+Each address observation cites `historic-map-27`, has an 1885 time span, points
+back to the E53/GeoSPARQL point anchor with
+`crm:P140_assigned_attribute_to`, assigns the dated address appellation with
+`crm:P141_assigned`, and retains its original QGIS feature index. Its geometry
+is serialized as GeoSPARQL `POINT` WKT under a `/geometry/point` URI. It is not
+a claim that the address, building, parcel, or function persisted at another
+time. The 1854 and 1916 descriptive fields in this source remain source content
+until independently georeferenced address datasets are available.
+
+## Deferred domains
+
+Rijksmuseum, births, deaths, ward registers, and emancipation data require
+their own source adapters. They must retain source-row provenance and may not
+assert unresolved place links as facts.
+
+## Validation
+
+The pipeline checks canonical IDs and structural P2 types, per-record JSON-LD
+contexts, unique graph IDs, complete temporal boundaries, function certainty
+and row-level provenance, generated JSON projections, authority-link syntax,
+and publication consistency. Focused derivation fixtures additionally test
+duplicate evidence, gaps, excluded non-functions, and controlled-term failures.
+The corresponding SHACL profile is
+`app/lod/place-record-profile.shacl.ttl`; pipeline checks enforce the supported
+record constraints until a general RDF/SHACL engine is added. The project does
+not claim full Linked Art conformance.

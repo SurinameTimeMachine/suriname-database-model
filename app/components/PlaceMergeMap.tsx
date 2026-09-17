@@ -1,0 +1,430 @@
+'use client';
+
+import 'leaflet/dist/leaflet.css';
+import { loadAllmapsAnnotation } from '@/lib/allmaps';
+import { DEFAULT_HISTORIC_MAP_URLS } from '@/lib/historic-maps';
+import L from 'leaflet';
+import { useCallback, useEffect, useRef, useState } from 'react';
+
+// Same Allmaps pane-position guard as PlaceMiniMap
+let _domUtilPatched = false;
+if (typeof window !== 'undefined' && !_domUtilPatched) {
+  const _orig = L.DomUtil.getPosition;
+  L.DomUtil.getPosition = function (el: HTMLElement): L.Point {
+    if (!el) return new L.Point(0, 0);
+    if (!(el as unknown as Record<string, unknown>)._leaflet_pos) {
+      (el as unknown as Record<string, unknown>)._leaflet_pos = new L.Point(
+        0,
+        0,
+      );
+    }
+    return _orig.call(this, el);
+  };
+  _domUtilPatched = true;
+}
+
+const HISTORIC_MAP_OVERLAY_URLS = DEFAULT_HISTORIC_MAP_URLS;
+
+function safelyRemove(target: { remove: () => unknown } | null) {
+  if (!target) return;
+  try {
+    target.remove();
+  } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError') return;
+    console.error('Unable to remove the place merge-map layer.', error);
+  }
+}
+
+const COLORS = [
+  { stroke: '#2a7abf', fill: '#4a88bf' },
+  { stroke: '#8a5018', fill: '#a67830' },
+  { stroke: '#7b3f98', fill: '#9b69b5' },
+  { stroke: '#177245', fill: '#4e9b72' },
+  { stroke: '#b14d36', fill: '#c87862' },
+  { stroke: '#75621b', fill: '#a49345' },
+];
+
+interface PlaceLocation {
+  lat: number | null;
+  lng: number | null;
+  wkt: string | null;
+}
+
+export interface PlaceMergeMapProps {
+  locations: Array<PlaceLocation & { id: string; name: string }>;
+}
+
+function parseWKTPolygon(wkt: string): [number, number][] {
+  const match = wkt.match(/\(\((.+)\)\)/);
+  if (!match) return [];
+  return match[1].split(',').map((pair) => {
+    const [lng, lat] = pair.trim().split(/\s+/).map(Number);
+    return [lat, lng] as [number, number];
+  });
+}
+
+function parseWKTPoint(wkt: string): [number, number] | null {
+  const match = wkt.match(/^POINT\s*\(\s*([-+\d.e]+)\s+([-+\d.e]+)\s*\)$/i);
+  if (!match) return null;
+  const lng = Number(match[1]);
+  const lat = Number(match[2]);
+  return Number.isFinite(lat) && Number.isFinite(lng) ? [lat, lng] : null;
+}
+
+type LatLng = [number, number];
+type MultiPolygonCoordinates = LatLng[][][];
+
+function stripOuterParentheses(value: string): string {
+  let result = value.trim();
+  while (result.startsWith('(') && result.endsWith(')')) {
+    let depth = 0;
+    let enclosesAll = true;
+    for (let index = 0; index < result.length; index++) {
+      if (result[index] === '(') depth++;
+      else if (result[index] === ')') depth--;
+      if (depth === 0 && index < result.length - 1) {
+        enclosesAll = false;
+        break;
+      }
+    }
+    if (!enclosesAll) break;
+    result = result.slice(1, -1).trim();
+  }
+  return result;
+}
+
+function stripOneOuterParentheses(value: string): string {
+  const result = value.trim();
+  if (!result.startsWith('(') || !result.endsWith(')')) return result;
+  let depth = 0;
+  for (let index = 0; index < result.length; index++) {
+    if (result[index] === '(') depth++;
+    else if (result[index] === ')') depth--;
+    if (depth === 0 && index < result.length - 1) return result;
+  }
+  return result.slice(1, -1).trim();
+}
+
+function splitTopLevel(value: string): string[] {
+  const parts: string[] = [];
+  let depth = 0;
+  let start = 0;
+  for (let index = 0; index < value.length; index++) {
+    if (value[index] === '(') depth++;
+    else if (value[index] === ')') depth--;
+    else if (value[index] === ',' && depth === 0) {
+      parts.push(value.slice(start, index).trim());
+      start = index + 1;
+    }
+  }
+  parts.push(value.slice(start).trim());
+  return parts.filter(Boolean);
+}
+
+function parseCoordinateRing(value: string): LatLng[] {
+  return stripOuterParentheses(value)
+    .split(',')
+    .map((pair) => {
+      const [lng, lat] = pair.trim().split(/\s+/).map(Number);
+      return [lat, lng] as LatLng;
+    })
+    .filter(([lat, lng]) => Number.isFinite(lat) && Number.isFinite(lng));
+}
+
+function parseWKTMultiPolygon(wkt: string): MultiPolygonCoordinates {
+  const body = wkt.replace(/^MULTIPOLYGON\s*/i, '').trim();
+  return splitTopLevel(stripOneOuterParentheses(body))
+    .map((polygon) =>
+      splitTopLevel(stripOneOuterParentheses(polygon)).map(parseCoordinateRing),
+    )
+    .filter((polygon) => polygon.some((ring) => ring.length > 0));
+}
+
+/**
+ * Parse WKT LineString or MultiLineString into Leaflet LatLng arrays.
+ * Returns an array of coordinate rings (one ring per line segment).
+ */
+function parseWKTLineString(wkt: string): [number, number][][] {
+  const upper = wkt.trim().toUpperCase();
+  if (upper.startsWith('MULTILINESTRING')) {
+    const innerMatch = wkt.match(/\(([\s\S]+)\)\s*$/);
+    if (!innerMatch) return [];
+    return innerMatch[1].split(/\)\s*,\s*\(/).map((ring) => {
+      const clean = ring.replace(/^\(|\)$/g, '').trim();
+      return clean.split(',').map((pair) => {
+        const [lng, lat] = pair.trim().split(/\s+/).map(Number);
+        return [lat, lng] as [number, number];
+      });
+    });
+  }
+  if (upper.startsWith('LINESTRING')) {
+    const innerMatch = wkt.match(/\((.+)\)/);
+    if (!innerMatch) return [];
+    return [
+      innerMatch[1].split(',').map((pair) => {
+        const [lng, lat] = pair.trim().split(/\s+/).map(Number);
+        return [lat, lng] as [number, number];
+      }),
+    ];
+  }
+  return [];
+}
+
+function makeLabel(letter: string, colors: { stroke: string }) {
+  return L.divIcon({
+    className: '',
+    html: `<div style="
+      width:20px;height:20px;
+      background:${colors.stroke};
+      border:2px solid white;
+      border-radius:50%;
+      display:flex;align-items:center;justify-content:center;
+      color:white;font-size:10px;font-weight:700;font-family:sans-serif;
+      box-shadow:0 1px 3px rgba(0,0,0,.4);
+    ">${letter}</div>`,
+    iconSize: [20, 20],
+    iconAnchor: [10, 10],
+  });
+}
+
+export default function PlaceMergeMap({
+  locations,
+}: PlaceMergeMapProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<L.Map | null>(null);
+  const layersRef = useRef<L.Layer[]>([]);
+  const warpedLayerRef = useRef<L.Layer | null>(null);
+  const [show1930Map, setShow1930Map] = useState(false);
+  const [mapError, setMapError] = useState<string | null>(null);
+
+  // Init map once
+  useEffect(() => {
+    if (!containerRef.current || mapRef.current) return;
+
+    const map = L.map(containerRef.current, {
+      zoomControl: true,
+      attributionControl: false,
+      scrollWheelZoom: true,
+    }).setView([5.5, -55.2], 8);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+    }).addTo(map);
+
+    mapRef.current = map;
+
+    return () => {
+      safelyRemove(warpedLayerRef.current);
+      warpedLayerRef.current = null;
+      safelyRemove(map);
+      mapRef.current = null;
+    };
+  }, []);
+
+  // Redraw both places whenever locations change
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    // Remove old layers
+    for (const l of layersRef.current) map.removeLayer(l);
+    layersRef.current = [];
+
+    const bounds: L.LatLngBoundsExpression[] = [];
+
+    const addPlace = (
+      loc: PlaceLocation,
+      name: string,
+      index: number,
+      id: string,
+    ) => {
+      const colors = COLORS[index % COLORS.length];
+      const label = String.fromCharCode(65 + index);
+      let parsedPoint: LatLng | null = null;
+
+      if (loc.wkt) {
+        const upper = loc.wkt.trim().toUpperCase();
+        if (upper.startsWith('POINT')) {
+          parsedPoint = parseWKTPoint(loc.wkt);
+          if (parsedPoint) bounds.push([parsedPoint]);
+        } else if (
+          upper.startsWith('LINESTRING') ||
+          upper.startsWith('MULTILINESTRING')
+        ) {
+          const lines = parseWKTLineString(loc.wkt);
+          if (lines.length > 0) {
+            const pl = L.polyline(lines, {
+              color: colors.stroke,
+              weight: 2.5,
+              dashArray: '6 4',
+              opacity: 0.85,
+            })
+              .bindTooltip(`${label}: ${name} (${id})`, {
+                sticky: true,
+                className: 'leaflet-tooltip-stm',
+              })
+              .addTo(map);
+            layersRef.current.push(pl);
+            bounds.push(pl.getBounds());
+          }
+        } else {
+          const coords: LatLng[][] | MultiPolygonCoordinates =
+            upper.startsWith('MULTIPOLYGON')
+              ? parseWKTMultiPolygon(loc.wkt)
+              : [parseWKTPolygon(loc.wkt)];
+          if (coords.length > 0) {
+            const poly = L.polygon(coords, {
+              color: colors.stroke,
+              fillColor: colors.fill,
+              fillOpacity: 0.25,
+              weight: 2.5,
+            })
+              .bindTooltip(`${label}: ${name} (${id})`, {
+                sticky: true,
+                className: 'leaflet-tooltip-stm',
+              })
+              .addTo(map);
+            layersRef.current.push(poly);
+            bounds.push(poly.getBounds());
+          }
+        }
+      }
+
+      const addMarker = (point: LatLng) => {
+        const marker = L.marker(point, {
+          icon: makeLabel(label, colors),
+        })
+          .bindTooltip(`${label}: ${name} (${id})`, {
+            className: 'leaflet-tooltip-stm',
+          })
+          .addTo(map);
+        layersRef.current.push(marker);
+      };
+
+      if (loc.lat != null && loc.lng != null) {
+        addMarker([loc.lat, loc.lng]);
+        if (!loc.wkt) bounds.push([[loc.lat, loc.lng]]);
+      } else if (parsedPoint) {
+        addMarker(parsedPoint);
+      }
+    };
+
+    locations.forEach((place, index) =>
+      addPlace(place, place.name, index, place.id),
+    );
+
+    if (bounds.length > 0) {
+      const combined = L.latLngBounds(
+        bounds.flatMap((b) =>
+          b instanceof L.LatLngBounds
+            ? [b.getSouthWest(), b.getNorthEast()]
+            : (b as [number, number][]).map((c) => L.latLng(c[0], c[1])),
+        ),
+      );
+      if (combined.isValid()) {
+        map.fitBounds(combined, { padding: [24, 24] });
+      }
+    }
+  }, [locations]);
+
+  // 1930 map overlay
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    if (!show1930Map) {
+      safelyRemove(warpedLayerRef.current);
+      warpedLayerRef.current = null;
+      return;
+    }
+
+    let cancelled = false;
+    let layer: L.Layer | null = null;
+    Promise.allSettled(HISTORIC_MAP_OVERLAY_URLS.map(loadAllmapsAnnotation))
+      .then(async (results) => {
+        const annotations: unknown[] = [];
+        for (const result of results) {
+          if (result.status === 'fulfilled') annotations.push(result.value);
+        }
+        if (annotations.length === 0) {
+          throw new Error('No historic map image service is available.');
+        }
+        const { WarpedMapLayer } = await import('@allmaps/leaflet');
+        if (cancelled || !mapRef.current) return;
+        layer = new WarpedMapLayer(annotations[0]);
+        layer.addTo(mapRef.current);
+        for (const annotation of annotations.slice(1)) {
+          if (cancelled) break;
+          (
+            layer as unknown as {
+              addGeoreferenceAnnotation: (value: unknown) => unknown;
+            }
+          ).addGeoreferenceAnnotation(annotation);
+        }
+        if (!cancelled) {
+          warpedLayerRef.current = layer;
+        } else {
+          safelyRemove(layer);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setMapError('Historic map image services are currently unavailable.');
+          setShow1930Map(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+      safelyRemove(layer);
+      if (warpedLayerRef.current === layer) warpedLayerRef.current = null;
+    };
+  }, [show1930Map]);
+
+  const toggle1930Map = useCallback(() => {
+    setMapError(null);
+    setShow1930Map((v) => !v);
+  }, []);
+
+  return (
+    <div
+      className="relative w-full border border-stm-warm-200"
+      style={{ height: '280px' }}
+    >
+      <div ref={containerRef} className="absolute inset-0" />
+
+      {/* Legend */}
+      <div className="absolute top-2 left-2 z-1000 flex flex-col gap-1 pointer-events-none">
+        {locations.map((place, index) => (
+          <div
+            key={place.id}
+            className="flex items-center gap-1.5 bg-white/90 px-2 py-1 text-xs font-medium shadow-sm border border-stm-warm-100"
+          >
+            <span
+              className="inline-flex h-3 w-3 items-center justify-center rounded-full border-2 border-white text-[7px] text-white"
+              style={{ background: COLORS[index % COLORS.length].stroke }}
+            >
+              {String.fromCharCode(65 + index)}
+            </span>
+            {String.fromCharCode(65 + index)}: {place.name}
+          </div>
+        ))}
+      </div>
+
+      {/* 1930 map toggle */}
+      <button
+        type="button"
+        onClick={toggle1930Map}
+        title={mapError ?? 'Toggle 1930 historical map'}
+        className={[
+          'absolute bottom-2 right-2 z-1000 px-2 py-0.5 text-[11px] font-medium border leading-tight',
+          show1930Map
+            ? 'bg-stm-sepia-600 text-white border-stm-sepia-700'
+            : 'bg-white/90 text-stm-warm-600 border-stm-warm-300 hover:bg-stm-warm-50',
+        ].join(' ')}
+      >
+        {mapError ? '1930 map unavailable' : 'Historical map'}
+      </button>
+    </div>
+  );
+}

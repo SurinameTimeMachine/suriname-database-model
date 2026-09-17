@@ -1,7 +1,8 @@
 {
   "@context": {
     "@vocab": "https://schema.org/",
-    "base": "https://data.suriname-timemachine.org/",
+    "base": "https://data.surinametijdmachine.org/",
+    "stm": "https://data.surinametijdmachine.org/",
     "wd": "http://www.wikidata.org/entity/",
     "wdt": "http://www.wikidata.org/prop/direct/",
     "crm": "http://www.cidoc-crm.org/cidoc-crm/",
@@ -11,6 +12,7 @@
     "sdo": "https://schema.org/",
     "xsd": "http://www.w3.org/2001/XMLSchema#",
     "dcterms": "http://purl.org/dc/terms/",
+    "owl": "http://www.w3.org/2002/07/owl#",
     "oa": "http://www.w3.org/ns/oa#",
     "picom": "https://personsincontext.org/model#",
     "picot": "https://personsincontext.org/thesaurus#",
@@ -19,21 +21,71 @@
     "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
     "hdsc": "https://data.colonialheritage.nl/ontology/",
     "ed": "https://lod.enslaved.org/wiki/",
+    "id": "@id",
+    "type": "@type",
+    "_label": "rdfs:label",
+    "AuthorityRecord": "stm:AuthorityRecord",
+    "Place": "crm:E53_Place",
+    "Name": "crm:E41_Appellation",
+    "Identifier": "crm:E42_Identifier",
+    "Type": "crm:E55_Type",
+    "HumanMadeFeature": "crm:E25_Human-Made_Feature",
+    "PhysicalFeature": "crm:E26_Physical_Feature",
+    "Geometry": "geo:Geometry",
+    "Group": "crm:E74_Group",
+    "AttributeAssignment": "crm:E13_Attribute_Assignment",
+    "TypeAssignment": "crm:E17_Type_Assignment",
+    "TimeSpan": "crm:E52_Time-Span",
+    "Concept": "skos:Concept",
+    "ConceptScheme": "skos:ConceptScheme",
     "Plantation": "crm:E25_Human-Made_Feature",
     "OrganizationObservation": "crm:E13_Attribute_Assignment",
     "ProvenanceRecord": "prov:Entity",
     "E13_Attribute_Assignment": "crm:E13_Attribute_Assignment",
+    "E22_Human_Made_Object": "crm:E22_Human-Made_Object",
     "E22_Human-Made_Object": "crm:E22_Human-Made_Object",
-    "E25_Human_Made_Feature": "crm:E25_Human-Made_Feature",
+    "E24_Physical_Human_Made_Thing": "crm:E24_Physical_Human-Made_Thing",
     "E24_Physical_Human-Made_Thing": "crm:E24_Physical_Human-Made_Thing",
+    "E25_Human_Made_Feature": "crm:E25_Human-Made_Feature",
+    "E25_Human-Made_Feature": "crm:E25_Human-Made_Feature",
     "E26_Physical_Feature": "crm:E26_Physical_Feature",
     "E36_Visual_Item": "crm:E36_Visual_Item",
     "E41_Appellation": "crm:E41_Appellation",
+    "E52_Time_Span": "crm:E52_Time-Span",
     "E52_Time-Span": "crm:E52_Time-Span",
     "E53_Place": "crm:E53_Place",
     "E55_Type": "crm:E55_Type",
     "E74_Group": "crm:E74_Group",
     "E12_Production": "crm:E12_Production",
+    "E21_Person": "crm:E21_Person",
+    "PersonObservation": "picom:PersonObservation",
+    "PresenceInference": "stm:PresenceInference",
+    "PlantationCompositionPeriod": "stm:PlantationCompositionPeriod",
+    "InferenceRule": "prov:Plan",
+    "OrganizationAuthorityOverride": "stm:OrganizationAuthorityOverride",
+    "physicalLinkReviewStatus": "stm:physicalLinkReviewStatus",
+    "reviewedPhysicalPlaceIds": "stm:reviewedPhysicalPlaceId",
+    "associatedPhysicalPlaceIds": "stm:associatedPhysicalPlaceId",
+    "functionEvidenceKind": "stm:functionEvidenceKind",
+    "firstAttestedYear": "stm:firstAttestedYear",
+    "lastAttestedYear": "stm:lastAttestedYear",
+    "observationYears": "stm:observationYear",
+    "hasEvidence": {
+      "@id": "stm:hasEvidence",
+      "@type": "@id"
+    },
+    "hasOperationalSummary": {
+      "@id": "stm:hasOperationalSummary",
+      "@type": "@id"
+    },
+    "hasFunctionSummary": {
+      "@id": "stm:hasFunctionSummary",
+      "@type": "@id"
+    },
+    "hasFunctionAssignment": {
+      "@id": "stm:hasFunctionAssignment",
+      "@type": "@id"
+    },
     "P1_is_identified_by": {
       "@id": "crm:P1_is_identified_by",
       "@type": "@id"
@@ -44,6 +96,10 @@
     },
     "P2_has_type": {
       "@id": "crm:P2_has_type",
+      "@type": "@id"
+    },
+    "P4_has_time_span": {
+      "@id": "crm:P4_has_time-span",
       "@type": "@id"
     },
     "P4_has_time-span": {
@@ -84,11 +140,11 @@
     },
     "P82a_begin_of_the_begin": {
       "@id": "crm:P82a_begin_of_the_begin",
-      "@type": "xsd:date"
+      "@type": "xsd:gYear"
     },
     "P82b_end_of_the_end": {
       "@id": "crm:P82b_end_of_the_end",
-      "@type": "xsd:date"
+      "@type": "xsd:gYear"
     },
     "P92i_was_brought_into_existence_by": {
       "@id": "crm:P92i_was_brought_into_existence_by",
@@ -154,11 +210,290 @@
       "@id": "crm:P190_has_symbolic_content",
       "@type": "xsd:string"
     },
+    "identified_by": {
+      "@id": "crm:P1_is_identified_by",
+      "@type": "@id"
+    },
+    "classified_as": {
+      "@id": "crm:P2_has_type",
+      "@type": "@id"
+    },
+    "content": "crm:P190_has_symbolic_content",
+    "language": {
+      "@id": "crm:P72_has_language",
+      "@type": "@id"
+    },
+    "carried_by": {
+      "@id": "crm:P128i_is_carried_by",
+      "@type": "@id"
+    },
+    "documented_by": {
+      "@id": "crm:P70i_is_documented_in",
+      "@type": "@id"
+    },
+    "defined_by": {
+      "@id": "crm:P168_place_is_defined_by",
+      "@type": "geo:wktLiteral"
+    },
+    "centroid": {
+      "@id": "geo:hasCentroid",
+      "@type": "@id"
+    },
+    "as_wkt": {
+      "@id": "geo:asWKT",
+      "@type": "geo:wktLiteral"
+    },
+    "part_of": {
+      "@id": "crm:P89_falls_within",
+      "@type": "@id"
+    },
+    "related_features": {
+      "@id": "crm:P53i_is_former_or_current_location_of",
+      "@type": "@id"
+    },
+    "associated_organizations": {
+      "@id": "stm:hasOrganizationalAssociation",
+      "@type": "@id"
+    },
+    "organization_association_status": {
+      "@id": "stm:organizationAssociationStatus",
+      "@type": "xsd:string"
+    },
+    "attributed_by": {
+      "@id": "crm:P140i_was_attributed_by",
+      "@type": "@id"
+    },
+    "classified_by": {
+      "@id": "crm:P41i_was_classified_by",
+      "@type": "@id"
+    },
+    "assigned_attribute": {
+      "@id": "crm:P141_assigned",
+      "@type": "@id"
+    },
+    "assigned_type": {
+      "@id": "crm:P42_assigned",
+      "@type": "@id"
+    },
+    "timespan": {
+      "@id": "crm:P4_has_time-span",
+      "@type": "@id"
+    },
+    "begin_of_the_begin": {
+      "@id": "crm:P82a_begin_of_the_begin",
+      "@type": "xsd:gYear"
+    },
+    "end_of_the_end": {
+      "@id": "crm:P82b_end_of_the_end",
+      "@type": "xsd:gYear"
+    },
+    "evidence": {
+      "@id": "prov:hadPrimarySource",
+      "@type": "@id"
+    },
+    "derived_from": {
+      "@id": "prov:wasDerivedFrom",
+      "@type": "@id"
+    },
+    "note": {
+      "@id": "crm:P3_has_note",
+      "@type": "xsd:string"
+    },
+    "standardized_content": {
+      "@id": "stm:standardizedContent",
+      "@type": "xsd:string"
+    },
+    "source_content": {
+      "@id": "stm:sourceContent",
+      "@type": "xsd:string"
+    },
+    "source_row": {
+      "@id": "dcterms:identifier",
+      "@type": "xsd:string"
+    },
+    "exact_match": {
+      "@id": "skos:exactMatch",
+      "@type": "@id"
+    },
+    "close_match": {
+      "@id": "skos:closeMatch",
+      "@type": "@id"
+    },
+    "broad_match": {
+      "@id": "skos:broadMatch",
+      "@type": "@id"
+    },
+    "narrow_match": {
+      "@id": "skos:narrowMatch",
+      "@type": "@id"
+    },
+    "related_match": {
+      "@id": "skos:relatedMatch",
+      "@type": "@id"
+    },
     "prefLabel": "skos:prefLabel",
     "altLabel": "skos:altLabel",
+    "definition": "skos:definition",
+    "example": "skos:example",
+    "hiddenLabel": "skos:hiddenLabel",
+    "scopeNote": "skos:scopeNote",
+    "historyNote": "skos:historyNote",
+    "broader": {
+      "@id": "skos:broader",
+      "@type": "@id"
+    },
+    "narrower": {
+      "@id": "skos:narrower",
+      "@type": "@id"
+    },
+    "related": {
+      "@id": "skos:related",
+      "@type": "@id"
+    },
+    "inScheme": {
+      "@id": "skos:inScheme",
+      "@type": "@id"
+    },
+    "topConceptOf": {
+      "@id": "skos:topConceptOf",
+      "@type": "@id"
+    },
+    "hasTopConcept": {
+      "@id": "skos:hasTopConcept",
+      "@type": "@id"
+    },
+    "notation": "skos:notation",
     "closeMatch": {
       "@id": "skos:closeMatch",
       "@type": "@id"
+    },
+    "exactMatch": {
+      "@id": "skos:exactMatch",
+      "@type": "@id"
+    },
+    "broadMatch": {
+      "@id": "skos:broadMatch",
+      "@type": "@id"
+    },
+    "narrowMatch": {
+      "@id": "skos:narrowMatch",
+      "@type": "@id"
+    },
+    "relatedMatch": {
+      "@id": "skos:relatedMatch",
+      "@type": "@id"
+    },
+    "typeId": {
+      "@id": "stm:typeId",
+      "@type": "xsd:string"
+    },
+    "color": {
+      "@id": "stm:color",
+      "@type": "xsd:string"
+    },
+    "crmClass": {
+      "@id": "stm:crmClass",
+      "@type": "xsd:string"
+    },
+    "crmBadge": {
+      "@id": "stm:crmBadge",
+      "@type": "xsd:string"
+    },
+    "sortOrder": {
+      "@id": "stm:sortOrder",
+      "@type": "xsd:integer"
+    },
+    "created": {
+      "@id": "dcterms:created",
+      "@type": "xsd:date"
+    },
+    "modified": {
+      "@id": "dcterms:modified",
+      "@type": "xsd:date"
+    },
+    "deprecated": {
+      "@id": "owl:deprecated",
+      "@type": "xsd:boolean"
+    },
+    "deprecatedAt": {
+      "@id": "prov:invalidatedAtTime",
+      "@type": "xsd:date"
+    },
+    "deprecatedBy": {
+      "@id": "stm:deprecatedBy",
+      "@type": "xsd:string"
+    },
+    "replacedBy": {
+      "@id": "dcterms:isReplacedBy",
+      "@type": "@id"
+    },
+    "deprecationNote": {
+      "@id": "stm:deprecationNote",
+      "@type": "xsd:string"
+    },
+    "hasOrganizationalAssociation": {
+      "@id": "stm:hasOrganizationalAssociation",
+      "@type": "@id"
+    },
+    "associatedPhysicalPlantation": {
+      "@id": "stm:associatedPhysicalPlantation",
+      "@type": "@id"
+    },
+    "hasDerivedInference": {
+      "@id": "stm:hasDerivedInference",
+      "@type": "@id"
+    },
+    "inferredPopulationAssociatedWith": {
+      "@id": "stm:inferredPopulationAssociatedWith",
+      "@type": "@id"
+    },
+    "inferredPresenceAt": {
+      "@id": "stm:inferredPresenceAt",
+      "@type": "@id"
+    },
+    "inferredPlace": {
+      "@id": "stm:inferredPlace",
+      "@type": "@id"
+    },
+    "populationCategory": {
+      "@id": "stm:populationCategory",
+      "@type": "@id"
+    },
+    "populationCount": {
+      "@id": "stm:populationCount",
+      "@type": "xsd:integer"
+    },
+    "certainty": {
+      "@id": "stm:certainty",
+      "@type": "@id"
+    },
+    "inferenceRule": {
+      "@id": "stm:inferenceRule",
+      "@type": "@id"
+    },
+    "presenceInferenceStatus": {
+      "@id": "stm:presenceInferenceStatus",
+      "@type": "xsd:string"
+    },
+    "editorialNote": {
+      "@id": "dcterms:description",
+      "@type": "xsd:string"
+    },
+    "authorityReviewStatus": {
+      "@id": "stm:authorityReviewStatus",
+      "@type": "xsd:string"
+    },
+    "organizationAssociationStatus": {
+      "@id": "stm:organizationAssociationStatus",
+      "@type": "xsd:string"
+    },
+    "modifiedAt": {
+      "@id": "dcterms:modified",
+      "@type": "xsd:date"
+    },
+    "modifiedBy": {
+      "@id": "stm:modifiedBy",
+      "@type": "xsd:string"
     },
     "hasGeometry": "geo:hasGeometry",
     "asWKT": {
@@ -185,40 +520,48 @@
       "@id": "sdo:sameAs",
       "@type": "@id"
     },
-    "wasDerivedFrom": {
-      "@id": "prov:wasDerivedFrom",
+    "dcterms:description": {
+      "@id": "dcterms:description",
+      "@type": "xsd:string"
+    },
+    "dcterms:identifier": {
+      "@id": "dcterms:identifier",
+      "@type": "xsd:string"
+    },
+    "skos:broader": {
+      "@id": "skos:broader",
       "@type": "@id"
     },
-    "hadPrimarySource": {
-      "@id": "prov:hadPrimarySource",
-      "@type": "@id"
+    "featureType": {
+      "@id": "stm:featureType",
+      "@type": "xsd:string"
     },
-    "generatedAtTime": {
-      "@id": "prov:generatedAtTime",
-      "@type": "xsd:dateTime"
+    "mainBodyWater": {
+      "@id": "crm:P3_has_note",
+      "@type": "xsd:string"
     },
     "status": {
-      "@id": "crm:P2_has_type",
+      "@id": "stm:status",
       "@type": "xsd:string"
     },
     "psurId": {
-      "@id": "crm:P1_is_identified_by",
+      "@id": "stm:psurId",
       "@type": "xsd:string"
     },
     "fid": {
-      "@id": "crm:P48_has_preferred_identifier",
+      "@id": "stm:fid",
       "@type": "xsd:integer"
     },
     "mapId": {
-      "@id": "crm:P48_has_preferred_identifier",
+      "@id": "stm:mapId",
       "@type": "xsd:string"
     },
     "mapYear": {
-      "@id": "crm:P4_has_time-span",
+      "@id": "stm:mapYear",
       "@type": "xsd:gYear"
     },
     "observedLabel": {
-      "@id": "crm:P1_is_identified_by",
+      "@id": "stm:observedLabel",
       "@type": "xsd:string"
     },
     "geometrySource": {
@@ -238,47 +581,55 @@
       "@type": "@id"
     },
     "observationYear": {
-      "@id": "crm:P4_has_time-span",
+      "@id": "stm:observationYear",
       "@type": "xsd:gYear"
     },
     "observedName": {
-      "@id": "crm:P141_assigned",
+      "@id": "stm:observedName",
       "@type": "xsd:string"
     },
     "product": {
-      "@id": "crm:P141_assigned",
+      "@id": "stm:productLabel",
       "@type": "xsd:string"
     },
     "enslavedCount": {
-      "@id": "crm:P43_has_dimension",
+      "@id": "stm:enslavedCount",
+      "@type": "xsd:integer"
+    },
+    "privateEnslavedCount": {
+      "@id": "stm:privateEnslavedCount",
+      "@type": "xsd:integer"
+    },
+    "explicitPlantationEnslavedCount": {
+      "@id": "stm:explicitPlantationEnslavedCount",
       "@type": "xsd:integer"
     },
     "deserted": {
-      "@id": "crm:P141_assigned",
+      "@id": "stm:desertedReported",
       "@type": "xsd:boolean"
     },
     "freeResidentsCount": {
-      "@id": "crm:P43_has_dimension",
+      "@id": "stm:freeResidentsCount",
       "@type": "xsd:integer"
     },
     "hasOwner": {
-      "@id": "crm:P14_carried_out_by",
-      "@type": "@id"
+      "@id": "stm:ownerTranscription",
+      "@type": "xsd:string"
     },
     "hasAdministrator": {
-      "@id": "crm:P14_carried_out_by",
-      "@type": "@id"
+      "@id": "stm:administratorTranscription",
+      "@type": "xsd:string"
     },
     "hasDirector": {
-      "@id": "crm:P14_carried_out_by",
-      "@type": "@id"
+      "@id": "stm:directorTranscription",
+      "@type": "xsd:string"
     },
     "locationStd": {
-      "@id": "crm:P7_took_place_at",
+      "@id": "stm:locationLabel",
       "@type": "xsd:string"
     },
     "sizeAkkers": {
-      "@id": "crm:P43_has_dimension",
+      "@id": "stm:sizeAkkers",
       "@type": "xsd:integer"
     },
     "pageReference": {
@@ -286,8 +637,7 @@
       "@type": "xsd:string"
     },
     "depictedOnMap": {
-      "@id": "crm:P138i_has_representation",
-      "@type": "@id"
+      "@id": "crm:P138i_has_representation"
     },
     "labelOnMap": {
       "@id": "crm:P190_has_symbolic_content",
@@ -305,8 +655,128 @@
       "@id": "hdsc:isEnslaverOf",
       "@type": "@id"
     },
-    "sourceFile": {
+    "idPerson": {
+      "@id": "dcterms:identifier",
+      "@type": "xsd:string"
+    },
+    "idSource": {
+      "@id": "dcterms:identifier",
+      "@type": "xsd:string"
+    },
+    "sex": {
+      "@id": "stm:sex",
+      "@type": "xsd:string"
+    },
+    "dayBirth": {
+      "@id": "stm:dayBirth",
+      "@type": "xsd:integer"
+    },
+    "monthBirth": {
+      "@id": "stm:monthBirth",
+      "@type": "xsd:integer"
+    },
+    "yearBirth": {
+      "@id": "stm:yearBirth",
+      "@type": "xsd:gYear"
+    },
+    "dayDeath": {
+      "@id": "stm:dayDeath",
+      "@type": "xsd:integer"
+    },
+    "monthDeath": {
+      "@id": "stm:monthDeath",
+      "@type": "xsd:integer"
+    },
+    "yearDeath": {
+      "@id": "stm:yearDeath",
+      "@type": "xsd:gYear"
+    },
+    "nameMother": {
+      "@id": "stm:nameMother",
+      "@type": "xsd:string"
+    },
+    "age": {
+      "@id": "stm:age",
+      "@type": "xsd:string"
+    },
+    "plantationText": {
+      "@id": "stm:plantationText",
+      "@type": "xsd:string"
+    },
+    "ownerName": {
+      "@id": "stm:ownerName",
+      "@type": "xsd:string"
+    },
+    "startDay": {
+      "@id": "stm:startDay",
+      "@type": "xsd:integer"
+    },
+    "startMonth": {
+      "@id": "stm:startMonth",
+      "@type": "xsd:integer"
+    },
+    "startYear": {
+      "@id": "stm:startYear",
+      "@type": "xsd:gYear"
+    },
+    "startEvent": {
+      "@id": "stm:startEvent",
+      "@type": "xsd:string"
+    },
+    "startInfo": {
+      "@id": "stm:startInfo",
+      "@type": "xsd:string"
+    },
+    "endDay": {
+      "@id": "stm:endDay",
+      "@type": "xsd:integer"
+    },
+    "endMonth": {
+      "@id": "stm:endMonth",
+      "@type": "xsd:integer"
+    },
+    "endYear": {
+      "@id": "stm:endYear",
+      "@type": "xsd:gYear"
+    },
+    "endEvent": {
+      "@id": "stm:endEvent",
+      "@type": "xsd:string"
+    },
+    "endEventDetailed": {
+      "@id": "stm:endEventDetailed",
+      "@type": "xsd:string"
+    },
+    "endInfo": {
+      "@id": "stm:endInfo",
+      "@type": "xsd:string"
+    },
+    "registerType": {
+      "@id": "stm:registerType",
+      "@type": "xsd:string"
+    },
+    "inventoryNumber": {
+      "@id": "stm:inventoryNumber",
+      "@type": "xsd:string"
+    },
+    "folioNumber": {
+      "@id": "stm:folioNumber",
+      "@type": "xsd:string"
+    },
+    "wasDerivedFrom": {
+      "@id": "prov:wasDerivedFrom",
+      "@type": "@id"
+    },
+    "hadPrimarySource": {
       "@id": "prov:hadPrimarySource",
+      "@type": "@id"
+    },
+    "generatedAtTime": {
+      "@id": "prov:generatedAtTime",
+      "@type": "xsd:dateTime"
+    },
+    "sourceFile": {
+      "@id": "stm:sourceFile",
       "@type": "xsd:string"
     },
     "sourceColumn": {
@@ -318,7 +788,7 @@
       "@type": "xsd:string"
     },
     "transformedBy": {
-      "@id": "prov:wasGeneratedBy",
+      "@id": "stm:transformedBy",
       "@type": "xsd:string"
     },
     "modelEntity": {
@@ -333,12 +803,52 @@
       "@id": "rdfs:comment",
       "@type": "xsd:string"
     },
-    "featureType": {
-      "@id": "crm:P2_has_type",
+    "sourceMaker": {
+      "@id": "stm:sourceMaker",
       "@type": "xsd:string"
     },
-    "mainBodyWater": {
-      "@id": "crm:P3_has_note",
+    "publicationPlace": {
+      "@id": "stm:publicationPlace",
+      "@type": "xsd:string"
+    },
+    "holdingArchive": {
+      "@id": "stm:holdingArchive",
+      "@type": "xsd:string"
+    },
+    "sranantongoName": {
+      "@id": "stm:sranantongoName",
+      "@type": "xsd:string"
+    },
+    "reportedComponentOrganization": {
+      "@id": "stm:reportedComponentOrganization",
+      "@type": "@id"
+    },
+    "reportedComponentOrganizationLabel": {
+      "@id": "stm:reportedComponentOrganizationLabel",
+      "@type": "xsd:string"
+    },
+    "reportedCompositeOrganization": {
+      "@id": "stm:reportedCompositeOrganization",
+      "@type": "@id"
+    },
+    "reportedCompositeOrganizationLabel": {
+      "@id": "stm:reportedCompositeOrganizationLabel",
+      "@type": "xsd:string"
+    },
+    "reportedOwnerOrganization": {
+      "@id": "stm:reportedOwnerOrganization",
+      "@type": "@id"
+    },
+    "reportedOwnerOrganizationLabel": {
+      "@id": "stm:reportedOwnerOrganizationLabel",
+      "@type": "xsd:string"
+    },
+    "enslavedSharedWith": {
+      "@id": "stm:enslavedSharedWith",
+      "@type": "xsd:string"
+    },
+    "sourcePlantationQid": {
+      "@id": "stm:sourcePlantationQid",
       "@type": "xsd:string"
     }
   }

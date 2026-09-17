@@ -174,7 +174,7 @@ wd:Q59115309
 
 ## Next Steps
 
-1. **Almanakken Integration**: Extract `plantation_observations.csv` from 23,004 Almanakken rows
+1. **Almanakken Integration**: Maintain the generated E13 projection of all 22,482 v2 rows
 2. **SPARQL Endpoint**: Consider using Oxigraph or Virtuoso for query support
 3. **Person Linking**: Connect enslaved persons via `sdo:affiliation` to plantation QIDs
 4. **Validation**: Run SHACL validation against PICO shapes

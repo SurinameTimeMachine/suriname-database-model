@@ -4,11 +4,21 @@ A Linked Open Data platform for historical records from Suriname's colonial arch
 
 ## Quick Start
 
+Run commands from the repository root (recommended):
+
 ```bash
-cd app
 pnpm install
 pnpm pipeline    # generate JSON-LD + prepare frontend data
 pnpm dev         # start dev server at http://localhost:3000
+```
+
+Alternatively, run the same scripts directly inside `app/`:
+
+```bash
+cd app
+pnpm install
+pnpm pipeline
+pnpm dev
 ```
 
 ## Project Structure
@@ -36,6 +46,18 @@ app/                             # Next.js application
 4. **prepare-data.ts** -- Splits the JSON-LD into indexed JSON files for the Next.js frontend
 
 Run the full pipeline: `pnpm pipeline`
+
+## JSON-LD publication
+
+The pipeline publishes the complete generated graph and its context as
+`/data/database.jsonld` and `/data/context.jsonld` in the deployed app. See
+[the LOD publication contract](docs/models/lod-publication.md) for validation
+coverage and the remaining canonical-domain and CIDOC-CRM conformance work.
+
+Public place authority records are generated from the editorial Gazetteer and
+are available as HTML, JSON-LD, and application JSON at `/place/{id}`,
+`/place/{id}.jsonld`, and `/place/{id}.json`. See the
+[place-record JSON-LD profile](docs/models/place-record-jsonld-profile.md).
 
 ## Data Sources
 

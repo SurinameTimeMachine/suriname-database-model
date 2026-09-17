@@ -10,7 +10,8 @@ flowchart TB
         E41_MAP["E41 Appellation<br/>Map label (identifies E25)"]
         E41_ALM["E41 Appellation<br/>Almanac name (identifies E74)"]
 
-        E25 -->|"P52 has current owner"| E74
+        E25 -->|"stm:hasOrganizationalAssociation"| E74
+        E74 -->|"stm:associatedPhysicalPlantation"| E25
         E25 -->|"P53 has former or current location"| E53
         E25 -->|"P1 is identified by"| E41_MAP
         E74 -->|"P1 is identified by"| E41_ALM

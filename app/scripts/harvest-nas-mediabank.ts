@@ -28,47 +28,18 @@ type NasRecord = {
   scrapeTimestamp: string;
 };
 
-type NasSegment = {
-  recordKey: string;
-  detailId: string;
-  mediaId: string;
-  segmentIndex: number;
-  tcStart: string;
-  tcEnd: string;
-  startSeconds: number;
-  endSeconds: number | null;
-  segmentLabel: string;
-  transcriptSnippet: string;
-  personMentions: string;
-  placeMentions: string;
-  confidence: string;
-  reviewedBy: string;
-};
-
-const BASE_URL = 'https://nationaalarchief.sr';
 const MEMORIX_URL = 'https://webservices.memorix.nl/mediabank';
-const API_KEY = process.env.NAS_API_KEY || '0bdf78cd-6a2a-4c64-b74b-ddc66124df75';
+const API_KEY = process.env.NAS_API_KEY;
 const ENTITY_ID = process.env.NAS_ENTITY_ID || 'fb953082-397a-912a-90b0-b9a6227b532c';
 const ROWS = Number(process.env.NAS_ROWS || '100');
 const OUTPUT_DIR = join(__dirname, '../..', 'data', 'nas-mediabank');
 const OUTPUT_RECORDS_JSON = join(OUTPUT_DIR, 'nas-mediabank-records.json');
-const OUTPUT_RECORDS_CSV = join(OUTPUT_DIR, 'nas-mediabank-records.csv');
-const OUTPUT_SEGMENTS_JSON = join(OUTPUT_DIR, 'nas-mediabank-segments.json');
-const OUTPUT_SEGMENTS_CSV = join(OUTPUT_DIR, 'nas-mediabank-segments.csv');
-const OUTPUT_SUMMARY = join(OUTPUT_DIR, 'nas-mediabank-summary.md');
 
 const DELAY_MS = Number(process.env.NAS_DELAY_MS || '400');
 const MAX_RECORDS = Number(process.env.NAS_MAX_RECORDS || '0');
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-function csvEscape(value: string): string {
-  if (value.includes('"') || value.includes(',') || value.includes('\n')) {
-    return `"${value.replace(/"/g, '""')}"`;
-  }
-  return value;
 }
 
 async function fetchJson<T>(url: string): Promise<T> {
@@ -89,7 +60,8 @@ async function fetchJson<T>(url: string): Promise<T> {
       await sleep(700 * attempt);
     }
   }
-  throw new Error(`Failed to fetch ${url}: ${lastError || 'unknown error'}`);
+  const safeUrl = url.replace(/([?&]apiKey=)[^&]+/i, '$1[redacted]');
+  throw new Error(`Failed to fetch ${safeUrl}: ${lastError || 'unknown error'}`);
 }
 
 type MemorixMetaField = {
@@ -126,15 +98,6 @@ function metadataMap(row: MemorixMediaRow): Map<string, string> {
     }
   }
   return map;
-}
-
-function firstPlayableUri(assets: MemorixAsset[]): string {
-  for (const asset of assets) {
-    for (const stream of asset.streams || []) {
-      if (stream.url) return stream.url;
-    }
-  }
-  return '';
 }
 
 function parseDurationToSeconds(raw: string): number | null {
@@ -205,7 +168,7 @@ function parseRecord(row: MemorixMediaRow, listingPage: number): NasRecord {
     detailId,
     mediaId,
     recordKey,
-    detailUrl: `${detailUrl} | ${firstPlayableUri(row.asset || [])}`,
+    detailUrl,
     listingPage,
     title,
     description,
@@ -228,118 +191,14 @@ function parseRecord(row: MemorixMediaRow, listingPage: number): NasRecord {
   };
 }
 
-function toRecordsCsv(rows: NasRecord[]): string {
-  const headers: Array<keyof NasRecord> = [
-    'source',
-    'detailId',
-    'mediaId',
-    'recordKey',
-    'detailUrl',
-    'listingPage',
-    'title',
-    'description',
-    'documentType',
-    'inventoryNumber',
-    'maker',
-    'yearRaw',
-    'personsRaw',
-    'colorRaw',
-    'collectionRaw',
-    'keywordsRaw',
-    'downloadableRaw',
-    'playtimeRaw',
-    'mediaType',
-    'hasTimeAxis',
-    'durationSeconds',
-    'tcStartDefault',
-    'tcEndDefault',
-    'scrapeTimestamp',
-  ];
-  return [
-    headers.join(','),
-    ...rows.map((row) => headers.map((header) => csvEscape(String(row[header] ?? ''))).join(',')),
-  ].join('\n');
-}
-
-function toSegmentsCsv(rows: NasSegment[]): string {
-  const headers: Array<keyof NasSegment> = [
-    'recordKey',
-    'detailId',
-    'mediaId',
-    'segmentIndex',
-    'tcStart',
-    'tcEnd',
-    'startSeconds',
-    'endSeconds',
-    'segmentLabel',
-    'transcriptSnippet',
-    'personMentions',
-    'placeMentions',
-    'confidence',
-    'reviewedBy',
-  ];
-  return [
-    headers.join(','),
-    ...rows.map((row) => headers.map((header) => csvEscape(String(row[header] ?? ''))).join(',')),
-  ].join('\n');
-}
-
-function toSegments(rows: NasRecord[]): NasSegment[] {
-  return rows
-    .filter((row) => row.hasTimeAxis)
-    .map((row) => ({
-      recordKey: row.recordKey,
-      detailId: row.detailId,
-      mediaId: row.mediaId,
-      segmentIndex: 1,
-      tcStart: '00:00:00.000',
-      tcEnd: row.tcEndDefault,
-      startSeconds: 0,
-      endSeconds: row.durationSeconds,
-      segmentLabel: 'full item',
-      transcriptSnippet: '',
-      personMentions: '',
-      placeMentions: '',
-      confidence: '',
-      reviewedBy: '',
-    }));
-}
-
-function buildSummary(records: NasRecord[], totalTarget: number): string {
-  const byType = new Map<string, number>();
-  let downloadable = 0;
-  let withDuration = 0;
-  for (const row of records) {
-    byType.set(row.mediaType, (byType.get(row.mediaType) || 0) + 1);
-    if (row.downloadableRaw.toLowerCase().includes('ja')) downloadable += 1;
-    if (row.durationSeconds !== null) withDuration += 1;
-  }
-
-  return [
-    '# NAS Mediabank Harvest Summary',
-    '',
-    `- Target records reported by NAS: ${totalTarget}`,
-    `- Harvested unique records: ${records.length}`,
-    `- Memorix rows per page: ${ROWS}`,
-    `- Delay per request (ms): ${DELAY_MS}`,
-    `- AV records with parsed duration: ${withDuration}`,
-    `- Downloadable marked yes: ${downloadable}`,
-    '',
-    '## By media type',
-    ...[...byType.entries()].sort((a, b) => b[1] - a[1]).map(([type, count]) => `- ${type}: ${count}`),
-  ].join('\n');
-}
-
-function writeAll(records: NasRecord[], totalTarget: number): void {
-  const segments = toSegments(records);
+function writeAll(records: NasRecord[]): void {
   writeFileSync(OUTPUT_RECORDS_JSON, JSON.stringify(records, null, 2), 'utf8');
-  writeFileSync(OUTPUT_RECORDS_CSV, toRecordsCsv(records), 'utf8');
-  writeFileSync(OUTPUT_SEGMENTS_JSON, JSON.stringify(segments, null, 2), 'utf8');
-  writeFileSync(OUTPUT_SEGMENTS_CSV, toSegmentsCsv(segments), 'utf8');
-  writeFileSync(OUTPUT_SUMMARY, buildSummary(records, totalTarget), 'utf8');
 }
 
 async function main(): Promise<void> {
+  if (!API_KEY) {
+    throw new Error('NAS_API_KEY is required to harvest the NAS Mediabank.');
+  }
   mkdirSync(OUTPUT_DIR, { recursive: true });
 
   const records: NasRecord[] = [];
@@ -375,21 +234,17 @@ async function main(): Promise<void> {
     }
 
     if (page % 5 === 0) {
-      writeAll(records, totalTarget);
+      writeAll(records);
       console.log(`Checkpoint: page ${page}/${totalPages}; ${records.length} unique records.`);
     }
 
     await sleep(DELAY_MS);
   }
 
-  writeAll(records, totalTarget);
+  writeAll(records);
 
   console.log(`Wrote ${records.length} NAS records to:`);
   console.log(`- ${OUTPUT_RECORDS_JSON}`);
-  console.log(`- ${OUTPUT_RECORDS_CSV}`);
-  console.log(`- ${OUTPUT_SEGMENTS_JSON}`);
-  console.log(`- ${OUTPUT_SEGMENTS_CSV}`);
-  console.log(`- ${OUTPUT_SUMMARY}`);
 }
 
 main().catch((error) => {

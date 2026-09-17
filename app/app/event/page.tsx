@@ -1,103 +1,42 @@
 'use client';
 
-import Hls from 'hls.js';
-import { useEffect, useMemo, useRef, useState } from 'react';
-
-type PlaceSuggestion = {
-  gazetteerId: string;
-  label: string;
-  category: string;
-  source: string;
-};
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { LOCATION_TYPES, type AddedPlace, type LocationType } from '@/lib/event-types';
 
 type EventTask = {
   taskId: string;
-  mode: 'image' | 'av';
-  recordKey: string;
   detailId: string;
   mediaId: string;
-  mediaType: string;
   title: string;
   description: string;
   yearRaw: string;
   inventoryNumber: string;
-  documentType: string;
   sourceUrl: string;
-  playableUrl: string;
   lowResUrl: string;
-  segmentIndex: number;
-  tcStart: string;
-  tcEnd: string;
-  suggestedPlaces: PlaceSuggestion[];
-  suggestedPersons: string[];
-  currentClaim: {
-    claimId: string;
-    participantId: string;
-    assignedAt: string;
-    leaseUntil: string;
-    round: 1 | 2;
-  } | null;
+  currentClaim: { claimId: string } | null;
 };
+
+const NAS_MEDIABANK_BASE_URL = 'https://nationaalarchief.sr/onderzoeken/mediabank/detail';
+
+// Domain may change; update here only.
+const STM_EXPLORE_URL = 'https://data.surinametijdmachine.org/explore';
+
+function nasMediabankUrl(current: EventTask): string {
+  if (!current.detailId || !current.mediaId) return '';
+  return `${NAS_MEDIABANK_BASE_URL}/${current.detailId}/media/${current.mediaId}?mode=detail`;
+}
 
 type Stats = {
   total: number;
   completed: number;
   assigned: number;
   unoffered: number;
-  unresolved: number;
+  pendingRound2: number;
   participants: number;
   round: 1 | 2;
 };
 
-type PlaceOption = {
-  id: string;
-  name: string;
-  type: string;
-  districtHint?: string;
-  wikidataQid?: string;
-};
-
-const STORAGE_KEY = 'stm_event_participant';
-
-function toHlsUrl(url: string): string {
-  if (!url) return '';
-  if (url.includes('.m3u8')) return url;
-  return url.replace('.mpd', '.m3u8');
-}
-
-function pickLowestBandwidthHls(manifestText: string, baseUrl: string): string {
-  const lines = manifestText
-    .split('\n')
-    .map((line) => line.trim())
-    .filter(Boolean);
-
-  let bestUrl = '';
-  let bestBandwidth = Number.POSITIVE_INFINITY;
-
-  for (let i = 0; i < lines.length - 1; i += 1) {
-    const line = lines[i];
-    if (!line.startsWith('#EXT-X-STREAM-INF:')) continue;
-
-    const match = line.match(/BANDWIDTH=(\d+)/i);
-    const bandwidth = match ? Number(match[1]) : Number.POSITIVE_INFINITY;
-    const nextLine = lines[i + 1];
-    if (!nextLine || nextLine.startsWith('#')) continue;
-
-    if (bandwidth < bestBandwidth) {
-      bestBandwidth = bandwidth;
-      bestUrl = new URL(nextLine, baseUrl).toString();
-    }
-  }
-
-  return bestUrl;
-}
-
-function formatPlaceOptionLabel(option: PlaceOption): string {
-  if (option.type === 'plantation' && option.districtHint) {
-    return `${option.name} (${option.districtHint})`;
-  }
-  return `${option.name} (${option.type})`;
-}
+const STORAGE_KEY = 'stm_annotate_participant_v1';
 
 export default function EventPage() {
   const [nickname, setNickname] = useState('');
@@ -107,25 +46,20 @@ export default function EventPage() {
   const [task, setTask] = useState<EventTask | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
   const [done, setDone] = useState(false);
-  const [placeOptions, setPlaceOptions] = useState<PlaceOption[]>([]);
-
-  const [selectedPlaceIds, setSelectedPlaceIds] = useState<string[]>([]);
-  const [selectedPlaceNames, setSelectedPlaceNames] = useState<string[]>([]);
-  const [addedPlaces, setAddedPlaces] = useState<string[]>([]);
+  const [addedPlaces, setAddedPlaces] = useState<AddedPlace[]>([]);
   const [addedDates, setAddedDates] = useState<string[]>([]);
-  const [selectedPersons, setSelectedPersons] = useState<string[]>([]);
   const [addedPersons, setAddedPersons] = useState<string[]>([]);
-  const [locationUnknown, setLocationUnknown] = useState(false);
+  const [locationUnknown, setLocationUnknown] = useState(true);
   const [notes, setNotes] = useState('');
   const [placeInput, setPlaceInput] = useState('');
   const [dateInput, setDateInput] = useState('');
   const [personInput, setPersonInput] = useState('');
-  const [avPlaybackUrl, setAvPlaybackUrl] = useState('');
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const hlsRef = useRef<Hls | null>(null);
+  const [descriptionExpanded, setDescriptionExpanded] = useState(false);
+  const [descriptionTruncated, setDescriptionTruncated] = useState(false);
+  const descriptionRef = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
+    localStorage.removeItem('stm_event_participant');
     const saved = localStorage.getItem(STORAGE_KEY);
     if (!saved) return;
     try {
@@ -138,140 +72,24 @@ export default function EventPage() {
     }
   }, []);
 
-  useEffect(() => {
-    fetch('/api/event/options')
-      .then((res) => res.json())
-      .then((data) => setPlaceOptions(data.places || []))
-      .catch(() => {
-        setPlaceOptions([]);
-      });
-  }, []);
-
-  const matchingPlaceOptions = useMemo(() => {
-    const query = placeInput.trim().toLowerCase();
-    if (!query) return placeOptions.slice(0, 8);
-    return placeOptions.filter((option) => {
-      const display = formatPlaceOptionLabel(option).toLowerCase();
-      return (
-        option.name.toLowerCase().includes(query) ||
-        option.type.toLowerCase().includes(query) ||
-        (option.districtHint || '').toLowerCase().includes(query) ||
-        display.includes(query)
-      );
-    }).slice(0, 8);
-  }, [placeOptions, placeInput]);
-  const avHlsUrl = useMemo(() => (task?.playableUrl ? toHlsUrl(task.playableUrl) : ''), [task]);
-  const isAudioTask = task?.mediaType === 'audio' || task?.documentType.toLowerCase().includes('audio');
-
-  useEffect(() => {
-    const media = isAudioTask ? audioRef.current : videoRef.current;
-    const currentHls = hlsRef.current;
-
-    if (currentHls) {
-      currentHls.destroy();
-      hlsRef.current = null;
-    }
-
-    if (!task || task.mode !== 'av' || !avPlaybackUrl || !media) {
-      return;
-    }
-
-    media.removeAttribute('src');
-    media.load();
-
-    const canPlayNative = media.canPlayType('application/vnd.apple.mpegurl');
-    if (canPlayNative) {
-      media.src = avPlaybackUrl;
-      media.load();
-      return;
-    }
-
-    if (!Hls.isSupported()) {
-      media.src = avPlaybackUrl;
-      media.load();
-      return;
-    }
-
-    const hls = new Hls({
-      enableWorker: true,
-      lowLatencyMode: false,
-      capLevelToPlayerSize: true,
-      startLevel: 0,
-    });
-    hlsRef.current = hls;
-    hls.loadSource(avPlaybackUrl);
-    hls.attachMedia(media);
-    hls.on(Hls.Events.ERROR, (_, data) => {
-      if (data.fatal) {
-        setStatus('AV-stream laadt niet goed. Probeer de mobiele link of laad opnieuw.');
-      }
-    });
-
-    return () => {
-      hls.destroy();
-      if (hlsRef.current === hls) {
-        hlsRef.current = null;
-      }
-    };
-  }, [task, avPlaybackUrl, isAudioTask]);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function prepareLowBandwidthPlaybackUrl() {
-      if (!task || task.mode !== 'av' || !avHlsUrl) {
-        setAvPlaybackUrl('');
-        return;
-      }
-
-      try {
-        const response = await fetch(avHlsUrl);
-        if (!response.ok) throw new Error('Cannot read HLS manifest');
-        const manifestText = await response.text();
-        if (cancelled) return;
-
-        const lowestVariant = pickLowestBandwidthHls(manifestText, avHlsUrl);
-        setAvPlaybackUrl(lowestVariant || avHlsUrl);
-      } catch {
-        if (!cancelled) setAvPlaybackUrl(avHlsUrl);
-      }
-    }
-
-    void prepareLowBandwidthPlaybackUrl();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [task, avHlsUrl]);
-
   function resetFormForTask(nextTask: EventTask | null) {
-    if (!nextTask) {
-      setSelectedPlaceIds([]);
-      setSelectedPlaceNames([]);
-      setSelectedPersons([]);
-      setAddedPlaces([]);
-      setAddedDates([]);
-      setAddedPersons([]);
-      setDateInput('');
-      setLocationUnknown(false);
-      setNotes('');
-      return;
-    }
-
-    const initialPlaceIds = nextTask.suggestedPlaces
-      .map((entry) => entry.gazetteerId)
-      .filter(Boolean);
-    const initialPlaceNames = nextTask.suggestedPlaces.map((entry) => entry.label);
-    setSelectedPlaceIds([...new Set(initialPlaceIds)]);
-    setSelectedPlaceNames([...new Set(initialPlaceNames)]);
-    setSelectedPersons([...new Set(nextTask.suggestedPersons)]);
     setAddedPlaces([]);
     setAddedDates([]);
     setAddedPersons([]);
-    setDateInput('');
-    setLocationUnknown(false);
+    setLocationUnknown(true);
+    setDateInput(nextTask?.yearRaw || '');
+    setPlaceInput('');
+    setPersonInput('');
     setNotes('');
+    setDescriptionExpanded(false);
   }
+
+  // Measure against the clamped (collapsed) layout so the toggle only appears when needed.
+  useLayoutEffect(() => {
+    const el = descriptionRef.current;
+    if (!el || descriptionExpanded) return;
+    setDescriptionTruncated(el.scrollHeight > el.clientHeight + 1);
+  }, [task?.taskId, task?.description, descriptionExpanded]);
 
   async function startSession() {
     if (!nickname.trim()) {
@@ -333,61 +151,29 @@ export default function EventPage() {
       setDone(false);
       setTask(data.task);
       resetFormForTask(data.task);
-      setStatus(data.reused ? 'Je hebt nog een actieve taak.' : 'Nieuwe taak toegewezen.');
+      setStatus('');
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : 'Onbekende fout bij claim.');
+      if (error instanceof Error && error.message.toLowerCase().includes('unknown participant')) {
+        localStorage.removeItem(STORAGE_KEY);
+        setParticipantId('');
+        setTask(null);
+        setStatus('Deze sessie is verlopen. Kies opnieuw een nickname.');
+      } else {
+        setStatus(error instanceof Error ? error.message : 'Onbekende fout bij claim.');
+      }
     } finally {
       setBusy(false);
     }
   }
 
-  function togglePlaceSuggestion(suggestion: PlaceSuggestion) {
-    const id = suggestion.gazetteerId;
-    if (!id) {
-      const exists = selectedPlaceNames.includes(suggestion.label);
-      setSelectedPlaceNames((prev) =>
-        exists ? prev.filter((value) => value !== suggestion.label) : [...prev, suggestion.label],
-      );
-      return;
-    }
-
-    const selected = selectedPlaceIds.includes(id);
-    if (selected) {
-      setSelectedPlaceIds((prev) => prev.filter((value) => value !== id));
-      setSelectedPlaceNames((prev) => prev.filter((value) => value !== suggestion.label));
-    } else {
-      setSelectedPlaceIds((prev) => [...prev, id]);
-      setSelectedPlaceNames((prev) => [...new Set([...prev, suggestion.label])]);
-    }
-  }
-
-  function togglePersonSuggestion(name: string) {
-    const selected = selectedPersons.includes(name);
-    setSelectedPersons((prev) =>
-      selected ? prev.filter((value) => value !== name) : [...prev, name],
-    );
-  }
-
-  function addPlaceTerm() {
-    const term = placeInput.trim();
-    if (!term) return;
-    if (selectedPlaceNames.includes(term) || addedPlaces.includes(term)) {
-      setPlaceInput('');
-      return;
-    }
-    setAddedPlaces((prev) => [...prev, term]);
-    setPlaceInput('');
-  }
-
-  function chooseGazetteerOption(option: PlaceOption) {
-    const suggestion = {
-      gazetteerId: option.id,
-      label: option.name,
-      category: option.type,
-      source: 'gazetteer',
-    };
-    togglePlaceSuggestion(suggestion);
-    setPlaceInput('');
+  function resetSession() {
+    localStorage.removeItem(STORAGE_KEY);
+    setParticipantId('');
+    setTask(null);
+    setDone(false);
+    setStats(null);
+    resetFormForTask(null);
+    setStatus('Kies een nickname om te beginnen.');
   }
 
   function addDateTerm() {
@@ -401,14 +187,24 @@ export default function EventPage() {
     setDateInput('');
   }
 
+  function addPlaceTerm() {
+    const term = placeInput.trim();
+    if (!term) return;
+    setAddedPlaces((prev) => (prev.some((place) => place.text === term) ? prev : [...prev, { text: term, type: '' }]));
+    setLocationUnknown(false);
+    setPlaceInput('');
+  }
+
+  function setPlaceType(text: string, type: LocationType) {
+    setAddedPlaces((prev) => prev.map((place) => (place.text === text ? { ...place, type } : place)));
+  }
+
   function addPersonTerm() {
     const term = personInput.trim();
     if (!term) return;
-    if (selectedPersons.includes(term) || addedPersons.includes(term)) {
-      setPersonInput('');
-      return;
+    if (!addedPersons.includes(term)) {
+      setAddedPersons((prev) => [...prev, term]);
     }
-    setAddedPersons((prev) => [...prev, term]);
     setPersonInput('');
   }
 
@@ -424,11 +220,8 @@ export default function EventPage() {
       const payload = {
         decision,
         locationUnknown,
-        selectedPlaceIds,
-        selectedPlaceNames,
         addedPlaces,
         addedDates,
-        selectedPersons,
         addedPersons,
         notes: notes.trim(),
       };
@@ -463,296 +256,163 @@ export default function EventPage() {
   }
 
   return (
-    <div className="h-full overflow-y-auto bg-stm-warm-50">
-      <div className="max-w-xl mx-auto p-4 sm:p-6 space-y-4">
-        <header className="border border-stm-warm-200 bg-white p-4">
-          <h1 className="text-xl font-semibold text-stm-warm-900">NAS Mediabank in de Suriname Time Machine</h1>
-          <p className="text-sm text-stm-warm-600 mt-1">
-            Smartphone toepassing voor verrijking beeldmateriaal.
-          </p>
-          {stats ? (
-            <p className="text-xs text-stm-warm-500 mt-2">
-              Totaal {stats.total} | Afgerond {stats.completed} | Open taken {stats.unresolved} | Ronde {stats.round}
-            </p>
-          ) : null}
-        </header>
-
-        {!participantId ? (
-          <section className="border border-stm-warm-200 bg-white p-4 space-y-3">
-            <label className="block text-sm font-medium text-stm-warm-800">Nickname</label>
-            <input
-              value={nickname}
-              onChange={(e) => setNickname(e.target.value)}
-              placeholder="Bijv. Team-12"
-              className="w-full border border-stm-warm-300 px-3 py-2 text-sm"
-            />
-            <button
-              onClick={startSession}
-              disabled={busy}
-              className="w-full bg-stm-sepia-600 text-white py-2 text-sm font-medium disabled:opacity-50"
-            >
-              Start
-            </button>
-          </section>
-        ) : null}
-
-        {participantId && !task && !done ? (
-          <section className="border border-stm-warm-200 bg-white p-4">
-            <button
-              onClick={claimNextTask}
-              disabled={busy}
-              className="w-full bg-stm-warm-900 text-white py-2 text-sm font-medium disabled:opacity-50"
-            >
-              Volgende taak ophalen
-            </button>
-          </section>
-        ) : null}
-
-        {done ? (
-          <section className="border border-stm-warm-200 bg-white p-4 text-sm text-stm-warm-700">
-            Geen taken meer beschikbaar op dit moment.
-          </section>
-        ) : null}
-
-        {task ? (
-          <section className="border border-stm-warm-200 bg-white p-4 space-y-4">
-            <div>
-              <p className="text-xs text-stm-warm-500">{task.mode === 'av' ? 'AV-taak' : 'Beeldtaak'}</p>
-              <h2 className="text-lg font-semibold text-stm-warm-900">{task.title || '(zonder titel)'}</h2>
-              <p className="text-sm text-stm-warm-700 mt-1">{task.description || '(geen beschrijving)'}</p>
-              <p className="text-xs text-stm-warm-500 mt-2">
-                Datum: {task.yearRaw || 'onbekend'} | Inventaris: {task.inventoryNumber || 'onbekend'}
-              </p>
-              {task.mode === 'av' ? (
-                <p className="text-xs text-stm-warm-500 mt-1">
-                  Segment {task.segmentIndex} | {task.tcStart} - {task.tcEnd || 'einde onbekend'}
-                </p>
-              ) : null}
-            </div>
-
-            {task.lowResUrl ? (
-              <img src={task.lowResUrl} alt={task.title || 'preview'} className="w-full border border-stm-warm-200" />
-            ) : null}
-
-            {task.mode === 'av' && avPlaybackUrl ? (
-              isAudioTask ? (
-                <audio ref={audioRef} controls preload="metadata" className="w-full">
-                  <source src={avPlaybackUrl} type="application/vnd.apple.mpegurl" />
-                </audio>
-              ) : (
-                <video ref={videoRef} controls preload="metadata" playsInline className="w-full border border-stm-warm-200">
-                  <source src={avPlaybackUrl} type="application/vnd.apple.mpegurl" />
-                </video>
-              )
-            ) : null}
-
-            <div className="flex gap-2">
-              {task.sourceUrl ? (
-                <a href={task.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-xs underline text-stm-sepia-700">
-                  Open bron
-                </a>
-              ) : null}
-              {avPlaybackUrl ? (
-                <a href={avPlaybackUrl} target="_blank" rel="noopener noreferrer" className="text-xs underline text-stm-sepia-700">
-                  Open AV stream (mobiel)
-                </a>
-              ) : null}
-            </div>
-
-            <div>
-              <h3 className="text-sm font-semibold text-stm-warm-900 mb-2">Locatiesuggesties</h3>
-              <label className="flex gap-2 text-sm mb-2">
-                <input
-                  type="checkbox"
-                  checked={locationUnknown}
-                  onChange={(e) => {
-                    const checked = e.target.checked;
-                    setLocationUnknown(checked);
-                    if (checked) {
-                      setSelectedPlaceIds([]);
-                      setSelectedPlaceNames([]);
-                      setAddedPlaces([]);
-                    }
-                  }}
-                />
-                <span>Locatie onbekend of niet zinvol voor dit item</span>
-              </label>
-              <div className="space-y-1">
-                {task.suggestedPlaces.map((suggestion, index) => {
-                  const checked = suggestion.gazetteerId
-                    ? selectedPlaceIds.includes(suggestion.gazetteerId)
-                    : selectedPlaceNames.includes(suggestion.label);
-                  return (
-                    <label
-                      key={suggestion.gazetteerId ? `${suggestion.gazetteerId}-${index}` : `${suggestion.label}-${index}`}
-                      className="flex gap-2 text-sm"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={checked}
-                        disabled={locationUnknown}
-                        onChange={() => togglePlaceSuggestion(suggestion)}
-                      />
-                      <span>
-                        {suggestion.label} <span className="text-stm-warm-500">({suggestion.category})</span>
-                      </span>
-                    </label>
-                  );
-                })}
+    <main className="h-full min-h-0 overflow-hidden bg-stm-warm-50 text-stm-warm-900">
+      <div className="mx-auto flex h-full w-full max-w-xl flex-col">
+        {!task ? (
+          <header className="shrink-0 border-b border-stm-warm-200 bg-white px-4 py-3">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-sm font-semibold">NAS foto-review</p>
+              <div className="flex items-center gap-3">
+                {stats ? <p className="text-xs text-stm-warm-500">{stats.completed}/{stats.total} afgerond</p> : null}
+                <a href={STM_EXPLORE_URL} target="_blank" rel="noopener noreferrer" className="text-xs text-stm-sepia-700 underline">STM-kaart</a>
+                {participantId ? <button type="button" onClick={resetSession} className="text-xs text-stm-warm-500 underline">Andere gebruiker</button> : null}
               </div>
             </div>
+          </header>
+        ) : null}
 
-            <div>
-              <label className="block text-sm font-medium text-stm-warm-800 mb-1">Locatie toevoegen</label>
-              <input
-                list="place-options"
-                value={placeInput}
-                onChange={(e) => setPlaceInput(e.target.value)}
-                placeholder="Zoek of typ nieuwe term"
-                disabled={locationUnknown}
-                className="w-full border border-stm-warm-300 px-3 py-2 text-sm"
-              />
-              <datalist id="place-options">
-                {placeOptions.map((option) => (
-                  <option key={option.id} value={option.name} label={formatPlaceOptionLabel(option)} />
-                ))}
-              </datalist>
-              <button onClick={addPlaceTerm} disabled={locationUnknown} className="mt-2 bg-stm-warm-200 px-3 py-1 text-xs disabled:opacity-50">
-                Voeg locatie toe
-              </button>
-              {addedPlaces.length > 0 ? (
-                <p className="text-xs text-stm-warm-600 mt-2">Nieuw: {addedPlaces.join(' | ')}</p>
-              ) : null}
-              {matchingPlaceOptions.length > 0 ? (
-                <div className="mt-3 space-y-2 text-xs text-stm-warm-700">
-                  <p className="font-medium text-stm-warm-800">Mogelijke matches</p>
-                  <div className="space-y-2">
-                    {matchingPlaceOptions.map((option) => (
-                      <div key={option.id} className="flex items-center justify-between gap-3 border border-stm-warm-200 bg-stm-warm-50 px-3 py-2">
-                        <div>
-                          <p className="font-medium text-stm-warm-800">
-                            {option.name}{' '}
-                            <span className="text-stm-warm-500">
-                              ({option.type === 'plantation' && option.districtHint ? option.districtHint : option.type})
-                            </span>
-                          </p>
-                          <p className="text-[11px] text-stm-warm-500">ID: {option.id}</p>
-                        </div>
-                        <div className="flex items-center gap-2 shrink-0">
-                          <button
-                            type="button"
-                            onClick={() => chooseGazetteerOption(option)}
-                            disabled={locationUnknown}
-                            className="bg-stm-sepia-700 text-white px-2 py-1 disabled:opacity-50"
-                          >
-                            Kies
-                          </button>
-                          <a
-                            href={`/places?id=${encodeURIComponent(option.id)}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="underline text-stm-sepia-700"
-                          >
-                            Controleer
-                          </a>
-                          {option.wikidataQid ? (
-                            <a
-                              href={`https://www.wikidata.org/wiki/${encodeURIComponent(option.wikidataQid)}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="underline text-stm-sepia-700"
-                            >
-                              Wikidata
-                            </a>
-                          ) : null}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-stm-warm-800 mb-1">Datum toevoegen</label>
+        <div className="flex min-h-0 flex-1 flex-col">
+          {!participantId ? (
+            <section className="m-3 border border-stm-warm-200 bg-white p-4">
+              <p className="mb-3 text-sm text-stm-warm-700">Kies een nickname om te beginnen.</p>
               <div className="flex gap-2">
                 <input
-                  value={dateInput}
-                  onChange={(e) => setDateInput(e.target.value)}
-                  placeholder="Bijv. 15 juli 1975"
-                  className="w-full border border-stm-warm-300 px-3 py-2 text-sm"
+                  value={nickname}
+                  onChange={(e) => setNickname(e.target.value)}
+                  placeholder="Bijv. Team-12"
+                  className="min-w-0 flex-1 border border-stm-warm-300 px-3 py-2 text-sm"
                 />
-                <button onClick={addDateTerm} className="bg-stm-warm-200 px-3 py-1 text-xs">
-                  Voeg datum toe
+                <button onClick={startSession} disabled={busy} className="bg-stm-sepia-700 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">
+                  Start
                 </button>
               </div>
-              {addedDates.length > 0 ? (
-                <p className="text-xs text-stm-warm-600 mt-2">Nieuw: {addedDates.join(' | ')}</p>
-              ) : null}
-            </div>
+            </section>
+          ) : null}
 
-            <div>
-              <h3 className="text-sm font-semibold text-stm-warm-900 mb-2">Persoonsuggesties</h3>
-              <div className="space-y-1">
-                {task.suggestedPersons.map((name, index) => (
-                  <label key={`${name}-${index}`} className="flex gap-2 text-sm">
-                    <input type="checkbox" checked={selectedPersons.includes(name)} onChange={() => togglePersonSuggestion(name)} />
-                    <span>{name}</span>
-                  </label>
-                ))}
+          {participantId && !task && !done ? (
+            <section className="m-3 border border-stm-warm-200 bg-white p-3">
+              <button onClick={claimNextTask} disabled={busy} className="w-full bg-stm-warm-900 py-3 text-sm font-semibold text-white disabled:opacity-50">
+                Volgende foto
+              </button>
+            </section>
+          ) : null}
+
+          {done ? <p className="m-3 border border-stm-warm-200 bg-white p-4 text-sm text-stm-warm-700">Geen foto&apos;s meer beschikbaar.</p> : null}
+
+          {task ? (
+            <section className="flex min-h-0 flex-1 flex-col bg-white">
+              <div className="min-h-0 flex-1 overflow-y-auto">
+                {task.lowResUrl ? (
+                  <div className="flex min-h-[38vh] items-center justify-center bg-stm-warm-900">
+                    <img src={task.lowResUrl} alt={task.title || 'Foto'} className="max-h-[52vh] w-full object-contain" />
+                  </div>
+                ) : <div className="flex min-h-[30vh] items-center justify-center bg-stm-warm-100 text-sm text-stm-warm-500">Geen preview beschikbaar</div>}
+
+                <div className="space-y-3 p-3">
+                  <div>
+                    <h1 className="text-base font-semibold leading-tight">{task.title || '(zonder titel)'}</h1>
+                    <p
+                      ref={descriptionRef}
+                      className={`mt-1 text-sm leading-snug text-stm-warm-700 ${descriptionExpanded ? '' : 'line-clamp-5'}`}
+                    >
+                      {task.description || '(geen beschrijving)'}
+                    </p>
+                    {descriptionTruncated || descriptionExpanded ? (
+                      <button
+                        type="button"
+                        onClick={() => setDescriptionExpanded((expanded) => !expanded)}
+                        className="min-h-11 text-sm font-semibold text-stm-sepia-700 underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stm-sepia-700"
+                      >
+                        {descriptionExpanded ? 'Minder' : 'Meer'}
+                      </button>
+                    ) : null}
+                    <p className="mt-1 text-xs text-stm-warm-500">{task.yearRaw || 'Datum onbekend'} · {task.inventoryNumber || 'Inventaris onbekend'}</p>
+                  </div>
+                  {nasMediabankUrl(task) ? (
+                    <a
+                      href={nasMediabankUrl(task)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block min-h-11 border-t border-stm-warm-200 pt-3 text-sm font-semibold text-stm-sepia-700 underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stm-sepia-700"
+                    >
+                      Volledige metadata op de NAS-website (opent nieuw tabblad)
+                    </a>
+                  ) : null}
+
+                  <div className="border-t border-stm-warm-200 pt-3">
+                    <label className="mb-1 block text-sm font-semibold text-stm-warm-700">Datum</label>
+                    <p className="min-h-11 flex items-center border border-stm-warm-300 bg-stm-warm-100 px-3 py-2 text-base text-stm-warm-600">
+                      {task.yearRaw.trim() || 'Onbekend'}
+                    </p>
+                  </div>
+
+                  <details className="border-t border-stm-warm-200 pt-3">
+                    <summary className="flex min-h-11 cursor-pointer items-center text-sm font-semibold text-stm-warm-700">Datum toevoegen</summary>
+                    <div className="mt-2 flex gap-2">
+                      <input id="event-date" aria-label="Datum" value={dateInput} onChange={(e) => setDateInput(e.target.value)} placeholder="Bijv. 15 juli 1975" className="min-h-11 min-w-0 flex-1 border border-stm-warm-300 px-3 py-2 text-base focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stm-sepia-700" />
+                      <button onClick={addDateTerm} className="min-h-11 bg-stm-warm-200 px-3 py-2 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stm-sepia-700">Toevoegen</button>
+                    </div>
+                    {addedDates.length > 0 ? <p className="mt-1 text-xs text-stm-warm-600">{addedDates.join(' · ')}</p> : null}
+                  </details>
+
+                  <details className="border-t border-stm-warm-200 pt-3">
+                    <summary className="flex min-h-11 cursor-pointer items-center text-sm font-semibold text-stm-warm-700">Locatie toevoegen</summary>
+                    <a href={STM_EXPLORE_URL} target="_blank" rel="noopener noreferrer" className="mt-2 block text-xs font-semibold text-stm-sepia-700 underline">Open STM-kaart (nieuw tabblad)</a>
+                    <div className="mt-2 flex gap-2">
+                      <input aria-label="Locatie" value={placeInput} onChange={(e) => setPlaceInput(e.target.value)} placeholder="Bijv. Paramaribo" className="min-h-11 min-w-0 flex-1 border border-stm-warm-300 px-3 py-2 text-base focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stm-sepia-700" />
+                      <button onClick={addPlaceTerm} className="min-h-11 bg-stm-warm-200 px-3 py-2 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stm-sepia-700">Toevoegen</button>
+                    </div>
+                    {addedPlaces.map((place) => (
+                      <div key={place.text} className="mt-2 border-t border-stm-warm-100 pt-2 first:border-t-0 first:pt-0">
+                        {place.type ? (
+                          <p className="text-xs text-stm-warm-600">{place.text} <span className="text-stm-warm-500">({place.type})</span></p>
+                        ) : (
+                          <div>
+                            <p className="text-xs font-semibold text-stm-warm-700">{place.text} — kies type:</p>
+                            <div className="mt-1 flex flex-wrap gap-1">
+                              {LOCATION_TYPES.map((locationType) => (
+                                <button
+                                  key={locationType}
+                                  type="button"
+                                  onClick={() => setPlaceType(place.text, locationType)}
+                                  className="min-h-8 border border-stm-warm-300 px-2 py-1 text-xs font-semibold text-stm-warm-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stm-sepia-700"
+                                >
+                                  {locationType}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </details>
+
+                  <details className="border-t border-stm-warm-200 pt-3">
+                    <summary className="flex min-h-11 cursor-pointer items-center text-sm font-semibold text-stm-warm-700">Persoon toevoegen</summary>
+                    <div className="mt-2 flex gap-2">
+                      <input aria-label="Persoon" value={personInput} onChange={(e) => setPersonInput(e.target.value)} placeholder="Typ naam" className="min-h-11 min-w-0 flex-1 border border-stm-warm-300 px-3 py-2 text-base focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stm-sepia-700" />
+                      <button onClick={addPersonTerm} className="min-h-11 bg-stm-warm-200 px-3 py-2 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stm-sepia-700">Toevoegen</button>
+                    </div>
+                    {addedPersons.length > 0 ? <p className="mt-1 text-xs text-stm-warm-600">{addedPersons.join(' · ')}</p> : null}
+                  </details>
+
+                  <details className="border-t border-stm-warm-200 pt-3">
+                    <summary className="flex min-h-11 cursor-pointer items-center text-sm font-semibold text-stm-warm-700">Notitie toevoegen</summary>
+                    <textarea aria-label="Notitie" value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} className="mt-2 w-full border border-stm-warm-300 px-3 py-2 text-base focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stm-sepia-700" placeholder="Optioneel" />
+                  </details>
+                </div>
               </div>
-            </div>
 
-            <div>
-              <label className="block text-sm font-medium text-stm-warm-800 mb-1">Persoon toevoegen</label>
-              <input
-                value={personInput}
-                onChange={(e) => setPersonInput(e.target.value)}
-                placeholder="Typ naam"
-                className="w-full border border-stm-warm-300 px-3 py-2 text-sm"
-              />
-              <button onClick={addPersonTerm} className="mt-2 bg-stm-warm-200 px-3 py-1 text-xs">
-                Voeg persoon toe
-              </button>
-              {addedPersons.length > 0 ? (
-                <p className="text-xs text-stm-warm-600 mt-2">Nieuw: {addedPersons.join(' | ')}</p>
-              ) : null}
-            </div>
+              <div className="grid shrink-0 grid-cols-2 gap-2 border-t border-stm-warm-200 bg-white p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+                <button onClick={() => submitCurrentTask('skip')} disabled={busy} className="min-h-12 border border-stm-warm-300 py-3 text-base font-semibold text-stm-warm-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stm-sepia-700 disabled:opacity-50">Overslaan</button>
+                <button onClick={() => submitCurrentTask('confirm')} disabled={busy} className="min-h-12 bg-stm-sepia-700 py-3 text-base font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stm-sepia-700 disabled:opacity-50">Bevestigen</button>
+              </div>
+            </section>
+          ) : null}
+        </div>
 
-            <div>
-              <label className="block text-sm font-medium text-stm-warm-800 mb-1">Notitie</label>
-              <textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                rows={3}
-                className="w-full border border-stm-warm-300 px-3 py-2 text-sm"
-                placeholder="Optioneel"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                onClick={() => submitCurrentTask('confirm')}
-                disabled={busy}
-                className="bg-stm-sepia-700 text-white py-2 text-sm font-semibold disabled:opacity-50"
-              >
-                Bevestigen
-              </button>
-              <button
-                onClick={() => submitCurrentTask('skip')}
-                disabled={busy}
-                className="bg-stm-warm-300 text-stm-warm-900 py-2 text-sm font-semibold disabled:opacity-50"
-              >
-                Overslaan
-              </button>
-            </div>
-          </section>
-        ) : null}
-
-        {status ? (
-          <section className="border border-stm-warm-200 bg-white p-3 text-xs text-stm-warm-700">{status}</section>
-        ) : null}
+        {status ? <p className="shrink-0 border-t border-stm-warm-200 bg-white px-3 py-2 text-xs text-stm-warm-700">{status}</p> : null}
       </div>
-    </div>
+    </main>
   );
 }

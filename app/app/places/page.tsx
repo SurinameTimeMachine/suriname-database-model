@@ -1,17 +1,39 @@
 'use client';
 
-import PlaceEditor from '@/components/PlaceEditor';
+import PlaceEditor, {
+  type PlaceOrganizationContext,
+} from '@/components/PlaceEditor';
+import PlaceMergeView from '@/components/PlaceMergeView';
 import SourceFilter, {
   emptyFilterState,
   type SourceFilterState,
 } from '@/components/SourceFilter';
 import { useAuth } from '@/lib/auth';
+import { type AllData, loadAllData } from '@/lib/data';
 import { getActiveSources, useSourceRegistry } from '@/lib/sources';
-import { usePlaceTypes } from '@/lib/thesaurus';
-import type { GazetteerPlace } from '@/lib/types';
+import { readableTypeTextColor, usePlaceTypes } from '@/lib/thesaurus';
+import type {
+  DistrictAssertion,
+  E41Appellation,
+  GazetteerPlace,
+  LocationAssertion,
+  PlantationStatusType,
+  ProductAssertion,
+  PlaceName,
+  StatusAssertion,
+} from '@/lib/types';
 import { getPreferredName } from '@/lib/types';
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { extractPlaceId } from '@/lib/url';
 import { useSearchParams } from 'next/navigation';
+import {
+  memo,
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 type SortKey =
   | 'name'
@@ -19,10 +41,407 @@ type SortKey =
   | 'district'
   | 'psurIds'
   | 'externalLinks'
+  | 'wikidata'
+  | 'dikland'
   | 'placeType'
   | 'lat'
-  | 'modifiedAt';
+  | 'modifiedAt'
+  | 'map1930'
+  | 'almanakken'
+  | 'almanakkenReview';
 type SortDir = 'asc' | 'desc';
+type WorkspaceMode = 'browse' | 'review' | 'merge';
+
+type PublicationNotice = {
+  recordUrl?: string;
+  jsonldUrl?: string;
+  jsonUrl?: string;
+  message?: string;
+};
+
+type AlmanakkenReviewEntry = {
+  placeId: string;
+  qid: string;
+  sourceVersion: string;
+  rows: number;
+  firstYear: number | null;
+  lastYear: number | null;
+  productRows: number;
+  desertedRows: number;
+  sourceNames: number;
+  products: string[];
+  hasGazetteerSource: boolean;
+  hasProductAssertions: boolean;
+  hasStatusAssertions: boolean;
+  hasAlmanakkenObservations: boolean;
+  issues: Array<{
+    type: string;
+    label: string;
+    detail?: string;
+  }>;
+};
+
+type AlmanakkenMissingQid = {
+  qid: string;
+  rows: number;
+  firstYear: number | null;
+  lastYear: number | null;
+  sourceNames: string[];
+  products: string[];
+};
+
+type AlmanakkenReviewData = {
+  sourceVersion: string;
+  generatedAt: string;
+  rowCounts?: {
+    total: number;
+    withQid: number;
+    withoutQid: number;
+    attached: number;
+    unresolved: number;
+  };
+  byPlaceId: Record<string, AlmanakkenReviewEntry>;
+  missingQids?: AlmanakkenMissingQid[];
+  unlinkedRows?: Array<{
+    recordId: string;
+    year: number | null;
+    page: string | null;
+    sourceName: string | null;
+    standardizedName: string | null;
+    location: string | null;
+    product: string | null;
+  }>;
+};
+
+function normalizeNamesFromLegacy(entry: Record<string, unknown>): PlaceName[] {
+  type LegacyName = {
+    text?: string;
+    language?: string;
+    type?: string;
+    isPreferred?: boolean;
+    source?: string;
+    sourceYear?: number;
+  };
+  const prefLabel =
+    typeof entry.prefLabel === 'string' ? entry.prefLabel.trim() : '';
+  const altLabels = Array.isArray(entry.altLabels)
+    ? entry.altLabels.filter((x): x is string => typeof x === 'string')
+    : [];
+  const sranantongoNames = Array.isArray(entry.sranantongoNames)
+    ? entry.sranantongoNames.filter((x): x is string => typeof x === 'string')
+    : [];
+  const names: LegacyName[] = Array.isArray(entry.names)
+    ? entry.names.filter((x): x is LegacyName =>
+        Boolean(x && typeof x === 'object'),
+      )
+    : [];
+  if (prefLabel) {
+    const existingPreferred = names.find((name) => name.text === prefLabel);
+    if (existingPreferred) {
+      existingPreferred.isPreferred = true;
+    } else {
+      names.push({
+        text: prefLabel,
+        language: 'nl',
+        type: 'official',
+        isPreferred: true,
+      });
+    }
+  }
+  for (const label of altLabels) {
+    if (!label || label === prefLabel) continue;
+    const exists = names.some((name) => name.text === label);
+    if (exists) continue;
+    names.push({
+      text: label,
+      language: 'und',
+      type: 'historical',
+      isPreferred: false,
+    });
+  }
+  for (const name of sranantongoNames) {
+    if (!name || name === prefLabel) continue;
+    const exists = names.some((entryName) => entryName.text === name);
+    if (exists) continue;
+    names.push({
+      text: name,
+      language: 'srn',
+      type: 'vernacular',
+      isPreferred: false,
+    });
+  }
+  return names as PlaceName[];
+}
+
+function getEffectiveDistrictAssertion(
+  assertions: DistrictAssertion[],
+): DistrictAssertion | null {
+  if (assertions.length === 0) return null;
+  const explicitCurrent = assertions.find((a) => a.isCurrent);
+  if (explicitCurrent) return explicitCurrent;
+  const withYear = assertions.filter((a) => typeof a.sourceYear === 'number');
+  if (withYear.length > 0) {
+    return withYear.sort(
+      (a, b) => (b.sourceYear || 0) - (a.sourceYear || 0),
+    )[0];
+  }
+  return assertions[0];
+}
+
+function normalizeDistrictAssertionsFromLegacy(
+  entry: Record<string, unknown>,
+): DistrictAssertion[] {
+  if (Array.isArray(entry.districtAssertions)) {
+    return entry.districtAssertions
+      .filter((a): a is Record<string, unknown> =>
+        Boolean(a && typeof a === 'object'),
+      )
+      .map((a, idx) => ({
+        id:
+          typeof a.id === 'string' && a.id.trim()
+            ? a.id
+            : `district-assertion-${idx + 1}`,
+        districtId:
+          typeof a.districtId === 'string' && a.districtId.trim()
+            ? a.districtId
+            : null,
+        districtLabel:
+          typeof a.districtLabel === 'string' && a.districtLabel.trim()
+            ? a.districtLabel
+            : null,
+        source:
+          typeof a.source === 'string' && a.source.trim()
+            ? a.source
+            : 'almanakken',
+        sourceYear:
+          typeof a.sourceYear === 'number' && Number.isFinite(a.sourceYear)
+            ? a.sourceYear
+            : undefined,
+        certainty:
+          a.certainty === 'certain' ||
+          a.certainty === 'probable' ||
+          a.certainty === 'uncertain'
+            ? a.certainty
+            : undefined,
+        note: typeof a.note === 'string' && a.note.trim() ? a.note : null,
+        isCurrent: Boolean(a.isCurrent),
+      }));
+  }
+
+  const broader = typeof entry.broader === 'string' ? entry.broader : null;
+  const district = typeof entry.district === 'string' ? entry.district : null;
+  const sources = Array.isArray(entry.sources)
+    ? entry.sources.filter((x): x is string => typeof x === 'string')
+    : [];
+
+  if (!broader && !district) return [];
+
+  return [
+    {
+      id: 'district-assertion-1',
+      districtId: broader,
+      districtLabel: district,
+      source: preferAlmanakkenSource(sources),
+      sourceYear: undefined,
+      certainty: 'certain',
+      note: null,
+      isCurrent: true,
+    },
+  ];
+}
+
+function preferAlmanakkenSource(sources: string[]): string {
+  return sources.includes('almanakken')
+    ? 'almanakken'
+    : sources[0] || 'almanakken';
+}
+
+function normalizeProductAssertionsFromLegacy(
+  entry: Record<string, unknown>,
+): ProductAssertion[] {
+  const sources = Array.isArray(entry.sources)
+    ? entry.sources.filter((x): x is string => typeof x === 'string')
+    : [];
+  if (Array.isArray(entry.productAssertions)) {
+    return entry.productAssertions
+      .filter((a): a is Record<string, unknown> =>
+        Boolean(a && typeof a === 'object'),
+      )
+      .map((a, idx) => ({
+        id:
+          typeof a.id === 'string' && a.id.trim()
+            ? a.id
+            : `product-assertion-${idx + 1}`,
+        value: typeof a.value === 'string' && a.value.trim() ? a.value : '',
+        source:
+          typeof a.source === 'string' && a.source.trim()
+            ? a.source
+            : preferAlmanakkenSource(sources),
+        startYear:
+          typeof a.startYear === 'number' && Number.isFinite(a.startYear)
+            ? a.startYear
+            : undefined,
+        endYear:
+          typeof a.endYear === 'number' && Number.isFinite(a.endYear)
+            ? a.endYear
+            : undefined,
+        note: typeof a.note === 'string' && a.note.trim() ? a.note : null,
+      }))
+      .filter((a) => Boolean(a.value));
+  }
+
+  const placeType =
+    typeof entry.placeType === 'string' && entry.placeType.trim()
+      ? entry.placeType
+      : null;
+  if (!placeType) return [];
+  return [
+    {
+      id: 'product-assertion-1',
+      value: placeType,
+      source: preferAlmanakkenSource(sources),
+      startYear: undefined,
+      endYear: undefined,
+      note: null,
+    },
+  ];
+}
+
+function normalizeLocationAssertionsFromLegacy(
+  entry: Record<string, unknown>,
+): LocationAssertion[] {
+  const sources = Array.isArray(entry.sources)
+    ? entry.sources.filter((x): x is string => typeof x === 'string')
+    : [];
+  if (Array.isArray(entry.locationAssertions)) {
+    return entry.locationAssertions
+      .filter((a): a is Record<string, unknown> =>
+        Boolean(a && typeof a === 'object'),
+      )
+      .map((a, idx) => ({
+        id:
+          typeof a.id === 'string' && a.id.trim()
+            ? a.id
+            : `location-assertion-${idx + 1}`,
+        standardized:
+          typeof a.standardized === 'string' && a.standardized.trim()
+            ? a.standardized
+            : null,
+        original:
+          typeof a.original === 'string' && a.original.trim()
+            ? a.original
+            : null,
+        source:
+          typeof a.source === 'string' && a.source.trim()
+            ? a.source
+            : preferAlmanakkenSource(sources),
+        startYear:
+          typeof a.startYear === 'number' && Number.isFinite(a.startYear)
+            ? a.startYear
+            : undefined,
+        endYear:
+          typeof a.endYear === 'number' && Number.isFinite(a.endYear)
+            ? a.endYear
+            : undefined,
+        note: typeof a.note === 'string' && a.note.trim() ? a.note : null,
+        sourceRow:
+          typeof a.sourceRow === 'string' && a.sourceRow.trim()
+            ? a.sourceRow
+            : undefined,
+      }))
+      .filter((a) => Boolean(a.standardized || a.original));
+  }
+
+  const locationDescription =
+    typeof entry.locationDescription === 'string' &&
+    entry.locationDescription.trim()
+      ? entry.locationDescription
+      : null;
+  const locationDescriptionOriginal =
+    typeof entry.locationDescriptionOriginal === 'string' &&
+    entry.locationDescriptionOriginal.trim()
+      ? entry.locationDescriptionOriginal
+      : null;
+  if (!locationDescription && !locationDescriptionOriginal) return [];
+  return [
+    {
+      id: 'location-assertion-1',
+      standardized: locationDescription,
+      original: locationDescriptionOriginal,
+      source: preferAlmanakkenSource(sources),
+      startYear: undefined,
+      endYear: undefined,
+      note: null,
+    },
+  ];
+}
+
+function normalizeStatusAssertionsFromLegacy(
+  entry: Record<string, unknown>,
+): StatusAssertion[] {
+  const sources = Array.isArray(entry.sources)
+    ? entry.sources.filter((x): x is string => typeof x === 'string')
+    : [];
+  if (Array.isArray(entry.statusAssertions)) {
+    return entry.statusAssertions
+      .filter((a): a is Record<string, unknown> =>
+        Boolean(a && typeof a === 'object'),
+      )
+      .map((a, idx) => ({
+        id:
+          typeof a.id === 'string' && a.id.trim()
+            ? a.id
+            : `status-assertion-${idx + 1}`,
+        status:
+          a.status === 'planned' ||
+          a.status === 'built' ||
+          a.status === 'abandoned' ||
+          a.status === 'reactivated' ||
+          a.status === 'unknown'
+            ? (a.status as PlantationStatusType)
+            : 'unknown',
+        source:
+          typeof a.source === 'string' && a.source.trim()
+            ? a.source
+            : preferAlmanakkenSource(sources),
+        startYear:
+          typeof a.startYear === 'number' && Number.isFinite(a.startYear)
+            ? a.startYear
+            : undefined,
+        endYear:
+          typeof a.endYear === 'number' && Number.isFinite(a.endYear)
+            ? a.endYear
+            : undefined,
+        note: typeof a.note === 'string' && a.note.trim() ? a.note : null,
+      }));
+  }
+  return [];
+}
+
+function normalizePlaceEntry(p: GazetteerPlace): GazetteerPlace {
+  return {
+    ...p,
+    names: normalizeNamesFromLegacy(p as unknown as Record<string, unknown>),
+    districtAssertions: normalizeDistrictAssertionsFromLegacy(
+      p as unknown as Record<string, unknown>,
+    ),
+    productAssertions: normalizeProductAssertionsFromLegacy(
+      p as unknown as Record<string, unknown>,
+    ),
+    locationAssertions: normalizeLocationAssertionsFromLegacy(
+      p as unknown as Record<string, unknown>,
+    ),
+    statusAssertions: normalizeStatusAssertionsFromLegacy(
+      p as unknown as Record<string, unknown>,
+    ),
+  };
+}
+
+function getCurrentDistrictLabel(place: GazetteerPlace): string | null {
+  const assertions = place.districtAssertions || [];
+  const effective = getEffectiveDistrictAssertion(assertions);
+  return effective?.districtLabel || place.district || null;
+}
 
 function emptyPlace(): GazetteerPlace {
   return {
@@ -33,18 +452,65 @@ function emptyPlace(): GazetteerPlace {
     description: '',
     location: { lat: null, lng: null, wkt: null, crs: 'EPSG:4326' },
     sources: [],
-    wikidataQid: null,
     externalLinks: [],
     fid: null,
     psurIds: [],
     district: null,
+    districtAssertions: [],
     locationDescription: null,
     locationDescriptionOriginal: null,
     placeType: null,
+    productAssertions: [],
+    locationAssertions: [],
+    statusAssertions: [],
     diklandRefs: [],
     modifiedBy: null,
     modifiedAt: null,
   };
+}
+
+const COLUMN_DEFS: {
+  key: SortKey;
+  label: string;
+  defaultVisible: boolean;
+  alwaysVisible?: boolean;
+}[] = [
+  { key: 'name', label: 'Name', defaultVisible: true, alwaysVisible: true },
+  { key: 'type', label: 'Type', defaultVisible: true },
+  { key: 'district', label: 'District', defaultVisible: true },
+  { key: 'placeType', label: 'Product / Type', defaultVisible: false },
+  { key: 'psurIds', label: 'PSUR', defaultVisible: true },
+  { key: 'externalLinks', label: 'Links', defaultVisible: true },
+  { key: 'wikidata', label: 'WD', defaultVisible: true },
+  { key: 'dikland', label: 'Dik.', defaultVisible: true },
+  { key: 'lat', label: 'Coords', defaultVisible: true },
+  { key: 'modifiedAt', label: 'Modified', defaultVisible: true },
+  { key: 'map1930', label: 'Map', defaultVisible: true },
+  { key: 'almanakken', label: 'Alm.', defaultVisible: true },
+  { key: 'almanakkenReview', label: 'Alm. review', defaultVisible: true },
+];
+
+const LS_COLUMNS_KEY = 'stm-places-visible-columns';
+
+function loadVisibleColumns(): Set<SortKey> {
+  try {
+    const stored = localStorage.getItem(LS_COLUMNS_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored) as SortKey[];
+      return new Set(parsed);
+    }
+  } catch {
+    // ignore
+  }
+  return new Set(COLUMN_DEFS.filter((c) => c.defaultVisible).map((c) => c.key));
+}
+
+function saveVisibleColumns(cols: Set<SortKey>) {
+  try {
+    localStorage.setItem(LS_COLUMNS_KEY, JSON.stringify([...cols]));
+  } catch {
+    // ignore
+  }
 }
 
 function SortArrow({ active, dir }: { active: boolean; dir: SortDir }) {
@@ -56,35 +522,124 @@ function SortArrow({ active, dir }: { active: boolean; dir: SortDir }) {
   );
 }
 
+function almanakkenReviewSeverity(
+  review: AlmanakkenReviewEntry | undefined,
+): number {
+  if (!review) return 0;
+  return review.issues.length > 0 ? 3 : review.rows > 0 ? 1 : 0;
+}
+
+const ALMANAKKEN_ISSUE_DISPLAY: Record<
+  string,
+  { short: string; label: string }
+> = {
+  'shared-organization-link': {
+    short: 'Choose one or keep both',
+    label: 'Decide whether these are one or several physical plantations',
+  },
+};
+
+function almanakkenIssueShortLabel(type: string): string {
+  return ALMANAKKEN_ISSUE_DISPLAY[type]?.short ?? type;
+}
+
+function almanakkenReviewTitle(
+  review: AlmanakkenReviewEntry | undefined,
+): string | undefined {
+  if (!review) return undefined;
+  const years =
+    review.firstYear && review.lastYear
+      ? `${review.firstYear}-${review.lastYear}`
+      : 'no dated rows';
+  const products =
+    review.products.length > 0
+      ? review.products.slice(0, 8).join(', ')
+      : 'none';
+  return [
+    `Almanakken ${review.sourceVersion}`,
+    `QID: ${review.qid}`,
+    `Source observations: ${review.rows} (${years})`,
+    `Product observations: ${review.productRows}`,
+    `Deserted observations: ${review.desertedRows}`,
+    `Source-name variants: ${review.sourceNames}`,
+    `Products: ${products}${review.products.length > 8 ? ', ...' : ''}`,
+    `Gazetteer source tag: ${review.hasGazetteerSource ? 'yes' : 'no'}`,
+    `Physical-place projection saved: ${review.hasAlmanakkenObservations ? 'yes' : 'no'}`,
+    review.issues.length > 0
+      ? `Research decisions:\n${review.issues
+          .map((issue) => `- ${issue.label}${issue.detail ? ` (${issue.detail})` : ''}`)
+          .join('\n')}`
+      : 'Research decisions: none',
+  ].join('\n');
+}
+
 interface PlaceRowProps {
   place: GazetteerPlace;
   isSelected: boolean;
   onSelect: (id: string) => void;
+  almanakkenReview?: AlmanakkenReviewEntry;
+  mergeChecked?: boolean;
+  mergeDisabled?: boolean;
+  onMergeCheck?: (id: string, checked: boolean) => void;
   colors: Record<string, string>;
   labels: Record<string, string>;
+  visibleColumns: Set<SortKey>;
 }
 
 const PlaceRow = memo(function PlaceRow({
   place,
   isSelected,
   onSelect,
+  almanakkenReview,
+  mergeChecked,
+  mergeDisabled,
+  onMergeCheck,
   colors,
   labels,
+  visibleColumns,
 }: PlaceRowProps) {
   const handleClick = useCallback(
     () => onSelect(place.id),
     [onSelect, place.id],
   );
   const altNames = place.names.filter((n) => !n.isPreferred);
+  const vis = (key: SortKey) => visibleColumns.has(key);
+  const almanakkenSeverity = almanakkenReviewSeverity(almanakkenReview);
+  const visibleAlmanakkenIssues = almanakkenReview?.issues.slice(0, 3) ?? [];
+  const hiddenAlmanakkenIssueCount = Math.max(
+    0,
+    (almanakkenReview?.issues.length ?? 0) - visibleAlmanakkenIssues.length,
+  );
 
   return (
     <tr
+      data-place-id={place.id}
       onClick={handleClick}
-      className={`cursor-pointer border-b border-stm-warm-50 transition-colors ${
-        isSelected ? 'bg-stm-sepia-50' : 'bg-white hover:bg-stm-warm-50'
+      className={`cursor-pointer border-b border-ink/5 transition-colors ${
+        isSelected
+          ? 'bg-teal-soft/30 shadow-[inset_4px_0_0_var(--teal-strong)]'
+          : 'bg-cream/70 hover:bg-teal-soft/15'
       }`}
     >
-      {/* Name */}
+      {/* Merge checkbox */}
+      {onMergeCheck !== undefined && (
+        <td className="py-1.5 px-2 w-8" onClick={(e) => e.stopPropagation()}>
+          <input
+            type="checkbox"
+            checked={!!mergeChecked}
+            onChange={(e) => onMergeCheck(place.id, e.target.checked)}
+            className="accent-stm-sepia-500 cursor-pointer disabled:cursor-not-allowed"
+            aria-label={`Select ${getPreferredName(place)} for merge`}
+            disabled={!!place.mergedInto || (mergeDisabled && !mergeChecked)}
+            title={
+              mergeDisabled && !mergeChecked
+                ? 'Deselect one of the 2 chosen places first'
+                : undefined
+            }
+          />
+        </td>
+      )}
+      {/* Name — always visible */}
       <td className="py-1.5 px-2 font-medium text-stm-warm-800 max-w-55 truncate">
         {getPreferredName(place)}
         {altNames.length > 0 && (
@@ -100,104 +655,206 @@ const PlaceRow = memo(function PlaceRow({
       </td>
 
       {/* Type */}
-      <td className="py-1.5 px-2">
-        <span
-          className="inline-block px-1.5 py-0.5 text-[10px] font-medium rounded"
-          style={{
-            backgroundColor: (colors[place.type] || '#888') + '20',
-            color: colors[place.type] || '#888',
-          }}
-        >
-          {labels[place.type] || place.type}
-        </span>
-      </td>
+      {vis('type') && (
+        <td className="py-1.5 px-2">
+          <span
+            className="inline-block rounded border px-1.5 py-0.5 text-[10px] font-medium"
+            style={{
+              backgroundColor: (colors[place.type] || '#888888') + '4d',
+              borderColor: (colors[place.type] || '#888888') + '99',
+              color: readableTypeTextColor(colors[place.type] || '#888888'),
+            }}
+          >
+            {labels[place.type] || place.type}
+          </span>
+        </td>
+      )}
 
       {/* District */}
-      <td className="py-1.5 px-2 text-stm-warm-600 max-w-35 truncate">
-        {place.district ?? <span className="text-stm-warm-200">--</span>}
-      </td>
+      {vis('district') && (
+        <td className="py-1.5 px-2 text-stm-warm-600 max-w-35 truncate">
+          {getCurrentDistrictLabel(place) ?? (
+            <span className="text-stm-warm-200">--</span>
+          )}
+        </td>
+      )}
 
       {/* Product / Type */}
-      <td className="py-1.5 px-2 text-stm-warm-500 text-xs max-w-30 truncate">
-        {place.placeType ?? <span className="text-stm-warm-200">--</span>}
-      </td>
+      {vis('placeType') && (
+        <td className="py-1.5 px-2 text-stm-warm-500 text-xs max-w-30 truncate">
+          {place.placeType ?? <span className="text-stm-warm-200">--</span>}
+        </td>
+      )}
 
       {/* PSUR */}
-      <td className="py-1.5 px-2 text-stm-warm-500 font-mono text-xs">
-        {place.psurIds.length > 0 ? (
-          place.psurIds.join(', ')
-        ) : (
-          <span className="text-stm-warm-200">--</span>
-        )}
-      </td>
+      {vis('psurIds') && (
+        <td className="py-1.5 px-2 text-stm-warm-500 font-mono text-xs">
+          {place.psurIds.length > 0 ? (
+            place.psurIds.join(', ')
+          ) : (
+            <span className="text-stm-warm-200">--</span>
+          )}
+        </td>
+      )}
 
       {/* External Links */}
-      <td className="py-1.5 px-2 text-center">
-        {(place.externalLinks || []).length > 0 ? (
-          <span
-            className="inline-block min-w-5 px-1 py-0.5 text-[10px] font-medium rounded bg-stm-teal-100 text-stm-teal-700"
-            title={(place.externalLinks || [])
-              .map(
-                (l) =>
-                  `${l.authority}: ${l.identifier} (${l.matchType.replace('Match', '')})`,
-              )
-              .join('\n')}
-          >
-            {(place.externalLinks || []).length}
-          </span>
-        ) : (
-          <span className="text-stm-warm-200">--</span>
-        )}
-      </td>
+      {vis('externalLinks') && (
+        <td className="py-1.5 px-2 text-center">
+          {(place.externalLinks || []).length > 0 ? (
+            <span
+              className="inline-block min-w-5 px-1 py-0.5 text-[10px] font-medium rounded bg-stm-teal-100 text-stm-teal-700"
+              title={(place.externalLinks || [])
+                .map(
+                  (l) =>
+                    `${l.authority}: ${l.identifier} (${l.matchType.replace('Match', '')})`,
+                )
+                .join('\n')}
+            >
+              {(place.externalLinks || []).length}
+            </span>
+          ) : (
+            <span className="text-stm-warm-200">--</span>
+          )}
+        </td>
+      )}
+
+      {/* Wikidata */}
+      {vis('wikidata') && (
+        <td className="py-1.5 px-2 text-center">
+          {(place.externalLinks || []).some(
+            (l) => l.authority === 'wikidata',
+          ) ? (
+            <span
+              className="text-stm-teal-600"
+              title={
+                (place.externalLinks || [])
+                  .filter((l) => l.authority === 'wikidata')
+                  .map((l) => l.identifier)
+                  .join(', ') || undefined
+              }
+            >
+              &#10003;
+            </span>
+          ) : (
+            <span className="text-stm-warm-200">-</span>
+          )}
+        </td>
+      )}
+
+      {/* Dikland */}
+      {vis('dikland') && (
+        <td className="py-1.5 px-2 text-center">
+          {(place.diklandRefs || []).length > 0 ? (
+            <span
+              className="text-stm-sepia-500"
+              title={`${place.diklandRefs.length} Dikland ref${place.diklandRefs.length > 1 ? 's' : ''}`}
+            >
+              &#10003;
+            </span>
+          ) : (
+            <span className="text-stm-warm-200">-</span>
+          )}
+        </td>
+      )}
 
       {/* Coords */}
-      <td className="py-1.5 px-2 text-stm-warm-400 font-mono text-xs whitespace-nowrap">
-        {place.location.lat != null ? (
-          <>
-            {place.location.lat.toFixed(2)}, {place.location.lng?.toFixed(2)}
-          </>
-        ) : (
-          <span className="text-stm-warm-200">--</span>
-        )}
-      </td>
+      {vis('lat') && (
+        <td className="py-1.5 px-2 text-stm-warm-400 font-mono text-xs whitespace-nowrap">
+          {place.location.lat != null ? (
+            <>
+              {place.location.lat.toFixed(2)}, {place.location.lng?.toFixed(2)}
+            </>
+          ) : (
+            <span className="text-stm-warm-200">--</span>
+          )}
+        </td>
+      )}
 
       {/* Modified */}
-      <td className="py-1.5 px-2 text-stm-warm-400 text-xs whitespace-nowrap">
-        {place.modifiedAt ? (
-          new Date(place.modifiedAt).toLocaleDateString()
-        ) : (
-          <span className="text-stm-warm-200">--</span>
-        )}
-      </td>
+      {vis('modifiedAt') && (
+        <td className="py-1.5 px-2 text-stm-warm-400 text-xs whitespace-nowrap">
+          {place.modifiedAt ? (
+            new Date(place.modifiedAt).toLocaleDateString()
+          ) : (
+            <span className="text-stm-warm-200">--</span>
+          )}
+        </td>
+      )}
 
       {/* Map 1930 */}
-      <td className="py-1.5 px-2 text-center">
-        {place.sources.includes('map-1930') ? (
-          <span className="text-stm-sepia-500" title="In Map 1930">
-            &#10003;
-          </span>
-        ) : (
-          <span className="text-stm-warm-200">-</span>
-        )}
-      </td>
+      {vis('map1930') && (
+        <td className="py-1.5 px-2 text-center">
+          {place.sources.includes('map-1930') ? (
+            <span className="text-stm-sepia-500" title="In Map 1930">
+              &#10003;
+            </span>
+          ) : (
+            <span className="text-stm-warm-200">-</span>
+          )}
+        </td>
+      )}
 
       {/* Almanakken */}
-      <td className="py-1.5 px-2 text-center">
-        {place.sources.includes('almanakken') ? (
-          <span className="text-stm-teal-600" title="In Almanakken">
-            &#10003;
-          </span>
-        ) : (
-          <span className="text-stm-warm-200">-</span>
-        )}
-      </td>
+      {vis('almanakken') && (
+        <td className="py-1.5 px-2 text-center">
+          {place.sources.includes('almanakken') ? (
+            <span className="text-stm-teal-600" title="In Almanakken">
+              &#10003;
+            </span>
+          ) : (
+            <span className="text-stm-warm-200">-</span>
+          )}
+        </td>
+      )}
+
+      {/* Almanakken merge review */}
+      {vis('almanakkenReview') && (
+        <td className="py-1.5 px-2">
+          {almanakkenReview ? (
+            <span
+              className={`inline-flex max-w-56 items-center gap-1 rounded border px-1.5 py-0.5 text-[10px] font-medium ${
+                almanakkenSeverity === 3
+                  ? 'border-amber-300 bg-amber-50 text-amber-700'
+                  : 'border-stm-teal-200 bg-stm-teal-50 text-stm-teal-700'
+              }`}
+              title={almanakkenReviewTitle(almanakkenReview)}
+            >
+              {visibleAlmanakkenIssues.length > 0 ? (
+                <>
+                  {visibleAlmanakkenIssues.map((issue) => (
+                    <span key={issue.type} className="whitespace-nowrap">
+                      {almanakkenIssueShortLabel(issue.type)}
+                    </span>
+                  ))}
+                  {hiddenAlmanakkenIssueCount > 0 && (
+                    <span className="whitespace-nowrap">
+                      +{hiddenAlmanakkenIssueCount}
+                    </span>
+                  )}
+                </>
+              ) : (
+                <span className="whitespace-nowrap">ok</span>
+              )}
+            </span>
+          ) : (
+            <span className="text-stm-warm-200">-</span>
+          )}
+        </td>
+      )}
     </tr>
   );
 });
 
 export default function PlacesPage() {
+  return (
+    <Suspense>
+      <PlacesPageInner />
+    </Suspense>
+  );
+}
+
+function PlacesPageInner() {
   const { labels, colors, allTypes } = usePlaceTypes();
-  const searchParams = useSearchParams();
   const typeFilters = useMemo(
     () => [
       { value: 'all', label: 'All' },
@@ -209,16 +866,41 @@ export default function PlacesPage() {
     [allTypes, labels],
   );
   const [places, setPlaces] = useState<GazetteerPlace[]>([]);
+  const [allData, setAllData] = useState<AllData | null>(null);
+  const [almanakkenReview, setAlmanakkenReview] =
+    useState<AlmanakkenReviewData | null>(null);
+  const [workspaceMode, setWorkspaceMode] =
+    useState<WorkspaceMode>('browse');
   const [loading, setLoading] = useState(true);
   const { canEdit } = useAuth();
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  // Selected place IDs — supports up to 2 for future compare/merge
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isCreating, setIsCreating] = useState(false);
   const [sortKey, setSortKey] = useState<SortKey>('name');
   const [sortDir, setSortDir] = useState<SortDir>('asc');
   const [sourceFilter, setSourceFilter] =
     useState<SourceFilterState>(emptyFilterState());
+  const [visibleColumns, setVisibleColumns] = useState<Set<SortKey>>(() =>
+    loadVisibleColumns(),
+  );
+  const [columnsOpen, setColumnsOpen] = useState(false);
+  const [mergeCheckIds, setMergeCheckIds] = useState<string[]>([]);
+  const [showMerged, setShowMerged] = useState(false);
+  const [mergeView, setMergeView] = useState<{
+    placeA: GazetteerPlace;
+    placeB: GazetteerPlace;
+    organizationPeers: GazetteerPlace[];
+  } | null>(null);
+  const [publicationNotice, setPublicationNotice] =
+    useState<PublicationNotice | null>(null);
+  const columnsRef = useRef<HTMLDivElement>(null);
+  const tableScrollRef = useRef<HTMLDivElement>(null);
+
+  // URL sync: read ?place= query param
+  const searchParams = useSearchParams();
+  const lastAppliedPlace = useRef<string | null>(null);
   const {
     sources: registrySources,
     categories: registryCategories,
@@ -236,51 +918,321 @@ export default function PlacesPage() {
       .then((data) => {
         const entries: GazetteerPlace[] = data['@graph'] || data;
         if (!Array.isArray(entries)) return;
-        // Normalize: guard against legacy entries that lack names[]
-        setPlaces(
-          entries.map((p) => ({
-            ...p,
-            names: Array.isArray(p.names) ? p.names : [],
-          })),
-        );
+        // Normalize: support legacy prefLabel/altLabels and preserve source metadata.
+        setPlaces(entries.map(normalizePlaceEntry));
       })
       .finally(() => setLoading(false));
+
+    loadAllData()
+      .then(setAllData)
+      .catch(() => setAllData(null));
+
+    fetch('/data/almanakken-review.json')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data: AlmanakkenReviewData | null) => {
+        setAlmanakkenReview(data);
+      })
+      .catch(() => setAlmanakkenReview(null));
   }, []);
 
-  const toggleSort = useCallback((key: SortKey) => {
-    setSortKey((prev) => {
-      if (prev === key) {
-        setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
-        return key;
-      }
-      setSortDir('asc');
-      return key;
-    });
-  }, []);
-
-  const handleRowSelect = useCallback((id: string) => {
-    setSelectedId(id);
-    setIsCreating(false);
-  }, []);
+  // Initialize/update selection from URL ?place= param
+  useEffect(() => {
+    if (places.length === 0) return;
+    const placeId = searchParams.get('place');
+    if (placeId === lastAppliedPlace.current) return;
+    lastAppliedPlace.current = placeId;
+    if (placeId && places.some((p) => p.id === placeId)) {
+      setSelectedIds([placeId]);
+    }
+  }, [places, searchParams]);
 
   useEffect(() => {
-    const id = searchParams.get('id');
-    if (!id) return;
-    setSelectedId(id);
-    setIsCreating(false);
-  }, [searchParams]);
+    const requestedMode = searchParams.get('mode');
+    if (
+      requestedMode === 'browse' ||
+      requestedMode === 'review' ||
+      (requestedMode === 'merge' && canEdit)
+    ) {
+      setWorkspaceMode(requestedMode);
+    }
+  }, [canEdit, searchParams]);
+
+  // Sync selectedIds to URL as ?place= query param (skip transient stm-new-* IDs)
+  const syncUrlToSelection = useCallback((ids: string[]) => {
+    const persistIds = ids.filter((id) => !id.startsWith('stm-new-'));
+    const params = new URLSearchParams(window.location.search);
+    if (persistIds[0]) {
+      params.set('place', persistIds[0]);
+    } else {
+      params.delete('place');
+    }
+    const qs = params.toString();
+    window.history.replaceState(null, '', qs ? `/places?${qs}` : '/places');
+  }, []);
+
+  const toggleSort = useCallback(
+    (key: SortKey) => {
+      const boolKeys: SortKey[] = [
+        'wikidata',
+        'dikland',
+        'map1930',
+        'almanakken',
+        'almanakkenReview',
+      ];
+      if (key === sortKey) {
+        setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+      } else {
+        setSortKey(key);
+        setSortDir(boolKeys.includes(key) ? 'desc' : 'asc');
+      }
+    },
+    [sortKey],
+  );
+
+  const handleRowSelect = useCallback(
+    (id: string) => {
+      setSelectedIds([id]);
+      setIsCreating(false);
+      syncUrlToSelection([id]);
+    },
+    [syncUrlToSelection],
+  );
+
+  const changeWorkspaceMode = useCallback((mode: WorkspaceMode) => {
+    setWorkspaceMode(mode);
+    setMergeCheckIds([]);
+    setColumnsOpen(false);
+    if (mode === 'review') {
+      setSearch('');
+      setTypeFilter('all');
+      setSourceFilter(emptyFilterState());
+      setShowMerged(false);
+      setSortKey('almanakkenReview');
+      setSortDir('desc');
+    }
+    const params = new URLSearchParams(window.location.search);
+    if (mode === 'browse') params.delete('mode');
+    else params.set('mode', mode);
+    const query = params.toString();
+    window.history.replaceState(null, '', query ? `/places?${query}` : '/places');
+  }, []);
+
+  const clearReviewIssue = useCallback(
+    (placeIds: string[], issueType: string) => {
+      const ids = new Set(placeIds);
+      setAlmanakkenReview((current) => {
+        if (!current) return current;
+        const byPlaceId = { ...current.byPlaceId };
+        for (const [placeId, review] of Object.entries(byPlaceId)) {
+          if (!ids.has(placeId)) continue;
+          byPlaceId[placeId] = {
+            ...review,
+            issues: review.issues.filter((issue) => issue.type !== issueType),
+          };
+        }
+        return { ...current, byPlaceId };
+      });
+    },
+    [],
+  );
+
+  const narrowReviewIssue = useCallback(
+    (reviewedPlaceIds: string[], remainingPlaceIds: string[], issueType: string) => {
+      const reviewedIds = new Set(reviewedPlaceIds);
+      const remainingIds = new Set(remainingPlaceIds);
+      setAlmanakkenReview((current) => {
+        if (!current) return current;
+        const byPlaceId = { ...current.byPlaceId };
+        for (const [placeId, review] of Object.entries(byPlaceId)) {
+          if (!reviewedIds.has(placeId)) continue;
+          byPlaceId[placeId] = {
+            ...review,
+            issues: remainingIds.has(placeId)
+              ? review.issues.map((issue) =>
+                  issue.type === issueType
+                    ? { ...issue, detail: remainingPlaceIds.join(', ') }
+                    : issue,
+                )
+              : review.issues.filter((issue) => issue.type !== issueType),
+          };
+        }
+        return { ...current, byPlaceId };
+      });
+    },
+    [],
+  );
+
+  const handleMergeCheck = useCallback(
+    (id: string, checked: boolean) => {
+      setMergeCheckIds((prev) => {
+        if (checked) {
+          const place = places.find((p) => p.id === id);
+          if (!place || place.mergedInto) return prev;
+          if (prev.length >= 2 || prev.includes(id)) return prev;
+          return [...prev, id];
+        }
+        return prev.filter((x) => x !== id);
+      });
+    },
+    [places],
+  );
+
+  const openMergeForPlaces = useCallback((placeIds: string[]) => {
+    const activePlaceIds = placeIds.filter((id) => {
+      const place = places.find((candidate) => candidate.id === id);
+      return place && !place.deprecated && !place.mergedInto;
+    });
+    if (activePlaceIds.length < 2) return;
+    const placeA = places.find((p) => p.id === activePlaceIds[0]);
+    const placeB = places.find((p) => p.id === activePlaceIds[1]);
+    if (placeA && placeB) {
+      const qidA = placeA.externalLinks.find(
+        (link) => link.authority === 'wikidata',
+      )?.identifier;
+      const qidB = placeB.externalLinks.find(
+        (link) => link.authority === 'wikidata',
+      )?.identifier;
+      const organizationPeers =
+        qidA && qidA === qidB
+          ? places.filter(
+              (place) =>
+                place.type === 'plantation' &&
+                !place.deprecated &&
+                !place.mergedInto &&
+                place.externalLinks.some(
+                  (link) =>
+                    link.authority === 'wikidata' &&
+                    link.identifier === qidA,
+                ),
+            )
+          : [placeA, placeB];
+      setMergeView({ placeA, placeB, organizationPeers });
+      setSelectedIds([]);
+      setIsCreating(false);
+    }
+  }, [places]);
+
+  const handleOpenMergeView = useCallback(() => {
+    if (mergeCheckIds.length !== 2) return;
+    openMergeForPlaces(mergeCheckIds);
+  }, [mergeCheckIds, openMergeForPlaces]);
+
+  const handleMergeConfirm = useCallback(
+    async (merged: GazetteerPlace, retiredIds: string[]) => {
+      const res = await fetch('/api/places/merge', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          primaryId: merged.id,
+          retiredIds,
+          mergedPlace: merged,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to merge');
+      }
+      const saved = data.place as GazetteerPlace | undefined;
+      const retiredPlaces = (data.retiredPlaces || []) as GazetteerPlace[];
+      if (saved && retiredPlaces.length > 0) {
+        const retiredById = new Map(
+          retiredPlaces.map((place) => [place.id, place]),
+        );
+        setPlaces((previous) =>
+          previous.map((place) => {
+            if (place.id === saved.id) return saved;
+            return retiredById.get(place.id) ?? place;
+          }),
+        );
+      }
+      const mergedAllOrganizationPeers =
+        mergeView != null &&
+        retiredIds.length + 1 === mergeView.organizationPeers.length;
+      if (mergedAllOrganizationPeers && mergeView) {
+        clearReviewIssue(
+          mergeView.organizationPeers.map((place) => place.id),
+          'shared-organization-link',
+        );
+      } else if (mergeView) {
+        const reviewedPlaceIds = mergeView.organizationPeers.map(
+          (place) => place.id,
+        );
+        narrowReviewIssue(
+          reviewedPlaceIds,
+          reviewedPlaceIds.filter((id) => !retiredIds.includes(id)),
+          'shared-organization-link',
+        );
+      }
+      setMergeView(null);
+      setMergeCheckIds([]);
+      setSelectedIds([merged.id]);
+      syncUrlToSelection([merged.id]);
+      setPublicationNotice({
+        ...(data.publication ?? {}),
+        message:
+          mergedAllOrganizationPeers
+            ? 'Merge and review saved. The selected duplicate records are retired and this item is no longer in the review queue; public data updates after deployment.'
+            : 'Selective merge saved. Unselected records remain active and available for the remaining organization-link review; public data updates after deployment.',
+      });
+    },
+    [clearReviewIssue, mergeView, narrowReviewIssue, syncUrlToSelection],
+  );
+
+  const handleKeepBothPlaces = useCallback(
+    async (
+      qid: string,
+      placeIds: string[],
+      reviewedPlaceIds: string[],
+    ) => {
+      const res = await fetch('/api/organizations', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ qid, placeIds, reviewedPlaceIds }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to confirm both places');
+      }
+      clearReviewIssue(reviewedPlaceIds, 'shared-organization-link');
+      setPublicationNotice({
+        ...(data.publication ?? {}),
+        message:
+          'Organization links saved. Selected plantations will be connected after deployment; unselected records remain active and unlinked.',
+      });
+      setMergeView(null);
+      setMergeCheckIds([]);
+      setSelectedIds(placeIds.slice(0, 1));
+      syncUrlToSelection(placeIds.slice(0, 1));
+    },
+    [clearReviewIssue, syncUrlToSelection],
+  );
 
   // Filter, search, and sort
   const filtered = useMemo(() => {
     let list = places;
+    // Always hide deprecated (tombstoned) entries - they are archived, not live
+    list = list.filter((p) => !p.deprecated);
+    // Hide merged-retired entries unless explicitly shown
+    if (!showMerged) {
+      list = list.filter((p) => !p.mergedInto);
+    }
     if (typeFilter !== 'all') {
       list = list.filter((p) => p.type === typeFilter);
+    }
+    if (workspaceMode === 'review') {
+      list = list.filter((p) => {
+        const review = almanakkenReview?.byPlaceId[p.id];
+        return Boolean(review && review.issues.length > 0);
+      });
     }
     // Source filter
     if (sourceFilter.selected.size > 0) {
       const selected = [...sourceFilter.selected];
       const matchFn = (p: GazetteerPlace) => {
-        const check = (key: string) => p.sources.includes(key);
+        const check = (key: string) =>
+          key === 'dikland-collection'
+            ? (p.diklandRefs || []).length > 0
+            : p.sources.includes(key);
         return sourceFilter.mode === 'and'
           ? selected.every(check)
           : selected.some(check);
@@ -302,13 +1254,13 @@ export default function PlacesPage() {
               l.identifier.toLowerCase().includes(q) ||
               l.authority.toLowerCase().includes(q),
           ) ||
-          (p.district && p.district.toLowerCase().includes(q)) ||
+          (getCurrentDistrictLabel(p) &&
+            getCurrentDistrictLabel(p)?.toLowerCase().includes(q)) ||
           p.psurIds.some((id) => id.toLowerCase().includes(q)) ||
           (p.locationDescription &&
             p.locationDescription.toLowerCase().includes(q)),
       );
     }
-
     // Sort
     const dir = sortDir === 'asc' ? 1 : -1;
     list = [...list].sort((a, b) => {
@@ -326,7 +1278,7 @@ export default function PlacesPage() {
         case 'type':
           return cmp(a.type, b.type);
         case 'district':
-          return cmp(a.district, b.district);
+          return cmp(getCurrentDistrictLabel(a), getCurrentDistrictLabel(b));
         case 'psurIds':
           return cmp(a.psurIds[0] ?? null, b.psurIds[0] ?? null);
         case 'externalLinks':
@@ -340,17 +1292,87 @@ export default function PlacesPage() {
           return cmp(a.location.lat, b.location.lat);
         case 'modifiedAt':
           return cmp(a.modifiedAt, b.modifiedAt);
+        case 'wikidata':
+          return cmp(
+            (a.externalLinks || []).some((l) => l.authority === 'wikidata')
+              ? 1
+              : 0,
+            (b.externalLinks || []).some((l) => l.authority === 'wikidata')
+              ? 1
+              : 0,
+          );
+        case 'dikland':
+          return cmp(
+            (a.diklandRefs || []).length > 0 ? 1 : 0,
+            (b.diklandRefs || []).length > 0 ? 1 : 0,
+          );
+        case 'map1930':
+          return cmp(
+            a.sources.includes('map-1930') ? 1 : 0,
+            b.sources.includes('map-1930') ? 1 : 0,
+          );
+        case 'almanakken':
+          return cmp(
+            a.sources.includes('almanakken') ? 1 : 0,
+            b.sources.includes('almanakken') ? 1 : 0,
+          );
+        case 'almanakkenReview':
+          return cmp(
+            almanakkenReviewSeverity(almanakkenReview?.byPlaceId[a.id]) *
+              100000 +
+              (almanakkenReview?.byPlaceId[a.id]?.issues.length ?? 0) * 1000 +
+              (almanakkenReview?.byPlaceId[a.id]?.rows ?? 0),
+            almanakkenReviewSeverity(almanakkenReview?.byPlaceId[b.id]) *
+              100000 +
+              (almanakkenReview?.byPlaceId[b.id]?.issues.length ?? 0) * 1000 +
+              (almanakkenReview?.byPlaceId[b.id]?.rows ?? 0),
+          );
         default:
           return 0;
       }
     });
     return list;
-  }, [places, typeFilter, search, sortKey, sortDir, sourceFilter]);
+  }, [
+    places,
+    typeFilter,
+    search,
+    sortKey,
+    sortDir,
+    sourceFilter,
+    showMerged,
+    almanakkenReview,
+    workspaceMode,
+  ]);
+
+  const mergedCount = useMemo(
+    () => places.filter((p) => p.mergedInto && !p.deprecated).length,
+    [places],
+  );
+
+  const deprecatedCount = useMemo(
+    () => places.filter((p) => p.deprecated).length,
+    [places],
+  );
+
+  const almanakkenIssueCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    const reviews = Object.values(almanakkenReview?.byPlaceId ?? {});
+    for (const review of reviews) {
+      if (review.issues.length > 0) counts.any = (counts.any ?? 0) + 1;
+      for (const issue of review.issues) {
+        counts[issue.type] = (counts[issue.type] ?? 0) + 1;
+      }
+    }
+    return counts;
+  }, [almanakkenReview]);
 
   const districts = useMemo(
     () => places.filter((p) => p.type === 'district'),
     [places],
   );
+
+  // Derive the first selected place (single-panel for now)
+  const selectedId = selectedIds[0] ?? null;
 
   const selectedPlace = useMemo(() => {
     if (isCreating) return emptyPlace();
@@ -358,55 +1380,195 @@ export default function PlacesPage() {
     return places.find((p) => p.id === selectedId) || null;
   }, [places, selectedId, isCreating]);
 
-  const typeCounts = useMemo(() => {
-    const counts: Record<string, number> = { all: places.length };
-    for (const p of places) counts[p.type] = (counts[p.type] || 0) + 1;
-    return counts;
-  }, [places]);
+  useEffect(() => {
+    if (!selectedId || isCreating) return;
+    const row = tableScrollRef.current?.querySelector<HTMLElement>(
+      `[data-place-id="${CSS.escape(selectedId)}"]`,
+    );
+    row?.scrollIntoView({ block: 'nearest' });
+  }, [selectedId, isCreating, filtered]);
 
-  const handleSave = useCallback(async (updated: GazetteerPlace) => {
-    const res = await fetch('/api/places', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updated),
+  const selectedSourceAppellations = useMemo(() => {
+    if (!allData?.geojson || !selectedId || isCreating) return [];
+
+    const selectedFeature = allData.geojson.features.find((f) => {
+      const props = f.properties;
+      return (
+        props.stmId === selectedId ||
+        extractPlaceId(props.placeUri) === selectedId ||
+        extractPlaceId(props.plantationUri) === selectedId ||
+        extractPlaceId(props.featureUri) === selectedId ||
+        f.id === selectedId
+      );
     });
-    if (!res.ok) {
-      const data = await res.json();
-      throw new Error(data.error || 'Failed to save');
+
+    if (!selectedFeature) return [];
+
+    const props = selectedFeature.properties;
+    const plantationUri = props.plantationUri ?? null;
+    const featureUri = props.featureUri ?? props.placeUri ?? null;
+    const uriCandidates = [plantationUri, featureUri].filter(
+      (uri): uri is string => Boolean(uri),
+    );
+
+    const gathered: E41Appellation[] = [];
+    for (const uri of uriCandidates) {
+      const apps = allData.appellations[uri] || [];
+      gathered.push(...apps);
     }
-    // Update local state
-    setPlaces((prev) => {
-      const idx = prev.findIndex((p) => p.id === updated.id);
-      if (idx >= 0) {
-        const next = [...prev];
-        next[idx] = updated;
-        return next;
-      }
-      return [...prev, updated];
+
+    return Array.from(new Map(gathered.map((a) => [a['@id'], a])).values()).map(
+      (app) => ({
+        id: app['@id'],
+        text: app.P190_has_symbolic_content,
+        language: app.P72_has_language,
+        sourceUri: app.P128i_is_carried_by,
+        sourceLabel: app.P128i_is_carried_by
+          ? allData.sources[app.P128i_is_carried_by]?.prefLabel || null
+          : null,
+        sourceYear: app.mapYear ? Number(app.mapYear) : undefined,
+      }),
+    );
+  }, [allData, selectedId, isCreating]);
+
+  const selectedOrganizationContext = useMemo<
+    PlaceOrganizationContext | undefined
+  >(() => {
+    if (!allData || !selectedPlace || isCreating) return undefined;
+    if (selectedPlace.type !== 'plantation') return undefined;
+
+    const selectedFeature = allData.geojson.features.find((feature) => {
+      const props = feature.properties;
+      return (
+        props.stmId === selectedPlace.id ||
+        extractPlaceId(props.placeUri) === selectedPlace.id ||
+        extractPlaceId(props.plantationUri) === selectedPlace.id ||
+        extractPlaceId(props.featureUri) === selectedPlace.id ||
+        feature.id === selectedPlace.id
+      );
     });
-    setSelectedId(updated.id);
-    setIsCreating(false);
-  }, []);
+    const featureUri =
+      selectedFeature?.properties.plantationUri ??
+      selectedFeature?.properties.featureUri ??
+      selectedFeature?.properties.placeUri;
+    const physicalEntity = featureUri
+      ? (allData.plantations[featureUri] ?? allData.physicalFeatures[featureUri])
+      : undefined;
+    const gazetteerQid = selectedPlace.externalLinks
+      .find((link) => link.authority === 'wikidata')
+      ?.identifier.match(/Q\d+/i)?.[0]
+      ?.toUpperCase();
+    const organizationUri =
+      physicalEntity?.hasOrganizationalAssociation ??
+      (gazetteerQid
+        ? `https://data.surinametijdmachine.org/organization/${gazetteerQid}`
+        : undefined);
+    const organization = organizationUri
+      ? (allData.organizations[organizationUri] ?? null)
+      : null;
+    const organizationQid =
+      organization?.exactMatch?.match(/Q\d+/i)?.[0]?.toUpperCase() ??
+      gazetteerQid ??
+      null;
+    const linkedPlantations = organizationUri
+      ? Object.values(allData.plantations).filter(
+          (plantation) =>
+            plantation.hasOrganizationalAssociation === organizationUri,
+        )
+      : [];
+    const associationStatus =
+      selectedFeature?.properties.organizationAssociationStatus ??
+      physicalEntity?.organizationAssociationStatus ??
+      (organization && linkedPlantations.length > 0
+        ? gazetteerQid
+          ? 'linked'
+          : 'needs-organization-link'
+        : organization
+          ? 'needs-physical-link-review'
+          : 'needs-organization-link');
+
+    return {
+      organization,
+      associationStatus,
+      linkedPlantations,
+      observations: organizationUri
+        ? (allData.observations[organizationUri] ?? [])
+        : [],
+      qid: organizationQid,
+    };
+  }, [allData, selectedPlace, isCreating]);
+
+  const typeCounts = useMemo(() => {
+    const countable = places.filter(
+      (place) => !place.deprecated && (showMerged || !place.mergedInto),
+    );
+    const counts: Record<string, number> = { all: countable.length };
+    for (const place of countable) {
+      counts[place.type] = (counts[place.type] || 0) + 1;
+    }
+    return counts;
+  }, [places, showMerged]);
+
+  const handleSave = useCallback(
+    async (updated: GazetteerPlace) => {
+      const res = await fetch('/api/places', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updated),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to save');
+      }
+      // Use the server response which includes modifiedBy/modifiedAt set by the API
+      if (!data.place?.modifiedBy || !data.place?.modifiedAt) {
+        throw new Error('Server response missing modifiedBy/modifiedAt');
+      }
+      const saved: GazetteerPlace = data.place;
+      // Update local state
+      setPlaces((prev) => {
+        const idx = prev.findIndex((p) => p.id === saved.id);
+        if (idx >= 0) {
+          const next = [...prev];
+          next[idx] = saved;
+          return next;
+        }
+        return [...prev, saved];
+      });
+      setSelectedIds([saved.id]);
+      setIsCreating(false);
+      syncUrlToSelection([saved.id]);
+      setPublicationNotice(data.publication ?? {});
+    },
+    [syncUrlToSelection],
+  );
 
   const handleCancel = useCallback(() => {
-    setSelectedId(null);
+    setSelectedIds([]);
     setIsCreating(false);
-  }, []);
+    syncUrlToSelection([]);
+  }, [syncUrlToSelection]);
 
-  const handleDelete = useCallback(async (id: string) => {
-    const res = await fetch('/api/places', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id }),
-    });
-    if (!res.ok) {
+  const handleDelete = useCallback(
+    async (id: string) => {
+      const res = await fetch('/api/places', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to delete');
+      }
       const data = await res.json();
-      throw new Error(data.error || 'Failed to delete');
-    }
-    setPlaces((prev) => prev.filter((p) => p.id !== id));
-    setSelectedId(null);
-    setIsCreating(false);
-  }, []);
+      setPlaces((prev) => prev.filter((p) => p.id !== id));
+      setSelectedIds([]);
+      setIsCreating(false);
+      syncUrlToSelection([]);
+      setPublicationNotice(data.publication ?? null);
+    },
+    [syncUrlToSelection],
+  );
 
   // Keyboard: Escape closes editor
   useEffect(() => {
@@ -417,60 +1579,241 @@ export default function PlacesPage() {
     return () => window.removeEventListener('keydown', handler);
   }, [handleCancel]);
 
+  // Close columns popover on outside click
+  useEffect(() => {
+    if (!columnsOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (
+        columnsRef.current &&
+        !columnsRef.current.contains(e.target as Node)
+      ) {
+        setColumnsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [columnsOpen]);
+
+  const toggleColumn = useCallback((key: SortKey) => {
+    setVisibleColumns((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
+      }
+      saveVisibleColumns(next);
+      return next;
+    });
+  }, []);
+
+  const resetColumns = useCallback(() => {
+    const defaults = new Set(
+      COLUMN_DEFS.filter((c) => c.defaultVisible).map((c) => c.key),
+    );
+    saveVisibleColumns(defaults);
+    setVisibleColumns(defaults);
+  }, []);
+
+  const tableVisibleColumns = useMemo(() => {
+    if (workspaceMode !== 'review') {
+      return new Set(
+        [...visibleColumns].filter((column) => column !== 'almanakkenReview'),
+      );
+    }
+    return new Set<SortKey>(['name', 'type', 'wikidata', 'almanakkenReview']);
+  }, [visibleColumns, workspaceMode]);
+
+  const displayedColumnDefs = useMemo(
+    () =>
+      COLUMN_DEFS.filter((column) =>
+        workspaceMode === 'review'
+          ? tableVisibleColumns.has(column.key)
+          : column.key !== 'almanakkenReview' &&
+            (column.alwaysVisible || tableVisibleColumns.has(column.key)),
+      ),
+    [tableVisibleColumns, workspaceMode],
+  );
+
   if (loading) {
     return (
-      <div className="w-full h-full flex items-center justify-center bg-stm-warm-50">
-        <div className="text-center">
-          <div className="w-8 h-8 border-4 border-stm-sepia-400 border-t-transparent animate-spin mx-auto mb-3" />
-          <p className="text-stm-warm-500 text-sm">Loading places...</p>
-        </div>
+      <div className="w-full h-full flex items-center justify-center px-4">
+        <section
+          role="status"
+          aria-live="polite"
+          aria-busy="true"
+          className="w-full max-w-4xl site-panel p-5"
+        >
+          <div className="site-kicker mb-4">Loading places</div>
+          <div className="grid gap-3 sm:grid-cols-4">
+            <div className="h-16 animate-pulse bg-ink/5" />
+            <div className="h-16 animate-pulse bg-ink/5" />
+            <div className="h-16 animate-pulse bg-ink/5" />
+            <div className="h-16 animate-pulse bg-ink/5" />
+          </div>
+        </section>
       </div>
     );
   }
 
   return (
-    <div className="h-full flex flex-col bg-stm-warm-50 overflow-hidden">
-      {/* Top bar: auth + tabs */}
-      <div className="border-b border-stm-warm-200 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-          <div className="flex items-center justify-between gap-4">
+    <div className="relative h-full min-h-0 flex flex-col overflow-hidden">
+      {/* Top bar */}
+      <div className="border-b border-ink/10 bg-cream">
+        <div className="px-4 py-3 sm:px-6 lg:px-8">
+          <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
             <div>
-              <h1 className="text-xl font-serif font-bold text-stm-warm-800">
+              <div className="site-kicker mb-1">Gazetteer</div>
+              <h1 className="text-xl font-semibold text-ink">
                 Suriname Gazetteer
               </h1>
+            </div>
+            <div
+              className="inline-flex w-full shrink-0 border border-ink/15 bg-background p-0.5 sm:w-auto"
+              role="group"
+              aria-label="Gazetteer workspace"
+            >
+              {(
+                [
+                  ['browse', 'Browse'],
+                  ['review', `Review (${almanakkenIssueCounts.any ?? 0})`],
+                  ...(canEdit ? ([['merge', 'Merge']] as const) : []),
+                ] as const
+              ).map(([mode, label]) => (
+                <button
+                  key={mode}
+                  type="button"
+                  onClick={() => changeWorkspaceMode(mode)}
+                  aria-pressed={workspaceMode === mode}
+                  className={`min-w-0 flex-1 px-3 py-1.5 text-sm font-medium transition-colors sm:flex-none ${
+                    workspaceMode === mode
+                      ? 'bg-teal-strong text-white'
+                      : 'text-ink/60 hover:bg-ink/5 hover:text-ink'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
             </div>
           </div>
         </div>
       </div>
 
-      <>
-        {/* Search + filters */}
-        <div className="border-b border-stm-warm-100 bg-white/50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
-            <div className="flex items-center gap-3 flex-wrap">
-              {/* Search */}
-              <div className="relative flex-1 min-w-48">
-                <input
-                  type="text"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search by name, district, PSUR ID..."
-                  className="w-full pl-8 pr-8 py-1.5 text-sm border border-stm-warm-200 rounded bg-white focus:ring-2 focus:ring-stm-sepia-400 focus:border-stm-sepia-400 outline-none"
-                />
-                <svg
-                  className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stm-warm-400 pointer-events-none"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+      {publicationNotice && (
+        <div className="border-b border-stm-warm-300/40 bg-stm-sepia-50 px-4 py-2 text-sm text-ink sm:px-6 lg:px-8">
+          {publicationNotice.message ??
+            'Gazetteer saved. The public HTML, JSON and JSON-LD representations will update with the deployment generated from this commit.'}
+          <span className="ml-2 inline-flex flex-wrap gap-2">
+            {publicationNotice.recordUrl && <a className="underline" href={publicationNotice.recordUrl}>record</a>}
+            {publicationNotice.jsonldUrl && <a className="underline" href={publicationNotice.jsonldUrl}>JSON-LD</a>}
+            {publicationNotice.jsonUrl && <a className="underline" href={publicationNotice.jsonUrl}>JSON</a>}
+          </span>
+        </div>
+      )}
+
+      {mergeView ? (
+        <PlaceMergeView
+          placeA={mergeView.placeA}
+          placeB={mergeView.placeB}
+          organizationPeers={mergeView.organizationPeers}
+          districts={districts}
+          canEdit={canEdit}
+          onMerge={handleMergeConfirm}
+          onKeepBoth={handleKeepBothPlaces}
+          onCancel={() => setMergeView(null)}
+        />
+      ) : (
+        <>
+          {/* Search + filters */}
+          <div className="border-b border-ink/10 bg-cream/80">
+            <div className="px-4 py-2 sm:px-6 lg:px-8">
+              <div className="flex items-center gap-3 flex-wrap">
+                {/* Search */}
+                <div className="relative flex-1 min-w-48">
+                  <input
+                    type="text"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Search by name, district, PSUR ID..."
+                    className="w-full border border-ink/15 bg-cream/95 py-1.5 pl-8 pr-8 text-sm text-ink/80 outline-none transition focus:border-teal-strong focus:ring-1 focus:ring-teal-bright/20"
+                  />
+                  <svg
+                    className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-ink/35 pointer-events-none"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle cx="11" cy="11" r="8" strokeWidth="2" />
+                    <path d="m21 21-4.35-4.35" strokeWidth="2" />
+                  </svg>
+                  {search && (
+                    <button
+                      onClick={() => setSearch('')}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-ink/35 hover:text-teal-strong"
+                      aria-label="Clear search"
+                    >
+                      <svg
+                        className="w-3.5 h-3.5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          d="M18 6 6 18M6 6l12 12"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                    </button>
+                  )}
+                </div>
+
+                {/* Browsing and merge filters */}
+                {workspaceMode !== 'review' && (
+                  <>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <label className="text-xs text-ink/55 whitespace-nowrap uppercase tracking-[0.2em]">
+                    Place type
+                  </label>
+                  <select
+                    value={typeFilter}
+                    onChange={(e) => setTypeFilter(e.target.value)}
+                    className="cursor-pointer border border-ink/15 bg-cream/95 py-1.5 pl-2.5 pr-7 text-sm text-ink/75 outline-none transition focus:border-teal-strong focus:ring-1 focus:ring-teal-bright/20"
+                  >
+                    {typeFilters.map(({ value, label }) => (
+                      <option key={value} value={value}>
+                        {label} ({typeCounts[value] ?? 0})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Source filter */}
+                {!registryLoading && (
+                  <div className="border-l border-ink/10 pl-3">
+                    <SourceFilter
+                      sources={activeRegistrySources}
+                      categories={registryCategories}
+                      value={sourceFilter}
+                      onChange={setSourceFilter}
+                    />
+                  </div>
+                )}
+
+                {/* Columns toggle */}
+                <div
+                  className="relative border-l border-ink/10 pl-3 shrink-0"
+                  ref={columnsRef}
                 >
-                  <circle cx="11" cy="11" r="8" strokeWidth="2" />
-                  <path d="m21 21-4.35-4.35" strokeWidth="2" />
-                </svg>
-                {search && (
                   <button
-                    onClick={() => setSearch('')}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 text-stm-warm-400 hover:text-stm-warm-600"
-                    aria-label="Clear search"
+                    onClick={() => setColumnsOpen((o) => !o)}
+                    className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs border transition-colors ${
+                      columnsOpen
+                        ? 'border-teal-strong bg-teal-soft/30 text-teal-strong'
+                        : 'border-ink/15 bg-cream/95 text-ink/60 hover:border-teal-strong/40 hover:text-ink'
+                    }`}
+                    aria-expanded={columnsOpen}
+                    aria-haspopup="true"
                   >
                     <svg
                       className="w-3.5 h-3.5"
@@ -479,140 +1822,313 @@ export default function PlacesPage() {
                       viewBox="0 0 24 24"
                     >
                       <path
-                        d="M18 6 6 18M6 6l12 12"
-                        strokeWidth="2"
                         strokeLinecap="round"
+                        strokeWidth="2"
+                        d="M9 4h1v16H9zM14 4h1v16h-1z"
+                      />
+                      <rect x="3" y="4" width="4" height="16" strokeWidth="2" />
+                      <rect
+                        x="17"
+                        y="4"
+                        width="4"
+                        height="16"
+                        strokeWidth="2"
                       />
                     </svg>
+                    Columns
+                    <span className="text-ink/40">
+                      ({visibleColumns.size}/{COLUMN_DEFS.length})
+                    </span>
+                  </button>
+
+                  {columnsOpen && (
+                    <div className="site-panel absolute left-0 top-full z-20 mt-1 min-w-44 py-1">
+                      {COLUMN_DEFS.filter(
+                        (column) => column.key !== 'almanakkenReview',
+                      ).map((col) => (
+                        <label
+                          key={col.key}
+                          className={`flex items-center gap-2 px-3 py-1.5 text-xs cursor-pointer select-none ${
+                            col.alwaysVisible
+                              ? 'text-ink/40 cursor-not-allowed'
+                              : 'text-ink/70 hover:bg-background'
+                          }`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={
+                              col.alwaysVisible || visibleColumns.has(col.key)
+                            }
+                            disabled={col.alwaysVisible}
+                            onChange={() =>
+                              !col.alwaysVisible && toggleColumn(col.key)
+                            }
+                            className="accent-teal-strong"
+                          />
+                          {col.label}
+                          {col.alwaysVisible && (
+                            <span className="ml-auto text-ink/30 text-[10px]">
+                              always
+                            </span>
+                          )}
+                        </label>
+                      ))}
+                      <div className="mt-1 border-t border-ink/10 px-3 pb-1 pt-1">
+                        <button
+                          onClick={resetColumns}
+                          className="text-[11px] text-ink/45 hover:text-teal-strong transition-colors"
+                        >
+                          Reset to defaults
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                  </>
+                )}
+
+                {/* Merge selection controls */}
+                {canEdit && workspaceMode === 'merge' && (
+                  <div className="flex items-center gap-2 border-l border-ink/10 pl-3 shrink-0">
+                    <span className="text-xs text-teal-strong whitespace-nowrap uppercase tracking-[0.2em]">
+                      {mergeCheckIds.length === 0
+                        ? 'Select 2 records'
+                        : mergeCheckIds.length === 1
+                          ? '1 of 2 selected'
+                          : '2 selected'}
+                    </span>
+                    {mergeCheckIds.length === 2 && (
+                      <button
+                        onClick={handleOpenMergeView}
+                        className="border border-teal-strong bg-teal-strong px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-teal-strong/90"
+                      >
+                        Merge selected
+                      </button>
+                    )}
+                    {mergeCheckIds.length > 0 && (
+                      <button
+                        onClick={() => setMergeCheckIds([])}
+                        className="text-xs text-ink/45 hover:text-teal-strong underline"
+                      >
+                        clear
+                      </button>
+                    )}
+                  </div>
+                )}
+
+                {/* Add button */}
+                {canEdit && workspaceMode === 'browse' && (
+                  <button
+                    onClick={() => {
+                      setIsCreating(true);
+                      setSelectedIds([]);
+                      syncUrlToSelection([]);
+                    }}
+                    className="shrink-0 border border-ink/20 px-3 py-1.5 text-sm font-medium text-ink/70 transition hover:border-teal-strong hover:text-teal-strong"
+                  >
+                    + Add Place
                   </button>
                 )}
               </div>
+            </div>
+          </div>
 
-              {/* Type filter */}
-              <div className="flex items-center gap-1.5 shrink-0">
-                <label className="text-xs text-stm-warm-500 whitespace-nowrap">
-                  Place type
-                </label>
-                <select
-                  value={typeFilter}
-                  onChange={(e) => setTypeFilter(e.target.value)}
-                  className="text-sm border border-stm-warm-200 rounded bg-white pl-2.5 pr-7 py-1.5 text-stm-warm-700 focus:ring-2 focus:ring-stm-sepia-400 focus:border-stm-sepia-400 outline-none cursor-pointer"
-                >
-                  {typeFilters.map(({ value, label }) => (
-                    <option key={value} value={value}>
-                      {label} ({typeCounts[value] ?? 0})
-                    </option>
-                  ))}
-                </select>
+          {almanakkenReview && workspaceMode === 'review' && (
+            <div className="border-b border-ink/10 bg-background/80 px-4 py-2 text-xs text-ink/60 sm:px-6 lg:px-8">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="font-medium text-ink/75">
+                  {almanakkenIssueCounts.any ?? 0} place records pending
+                </span>
+                {(almanakkenReview.missingQids?.length ?? 0) > 0 && (
+                  <span
+                    className="border-l border-ink/10 pl-2 text-ink/50"
+                    title="Almanakken QIDs with observations but no active Gazetteer place link"
+                  >
+                    {almanakkenReview.missingQids?.length ?? 0} organization IDs
+                    have no place record
+                  </span>
+                )}
+                {(almanakkenReview.unlinkedRows?.length ?? 0) > 0 && (
+                  <span
+                    className="border-l border-ink/10 pl-2 text-amber-800"
+                    title="These source rows cannot enter the place review queue until a Wikidata QID is supplied in the source data"
+                  >
+                    {almanakkenReview.unlinkedRows?.length ?? 0} source rows
+                    have no QID
+                  </span>
+                )}
               </div>
-
-              {/* Source filter */}
-              {!registryLoading && (
-                <div className="border-l border-stm-warm-200 pl-3">
-                  <SourceFilter
-                    sources={activeRegistrySources}
-                    categories={registryCategories}
-                    value={sourceFilter}
-                    onChange={setSourceFilter}
-                  />
-                </div>
-              )}
-
-              {/* Add button */}
-              {canEdit && (
-                <button
-                  onClick={() => {
-                    setIsCreating(true);
-                    setSelectedId(null);
-                  }}
-                  className="px-3 py-1.5 text-sm font-medium bg-stm-teal-600 text-white rounded hover:bg-stm-teal-700 transition-colors shrink-0"
-                >
-                  + Add Place
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Main content: table + editor */}
-        <div className="flex-1 overflow-hidden flex">
-          {/* Place table */}
-          <div className="flex-1 overflow-auto">
-            <div className="text-xs text-stm-warm-400 px-4 sm:px-6 lg:px-8 pt-2 pb-1 max-w-350 mx-auto">
-              {filtered.length} of {places.length} places
-            </div>
-
-            <div className="px-4 sm:px-6 lg:px-8 pb-4 max-w-350 mx-auto">
-              <table className="w-full text-sm border-collapse">
-                <thead className="sticky top-0 z-10 bg-white">
-                  <tr className="text-left text-xs text-stm-warm-500 border-b border-stm-warm-200">
-                    {(
-                      [
-                        ['name', 'Name'],
-                        ['type', 'Type'],
-                        ['district', 'District'],
-                        ['placeType', 'Product / Type'],
-                        ['psurIds', 'PSUR'],
-                        ['externalLinks', 'Links'],
-                        ['lat', 'Coords'],
-                        ['modifiedAt', 'Modified'],
-                      ] as [SortKey, string][]
-                    ).map(([key, label]) => (
-                      <th
-                        key={key}
-                        className="py-2 px-2 font-medium cursor-pointer hover:text-stm-warm-700 select-none whitespace-nowrap"
-                        onClick={() => toggleSort(key)}
-                      >
-                        {label}
-                        <SortArrow active={sortKey === key} dir={sortDir} />
-                      </th>
-                    ))}
-                    <th className="py-2 px-2 font-medium whitespace-nowrap text-center">
-                      Map
-                    </th>
-                    <th className="py-2 px-2 font-medium whitespace-nowrap text-center">
-                      Alm.
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filtered.map((place) => (
-                    <PlaceRow
-                      key={place.id}
-                      place={place}
-                      isSelected={selectedId === place.id}
-                      onSelect={handleRowSelect}
-                      colors={colors}
-                      labels={labels}
-                    />
-                  ))}
-                </tbody>
-              </table>
-
-              {filtered.length === 0 && (
-                <p className="text-sm text-stm-warm-400 text-center py-8">
-                  No places match your search.
-                </p>
-              )}
-            </div>
-          </div>
-
-          {/* Editor panel */}
-          {selectedPlace && (
-            <div className="w-105 shrink-0 border-l border-stm-warm-200 bg-stm-warm-50 overflow-y-auto">
-              <PlaceEditor
-                key={selectedPlace.id}
-                place={selectedPlace}
-                districts={districts}
-                canEdit={canEdit}
-                onSave={handleSave}
-                onCancel={handleCancel}
-                onDelete={canEdit ? handleDelete : undefined}
-              />
             </div>
           )}
-        </div>
-      </>
+
+          {/* Main content: table + editor */}
+          <div className="flex min-h-0 flex-1 overflow-hidden">
+            {/* Place table */}
+            <div
+              ref={tableScrollRef}
+              className="min-w-0 flex-1 overflow-auto"
+            >
+              <div className="px-4 pb-4 sm:px-6 lg:px-8">
+                <table className="w-full min-w-max border-collapse border border-ink/10 bg-cream/70 text-sm shadow-[0_15px_35px_rgba(0,30,24,0.08)]">
+                  <caption className="caption-top border-x border-t border-ink/10 bg-background/95 px-3 py-1.5 text-left text-xs text-ink/45">
+                    <span className="inline-flex min-w-max items-center gap-3">
+                      <span>
+                        {workspaceMode === 'review'
+                          ? `${filtered.length} pending place reviews`
+                          : `${filtered.length} of ${places.length - deprecatedCount} places`}
+                      </span>
+                      {selectedPlace && !isCreating && (
+                        <span className="hidden max-w-80 truncate text-teal-strong md:inline">
+                          &middot; selected: {getPreferredName(selectedPlace)}
+                        </span>
+                      )}
+                      {mergedCount > 0 && (
+                        <span>
+                          &middot;{' '}
+                          {showMerged ? (
+                            <>
+                              {mergedCount} merged shown{' '}
+                              <button
+                                onClick={() => setShowMerged(false)}
+                                className="underline hover:text-teal-strong"
+                              >
+                                hide
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              {mergedCount} merged hidden{' '}
+                              <button
+                                onClick={() => setShowMerged(true)}
+                                className="underline hover:text-teal-strong"
+                              >
+                                show
+                              </button>
+                            </>
+                          )}
+                        </span>
+                      )}
+                      {deprecatedCount > 0 && (
+                        <span className="text-ink/30">
+                          &middot; {deprecatedCount} deprecated
+                        </span>
+                      )}
+                    </span>
+                  </caption>
+                  <thead className="sticky top-0 z-10 bg-cream">
+                    <tr className="border-b border-ink/10 text-left text-xs text-ink/55 uppercase tracking-[0.2em]">
+                      {canEdit && workspaceMode === 'merge' && (
+                        <th
+                          className="py-2 px-2 w-8"
+                          aria-label="Select for merge"
+                        />
+                      )}
+                      {displayedColumnDefs.map((col) => (
+                        <th
+                          key={col.key}
+                          className="cursor-pointer select-none whitespace-nowrap px-2 py-2 font-medium hover:text-ink"
+                          onClick={() => toggleSort(col.key)}
+                        >
+                          {col.label}
+                          <SortArrow
+                            active={sortKey === col.key}
+                            dir={sortDir}
+                          />
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filtered.map((place) => (
+                      <PlaceRow
+                        key={place.id}
+                        place={place}
+                        isSelected={selectedIds.includes(place.id)}
+                        onSelect={handleRowSelect}
+                        almanakkenReview={
+                          almanakkenReview?.byPlaceId[place.id]
+                        }
+                        mergeChecked={
+                          canEdit && workspaceMode === 'merge'
+                            ? mergeCheckIds.includes(place.id)
+                            : undefined
+                        }
+                        mergeDisabled={
+                          canEdit && workspaceMode === 'merge'
+                            ? mergeCheckIds.length >= 2
+                            : undefined
+                        }
+                        onMergeCheck={
+                          canEdit && workspaceMode === 'merge'
+                            ? handleMergeCheck
+                            : undefined
+                        }
+                        colors={colors}
+                        labels={labels}
+                        visibleColumns={tableVisibleColumns}
+                      />
+                    ))}
+                  </tbody>
+                </table>
+
+                {filtered.length === 0 && (
+                  <p className="py-8 text-center text-sm text-ink/40">
+                    {workspaceMode === 'review'
+                      ? 'No place records are waiting for review.'
+                      : 'No places match your search.'}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Detail panel */}
+            {selectedPlace && (
+              <aside className="absolute inset-y-0 right-0 z-40 hidden w-[clamp(34rem,52vw,58rem)] flex-col overflow-hidden border-l border-ink/10 bg-background shadow-[-20px_0_50px_rgba(0,30,24,0.16)] lg:flex">
+                <div className="min-h-0 flex-1 overflow-hidden">
+                  <PlaceEditor
+                    key={selectedPlace.id}
+                    place={selectedPlace}
+                    districts={districts}
+                    sourceAppellations={selectedSourceAppellations}
+                    almanakkenReview={
+                      almanakkenReview?.byPlaceId[selectedPlace.id]
+                    }
+                    organizationContext={selectedOrganizationContext}
+                    canEdit={canEdit}
+                    onSave={handleSave}
+                    onCancel={handleCancel}
+                    onDelete={canEdit ? handleDelete : undefined}
+                    onReviewPhysicalLinks={openMergeForPlaces}
+                  />
+                </div>
+              </aside>
+            )}
+
+            {selectedPlace && (
+              <div className="fixed inset-0 z-50 flex w-screen max-w-full flex-col overflow-hidden bg-background lg:hidden">
+                <div className="min-h-0 flex-1 overflow-hidden">
+                  <PlaceEditor
+                    key={selectedPlace.id}
+                    place={selectedPlace}
+                    districts={districts}
+                    sourceAppellations={selectedSourceAppellations}
+                    almanakkenReview={
+                      almanakkenReview?.byPlaceId[selectedPlace.id]
+                    }
+                    organizationContext={selectedOrganizationContext}
+                    canEdit={canEdit}
+                    onSave={handleSave}
+                    onCancel={handleCancel}
+                    onDelete={canEdit ? handleDelete : undefined}
+                    onReviewPhysicalLinks={openMergeForPlaces}
+                  />
+                </div>
+              </div>
+            )}
+
+          </div>
+        </>
+      )}
     </div>
   );
 }

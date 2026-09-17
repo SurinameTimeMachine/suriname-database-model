@@ -1,8 +1,10 @@
 'use client';
 
 import 'leaflet/dist/leaflet.css';
-import type { GeoJSONCollection, GeoJSONFeature } from '@/lib/types';
+import { loadAllmapsAnnotation } from '@/lib/allmaps';
+import { HISTORIC_MAPS } from '@/lib/historic-maps';
 import { usePlaceTypes } from '@/lib/thesaurus';
+import type { GeoJSONCollection, GeoJSONFeature } from '@/lib/types';
 import L from 'leaflet';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -26,41 +28,10 @@ interface OverlayConfig {
 }
 
 const OVERLAY_CONFIGS: OverlayConfig[] = [
-  {
-    id: '1930-plantation',
-    label: '1930 Plantation Map',
-    annotationUrls: [
-      'https://annotations.allmaps.org/maps/d9191cafde1831f0', // sheet 3
-      'https://annotations.allmaps.org/maps/dc967c11ce9e86b3', // sheet 4
-      'https://annotations.allmaps.org/maps/edaf1bbc8b86f0bf', // sheet 5
-      'https://annotations.allmaps.org/maps/9eac27facff8687f', // sheet 6
-      'https://annotations.allmaps.org/maps/5e0b6889ed3816d9', // sheet 7
-      'https://annotations.allmaps.org/maps/aacef031cb456d2a', // sheet 8
-      'https://annotations.allmaps.org/maps/4d07f0d3bf9fc347', // sheet 9
-      // sheet 10 (1d7e4a0bd68f039c) excluded — smaller size, fewer GCPs, causes overlap
-      'https://annotations.allmaps.org/maps/ddd8d3ca24e1916a', // sheet 11
-    ],
-    defaultEnabled: true,
-    transformation: 'thinPlateSpline',
-    gcpCount: '10-80/sheet',
-  },
-  {
-    id: '1930-plantation-onemanifest',
-    label: '1930 Plantation Map (One Manifest)',
-    annotationUrl: 'https://annotations.allmaps.org/manifests/5178b46e14dc211e',
-    defaultEnabled: false,
-    transformation: 'thinPlateSpline',
-    gcpCount: 'unknown',
-  },
-  {
-    id: '1930-plantation-neat',
-    label: '1930 Plantation Map (Neat)',
-    annotationUrl:
-      'https://surinametijdmachine.org/iiif/mapathon/kaart-van-suriname-1930.json',
-    defaultEnabled: false,
-    transformation: 'thinPlateSpline',
-    gcpCount: '2-4/sheet',
-  },
+  ...HISTORIC_MAPS.map((map) => ({
+    ...map,
+    defaultEnabled: map.defaultEnabled ?? false,
+  })),
   {
     id: 'moseberg-sheet2-1801',
     label: 'Moseberg Specialkaart Sheet 2 (1801)',
@@ -150,6 +121,22 @@ const OVERLAY_CONFIGS: OverlayConfig[] = [
     gcpCount: 5,
   },
   {
+    id: 'historic-map-32-main',
+    label: 'Paramaribo main map 1916-17',
+    annotationUrl: 'https://annotations.allmaps.org/maps/a8b80690c8e2e4cb',
+    defaultEnabled: false,
+    transformation: 'polynominal',
+    gcpCount: '28',
+  },
+  {
+    id: 'historic-map-32-districts',
+    label: 'Paramaribo districts 1916',
+    annotationUrl: 'https://annotations.allmaps.org/maps/5f85ef4e29065511',
+    defaultEnabled: false,
+    transformation: 'thinPlateSpline',
+    gcpCount: '13',
+  },
+  {
     id: 'leiden-overview',
     label: 'Leiden Overview Map',
     annotationUrl: 'https://annotations.allmaps.org/maps/d76dd411d74219c1',
@@ -162,6 +149,50 @@ const OVERLAY_CONFIGS: OverlayConfig[] = [
 const DEFAULT_ENABLED = new Set(
   OVERLAY_CONFIGS.filter((c) => c.defaultEnabled).map((c) => c.id),
 );
+const ENABLE_WARPED_OVERLAYS = true;
+const MAP_DESIGN = {
+  cream: '#fdf8f2',
+  tealStrong: '#006d5b',
+  tealBright: '#34d1b3',
+  mutedPlace: '#94cc7d',
+};
+
+function featureColor(
+  featureType: string | undefined,
+  colors: Record<string, string>,
+) {
+  return colors[featureType || ''] || MAP_DESIGN.mutedPlace;
+}
+
+function lineDash(featureType: string | undefined) {
+  if (featureType === 'road') return '5 4';
+  if (featureType === 'railroad') return '8 4 2 4';
+  return undefined;
+}
+
+function lineWeight(featureType: string | undefined) {
+  if (featureType === 'river') return 2.6;
+  if (featureType === 'creek') return 1.8;
+  if (featureType === 'railroad') return 3;
+  if (featureType === 'road') return 2.2;
+  return 2;
+}
+
+function nextFrame(): Promise<void> {
+  return new Promise((resolve) => requestAnimationFrame(() => resolve()));
+}
+
+function safelyRemove(target: { remove: () => unknown } | null) {
+  if (!target) return;
+  try {
+    target.remove();
+  } catch (error) {
+    // Allmaps uses AbortController for annotation fetches. Removing a warped
+    // layer or map aborts those requests as part of normal cleanup.
+    if (error instanceof Error && error.name === 'AbortError') return;
+    console.error('Unable to remove a map layer.', error);
+  }
+}
 
 // Monkey-patch L.DomUtil.getPosition so that _leaflet_pos is never
 // undefined.  Allmaps' WebGL renderer continuously reads _leaflet_pos
@@ -184,6 +215,9 @@ interface MapViewProps {
   panelOpen: boolean;
   onSelectPlantation: (feature: GeoJSONFeature) => void;
   onHighlightName: (name: string) => void;
+  initialCenter?: [number, number];
+  initialZoom?: number;
+  onViewportChange?: (center: [number, number], zoom: number) => void;
 }
 
 export default function MapView({
@@ -193,6 +227,9 @@ export default function MapView({
   panelOpen,
   onSelectPlantation,
   onHighlightName,
+  initialCenter,
+  initialZoom,
+  onViewportChange,
 }: MapViewProps) {
   const mapRef = useRef<L.Map | null>(null);
   const layerRef = useRef<L.GeoJSON | null>(null);
@@ -216,6 +253,9 @@ export default function MapView({
   const [enabledOverlays, setEnabledOverlays] = useState<Set<string>>(
     () => new Set(DEFAULT_ENABLED),
   );
+  const [overlayErrors, setOverlayErrors] = useState<Record<string, string>>({});
+  const enabledOverlaysRef = useRef(enabledOverlays);
+  enabledOverlaysRef.current = enabledOverlays;
   const [layersOpen, setLayersOpen] = useState(false);
   const [toolbarOpen, setToolbarOpen] = useState(true);
   const layersDropdownRef = useRef<HTMLDivElement>(null);
@@ -224,8 +264,19 @@ export default function MapView({
   );
   const enabledFeaturesRef = useRef(enabledFeatures);
   enabledFeaturesRef.current = enabledFeatures;
+  const knownFeatureTypesRef = useRef<Set<string>>(new Set(allTypes));
   const [featuresOpen, setFeaturesOpen] = useState(false);
   const featuresDropdownRef = useRef<HTMLDivElement>(null);
+
+  // The thesaurus loads after the map mounts. Enable newly published place
+  // types by default without re-enabling types a visitor has turned off.
+  useEffect(() => {
+    const known = knownFeatureTypesRef.current;
+    const newTypes = allTypes.filter((type) => !known.has(type));
+    if (newTypes.length === 0) return;
+    knownFeatureTypesRef.current = new Set([...known, ...newTypes]);
+    setEnabledFeatures((previous) => new Set([...previous, ...newTypes]));
+  }, [allTypes]);
 
   // Keep callback ref in sync
   useEffect(() => {
@@ -237,8 +288,8 @@ export default function MapView({
     if (mapRef.current || !containerRef.current) return;
 
     const map = L.map(containerRef.current, {
-      center: [5.5, -55.2],
-      zoom: 8,
+      center: initialCenter ?? [5.5, -55.2],
+      zoom: initialZoom ?? 8,
       zoomControl: false,
       zoomAnimation: false,
     });
@@ -251,97 +302,155 @@ export default function MapView({
 
     mapRef.current = map;
 
+    // Leaflet and Allmaps both need one frame after mount to observe the
+    // final container size before warped overlays start reading pane positions.
+    requestAnimationFrame(() => {
+      map.invalidateSize();
+    });
+
     return () => {
       // Remove all warped layers
       warpedLayersRef.current.forEach((layers) => {
-        layers.forEach((l) => l.remove());
+        layers.forEach(safelyRemove);
       });
       warpedLayersRef.current.clear();
-      map.remove();
+      safelyRemove(map);
       mapRef.current = null;
     };
   }, []);
 
-  // Toggle overlay callback — creates/destroys WarpedMapLayer lazily
-  const toggleOverlay = useCallback((id: string, config: OverlayConfig) => {
-    setEnabledOverlays((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        // Remove existing layers
-        const layers = warpedLayersRef.current.get(id);
-        if (layers) {
-          layers.forEach((l) => l.remove());
-          warpedLayersRef.current.delete(id);
-        }
-        next.delete(id);
-      } else {
-        // Create new layers lazily
-        next.add(id);
-        const map = mapRef.current;
-        if (map) {
-          import('@allmaps/leaflet')
-            .then(async ({ WarpedMapLayer }) => {
-              if (!mapRef.current || !next.has(id)) return;
-              // Create a single WarpedMapLayer and add all annotations to it
-              // (matches reference site pattern: one layer, multiple sheets)
-              const urls =
-                config.annotationUrls ??
-                (config.annotationUrl ? [config.annotationUrl] : []);
-              if (urls.length === 0) return;
-              const warpedMapLayer = new WarpedMapLayer(urls[0]);
-              warpedMapLayer.addTo(map);
-              for (const url of urls.slice(1)) {
-                await (
-                  warpedMapLayer as unknown as {
-                    addGeoreferenceAnnotationByUrl: (
-                      u: string,
-                    ) => Promise<unknown>;
-                  }
-                ).addGeoreferenceAnnotationByUrl(url);
-              }
-              if ('setOpacity' in warpedMapLayer) {
-                (
-                  warpedMapLayer as unknown as {
-                    setOpacity: (o: number) => void;
-                  }
-                ).setOpacity(opacityRef.current);
-              }
-              warpedLayersRef.current.set(id, [warpedMapLayer]);
-            })
-            .catch(() => {
-              // Allmaps module failed to load
-            });
-        }
-      }
-      return next;
-    });
-  }, []);
-
-  // Initialize default-enabled overlays once map is ready
+  // Notify parent of viewport changes (debounced to avoid flooding)
+  const onViewportChangeRef = useRef(onViewportChange);
+  onViewportChangeRef.current = onViewportChange;
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const handler = () => {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        const c = map.getCenter();
+        onViewportChangeRef.current?.([c.lat, c.lng], map.getZoom());
+      }, 1500);
+    };
+    map.on('moveend', handler);
+    return () => {
+      if (timer) clearTimeout(timer);
+      map.off('moveend', handler);
+    };
+  }, []);
 
+  const loadOverlay = useCallback((id: string, config: OverlayConfig) => {
+    const map = mapRef.current;
+    if (!map || warpedLayersRef.current.has(id)) return;
+    const urls =
+      config.annotationUrls ??
+      (config.annotationUrl ? [config.annotationUrl] : []);
+    if (urls.length === 0) return;
+
+    Promise.all(urls.map(loadAllmapsAnnotation))
+      .then(async (annotations) => {
+        const { WarpedMapLayer } = await import('@allmaps/leaflet');
+        if (mapRef.current !== map || !enabledOverlaysRef.current.has(id)) return;
+        await nextFrame();
+        if (mapRef.current !== map || !enabledOverlaysRef.current.has(id)) return;
+
+        const warpedMapLayer = new WarpedMapLayer(annotations[0]);
+        warpedMapLayer.addTo(map);
+        warpedLayersRef.current.set(id, [warpedMapLayer]);
+        for (const annotation of annotations.slice(1)) {
+          if (mapRef.current !== map || !enabledOverlaysRef.current.has(id)) {
+            safelyRemove(warpedMapLayer);
+            warpedLayersRef.current.delete(id);
+            return;
+          }
+          (
+            warpedMapLayer as unknown as {
+              addGeoreferenceAnnotation: (value: unknown) => unknown;
+            }
+          ).addGeoreferenceAnnotation(annotation);
+        }
+        if ('setOpacity' in warpedMapLayer) {
+          (
+            warpedMapLayer as unknown as {
+              setOpacity: (o: number) => void;
+            }
+          ).setOpacity(opacityRef.current);
+        }
+      })
+      .catch(() => {
+        if (mapRef.current !== map) return;
+        setOverlayErrors((previous) => ({
+          ...previous,
+          [id]: 'Image service unavailable',
+        }));
+        const disabled = new Set(enabledOverlaysRef.current);
+        disabled.delete(id);
+        enabledOverlaysRef.current = disabled;
+        setEnabledOverlays(disabled);
+      });
+  }, []);
+
+  // Toggle overlay callback — creates/destroys WarpedMapLayer lazily
+  const toggleOverlay = useCallback((id: string, config: OverlayConfig) => {
+    if (!ENABLE_WARPED_OVERLAYS) return;
+    const next = new Set(enabledOverlaysRef.current);
+    if (next.has(id)) {
+      const layers = warpedLayersRef.current.get(id);
+      if (layers) {
+        layers.forEach(safelyRemove);
+        warpedLayersRef.current.delete(id);
+      }
+      next.delete(id);
+      enabledOverlaysRef.current = next;
+      setEnabledOverlays(next);
+      return;
+    }
+
+    next.add(id);
+    enabledOverlaysRef.current = next;
+    setEnabledOverlays(next);
+    setOverlayErrors((previous) => {
+      const { [id]: _removed, ...remaining } = previous;
+      return remaining;
+    });
+    loadOverlay(id, config);
+  }, [loadOverlay]);
+
+  // Initialize default-enabled overlays once map is ready
+  useEffect(() => {
+    if (!ENABLE_WARPED_OVERLAYS) return;
+    const map = mapRef.current;
+    if (!map) return;
+
+    let cancelled = false;
     map.whenReady(() => {
       OVERLAY_CONFIGS.forEach((config) => {
         if (config.defaultEnabled && !warpedLayersRef.current.has(config.id)) {
-          import('@allmaps/leaflet')
-            .then(async ({ WarpedMapLayer }) => {
-              if (!mapRef.current) return;
-              const urls =
-                config.annotationUrls ??
-                (config.annotationUrl ? [config.annotationUrl] : []);
+          const urls =
+            config.annotationUrls ??
+            (config.annotationUrl ? [config.annotationUrl] : []);
+          Promise.all(urls.map(loadAllmapsAnnotation))
+            .then(async (annotations) => {
+              const { WarpedMapLayer } = await import('@allmaps/leaflet');
+              if (cancelled || mapRef.current !== map) return;
+              await nextFrame();
+              if (cancelled || mapRef.current !== map) return;
               if (urls.length === 0) return;
-              const warpedMapLayer = new WarpedMapLayer(urls[0]);
+              const warpedMapLayer = new WarpedMapLayer(annotations[0]);
               warpedMapLayer.addTo(map);
-              for (const url of urls.slice(1)) {
-                await (
+              warpedLayersRef.current.set(config.id, [warpedMapLayer]);
+              for (const annotation of annotations.slice(1)) {
+                if (cancelled || mapRef.current !== map) {
+                  safelyRemove(warpedMapLayer);
+                  warpedLayersRef.current.delete(config.id);
+                  return;
+                }
+                (
                   warpedMapLayer as unknown as {
-                    addGeoreferenceAnnotationByUrl: (
-                      u: string,
-                    ) => Promise<unknown>;
+                    addGeoreferenceAnnotation: (value: unknown) => unknown;
                   }
-                ).addGeoreferenceAnnotationByUrl(url);
+                ).addGeoreferenceAnnotation(annotation);
               }
               if ('setOpacity' in warpedMapLayer) {
                 (
@@ -350,7 +459,6 @@ export default function MapView({
                   }
                 ).setOpacity(opacityRef.current);
               }
-              warpedLayersRef.current.set(config.id, [warpedMapLayer]);
             })
             .catch(() => {
               // Allmaps module failed to load — map still usable
@@ -358,6 +466,10 @@ export default function MapView({
         }
       });
     });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // Add/update GeoJSON layer — recreate only when data changes
@@ -373,13 +485,18 @@ export default function MapView({
         const ft = feature?.properties?.featureType;
         return !ft || enabledFeaturesRef.current.has(ft);
       },
-      pointToLayer: (_feature, latlng) => {
-        return L.circleMarker(latlng, { radius: 6 });
+      pointToLayer: (feature, latlng) => {
+        const isHistoricalAddress =
+          feature.properties?.featureType === 'historical-address';
+        return L.circleMarker(latlng, {
+          radius: isHistoricalAddress ? 3.25 : 5.5,
+        });
       },
       style: (feature) => {
         const props = feature?.properties;
         const geomType = feature?.geometry?.type;
         const ft = props?.featureType || 'plantation';
+        const color = featureColor(ft, placeTypeColorsRef.current);
         const featureIdentifier =
           props?.plantationUri ?? props?.featureUri ?? props?.placeUri;
         const isSelected = featureIdentifier === selectedUriRef.current;
@@ -392,90 +509,58 @@ export default function MapView({
 
         // Point features (settlements, military posts, stations, villages, towns)
         if (geomType === 'Point') {
-          const color = placeTypeColorsRef.current[ft] || '#888';
           if (isSelected) {
             return {
               fillColor: color,
-              fillOpacity: 0.9,
-              color: '#333',
-              weight: 2.5,
+              fillOpacity: 0.95,
+              color: MAP_DESIGN.tealStrong,
+              opacity: 1,
+              weight: 3,
             };
           }
           if (isHighlighted) {
             return {
-              fillColor: '#e07850',
-              fillOpacity: 0.8,
-              color: '#a04020',
-              weight: 2,
+              fillColor: color,
+              fillOpacity: 0.9,
+              color: MAP_DESIGN.tealBright,
+              opacity: 1,
+              weight: 2.5,
             };
           }
           return {
             fillColor: color,
-            fillOpacity: 0.7,
-            color: '#fff',
-            weight: 1.5,
+            fillOpacity: 0.74,
+            color: MAP_DESIGN.cream,
+            opacity: 1,
+            weight: 1.4,
           };
         }
 
-        // LineString features
-        if (geomType === 'LineString') {
-          // Roads
-          if (ft === 'road') {
-            if (isSelected)
-              return { color: '#8B4513', weight: 3, opacity: 0.9 };
-            if (isHighlighted)
-              return {
-                color: '#e07850',
-                weight: 2.5,
-                opacity: 0.8,
-                dashArray: '6 3',
-              };
-            return {
-              color: '#a0522d',
-              weight: 2,
-              opacity: 0.6,
-              dashArray: '5 4',
-            };
-          }
-          // Railroad
-          if (ft === 'railroad') {
-            if (isSelected)
-              return { color: '#1a1a1a', weight: 4, opacity: 0.9 };
-            if (isHighlighted)
-              return {
-                color: '#e07850',
-                weight: 3.5,
-                opacity: 0.8,
-                dashArray: '6 3',
-              };
-            return {
-              color: '#2c2c2c',
-              weight: 3,
-              opacity: 0.7,
-              dashArray: '8 4 2 4',
-            };
-          }
-          // Rivers and creeks
-          const isCreek = ft === 'creek';
+        // LineString / MultiLineString features
+        if (geomType === 'LineString' || geomType === 'MultiLineString') {
+          const baseWeight = lineWeight(ft);
+          const dash = isHighlighted ? '6 3' : lineDash(ft);
           if (isSelected) {
             return {
-              color: '#1a6fa0',
-              weight: isCreek ? 3 : 4,
-              opacity: 0.9,
+              color,
+              weight: baseWeight + 1.4,
+              opacity: 0.95,
+              dashArray: dash,
             };
           }
           if (isHighlighted) {
             return {
-              color: '#e07850',
-              weight: isCreek ? 2.5 : 3.5,
-              opacity: 0.8,
-              dashArray: '6 3',
+              color: MAP_DESIGN.tealBright,
+              weight: baseWeight + 1,
+              opacity: 0.92,
+              dashArray: dash,
             };
           }
           return {
-            color: isCreek ? '#6baed6' : '#3182bd',
-            weight: isCreek ? 1.5 : 2.5,
-            opacity: 0.7,
+            color,
+            weight: baseWeight,
+            opacity: 0.72,
+            dashArray: dash,
           };
         }
 
@@ -483,26 +568,28 @@ export default function MapView({
         const isBuilt = props?.status === 'built';
         if (isSelected) {
           return {
-            fillColor: '#c0944e',
-            fillOpacity: 0.55,
-            color: '#8c6228',
+            fillColor: color,
+            fillOpacity: 0.48,
+            color: MAP_DESIGN.tealStrong,
             weight: 3,
           };
         }
         if (isHighlighted) {
           return {
-            fillColor: '#e07850',
-            fillOpacity: 0.45,
-            color: '#a04020',
+            fillColor: color,
+            fillOpacity: 0.42,
+            color: MAP_DESIGN.tealBright,
             weight: 2,
             dashArray: '6 3',
           };
         }
         return {
-          fillColor: isBuilt ? '#a67830' : '#a39b8e',
-          fillOpacity: 0.25,
-          color: isBuilt ? '#6e4d20' : '#6e6658',
-          weight: 1,
+          fillColor: color,
+          fillOpacity: isBuilt ? 0.24 : 0.14,
+          color,
+          opacity: isBuilt ? 0.68 : 0.45,
+          weight: isBuilt ? 1.2 : 1,
+          dashArray: isBuilt ? undefined : '4 3',
         };
       },
       onEachFeature: (feature, featureLayer) => {
@@ -525,11 +612,26 @@ export default function MapView({
           const target = e.target as L.Path;
           if (featureIdentifier !== selectedUriRef.current) {
             if (feature.geometry?.type === 'Point') {
-              target.setStyle({ fillOpacity: 0.9, weight: 2.5 });
-            } else if (feature.geometry?.type === 'LineString') {
-              target.setStyle({ opacity: 0.9, weight: 3.5 });
+              target.setStyle({
+                color: MAP_DESIGN.tealBright,
+                fillOpacity: 0.9,
+                weight: 2.5,
+              });
+            } else if (
+              feature.geometry?.type === 'LineString' ||
+              feature.geometry?.type === 'MultiLineString'
+            ) {
+              target.setStyle({
+                color: MAP_DESIGN.tealBright,
+                opacity: 0.9,
+                weight: lineWeight(ft) + 1,
+              });
             } else {
-              target.setStyle({ fillOpacity: 0.5, weight: 2 });
+              target.setStyle({
+                color: MAP_DESIGN.tealBright,
+                fillOpacity: 0.44,
+                weight: 2,
+              });
             }
           }
         });
@@ -680,7 +782,7 @@ export default function MapView({
         {!toolbarOpen && (
           <button
             onClick={() => setToolbarOpen(true)}
-            className="bg-white/95 backdrop-blur-sm shadow-md p-2 border border-stm-warm-200 hover:bg-stm-warm-50 transition-colors"
+            className="site-panel p-2 text-ink/75 hover:text-teal-strong transition-colors"
             aria-label="Open map toolbar"
           >
             <svg
@@ -698,12 +800,12 @@ export default function MapView({
 
         {/* Toolbar panel */}
         {toolbarOpen && (
-          <div className="bg-white/95 backdrop-blur-sm shadow-md border border-stm-warm-200 flex items-center gap-3 px-3 py-2 flex-wrap">
+          <div className="site-panel flex items-center gap-3 px-3 py-2 flex-wrap backdrop-blur-sm">
             {/* Zoom controls */}
             <div className="flex items-center">
               <button
                 onClick={handleZoomIn}
-                className="w-7 h-7 flex items-center justify-center text-stm-warm-700 hover:bg-stm-warm-100 transition-colors border-r border-stm-warm-200"
+                className="w-7 h-7 flex items-center justify-center text-ink/75 hover:bg-teal-soft/25 hover:text-teal-strong transition-colors border-r border-ink/10"
                 aria-label="Zoom in"
               >
                 <svg
@@ -719,7 +821,7 @@ export default function MapView({
               </button>
               <button
                 onClick={handleZoomOut}
-                className="w-7 h-7 flex items-center justify-center text-stm-warm-700 hover:bg-stm-warm-100 transition-colors"
+                className="w-7 h-7 flex items-center justify-center text-ink/75 hover:bg-teal-soft/25 hover:text-teal-strong transition-colors"
                 aria-label="Zoom out"
               >
                 <svg
@@ -736,7 +838,7 @@ export default function MapView({
             </div>
 
             {/* Divider */}
-            <div className="w-px h-6 bg-stm-warm-200" />
+            <div className="w-px h-6 bg-ink/10" />
 
             {/* Search */}
             <SearchInput
@@ -746,22 +848,22 @@ export default function MapView({
             />
 
             {/* Divider */}
-            <div className="w-px h-6 bg-stm-warm-200" />
+            <div className="w-px h-6 bg-ink/10" />
 
             {/* Legend (compact) */}
             <div className="flex items-center gap-3 text-xs">
               <div className="flex items-center gap-1.5">
-                <span className="w-3.5 h-2.5 border-2 border-stm-sepia-600 bg-stm-sepia-300 opacity-80 inline-block" />
-                <span className="text-stm-warm-600">Selected</span>
+                <span className="w-3.5 h-2.5 border-2 border-teal-strong bg-teal-soft/80 inline-block" />
+                <span className="text-ink/65">Selected</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="w-3.5 h-2.5 border border-dashed border-[#a04020] bg-[#e07850] opacity-70 inline-block" />
-                <span className="text-stm-warm-600">Highlighted</span>
+                <span className="w-3.5 h-2.5 border border-dashed border-teal-bright bg-teal-soft/60 inline-block" />
+                <span className="text-ink/65">Highlighted</span>
               </div>
             </div>
 
             {/* Divider */}
-            <div className="w-px h-6 bg-stm-warm-200" />
+            <div className="w-px h-6 bg-ink/10" />
 
             {/* Feature layers dropdown */}
             <div className="relative" ref={featuresDropdownRef}>
@@ -769,8 +871,8 @@ export default function MapView({
                 onClick={() => setFeaturesOpen((v) => !v)}
                 className={`flex items-center gap-1.5 text-xs font-medium px-2 py-1 transition-colors ${
                   featuresOpen
-                    ? 'bg-stm-sepia-100 text-stm-sepia-800'
-                    : 'text-stm-warm-700 hover:bg-stm-warm-100'
+                    ? 'bg-teal-soft/35 text-ink'
+                    : 'text-ink/75 hover:bg-teal-soft/25 hover:text-teal-strong'
                 }`}
                 aria-label="Toggle feature layers"
                 aria-expanded={featuresOpen}
@@ -796,9 +898,9 @@ export default function MapView({
               </button>
 
               {featuresOpen && (
-                <div className="absolute top-full left-0 mt-1 w-56 bg-white border border-stm-warm-200 shadow-lg z-10">
-                  <div className="px-3 py-1.5 border-b border-stm-warm-100 flex items-center justify-between">
-                    <span className="text-[10px] font-medium text-stm-warm-500 uppercase tracking-wide">
+                <div className="site-panel absolute top-full left-0 mt-1 w-56 z-10">
+                  <div className="px-3 py-1.5 border-b border-ink/10 flex items-center justify-between">
+                    <span className="text-[10px] font-medium text-ink/55 uppercase tracking-wide">
                       Feature Layers
                     </span>
                     <button
@@ -829,7 +931,7 @@ export default function MapView({
                       const isPoly = ft === 'plantation';
                       return (
                         <li key={ft}>
-                          <label className="flex items-center gap-2 px-3 py-1 hover:bg-stm-warm-50 cursor-pointer text-xs">
+                          <label className="flex items-center gap-2 px-3 py-1 hover:bg-teal-soft/20 cursor-pointer text-xs">
                             <input
                               type="checkbox"
                               checked={isOn}
@@ -845,21 +947,30 @@ export default function MapView({
                             />
                             {isPoly ? (
                               <span
-                                className="w-3.5 h-2.5 inline-block opacity-60"
-                                style={{ backgroundColor: color }}
+                                className="w-3.5 h-2.5 inline-block border opacity-70"
+                                style={{
+                                  backgroundColor: color,
+                                  borderColor: color,
+                                }}
                               />
                             ) : isLine ? (
                               <span
                                 className="w-3.5 h-0.5 inline-block"
-                                style={{ backgroundColor: color }}
+                                style={{
+                                  backgroundColor: color,
+                                  opacity: 0.75,
+                                }}
                               />
                             ) : (
                               <span
-                                className="w-2.5 h-2.5 rounded-full inline-block"
-                                style={{ backgroundColor: color, opacity: 0.7 }}
+                                className="w-2.5 h-2.5 rounded-full inline-block border border-cream"
+                                style={{
+                                  backgroundColor: color,
+                                  opacity: 0.8,
+                                }}
                               />
                             )}
-                            <span className="text-stm-warm-800 flex-1">
+                            <span className="text-ink/80 flex-1">
                               {label}
                             </span>
                           </label>
@@ -870,101 +981,123 @@ export default function MapView({
                 </div>
               )}
             </div>
-            {/* Divider */}
-            <div className="w-px h-6 bg-stm-warm-200" />
+            {ENABLE_WARPED_OVERLAYS && (
+              <>
+                {/* Divider */}
+                <div className="w-px h-6 bg-ink/10" />
 
-            {/* Overlay layers dropdown */}
-            <div className="relative" ref={layersDropdownRef}>
-              <button
-                onClick={() => setLayersOpen((v) => !v)}
-                className={`flex items-center gap-1.5 text-xs font-medium px-2 py-1 transition-colors ${
-                  layersOpen
-                    ? 'bg-stm-sepia-100 text-stm-sepia-800'
-                    : 'text-stm-warm-700 hover:bg-stm-warm-100'
-                }`}
-                aria-label="Toggle map layers panel"
-                aria-expanded={layersOpen}
-              >
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 14 14"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                >
-                  <path
-                    d="M7 2L1 5l6 3 6-3-6-3zM1 9l6 3 6-3M1 7l6 3 6-3"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-                Layers
-                {enabledOverlays.size > 0 && (
-                  <span className="ml-0.5 bg-stm-sepia-600 text-white text-[10px] leading-none px-1 py-0.5 rounded-full">
-                    {enabledOverlays.size}
-                  </span>
-                )}
-              </button>
+                {/* Overlay layers dropdown */}
+                <div className="relative" ref={layersDropdownRef}>
+                  <button
+                    onClick={() => setLayersOpen((v) => !v)}
+                    className={`flex items-center gap-1.5 text-xs font-medium px-2 py-1 transition-colors ${
+                      layersOpen
+                        ? 'bg-teal-soft/35 text-ink'
+                        : 'text-ink/75 hover:bg-teal-soft/25 hover:text-teal-strong'
+                    }`}
+                    aria-label="Toggle map layers panel"
+                    aria-expanded={layersOpen}
+                  >
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 14 14"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                    >
+                      <path
+                        d="M7 2L1 5l6 3 6-3-6-3zM1 9l6 3 6-3M1 7l6 3 6-3"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                    Layers
+                    {enabledOverlays.size > 0 && (
+                      <span className="ml-0.5 bg-stm-sepia-600 text-white text-[10px] leading-none px-1 py-0.5 rounded-full">
+                        {enabledOverlays.size}
+                      </span>
+                    )}
+                  </button>
 
-              {layersOpen && (
-                <div className="absolute top-full left-0 mt-1 w-80 bg-white border border-stm-warm-200 shadow-lg z-10">
-                  {/* Shared opacity slider */}
-                  <div className="px-3 py-2 border-b border-stm-warm-100 flex items-center gap-2">
-                    <span className="text-xs text-stm-warm-600 whitespace-nowrap">
-                      Opacity
-                    </span>
-                    <input
-                      type="range"
-                      min={0}
-                      max={1}
-                      step={0.05}
-                      value={opacity}
-                      onChange={(e) => setOpacity(parseFloat(e.target.value))}
-                      className="flex-1 accent-stm-sepia-600"
-                      aria-label="Map overlay opacity"
-                    />
-                    <span className="text-[10px] text-stm-warm-400 w-7 text-right">
-                      {Math.round(opacity * 100)}%
-                    </span>
-                  </div>
+                  {layersOpen && (
+                    <div className="site-panel absolute top-full left-0 mt-1 w-80 z-10">
+                      {/* Shared opacity slider */}
+                      <div className="px-3 py-2 border-b border-ink/10 flex items-center gap-2">
+                        <span className="text-xs text-ink/65 whitespace-nowrap">
+                          Opacity
+                        </span>
+                        <input
+                          type="range"
+                          min={0}
+                          max={1}
+                          step={0.05}
+                          value={opacity}
+                          onChange={(e) => setOpacity(parseFloat(e.target.value))}
+                          className="flex-1 accent-stm-sepia-600"
+                          aria-label="Map overlay opacity"
+                        />
+                        <span className="text-[10px] text-stm-warm-400 w-7 text-right">
+                          {Math.round(opacity * 100)}%
+                        </span>
+                      </div>
 
-                  {/* Map checkboxes with info */}
-                  <ul className="max-h-80 overflow-y-auto py-1">
-                    {OVERLAY_CONFIGS.map((config) => {
-                      const isEnabled = enabledOverlays.has(config.id);
-                      return (
-                        <li key={config.id}>
-                          <label className="flex items-center gap-2 px-3 py-1.5 hover:bg-stm-warm-50 cursor-pointer text-xs">
-                            <input
-                              type="checkbox"
-                              checked={isEnabled}
-                              onChange={() => toggleOverlay(config.id, config)}
-                              className="accent-stm-sepia-600"
-                            />
-                            <span className="text-stm-warm-800 truncate flex-1">
-                              {config.label}
-                            </span>
-                          </label>
-                          {isEnabled && (
-                            <div className="flex items-center gap-2 px-3 pb-1 pl-8 text-[10px] text-stm-warm-400">
-                              <span title="Transformation type">
-                                {TRANSFORMATION_LABELS[config.transformation] ??
-                                  config.transformation}
-                              </span>
-                              <span>·</span>
-                              <span title="Ground control points">
-                                {config.gcpCount} GCPs
-                              </span>
-                            </div>
-                          )}
-                        </li>
-                      );
-                    })}
-                  </ul>
+                      {/* Map checkboxes with info */}
+                      <ul className="max-h-80 overflow-y-auto py-1">
+                        {OVERLAY_CONFIGS.map((config) => {
+                          const isEnabled = enabledOverlays.has(config.id);
+                          const error = overlayErrors[config.id];
+                          return (
+                            <li key={config.id}>
+                              <label className="flex items-center gap-2 px-3 py-1.5 hover:bg-teal-soft/20 cursor-pointer text-xs">
+                                <input
+                                  type="checkbox"
+                                  checked={isEnabled}
+                                  onChange={() => toggleOverlay(config.id, config)}
+                                  className="accent-stm-sepia-600"
+                                />
+                                <span className="text-stm-warm-800 truncate flex-1">
+                                  {config.label}
+                                </span>
+                              </label>
+                              {error && (
+                                <p className="px-3 pb-1 pl-8 text-[10px] text-stm-warm-500">
+                                  {error}
+                                </p>
+                              )}
+                              {config.annotationUrl && (
+                                <p className="px-3 pb-1 pl-8 text-[10px]">
+                                  <a
+                                    href={config.annotationUrl}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="text-stm-sepia-600 underline hover:text-stm-sepia-800"
+                                  >
+                                    Allmaps source
+                                  </a>
+                                </p>
+                              )}
+                              {isEnabled && (
+                                <div className="flex items-center gap-2 px-3 pb-1 pl-8 text-[10px] text-stm-warm-400">
+                                  <span title="Transformation type">
+                                    {TRANSFORMATION_LABELS[config.transformation] ??
+                                      config.transformation}
+                                  </span>
+                                  <span>·</span>
+                                  <span title="Ground control points">
+                                    {config.gcpCount} GCPs
+                                  </span>
+                                </div>
+                              )}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
+              </>
+            )}
 
             {/* Collapse button */}
             <button
@@ -1033,17 +1166,17 @@ function SearchInput({
         aria-autocomplete="list"
         role="combobox"
         aria-expanded={open && results.length > 0}
-        className="w-48 px-2.5 py-1 border border-stm-warm-300 bg-white text-sm text-stm-warm-900 placeholder:text-stm-warm-400 focus:outline-none focus:ring-2 focus:ring-stm-sepia-400"
+        className="w-48 px-2.5 py-1 border border-ink/15 bg-cream/95 text-sm text-ink placeholder:text-ink/35 focus:outline-none focus:ring-2 focus:ring-teal-bright/40"
       />
       {open && results.length > 0 && (
         <ul
-          className="absolute top-full left-0 mt-1 w-64 bg-white border border-stm-warm-200 shadow-lg max-h-64 overflow-y-auto z-10"
+          className="site-panel absolute top-full left-0 mt-1 w-64 max-h-64 overflow-y-auto z-10"
           role="listbox"
         >
           {results.map((f) => (
             <li key={f.id} role="option">
               <button
-                className="w-full text-left px-3 py-2 text-sm text-stm-warm-800 hover:bg-stm-sepia-50 transition-colors"
+                className="w-full text-left px-3 py-2 text-sm text-ink/80 hover:bg-teal-soft/20 transition-colors"
                 onMouseDown={() => {
                   onSelect(f);
                   setQuery(f.properties.name);
@@ -1051,9 +1184,9 @@ function SearchInput({
                 }}
               >
                 <span className="font-medium">{f.properties.name}</span>
-                {f.properties.organizationQid && (
+                {f.properties.wikidataQid && (
                   <span className="ml-2 text-xs text-stm-warm-400">
-                    {f.properties.organizationQid}
+                    {f.properties.wikidataQid}
                   </span>
                 )}
               </button>

@@ -1,5 +1,19 @@
 {
+  "private": true,
+  "packageManager": "pnpm@10.19.0",
+  "scripts": {
+    "dev": "pnpm --dir app dev",
+    "build": "pnpm --dir app build",
+    "start": "pnpm --dir app start",
+    "lint": "pnpm --dir app lint",
+    "generate": "pnpm --dir app generate",
+    "prepare-data": "pnpm --dir app prepare-data",
+    "pipeline": "pnpm --dir app pipeline",
+    "seed-gazetteer": "pnpm --dir app seed-gazetteer",
+    "import-streets-1916": "pnpm --dir app import-streets-1916"
+  },
   "dependencies": {
-    "@vercel/analytics": "^2.0.1"
+    "@vercel/analytics": "^2.0.1",
+    "next": "^16.2.9"
   }
 }

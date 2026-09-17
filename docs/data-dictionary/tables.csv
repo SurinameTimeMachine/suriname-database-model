@@ -1,0 +1,7 @@
+table_id,source_file,record_scope,record_count,field_count,role,current_editability,has_space_fields,has_time_fields,has_source_fields,has_edit_provenance,has_dataset_release_version,dictionary_file
+organization-authority-links,data/organization-authority-overrides.jsonld,@graph[],22,9,editorial-authority,editor-managed,no,yes,no,yes,no,docs/data-dictionary/organization-authority-links.csv
+place-types,data/place-types-thesaurus.jsonld,@graph[],45,44,editorial-authority,editor-managed,no,yes,no,no,no,docs/data-dictionary/place-types.csv
+places,data/places-gazetteer.jsonld,@graph[],9138,163,editorial-authority,editor-managed,yes,yes,yes,yes,no,docs/data-dictionary/places.csv
+sources,data/sources-registry.jsonld,@graph[],140,24,editorial-authority,editor-managed,yes,yes,yes,no,no,docs/data-dictionary/sources.csv
+source-snapshot-fields,11 immutable GeoJSON files; see source_file in the dictionary,features[],3784,128,source-snapshot,immutable-source,yes,no,no,no,no,docs/data-dictionary/source-snapshot-fields.csv
+plantation-composition-periods,app/lod/database.jsonld#PlantationCompositionPeriod (generated from Almanakken v2 CSV),derived[],202,17,generated-projection,generated-read-only,no,yes,yes,no,no,docs/data-dictionary/plantation-composition-periods.csv

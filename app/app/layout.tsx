@@ -1,26 +1,27 @@
 import './globals.css';
 import Navigation from '@/components/Navigation';
-import type { Metadata } from 'next';
-import { Inter, Libre_Baskerville } from 'next/font/google';
-import { Suspense } from 'react';
+import SiteFooter from '@/components/SiteFooter';
 import { Analytics } from '@vercel/analytics/next';
+import type { Metadata } from 'next';
+import { Geist, Geist_Mono } from 'next/font/google';
+import { Suspense } from 'react';
 
-const serif = Libre_Baskerville({
+const geistSans = Geist({
   subsets: ['latin'],
-  weight: ['400', '700'],
-  variable: '--font-serif',
+  variable: '--font-geist-sans',
   display: 'swap',
 });
 
-const sans = Inter({
+const geistMono = Geist_Mono({
   subsets: ['latin'],
-  variable: '--font-sans',
+  variable: '--font-geist-mono',
   display: 'swap',
 });
 
 export const metadata: Metadata = {
-  title: 'NAS Mediabank in de Suriname Time Machine',
-  description: 'smartphone toepassing voor verrijking beeldmateriaal',
+  title: 'Suriname Time Machine',
+  description:
+    'Explore historical plantations of Suriname through linked open data and interactive maps',
 };
 
 export default function RootLayout({
@@ -29,17 +30,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="nl" className={`${serif.variable} ${sans.variable}`}>
-      <body className="antialiased font-sans bg-stm-warm-50 text-stm-warm-900 flex flex-col h-screen overflow-hidden">
+    <html
+      lang="en"
+      data-scroll-behavior="smooth"
+      className={`${geistSans.variable} ${geistMono.variable} scroll-smooth`}
+    >
+      <body suppressHydrationWarning className="site-shell flex h-dvh flex-col overflow-hidden bg-background text-foreground antialiased">
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>
         <Suspense>
           <Navigation />
         </Suspense>
-        <main id="main-content" className="flex-1 overflow-hidden">
+        <main id="main-content" className="flex min-h-0 flex-1 flex-col">
           {children}
         </main>
+        <SiteFooter />
         <Analytics />
       </body>
     </html>

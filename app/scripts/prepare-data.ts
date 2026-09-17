@@ -10,11 +10,482 @@ import {
   writeFileSync,
 } from 'fs';
 import { join } from 'path';
+import {
+  derivePlaceFunctionAssertions,
+  placeFunctionLabels,
+  PLACE_FUNCTION_SCHEME_URI,
+  relatedPlaceType,
+  type PlaceFunctionSource,
+} from '../lib/place-functions';
+import { resolveConfirmedPhysicalLinkReview } from '../lib/physical-organization-links';
+import {
+  almanakkenField,
+  isVerlaten,
+  readAlmanakkenRows,
+} from './almanakken';
 
 const LOD_DIR = join(__dirname, '../lod');
 const OUT_DIR = join(__dirname, '../public/data');
+const DATA_DIR = join(__dirname, '../../data');
+const DATA_BASE = 'https://data.surinametijdmachine.org/';
+const ONTOLOGY_BASE = 'https://data.surinametijdmachine.org/';
+const PIPELINE_TYPES = new Set(['plantation', 'river', 'creek']);
 
 mkdirSync(OUT_DIR, { recursive: true });
+
+const gazetteerSrc = join(DATA_DIR, 'places-gazetteer.jsonld');
+const thesaurusSrc = join(DATA_DIR, 'place-types-thesaurus.jsonld');
+const sourcesSrc = join(DATA_DIR, 'sources-registry.jsonld');
+const organizationOverridesSrc = join(
+  DATA_DIR,
+  'organization-authority-overrides.jsonld',
+);
+const databaseSrc = join(LOD_DIR, 'database.jsonld');
+const contextSrc = join(LOD_DIR, 'context.jsonld');
+
+type GazetteerLocation = {
+  lat?: number | null;
+  lng?: number | null;
+  wkt?: string | null;
+  crs?: string | null;
+};
+
+type GazetteerName = {
+  text?: string;
+  language?: string;
+  type?: string;
+  isPreferred?: boolean;
+  source?: string;
+  sourceYear?: number;
+};
+
+type GazetteerExternalLink = {
+  authority?: string;
+  identifier?: string;
+  matchType?: string;
+};
+
+type AlmanakkenReviewEntry = {
+  placeId: string;
+  qid: string;
+  sourceVersion: string;
+  rows: number;
+  firstYear: number | null;
+  lastYear: number | null;
+  productRows: number;
+  desertedRows: number;
+  sourceNames: number;
+  products: string[];
+  hasGazetteerSource: boolean;
+  hasProductAssertions: boolean;
+  hasStatusAssertions: boolean;
+  hasAlmanakkenObservations: boolean;
+  issues: Array<{
+    type:
+      | 'missing-gazetteer-link'
+      | 'shared-organization-link'
+      | 'missing-source-tag'
+      | 'missing-product-assertions'
+      | 'missing-status-assertions'
+      | 'missing-almanakken-observations';
+    label: string;
+    detail?: string;
+  }>;
+};
+
+type OrganizationOverride = {
+  qid?: string;
+  physicalLinkReviewStatus?: 'confirmed-multiple';
+  reviewedPhysicalPlaceIds?: string[];
+  associatedPhysicalPlaceIds?: string[];
+};
+
+type AlmanakkenMissingQid = {
+  qid: string;
+  rows: number;
+  firstYear: number | null;
+  lastYear: number | null;
+  sourceNames: string[];
+  products: string[];
+};
+
+type AlmanakkenUnlinkedRow = {
+  recordId: string;
+  year: number | null;
+  page: string | null;
+  sourceName: string | null;
+  standardizedName: string | null;
+  location: string | null;
+  product: string | null;
+};
+
+type GazetteerEntry = Record<string, unknown> & {
+  '@id'?: string;
+  id?: string;
+  type?: string;
+  prefLabel?: string;
+  altLabels?: string[];
+  names?: GazetteerName[];
+  externalLinks?: GazetteerExternalLink[];
+  location?: GazetteerLocation | null;
+  sources?: string[];
+  fid?: number | null;
+  description?: string;
+  statusAssertions?: Array<Record<string, unknown>>;
+  productAssertions?: PlaceFunctionSource['productAssertions'];
+  almanakkenObservations?: PlaceFunctionSource['almanakkenObservations'];
+  lifecycleEvents?: Array<Record<string, unknown>>;
+  deprecated?: true;
+  mergedInto?: string;
+};
+
+function toArray<T>(value: T | T[] | undefined | null): T[] {
+  if (value == null) return [];
+  return Array.isArray(value) ? value : [value];
+}
+
+function appendValue(
+  entity: Record<string, unknown>,
+  property: string,
+  value: string,
+) {
+  const current = entity[property];
+  entity[property] = current == null ? value : [...toArray(current as string | string[]), value];
+}
+
+function addExternalAuthorityLinks(
+  entity: Record<string, unknown>,
+  links: GazetteerExternalLink[] | undefined,
+) {
+  for (const link of links ?? []) {
+    if (!link.identifier) continue;
+
+    const uri =
+      link.authority === 'wikidata'
+        ? `http://www.wikidata.org/entity/${link.identifier}`
+        : /^https?:\/\//.test(link.identifier)
+          ? link.identifier
+          : null;
+    if (!uri) continue;
+
+    switch (link.matchType) {
+      case 'exactMatch':
+      case 'closeMatch':
+      case 'broadMatch':
+      case 'narrowMatch':
+      case 'relatedMatch':
+        appendValue(entity, link.matchType, uri);
+        break;
+    }
+  }
+}
+
+function readJsonIfExists(path: string): Record<string, unknown> | null {
+  return existsSync(path)
+    ? (JSON.parse(readFileSync(path, 'utf-8')) as Record<string, unknown>)
+    : null;
+}
+
+function normalizeCrmClass(type: string | undefined): string {
+  if (!type) return 'E53_Place';
+  return type.replace('E25_Human-Made_Feature', 'E25_Human_Made_Feature');
+}
+
+function crmBadgeFromClass(type: string): 'E25' | 'E26' | 'E53' {
+  if (type.includes('E25')) return 'E25';
+  if (type.includes('E26')) return 'E26';
+  return 'E53';
+}
+
+function preferredName(entry: GazetteerEntry): string {
+  const names = Array.isArray(entry.names) ? entry.names : [];
+  const preferred = names.find((n) => n.isPreferred === true);
+  const first = names[0];
+  return (
+    preferred?.text ||
+    first?.text ||
+    (typeof entry.prefLabel === 'string' ? entry.prefLabel : '') ||
+    ''
+  );
+}
+
+function canonicalPlaceUri(entry: GazetteerEntry): string | null {
+  if (!entry.id) return null;
+  const raw = typeof entry['@id'] === 'string' ? entry['@id'] : '';
+  if (raw.startsWith('http')) return raw;
+  return `${DATA_BASE}place/${entry.id}`;
+}
+
+function allNames(entry: GazetteerEntry): GazetteerName[] {
+  if (Array.isArray(entry.names) && entry.names.length > 0) {
+    return entry.names.filter((n) => typeof n.text === 'string' && n.text);
+  }
+
+  const names: GazetteerName[] = [];
+  const pref = typeof entry.prefLabel === 'string' ? entry.prefLabel.trim() : '';
+  if (pref) {
+    names.push({
+      text: pref,
+      language: 'nl',
+      type: 'official',
+      isPreferred: true,
+    });
+  }
+
+  for (const alt of Array.isArray(entry.altLabels) ? entry.altLabels : []) {
+    const text = typeof alt === 'string' ? alt.trim() : '';
+    if (text) {
+      names.push({
+        text,
+        language: 'nl',
+        type: 'historical',
+        isPreferred: false,
+      });
+    }
+  }
+
+  return names;
+}
+
+function pointWkt(location: GazetteerLocation): string | null {
+  if (location.lng == null || location.lat == null) return null;
+  return `Point (${location.lng} ${location.lat})`;
+}
+
+function mapYearFromSources(
+  sourceIds: string[],
+  sourceRegistryById: Map<string, Record<string, unknown>>,
+): string {
+  const years = sourceIds
+    .map((sourceId) => sourceRegistryById.get(sourceId)?.mapYear)
+    .filter((year): year is string | number => year != null)
+    .map(String);
+  if (years.length > 0) return years[0];
+  if (sourceIds.includes('paramaribo-street-map-1916')) return '1916';
+  if (sourceIds.includes('map-1882')) return '1882';
+  return '1930';
+}
+
+function primaryWikidataQid(entry: GazetteerEntry): string | null {
+  const link = entry.externalLinks?.find(
+    (candidate) =>
+      candidate.authority === 'wikidata' &&
+      typeof candidate.identifier === 'string' &&
+      candidate.identifier.trim(),
+  );
+  return link?.identifier?.trim() ?? null;
+}
+
+function buildAlmanakkenReview(
+  entries: GazetteerEntry[],
+  organizationOverrides: Map<string, OrganizationOverride>,
+): {
+  sourceVersion: string;
+  generatedAt: string;
+  rowCounts: {
+    total: number;
+    withQid: number;
+    withoutQid: number;
+    attached: number;
+    unresolved: number;
+  };
+  byPlaceId: Record<string, AlmanakkenReviewEntry>;
+  missingQids: AlmanakkenMissingQid[];
+  unlinkedRows: AlmanakkenUnlinkedRow[];
+} {
+  const { version, rows } = readAlmanakkenRows();
+  type Summary = {
+    rows: number;
+    years: number[];
+    productRows: number;
+    desertedRows: number;
+    sourceNames: Set<string>;
+    products: Set<string>;
+  };
+  const byQid = new Map<string, Summary>();
+  const unlinkedRows: AlmanakkenUnlinkedRow[] = [];
+
+  for (const row of rows) {
+    const qid = almanakkenField(row, 'plantation_id');
+    if (!qid) {
+      const year = Number.parseInt(almanakkenField(row, 'year'), 10);
+      unlinkedRows.push({
+        recordId: almanakkenField(row, 'recordid'),
+        year: Number.isFinite(year) ? year : null,
+        page: almanakkenField(row, 'page') || null,
+        sourceName: almanakkenField(row, 'plantation_org') || null,
+        standardizedName: almanakkenField(row, 'plantation_std') || null,
+        location: almanakkenField(row, 'loc_std', 'loc_org') || null,
+        product: almanakkenField(row, 'product_std') || null,
+      });
+      continue;
+    }
+    const summary =
+      byQid.get(qid) ??
+      {
+        rows: 0,
+        years: [],
+        productRows: 0,
+        desertedRows: 0,
+        sourceNames: new Set<string>(),
+        products: new Set<string>(),
+      };
+    summary.rows++;
+
+    const year = Number.parseInt(almanakkenField(row, 'year'), 10);
+    if (Number.isFinite(year)) summary.years.push(year);
+
+    const product = almanakkenField(row, 'product_std');
+    if (product) {
+      summary.productRows++;
+      summary.products.add(product);
+    }
+
+    if (isVerlaten(row.deserted)) summary.desertedRows++;
+
+    const sourceName = almanakkenField(row, 'plantation_org');
+    if (sourceName) summary.sourceNames.add(sourceName);
+    byQid.set(qid, summary);
+  }
+
+  const placeIdsByQid = new Map<string, string[]>();
+  for (const entry of entries) {
+    if (entry.deprecated || entry.mergedInto || entry.type !== 'plantation') {
+      continue;
+    }
+    if (!entry.id) continue;
+    const qid = primaryWikidataQid(entry);
+    if (!qid) continue;
+    placeIdsByQid.set(qid, [...(placeIdsByQid.get(qid) ?? []), entry.id]);
+  }
+
+  const byPlaceId: Record<string, AlmanakkenReviewEntry> = {};
+  for (const entry of entries) {
+    if (entry.deprecated || entry.mergedInto || entry.type !== 'plantation') {
+      continue;
+    }
+    if (!entry.id) continue;
+    const qid = primaryWikidataQid(entry);
+    if (!qid) continue;
+    const summary = byQid.get(qid);
+    if (!summary && !entry.sources?.includes('almanakken')) continue;
+
+    const years = summary?.years ?? [];
+    const issues: AlmanakkenReviewEntry['issues'] = [];
+    const mappedPlaceIds = placeIdsByQid.get(qid) ?? [];
+    const reviewedPlaceIds =
+      organizationOverrides.get(qid)?.reviewedPhysicalPlaceIds ?? [];
+    const multiplePhysicalLinksConfirmed =
+      organizationOverrides.get(qid)?.physicalLinkReviewStatus ===
+        'confirmed-multiple' &&
+      mappedPlaceIds.length > 1 &&
+      [...mappedPlaceIds].sort().join('\u0000') ===
+        [...reviewedPlaceIds].sort().join('\u0000');
+    if (summary && mappedPlaceIds.length > 1 && !multiplePhysicalLinksConfirmed) {
+      issues.push({
+        type: 'shared-organization-link',
+        label: `${mappedPlaceIds.length} physical plantations share this organization QID`,
+        detail: mappedPlaceIds.join(', '),
+      });
+    }
+    const hasProductAssertions =
+      entry.productAssertions?.some(
+        (assertion) => assertion.source === 'almanakken',
+      ) ?? false;
+    const hasStatusAssertions =
+      entry.statusAssertions?.some(
+        (assertion) => assertion.source === 'almanakken',
+      ) ?? false;
+    const hasAlmanakkenObservations =
+      (entry.almanakkenObservations?.length ?? 0) > 0;
+    byPlaceId[entry.id] = {
+      placeId: entry.id,
+      qid,
+      sourceVersion: version,
+      rows: summary?.rows ?? 0,
+      firstYear: years.length > 0 ? Math.min(...years) : null,
+      lastYear: years.length > 0 ? Math.max(...years) : null,
+      productRows: summary?.productRows ?? 0,
+      desertedRows: summary?.desertedRows ?? 0,
+      sourceNames: summary?.sourceNames.size ?? 0,
+      products: [...(summary?.products ?? [])].sort(),
+      hasGazetteerSource: entry.sources?.includes('almanakken') ?? false,
+      hasProductAssertions,
+      hasStatusAssertions,
+      hasAlmanakkenObservations,
+      issues,
+    };
+  }
+
+  const missingQids = [...byQid.entries()]
+    .filter(([qid]) => !placeIdsByQid.has(qid))
+    .map(([qid, summary]) => ({
+      qid,
+      rows: summary.rows,
+      firstYear: summary.years.length > 0 ? Math.min(...summary.years) : null,
+      lastYear: summary.years.length > 0 ? Math.max(...summary.years) : null,
+      sourceNames: [...summary.sourceNames].sort(),
+      products: [...summary.products].sort(),
+    }))
+    .sort((a, b) => b.rows - a.rows || a.qid.localeCompare(b.qid));
+
+  const attachedRecordIds = new Set<string>();
+  for (const entry of entries) {
+    if (entry.deprecated || entry.mergedInto) continue;
+    for (const observation of entry.almanakkenObservations ?? []) {
+      const recordId = observation.recordId;
+      if (typeof recordId === 'string' && recordId) attachedRecordIds.add(recordId);
+    }
+  }
+  const withQid = rows.length - unlinkedRows.length;
+
+  return {
+    sourceVersion: version,
+    generatedAt: new Date().toISOString(),
+    rowCounts: {
+      total: rows.length,
+      withQid,
+      withoutQid: unlinkedRows.length,
+      attached: attachedRecordIds.size,
+      unresolved: withQid - attachedRecordIds.size,
+    },
+    byPlaceId,
+    missingQids,
+    unlinkedRows,
+  };
+}
+
+function eventTypeToCrmType(crmClass: string): string {
+  switch (crmClass) {
+    case 'E12':
+      return 'E12_Production';
+    case 'E11':
+      return 'E11_Modification';
+    case 'E6':
+      return 'E6_Destruction';
+    case 'E81':
+      return 'E81_Transformation';
+    case 'E17':
+    default:
+      return 'E17_Type_Assignment';
+  }
+}
+
+function eventTimeSpan(
+  startYear: unknown,
+  endYear: unknown,
+): string | undefined {
+  const start =
+    typeof startYear === 'number' && Number.isFinite(startYear)
+      ? startYear
+      : undefined;
+  const end =
+    typeof endYear === 'number' && Number.isFinite(endYear)
+      ? endYear
+      : undefined;
+  if (start == null) return undefined;
+  return end != null && end !== start ? `${start}/${end}` : String(start);
+}
 
 // Load the full database
 console.log('Loading database.jsonld...');
@@ -30,6 +501,8 @@ const places: Record<string, unknown>[] = [];
 const appellations: Record<string, unknown>[] = [];
 const sources: Record<string, unknown>[] = [];
 const observations: Record<string, unknown>[] = [];
+const compositionPeriods: Record<string, unknown>[] = [];
+const presenceInferences: Record<string, unknown>[] = [];
 const provenance: Record<string, unknown>[] = [];
 
 for (const entity of graph) {
@@ -50,8 +523,12 @@ for (const entity of graph) {
     appellations.push(entity);
   } else if (typeSet.has('E22_Human_Made_Object')) {
     sources.push(entity);
+  } else if (typeSet.has('PlantationCompositionPeriod')) {
+    compositionPeriods.push(entity);
   } else if (typeSet.has('E13_Attribute_Assignment')) {
     observations.push(entity);
+  } else if (typeSet.has('PresenceInference')) {
+    presenceInferences.push(entity);
   } else if (typeSet.has('ProvenanceRecord')) {
     provenance.push(entity);
   }
@@ -64,6 +541,8 @@ console.log(`  Places: ${places.length}`);
 console.log(`  Appellations: ${appellations.length}`);
 console.log(`  Sources: ${sources.length}`);
 console.log(`  Observations: ${observations.length}`);
+console.log(`  Composition periods: ${compositionPeriods.length}`);
+console.log(`  Presence inferences: ${presenceInferences.length}`);
 console.log(`  Provenance: ${provenance.length}`);
 
 // Build indexes
@@ -80,7 +559,7 @@ for (const f of physicalFeatures) {
   physicalFeatureIndex[f['@id'] as string] = f;
 }
 
-// Organization index: keyed by @id (wd:Q...)
+// Organization index: keyed by canonical local @id
 const orgIndex: Record<string, unknown> = {};
 for (const o of organizations) {
   orgIndex[o['@id'] as string] = o;
@@ -101,13 +580,20 @@ for (const s of sources) {
 // Appellation index: grouped by P1i_identifies
 const appellationsByEntity: Record<string, unknown[]> = {};
 for (const a of appellations) {
-  const identifies = a['P1i_identifies'] as string;
-  if (identifies) {
+  for (const identifies of toArray(a['P1i_identifies'] as string | string[])) {
     if (!appellationsByEntity[identifies]) {
       appellationsByEntity[identifies] = [];
     }
     appellationsByEntity[identifies].push(a);
   }
+}
+
+const presenceInferencesByPlantation: Record<string, unknown[]> = {};
+for (const inference of presenceInferences) {
+  const plantation = inference.inferredPresenceAt as string;
+  if (!plantation) continue;
+  presenceInferencesByPlantation[plantation] ??= [];
+  presenceInferencesByPlantation[plantation].push(inference);
 }
 
 // Observation index: grouped by observationOf (organization URI)
@@ -122,11 +608,917 @@ for (const o of observations) {
   }
 }
 
+// Rijksmuseum images index: E36 Visual Items grouped by the E74 organization
+// their depicted E25 plantation resolves to (via hasOrganizationalAssociation).
+// Underlying model: E22 Source -> P128 carries -> E36 Visual Item
+//   -> P138 represents -> E25 Plantation.
+// The organization keying here is a derived UI index only.
+const imagesByOrg: Record<string, Record<string, unknown>[]> = {};
+const rijksmuseumImagesPath = join(DATA_DIR, 'rijksmuseum-images.jsonld');
+if (existsSync(rijksmuseumImagesPath)) {
+  const imagesGraph = (JSON.parse(readFileSync(rijksmuseumImagesPath, 'utf-8')) as {
+    '@graph'?: Record<string, unknown>[];
+  })['@graph'] ?? [];
+  for (const entity of imagesGraph) {
+    const depicts = entity.P138_represents as string | undefined;
+    if (!depicts) continue;
+    // P138_represents targets the depicted E25 plantation; resolve the
+    // organization UI grouping via its hasOrganizationalAssociation link.
+    // (Legacy snapshots pointed P138_represents directly at the organization.)
+    let organizationUri: string | undefined;
+    const plantation = plantationIndex[depicts] as
+      | Record<string, unknown>
+      | undefined;
+    if (
+      plantation &&
+      typeof plantation.hasOrganizationalAssociation === 'string'
+    ) {
+      organizationUri = plantation.hasOrganizationalAssociation;
+    } else if (depicts.includes('/organization/')) {
+      organizationUri = depicts;
+    } else {
+      // No direct E25 match (e.g. plantation URI keyed by label rather than
+      // Q-ID): fall back to wikidata Q-ID matches via closeMatch, preferring
+      // PSUR-registered plantations (same eligibility rule as the import).
+      const depictsQid = depicts.includes('/entity/')
+        ? depicts.split('/').pop()?.toUpperCase()
+        : null;
+      if (depictsQid) {
+        const cands = plantations.filter(
+          (p) =>
+            toArray(p.closeMatch as string | string[] | undefined).some(
+              (match) =>
+                typeof match === 'string' &&
+                match.split('/').pop()?.toUpperCase() === depictsQid,
+            ),
+        );
+        const picked =
+          cands.find((p) => p.psurId != null) ??
+          (cands.length === 1 ? cands[0] : undefined);
+        if (
+          picked &&
+          typeof picked.hasOrganizationalAssociation === 'string'
+        ) {
+          organizationUri = picked.hasOrganizationalAssociation;
+        }
+      }
+    }
+    if (!organizationUri) continue;
+    imagesByOrg[organizationUri] ??= [];
+    imagesByOrg[organizationUri].push({
+      id: entity['@id'], label: entity.prefLabel, objectNumber: entity.objectNumber,
+      year: entity.year, thumbnailUrl: entity.thumbnailUrl, contentUrl: entity.contentUrl,
+      sameAs: entity.sameAs, isPublicDomain: entity.isPublicDomain, licenseLabel: entity.licenseLabel,
+    });
+  }
+}
+// Person index: persons.jsonld PersonObservation rows grouped by person, then
+// by the E74 organization they resolved to (isEnslavedBy). Persons are linked
+// through organizations, not places directly (see transform-persons.ts).
+const personsByOrg: Record<string, Record<string, unknown>[]> = {};
+const personsPath = join(LOD_DIR, 'persons.jsonld');
+if (existsSync(personsPath)) {
+  const personsGraph =
+    (
+      JSON.parse(readFileSync(personsPath, 'utf-8')) as {
+        '@graph'?: Record<string, unknown>[];
+      }
+    )['@graph'] ?? [];
+  const personEntityById = new Map<string, Record<string, unknown>>();
+  for (const entity of personsGraph) {
+    if (
+      toArray(entity['@type'] as string | string[]).includes('E21_Person') &&
+      typeof entity['@id'] === 'string'
+    ) {
+      personEntityById.set(entity['@id'], entity);
+    }
+  }
+  const groupedByOrg = new Map<
+    string,
+    Map<string, Record<string, unknown>>
+  >();
+  for (const entity of personsGraph) {
+    if (
+      !toArray(entity['@type'] as string | string[]).includes(
+        'PersonObservation',
+      )
+    ) {
+      continue;
+    }
+    const organizationUri = entity['isEnslavedBy'] as string | undefined;
+    const personUri = entity['P140_assigned_attribute_to'] as
+      | string
+      | undefined;
+    if (!organizationUri || !personUri) continue;
+    const person = personEntityById.get(personUri);
+    const idPerson =
+      (person?.idPerson as string | undefined) ?? personUri.split('/').pop()!;
+    const group =
+      groupedByOrg.get(organizationUri) ??
+      new Map<string, Record<string, unknown>>();
+    groupedByOrg.set(organizationUri, group);
+    const linked = group.get(idPerson) ?? {
+      id: idPerson,
+      label: person?.prefLabel ?? idPerson,
+      sex: person?.sex,
+      dayBirth: person?.dayBirth,
+      monthBirth: person?.monthBirth,
+      yearBirth: person?.yearBirth,
+      dayDeath: person?.dayDeath,
+      monthDeath: person?.monthDeath,
+      yearDeath: person?.yearDeath,
+      nameMother: person?.nameMother,
+      observations: [],
+    };
+    group.set(idPerson, linked);
+    (linked.observations as Record<string, unknown>[]).push({
+      id: entity['@id'],
+      nameEnslaved: entity['prefLabel'],
+      sex: entity['sex'],
+      age: entity['age'],
+      plantationText: entity['plantationText'],
+      ownerName: entity['ownerName'],
+      startDay: entity['startDay'],
+      startMonth: entity['startMonth'],
+      startYear: entity['startYear'],
+      startEvent: entity['startEvent'],
+      startInfo: entity['startInfo'],
+      endDay: entity['endDay'],
+      endMonth: entity['endMonth'],
+      endYear: entity['endYear'],
+      endEvent: entity['endEvent'],
+      endEventDetailed: entity['endEventDetailed'],
+      endInfo: entity['endInfo'],
+      registerType: entity['registerType'],
+    });
+  }
+  for (const [organizationUri, group] of groupedByOrg) {
+    personsByOrg[organizationUri] = [...group.values()].sort((a, b) =>
+      String(a.label).localeCompare(String(b.label)),
+    );
+  }
+}
+
+const compositionPeriodsByOrg: Record<string, unknown[]> = {};
+for (const period of compositionPeriods) {
+  const participants = [
+    period.P140_assigned_attribute_to,
+    ...toArray(
+      period.reportedComponentOrganization as string | string[] | undefined,
+    ),
+  ].filter((uri): uri is string => typeof uri === 'string' && Boolean(uri));
+  for (const organizationUri of participants) {
+    compositionPeriodsByOrg[organizationUri] ??= [];
+    compositionPeriodsByOrg[organizationUri].push(period);
+  }
+}
+
 // Provenance index: keyed by @id
 const provenanceIndex: Record<string, unknown> = {};
 for (const p of provenance) {
   provenanceIndex[p['@id'] as string] = p;
 }
+
+// Gazetteer integration: points and gazetteer-only lines are first-class CRM
+// features too. The source transforms create plantation polygons and
+// river/creek lines; this pass adds the gazetteer-maintained E25/E26/E53
+// records to the same frontend indexes so Explore and the data panels resolve
+// them through the same CIDOC-CRM shape.
+const gazetteerRaw = readJsonIfExists(gazetteerSrc);
+const gazetteerEntries = (gazetteerRaw?.['@graph'] || []) as GazetteerEntry[];
+const organizationOverridesRaw = readJsonIfExists(organizationOverridesSrc);
+const organizationOverrides = new Map(
+  (
+    (organizationOverridesRaw?.['@graph'] as OrganizationOverride[] | undefined) ??
+    []
+  )
+    .filter((entry) => typeof entry.qid === 'string')
+    .map((entry) => [entry.qid as string, entry]),
+);
+const activePlantationsByQid = new Map<string, GazetteerEntry[]>();
+const activeGazetteerById = new Map<string, GazetteerEntry>();
+const functionAssertionsByEntryId = new Map<
+  string,
+  ReturnType<typeof derivePlaceFunctionAssertions>
+>();
+
+for (const entry of gazetteerEntries) {
+  if (entry.deprecated || entry.mergedInto || !entry.id) continue;
+  activeGazetteerById.set(entry.id, entry);
+  if (entry.type !== 'plantation') continue;
+  const qid = primaryWikidataQid(entry);
+  if (!qid) continue;
+  activePlantationsByQid.set(qid, [
+    ...(activePlantationsByQid.get(qid) ?? []),
+    entry,
+  ]);
+}
+
+function organizationAssociationStatus(
+  entry: GazetteerEntry,
+): 'linked' | 'needs-organization-link' | 'needs-physical-link-review' {
+  const qid = primaryWikidataQid(entry);
+  if (!qid) return 'needs-organization-link';
+  const activeIds = (activePlantationsByQid.get(qid) ?? [])
+    .map((plantation) => plantation.id)
+    .filter((id): id is string => Boolean(id))
+    .sort();
+  const override = organizationOverrides.get(qid);
+  const confirmedReview = resolveConfirmedPhysicalLinkReview(
+    override,
+    (activePlantationsByQid.get(qid) ?? []).map((plantation) => ({
+      id: plantation.id!,
+      fid: plantation.fid,
+    })),
+  );
+  if (activeIds.length > 1 && !confirmedReview) {
+    return 'needs-physical-link-review';
+  }
+  return confirmedReview && entry.id
+    ? confirmedReview.associatedPlaceIds.has(entry.id)
+      ? 'linked'
+      : 'needs-organization-link'
+    : 'linked';
+}
+
+const thesaurusRaw = readJsonIfExists(thesaurusSrc);
+const placeTypeConcepts = ((thesaurusRaw?.['@graph'] || []) as Record<
+  string,
+  unknown
+>[]).filter((entry) => entry.typeId);
+const crmClassByType = new Map<string, string>(
+  placeTypeConcepts.map((entry) => [
+    entry.typeId as string,
+    normalizeCrmClass(entry.crmClass as string | undefined),
+  ]),
+);
+
+const sourcesRegistryRaw = readJsonIfExists(sourcesSrc);
+const sourceRegistryEntries = ((sourcesRegistryRaw?.['@graph'] || []) as Record<
+  string,
+  unknown
+>[]).filter((entry) => entry.sourceId);
+const sourceRegistryById = new Map<string, Record<string, unknown>>(
+  sourceRegistryEntries.map((entry) => [entry.sourceId as string, entry]),
+);
+
+function ensureSource(sourceId: string): string {
+  const ontologyUri = `${ONTOLOGY_BASE}source/${sourceId}`;
+  if (sourceIndex[ontologyUri]) return ontologyUri;
+
+  const registryEntry = sourceRegistryById.get(sourceId);
+  const uri =
+    (registryEntry?.['@id'] as string | undefined) ||
+    `${DATA_BASE}source/${sourceId}`;
+
+  if (!sourceIndex[uri]) {
+    sourceIndex[uri] = {
+      '@id': uri,
+      '@type': ['E22_Human_Made_Object'],
+      sourceId,
+      prefLabel: (registryEntry?.prefLabel as string | undefined) || sourceId,
+      P2_has_type: registryEntry?.P2_has_type,
+      mapYear:
+        registryEntry?.mapYear != null ? String(registryEntry.mapYear) : null,
+      sameAs:
+        (registryEntry?.handleUrl as string | undefined) ||
+        (registryEntry?.iiifManifest as string | undefined) ||
+        undefined,
+    };
+  }
+
+  return uri;
+}
+
+let indexedGazetteerFeatures = 0;
+let indexedGazetteerPlaces = 0;
+let indexedGazetteerAppellations = 0;
+
+for (const entry of gazetteerEntries) {
+  if (entry.deprecated || entry.mergedInto) continue;
+
+  const type = entry.type;
+  const id = entry.id;
+  const entryUri = canonicalPlaceUri(entry);
+  if (!type || !id || !entryUri) continue;
+  if (PIPELINE_TYPES.has(type)) continue;
+
+  const location = entry.location || null;
+  const sourceIds = Array.isArray(entry.sources) ? entry.sources : [];
+  const sourceUris = sourceIds.map(ensureSource);
+  const primarySourceUri = sourceUris[0] ?? null;
+  const mapYear = mapYearFromSources(sourceIds, sourceRegistryById);
+  const crmClass = crmClassByType.get(type) ?? 'E53_Place';
+  const crmBadge = crmBadgeFromClass(crmClass);
+  const displayName = preferredName(entry);
+  const geometryWkt = location?.wkt || (location ? pointWkt(location) : null);
+  const hasLocation = !!geometryWkt;
+  const typeUri = `${DATA_BASE}vocabulary/place-type/${type}`;
+
+  const featureUri = crmBadge === 'E53' ? null : entryUri;
+  const placeUri = crmBadge === 'E53' ? entryUri : `${entryUri}/location`;
+
+  if (crmBadge !== 'E53') {
+    const targetFeatureUri = entryUri;
+    const featureEntity: Record<string, unknown> = {
+      '@id': targetFeatureUri,
+      '@type': [crmClass],
+      featureType: type,
+      P2_has_type: typeUri,
+      prefLabel: displayName,
+      status: type === 'road' || type === 'railroad' ? 'infrastructure' : 'named',
+      gazetteerId: id,
+      P53_has_location: hasLocation ? placeUri : undefined,
+    };
+    if (primarySourceUri) featureEntity.P70i_is_documented_in = primarySourceUri;
+    if (entry.description) featureEntity.description = entry.description;
+    addExternalAuthorityLinks(featureEntity, entry.externalLinks);
+
+    const featureProvId = `${DATA_BASE}provenance/gazetteer-feature-${id}`;
+    featureEntity.wasDerivedFrom = featureProvId;
+    provenanceIndex[featureProvId] = {
+      '@id': featureProvId,
+      '@type': ['ProvenanceRecord'],
+      sourceFile: 'data/places-gazetteer.jsonld',
+      sourceColumn: 'type, names, sources, location',
+      sourceRow: `id=${id}`,
+      transformedBy: 'scripts/prepare-data.ts',
+      modelEntity:
+        crmBadge === 'E26' ? 'E26_Physical_Feature' : 'E25_Human_Made_Feature',
+      schemaTable: 'gazetteer_features',
+      linkedVia: `P2_has_type -> ${typeUri}`,
+    };
+
+    physicalFeatureIndex[targetFeatureUri] = featureEntity;
+    indexedGazetteerFeatures++;
+  }
+
+  if (crmBadge === 'E53' || hasLocation) {
+    const placeEntity: Record<string, unknown> = {
+      '@id': placeUri,
+      '@type': ['E53_Place'],
+      fid: entry.fid ?? null,
+      mapYear,
+      observedLabel: displayName,
+      featureType: type,
+      gazetteerId: id,
+    };
+    if (primarySourceUri) {
+      placeEntity.P70i_is_documented_in = primarySourceUri;
+    }
+    if (geometryWkt) {
+      placeEntity.hasGeometry = {
+        '@type': 'geo:Geometry',
+        asWKT: geometryWkt,
+        geometrySource: primarySourceUri,
+      };
+    }
+
+    const locationProvId = `${DATA_BASE}provenance/gazetteer-location-${id}`;
+    placeEntity.wasDerivedFrom = locationProvId;
+    provenanceIndex[locationProvId] = {
+      '@id': locationProvId,
+      '@type': ['ProvenanceRecord'],
+      sourceFile: 'data/places-gazetteer.jsonld',
+      sourceColumn: 'location',
+      sourceRow: `id=${id}`,
+      transformedBy: 'scripts/prepare-data.ts',
+      modelEntity: 'E53_Place',
+      schemaTable: 'gazetteer_places',
+      linkedVia:
+        crmBadge === 'E53'
+          ? `P2_has_type -> ${typeUri}`
+          : `P53i_is_location_of -> ${featureUri}`,
+    };
+
+    placeIndex[placeUri] = placeEntity;
+    indexedGazetteerPlaces++;
+  }
+
+  const appellationTarget = featureUri ?? placeUri;
+  const nameEntries = allNames(entry);
+  if (appellationTarget && nameEntries.length > 0) {
+    const existing = appellationsByEntity[appellationTarget] ?? [];
+    const created = nameEntries.map((name, index) => {
+      const appSourceUri = name.source
+        ? ensureSource(name.source)
+        : primarySourceUri ?? undefined;
+      return {
+        '@id': `${entryUri}/appellation/${index + 1}`,
+        '@type': ['E41_Appellation'],
+        P190_has_symbolic_content: name.text,
+        P72_has_language: name.language || 'nl',
+        P2_has_type: `${DATA_BASE}type/name-type/${name.type || 'historical'}`,
+        P128i_is_carried_by: appSourceUri,
+        P1i_identifies: appellationTarget,
+        mapYear:
+          name.sourceYear != null ? String(name.sourceYear) : mapYear,
+        isPreferred: name.isPreferred === true,
+      };
+    });
+    appellationsByEntity[appellationTarget] = [...existing, ...created];
+    indexedGazetteerAppellations += created.length;
+  }
+}
+
+if (gazetteerEntries.length > 0) {
+  console.log('\nIntegrated gazetteer entries into CRM indexes...');
+  console.log(`  Gazetteer features:     ${indexedGazetteerFeatures}`);
+  console.log(`  Gazetteer E53 places:   ${indexedGazetteerPlaces}`);
+  console.log(`  Gazetteer appellations: ${indexedGazetteerAppellations}`);
+}
+
+const lifecycleEventsByEntity: Record<string, Record<string, unknown>[]> = {};
+
+function addLifecycleEvent(
+  featureUri: string,
+  event: Record<string, unknown>,
+) {
+  const list = lifecycleEventsByEntity[featureUri] ?? [];
+  if (!list.some((existing) => existing['@id'] === event['@id'])) {
+    list.push(event);
+  }
+  lifecycleEventsByEntity[featureUri] = list;
+}
+
+function attachLifecycleEventsToEntity(featureUri: string) {
+  const eventUris = (lifecycleEventsByEntity[featureUri] ?? []).map(
+    (event) => event['@id'] as string,
+  );
+  if (eventUris.length === 0) return;
+
+  const entity =
+    (plantationIndex[featureUri] as Record<string, unknown> | undefined) ??
+    (physicalFeatureIndex[featureUri] as Record<string, unknown> | undefined) ??
+    (placeIndex[featureUri] as Record<string, unknown> | undefined);
+  if (!entity) return;
+  entity.lifecycleEvents = eventUris;
+}
+
+function slugify(value: string): string {
+  return value
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/['\u2019]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+const pipelineFeatureByTypeAndFid = new Map<string, string>();
+for (const entity of Object.values(
+  plantationIndex as Record<string, Record<string, unknown>>,
+)) {
+  const placeUri = entity.P53_has_location as string | undefined;
+  const place = placeUri
+    ? (placeIndex[placeUri] as Record<string, unknown> | undefined)
+    : undefined;
+  if (place?.fid != null) {
+    pipelineFeatureByTypeAndFid.set(
+      `plantation:${place.fid}`,
+      entity['@id'] as string,
+    );
+  }
+}
+for (const entity of Object.values(
+  physicalFeatureIndex as Record<string, Record<string, unknown>>,
+)) {
+  const featureType = entity.featureType as string | undefined;
+  if (!featureType || !PIPELINE_TYPES.has(featureType)) continue;
+  const placeUri = entity.P53_has_location as string | undefined;
+  const place = placeUri
+    ? (placeIndex[placeUri] as Record<string, unknown> | undefined)
+    : undefined;
+  if (place?.fid != null) {
+    pipelineFeatureByTypeAndFid.set(
+      `${featureType}:${place.fid}`,
+      entity['@id'] as string,
+    );
+  }
+}
+
+function featureUriForGazetteerEntry(entry: GazetteerEntry): string | null {
+  const type = entry.type;
+  const entryUri = canonicalPlaceUri(entry);
+  if (!type || !entryUri) return null;
+  if (PIPELINE_TYPES.has(type) && entry.fid != null) {
+    return pipelineFeatureByTypeAndFid.get(`${type}:${entry.fid}`) ?? null;
+  }
+  const crmClass = crmClassByType.get(type) ?? 'E53_Place';
+  return crmBadgeFromClass(crmClass) === 'E53' ? entryUri : entryUri;
+}
+
+let lifecycleEventCount = 0;
+
+function addPresenceLifecycleEvent(params: {
+  featureUri: string;
+  localId: string;
+  label: string;
+  mapYear?: string;
+  sourceId?: string;
+  sourceUri?: string;
+  note?: string;
+}) {
+  const startYear = params.mapYear
+    ? Number.parseInt(params.mapYear, 10)
+    : NaN;
+  const dated = Number.isFinite(startYear);
+  const eventSuffix = dated
+    ? `source-presence-${params.mapYear}`
+    : 'mapped-presence-undated';
+  addLifecycleEvent(params.featureUri, {
+    '@id': `${DATA_BASE}event/${params.localId}/${eventSuffix}`,
+    '@type': [eventTypeToCrmType('E17')],
+    crmClass: 'E17',
+    eventType: 'presence',
+    prefLabel: dated
+      ? `${params.label}: present in ${params.mapYear}`
+      : `${params.label}: mapped presence`,
+    featureUri: params.featureUri,
+    P41_classified: params.featureUri,
+    P42_assigned: `${DATA_BASE}type/feature-status/present`,
+    P4_has_time_span: dated ? params.mapYear : undefined,
+    startYear: dated ? startYear : undefined,
+    hadPrimarySource: params.sourceUri,
+    status: 'present',
+    note:
+      params.note ??
+      (params.sourceId ? `Attested by ${params.sourceId}` : 'Mapped record'),
+  });
+  lifecycleEventCount++;
+}
+
+for (const entry of gazetteerEntries) {
+  if (entry.deprecated || entry.mergedInto) continue;
+
+  const id = entry.id;
+  const type = entry.type;
+  if (!id || !type) continue;
+  const functionAssertions =
+    type === 'plantation' ? derivePlaceFunctionAssertions(entry) : [];
+  functionAssertionsByEntryId.set(id, functionAssertions);
+
+  const featureUri = featureUriForGazetteerEntry(entry);
+  if (!featureUri) continue;
+
+  const entrySourceIds = Array.isArray(entry.sources) ? entry.sources : [];
+  const nameSourceIds = (Array.isArray(entry.names) ? entry.names : [])
+    .map((name) => name.source)
+    .filter((source): source is string => Boolean(source));
+  const sourceIds = [...new Set([...entrySourceIds, ...nameSourceIds])];
+  const sourceUris = sourceIds.map(ensureSource);
+  const primarySourceUri = sourceUris[0] ?? undefined;
+  const mapYear = mapYearFromSources(sourceIds, sourceRegistryById);
+  const statusAssertions = Array.isArray(entry.statusAssertions)
+    ? entry.statusAssertions
+    : [];
+  const genericEvents = Array.isArray(entry.lifecycleEvents)
+    ? entry.lifecycleEvents
+    : [];
+
+  for (const assertion of statusAssertions) {
+    const assertionId =
+      typeof assertion.id === 'string' && assertion.id
+        ? assertion.id
+        : `status-${lifecycleEventCount + 1}`;
+    const status =
+      typeof assertion.status === 'string' ? assertion.status : 'present';
+    const sourceId =
+      typeof assertion.source === 'string' && assertion.source
+        ? assertion.source
+        : sourceIds[0];
+    const sourceUri = sourceId ? ensureSource(sourceId) : primarySourceUri;
+    const startYear = assertion.startYear as number | undefined;
+    const endYear = assertion.endYear as number | undefined;
+    const eventUri = `${DATA_BASE}event/${id}/${assertionId}`;
+
+    addLifecycleEvent(featureUri, {
+      '@id': eventUri,
+      '@type': [eventTypeToCrmType('E17')],
+      crmClass: 'E17',
+      eventType: status === 'present' ? 'presence' : 'status-assignment',
+      prefLabel: `${preferredName(entry) || id}: ${status}`,
+      featureUri,
+      P41_classified: featureUri,
+      P42_assigned: `${DATA_BASE}type/feature-status/${slugify(status)}`,
+      P4_has_time_span: eventTimeSpan(startYear, endYear),
+      startYear,
+      endYear,
+      hadPrimarySource: sourceUri,
+      status,
+      note: assertion.note ?? null,
+    });
+    lifecycleEventCount++;
+  }
+
+  for (const assertion of functionAssertions) {
+    const assertionId = assertion.id;
+    const sourceId = assertion.source || sourceIds[0];
+    const sourceUri = sourceId ? ensureSource(sourceId) : primarySourceUri;
+    const startYear = assertion.startYear;
+    const endYear = assertion.endYear;
+    const assignedType = assertion.functionUri;
+
+    addLifecycleEvent(featureUri, {
+      '@id': `${DATA_BASE}event/${id}/${assertionId}`,
+      '@type': [eventTypeToCrmType('E17')],
+      crmClass: 'E17',
+      eventType: 'function-assignment',
+      prefLabel: `${preferredName(entry) || id}: function ${assertion.label}`,
+      featureUri,
+      P41_classified: featureUri,
+      P42_assigned: assignedType,
+      P4_has_time_span: eventTimeSpan(startYear, endYear),
+      startYear,
+      endYear,
+      hadPrimarySource: sourceUri,
+      assignedType,
+      assignedLabel: assertion.label,
+      sourceLabel: assertion.sourceLabel,
+      evidenceKinds: assertion.evidenceKinds,
+      sourceRows: assertion.sourceRows,
+      certainty: assertion.certainty,
+      note: assertion.note ?? null,
+    });
+    lifecycleEventCount++;
+  }
+
+  for (const event of genericEvents) {
+    const crmClass =
+      typeof event.crmClass === 'string' ? event.crmClass : 'E17';
+    const eventType =
+      typeof event.eventType === 'string'
+        ? event.eventType
+        : 'status-assignment';
+    const eventId =
+      typeof event.id === 'string' && event.id
+        ? event.id
+        : `${eventType}-${lifecycleEventCount + 1}`;
+    const sourceId =
+      typeof event.source === 'string' && event.source
+        ? event.source
+        : sourceIds[0];
+    const sourceUri = sourceId ? ensureSource(sourceId) : primarySourceUri;
+    const startYear = event.startYear as number | undefined;
+    const endYear = event.endYear as number | undefined;
+    const assignedType =
+      typeof event.assignedType === 'string'
+        ? event.assignedType
+        : typeof event.status === 'string'
+          ? `${DATA_BASE}type/feature-status/${slugify(event.status)}`
+          : undefined;
+
+    addLifecycleEvent(featureUri, {
+      '@id': `${DATA_BASE}event/${id}/${eventId}`,
+      '@type': [eventTypeToCrmType(crmClass)],
+      crmClass,
+      eventType,
+      prefLabel:
+        (event.prefLabel as string | undefined) ||
+        `${preferredName(entry) || id}: ${eventType}`,
+      featureUri,
+      P4_has_time_span: eventTimeSpan(startYear, endYear),
+      startYear,
+      endYear,
+      hadPrimarySource: sourceUri,
+      P41_classified: crmClass === 'E17' ? featureUri : undefined,
+      P42_assigned: crmClass === 'E17' ? assignedType : undefined,
+      P31_has_modified: crmClass === 'E11' ? featureUri : undefined,
+      P13_destroyed: crmClass === 'E6' ? featureUri : undefined,
+      P124_transformed: crmClass === 'E81' ? featureUri : undefined,
+      P123_resulted_in: event.resultedIn,
+      assignedType,
+      status: event.status,
+      note: event.note ?? null,
+    });
+    lifecycleEventCount++;
+  }
+
+  const hasPresenceForMapYear = (lifecycleEventsByEntity[featureUri] ?? []).some(
+    (event) =>
+      event.eventType === 'presence' &&
+      event.startYear != null &&
+      String(event.startYear) === mapYear,
+  );
+  if (!hasPresenceForMapYear) {
+    const sourceId = sourceIds.includes('map-1930')
+      ? 'map-1930'
+      : sourceIds[0];
+    addPresenceLifecycleEvent({
+      featureUri,
+      localId: id,
+      label: preferredName(entry) || id,
+      mapYear,
+      sourceId,
+      sourceUri: sourceId ? ensureSource(sourceId) : undefined,
+    });
+  }
+}
+
+function sourceIdFromUri(sourceUri: string | undefined): string | undefined {
+  if (!sourceUri) return undefined;
+  const last = sourceUri.split('/').filter(Boolean).pop();
+  return last || undefined;
+}
+
+function ensureIndexedFeaturePresence(
+  entity: Record<string, unknown>,
+  fallbackType: string,
+) {
+  const featureUri = entity['@id'] as string | undefined;
+  if (!featureUri || (lifecycleEventsByEntity[featureUri] ?? []).length > 0) {
+    return;
+  }
+  const depictions = Array.isArray(entity.depictedOnMap)
+    ? (entity.depictedOnMap as Record<string, unknown>[])
+    : [];
+  const depiction =
+    depictions.find((item) => item.P70i_is_documented_in) ?? depictions[0];
+  const sourceUri = depiction?.P70i_is_documented_in as string | undefined;
+  const sourceId = sourceIdFromUri(sourceUri);
+  const label =
+    (entity.prefLabel as string | undefined) ||
+    `${fallbackType} ${featureUri.split('/').filter(Boolean).pop()}`;
+
+  addPresenceLifecycleEvent({
+    featureUri,
+    localId: slugify(featureUri),
+    label,
+    mapYear: mapYearFromSources(sourceId ? [sourceId] : [], sourceRegistryById),
+    sourceId,
+    sourceUri,
+    note: sourceId ? undefined : 'Mapped pipeline feature',
+  });
+}
+
+for (const entity of Object.values(
+  plantationIndex as Record<string, Record<string, unknown>>,
+)) {
+  ensureIndexedFeaturePresence(entity, 'plantation');
+}
+for (const entity of Object.values(
+  physicalFeatureIndex as Record<string, Record<string, unknown>>,
+)) {
+  ensureIndexedFeaturePresence(entity, 'feature');
+}
+
+for (const featureUri of Object.keys(lifecycleEventsByEntity)) {
+  lifecycleEventsByEntity[featureUri].sort((a, b) => {
+    const ay = typeof a.startYear === 'number' ? a.startYear : 9999;
+    const by = typeof b.startYear === 'number' ? b.startYear : 9999;
+    return ay - by;
+  });
+  attachLifecycleEventsToEntity(featureUri);
+}
+
+type FunctionUsage = {
+  assertionId: string;
+  evidenceKinds: Array<'production' | 'recorded-function'>;
+  sourceLabel: string;
+  source: string;
+  sourceRows: string[];
+  certainty: 'certain' | 'probable' | 'uncertain';
+  startYear?: number;
+  endYear?: number;
+};
+
+type FunctionPlace = {
+  id: string;
+  label: string;
+  recordUrl: string;
+  usages: FunctionUsage[];
+};
+
+type FunctionConcept = {
+  id: string;
+  uri: string;
+  relatedPlaceType?: { id: string; uri: string };
+  prefLabel: { nl: string; en: string };
+  sourceLabels: string[];
+  evidenceKinds: Array<'production' | 'recorded-function'>;
+  placeCount: number;
+  assertionCount: number;
+  firstYear: number | null;
+  lastYear: number | null;
+  places: FunctionPlace[];
+};
+
+const functionConceptsById = new Map<
+  string,
+  Omit<FunctionConcept, 'placeCount' | 'assertionCount' | 'firstYear' | 'lastYear'>
+>();
+for (const entry of gazetteerEntries) {
+  if (
+    entry.type !== 'plantation' ||
+    entry.deprecated ||
+    entry.mergedInto ||
+    !entry.id
+  ) {
+    continue;
+  }
+  for (const assertion of functionAssertionsByEntryId.get(entry.id) ?? []) {
+    const concept = functionConceptsById.get(assertion.functionId) ?? {
+      id: assertion.functionId,
+      uri: assertion.functionUri,
+      prefLabel: placeFunctionLabels(
+        assertion.functionId,
+        assertion.sourceLabel,
+      ),
+      sourceLabels: [],
+      evidenceKinds: [],
+      places: [],
+    };
+    if (!concept.sourceLabels.includes(assertion.sourceLabel)) {
+      concept.sourceLabels.push(assertion.sourceLabel);
+    }
+    for (const evidenceKind of assertion.evidenceKinds) {
+      if (!concept.evidenceKinds.includes(evidenceKind)) {
+        concept.evidenceKinds.push(evidenceKind);
+      }
+    }
+    let place = concept.places.find((candidate) => candidate.id === entry.id);
+    if (!place) {
+      place = {
+        id: entry.id,
+        label: preferredName(entry) || entry.id,
+        recordUrl: `/place/${entry.id}`,
+        usages: [],
+      };
+      concept.places.push(place);
+    }
+    place.usages.push({
+      assertionId: assertion.id,
+      evidenceKinds: assertion.evidenceKinds,
+      sourceLabel: assertion.sourceLabel,
+      source: assertion.source,
+      sourceRows: assertion.sourceRows,
+      certainty: assertion.certainty,
+      startYear: assertion.startYear,
+      endYear: assertion.endYear,
+    });
+    functionConceptsById.set(assertion.functionId, concept);
+  }
+}
+
+const placeFunctionVocabulary = {
+  scheme: {
+    id: 'place-function',
+    uri: PLACE_FUNCTION_SCHEME_URI,
+    prefLabel: {
+      en: 'Place functions vocabulary',
+      nl: 'Vocabulaire van plaatsfuncties',
+    },
+    scopeNote: {
+      en: 'Time-scoped functions assigned only to physical place features from source-qualified evidence.',
+      nl: 'Tijdgebonden functies die uitsluitend op basis van brongebonden bewijs aan fysieke plaatsen zijn toegekend.',
+    },
+  },
+  functions: [...functionConceptsById.values()]
+    .map((concept): FunctionConcept => {
+      const years = concept.places.flatMap((place) =>
+        place.usages.flatMap((usage) =>
+          [usage.startYear, usage.endYear].filter(
+            (year): year is number => year != null,
+          ),
+        ),
+      );
+      const assertionCount = concept.places.reduce(
+        (sum, place) => sum + place.usages.length,
+        0,
+      );
+      const placeType = relatedPlaceType(concept.id);
+      return {
+        ...concept,
+        ...(placeType ? { relatedPlaceType: placeType } : {}),
+        sourceLabels: concept.sourceLabels.sort(),
+        evidenceKinds: concept.evidenceKinds.sort(),
+        placeCount: concept.places.length,
+        assertionCount,
+        firstYear: years.length > 0 ? Math.min(...years) : null,
+        lastYear: years.length > 0 ? Math.max(...years) : null,
+        places: concept.places
+          .map((place) => ({
+            ...place,
+            usages: place.usages.sort(
+              (a, b) =>
+                (a.startYear ?? Number.POSITIVE_INFINITY) -
+                (b.startYear ?? Number.POSITIVE_INFINITY),
+            ),
+          }))
+          .sort((a, b) => a.label.localeCompare(b.label)),
+      };
+    })
+    .sort((a, b) => a.prefLabel.en.localeCompare(b.prefLabel.en)),
+};
+
+console.log('\nBuilt lifecycle event index...');
+console.log(`  Features with events: ${Object.keys(lifecycleEventsByEntity).length}`);
+console.log(
+  `  Lifecycle events:     ${Object.values(lifecycleEventsByEntity).reduce(
+    (sum, events) => sum + events.length,
+    0,
+  )}`,
+);
 
 // Write output files
 function writeJSON(filename: string, data: unknown) {
@@ -148,6 +1540,12 @@ writeJSON('places.json', placeIndex);
 writeJSON('sources.json', sourceIndex);
 writeJSON('appellations-by-entity.json', appellationsByEntity);
 writeJSON('observations-by-org.json', observationsByOrg);
+writeJSON('images-by-org.json', imagesByOrg);
+writeJSON('persons-by-org.json', personsByOrg);
+writeJSON('organization-composition-periods.json', compositionPeriodsByOrg);
+writeJSON('presence-inferences-by-plantation.json', presenceInferencesByPlantation);
+writeJSON('lifecycle-events.json', lifecycleEventsByEntity);
+writeJSON('place-functions.json', placeFunctionVocabulary);
 writeJSON('provenance.json', provenanceIndex);
 
 // Copy GeoJSON and merge gazetteer features
@@ -156,58 +1554,209 @@ if (existsSync(geojsonSrc)) {
   const geojson = JSON.parse(readFileSync(geojsonSrc, 'utf-8'));
 
   // Merge additional features from gazetteer (places.csv, military posts, roads, railroad)
-  const gazetteerPath = join(__dirname, '../../data/places-gazetteer.jsonld');
-  if (existsSync(gazetteerPath)) {
-    const gazetteerData = JSON.parse(readFileSync(gazetteerPath, 'utf-8'));
-    const entries = gazetteerData['@graph'] || [];
+  if (gazetteerEntries.length > 0) {
+    const entries = gazetteerEntries.filter(
+      (entry) => !entry.deprecated && !entry.mergedInto,
+    );
     let added = 0;
 
-    // Existing feature types in geojson are 'plantation', 'river', 'creek'
-    // Add features for types NOT already in the pipeline
-    const pipelineTypes = new Set(['plantation', 'river', 'creek']);
+    // Build lookups: fid -> stmId, placeUri -> stmId
+    // Existing generated GeoJSON contains only these pipeline-backed types.
+    // Do not let gazetteer-only road/point FIDs collide with polygon/river FIDs.
+    const fidToStmId = new Map<number, string>();
+    const uriToStmId = new Map<string, string>();
+    for (const entry of entries) {
+      if (!entry.type || !PIPELINE_TYPES.has(entry.type)) continue;
+      const stmId = entry.id as string;
+      if (entry.fid != null) fidToStmId.set(entry.fid as number, stmId);
+      if (entry['@id']) uriToStmId.set(entry['@id'] as string, stmId);
+    }
 
-    for (const entry of entries as Record<string, unknown>[]) {
+    // Inject stmId into existing features
+    let enriched = 0;
+    const mappedGazetteerIds = new Set<string>();
+    for (const feature of geojson.features) {
+      const props = feature.properties;
+      const pipelineFeatureUri =
+        props.featureType && props.fid != null
+          ? pipelineFeatureByTypeAndFid.get(`${props.featureType}:${props.fid}`)
+          : null;
+      if (pipelineFeatureUri) {
+        props.featureUri = pipelineFeatureUri;
+      } else if (props.plantationUri && !props.featureUri) {
+        props.featureUri = props.plantationUri;
+      }
+      const stmId =
+        fidToStmId.get(props.fid) ??
+        uriToStmId.get(props.featureUri ?? '') ??
+        uriToStmId.get(props.plantationUri ?? '') ??
+        uriToStmId.get(props.placeUri ?? '') ??
+        null;
+      if (stmId) {
+        props.stmId = stmId;
+        const gazetteerEntry = activeGazetteerById.get(stmId);
+        if (gazetteerEntry?.type === 'plantation') {
+          props.wikidataQid = primaryWikidataQid(gazetteerEntry) ?? undefined;
+          props.organizationAssociationStatus =
+            organizationAssociationStatus(gazetteerEntry);
+        }
+        mappedGazetteerIds.add(stmId);
+        enriched++;
+      }
+    }
+    console.log(`  Enriched ${enriched} existing features with stmId`);
+
+    // Existing feature types in geojson are 'plantation', 'river', 'creek'.
+    // Add any Gazetteer entry that was not matched to one of those pipeline
+    // features, including manually added points and unmatched natural features.
+    for (const entry of entries) {
       const type = entry.type as string;
-      if (pipelineTypes.has(type)) continue;
+      if (mappedGazetteerIds.has(entry.id as string)) continue;
 
-      const loc = entry.location as {
-        lat: number | null;
-        lng: number | null;
-        wkt: string | null;
-      } | null;
+      const loc = entry.location || null;
       if (!loc) continue;
 
-      // LineString features (roads, railroad) — use WKT if available
-      if (loc.wkt && (type === 'road' || type === 'railroad')) {
-        const match = loc.wkt.match(/LineString\s*\((.+?)\)/i);
-        if (match) {
-          const coords: number[][] = [];
-          for (const pair of match[1].split(',')) {
-            const parts = pair.trim().split(/\s+/);
-            if (parts.length >= 2) {
-              const lon = parseFloat(parts[0]);
-              const lat = parseFloat(parts[1]);
-              if (!isNaN(lon) && !isNaN(lat)) coords.push([lon, lat]);
+      const displayName = preferredName(entry);
+      const entryNames = allNames(entry);
+      const nameTexts = [
+        ...new Set(entryNames.map((name) => name.text).filter(Boolean)),
+      ];
+      const entrySources = Array.isArray(entry.sources) ? entry.sources : [];
+      const derivedMapYear = mapYearFromSources(
+        entrySources,
+        sourceRegistryById,
+      );
+      const crmClass = crmClassByType.get(type) ?? 'E53_Place';
+      const crmBadge = crmBadgeFromClass(crmClass);
+      const entryUri = canonicalPlaceUri(entry);
+      if (!entryUri) continue;
+      const featureUri = crmBadge === 'E53' ? null : entryUri;
+      const placeUri =
+        crmBadge === 'E53' ? entryUri : `${entryUri}/location`;
+      const status =
+        type === 'road' || type === 'railroad' ? 'infrastructure' : 'named';
+      const wikidataQid =
+        type === 'plantation' ? primaryWikidataQid(entry) : null;
+      const associationStatus =
+        type === 'plantation' ? organizationAssociationStatus(entry) : undefined;
+
+      // LineString / MultiLineString features - use WKT if available.
+      const wkt = typeof loc.wkt === 'string' ? loc.wkt : null;
+      const isLineWkt =
+        wkt !== null && /^(?:Multi)?LineString\s*\(/i.test(wkt);
+      if (
+        isLineWkt &&
+        (type === 'road' ||
+          type === 'railroad' ||
+          type === 'river' ||
+          type === 'creek')
+      ) {
+        const isMulti = /^MultiLineString\s*\(/i.test(wkt);
+        let geometry:
+          | { type: 'LineString'; coordinates: number[][] }
+          | { type: 'MultiLineString'; coordinates: number[][][] }
+          | null = null;
+
+        if (isMulti) {
+          const inner = wkt
+            .replace(/^MultiLineString\s*\(/i, '')
+            .replace(/\)\s*$/, '');
+          const segmentMatches = [...inner.matchAll(/\(([^)]+)\)/g)];
+          const allSegments: number[][][] = [];
+          for (const segMatch of segmentMatches) {
+            const coords: number[][] = [];
+            for (const pair of segMatch[1].split(',')) {
+              const pts = pair.trim().split(/\s+/);
+              if (pts.length >= 2) {
+                const lon = parseFloat(pts[0]);
+                const lat = parseFloat(pts[1]);
+                if (!isNaN(lon) && !isNaN(lat)) coords.push([lon, lat]);
+              }
+            }
+            if (coords.length >= 2) allSegments.push(coords);
+          }
+          if (allSegments.length === 1) {
+            geometry = { type: 'LineString', coordinates: allSegments[0] };
+          } else if (allSegments.length > 1) {
+            geometry = { type: 'MultiLineString', coordinates: allSegments };
+          }
+        } else {
+          const match = wkt.match(/LineString\s*\(([^)]+)\)/i);
+          if (match) {
+            const coords: number[][] = [];
+            for (const pair of match[1].split(',')) {
+              const pts = pair.trim().split(/\s+/);
+              if (pts.length >= 2) {
+                const lon = parseFloat(pts[0]);
+                const lat = parseFloat(pts[1]);
+                if (!isNaN(lon) && !isNaN(lat)) coords.push([lon, lat]);
+              }
+            }
+            if (coords.length >= 2) {
+              geometry = { type: 'LineString', coordinates: coords };
             }
           }
-          if (coords.length >= 2) {
+        }
+
+        if (geometry) {
+          geojson.features.push({
+            type: 'Feature',
+            id: `${type}-${entry.fid || entry.id}`,
+            geometry,
+            properties: {
+              fid: entry.fid ?? null,
+              name: displayName,
+              allNames: nameTexts,
+              stmId: entry.id as string,
+              featureUri,
+              placeUri,
+              status,
+              featureType: type,
+              mapYear: derivedMapYear,
+              wikidataQid: wikidataQid ?? undefined,
+              organizationAssociationStatus: associationStatus,
+            },
+          });
+          added++;
+        }
+        continue;
+      }
+
+      // Polygon features not already present in the source GeoJSON.
+      if (loc.wkt && type === 'plantation') {
+        const match = loc.wkt.match(/Polygon\s*\(\(([^)]+)\)\)/i);
+        if (match) {
+          const coordinates: number[][] = [];
+          for (const pair of match[1].split(',')) {
+            const points = pair.trim().split(/\s+/);
+            if (points.length < 2) continue;
+            const lon = parseFloat(points[0]);
+            const lat = parseFloat(points[1]);
+            if (!isNaN(lon) && !isNaN(lat)) coordinates.push([lon, lat]);
+          }
+          if (coordinates.length >= 3) {
             geojson.features.push({
               type: 'Feature',
               id: `${type}-${entry.fid || entry.id}`,
-              geometry: { type: 'LineString', coordinates: coords },
+              geometry: { type: 'Polygon', coordinates: [coordinates] },
               properties: {
                 fid: entry.fid ?? null,
-                name: entry.prefLabel || '',
-                placeUri: (entry['@id'] as string) || `stm:place/${entry.id}`,
-                status: 'infrastructure',
+                name: displayName,
+                allNames: nameTexts,
+                stmId: entry.id as string,
+                featureUri,
+                placeUri,
+                status,
                 featureType: type,
-                mapYear: '1930',
+                mapYear: derivedMapYear,
+                wikidataQid: wikidataQid ?? undefined,
+                organizationAssociationStatus: associationStatus,
               },
             });
             added++;
+            continue;
           }
         }
-        continue;
       }
 
       // Point features — use lat/lng
@@ -221,13 +1770,16 @@ if (existsSync(geojsonSrc)) {
           },
           properties: {
             fid: entry.fid ?? null,
-            name: entry.prefLabel || '',
-            placeUri: (entry['@id'] as string) || `stm:place/${entry.id}`,
-            status: 'named',
+            name: displayName,
+            allNames: nameTexts,
+            stmId: entry.id as string,
+            featureUri,
+            placeUri,
+            status,
             featureType: type,
-            mapYear: (entry.sources as string[])?.includes('map-1882')
-              ? '1882'
-              : '1930',
+            mapYear: derivedMapYear,
+            wikidataQid: wikidataQid ?? undefined,
+            organizationAssociationStatus: associationStatus,
           },
         });
         added++;
@@ -244,11 +1796,9 @@ if (existsSync(geojsonSrc)) {
 
 // Copy places gazetteer (if it exists in data root)
 // Applies inline migration: entries still using prefLabel instead of names[] are converted.
-const gazetteerSrc = join(__dirname, '../../data/places-gazetteer.jsonld');
-if (existsSync(gazetteerSrc)) {
-  const gazetteerRaw = JSON.parse(readFileSync(gazetteerSrc, 'utf-8'));
+if (gazetteerRaw) {
   const gazetteerGraph: Record<string, unknown>[] =
-    gazetteerRaw['@graph'] || [];
+    (gazetteerRaw['@graph'] as Record<string, unknown>[] | undefined) || [];
   let migrated = 0;
   const migratedGraph = gazetteerGraph.map((entry) => {
     if (Array.isArray(entry.names) && !entry.prefLabel) return entry;
@@ -297,27 +1847,43 @@ if (existsSync(gazetteerSrc)) {
     JSON.stringify({ ...gazetteerRaw, '@graph': migratedGraph }),
   );
   console.log('  Wrote places-gazetteer.jsonld');
-} else {
-  // Fallback: try old .json format
-  const gazetteerSrcJson = join(__dirname, '../../data/places-gazetteer.json');
-  if (existsSync(gazetteerSrcJson)) {
-    copyFileSync(gazetteerSrcJson, join(OUT_DIR, 'places-gazetteer.json'));
-    console.log('  Copied places-gazetteer.json (legacy format)');
-  }
+
+  const almanakkenReview = buildAlmanakkenReview(
+    gazetteerEntries,
+    organizationOverrides,
+  );
+  writeFileSync(
+    join(OUT_DIR, 'almanakken-review.json'),
+    JSON.stringify(almanakkenReview),
+  );
+  console.log(
+    `  Wrote almanakken-review.json (${Object.keys(almanakkenReview.byPlaceId).length} places)`,
+  );
 }
 
 // Copy place-types thesaurus
-const thesaurusSrc = join(__dirname, '../../data/place-types-thesaurus.jsonld');
 if (existsSync(thesaurusSrc)) {
   copyFileSync(thesaurusSrc, join(OUT_DIR, 'place-types-thesaurus.jsonld'));
   console.log('  Copied place-types-thesaurus.jsonld');
 }
 
 // Copy sources registry
-const sourcesSrc = join(__dirname, '../../data/sources-registry.jsonld');
 if (existsSync(sourcesSrc)) {
   copyFileSync(sourcesSrc, join(OUT_DIR, 'sources-registry.jsonld'));
   console.log('  Copied sources-registry.jsonld');
+}
+
+// Publish the complete graph and its context alongside the frontend indexes.
+// These artifacts are generated by generate-database.ts before this script runs.
+for (const [source, name] of [
+  [databaseSrc, 'database.jsonld'],
+  [contextSrc, 'context.jsonld'],
+] as const) {
+  if (!existsSync(source)) {
+    throw new Error(`Missing generated LOD artifact: ${source}`);
+  }
+  copyFileSync(source, join(OUT_DIR, name));
+  console.log(`  Published ${name}`);
 }
 
 console.log('\nDone! Data files ready in public/data/');

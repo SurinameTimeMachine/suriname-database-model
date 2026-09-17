@@ -1,13 +1,49 @@
 'use client';
 
 import 'leaflet/dist/leaflet.css';
+import { loadAllmapsAnnotation } from '@/lib/allmaps';
+import { DEFAULT_HISTORIC_MAP_URLS } from '@/lib/historic-maps';
+import { usePlaceTypes } from '@/lib/thesaurus';
 import L from 'leaflet';
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+
+// Allmaps' WebGL renderer reads _leaflet_pos from pane elements before Leaflet
+// sets it; guard against undefined to avoid a TypeError on first render.
+let _domUtilPatched = false;
+if (typeof window !== 'undefined' && !_domUtilPatched) {
+  const _orig = L.DomUtil.getPosition;
+  L.DomUtil.getPosition = function (el: HTMLElement): L.Point {
+    if (!el) return new L.Point(0, 0);
+    if (!(el as unknown as Record<string, unknown>)._leaflet_pos) {
+      (el as unknown as Record<string, unknown>)._leaflet_pos = new L.Point(
+        0,
+        0,
+      );
+    }
+    return _orig.call(this, el);
+  };
+  _domUtilPatched = true;
+}
+
+const HISTORIC_MAP_OVERLAY_URLS = DEFAULT_HISTORIC_MAP_URLS;
+
+function safelyRemove(target: { remove: () => unknown } | null) {
+  if (!target) return;
+  try {
+    target.remove();
+  } catch (error) {
+    // Allmaps aborts in-flight annotation requests during Leaflet teardown.
+    // That is expected when React remounts this client component in dev mode.
+    if (error instanceof Error && error.name === 'AbortError') return;
+    console.error('Unable to remove the place mini-map layer.', error);
+  }
+}
 
 interface PlaceMiniMapProps {
   lat: number | null;
   lng: number | null;
   wkt: string | null;
+  featureType?: string | null;
   editable?: boolean;
   onLocationChange?: (lat: number, lng: number) => void;
 }
@@ -20,13 +56,19 @@ export default function PlaceMiniMap({
   lat,
   lng,
   wkt,
+  featureType,
   editable = false,
   onLocationChange,
 }: PlaceMiniMapProps) {
+  const { colors: placeTypeColors } = usePlaceTypes();
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const markerRef = useRef<L.Marker | null>(null);
   const polygonRef = useRef<L.Polygon | null>(null);
+  const polylineRef = useRef<L.Polyline | null>(null);
+  const warpedLayerRef = useRef<L.Layer | null>(null);
+  const [show1930Map, setShow1930Map] = useState(false);
+  const [mapError, setMapError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
@@ -44,9 +86,70 @@ export default function PlaceMiniMap({
     mapRef.current = map;
 
     return () => {
-      map.remove();
+      safelyRemove(warpedLayerRef.current);
+      warpedLayerRef.current = null;
+      safelyRemove(map);
       mapRef.current = null;
     };
+  }, []);
+
+  // Load or unload the 1930 historic-map overlay.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    if (!show1930Map) {
+      safelyRemove(warpedLayerRef.current);
+      warpedLayerRef.current = null;
+      return;
+    }
+
+    let cancelled = false;
+    let layer: L.Layer | null = null;
+    Promise.allSettled(HISTORIC_MAP_OVERLAY_URLS.map(loadAllmapsAnnotation))
+      .then(async (results) => {
+        const annotations: unknown[] = [];
+        for (const result of results) {
+          if (result.status === 'fulfilled') annotations.push(result.value);
+        }
+        if (annotations.length === 0) {
+          throw new Error('No historic map image service is available.');
+        }
+        const { WarpedMapLayer } = await import('@allmaps/leaflet');
+        if (cancelled || !mapRef.current) return;
+        layer = new WarpedMapLayer(annotations[0]);
+        layer.addTo(mapRef.current);
+        for (const annotation of annotations.slice(1)) {
+          if (cancelled) break;
+          (
+            layer as unknown as {
+              addGeoreferenceAnnotation: (value: unknown) => unknown;
+            }
+          ).addGeoreferenceAnnotation(annotation);
+        }
+        if (!cancelled) {
+          warpedLayerRef.current = layer;
+        } else {
+          safelyRemove(layer);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setMapError('Historic map image services are currently unavailable.');
+          setShow1930Map(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+      safelyRemove(layer);
+      if (warpedLayerRef.current === layer) warpedLayerRef.current = null;
+    };
+  }, [show1930Map]);
+
+  const toggle1930Map = useCallback(() => {
+    setMapError(null);
+    setShow1930Map((v) => !v);
   }, []);
 
   // Update map content when props change
@@ -63,30 +166,65 @@ export default function PlaceMiniMap({
       map.removeLayer(polygonRef.current);
       polygonRef.current = null;
     }
+    if (polylineRef.current) {
+      map.removeLayer(polylineRef.current);
+      polylineRef.current = null;
+    }
 
-    // Draw polygon from WKT if available
+    // Draw geometry from WKT if available
     if (wkt) {
-      const coords = parseWKTPolygon(wkt);
-      if (coords.length > 0) {
-        const poly = L.polygon(coords, {
-          color: '#a67830',
-          fillColor: '#d4b67e',
-          fillOpacity: 0.3,
-          weight: 2,
-        }).addTo(map);
-        polygonRef.current = poly;
-        map.fitBounds(poly.getBounds(), { padding: [20, 20] });
+      const upper = wkt.trim().toUpperCase();
+      const fallbackType =
+        featureType ||
+        (upper.startsWith('LINESTRING') || upper.startsWith('MULTILINESTRING')
+          ? 'river'
+          : 'plantation');
+      const color = placeTypeColors[fallbackType] || '#94cc7d';
+      if (
+        upper.startsWith('LINESTRING') ||
+        upper.startsWith('MULTILINESTRING')
+      ) {
+        const lines = parseWKTLineString(wkt);
+        if (lines.length > 0) {
+          const pl = L.polyline(lines, {
+            color,
+            weight: fallbackType === 'creek' ? 2 : 2.8,
+            dashArray:
+              fallbackType === 'road'
+                ? '5 4'
+                : fallbackType === 'railroad'
+                  ? '8 4 2 4'
+                  : undefined,
+            opacity: 0.82,
+          }).addTo(map);
+          polylineRef.current = pl;
+          map.fitBounds(pl.getBounds(), { padding: [20, 20] });
+        }
+      } else {
+        const coords = parseWKTPolygon(wkt);
+        if (coords.length > 0) {
+          const poly = L.polygon(coords, {
+            color,
+            fillColor: color,
+            fillOpacity: 0.26,
+            opacity: 0.72,
+            weight: 1.6,
+          }).addTo(map);
+          polygonRef.current = poly;
+          map.fitBounds(poly.getBounds(), { padding: [20, 20] });
+        }
       }
     }
 
     // Place marker at centroid
     if (lat != null && lng != null) {
+      const color = placeTypeColors[featureType || ''] || '#94cc7d';
       const marker = L.marker([lat, lng], {
         icon: L.divIcon({
           className: 'place-marker',
-          html: '<div style="width:12px;height:12px;background:#a67830;border:2px solid #503818;border-radius:50%;"></div>',
-          iconSize: [12, 12],
-          iconAnchor: [6, 6],
+          html: `<div style="width:14px;height:14px;background:${color};border:2px solid #006d5b;border-radius:50%;box-shadow:0 0 0 2px rgba(253,248,242,.95),0 2px 8px rgba(0,60,52,.22);"></div>`,
+          iconSize: [14, 14],
+          iconAnchor: [7, 7],
         }),
       }).addTo(map);
       markerRef.current = marker;
@@ -109,14 +247,28 @@ export default function PlaceMiniMap({
         map.off('click', handleClick);
       };
     }
-  }, [lat, lng, wkt, editable, onLocationChange]);
+  }, [lat, lng, wkt, featureType, editable, onLocationChange, placeTypeColors]);
 
   return (
     <div
       ref={containerRef}
-      className="w-full h-48 rounded border border-stm-warm-200"
+      className="relative w-full h-48 border border-stm-warm-200"
       style={{ minHeight: '192px' }}
-    />
+    >
+      <button
+        type="button"
+        onClick={toggle1930Map}
+        title={mapError ?? 'Toggle 1930 historical map'}
+        className={[
+          'absolute bottom-2 right-2 z-1000 px-2 py-0.5 text-[11px] font-medium border leading-tight',
+          show1930Map
+            ? 'bg-stm-sepia-600 text-white border-stm-sepia-700'
+            : 'bg-white/90 text-stm-warm-600 border-stm-warm-300 hover:bg-stm-warm-50',
+        ].join(' ')}
+      >
+        {mapError ? '1930 map unavailable' : 'Historical map'}
+      </button>
+    </div>
   );
 }
 
@@ -128,4 +280,36 @@ function parseWKTPolygon(wkt: string): [number, number][] {
     const [lng, lat] = pair.trim().split(/\s+/).map(Number);
     return [lat, lng] as [number, number];
   });
+}
+
+/**
+ * Parse WKT LineString or MultiLineString into Leaflet LatLng arrays.
+ * Returns an array of coordinate rings (one ring per line segment).
+ */
+function parseWKTLineString(wkt: string): [number, number][][] {
+  const upper = wkt.trim().toUpperCase();
+  if (upper.startsWith('MULTILINESTRING')) {
+    // MULTILINESTRING ((lon lat, lon lat), (lon lat, lon lat))
+    const innerMatch = wkt.match(/\(([\s\S]+)\)\s*$/);
+    if (!innerMatch) return [];
+    return innerMatch[1].split(/\)\s*,\s*\(/).map((ring) => {
+      const clean = ring.replace(/^\(|\)$/g, '').trim();
+      return clean.split(',').map((pair) => {
+        const [lng, lat] = pair.trim().split(/\s+/).map(Number);
+        return [lat, lng] as [number, number];
+      });
+    });
+  }
+  if (upper.startsWith('LINESTRING')) {
+    // LineString (lon lat, lon lat, ...)
+    const innerMatch = wkt.match(/\((.+)\)/);
+    if (!innerMatch) return [];
+    return [
+      innerMatch[1].split(',').map((pair) => {
+        const [lng, lat] = pair.trim().split(/\s+/).map(Number);
+        return [lat, lng] as [number, number];
+      }),
+    ];
+  }
+  return [];
 }

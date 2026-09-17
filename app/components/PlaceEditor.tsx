@@ -3,27 +3,272 @@
 import { getSourcesByCategory, useSourceRegistry } from '@/lib/sources';
 import { usePlaceTypes } from '@/lib/thesaurus';
 import type {
+  AlmanakkenPlantationObservation,
+  AssertionCertainty,
   DiklandRef,
+  DistrictAssertion,
+  E25Plantation,
+  E74Organization,
   ExternalLink,
   GazetteerPlace,
   LanguageCode,
+  LocationAssertion,
   NameType,
+  OrganizationAssociationStatus,
+  OrganizationObservation,
   PlaceName,
+  PlantationStatusType,
+  ProductAssertion,
   SkosMatchType,
+  StatusAssertion,
 } from '@/lib/types';
 import { getPreferredName } from '@/lib/types';
+import { buildExploreUrl } from '@/lib/url';
 import dynamic from 'next/dynamic';
-import { useCallback, useMemo, useState } from 'react';
+import Link from 'next/link';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 const PlaceMiniMap = dynamic(() => import('./PlaceMiniMap'), { ssr: false });
 
 interface PlaceEditorProps {
   place: GazetteerPlace;
   districts: GazetteerPlace[];
+  sourceAppellations?: SourceAppellationHint[];
+  almanakkenReview?: AlmanakkenReviewEntry;
+  organizationContext?: PlaceOrganizationContext;
   canEdit: boolean;
   onSave: (place: GazetteerPlace) => Promise<void>;
   onCancel: () => void;
   onDelete?: (id: string) => Promise<void>;
+  onReviewPhysicalLinks?: (placeIds: string[]) => void;
+}
+
+export interface PlaceOrganizationContext {
+  organization: E74Organization | null;
+  associationStatus: OrganizationAssociationStatus;
+  linkedPlantations: E25Plantation[];
+  observations: OrganizationObservation[];
+  qid: string | null;
+}
+
+interface AlmanakkenReviewEntry {
+  placeId: string;
+  qid: string;
+  sourceVersion: string;
+  rows: number;
+  firstYear: number | null;
+  lastYear: number | null;
+  productRows: number;
+  desertedRows: number;
+  sourceNames: number;
+  products: string[];
+  hasGazetteerSource: boolean;
+  hasProductAssertions: boolean;
+  hasStatusAssertions: boolean;
+  hasAlmanakkenObservations: boolean;
+  issues: Array<{
+    type: string;
+    label: string;
+    detail?: string;
+  }>;
+}
+
+interface SourceAppellationHint {
+  id: string;
+  text: string;
+  language?: string;
+  sourceUri?: string;
+  sourceLabel?: string | null;
+  sourceYear?: number;
+}
+
+function normalizeAppellationText(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
+function observationValue(value: string | number | undefined): string {
+  return value == null || value === '' ? '-' : String(value);
+}
+
+function observationRelations(
+  relations: AlmanakkenPlantationObservation['hasParts'],
+): string {
+  if (!relations?.length) return '-';
+  return relations
+    .map((relation) => relation.label || relation.qid)
+    .filter(Boolean)
+    .join(', ');
+}
+
+function observationPopulation(
+  observation: AlmanakkenPlantationObservation,
+): string {
+  const population = observation.population;
+  if (!population) return '-';
+  const values = [
+    population.enslavedCount != null
+      ? `${population.enslavedCount} enslaved`
+      : null,
+    population.freeResidents != null
+      ? `${population.freeResidents} free`
+      : null,
+    population.totalResidents != null
+      ? `${population.totalResidents} total`
+      : null,
+  ].filter(Boolean);
+  return values.length > 0 ? values.join(', ') : '-';
+}
+
+function observationDetails(
+  observation: AlmanakkenPlantationObservation,
+): string {
+  const values = [
+    observation.sizeAkkers != null ? `${observation.sizeAkkers} akkers` : null,
+    observation.function ? `function: ${observation.function}` : null,
+    observation.lot ? `lot: ${observation.lot}` : null,
+    observation.mill?.type ? `mill: ${observation.mill.type}` : null,
+    observation.additionalInfo,
+  ].filter(Boolean);
+  return values.length > 0 ? values.join(' | ') : '-';
+}
+
+function getEffectiveDistrictAssertion(
+  assertions: DistrictAssertion[],
+): DistrictAssertion | null {
+  if (assertions.length === 0) return null;
+  const explicitCurrent = assertions.find((a) => a.isCurrent);
+  if (explicitCurrent) return explicitCurrent;
+  const withYear = assertions.filter((a) => typeof a.sourceYear === 'number');
+  if (withYear.length > 0) {
+    return withYear.sort(
+      (a, b) => (b.sourceYear || 0) - (a.sourceYear || 0),
+    )[0];
+  }
+  return assertions[0];
+}
+
+function normalizeDistrictAssertions(
+  place: GazetteerPlace,
+): DistrictAssertion[] {
+  if (Array.isArray(place.districtAssertions)) {
+    return place.districtAssertions.map((a, idx) => ({
+      id: a.id || `district-assertion-${idx + 1}`,
+      districtId: a.districtId ?? null,
+      districtLabel: a.districtLabel ?? null,
+      source: a.source || preferAlmanakkenSource(place.sources),
+      sourceYear: a.sourceYear,
+      certainty: a.certainty,
+      note: a.note ?? null,
+      isCurrent: a.isCurrent,
+    }));
+  }
+
+  if (!place.broader && !place.district) return [];
+
+  return [
+    {
+      id: 'district-assertion-1',
+      districtId: place.broader ?? null,
+      districtLabel: place.district ?? null,
+      source: preferAlmanakkenSource(place.sources),
+      sourceYear: undefined,
+      certainty: 'certain',
+      note: null,
+      isCurrent: true,
+    },
+  ];
+}
+
+function preferAlmanakkenSource(sources: string[]): string {
+  return sources.includes('almanakken')
+    ? 'almanakken'
+    : sources[0] || 'almanakken';
+}
+
+function normalizeProductAssertions(place: GazetteerPlace): ProductAssertion[] {
+  if (Array.isArray(place.productAssertions)) {
+    return place.productAssertions
+      .map((a, idx) => ({
+        id: a.id || `product-assertion-${idx + 1}`,
+        value: a.value || '',
+        source: a.source || preferAlmanakkenSource(place.sources),
+        startYear: a.startYear,
+        endYear: a.endYear,
+        note: a.note ?? null,
+      }))
+      .filter((a) => Boolean(a.value));
+  }
+  if (!place.placeType) return [];
+  return [
+    {
+      id: 'product-assertion-1',
+      value: place.placeType,
+      source: preferAlmanakkenSource(place.sources),
+      startYear: undefined,
+      endYear: undefined,
+      note: null,
+    },
+  ];
+}
+
+function normalizeLocationAssertions(
+  place: GazetteerPlace,
+): LocationAssertion[] {
+  if (Array.isArray(place.locationAssertions)) {
+    return place.locationAssertions
+      .map((a, idx) => ({
+        id: a.id || `location-assertion-${idx + 1}`,
+        standardized: a.standardized ?? null,
+        original: a.original ?? null,
+        source: a.source || preferAlmanakkenSource(place.sources),
+        startYear: a.startYear,
+        endYear: a.endYear,
+        note: a.note ?? null,
+        sourceRow: a.sourceRow,
+      }))
+      .filter((a) => Boolean(a.standardized || a.original));
+  }
+  if (!place.locationDescription && !place.locationDescriptionOriginal)
+    return [];
+  return [
+    {
+      id: 'location-assertion-1',
+      standardized: place.locationDescription ?? null,
+      original: place.locationDescriptionOriginal ?? null,
+      source: preferAlmanakkenSource(place.sources),
+      startYear: undefined,
+      endYear: undefined,
+      note: null,
+    },
+  ];
+}
+
+const VALID_STATUSES: PlantationStatusType[] = [
+  'planned',
+  'built',
+  'abandoned',
+  'reactivated',
+  'present',
+  'unknown',
+];
+
+function normalizeStatusAssertions(place: GazetteerPlace): StatusAssertion[] {
+  if (Array.isArray(place.statusAssertions)) {
+    return place.statusAssertions.map((a, idx) => ({
+      id: a.id || `status-assertion-${idx + 1}`,
+      status: VALID_STATUSES.includes(a.status) ? a.status : 'unknown',
+      source: a.source || preferAlmanakkenSource(place.sources),
+      startYear: a.startYear,
+      endYear: a.endYear,
+      note: a.note ?? null,
+    }));
+  }
+  return [];
 }
 
 const CATEGORY_ORDER = [
@@ -339,10 +584,14 @@ function DiklandRefAdder({ onAdd }: { onAdd: (ref: DiklandRef) => void }) {
 export default function PlaceEditor({
   place,
   districts,
+  sourceAppellations = [],
+  almanakkenReview,
+  organizationContext,
   canEdit,
   onSave,
   onCancel,
   onDelete,
+  onReviewPhysicalLinks,
 }: PlaceEditorProps) {
   const { labels, crmBadges, biasTypes, allTypes } = usePlaceTypes();
   const { sources: registrySources, categories: registryCategories } =
@@ -360,11 +609,516 @@ export default function PlaceEditor({
       }),
     [registryCategories],
   );
-  const [draft, setDraft] = useState<GazetteerPlace>({ ...place });
+  const [draft, setDraft] = useState<GazetteerPlace>({
+    ...place,
+    districtAssertions: normalizeDistrictAssertions(place),
+    productAssertions: normalizeProductAssertions(place),
+    locationAssertions: normalizeLocationAssertions(place),
+    statusAssertions: normalizeStatusAssertions(place),
+  });
+  const hydratedFromAppellations = useRef(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sourceDropdownOpen, setSourceDropdownOpen] = useState(false);
   const diklandRefs: DiklandRef[] = draft.diklandRefs ?? [];
+  const sourceIdByUri = useMemo(
+    () => new Map(registrySources.map((s) => [s.id, s.sourceId])),
+    [registrySources],
+  );
+  const sourceById = useMemo(
+    () => new Map(registrySources.map((s) => [s.sourceId, s])),
+    [registrySources],
+  );
+
+  const deriveYearFromSourceId = useCallback(
+    (sourceId?: string): number | undefined => {
+      if (!sourceId) return undefined;
+      const source = sourceById.get(sourceId);
+      if (!source) return undefined;
+      if (source.mapYear != null) return source.mapYear;
+      if (source.timeSpan) {
+        const match = source.timeSpan.match(/\b(\d{4})\b/);
+        if (match) return Number(match[1]);
+      }
+      return undefined;
+    },
+    [sourceById],
+  );
+
+  const sourceDisplayLabel = useCallback(
+    (sourceId: string): string => {
+      const source = sourceById.get(sourceId);
+      if (!source) return sourceId;
+      const yearOrRange =
+        source.mapYear != null
+          ? String(source.mapYear)
+          : source.timeSpan || 'n.d.';
+      return `${source.sourceId} (${yearOrRange})`;
+    },
+    [sourceById],
+  );
+
+  const deriveDistrictLabelById = useCallback(
+    (districtId: string | null): string | null => {
+      if (!districtId) return null;
+      const match = districts.find((d) => d.id === districtId);
+      return match ? getPreferredName(match) : null;
+    },
+    [districts],
+  );
+
+  const applyDistrictAssertions = useCallback(
+    (nextAssertions: DistrictAssertion[]) => {
+      const effective = getEffectiveDistrictAssertion(nextAssertions);
+      const effectiveDistrictId = effective?.districtId ?? null;
+      const effectiveDistrictLabel =
+        effective?.districtLabel ??
+        deriveDistrictLabelById(effectiveDistrictId);
+      setDraft((d) => ({
+        ...d,
+        districtAssertions: nextAssertions,
+        broader: effectiveDistrictId,
+        district: effectiveDistrictLabel ?? null,
+      }));
+    },
+    [deriveDistrictLabelById],
+  );
+
+  const districtSourceSummary = useMemo(() => {
+    const assertionSources = (draft.districtAssertions || [])
+      .map((a) => a.source)
+      .filter(Boolean);
+    const sourceIds =
+      assertionSources.length > 0 ? assertionSources : draft.sources;
+    const labels = Array.from(
+      new Set(
+        sourceIds
+          .map((sourceId) => sourceById.get(sourceId)?.prefLabel || sourceId)
+          .filter(Boolean),
+      ),
+    );
+    if (labels.length === 0) return 'source metadata unavailable';
+    if (labels.length === 1) return labels[0];
+    if (labels.length === 2) return `${labels[0]} + ${labels[1]}`;
+    return `${labels[0]} + ${labels[1]} + ${labels.length - 2} more`;
+  }, [draft.districtAssertions, draft.sources, sourceById]);
+
+  const districtAssertions = draft.districtAssertions || [];
+
+  const addDistrictAssertion = useCallback(() => {
+    const next: DistrictAssertion[] = [
+      ...districtAssertions,
+      {
+        id: `district-assertion-${Date.now()}`,
+        districtId: draft.broader ?? null,
+        districtLabel: draft.district ?? null,
+        source: preferAlmanakkenSource(draft.sources),
+        sourceYear: undefined,
+        certainty: 'certain',
+        note: null,
+        isCurrent: districtAssertions.length === 0,
+      },
+    ];
+    applyDistrictAssertions(next);
+  }, [
+    applyDistrictAssertions,
+    districtAssertions,
+    draft.broader,
+    draft.district,
+    draft.sources,
+  ]);
+
+  const updateDistrictAssertion = useCallback(
+    (idx: number, patch: Partial<DistrictAssertion>) => {
+      const next = districtAssertions.map((a, i) => {
+        if (i !== idx) return a;
+        const updated = { ...a, ...patch };
+        updated.districtLabel = deriveDistrictLabelById(updated.districtId);
+        return updated;
+      });
+
+      if (patch.isCurrent) {
+        for (let i = 0; i < next.length; i += 1) {
+          next[i] = { ...next[i], isCurrent: i === idx };
+        }
+      }
+
+      applyDistrictAssertions(next);
+    },
+    [applyDistrictAssertions, deriveDistrictLabelById, districtAssertions],
+  );
+
+  const removeDistrictAssertion = useCallback(
+    (idx: number) => {
+      const next = districtAssertions.filter((_, i) => i !== idx);
+      if (next.length > 0 && !next.some((a) => a.isCurrent)) {
+        next[0] = { ...next[0], isCurrent: true };
+      }
+      applyDistrictAssertions(next);
+    },
+    [applyDistrictAssertions, districtAssertions],
+  );
+
+  const handleDistrictSelection = useCallback(
+    (districtId: string | null) => {
+      const districtLabel = deriveDistrictLabelById(districtId);
+      if (districtAssertions.length === 0) {
+        setDraft((d) => ({
+          ...d,
+          broader: districtId,
+          district: districtLabel,
+        }));
+        return;
+      }
+
+      const currentIdx = districtAssertions.findIndex((a) => a.isCurrent);
+      const targetIdx = currentIdx >= 0 ? currentIdx : 0;
+      const next = districtAssertions.map((a, i) =>
+        i === targetIdx ? { ...a, districtId, districtLabel } : a,
+      );
+      if (currentIdx < 0 && next.length > 0) {
+        next[0] = { ...next[0], isCurrent: true };
+      }
+      applyDistrictAssertions(next);
+    },
+    [applyDistrictAssertions, deriveDistrictLabelById, districtAssertions],
+  );
+
+  // ── Place-function assertions (stored in the legacy productAssertions key) ─
+
+  const productAssertions = draft.productAssertions || [];
+
+  const applyProductAssertions = useCallback(
+    (nextAssertions: ProductAssertion[]) => {
+      const latest = [...nextAssertions]
+        .filter((a) => a.value)
+        .sort(
+          (a, b) =>
+            (b.endYear || b.startYear || 0) - (a.endYear || a.startYear || 0),
+        )[0];
+      setDraft((d) => ({
+        ...d,
+        productAssertions: nextAssertions,
+        placeType: latest?.value ?? null,
+      }));
+    },
+    [],
+  );
+
+  const addProductAssertion = useCallback(() => {
+    const next: ProductAssertion[] = [
+      ...productAssertions,
+      {
+        id: `product-assertion-${Date.now()}`,
+        value: '',
+        source: preferAlmanakkenSource(draft.sources),
+        startYear: undefined,
+        endYear: undefined,
+        note: null,
+      },
+    ];
+    applyProductAssertions(next);
+  }, [applyProductAssertions, productAssertions, draft.sources]);
+
+  const updateProductAssertion = useCallback(
+    (idx: number, patch: Partial<ProductAssertion>) => {
+      const next = productAssertions.map((a, i) =>
+        i === idx ? { ...a, ...patch } : a,
+      );
+      applyProductAssertions(next);
+    },
+    [applyProductAssertions, productAssertions],
+  );
+
+  const removeProductAssertion = useCallback(
+    (idx: number) => {
+      const next = productAssertions.filter((_, i) => i !== idx);
+      applyProductAssertions(next);
+    },
+    [applyProductAssertions, productAssertions],
+  );
+
+  // ── Location assertions ───────────────────────────────────────────────────
+
+  const locationAssertions = draft.locationAssertions || [];
+
+  const applyLocationAssertions = useCallback(
+    (nextAssertions: LocationAssertion[]) => {
+      const latest = [...nextAssertions].sort(
+        (a, b) =>
+          (b.endYear || b.startYear || 0) - (a.endYear || a.startYear || 0),
+      )[0];
+      setDraft((d) => ({
+        ...d,
+        locationAssertions: nextAssertions,
+        locationDescription: latest?.standardized ?? null,
+        locationDescriptionOriginal: latest?.original ?? null,
+      }));
+    },
+    [],
+  );
+
+  const addLocationAssertion = useCallback(() => {
+    const next: LocationAssertion[] = [
+      ...locationAssertions,
+      {
+        id: `location-assertion-${Date.now()}`,
+        standardized: null,
+        original: null,
+        source: preferAlmanakkenSource(draft.sources),
+        startYear: undefined,
+        endYear: undefined,
+        note: null,
+      },
+    ];
+    applyLocationAssertions(next);
+  }, [applyLocationAssertions, locationAssertions, draft.sources]);
+
+  const updateLocationAssertion = useCallback(
+    (idx: number, patch: Partial<LocationAssertion>) => {
+      const next = locationAssertions.map((a, i) =>
+        i === idx ? { ...a, ...patch } : a,
+      );
+      applyLocationAssertions(next);
+    },
+    [applyLocationAssertions, locationAssertions],
+  );
+
+  const removeLocationAssertion = useCallback(
+    (idx: number) => {
+      const next = locationAssertions.filter((_, i) => i !== idx);
+      applyLocationAssertions(next);
+    },
+    [applyLocationAssertions, locationAssertions],
+  );
+
+  // ── Status assertions (lifecycle) ─────────────────────────────────────────
+
+  const statusAssertions = draft.statusAssertions || [];
+
+  const applyStatusAssertions = useCallback(
+    (nextAssertions: StatusAssertion[]) => {
+      setDraft((d) => ({ ...d, statusAssertions: nextAssertions }));
+    },
+    [],
+  );
+
+  const addStatusAssertion = useCallback(() => {
+    const next: StatusAssertion[] = [
+      ...statusAssertions,
+      {
+        id: `status-assertion-${Date.now()}`,
+        status: 'built',
+        source: preferAlmanakkenSource(draft.sources),
+        startYear: undefined,
+        endYear: undefined,
+        note: null,
+      },
+    ];
+    applyStatusAssertions(next);
+  }, [applyStatusAssertions, statusAssertions, draft.sources]);
+
+  const updateStatusAssertion = useCallback(
+    (idx: number, patch: Partial<StatusAssertion>) => {
+      const next = statusAssertions.map((a, i) =>
+        i === idx ? { ...a, ...patch } : a,
+      );
+      applyStatusAssertions(next);
+    },
+    [applyStatusAssertions, statusAssertions],
+  );
+
+  const removeStatusAssertion = useCallback(
+    (idx: number) => {
+      const next = statusAssertions.filter((_, i) => i !== idx);
+      applyStatusAssertions(next);
+    },
+    [applyStatusAssertions, statusAssertions],
+  );
+
+  /**
+   * Computed lifecycle events — merges status assertions + function assertions
+   * into a flat sorted list for the read-only timeline display.
+   */
+  const computedLifecycleEvents = useMemo(() => {
+    type EventKind = 'status' | 'function-assignment';
+    interface LifecycleEvent {
+      kind: EventKind;
+      status?: PlantationStatusType;
+      product?: string;
+      startYear?: number;
+      endYear?: number;
+      source?: string;
+    }
+
+    const events: LifecycleEvent[] = [];
+
+    for (const a of statusAssertions) {
+      events.push({
+        kind: 'status',
+        status: a.status,
+        startYear: a.startYear,
+        endYear: a.endYear,
+        source: a.source,
+      });
+    }
+
+    for (const a of (draft.productAssertions || []).filter((p) => p.value)) {
+      events.push({
+        kind: 'function-assignment',
+        product: a.value,
+        startYear: a.startYear,
+        endYear: a.endYear,
+        source: a.source,
+      });
+    }
+
+    // Sort by startYear ascending (undefined years go to end)
+    events.sort(
+      (a, b) => (a.startYear ?? Infinity) - (b.startYear ?? Infinity),
+    );
+
+    return events;
+  }, [statusAssertions, draft.productAssertions]);
+
+  /** Earliest year recorded across all assertions */
+  const firstMentionYear = useMemo(() => {
+    const years: number[] = [];
+    for (const a of statusAssertions) {
+      if (a.startYear) years.push(a.startYear);
+    }
+    for (const a of draft.productAssertions || []) {
+      if (a.startYear) years.push(a.startYear);
+    }
+    for (const a of draft.locationAssertions || []) {
+      if (a.startYear) years.push(a.startYear);
+    }
+    for (const a of draft.districtAssertions || []) {
+      if (a.sourceYear) years.push(a.sourceYear);
+    }
+    return years.length > 0 ? Math.min(...years) : null;
+  }, [
+    statusAssertions,
+    draft.productAssertions,
+    draft.locationAssertions,
+    draft.districtAssertions,
+  ]);
+
+  /** Latest year recorded across all assertions */
+  const lastMentionYear = useMemo(() => {
+    const years: number[] = [];
+    for (const a of statusAssertions) {
+      if (a.endYear) years.push(a.endYear);
+      else if (a.startYear) years.push(a.startYear);
+    }
+    for (const a of draft.productAssertions || []) {
+      if (a.endYear) years.push(a.endYear);
+      else if (a.startYear) years.push(a.startYear);
+    }
+    for (const a of draft.locationAssertions || []) {
+      if (a.endYear) years.push(a.endYear);
+      else if (a.startYear) years.push(a.startYear);
+    }
+    for (const a of draft.districtAssertions || []) {
+      if (a.sourceYear) years.push(a.sourceYear);
+    }
+    return years.length > 0 ? Math.max(...years) : null;
+  }, [
+    statusAssertions,
+    draft.productAssertions,
+    draft.locationAssertions,
+    draft.districtAssertions,
+  ]);
+
+  useEffect(() => {
+    if (hydratedFromAppellations.current) return;
+    if (sourceAppellations.length === 0) return;
+    // Wait for registry to resolve before hydrating
+    if (sourceIdByUri.size === 0) return;
+
+    hydratedFromAppellations.current = true;
+    setDraft((d) => {
+      let changed = false;
+      const nextNames = [...d.names];
+
+      for (const app of sourceAppellations) {
+        const text = app.text?.trim();
+        if (!text) continue;
+
+        const idx = nextNames.findIndex(
+          (n) =>
+            normalizeAppellationText(n.text) === normalizeAppellationText(text),
+        );
+        const sourceId =
+          (app.sourceUri ? sourceIdByUri.get(app.sourceUri) : undefined) ||
+          undefined;
+        const sourceYear =
+          app.sourceYear && Number.isFinite(app.sourceYear)
+            ? app.sourceYear
+            : undefined;
+        const hintedLanguage: LanguageCode =
+          app.language === 'nl' ||
+          app.language === 'en' ||
+          app.language === 'srn' ||
+          app.language === 'und'
+            ? app.language
+            : 'und';
+
+        if (idx >= 0) {
+          const current = nextNames[idx];
+          const patched: PlaceName = {
+            ...current,
+            text: current.text.length >= text.length ? current.text : text,
+            language:
+              current.language === 'und' && hintedLanguage !== 'und'
+                ? hintedLanguage
+                : current.language,
+            source: current.source || sourceId,
+            sourceYear: current.sourceYear ?? sourceYear,
+          };
+          if (JSON.stringify(current) !== JSON.stringify(patched)) {
+            nextNames[idx] = patched;
+            changed = true;
+          }
+          continue;
+        }
+
+        nextNames.push({
+          text,
+          language: hintedLanguage,
+          type: 'historical',
+          isPreferred: nextNames.length === 0,
+          source: sourceId,
+          sourceYear,
+        });
+        changed = true;
+      }
+
+      if (nextNames.length > 0 && !nextNames.some((n) => n.isPreferred)) {
+        nextNames[0] = { ...nextNames[0], isPreferred: true };
+        changed = true;
+      }
+
+      // Preferred label policy: map-1930 name is authoritative when present.
+      const preferredFrom1930 = nextNames.findIndex(
+        (n) => n.source === 'map-1930',
+      );
+      if (preferredFrom1930 >= 0) {
+        nextNames.forEach((name, idx) => {
+          const shouldBePreferred = idx === preferredFrom1930;
+          if (name.isPreferred !== shouldBePreferred) {
+            nextNames[idx] = {
+              ...name,
+              isPreferred: shouldBePreferred,
+            };
+            changed = true;
+          }
+        });
+      }
+
+      return changed ? { ...d, names: nextNames } : d;
+    });
+  }, [sourceAppellations, sourceIdByUri]);
 
   // --- Name helpers ---
   const updateName = (index: number, patch: Partial<PlaceName>) => {
@@ -447,13 +1201,115 @@ export default function PlaceEditor({
     update('sources', sources);
   };
 
+  const almanakkenObservations = [...(draft.almanakkenObservations ?? [])].sort(
+    (a, b) =>
+      (a.year ?? 0) - (b.year ?? 0) || a.recordId.localeCompare(b.recordId),
+  );
+  const almanakkenObservationYears = almanakkenObservations
+    .map((observation) => observation.year)
+    .filter((year): year is number => year != null);
+  const almanakkenYears =
+    almanakkenObservationYears.length > 0
+      ? `${Math.min(...almanakkenObservationYears)}-${Math.max(...almanakkenObservationYears)}`
+      : almanakkenReview?.firstYear && almanakkenReview.lastYear
+      ? `${almanakkenReview.firstYear}-${almanakkenReview.lastYear}`
+      : null;
+  const almanakkenProducts =
+    almanakkenReview && almanakkenReview.products.length > 0
+      ? almanakkenReview.products.join(', ')
+      : null;
+  const sharedPhysicalLinkReview = almanakkenReview?.issues.find(
+    (issue) => issue.type === 'shared-organization-link',
+  );
+  const sharedPhysicalPlaceIds = (sharedPhysicalLinkReview?.detail ?? '')
+    .split(',')
+    .map((id) => id.trim())
+    .filter(Boolean);
+  const reportedOwners = useMemo(() => {
+    const values = (organizationContext?.observations ?? [])
+      .filter(
+        (observation): observation is OrganizationObservation & {
+          hasOwner: string;
+        } => Boolean(observation.hasOwner?.trim()),
+      )
+      .map((observation) => ({
+        year: observation.observationYear,
+        value: observation.hasOwner.trim(),
+      }))
+      .sort((a, b) => b.year.localeCompare(a.year));
+
+    return Array.from(
+      new Map(
+        values.map((value) => [
+          `${value.year}\u0000${value.value}`,
+          value,
+        ]),
+      ).values(),
+    );
+  }, [organizationContext]);
+  const physicalOwnershipAssertions = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          (organizationContext?.linkedPlantations ?? []).flatMap((plantation) =>
+            [
+              plantation.P51_has_former_or_current_owner,
+              plantation.P52_has_current_owner,
+            ].filter((value): value is string => Boolean(value)),
+          ),
+        ),
+      ),
+    [organizationContext],
+  );
+
   return (
-    <div className="bg-white border border-stm-warm-200 rounded-lg shadow-sm">
+    <div className="flex h-full min-h-0 w-full min-w-0 max-w-full flex-col overflow-hidden border border-stm-warm-200 bg-white shadow-sm">
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-3 border-b border-stm-warm-100">
-        <h3 className="text-lg font-serif font-bold text-stm-warm-800">
-          {place.modifiedAt ? 'Edit Place' : 'New Place'}
-        </h3>
+        <div className="min-w-0">
+          <h3 className="text-lg font-serif font-bold text-stm-warm-800 truncate">
+            {place.id.startsWith('stm-new-')
+              ? 'New Place'
+              : getPreferredName(place) || 'Unnamed Place'}
+          </h3>
+          {!place.id.startsWith('stm-new-') && (
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+              <Link
+                href={`/place/${place.id}`}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1 text-[11px] text-stm-teal-600 hover:text-stm-teal-700 hover:underline"
+              >
+                View entity
+                <span aria-hidden>↗</span>
+              </Link>
+              <Link
+                href={buildExploreUrl({
+                  place: place.id,
+                  ...(place.location.lat != null && place.location.lng != null
+                    ? { lat: place.location.lat, lng: place.location.lng, z: 14 }
+                    : {}),
+                })}
+                className="inline-flex items-center gap-1 text-[11px] text-stm-teal-600 hover:text-stm-teal-700 hover:underline"
+              >
+                <svg
+                  className="w-3 h-3"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l5.447 2.724A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
+                  />
+                </svg>
+                View on map
+              </Link>
+            </div>
+          )}
+        </div>
         <button
           onClick={onCancel}
           className="text-stm-warm-400 hover:text-stm-warm-600 text-xl leading-none"
@@ -463,7 +1319,325 @@ export default function PlaceEditor({
         </button>
       </div>
 
-      <div className="p-5 space-y-4 max-h-[70vh] overflow-y-auto">
+      <div className="min-h-0 flex-1 overflow-y-auto p-4 space-y-4">
+        {canEdit && (
+          <p className="border-l-2 border-stm-warm-400 bg-stm-sepia-50 px-3 py-2 text-xs text-stm-warm-700">
+            Edit the Gazetteer record, not JSON-LD. Add a source to each
+            statement; add a date or span when the source provides one.
+          </p>
+        )}
+
+        {organizationContext && (
+          <section className="min-w-0 overflow-hidden border border-stm-warm-200 bg-stm-warm-50 p-3 text-xs text-stm-warm-800">
+            <div className="grid min-w-0 grid-cols-1 items-start gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
+              <div className="min-w-0">
+                <div className="text-[10px] font-medium uppercase tracking-[0.16em] text-stm-warm-500">
+                  Organization
+                </div>
+                {organizationContext.organization ? (
+                  <Link
+                    href={`/organizations?organization=${encodeURIComponent(
+                      organizationContext.qid ??
+                        organizationContext.organization['@id'],
+                    )}`}
+                    className="break-words text-sm font-semibold text-stm-teal-700 hover:underline"
+                  >
+                    {organizationContext.organization.prefLabel}
+                  </Link>
+                ) : (
+                  <div className="text-sm font-semibold">
+                    No organization linked
+                  </div>
+                )}
+              </div>
+              <span
+                className={`w-fit border px-2 py-1 text-[10px] font-medium sm:justify-self-end ${
+                  organizationContext.associationStatus === 'linked'
+                    ? 'border-stm-teal-300 bg-stm-teal-50 text-stm-teal-800'
+                    : 'border-amber-400 bg-amber-50 text-amber-900'
+                }`}
+              >
+                {organizationContext.associationStatus === 'linked'
+                  ? 'linked'
+                  : organizationContext.associationStatus ===
+                      'needs-organization-link'
+                    ? 'needs organization link'
+                    : 'needs physical-link review'}
+              </span>
+            </div>
+
+            <dl className="mt-3 grid min-w-0 grid-cols-1 gap-x-3 gap-y-1 border-t border-stm-warm-200 pt-3 sm:grid-cols-[8rem_minmax(0,1fr)] sm:gap-y-2">
+              <dt className="text-stm-warm-500">Authority match</dt>
+              <dd className="min-w-0 break-words pb-1 sm:pb-0">
+                {organizationContext.qid ? (
+                  <a
+                    href={`https://www.wikidata.org/entity/${organizationContext.qid}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-mono text-stm-teal-700 hover:underline"
+                  >
+                    {organizationContext.qid}
+                  </a>
+                ) : (
+                  <span className="text-amber-800">Not established</span>
+                )}
+                {organizationContext.organization && (
+                  <span className="ml-2 text-stm-warm-500">
+                    exact match for E74
+                  </span>
+                )}
+              </dd>
+
+              <dt className="text-stm-warm-500">Physical plantation</dt>
+              <dd className="min-w-0 break-words pb-1 sm:pb-0">
+                {organizationContext.linkedPlantations.length > 0 ? (
+                  <div className="flex flex-wrap gap-x-3 gap-y-1">
+                    {organizationContext.linkedPlantations.map((plantation) => (
+                      <a
+                        key={plantation['@id']}
+                        href={plantation['@id']}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-stm-teal-700 hover:underline"
+                      >
+                        {plantation.prefLabel}
+                      </a>
+                    ))}
+                  </div>
+                ) : (
+                  <span className="text-amber-800">Needs review</span>
+                )}
+                {sharedPhysicalLinkReview && (
+                  <div className="mt-2 flex flex-col gap-2 border-l-2 border-amber-500 bg-amber-50 px-2 py-1.5 sm:flex-row sm:items-center sm:justify-between">
+                    <span className="text-[11px] leading-4 text-amber-900">
+                      <strong>Review:</strong> same physical plantation or
+                      separate valid plantations?
+                    </span>
+                    {sharedPhysicalPlaceIds.length >= 2 &&
+                      onReviewPhysicalLinks && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            onReviewPhysicalLinks(sharedPhysicalPlaceIds)
+                          }
+                          className="shrink-0 border border-amber-600 bg-amber-600 px-2.5 py-1 text-[11px] font-semibold text-white hover:bg-amber-700"
+                        >
+                          Compare places
+                        </button>
+                      )}
+                  </div>
+                )}
+              </dd>
+
+              <dt className="text-stm-warm-500">Land ownership</dt>
+              <dd className="min-w-0 break-words">
+                {physicalOwnershipAssertions.length > 0 ? (
+                  <div className="space-y-1">
+                    {physicalOwnershipAssertions.map((owner) => (
+                      <a
+                        key={owner}
+                        href={owner}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="block break-all text-stm-teal-700 hover:underline"
+                      >
+                        {owner}
+                      </a>
+                    ))}
+                  </div>
+                ) : (
+                  <span>No sourced P51/P52 assertion</span>
+                )}
+              </dd>
+            </dl>
+
+            {reportedOwners.length > 0 && (
+              <div className="mt-3 border-t border-stm-warm-200 pt-3">
+                <div className="mb-1 grid min-w-0 grid-cols-1 gap-1 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+                  <span className="font-medium">
+                    Reported owners in Almanakken
+                  </span>
+                  <span className="font-mono text-[10px] text-stm-warm-500 sm:text-right">
+                    {reportedOwners.length} dated transcription
+                    {reportedOwners.length === 1 ? '' : 's'}
+                  </span>
+                </div>
+                <div className="max-h-28 overflow-auto border border-stm-warm-200 bg-white">
+                  {reportedOwners.map((owner) => (
+                    <div
+                      key={`${owner.year}-${owner.value}`}
+                      className="grid grid-cols-[3.5rem_minmax(0,1fr)] gap-2 border-b border-stm-warm-100 px-2 py-1 last:border-b-0"
+                    >
+                      <span className="font-mono text-stm-warm-500">
+                        {owner.year}
+                      </span>
+                      <span className="min-w-0 break-words">{owner.value}</span>
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-2 text-[11px] leading-4 text-stm-warm-600">
+                  These are dated source transcriptions about the organization;
+                  they do not by themselves assert ownership of the land.
+                </p>
+              </div>
+            )}
+          </section>
+        )}
+
+        {almanakkenReview && (
+          <div className="border border-stm-teal-200 bg-stm-teal-50 p-3 text-xs text-stm-teal-900">
+            <div className="mb-2">
+              <div>
+                <div className="text-[10px] font-medium uppercase tracking-[0.18em] opacity-70">
+                  Almanakken {almanakkenReview.sourceVersion} organization evidence
+                </div>
+                <div className="font-medium">
+                  {almanakkenReview.rows} observations
+                  {almanakkenYears ? ` (${almanakkenYears})` : ''}
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              <div className="border border-black/10 bg-white/60 p-2">
+                <div className="text-[10px] uppercase tracking-[0.16em] opacity-60">
+                  Production functions
+                </div>
+                <div className="font-medium">
+                  {almanakkenReview.productRows} rows
+                </div>
+                <div className="mt-1 line-clamp-2 text-[11px] opacity-75">
+                  {almanakkenProducts ?? 'none'}
+                </div>
+              </div>
+              <div className="border border-black/10 bg-white/60 p-2">
+                <div className="text-[10px] uppercase tracking-[0.16em] opacity-60">
+                  Physical projection
+                </div>
+                <div className="font-medium">
+                  {almanakkenObservations.length} rows
+                </div>
+                <div className="text-[11px] opacity-75">
+                  {almanakkenObservations.length > 0
+                    ? 'shown here for context'
+                    : 'organization only'}
+                </div>
+              </div>
+              <div className="border border-black/10 bg-white/60 p-2">
+                <div className="text-[10px] uppercase tracking-[0.16em] opacity-60">
+                  Deserted
+                </div>
+                <div className="font-medium">
+                  {almanakkenReview.desertedRows} rows
+                </div>
+                <div className="text-[11px] opacity-75">
+                  {almanakkenReview.sourceNames} name variants
+                </div>
+              </div>
+            </div>
+
+            {almanakkenObservations.length > 0 && (
+              <div className="mt-3 border border-black/10 bg-white/70">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-black/10 px-2 py-1.5">
+                  <div className="font-medium">
+                    Saved Almanakken v2 observations
+                  </div>
+                  <div className="font-mono text-[10px] opacity-70">
+                    {almanakkenObservations.length} rows
+                  </div>
+                </div>
+                <div className="max-h-72 overflow-auto">
+                  <table className="min-w-full border-collapse text-left text-[11px]">
+                    <thead className="sticky top-0 bg-white text-[10px] uppercase tracking-[0.12em] opacity-70">
+                      <tr>
+                        <th className="whitespace-nowrap border-b border-black/10 px-2 py-1">
+                          Year
+                        </th>
+                        <th className="whitespace-nowrap border-b border-black/10 px-2 py-1">
+                          Source row
+                        </th>
+                        <th className="border-b border-black/10 px-2 py-1">
+                          Name / product
+                        </th>
+                        <th className="border-b border-black/10 px-2 py-1">
+                          Location
+                        </th>
+                        <th className="border-b border-black/10 px-2 py-1">
+                          Population
+                        </th>
+                        <th className="border-b border-black/10 px-2 py-1">
+                          Relations
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {almanakkenObservations.map((observation) => (
+                        <tr
+                          key={observation.recordId}
+                          className="border-b border-black/5 align-top"
+                        >
+                          <td className="whitespace-nowrap px-2 py-1 font-mono">
+                            {observationValue(observation.year)}
+                          </td>
+                          <td className="whitespace-nowrap px-2 py-1 font-mono">
+                            {observation.recordId}
+                          </td>
+                          <td className="min-w-44 px-2 py-1">
+                            <div className="font-medium">
+                              {observationValue(
+                                observation.plantationOriginal ||
+                                  observation.plantationStandardized,
+                              )}
+                            </div>
+                            <div className="opacity-75">
+                              {observation.product || '-'}
+                              {observation.deserted ? ' | deserted' : ''}
+                            </div>
+                            <div className="opacity-75">
+                              {observationDetails(observation)}
+                            </div>
+                          </td>
+                          <td className="min-w-48 px-2 py-1">
+                            <div>
+                              {observationValue(
+                                observation.locationStandardized,
+                              )}
+                            </div>
+                            <div className="opacity-70">
+                              {observation.locationOriginal || '-'}
+                            </div>
+                            <div className="opacity-70">
+                              {[observation.riverOrRoad, observation.direction]
+                                .filter(Boolean)
+                                .join(' | ') || '-'}
+                            </div>
+                          </td>
+                          <td className="min-w-36 px-2 py-1">
+                            {observationPopulation(observation)}
+                          </td>
+                          <td className="min-w-44 px-2 py-1">
+                            <div>
+                              part of: {observationRelations(observation.partOf)}
+                            </div>
+                            <div>
+                              has parts:{' '}
+                              {observationRelations(observation.hasParts)}
+                            </div>
+                            <div>
+                              owned by: {observationRelations(observation.ownedBy)}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+          </div>
+        )}
+
         {/* Names */}
         <div>
           <div className="flex items-center justify-between mb-1">
@@ -541,6 +1715,29 @@ export default function PlaceEditor({
                     <option value="variant">Variant spelling</option>
                   </select>
 
+                  {/* Source ID (registry only) */}
+                  <select
+                    value={nm.source ?? ''}
+                    onChange={(e) => {
+                      const nextSource = e.target.value || undefined;
+                      const sourceYearFromRegistry =
+                        deriveYearFromSourceId(nextSource);
+                      updateName(i, {
+                        source: nextSource,
+                        sourceYear: sourceYearFromRegistry,
+                      });
+                    }}
+                    disabled={!canEdit}
+                    className="px-2 py-1 text-xs border border-stm-warm-200 bg-white focus:ring-1 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50 w-48"
+                  >
+                    <option value="">Source (ID + year)</option>
+                    {registrySources.map((source) => (
+                      <option key={source.sourceId} value={source.sourceId}>
+                        {sourceDisplayLabel(source.sourceId)}
+                      </option>
+                    ))}
+                  </select>
+
                   {/* Preferred radio */}
                   {canEdit && (
                     <label className="flex items-center gap-1 text-xs text-stm-warm-600 cursor-pointer select-none">
@@ -577,10 +1774,37 @@ export default function PlaceEditor({
               </div>
             ))}
           </div>
+          <p className="mt-1 text-[10px] text-stm-warm-400">
+            Each row is one appellation. Source is selected from one authority
+            dropdown (ID + year/range) and can be switched in edit mode. The
+            preferred display label defaults to the 1930 map appellation when
+            available.
+          </p>
+          {sourceAppellations.length > 0 && (
+            <div className="mt-2 border border-stm-warm-200 bg-stm-warm-50 p-2 space-y-1">
+              <p className="text-[10px] text-stm-warm-500 uppercase tracking-wider">
+                Appellations from sources
+              </p>
+              {sourceAppellations.map((app) => (
+                <div key={app.id} className="text-[10px] text-stm-warm-600">
+                  <span className="font-medium text-stm-warm-700">
+                    {app.text}
+                  </span>
+                  <span className="ml-1">lang: {app.language || 'und'}</span>
+                  {app.sourceLabel && (
+                    <span className="ml-1">source: {app.sourceLabel}</span>
+                  )}
+                  {app.sourceYear && (
+                    <span className="ml-1">year: {app.sourceYear}</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
-        {/* Type + District row */}
-        <div className="grid grid-cols-2 gap-3">
+        {/* Type */}
+        <div>
           <div>
             <label className="block text-sm font-medium text-stm-warm-700 mb-1">
               Type
@@ -608,25 +1832,6 @@ export default function PlaceEditor({
                 {biasTypes[draft.type].editorialNote}
               </p>
             )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-stm-warm-700 mb-1">
-              Part of (District)
-            </label>
-            <select
-              value={draft.broader || ''}
-              onChange={(e) => update('broader', e.target.value || null)}
-              disabled={!canEdit}
-              className="w-full px-3 py-2 border border-stm-warm-200 rounded text-sm bg-white focus:ring-2 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50"
-            >
-              <option value="">-- None --</option>
-              {districts.map((d) => (
-                <option key={d.id} value={d.id}>
-                  {getPreferredName(d)}
-                </option>
-              ))}
-            </select>
           </div>
         </div>
 
@@ -710,13 +1915,14 @@ export default function PlaceEditor({
             lat={draft.location.lat}
             lng={draft.location.lng}
             wkt={draft.location.wkt}
+            featureType={draft.placeType}
             editable={canEdit}
             onLocationChange={handleLocationChange}
           />
         </div>
 
         {/* External Links */}
-        <div>
+        <div id="external-links" className="scroll-mt-4">
           <label className="block text-sm font-medium text-stm-warm-700 mb-1">
             External Links
             <span className="text-stm-warm-400 font-normal text-xs ml-1">
@@ -889,7 +2095,7 @@ export default function PlaceEditor({
         </div>
 
         {/* Dikland Collection */}
-        <div>
+        <div id="sources" className="scroll-mt-4">
           <label className="block text-sm font-medium text-stm-warm-700 mb-1">
             Dikland Collection
             <span className="text-stm-warm-400 font-normal text-xs ml-1">
@@ -1238,91 +2444,586 @@ export default function PlaceEditor({
           />
         </div>
 
-        {/* Location Description + Original + Place Type */}
+        {/* Location Context */}
         <div className="space-y-3">
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-sm font-medium text-stm-warm-700 mb-1">
-                Location
-                <span className="text-stm-warm-400 font-normal">
-                  {' '}
-                  (standardized)
-                </span>
-              </label>
-              <input
-                type="text"
-                value={draft.locationDescription || ''}
-                onChange={(e) =>
-                  update('locationDescription', e.target.value || null)
-                }
-                disabled={!canEdit}
-                placeholder="e.g. Suriname"
-                className="w-full px-3 py-2 border border-stm-warm-200 rounded text-sm bg-white focus:ring-2 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-stm-warm-700 mb-1">
-                Place Type / Product
-              </label>
-              <input
-                type="text"
-                value={draft.placeType || ''}
-                onChange={(e) => update('placeType', e.target.value || null)}
-                disabled={!canEdit}
-                placeholder="e.g. koffie, suiker"
-                className="w-full px-3 py-2 border border-stm-warm-200 rounded text-sm bg-white focus:ring-2 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50"
-              />
+          <label className="block text-sm font-medium text-stm-warm-700">
+            Location Context
+          </label>
+          <div id="product-observations" className="scroll-mt-4">
+            <label className="block text-sm font-medium text-stm-warm-700 mb-1">
+              District (according to {districtSourceSummary})
+            </label>
+            <select
+              value={draft.broader || ''}
+              onChange={(e) => handleDistrictSelection(e.target.value || null)}
+              disabled={!canEdit}
+              className="w-full px-3 py-2 border border-stm-warm-200 rounded text-sm bg-white focus:ring-2 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50"
+            >
+              <option value="">-- None --</option>
+              {districts.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {getPreferredName(d)}
+                </option>
+              ))}
+            </select>
+            <div className="mt-2 space-y-2">
+              <div className="flex items-center justify-between">
+                <p className="text-[10px] text-stm-warm-500 uppercase tracking-wider">
+                  District Statements
+                </p>
+                {canEdit && (
+                  <button
+                    type="button"
+                    onClick={addDistrictAssertion}
+                    className="text-xs text-stm-teal-600 hover:text-stm-teal-700 font-medium"
+                  >
+                    + Add district statement
+                  </button>
+                )}
+              </div>
+
+              {districtAssertions.length === 0 && (
+                <p className="text-xs text-stm-warm-400 italic">
+                  No district statements yet.
+                </p>
+              )}
+
+              {districtAssertions.map((assertion, i) => (
+                <div
+                  key={assertion.id}
+                  className="border border-stm-warm-200 bg-white p-2.5 space-y-2"
+                >
+                  <div className="grid grid-cols-2 gap-2">
+                    <select
+                      value={assertion.districtId || ''}
+                      onChange={(e) =>
+                        updateDistrictAssertion(i, {
+                          districtId: e.target.value || null,
+                        })
+                      }
+                      disabled={!canEdit}
+                      className="px-2 py-1 text-xs border border-stm-warm-200 bg-white focus:ring-1 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50"
+                    >
+                      <option value="">District target</option>
+                      {districts.map((d) => (
+                        <option key={d.id} value={d.id}>
+                          {getPreferredName(d)}
+                        </option>
+                      ))}
+                    </select>
+                    <select
+                      value={assertion.source}
+                      onChange={(e) =>
+                        updateDistrictAssertion(i, { source: e.target.value })
+                      }
+                      disabled={!canEdit}
+                      className="px-2 py-1 text-xs border border-stm-warm-200 bg-white focus:ring-1 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50"
+                    >
+                      {registrySources.map((source) => (
+                        <option key={source.sourceId} value={source.sourceId}>
+                          {sourceDisplayLabel(source.sourceId)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <input
+                      type="number"
+                      value={assertion.sourceYear ?? ''}
+                      onChange={(e) =>
+                        updateDistrictAssertion(i, {
+                          sourceYear: e.target.value
+                            ? Number(e.target.value)
+                            : undefined,
+                        })
+                      }
+                      disabled={!canEdit}
+                      placeholder="Year"
+                      className="px-2 py-1 text-xs border border-stm-warm-200 bg-white focus:ring-1 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50"
+                    />
+                    <select
+                      value={assertion.certainty || 'certain'}
+                      onChange={(e) =>
+                        updateDistrictAssertion(i, {
+                          certainty: e.target.value as AssertionCertainty,
+                        })
+                      }
+                      disabled={!canEdit}
+                      className="px-2 py-1 text-xs border border-stm-warm-200 bg-white focus:ring-1 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50"
+                    >
+                      <option value="certain">Certain</option>
+                      <option value="probable">Probable</option>
+                      <option value="uncertain">Uncertain</option>
+                    </select>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <label className="flex items-center gap-1 text-xs text-stm-warm-600">
+                      <input
+                        type="checkbox"
+                        checked={Boolean(assertion.isCurrent)}
+                        onChange={(e) =>
+                          updateDistrictAssertion(i, {
+                            isCurrent: e.target.checked,
+                          })
+                        }
+                        disabled={!canEdit}
+                      />
+                      Current
+                    </label>
+                    {canEdit && (
+                      <button
+                        type="button"
+                        onClick={() => removeDistrictAssertion(i)}
+                        className="text-xs text-stm-warm-400 hover:text-red-500"
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
+          {/* Place-function observations */}
           <div>
-            <label className="block text-sm font-medium text-stm-warm-700 mb-1">
-              Location Description
-              <span className="text-stm-warm-400 font-normal">
-                {' '}
-                (original from source)
-              </span>
-            </label>
-            <input
-              type="text"
-              value={draft.locationDescriptionOriginal || ''}
-              onChange={(e) =>
-                update('locationDescriptionOriginal', e.target.value || null)
-              }
-              disabled={!canEdit}
-              placeholder="e.g. Rivier Suriname, regterhand"
-              className="w-full px-3 py-2 border border-stm-warm-200 rounded text-sm bg-white focus:ring-2 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50"
-            />
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-sm font-medium text-stm-warm-700">
+                Place function (per year / source)
+              </label>
+              {canEdit && (
+                <button
+                  type="button"
+                  onClick={addProductAssertion}
+                  className="text-xs text-stm-sepia-600 hover:text-stm-sepia-800"
+                >
+                  + Add function observation
+                </button>
+              )}
+            </div>
+            {productAssertions.length === 0 && (
+              <p className="text-xs text-stm-warm-400 italic">
+                No function observations recorded.
+              </p>
+            )}
+            <div className="space-y-2">
+              {productAssertions.map((assertion, i) => (
+                <div
+                  key={assertion.id}
+                  className="border border-stm-warm-200 bg-stm-warm-50 p-2 space-y-2"
+                >
+                  <div className="grid grid-cols-3 gap-2">
+                    <input
+                      type="text"
+                      value={assertion.value}
+                      onChange={(e) =>
+                        updateProductAssertion(i, { value: e.target.value })
+                      }
+                      disabled={!canEdit}
+                      placeholder="e.g. koffie, suiker"
+                      className="px-2 py-1 text-xs border border-stm-warm-200 bg-white focus:ring-1 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50"
+                    />
+                    <input
+                      type="number"
+                      value={assertion.startYear ?? ''}
+                      onChange={(e) =>
+                        updateProductAssertion(i, {
+                          startYear: e.target.value
+                            ? Number(e.target.value)
+                            : undefined,
+                        })
+                      }
+                      disabled={!canEdit}
+                      placeholder="From"
+                      className="px-2 py-1 text-xs border border-stm-warm-200 bg-white focus:ring-1 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50"
+                    />
+                    <input
+                      type="number"
+                      value={assertion.endYear ?? ''}
+                      onChange={(e) =>
+                        updateProductAssertion(i, {
+                          endYear: e.target.value
+                            ? Number(e.target.value)
+                            : undefined,
+                        })
+                      }
+                      disabled={!canEdit}
+                      placeholder="To"
+                      className="px-2 py-1 text-xs border border-stm-warm-200 bg-white focus:ring-1 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={assertion.source}
+                      onChange={(e) =>
+                        updateProductAssertion(i, { source: e.target.value })
+                      }
+                      disabled={!canEdit}
+                      className="flex-1 px-2 py-1 text-xs border border-stm-warm-200 bg-white focus:ring-1 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50"
+                    >
+                      {registrySources.map((source) => (
+                        <option key={source.sourceId} value={source.sourceId}>
+                          {sourceDisplayLabel(source.sourceId)}
+                        </option>
+                      ))}
+                    </select>
+                    {canEdit && (
+                      <button
+                        type="button"
+                        onClick={() => removeProductAssertion(i)}
+                        className="text-xs text-stm-warm-400 hover:text-red-500 shrink-0"
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Location observations */}
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-sm font-medium text-stm-warm-700">
+                Location observations (source and time)
+              </label>
+              {canEdit && (
+                <button
+                  type="button"
+                  onClick={addLocationAssertion}
+                  className="text-xs text-stm-sepia-600 hover:text-stm-sepia-800"
+                >
+                  + Add location observation
+                </button>
+              )}
+            </div>
+            {locationAssertions.length === 0 && (
+              <p className="text-xs text-stm-warm-400 italic">
+                No location observations recorded.
+              </p>
+            )}
+            <div className="space-y-2">
+              {locationAssertions.map((assertion, i) => (
+                <div
+                  key={assertion.id}
+                  className="border border-stm-warm-200 bg-stm-warm-50 p-2 space-y-2"
+                >
+                  <div className="grid grid-cols-2 gap-2">
+                    <input
+                      type="text"
+                      value={assertion.standardized || ''}
+                      onChange={(e) =>
+                        updateLocationAssertion(i, {
+                          standardized: e.target.value || null,
+                        })
+                      }
+                      disabled={!canEdit}
+                      placeholder="Standardized (e.g. Suriname)"
+                      className="px-2 py-1 text-xs border border-stm-warm-200 bg-white focus:ring-1 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50"
+                    />
+                    <input
+                      type="text"
+                      value={assertion.original || ''}
+                      onChange={(e) =>
+                        updateLocationAssertion(i, {
+                          original: e.target.value || null,
+                        })
+                      }
+                      disabled={!canEdit}
+                      placeholder="Original (e.g. Rivier Suriname, regterhand)"
+                      className="px-2 py-1 text-xs border border-stm-warm-200 bg-white focus:ring-1 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <select
+                      value={assertion.source}
+                      onChange={(e) =>
+                        updateLocationAssertion(i, { source: e.target.value })
+                      }
+                      disabled={!canEdit}
+                      className="px-2 py-1 text-xs border border-stm-warm-200 bg-white focus:ring-1 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50"
+                    >
+                      {registrySources.map((source) => (
+                        <option key={source.sourceId} value={source.sourceId}>
+                          {sourceDisplayLabel(source.sourceId)}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="flex items-center gap-1">
+                      <input
+                        type="number"
+                        value={assertion.startYear ?? ''}
+                        onChange={(e) =>
+                          updateLocationAssertion(i, {
+                            startYear: e.target.value
+                              ? Number(e.target.value)
+                              : undefined,
+                          })
+                        }
+                        disabled={!canEdit}
+                        placeholder="From"
+                        className="w-full px-2 py-1 text-xs border border-stm-warm-200 bg-white focus:ring-1 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50"
+                      />
+                      <span className="text-xs text-stm-warm-400 shrink-0">
+                        –
+                      </span>
+                      <input
+                        type="number"
+                        value={assertion.endYear ?? ''}
+                        onChange={(e) =>
+                          updateLocationAssertion(i, {
+                            endYear: e.target.value
+                              ? Number(e.target.value)
+                              : undefined,
+                          })
+                        }
+                        disabled={!canEdit}
+                        placeholder="To"
+                        className="w-full px-2 py-1 text-xs border border-stm-warm-200 bg-white focus:ring-1 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50"
+                      />
+                      {canEdit && (
+                        <button
+                          type="button"
+                          onClick={() => removeLocationAssertion(i)}
+                          className="text-xs text-stm-warm-400 hover:text-red-500 shrink-0"
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* IDs (read-only) */}
-        <div className="space-y-1 text-xs text-stm-warm-400">
-          <div>
-            Gazetteer ID: <span className="font-mono">{draft.id}</span>
+        {/* Plantation Lifecycle */}
+        {draft.type === 'plantation' && (
+          <div id="plantation-lifecycle" className="scroll-mt-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <label className="block text-sm font-medium text-stm-warm-700">
+                Plantation Lifecycle
+              </label>
+              {canEdit && (
+                <button
+                  type="button"
+                  onClick={addStatusAssertion}
+                  className="text-xs text-stm-sepia-600 hover:text-stm-sepia-800"
+                >
+                  + Add lifecycle event
+                </button>
+              )}
+            </div>
+
+            {/* First / last mention computed markers */}
+            {(firstMentionYear !== null || lastMentionYear !== null) && (
+              <div className="flex gap-3">
+                {firstMentionYear !== null && (
+                  <span className="inline-flex items-center gap-1 text-[10px] text-stm-warm-600 bg-stm-warm-100 border border-stm-warm-200 px-2 py-0.5">
+                    <span className="font-medium">First mentioned:</span>{' '}
+                    {firstMentionYear}
+                  </span>
+                )}
+                {lastMentionYear !== null && (
+                  <span className="inline-flex items-center gap-1 text-[10px] text-stm-warm-600 bg-stm-warm-100 border border-stm-warm-200 px-2 py-0.5">
+                    <span className="font-medium">Last mentioned:</span>{' '}
+                    {lastMentionYear}
+                  </span>
+                )}
+              </div>
+            )}
+
+            {/* Computed timeline (read-only merged view) */}
+            {computedLifecycleEvents.length > 0 && (
+              <div className="border border-stm-warm-200 divide-y divide-stm-warm-100">
+                <p className="px-2 py-1 text-[10px] text-stm-warm-500 uppercase tracking-wider bg-stm-warm-50">
+                  Timeline
+                </p>
+                {computedLifecycleEvents.map((ev, i) => {
+                  const yearSpan = ev.startYear
+                    ? ev.endYear && ev.endYear !== ev.startYear
+                      ? `${ev.startYear}–${ev.endYear}`
+                      : String(ev.startYear)
+                    : ev.endYear
+                      ? `–${ev.endYear}`
+                      : null;
+
+                  const statusColors: Record<string, string> = {
+                    planned:
+                      'bg-stm-warm-100 text-stm-warm-700 border-stm-warm-300',
+                    built:
+                      'bg-stm-teal-50 text-stm-teal-800 border-stm-teal-200',
+                    abandoned: 'bg-red-50 text-red-700 border-red-200',
+                    reactivated: 'bg-green-50 text-green-800 border-green-200',
+                    present: 'bg-blue-50 text-blue-700 border-blue-200',
+                    unknown:
+                      'bg-stm-warm-50 text-stm-warm-500 border-stm-warm-200',
+                    'function-assignment':
+                      'bg-stm-sepia-50 text-stm-sepia-700 border-stm-sepia-200',
+                  };
+
+                  const colorKey =
+                    ev.kind === 'function-assignment'
+                      ? 'function-assignment'
+                      : (ev.status ?? 'unknown');
+                  const colorClass =
+                    statusColors[colorKey] ?? statusColors.unknown;
+
+                  return (
+                    <div
+                      key={i}
+                      className="flex items-center gap-2 px-2 py-1.5 text-xs"
+                    >
+                      <span
+                        className={`inline-block border px-1.5 py-0.5 text-[10px] font-medium shrink-0 ${colorClass}`}
+                      >
+                        {ev.kind === 'function-assignment'
+                          ? ev.product
+                          : ev.status}
+                      </span>
+                      {yearSpan && (
+                        <span className="text-stm-warm-500 font-mono shrink-0">
+                          {yearSpan}
+                        </span>
+                      )}
+                      {ev.kind === 'function-assignment' && (
+                        <span className="text-stm-warm-400 text-[10px]">
+                          (place function)
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {computedLifecycleEvents.length === 0 &&
+              statusAssertions.length === 0 && (
+                <p className="text-xs text-stm-warm-400 italic">
+                  No lifecycle events recorded. Add function observations or
+                  status events to build the timeline.
+                </p>
+              )}
+
+            {/* Editable status assertions */}
+            {statusAssertions.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-[10px] text-stm-warm-500 uppercase tracking-wider">
+                  Status Events
+                </p>
+                {statusAssertions.map((assertion, i) => (
+                  <div
+                    key={assertion.id}
+                    className="border border-stm-warm-200 bg-stm-warm-50 p-2 space-y-2"
+                  >
+                    <div className="grid grid-cols-3 gap-2">
+                      <select
+                        value={assertion.status}
+                        onChange={(e) =>
+                          updateStatusAssertion(i, {
+                            status: e.target.value as PlantationStatusType,
+                          })
+                        }
+                        disabled={!canEdit}
+                        className="px-2 py-1 text-xs border border-stm-warm-200 bg-white focus:ring-1 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50"
+                      >
+                        <option value="planned">Planned</option>
+                        <option value="built">Built / Active</option>
+                        <option value="abandoned">Abandoned (verlaten)</option>
+                        <option value="reactivated">Reactivated</option>
+                        <option value="unknown">Unknown</option>
+                      </select>
+                      <input
+                        type="number"
+                        value={assertion.startYear ?? ''}
+                        onChange={(e) =>
+                          updateStatusAssertion(i, {
+                            startYear: e.target.value
+                              ? Number(e.target.value)
+                              : undefined,
+                          })
+                        }
+                        disabled={!canEdit}
+                        placeholder="From"
+                        className="px-2 py-1 text-xs border border-stm-warm-200 bg-white focus:ring-1 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50"
+                      />
+                      <input
+                        type="number"
+                        value={assertion.endYear ?? ''}
+                        onChange={(e) =>
+                          updateStatusAssertion(i, {
+                            endYear: e.target.value
+                              ? Number(e.target.value)
+                              : undefined,
+                          })
+                        }
+                        disabled={!canEdit}
+                        placeholder="To"
+                        className="px-2 py-1 text-xs border border-stm-warm-200 bg-white focus:ring-1 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50"
+                      />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <select
+                        value={assertion.source}
+                        onChange={(e) =>
+                          updateStatusAssertion(i, { source: e.target.value })
+                        }
+                        disabled={!canEdit}
+                        className="flex-1 px-2 py-1 text-xs border border-stm-warm-200 bg-white focus:ring-1 focus:ring-stm-sepia-400 outline-none disabled:bg-stm-warm-50"
+                      >
+                        {registrySources.map((source) => (
+                          <option key={source.sourceId} value={source.sourceId}>
+                            {sourceDisplayLabel(source.sourceId)}
+                          </option>
+                        ))}
+                      </select>
+                      {canEdit && (
+                        <button
+                          type="button"
+                          onClick={() => removeStatusAssertion(i)}
+                          className="text-xs text-stm-warm-400 hover:text-red-500 shrink-0"
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-          {draft.fid != null && <div>QGIS Feature ID: {draft.fid}</div>}
+        )}
+      </div>
+
+      {/* Footer: IDs, modification metadata, and actions stay visible in the card. */}
+      <div className="shrink-0 border-t border-stm-warm-100 bg-white px-4 py-2">
+        {/* IDs (read-only) */}
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-stm-warm-400">
+          <span>
+            Gazetteer ID: <span className="font-mono">{draft.id}</span>
+          </span>
+          {draft.fid != null && <span>QGIS Feature ID: {draft.fid}</span>}
           {draft.district && (
-            <div>District (auto-linked): {draft.district}</div>
+            <span>District (auto-linked): {draft.district}</span>
+          )}
+          {draft.modifiedBy && (
+            <span>
+              Modified by {draft.modifiedBy} on {draft.modifiedAt}
+            </span>
           )}
         </div>
 
-        {/* Metadata */}
-        {draft.modifiedBy && (
-          <div className="text-xs text-stm-warm-400">
-            Last modified by {draft.modifiedBy} on {draft.modifiedAt}
-          </div>
-        )}
-
         {/* Error */}
         {error && (
-          <div className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded">
+          <div className="mt-2 bg-red-50 px-3 py-2 text-sm text-red-600">
             {error}
           </div>
         )}
 
         {/* Actions */}
         {canEdit && (
-          <div className="flex gap-2 pt-2">
+          <div className="mt-2 flex gap-2">
             <button
               onClick={handleSave}
               disabled={
@@ -1344,6 +3045,7 @@ export default function PlaceEditor({
             {onDelete && !place.id.startsWith('stm-new-') && (
               <button
                 onClick={() => {
+                  // eslint-disable-next-line no-restricted-globals
                   if (
                     confirm(
                       `Delete "${getPreferredName(draft)}"? This cannot be undone.`,
