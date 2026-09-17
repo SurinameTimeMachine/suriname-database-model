@@ -93,19 +93,26 @@ export default function ParamariboAddressHistory({
     return `Registry source: ${registrySources.join(', ')}`;
   }, [rows]);
 
-  const attribution = useMemo(() => {
-    if (sourceAttribution) return sourceAttribution;
-    return null;
-  }, [sourceAttribution]);
+  const attributionUrl =
+    sourceAttribution?.url ??
+    'https://www.concordansparamaribo.info/concordans/concordans-2022';
 
   return (
     <section className="mt-10 border-t border-ink/10 pt-6">
       <h2 className="text-xl font-semibold">Paramaribo address history</h2>
       <p className="mt-2 text-sm text-ink/65">
         Historical address designations for this location point, linked through
-        the Concordans ({rows.length}{' '}
-        {rows.length === 1 ? 'entry' : 'entries'}). Expand an entry to see the
-        chronological address and regime parcel components.
+        the{' '}
+        <a
+          href={attributionUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-stm-sepia-700 underline decoration-stm-sepia-300 underline-offset-2 hover:text-stm-sepia-800"
+        >
+          Paramaribo Concordans by Dr. Muntjewerff (version 2022)
+        </a>{' '}
+        ({rows.length} {rows.length === 1 ? 'entry' : 'entries'}). Expand an
+        entry to see the chronological address and regime parcel components.
       </p>
       <div className="mt-3 space-y-2">
         {rows.map((address) => {
@@ -209,17 +216,15 @@ export default function ParamariboAddressHistory({
           </>
         )}
         For historical addresses in Paramaribo we are grateful for the{' '}
-        {attribution ? (
-          <>
-            <a
-              href={attribution.url}
-              target="_blank"
-              rel="noreferrer"
-              className="underline"
-            >
-              {attribution.name}
-            </a>
-          </>
+        {sourceAttribution ? (
+          <a
+            href={attributionUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline"
+          >
+            {sourceAttribution.name}
+          </a>
         ) : (
           <>Concordans by Dr. Muntjewerff</>
         )}

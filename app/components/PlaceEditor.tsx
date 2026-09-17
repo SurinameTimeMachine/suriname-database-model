@@ -1090,6 +1090,10 @@ export default function PlaceEditor({
 
   // ── Status assertions (lifecycle) ─────────────────────────────────────────
 
+  const concordansAttributionUrl =
+    concordansSourceAttribution?.url ??
+    'https://www.concordansparamaribo.info/concordans/concordans-2022';
+
   const statusAssertions = draft.statusAssertions || [];
 
   const applyStatusAssertions = useCallback(
@@ -3068,8 +3072,16 @@ export default function PlaceEditor({
             </div>
             {concordansObservationCandidates.length > 0 && (
               <div className="mt-3 space-y-2">
-                <p className="text-[10px] text-stm-sepia-600 uppercase tracking-wider">
-                  Concordans observations (read-only)
+                <p className="text-[10px] text-stm-sepia-600 tracking-wider">
+                  Muntjewerff Concordans observations (read-only) —{' '}
+                  <a
+                    href={concordansAttributionUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-stm-sepia-700 underline decoration-stm-sepia-300 underline-offset-2 hover:text-stm-sepia-800 normal-case"
+                  >
+                    Paramaribo Concordans by Dr. Muntjewerff (version 2022)
+                  </a>
                 </p>
                 {concordansObservationCandidates.map((candidate) => (
                   <div
