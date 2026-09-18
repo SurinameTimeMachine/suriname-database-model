@@ -1011,8 +1011,40 @@ export default function PlaceEditor({
         });
       }
     }
-    return candidates.sort((a, b) => a.year - b.year);
+    return candidates;
   }, [historicalAddresses, draft.locationAssertions]);
+
+  type ConcordansYearGroup = {
+    year: number;
+    eraLabel: string;
+    candidates: ConcordansCandidate[];
+  };
+
+  // Group candidates strictly by year so there is EXACTLY ONE <details>
+  // accordion per distinct year, even when several Concordans rows attest
+  // the same era (e.g. two "1782 Not recorded" or two "1817" records for
+  // neighbouring parcels). Individual records keep their own parcel,
+  // source-row, note and adopt action inside the shared year body.
+  const concordansCandidatesByYear: ConcordansYearGroup[] = useMemo(() => {
+    const byYear = new Map<number, ConcordansCandidate[]>();
+    for (const candidate of concordansObservationCandidates) {
+      const list = byYear.get(candidate.year);
+      if (list) list.push(candidate);
+      else byYear.set(candidate.year, [candidate]);
+    }
+    return [...byYear.entries()]
+      .sort((a, b) => a[0] - b[0])
+      .map(([year, candidates]) => ({
+        year,
+        eraLabel: candidates[0]?.eraLabel ?? String(year),
+        candidates: [...candidates].sort(
+          (a, b) =>
+            a.address.localeCompare(b.address) ||
+            (a.sourceRow ?? '').localeCompare(b.sourceRow ?? '') ||
+            a.key.localeCompare(b.key),
+        ),
+      }));
+  }, [concordansObservationCandidates]);
 
   const adoptedConcordansRows = useMemo(() => {
     const rows: Array<{
@@ -3070,7 +3102,7 @@ export default function PlaceEditor({
                 </div>
               ))}
             </div>
-            {concordansObservationCandidates.length > 0 && (
+            {concordansCandidatesByYear.length > 0 && (
               <div className="mt-3 space-y-2">
                 <p className="text-[10px] text-stm-sepia-600 tracking-wider">
                   Muntjewerff Concordans observations (read-only) —{' '}
@@ -3083,61 +3115,89 @@ export default function PlaceEditor({
                     Paramaribo Concordans by Dr. Muntjewerff (version 2022)
                   </a>
                 </p>
-                {concordansObservationCandidates.map((candidate) => (
-                  <details
-                    key={candidate.key}
-                    className="border border-stm-sepia-200 bg-stm-sepia-50"
-                  >
-                    <summary className="flex cursor-pointer items-center gap-2 p-2 text-xs marker:text-stm-sepia-500">
-                      <span className="font-mono font-semibold text-stm-sepia-800 shrink-0">
-                        {candidate.year}
-                      </span>
-                      <span className="text-stm-warm-700 truncate">
-                        {candidate.address}
-                      </span>
-                      <span
-                        className={`ml-auto px-1.5 py-0.5 text-[10px] font-medium shrink-0 ${
-                          candidate.certainty === 'certain'
-                            ? 'bg-stm-sepia-600 text-white'
-                            : 'bg-stm-sepia-200 text-stm-warm-800'
-                        }`}
-                      >
-                        {candidate.certainty}
-                      </span>
-                    </summary>
-                    <div className="space-y-1 px-2 pb-2">
-                      <p className="text-[10px] text-stm-warm-500">
-                        Concordans {candidate.eraLabel} · concordans-paramaribo
-                        {candidate.sourceRow != null &&
-                          ` · rij ${candidate.sourceRow}`}
-                      </p>
-                      {Object.keys(candidate.parcelComponents).length > 0 && (
-                        <p className="text-[10px] text-stm-warm-600">
-                          {Object.entries(candidate.parcelComponents)
-                            .map(
-                              ([component, value]) =>
-                                `${CONCORDANS_PARCEL_LABELS[component] ?? component}: ${value}`,
-                            )
-                            .join(' · ')}
-                        </p>
-                      )}
-                      {candidate.note && (
-                        <p className="text-[10px] font-medium text-stm-warm-700">
-                          {candidate.note}
-                        </p>
-                      )}
-                      {canEdit && (
-                        <button
-                          type="button"
-                          onClick={() => adoptConcordansObservation(candidate)}
-                          className="mt-0.5 text-xs text-stm-sepia-600 hover:text-stm-sepia-800 underline"
-                        >
-                          Adopt into editable assertions
-                        </button>
-                      )}
-                    </div>
-                  </details>
-                ))}
+                {concordansCandidatesByYear.map((group) => {
+                  const previewAddress =
+                    group.candidates.find(
+                      (candidate) => candidate.address !== 'Not recorded',
+                    )?.address ??
+                    group.candidates[0]?.address ??
+                    'Not recorded';
+                  return (
+                    <details
+                      key={`concordans-year-${group.year}`}
+                      className="border border-stm-sepia-200 bg-stm-sepia-50"
+                    >
+                      <summary className="flex cursor-pointer items-center gap-2 p-2 text-xs marker:text-stm-sepia-500">
+                        <span className="font-mono font-semibold text-stm-sepia-800 shrink-0">
+                          {group.year}
+                        </span>
+                        <span className="text-stm-warm-700 truncate">
+                          {previewAddress}
+                        </span>
+                        {group.candidates.length > 1 && (
+                          <span className="font-mono text-[10px] text-stm-warm-500 shrink-0">
+                            ×{group.candidates.length}
+                          </span>
+                        )}
+                        <span className="ml-auto px-1.5 py-0.5 text-[10px] font-medium shrink-0 bg-stm-sepia-200 text-stm-warm-800">
+                          {group.eraLabel}
+                        </span>
+                      </summary>
+                      <div className="space-y-2 px-2 pb-2">
+                        {group.candidates.map((candidate) => (
+                          <div
+                            key={candidate.key}
+                            className="space-y-1 border-t border-stm-sepia-200/70 pt-1.5 first:border-t-0 first:pt-0"
+                          >
+                            <p className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[10px] text-stm-warm-500">
+                              <span className="font-mono font-semibold text-stm-sepia-800">
+                                {candidate.address}
+                              </span>
+                              <span
+                                className={`px-1.5 py-0.5 text-[10px] font-medium ${
+                                  candidate.certainty === 'certain'
+                                    ? 'bg-stm-sepia-600 text-white'
+                                    : 'bg-stm-sepia-200 text-stm-warm-800'
+                                }`}
+                              >
+                                {candidate.certainty}
+                              </span>
+                            </p>
+                            <p className="text-[10px] text-stm-warm-500">
+                              Concordans {candidate.eraLabel} · concordans-paramaribo
+                              {candidate.sourceRow != null &&
+                                ` · rij ${candidate.sourceRow}`}
+                            </p>
+                            {Object.keys(candidate.parcelComponents).length > 0 && (
+                              <p className="text-[10px] text-stm-warm-600">
+                                {Object.entries(candidate.parcelComponents)
+                                  .map(
+                                    ([component, value]) =>
+                                      `${CONCORDANS_PARCEL_LABELS[component] ?? component}: ${value}`,
+                                  )
+                                  .join(' · ')}
+                              </p>
+                            )}
+                            {candidate.note && (
+                              <p className="text-[10px] font-medium text-stm-warm-700">
+                                {candidate.note}
+                              </p>
+                            )}
+                            {canEdit && (
+                              <button
+                                type="button"
+                                onClick={() => adoptConcordansObservation(candidate)}
+                                className="mt-0.5 text-xs text-stm-sepia-600 hover:text-stm-sepia-800 underline"
+                              >
+                                Adopt into editable assertions
+                              </button>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </details>
+                  );
+                })}
               </div>
             )}
           </div>
