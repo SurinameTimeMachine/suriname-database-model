@@ -932,6 +932,8 @@ function PlacesPageInner() {
     useState<PublicationNotice | null>(null);
   const columnsRef = useRef<HTMLDivElement>(null);
   const tableScrollRef = useRef<HTMLDivElement>(null);
+  const desktopEditorScrollRef = useRef<HTMLDivElement>(null);
+  const mobileEditorScrollRef = useRef<HTMLDivElement>(null);
 
   // URL sync: read ?place= query param
   const searchParams = useSearchParams();
@@ -1453,6 +1455,14 @@ function PlacesPageInner() {
     );
     row?.scrollIntoView({ block: 'nearest' });
   }, [selectedId, isCreating, filtered]);
+
+  // Reset both editor panel scrollers to the top on record change. The
+  // panel wrappers persist across selections (only PlaceEditor remounts via
+  // key), so without this the pane keeps its previous scroll position.
+  useEffect(() => {
+    desktopEditorScrollRef.current?.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+    mobileEditorScrollRef.current?.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+  }, [selectedPlace?.id]);
 
   const selectedSourceAppellations = useMemo(() => {
     if (!allData?.geojson || !selectedId || isCreating) return [];
@@ -2150,7 +2160,10 @@ function PlacesPageInner() {
             {/* Detail panel */}
             {selectedPlace && (
               <aside className="absolute inset-y-0 right-0 z-40 hidden w-[clamp(34rem,52vw,58rem)] flex-col border-l border-ink/10 bg-background shadow-[-20px_0_50px_rgba(0,30,24,0.16)] lg:flex">
-                <div className="min-h-0 flex-1 overflow-y-auto">
+                <div
+                  ref={desktopEditorScrollRef}
+                  className="min-h-0 flex-1 overflow-y-auto"
+                >
                   <PlaceEditor
                     key={selectedPlace.id}
                     place={selectedPlace}
@@ -2180,7 +2193,10 @@ function PlacesPageInner() {
 
             {selectedPlace && (
               <div className="fixed inset-0 z-50 flex w-screen max-w-full flex-col bg-background lg:hidden">
-                <div className="min-h-0 flex-1 overflow-y-auto">
+                <div
+                  ref={mobileEditorScrollRef}
+                  className="min-h-0 flex-1 overflow-y-auto"
+                >
                   <PlaceEditor
                     key={selectedPlace.id}
                     place={selectedPlace}
