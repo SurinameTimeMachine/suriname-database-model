@@ -134,14 +134,6 @@ function PersonRow({ person }: { person: LinkedPerson }) {
       </button>
       {open && (
         <ol className="mt-2 space-y-2 border-t border-ink/10 pt-2 text-xs text-ink/75">
-          {postEmancipationName && (
-            <li className="text-ink/75">
-              <span className="text-ink/45">Naam na emancipatie: </span>
-              <span className="font-medium text-ink">
-                {postEmancipationName}
-              </span>
-            </li>
-          )}
           {person.observations.map((observation) => (
             <li key={observation.id} className="border-l border-ink/20 pl-2">
               <div>
