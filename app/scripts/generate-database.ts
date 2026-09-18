@@ -557,7 +557,7 @@ function buildPersons(
       sourceFile:
         'data/05-slave-emancipation - Suriname Slave and Emancipation Registers Dataset Version 1.1/Dataset Suriname Slave and Emancipation Registers Version 1.1.csv',
       sourceColumn:
-        'Id_person, Plantation, Name_enslaved, Sex, Age, Year_birth, Year_death, Name_mother, StartEntry*, EndEntry*',
+        'Id_person, Plantation, Name_enslaved, First_name, Family_name, Sex, Age, Year_birth, Year_death, Name_mother, StartEntry*, EndEntry*',
       sourceRow: 'all rows',
       transformedBy: 'scripts/transform-persons.ts',
       modelEntity: 'E21_Person / PersonObservation',
