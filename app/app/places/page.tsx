@@ -1751,7 +1751,7 @@ function PlacesPageInner() {
   }
 
   return (
-    <div className="relative flex h-full min-h-0 flex-col overflow-hidden">
+    <div className="relative flex h-dvh min-h-0 flex-col overflow-hidden">
       {/* Top bar */}
       <div className="border-b border-ink/10 bg-cream">
         <div className="px-4 py-3 sm:px-6 lg:px-8">
