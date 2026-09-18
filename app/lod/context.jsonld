@@ -695,6 +695,14 @@
       "@id": "stm:nameMother",
       "@type": "xsd:string"
     },
+    "emancipationFirstName": {
+      "@id": "stm:emancipationFirstName",
+      "@type": "xsd:string"
+    },
+    "emancipationFamilyName": {
+      "@id": "stm:emancipationFamilyName",
+      "@type": "xsd:string"
+    },
     "age": {
       "@id": "stm:age",
       "@type": "xsd:string"

@@ -728,12 +728,33 @@ if (existsSync(personsPath)) {
       monthDeath: person?.monthDeath,
       yearDeath: person?.yearDeath,
       nameMother: person?.nameMother,
+      emancipationFirstName: person?.emancipationFirstName,
+      emancipationFamilyName: person?.emancipationFamilyName,
       observations: [],
     };
+    // An Emancipation Register observation may be grouped after earlier
+    // slave-register rows — backfill the person-level post-1863 name.
+    const linkedRecord = linked as Record<string, unknown>;
+    if (
+      !linkedRecord.emancipationFirstName &&
+      typeof entity['emancipationFirstName'] === 'string' &&
+      entity['emancipationFirstName']
+    ) {
+      linkedRecord.emancipationFirstName = entity['emancipationFirstName'];
+    }
+    if (
+      !linkedRecord.emancipationFamilyName &&
+      typeof entity['emancipationFamilyName'] === 'string' &&
+      entity['emancipationFamilyName']
+    ) {
+      linkedRecord.emancipationFamilyName = entity['emancipationFamilyName'];
+    }
     group.set(idPerson, linked);
     (linked.observations as Record<string, unknown>[]).push({
       id: entity['@id'],
       nameEnslaved: entity['prefLabel'],
+      emancipationFirstName: entity['emancipationFirstName'],
+      emancipationFamilyName: entity['emancipationFamilyName'],
       sex: entity['sex'],
       age: entity['age'],
       plantationText: entity['plantationText'],

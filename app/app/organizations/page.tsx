@@ -38,9 +38,13 @@ type OrganizationDetails = {
     monthDeath?: string;
     yearDeath?: string;
     nameMother?: string;
+    emancipationFirstName?: string;
+    emancipationFamilyName?: string;
     observations: Array<{
       id: string;
       nameEnslaved?: string;
+      emancipationFirstName?: string;
+      emancipationFamilyName?: string;
       sex?: string;
       age?: string;
       plantationText?: string;

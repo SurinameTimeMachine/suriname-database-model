@@ -483,6 +483,10 @@ function buildPersons(
     };
     if (p.prefLabel) entity.prefLabel = p.prefLabel;
     if (p.sex) entity.sex = p.sex;
+    if (p.emancipationFirstName)
+      entity.emancipationFirstName = p.emancipationFirstName;
+    if (p.emancipationFamilyName)
+      entity.emancipationFamilyName = p.emancipationFamilyName;
     if (p.dayBirth) entity.dayBirth = p.dayBirth;
     if (p.monthBirth) entity.monthBirth = p.monthBirth;
     if (p.yearBirth) entity.yearBirth = p.yearBirth;
@@ -504,6 +508,10 @@ function buildPersons(
       wasDerivedFrom: provId,
     };
     if (o.nameEnslaved) entity.prefLabel = o.nameEnslaved;
+    if (o.emancipationFirstName)
+      entity.emancipationFirstName = o.emancipationFirstName;
+    if (o.emancipationFamilyName)
+      entity.emancipationFamilyName = o.emancipationFamilyName;
     if (o.sex) entity.sex = o.sex;
     if (o.age) entity.age = o.age;
     if (o.plantationText) entity.plantationText = o.plantationText;
