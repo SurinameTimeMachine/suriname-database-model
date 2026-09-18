@@ -1011,7 +1011,7 @@ export default function PlaceEditor({
         });
       }
     }
-    return candidates.sort((a, b) => a.year - b.year);
+    return candidates;
   }, [historicalAddresses, draft.locationAssertions]);
 
   type ConcordansYearGroup = {

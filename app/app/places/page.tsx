@@ -1464,9 +1464,9 @@ function PlacesPageInner() {
   // key), so without this the pane keeps its previous scroll position.
   // requestAnimationFrame defers past the remount/reflow so the freshly
   // rendered (often taller) PlaceEditor is measured, then both the direct
-  // scrollTop assignment and the scrollTo fallback cover browsers that
-  // ignore `behavior: 'instant'`. Keyed on both the selected record and
-  // the ?place= URL param so back/forward navigation resets as well.
+  // scrollTop assignment and the scrollTo fallback reset the position.
+  // Keyed on both the selected record and the ?place= URL param so
+  // back/forward navigation resets as well.
   useEffect(() => {
     const resetEditorScroll = () => {
       for (const container of [
@@ -1475,7 +1475,7 @@ function PlacesPageInner() {
       ]) {
         if (!container) continue;
         container.scrollTop = 0;
-        container.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
+        container.scrollTo({ top: 0, left: 0 });
       }
     };
     const frame = requestAnimationFrame(resetEditorScroll);
