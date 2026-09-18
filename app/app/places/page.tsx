@@ -937,6 +937,7 @@ function PlacesPageInner() {
 
   // URL sync: read ?place= query param
   const searchParams = useSearchParams();
+  const placeParam = searchParams.get('place');
   const lastAppliedPlace = useRef<string | null>(null);
   const {
     sources: registrySources,
@@ -975,7 +976,7 @@ function PlacesPageInner() {
   // Initialize/update selection from URL ?place= param
   useEffect(() => {
     if (places.length === 0) return;
-    const placeId = searchParams.get('place');
+    const placeId = placeParam;
     if (placeId === lastAppliedPlace.current) return;
     lastAppliedPlace.current = placeId;
     if (placeId && places.some((p) => p.id === placeId)) {
@@ -983,7 +984,7 @@ function PlacesPageInner() {
     } else {
       setSelectedIds([]);
     }
-  }, [places, searchParams]);
+  }, [places, placeParam]);
 
   // Keep derived Concordans links available for whichever record is
   // selected: fetch that record's projection on selection change. The gazetteer
@@ -1014,8 +1015,10 @@ function PlacesPageInner() {
     };
   }, [selectedIdForConcordans]);
 
+  const modeParam = searchParams.get('mode');
+
   useEffect(() => {
-    const requestedMode = searchParams.get('mode');
+    const requestedMode = modeParam;
     if (
       requestedMode === 'browse' ||
       requestedMode === 'review' ||
@@ -1023,7 +1026,7 @@ function PlacesPageInner() {
     ) {
       setWorkspaceMode(requestedMode);
     }
-  }, [canEdit, searchParams]);
+  }, [canEdit, modeParam]);
 
   // Sync selectedIds to URL as ?place= query param (skip transient stm-new-* IDs)
   const syncUrlToSelection = useCallback((ids: string[]) => {
@@ -1459,10 +1462,25 @@ function PlacesPageInner() {
   // Reset both editor panel scrollers to the top on record change. The
   // panel wrappers persist across selections (only PlaceEditor remounts via
   // key), so without this the pane keeps its previous scroll position.
+  // requestAnimationFrame defers past the remount/reflow so the freshly
+  // rendered (often taller) PlaceEditor is measured, then both the direct
+  // scrollTop assignment and the scrollTo fallback reset the position.
+  // Keyed on both the selected record and the ?place= URL param so
+  // back/forward navigation resets as well.
   useEffect(() => {
-    desktopEditorScrollRef.current?.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
-    mobileEditorScrollRef.current?.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
-  }, [selectedPlace?.id]);
+    const resetEditorScroll = () => {
+      for (const container of [
+        desktopEditorScrollRef.current,
+        mobileEditorScrollRef.current,
+      ]) {
+        if (!container) continue;
+        container.scrollTop = 0;
+        container.scrollTo({ top: 0, left: 0 });
+      }
+    };
+    const frame = requestAnimationFrame(resetEditorScroll);
+    return () => cancelAnimationFrame(frame);
+  }, [selectedPlace?.id, placeParam]);
 
   const selectedSourceAppellations = useMemo(() => {
     if (!allData?.geojson || !selectedId || isCreating) return [];

@@ -58,6 +58,9 @@ export interface E21Row {
   monthDeath: string;
   yearDeath: string;
   nameMother: string;
+  /** Post-1863 free name from the Emancipation Register (First_name + Family_name). */
+  emancipationFirstName: string;
+  emancipationFamilyName: string;
 }
 
 export interface PersonObservationRow {
@@ -66,6 +69,9 @@ export interface PersonObservationRow {
   idPerson: string;
   idSource: string;
   nameEnslaved: string;
+  /** Post-1863 free name carried on this observation's source row (Emancipation Register only). */
+  emancipationFirstName: string;
+  emancipationFamilyName: string;
   sex: string;
   age: string;
   plantationText: string;
@@ -166,7 +172,20 @@ export function transformPersons(): PersonTransformResult {
         monthDeath: (row.Month_death ?? '').trim(),
         yearDeath: (row.Year_death ?? '').trim(),
         nameMother: (row.Name_mother ?? '').trim(),
+        emancipationFirstName: (row.First_name ?? '').trim(),
+        emancipationFamilyName: (row.Family_name ?? '').trim(),
       });
+    } else {
+      // Later rows for the same Id_person may carry the Emancipation
+      // Register free name while earlier slave-register rows do not —
+      // backfill it so the E21 person always exposes the post-1863 name.
+      const existing = e21ByIdPerson.get(idPerson)!;
+      if (!existing.emancipationFirstName && (row.First_name ?? '').trim()) {
+        existing.emancipationFirstName = (row.First_name ?? '').trim();
+      }
+      if (!existing.emancipationFamilyName && (row.Family_name ?? '').trim()) {
+        existing.emancipationFamilyName = (row.Family_name ?? '').trim();
+      }
     }
 
     const plantationText = (row.Plantation ?? '').trim();
@@ -192,6 +211,8 @@ export function transformPersons(): PersonTransformResult {
       idPerson,
       idSource: (row.Id_source ?? '').trim(),
       nameEnslaved: (row.Name_enslaved ?? '').trim(),
+      emancipationFirstName: (row.First_name ?? '').trim(),
+      emancipationFamilyName: (row.Family_name ?? '').trim(),
       sex: (row.Sex ?? '').trim(),
       age: (row.Age ?? '').trim(),
       plantationText,

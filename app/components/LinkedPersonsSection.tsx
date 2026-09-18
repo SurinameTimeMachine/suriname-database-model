@@ -5,6 +5,8 @@ import { useMemo, useState } from 'react';
 interface LinkedPersonObservation {
   id: string;
   nameEnslaved?: string;
+  emancipationFirstName?: string;
+  emancipationFamilyName?: string;
   sex?: string;
   age?: string;
   plantationText?: string;
@@ -34,7 +36,43 @@ interface LinkedPerson {
   monthDeath?: string;
   yearDeath?: string;
   nameMother?: string;
+  emancipationFirstName?: string;
+  emancipationFamilyName?: string;
   observations: LinkedPersonObservation[];
+}
+
+function emancipationName(
+  firstName?: string,
+  familyName?: string,
+): string | null {
+  const full = [firstName?.trim(), familyName?.trim()]
+    .filter(Boolean)
+    .join(' ');
+  return full || null;
+}
+
+function emancipationNameFor(
+  person: Pick<
+    LinkedPerson,
+    'emancipationFirstName' | 'emancipationFamilyName'
+  >,
+  observations: LinkedPersonObservation[],
+): string | null {
+  return (
+    emancipationName(
+      person.emancipationFirstName,
+      person.emancipationFamilyName,
+    ) ??
+    observations
+      .map((observation) =>
+        emancipationName(
+          observation.emancipationFirstName,
+          observation.emancipationFamilyName,
+        ),
+      )
+      .find((name): name is string => name != null) ??
+    null
+  );
 }
 
 function formatDate(day?: string, month?: string, year?: string): string {
@@ -61,6 +99,10 @@ function PersonRow({ person }: { person: LinkedPerson }) {
     person.observations.find((o) => o.endYear)?.endYear;
   const birth = birthDisplay(person, firstObservationYear);
   const death = deathDisplay(person);
+  const postEmancipationName = emancipationNameFor(
+    person,
+    person.observations,
+  );
 
   return (
     <li className="border-l-2 border-teal-strong pl-3 py-1">
@@ -70,7 +112,14 @@ function PersonRow({ person }: { person: LinkedPerson }) {
         className="flex w-full flex-wrap items-baseline gap-x-2 gap-y-0.5 text-left text-sm"
         aria-expanded={open}
       >
-        <span className="bg-entity-e21 font-semibold text-stm-warm-800">{person.label}</span>
+        <span className="bg-entity-e21 font-semibold text-stm-warm-800">
+          {person.label}
+          {postEmancipationName &&
+            postEmancipationName.toLowerCase() !==
+              person.label.trim().toLowerCase() && (
+              <span className="font-normal"> ({postEmancipationName})</span>
+            )}
+        </span>
         {person.sex && <span className="text-ink/55">({person.sex})</span>}
         {birth && <span className="text-ink/65">b. {birth}</span>}
         {death && <span className="text-ink/65">d. {death}</span>}
@@ -120,6 +169,18 @@ function PersonRow({ person }: { person: LinkedPerson }) {
               {observation.registerType && (
                 <p className="mt-0.5 text-ink/45">{observation.registerType}</p>
               )}
+              {emancipationName(
+                observation.emancipationFirstName,
+                observation.emancipationFamilyName,
+              ) && (
+                <p className="mt-0.5">
+                  <span className="text-ink/45">Naam na emancipatie: </span>
+                  {emancipationName(
+                    observation.emancipationFirstName,
+                    observation.emancipationFamilyName,
+                  )}
+                </p>
+              )}
             </li>
           ))}
         </ol>
@@ -139,7 +200,11 @@ export default function LinkedPersonsSection({
     const q = query.trim().toLowerCase();
     if (!q) return persons;
     return persons.filter((person) =>
-      [person.label, person.nameMother]
+      [
+        person.label,
+        person.nameMother,
+        emancipationNameFor(person, person.observations),
+      ]
         .filter(Boolean)
         .some((text) => text!.toLowerCase().includes(q)),
     );
