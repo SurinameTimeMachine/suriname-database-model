@@ -503,6 +503,14 @@ export function buildContext(): Record<string, unknown> {
     monthDeath: { '@id': 'stm:monthDeath', '@type': 'xsd:integer' },
     yearDeath: { '@id': 'stm:yearDeath', '@type': 'xsd:gYear' },
     nameMother: { '@id': 'stm:nameMother', '@type': 'xsd:string' },
+    emancipationFirstName: {
+      '@id': 'stm:emancipationFirstName',
+      '@type': 'xsd:string',
+    },
+    emancipationFamilyName: {
+      '@id': 'stm:emancipationFamilyName',
+      '@type': 'xsd:string',
+    },
     age: { '@id': 'stm:age', '@type': 'xsd:string' },
     plantationText: { '@id': 'stm:plantationText', '@type': 'xsd:string' },
     ownerName: { '@id': 'stm:ownerName', '@type': 'xsd:string' },
