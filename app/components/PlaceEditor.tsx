@@ -1525,7 +1525,7 @@ export default function PlaceEditor({
   );
 
   return (
-    <div className="flex h-full min-h-0 w-full min-w-0 max-w-full flex-col overflow-hidden border border-stm-warm-200 bg-white shadow-sm">
+    <div className="flex h-auto min-h-0 w-full min-w-0 max-w-full flex-col overflow-visible border border-stm-warm-200 bg-white shadow-sm">
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-3 border-b border-stm-warm-100">
         <div className="min-w-0">
@@ -1581,7 +1581,7 @@ export default function PlaceEditor({
         </button>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="p-4 space-y-4">
         {canEdit && (
           <p className="border-l-2 border-stm-warm-400 bg-stm-sepia-50 px-3 py-2 text-xs text-stm-warm-700">
             Edit the Gazetteer record, not JSON-LD. Add a source to each
@@ -3084,11 +3084,11 @@ export default function PlaceEditor({
                   </a>
                 </p>
                 {concordansObservationCandidates.map((candidate) => (
-                  <div
+                  <details
                     key={candidate.key}
-                    className="border border-stm-sepia-200 bg-stm-sepia-50 p-2"
+                    className="border border-stm-sepia-200 bg-stm-sepia-50"
                   >
-                    <div className="flex items-center gap-2 text-xs">
+                    <summary className="flex cursor-pointer items-center gap-2 p-2 text-xs marker:text-stm-sepia-500">
                       <span className="font-mono font-semibold text-stm-sepia-800 shrink-0">
                         {candidate.year}
                       </span>
@@ -3104,37 +3104,39 @@ export default function PlaceEditor({
                       >
                         {candidate.certainty}
                       </span>
+                    </summary>
+                    <div className="space-y-1 px-2 pb-2">
+                      <p className="text-[10px] text-stm-warm-500">
+                        Concordans {candidate.eraLabel} · concordans-paramaribo
+                        {candidate.sourceRow != null &&
+                          ` · rij ${candidate.sourceRow}`}
+                      </p>
+                      {Object.keys(candidate.parcelComponents).length > 0 && (
+                        <p className="text-[10px] text-stm-warm-600">
+                          {Object.entries(candidate.parcelComponents)
+                            .map(
+                              ([component, value]) =>
+                                `${CONCORDANS_PARCEL_LABELS[component] ?? component}: ${value}`,
+                            )
+                            .join(' · ')}
+                        </p>
+                      )}
+                      {candidate.note && (
+                        <p className="text-[10px] font-medium text-stm-warm-700">
+                          {candidate.note}
+                        </p>
+                      )}
+                      {canEdit && (
+                        <button
+                          type="button"
+                          onClick={() => adoptConcordansObservation(candidate)}
+                          className="mt-0.5 text-xs text-stm-sepia-600 hover:text-stm-sepia-800 underline"
+                        >
+                          Adopt into editable assertions
+                        </button>
+                      )}
                     </div>
-                    <p className="mt-1 text-[10px] text-stm-warm-500">
-                      Concordans {candidate.eraLabel} · concordans-paramaribo
-                      {candidate.sourceRow != null &&
-                        ` · rij ${candidate.sourceRow}`}
-                    </p>
-                    {Object.keys(candidate.parcelComponents).length > 0 && (
-                      <p className="mt-1 text-[10px] text-stm-warm-600">
-                        {Object.entries(candidate.parcelComponents)
-                          .map(
-                            ([component, value]) =>
-                              `${CONCORDANS_PARCEL_LABELS[component] ?? component}: ${value}`,
-                          )
-                          .join(' · ')}
-                      </p>
-                    )}
-                    {candidate.note && (
-                      <p className="mt-1 text-[10px] font-medium text-stm-warm-700">
-                        {candidate.note}
-                      </p>
-                    )}
-                    {canEdit && (
-                      <button
-                        type="button"
-                        onClick={() => adoptConcordansObservation(candidate)}
-                        className="mt-1.5 text-xs text-stm-sepia-600 hover:text-stm-sepia-800 underline"
-                      >
-                        Adopt into editable assertions
-                      </button>
-                    )}
-                  </div>
+                  </details>
                 ))}
               </div>
             )}
