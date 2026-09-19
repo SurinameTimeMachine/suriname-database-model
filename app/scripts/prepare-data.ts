@@ -780,6 +780,61 @@ if (existsSync(personsPath)) {
   }
 }
 
+// Ward Register residents (1828-1847) grouped by 1885 address-point place.
+// The linker emits one WardAddressLink per source row; each place-id in the
+// link fans out to that place's bucket. Buckets are sorted by (year, address,
+// source record) for stable, payload-friendly rendering downstream.
+const wardResidentsByPlace: Record<string, Record<string, unknown>[]> = {};
+const wardLinksPath = join(DATA_DIR, 'paramaribo-ward-register-address-links.json');
+if (existsSync(wardLinksPath)) {
+  const wardDocument = JSON.parse(readFileSync(wardLinksPath, 'utf-8')) as {
+    links?: Array<Record<string, unknown>>;
+  };
+  for (const link of wardDocument.links ?? []) {
+    const placeIds = Array.isArray(link.placeIds)
+      ? (link.placeIds as unknown[]).filter(
+          (placeId): placeId is string => typeof placeId === 'string',
+        )
+      : [];
+    if (placeIds.length === 0) continue;
+    const record = {
+      id: link.id,
+      sourceRecordId: link.sourceRecordId,
+      year: link.year,
+      regime: link.regime,
+      sourceAddress: link.sourceAddress,
+      observedPersons: link.observedPersons,
+      enslavedRemarks: link.enslavedRemarks,
+      sourceScan: link.sourceScan,
+      householdHead: link.householdHead,
+      matchStrategy: link.matchStrategy,
+      certainty: link.certainty,
+    };
+    for (const placeId of placeIds) {
+      wardResidentsByPlace[placeId] ??= [];
+      wardResidentsByPlace[placeId].push(record);
+    }
+  }
+  for (const records of Object.values(wardResidentsByPlace)) {
+    records.sort(
+      (a, b) =>
+        Number(a.year ?? 0) - Number(b.year ?? 0) ||
+        String(
+          (a.sourceAddress as Record<string, unknown> | undefined)
+            ?.addressFull ?? '',
+        ).localeCompare(
+          String(
+            (b.sourceAddress as Record<string, unknown> | undefined)
+              ?.addressFull ?? '',
+          ),
+        ) ||
+        String(a.sourceRecordId ?? '').localeCompare(
+          String(b.sourceRecordId ?? ''),
+        ),
+    );
+  }
+}
+
 const compositionPeriodsByOrg: Record<string, unknown[]> = {};
 for (const period of compositionPeriods) {
   const participants = [
@@ -1563,6 +1618,7 @@ writeJSON('appellations-by-entity.json', appellationsByEntity);
 writeJSON('observations-by-org.json', observationsByOrg);
 writeJSON('images-by-org.json', imagesByOrg);
 writeJSON('persons-by-org.json', personsByOrg);
+writeJSON('ward-residents-by-place.json', wardResidentsByPlace);
 writeJSON('organization-composition-periods.json', compositionPeriodsByOrg);
 writeJSON('presence-inferences-by-plantation.json', presenceInferencesByPlantation);
 writeJSON('lifecycle-events.json', lifecycleEventsByEntity);

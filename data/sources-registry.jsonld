@@ -209,8 +209,8 @@
       "prefLabel": "Paramaribo Ward Registers (1828-1847)",
       "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/register",
       "timeSpan": "1828-1847",
-      "linkedToGazetteer": false,
-      "description": "Census-like registration of free persons in Paramaribo. 102,260 records including demographics, household enslaved counts, and addresses."
+      "linkedToGazetteer": true,
+      "description": "Census-like registration of free persons in Paramaribo. 102,260 source records (100,260 ingested rows, 100,109 with address keys) including demographics, individualized enslaved person attestations, and addresses linked to 1885 location points via the Concordans Paramaribo."
     },
     {
       "@id": "https://data.surinametijdmachine.org/source/death-certificates",

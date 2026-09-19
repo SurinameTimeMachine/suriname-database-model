@@ -416,6 +416,52 @@ export interface SourceAttribution {
   url: string;
 }
 
+/** Ward Register (1828-1847) source address carried on a resident link. */
+export interface WardRegisterSourceAddress {
+  addressFull: string | null;
+  streetName: string | null;
+  ward: string | null;
+  wardLetter: string;
+  houseNumber: string;
+  addition: string | null;
+  room: string | null;
+  neighbourhoodCode: string | null;
+  locationNote: string | null;
+  addressRemarks: string | null;
+}
+
+/** Individualized Ward Register person attestation (free or enslaved). */
+export interface WardRegisterObservedPerson {
+  id: string;
+  status: 'free' | 'enslaved';
+  name: string | null;
+  age: string | null;
+  sex: string | null;
+  recordedCategory: string | null;
+  ageGroup: 'adult' | 'child' | 'unknown' | null;
+  ethnicity: string | null;
+  occupation: string | null;
+  origin: string | null;
+  religion: string | null;
+  householdContext: string | null;
+  notes: string | null;
+}
+
+/** Ward Register address link attached to an 1885 address-point place. */
+export interface WardRegisterResidentLink {
+  id: string;
+  sourceRecordId: string;
+  year: number;
+  regime: 'ow' | 'nw';
+  sourceAddress: WardRegisterSourceAddress;
+  observedPersons: WardRegisterObservedPerson[];
+  enslavedRemarks: string | null;
+  sourceScan: string | null;
+  householdHead: string | null;
+  matchStrategy: string;
+  certainty: 'certain' | 'probable' | 'unresolved';
+}
+
 /**
  * Plantation lifecycle status — vocabulary for E55 Type (type/plantation-status/*).
  * CRM: E17 Type Assignment (P41 classified E25 Plantation, P42 assigned E55 Type).
