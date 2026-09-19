@@ -162,6 +162,9 @@ function countField(value: string | undefined): number {
 }
 
 function namedFreePerson(row: WardRow, kaartHead: string | null): ObservedPerson | null {
+  // Rows flagged Enslaved=1 describe an enslaved resident — they are
+  // attested by namedEnslavedPerson() below, never as free.
+  if (clean(row.Enslaved) === '1') return null;
   const name = [
     clean(row.Voornaam),
     clean(row.Tussenvoegsel),
@@ -283,34 +286,25 @@ function parseCsvFile(path: string, encoding: BufferEncoding = 'utf-8'): Concord
 }
 
 function loadWardRows(): WardRow[] {
-  // Free-text remarks contain unescaped double quotes and semicolons, so the
-  // single-quoted header plus quote:false parsing breaks on long rows.
-  // Parse manually: header is single-quoted, fields split on ';' with the
-  // surplus trailing field folded back into the last column.
+  // Quote-aware parse (csv-parse, same as the rest of the pipeline):
+  // free-text remarks (Remarks_Orig) contain quoted fields with embedded
+  // semicolons (e.g. "vendumeester; [overleden ...]") that naive
+  // line.split(';') would shred into the wrong columns.
   const raw = readFileSync(WARD_REGISTERS_CSV, 'utf-8').replace(/^﻿/, '');
-  const lines = raw.split('\n').filter((line) => line.trim().length > 0);
-  const header = (lines[0] ?? '').split(';').map((column) =>
-    column
-      .trim()
-      .replace(/^'/, '')
-      .replace(/'$/, '')
-      .trim(),
-  );
-  const rows: WardRow[] = [];
-  for (const line of lines.slice(1)) {
-    const fields = line.split(';');
-    while (fields.length > header.length) {
-      const extra = fields.pop() as string;
-      fields[fields.length - 1] += `;${extra}`;
-    }
-    if (fields.length < header.length) continue;
-    const row: WardRow = {};
-    header.forEach((column, index) => {
-      row[column] = (fields[index] ?? '').trim();
-    });
-    rows.push(row);
-  }
-  return rows;
+  return parse(raw, {
+    columns: (header: string[]) =>
+      header.map((column) =>
+        column
+          .trim()
+          .replace(/^'/, '')
+          .replace(/'$/, '')
+          .trim(),
+      ),
+    skip_empty_lines: true,
+    trim: true,
+    delimiter: ';',
+    relax_column_count: true,
+  }) as WardRow[];
 }
 
 function streetIndex(): Map<string, string> {
@@ -483,7 +477,10 @@ function main() {
         const stored = link.certaintyByPlace[placeId] ?? 'probable';
         const combined = lowerCertainty(base, stored);
         const existing = placeCertainty.get(placeId);
-        if (!existing || combined === 'certain') placeCertainty.set(placeId, combined);
+        placeCertainty.set(
+          placeId,
+          existing == null ? combined : lowerCertainty(existing, combined),
+        );
       }
     }
     // Street cross-check: demote one level on mismatch, never promote.
