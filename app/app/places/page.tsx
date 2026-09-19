@@ -932,8 +932,6 @@ function PlacesPageInner() {
     useState<PublicationNotice | null>(null);
   const columnsRef = useRef<HTMLDivElement>(null);
   const tableScrollRef = useRef<HTMLDivElement>(null);
-  const desktopEditorScrollRef = useRef<HTMLDivElement>(null);
-  const mobileEditorScrollRef = useRef<HTMLDivElement>(null);
 
   // URL sync: read ?place= query param
   const searchParams = useSearchParams();
@@ -1451,6 +1449,7 @@ function PlacesPageInner() {
     return places.find((p) => p.id === selectedId) || null;
   }, [places, selectedId, isCreating]);
 
+  // Keep the selected table row in view within the left pane.
   useEffect(() => {
     if (!selectedId || isCreating) return;
     const row = tableScrollRef.current?.querySelector<HTMLElement>(
@@ -1458,29 +1457,6 @@ function PlacesPageInner() {
     );
     row?.scrollIntoView({ block: 'nearest' });
   }, [selectedId, isCreating, filtered]);
-
-  // Reset both editor panel scrollers to the top on record change. The
-  // panel wrappers persist across selections (only PlaceEditor remounts via
-  // key), so without this the pane keeps its previous scroll position.
-  // requestAnimationFrame defers past the remount/reflow so the freshly
-  // rendered (often taller) PlaceEditor is measured, then both the direct
-  // scrollTop assignment and the scrollTo fallback reset the position.
-  // Keyed on both the selected record and the ?place= URL param so
-  // back/forward navigation resets as well.
-  useEffect(() => {
-    const resetEditorScroll = () => {
-      for (const container of [
-        desktopEditorScrollRef.current,
-        mobileEditorScrollRef.current,
-      ]) {
-        if (!container) continue;
-        container.scrollTop = 0;
-        container.scrollTo({ top: 0, left: 0 });
-      }
-    };
-    const frame = requestAnimationFrame(resetEditorScroll);
-    return () => cancelAnimationFrame(frame);
-  }, [selectedPlace?.id, placeParam]);
 
   const selectedSourceAppellations = useMemo(() => {
     if (!allData?.geojson || !selectedId || isCreating) return [];
@@ -1751,7 +1727,7 @@ function PlacesPageInner() {
   }
 
   return (
-    <div className="relative flex h-dvh min-h-0 flex-col overflow-hidden">
+    <div className="relative flex min-h-0 flex-col">
       {/* Top bar */}
       <div className="border-b border-ink/10 bg-cream">
         <div className="px-4 py-3 sm:px-6 lg:px-8">
@@ -2056,11 +2032,11 @@ function PlacesPageInner() {
           )}
 
           {/* Main content: table + editor */}
-          <div className="flex min-h-0 flex-1 overflow-hidden">
+          <div className="flex items-start gap-0">
             {/* Place table */}
             <div
               ref={tableScrollRef}
-              className="min-w-0 flex-1 overflow-auto"
+              className="min-w-0 flex-1"
             >
               <div className="px-4 pb-4 sm:px-6 lg:px-8">
                 <table className="w-full min-w-max border-collapse border border-ink/10 bg-cream/70 text-sm shadow-[0_15px_35px_rgba(0,30,24,0.08)]">
@@ -2175,13 +2151,12 @@ function PlacesPageInner() {
               </div>
             </div>
 
-            {/* Detail panel */}
+            {/* Detail panel — sticky viewport alignment: the pane
+                tracks the user's active viewport beside the selected row
+                instead of relying on inner scroll resets. */}
             {selectedPlace && (
-              <aside className="absolute inset-y-0 right-0 z-40 hidden w-[clamp(34rem,52vw,58rem)] flex-col border-l border-ink/10 bg-background shadow-[-20px_0_50px_rgba(0,30,24,0.16)] lg:flex">
-                <div
-                  ref={desktopEditorScrollRef}
-                  className="min-h-0 flex-1 overflow-y-auto"
-                >
+              <aside className="sticky top-4 z-40 hidden max-h-[calc(100vh-2rem)] w-[clamp(34rem,52vw,58rem)] shrink-0 flex-col overflow-y-auto border-l border-ink/10 bg-background shadow-[-20px_0_50px_rgba(0,30,24,0.16)] lg:flex">
+                <div className="min-h-0 flex-1">
                   <PlaceEditor
                     key={selectedPlace.id}
                     place={selectedPlace}
@@ -2210,11 +2185,8 @@ function PlacesPageInner() {
             )}
 
             {selectedPlace && (
-              <div className="fixed inset-0 z-50 flex w-screen max-w-full flex-col bg-background lg:hidden">
-                <div
-                  ref={mobileEditorScrollRef}
-                  className="min-h-0 flex-1 overflow-y-auto"
-                >
+              <div className="fixed inset-0 z-50 flex w-screen max-w-full flex-col overflow-y-auto bg-background lg:hidden">
+                <div className="min-h-0 flex-1">
                   <PlaceEditor
                     key={selectedPlace.id}
                     place={selectedPlace}
