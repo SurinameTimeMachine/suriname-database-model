@@ -23,6 +23,7 @@ import type {
   SkosMatchType,
   SourceAttribution,
   StatusAssertion,
+  WardRegisterResidentLink,
 } from '@/lib/types';
 import { getPreferredName } from '@/lib/types';
 import { buildExploreUrl } from '@/lib/url';
@@ -41,6 +42,8 @@ interface PlaceEditorProps {
   /** Derived Concordans links for this record; kept out of the save payload. */
   historicalAddresses?: HistoricalAddressLink[];
   concordansSourceAttribution?: SourceAttribution | null;
+  /** Derived Ward Register resident links (1828-1847); read-only. */
+  wardResidents?: WardRegisterResidentLink[];
   canEdit: boolean;
   onSave: (place: GazetteerPlace) => Promise<void>;
   onCancel: () => void;
@@ -657,6 +660,7 @@ export default function PlaceEditor({
   organizationContext,
   historicalAddresses = [],
   concordansSourceAttribution = null,
+  wardResidents = [],
   canEdit,
   onSave,
   onCancel,
@@ -1045,6 +1049,46 @@ export default function PlaceEditor({
         ),
       }));
   }, [concordansObservationCandidates]);
+
+  type WardResidentYearGroup = {
+    year: number;
+    previewAddress: string;
+    personCount: number;
+    records: WardRegisterResidentLink[];
+  };
+
+  // Group Ward Register observations strictly by year so there is EXACTLY
+  // ONE <details> accordion per year, mirroring the Concordans grouping.
+  const wardResidentsByYear: WardResidentYearGroup[] = useMemo(() => {
+    const byYear = new Map<number, WardRegisterResidentLink[]>();
+    for (const record of wardResidents) {
+      const list = byYear.get(record.year);
+      if (list) list.push(record);
+      else byYear.set(record.year, [record]);
+    }
+    return [...byYear.entries()]
+      .sort((a, b) => a[0] - b[0])
+      .map(([year, records]) => {
+        const sorted = [...records].sort(
+          (a, b) =>
+            (a.sourceAddress.addressFull ?? '').localeCompare(
+              b.sourceAddress.addressFull ?? '',
+            ) || a.sourceRecordId.localeCompare(b.sourceRecordId),
+        );
+        return {
+          year,
+          previewAddress:
+            sorted[0]?.sourceAddress.addressFull ??
+            sorted[0]?.householdHead ??
+            `${sorted.length} observations`,
+          personCount: sorted.reduce(
+            (total, record) => total + record.observedPersons.length,
+            0,
+          ),
+          records: sorted,
+        };
+      });
+  }, [wardResidents]);
 
   const adoptedConcordansRows = useMemo(() => {
     const rows: Array<{
@@ -3198,6 +3242,125 @@ export default function PlaceEditor({
                     </details>
                   );
                 })}
+              </div>
+            )}
+            {wardResidents.length > 0 && (
+              <div className="mt-3 space-y-2">
+                <p className="text-[10px] text-stm-sepia-600 tracking-wider">
+                  Wijkregister bewoners (1828–1847) — Ward register residents
+                  (read-only) · {wardResidents.length} observations
+                </p>
+                {wardResidentsByYear.map((group) => (
+                  <details
+                    key={`ward-year-${group.year}`}
+                    className="border border-stm-sepia-200 bg-stm-sepia-50"
+                  >
+                    <summary className="flex cursor-pointer items-center gap-2 p-2 text-xs marker:text-stm-sepia-500">
+                      <span className="font-mono font-semibold text-stm-sepia-800 shrink-0">
+                        {group.year}
+                      </span>
+                      <span className="text-stm-warm-700 truncate">
+                        {group.previewAddress}
+                      </span>
+                      {group.records.length > 1 && (
+                        <span className="font-mono text-[10px] text-stm-warm-500 shrink-0">
+                          ×{group.records.length}
+                        </span>
+                      )}
+                      <span className="ml-auto px-1.5 py-0.5 text-[10px] font-medium shrink-0 bg-stm-sepia-200 text-stm-warm-800">
+                        {group.personCount}{' '}
+                        {group.personCount === 1 ? 'person' : 'persons'}
+                      </span>
+                    </summary>
+                    <div className="space-y-2 px-2 pb-2">
+                      {group.records.map((record) => (
+                        <div
+                          key={record.id}
+                          className="space-y-1 border-t border-stm-sepia-200/70 pt-1.5 first:border-t-0 first:pt-0"
+                        >
+                          <p className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[10px] text-stm-warm-500">
+                            <span className="font-mono font-semibold text-stm-sepia-800">
+                              {record.sourceAddress.addressFull ??
+                                `${record.sourceAddress.wardLetter}${record.sourceAddress.houseNumber}`}
+                            </span>
+                            <span
+                              className={`px-1.5 py-0.5 text-[10px] font-medium ${
+                                record.certainty === 'certain'
+                                  ? 'bg-stm-sepia-600 text-white'
+                                  : 'bg-stm-sepia-200 text-stm-warm-800'
+                              }`}
+                            >
+                              {record.certainty}
+                            </span>
+                            {record.householdHead && (
+                              <span className="text-stm-warm-700">
+                                {record.householdHead}
+                              </span>
+                            )}
+                          </p>
+                          {record.observedPersons.length > 0 ? (
+                            <ul className="space-y-0.5">
+                              {record.observedPersons.map((person) => (
+                                <li
+                                  key={person.id}
+                                  className="flex flex-wrap items-baseline gap-x-1.5 text-[10px] text-stm-warm-700"
+                                >
+                                  <span className="font-medium">
+                                    {person.name ?? (
+                                      <span className="italic text-stm-warm-500">
+                                        unnamed ({person.recordedCategory ?? person.status})
+                                      </span>
+                                    )}
+                                  </span>
+                                  <span className="text-stm-warm-500">
+                                    {[
+                                      person.status,
+                                      person.sex,
+                                      person.age ? `age ${person.age}` : null,
+                                      person.recordedCategory,
+                                      person.occupation,
+                                      person.origin,
+                                      person.religion,
+                                    ]
+                                      .filter(Boolean)
+                                      .join(' · ')}
+                                  </span>
+                                </li>
+                              ))}
+                            </ul>
+                          ) : (
+                            <p className="text-[10px] italic text-stm-warm-500">
+                              No individualized residents recorded.
+                            </p>
+                          )}
+                          <p className="text-[10px] text-stm-warm-500">
+                            ward-registers · {record.regime === 'ow' ? 'Oude Wijk' : 'Nieuwe Wijk'}
+                            {record.matchStrategy != null &&
+                              ` · ${record.matchStrategy}`}
+                            {record.sourceScan != null && (
+                              <>
+                                {' · '}
+                                <a
+                                  href={record.sourceScan}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-stm-sepia-700 underline decoration-stm-sepia-300 underline-offset-2 hover:text-stm-sepia-800"
+                                >
+                                  scan
+                                </a>
+                              </>
+                            )}
+                          </p>
+                          {record.enslavedRemarks && (
+                            <p className="text-[10px] font-medium text-stm-warm-700">
+                              {record.enslavedRemarks}
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </details>
+                ))}
               </div>
             )}
           </div>

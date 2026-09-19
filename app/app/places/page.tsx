@@ -23,6 +23,7 @@ import type {
   PlaceName,
   SourceAttribution,
   StatusAssertion,
+  WardRegisterResidentLink,
 } from '@/lib/types';
 import { getPreferredName } from '@/lib/types';
 import { extractPlaceId } from '@/lib/url';
@@ -898,6 +899,7 @@ function PlacesPageInner() {
       {
         historicalAddresses?: HistoricalAddressLink[];
         concordansSourceAttribution?: SourceAttribution | null;
+        wardResidents?: WardRegisterResidentLink[];
       }
     >
   >(new Map());
@@ -1005,6 +1007,7 @@ function PlacesPageInner() {
             historicalAddresses: projection.historicalAddresses ?? [],
             concordansSourceAttribution:
               projection.concordansSourceAttribution ?? null,
+            wardResidents: projection.wardResidents ?? [],
           });
           return next;
         });
@@ -2199,6 +2202,10 @@ function PlacesPageInner() {
                       historicalAddressesByPlace.get(selectedPlace.id)
                         ?.concordansSourceAttribution ?? null
                     }
+                    wardResidents={
+                      historicalAddressesByPlace.get(selectedPlace.id)
+                        ?.wardResidents ?? []
+                    }
                     canEdit={canEdit}
                     onSave={handleSave}
                     onCancel={handleCancel}
@@ -2231,6 +2238,10 @@ function PlacesPageInner() {
                     concordansSourceAttribution={
                       historicalAddressesByPlace.get(selectedPlace.id)
                         ?.concordansSourceAttribution ?? null
+                    }
+                    wardResidents={
+                      historicalAddressesByPlace.get(selectedPlace.id)
+                        ?.wardResidents ?? []
                     }
                     canEdit={canEdit}
                     onSave={handleSave}

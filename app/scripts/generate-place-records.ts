@@ -43,6 +43,24 @@ const PARAMARIBO_CONCORDANCE_PATH = join(
   DATA_DIR,
   'paramaribo-address-concordance.json',
 );
+const WARD_REGISTER_LINKS_PATH = join(
+  DATA_DIR,
+  'paramaribo-ward-register-address-links.json',
+);
+
+type WardResidentRecord = {
+  id?: unknown;
+  sourceRecordId?: unknown;
+  year?: unknown;
+  regime?: unknown;
+  sourceAddress?: unknown;
+  observedPersons?: unknown;
+  enslavedRemarks?: unknown;
+  sourceScan?: unknown;
+  householdHead?: unknown;
+  matchStrategy?: unknown;
+  certainty?: unknown;
+};
 
 type JsonObject = Record<string, unknown>;
 
@@ -199,6 +217,57 @@ function readHistoricalAddressLinks(): Map<string, HistoricalAddressLink[]> {
         result.set(placeId, [narrowed]);
       }
     }
+  }
+  return result;
+}
+
+function readWardResidentLinks(): Map<string, WardResidentRecord[]> {
+  if (!existsSync(WARD_REGISTER_LINKS_PATH)) return new Map();
+  const document = JSON.parse(readFileSync(WARD_REGISTER_LINKS_PATH, 'utf-8')) as {
+    links?: Array<WardResidentRecord & { placeIds?: unknown }>;
+  };
+  const result = new Map<string, WardResidentRecord[]>();
+  for (const link of document.links ?? []) {
+    const placeIds = Array.isArray(link.placeIds)
+      ? link.placeIds.filter(
+          (placeId): placeId is string => typeof placeId === 'string',
+        )
+      : [];
+    if (placeIds.length === 0) continue;
+    const {
+      placeIds: _placeIds,
+      concordansIds: _concordansIds,
+      ...record
+    } = link as WardResidentRecord & {
+      placeIds?: unknown;
+      concordansIds?: unknown;
+    };
+    for (const placeId of placeIds) {
+      const bucket = result.get(placeId);
+      if (bucket) {
+        bucket.push(record);
+      } else {
+        result.set(placeId, [record]);
+      }
+    }
+  }
+  for (const records of result.values()) {
+    records.sort(
+      (a, b) =>
+        Number(a.year ?? 0) - Number(b.year ?? 0) ||
+        String(
+          (a.sourceAddress as Record<string, unknown> | undefined)
+            ?.addressFull ?? '',
+        ).localeCompare(
+          String(
+            (b.sourceAddress as Record<string, unknown> | undefined)
+              ?.addressFull ?? '',
+          ),
+        ) ||
+        String(a.sourceRecordId ?? '').localeCompare(
+          String(b.sourceRecordId ?? ''),
+        ),
+    );
   }
   return result;
 }
@@ -382,6 +451,7 @@ export function generatePlaceRecords() {
       .map((entry) => [entry.sourceId as string, entry['@id'] as string]),
   );
   const historicalAddressesByPlace = readHistoricalAddressLinks();
+  const wardResidentsByPlace = readWardResidentLinks();
   mkdirSync(OUT_DIR, { recursive: true });
   mkdirSync(PROJECTIONS_DIR, { recursive: true });
   if (existsSync(OUT_DIR)) {
@@ -1121,6 +1191,10 @@ export function generatePlaceRecords() {
       historicalAddresses:
         entry.type === 'historical-address'
           ? (historicalAddressesByPlace.get(entry.id) ?? [])
+          : [],
+      wardResidents:
+        entry.type === 'historical-address'
+          ? (wardResidentsByPlace.get(entry.id) ?? [])
           : [],
       almanakkenObservations,
       diklandRefs: asArray(entry.diklandRefs),
