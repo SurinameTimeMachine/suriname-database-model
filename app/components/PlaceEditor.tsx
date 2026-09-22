@@ -57,6 +57,12 @@ export interface PlaceOrganizationContext {
   linkedPlantations: E25Plantation[];
   observations: OrganizationObservation[];
   qid: string | null;
+  /** Enslaved-person attestations linked to the organization entity. */
+  linkedPersons?: Array<{
+    id: string;
+    label: string;
+    observations: Array<Record<string, unknown>>;
+  }>;
 }
 
 interface AlmanakkenReviewEntry {
@@ -1695,6 +1701,28 @@ export default function PlaceEditor({
                     No organization linked
                   </div>
                 )}
+                {(organizationContext.linkedPersons?.length ?? 0) > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      document
+                        .getElementById('organization-linked-persons')
+                        ?.scrollIntoView({
+                          behavior: 'smooth',
+                          block: 'start',
+                        });
+                    }}
+                    className="mt-1 block text-left text-sm text-indigo-700 hover:text-indigo-900 hover:underline"
+                  >
+                    {organizationContext.linkedPersons!.reduce(
+                      (total, person) =>
+                        total + (person.observations?.length ?? 0),
+                      0,
+                    )}{' '}
+                    people in slavery are linked to this organization entity
+                    →
+                  </button>
+                )}
               </div>
               <span
                 className={`w-fit border px-2 py-1 text-[10px] font-medium sm:justify-self-end ${
@@ -1824,6 +1852,65 @@ export default function PlaceEditor({
                 <p className="mt-2 text-[11px] leading-4 text-stm-warm-600">
                   These are dated source transcriptions about the organization;
                   they do not by themselves assert ownership of the land.
+                </p>
+              </div>
+            )}
+
+            {(organizationContext.linkedPersons?.length ?? 0) > 0 && (
+              <div
+                id="organization-linked-persons"
+                className="mt-3 scroll-mt-4 border-t border-stm-warm-200 pt-3"
+              >
+                <div className="mb-1 grid min-w-0 grid-cols-1 gap-1 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+                  <span className="font-medium">
+                    People in slavery linked to this organization
+                  </span>
+                  <span className="font-mono text-[10px] text-stm-warm-500 sm:text-right">
+                    {organizationContext.linkedPersons!.length}{' '}
+                    {organizationContext.linkedPersons!.length === 1
+                      ? 'person'
+                      : 'persons'}
+                    {' · '}
+                    {organizationContext.linkedPersons!.reduce(
+                      (total, person) =>
+                        total + (person.observations?.length ?? 0),
+                      0,
+                    )}{' '}
+                    attestations
+                  </span>
+                </div>
+                <div className="max-h-40 overflow-auto border border-stm-warm-200 bg-white">
+                  {organizationContext.linkedPersons!.map((person) => (
+                    <div
+                      key={person.id}
+                      className="grid grid-cols-[minmax(0,1fr)_auto] gap-2 border-b border-stm-warm-100 px-2 py-1 last:border-b-0"
+                    >
+                      <span className="min-w-0 break-words">
+                        {person.label}
+                      </span>
+                      <span className="font-mono text-stm-warm-500">
+                        {person.observations?.length ?? 0}{' '}
+                        {(person.observations?.length ?? 0) === 1
+                          ? 'attestation'
+                          : 'attestations'}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-2 text-[11px] leading-4 text-stm-warm-600">
+                  Full person records with observation details are available
+                  on the{' '}
+                  <Link
+                    href={`/organizations?organization=${encodeURIComponent(
+                      organizationContext.qid ??
+                        organizationContext.organization?.['@id'] ??
+                        '',
+                    )}`}
+                    className="text-indigo-700 hover:text-indigo-900 hover:underline"
+                  >
+                    organization page
+                  </Link>
+                  .
                 </p>
               </div>
             )}
