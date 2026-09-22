@@ -291,6 +291,20 @@ const CONCORDANS_PARCEL_LABELS: Record<string, string> = {
   side: 'zijde',
 };
 
+/**
+ * Format a Ward Register origin value for display: normalize the historical
+ * term "Inboorling" (case-insensitive) to "Suriname" and prefix non-empty
+ * values with the "Herkomst: " label. Returns null when there is nothing
+ * to render.
+ */
+function formatWardOrigin(origin: string | null | undefined): string | null {
+  const raw = origin?.trim();
+  if (!raw) return null;
+  const normalized =
+    raw.toLowerCase() === 'inboorling' ? 'Suriname' : raw;
+  return `Herkomst: ${normalized}`;
+}
+
 // The shared HistoricalAddressLink shape (lib/types) is the projection
 // shape consumed here; the HistoricalAddress alias below preserves the
 // previous component export consumed by /place/[id].
@@ -3338,7 +3352,7 @@ export default function PlaceEditor({
                                       person.age ? `age ${person.age}` : null,
                                       person.recordedCategory,
                                       person.occupation,
-                                      person.origin,
+                                      formatWardOrigin(person.origin),
                                       person.religion,
                                     ]
                                       .filter(Boolean)
