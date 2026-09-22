@@ -317,8 +317,9 @@ export async function startParticipant(nickname: string): Promise<{
   });
 }
 
-export async function claimTask(participantId: string): Promise<ClaimResponse> {
+export async function claimTask(participantId: string, excludeTaskId?: string): Promise<ClaimResponse> {
   return await getSql().begin(async (db) => {
+    const exclude = excludeTaskId?.trim() ? excludeTaskId.trim() : null;
     const participants = await db<ParticipantIdRow[]>`
       update participants
       set last_seen_at = now()
@@ -351,32 +352,60 @@ export async function claimTask(participantId: string): Promise<ClaimResponse> {
     }
 
     // Round 1: hand out every task once before any task is offered a second time.
+    // The just-skipped task is excluded so a single skip can never hand back
+    // the same image (it returns to 'unoffered' and would otherwise be
+    // re-selected by the task_id ordering below).
     let round: 1 | 2 = 1;
-    let candidates = await db<TaskIdRow[]>`
-      select t.task_id
-      from tasks t
-      left join claims c on c.claim_id = t.current_claim_id
-      where t.status = 'unoffered'
-         or (t.status = 'assigned' and c.round = 1 and c.lease_until <= now())
-      order by t.task_id asc
-      limit 1
-      for update of t skip locked`;
+    let candidates = exclude
+      ? await db<TaskIdRow[]>`
+        select t.task_id
+        from tasks t
+        left join claims c on c.claim_id = t.current_claim_id
+        where t.task_id <> ${exclude}
+          and (t.status = 'unoffered'
+            or (t.status = 'assigned' and c.round = 1 and c.lease_until <= now()))
+        order by t.task_id asc
+        limit 1
+        for update of t skip locked`
+      : await db<TaskIdRow[]>`
+        select t.task_id
+        from tasks t
+        left join claims c on c.claim_id = t.current_claim_id
+        where t.status = 'unoffered'
+           or (t.status = 'assigned' and c.round = 1 and c.lease_until <= now())
+        order by t.task_id asc
+        limit 1
+        for update of t skip locked`;
 
     if (candidates.length === 0) {
       // Round 2: re-review the same tasks, but never assign one back to its round-1 reviewer.
       round = 2;
-      candidates = await db<TaskIdRow[]>`
-        select t.task_id
-        from tasks t
-        left join claims c on c.claim_id = t.current_claim_id
-        where t.round1_participant is distinct from ${participantId}
-          and (
-            t.status = 'pending-round-2'
-            or (t.status = 'assigned' and c.round = 2 and c.lease_until <= now())
-          )
-        order by t.assignment_count asc, t.last_assigned_at asc nulls first
-        limit 1
-        for update of t skip locked`;
+      candidates = exclude
+        ? await db<TaskIdRow[]>`
+          select t.task_id
+          from tasks t
+          left join claims c on c.claim_id = t.current_claim_id
+          where t.task_id <> ${exclude}
+            and t.round1_participant is distinct from ${participantId}
+            and (
+              t.status = 'pending-round-2'
+              or (t.status = 'assigned' and c.round = 2 and c.lease_until <= now())
+            )
+          order by t.assignment_count asc, t.last_assigned_at asc nulls first
+          limit 1
+          for update of t skip locked`
+        : await db<TaskIdRow[]>`
+          select t.task_id
+          from tasks t
+          left join claims c on c.claim_id = t.current_claim_id
+          where t.round1_participant is distinct from ${participantId}
+            and (
+              t.status = 'pending-round-2'
+              or (t.status = 'assigned' and c.round = 2 and c.lease_until <= now())
+            )
+          order by t.assignment_count asc, t.last_assigned_at asc nulls first
+          limit 1
+          for update of t skip locked`;
     }
 
     if (candidates.length === 0) {
