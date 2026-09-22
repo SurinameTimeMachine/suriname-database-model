@@ -1054,6 +1054,7 @@ export default function PlaceEditor({
     year: number;
     previewAddress: string;
     personCount: number;
+    certainty: WardRegisterResidentLink['certainty'];
     records: WardRegisterResidentLink[];
   };
 
@@ -1085,6 +1086,13 @@ export default function PlaceEditor({
             (total, record) => total + record.observedPersons.length,
             0,
           ),
+          // The year group inherits the weakest address-match certainty of
+          // its records: one probable link degrades the whole group badge.
+          certainty: sorted.some(
+            (record) => record.certainty !== 'certain',
+          )
+            ? 'probable'
+            : 'certain',
           records: sorted,
         };
       });
@@ -3246,9 +3254,16 @@ export default function PlaceEditor({
             )}
             {wardResidents.length > 0 && (
               <div className="mt-3 space-y-2">
+                <label className="block text-sm font-medium text-stm-warm-700">
+                  Wijkregister bewoners (1828–1847)
+                </label>
                 <p className="text-[10px] text-stm-sepia-600 tracking-wider">
-                  Wijkregister bewoners (1828–1847) — Ward register residents
-                  (read-only) · {wardResidents.length} observations
+                  Ward register residents (read-only) ·{' '}
+                  {wardResidents.length} observations
+                </p>
+                <p className="text-[10px] text-stm-sepia-600 tracking-wider">
+                  Colonial bias: The Ward registers list skin color as a racial
+                  marker
                 </p>
                 {wardResidentsByYear.map((group) => (
                   <details
@@ -3267,7 +3282,20 @@ export default function PlaceEditor({
                           ×{group.records.length}
                         </span>
                       )}
-                      <span className="ml-auto px-1.5 py-0.5 text-[10px] font-medium shrink-0 bg-stm-sepia-200 text-stm-warm-800">
+                      <span
+                        className={`px-1.5 py-0.5 text-[10px] font-medium shrink-0 ${
+                          group.certainty === 'certain'
+                            ? 'bg-stm-sepia-600 text-white'
+                            : 'bg-stm-sepia-200 text-stm-warm-800'
+                        }`}
+                        title="Geeft de nauwkeurigheid aan van de koppeling tussen het historische wijkregisteradres en de locatie op de kaart."
+                      >
+                        Adresmatch:{' '}
+                        {group.certainty === 'certain'
+                          ? 'Zeker'
+                          : 'Waarschijnlijk'}
+                      </span>
+                      <span className="px-1.5 py-0.5 text-[10px] font-medium shrink-0 bg-stm-sepia-200 text-stm-warm-800">
                         {group.personCount}{' '}
                         {group.personCount === 1 ? 'person' : 'persons'}
                       </span>
@@ -3282,15 +3310,6 @@ export default function PlaceEditor({
                             <span className="font-mono font-semibold text-stm-sepia-800">
                               {record.sourceAddress.addressFull ??
                                 `${record.sourceAddress.wardLetter}${record.sourceAddress.houseNumber}`}
-                            </span>
-                            <span
-                              className={`px-1.5 py-0.5 text-[10px] font-medium ${
-                                record.certainty === 'certain'
-                                  ? 'bg-stm-sepia-600 text-white'
-                                  : 'bg-stm-sepia-200 text-stm-warm-800'
-                              }`}
-                            >
-                              {record.certainty}
                             </span>
                             {record.householdHead && (
                               <span className="text-stm-warm-700">
