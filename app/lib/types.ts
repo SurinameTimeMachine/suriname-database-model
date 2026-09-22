@@ -285,6 +285,79 @@ export interface GeoJSONCollection {
   features: GeoJSONFeature[];
 }
 
+// ---------------------------------------------------------------------------
+// Person / actor search index (person-search-index.json + ward-name-index.json)
+// ---------------------------------------------------------------------------
+// Aggregated build-time indexes: compact per-name records across
+// enslaved/emancipated persons, ward register residents, and almanac
+// organization actors (owner / administrator / director).
+// Details stay in the heavy source files (persons-by-org.json,
+// ward-residents-by-place.json, observations-by-org.json); these indexes
+// only route a name query to the right place / organization records.
+// The index is split by cardinality: plantation-linked names
+// (person-search-index.json) stay small enough for eager load, while the
+// 52k distinct ward resident names (ward-name-index.json) lazy-load on
+// first person-search focus.
+
+/** Actor category for a person-search hit. */
+export type PersonSearchKind =
+  | 'enslaved'
+  | 'emancipated'
+  | 'ward-resident'
+  | 'org-actor';
+
+/** Almanac actor role within an org-actor ref. */
+export type PersonSearchActorRole = 'owner' | 'administrator' | 'director';
+
+/** One occurrence of a name: where it appears and when. */
+export interface PersonSearchRef {
+  /** Ref kind as compact code: e = enslaved, m = emancipated, w = ward-resident, a = org-actor. */
+  k: 'e' | 'm' | 'w' | 'a';
+  /** Index into the shard's org table ([orgUri, orgQid, placeIds]). */
+  o?: number;
+  /** Almanac actor role (owner / administrator / director). */
+  r?: PersonSearchActorRole;
+  /** Ward resident status (free / enslaved). */
+  s?: 'free' | 'enslaved';
+  /** Emancipated display variant (e.g. "Adolph Vorm") when it differs from the key. */
+  v?: string;
+  /** Number of attestations folded into this ref. */
+  c: number;
+}
+
+/**
+ * Compact person-search record. Field codes: k = normalized key,
+ * d = display (omitted when it lowercases to the key), b = kinds bitmask
+ * (1 enslaved, 2 emancipated, 4 ward-resident, 8 org-actor), p = union
+ * place IDs, y = union years (ward shard: run-length [start, len] pairs,
+ * flagged by yr), r = refs.
+ */
+export interface PersonSearchRecord {
+  k: string;
+  d?: string;
+  b: number;
+  p: string[];
+  y: number[];
+  /** Ward shard only: y holds [start, length] run pairs, not plain years. */
+  yr?: boolean;
+  r: PersonSearchRef[];
+  /** True when p was capped during aggregation. */
+  t?: boolean;
+}
+
+/** Org table entry: [orgUri, orgQid, placeIds]. */
+export type PersonSearchOrgEntry = [uri: string, qid: string | null, places: string[]];
+
+/** Shared envelope for both person-search index shards. */
+export interface PersonSearchIndex {
+  version: 2;
+  generatedAt: string;
+  normalization: 'nfkd-lower-strip-diacritics-single-space';
+  recordCount: number;
+  orgs: PersonSearchOrgEntry[];
+  records: PersonSearchRecord[];
+}
+
 /** SKOS match types for external authority links */
 export type SkosMatchType =
   | 'exactMatch'

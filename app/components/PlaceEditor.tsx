@@ -44,6 +44,8 @@ interface PlaceEditorProps {
   concordansSourceAttribution?: SourceAttribution | null;
   /** Derived Ward Register resident links (1828-1847); read-only. */
   wardResidents?: WardRegisterResidentLink[];
+  /** Person-name quick-filter from the /places toolbar (substring match). */
+  personFilter?: string;
   canEdit: boolean;
   onSave: (place: GazetteerPlace) => Promise<void>;
   onCancel: () => void;
@@ -667,6 +669,7 @@ export default function PlaceEditor({
   historicalAddresses = [],
   concordansSourceAttribution = null,
   wardResidents = [],
+  personFilter = '',
   canEdit,
   onSave,
   onCancel,
@@ -1103,6 +1106,84 @@ export default function PlaceEditor({
         };
       });
   }, [wardResidents]);
+
+  // Person-name quick-filter from the /places toolbar: normalized substring
+  // match over linked persons, ward resident names, and almanac actor names.
+  const normalizedPersonFilter = useMemo(
+    () =>
+      personFilter
+        .normalize('NFKD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .trim(),
+    [personFilter],
+  );
+
+  const linkedPersonsMatch = useCallback(
+    (person: { label: string; observations?: Array<Record<string, unknown>> }) => {
+      if (!normalizedPersonFilter) return true;
+      const haystacks = [
+        person.label,
+        ...((person.observations ?? []).flatMap((observation) =>
+          [
+            observation.nameEnslaved,
+            observation.emancipationFirstName,
+            observation.emancipationFamilyName,
+          ].filter((value): value is string => typeof value === 'string'),
+        )),
+      ];
+      return haystacks.some((text) =>
+        text
+          .normalize('NFKD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .toLowerCase()
+          .includes(normalizedPersonFilter),
+      );
+    },
+    [normalizedPersonFilter],
+  );
+
+  const wardRecordMatch = useCallback(
+    (record: WardRegisterResidentLink) => {
+      if (!normalizedPersonFilter) return true;
+      const haystacks = [
+        record.householdHead,
+        record.sourceAddress.addressFull,
+        ...record.observedPersons.map((person) => person.name),
+      ];
+      return haystacks.some(
+        (text) =>
+          typeof text === 'string' &&
+          text
+            .normalize('NFKD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .includes(normalizedPersonFilter),
+      );
+    },
+    [normalizedPersonFilter],
+  );
+
+  const actorObservationMatch = useCallback(
+    (observation: OrganizationObservation) => {
+      if (!normalizedPersonFilter) return true;
+      return [
+        observation.hasOwner,
+        observation.hasAdministrator,
+        observation.hasDirector,
+        observation.observedName,
+      ].some(
+        (text) =>
+          typeof text === 'string' &&
+          text
+            .normalize('NFKD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .includes(normalizedPersonFilter),
+      );
+    },
+    [normalizedPersonFilter],
+  );
 
   const adoptedConcordansRows = useMemo(() => {
     const rows: Array<{
@@ -1579,15 +1660,22 @@ export default function PlaceEditor({
     .filter(Boolean);
   const reportedOwners = useMemo(() => {
     const values = (organizationContext?.observations ?? [])
-      .filter(
-        (observation): observation is OrganizationObservation & {
-          hasOwner: string;
-        } => Boolean(observation.hasOwner?.trim()),
+      .filter(actorObservationMatch)
+      .flatMap((observation) =>
+        (
+          [
+            { role: 'owner', value: observation.hasOwner },
+            { role: 'administrator', value: observation.hasAdministrator },
+            { role: 'director', value: observation.hasDirector },
+          ] as const
+        )
+          .filter((entry) => Boolean(entry.value?.trim()))
+          .map((entry) => ({
+            year: observation.observationYear,
+            role: entry.role,
+            value: `${entry.value!.trim()} (${entry.role})`,
+          })),
       )
-      .map((observation) => ({
-        year: observation.observationYear,
-        value: observation.hasOwner.trim(),
-      }))
       .sort((a, b) => b.year.localeCompare(a.year));
 
     return Array.from(
@@ -1598,7 +1686,7 @@ export default function PlaceEditor({
         ]),
       ).values(),
     );
-  }, [organizationContext]);
+  }, [organizationContext, actorObservationMatch]);
   const physicalOwnershipAssertions = useMemo(
     () =>
       Array.from(
@@ -1829,15 +1917,41 @@ export default function PlaceEditor({
               <div className="mt-3 border-t border-stm-warm-200 pt-3">
                 <div className="mb-1 grid min-w-0 grid-cols-1 gap-1 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
                   <span className="font-medium">
-                    Reported owners in Almanakken
+                    Reported owners, administrators &amp; directors in
+                    Almanakken
                   </span>
                   <span className="font-mono text-[10px] text-stm-warm-500 sm:text-right">
                     {reportedOwners.length} dated transcription
                     {reportedOwners.length === 1 ? '' : 's'}
+                    {normalizedPersonFilter &&
+                      ` · ${reportedOwners.filter((owner) =>
+                        [owner.value, String(owner.year)].some(
+                          (text) =>
+                            typeof text === 'string' &&
+                            text
+                              .normalize('NFKD')
+                              .replace(/[\u0300-\u036f]/g, '')
+                              .toLowerCase()
+                              .includes(normalizedPersonFilter),
+                        ),
+                      ).length} matching filter`}
                   </span>
                 </div>
                 <div className="max-h-28 overflow-auto border border-stm-warm-200 bg-white">
-                  {reportedOwners.map((owner) => (
+                  {reportedOwners
+                    .filter((owner) =>
+                      [owner.value, String(owner.year)].some(
+                        (text) =>
+                          !normalizedPersonFilter ||
+                          (typeof text === 'string' &&
+                            text
+                              .normalize('NFKD')
+                              .replace(/[\u0300-\u036f]/g, '')
+                              .toLowerCase()
+                              .includes(normalizedPersonFilter)),
+                      ),
+                    )
+                    .map((owner) => (
                     <div
                       key={`${owner.year}-${owner.value}`}
                       className="grid grid-cols-[3.5rem_minmax(0,1fr)] gap-2 border-b border-stm-warm-100 px-2 py-1 last:border-b-0"
@@ -1877,10 +1991,21 @@ export default function PlaceEditor({
                       0,
                     )}{' '}
                     attestations
+                    {normalizedPersonFilter &&
+                      ` · ${organizationContext.linkedPersons!.filter(linkedPersonsMatch).length} matching filter`}
                   </span>
                 </div>
+                {normalizedPersonFilter &&
+                  organizationContext.linkedPersons!.filter(linkedPersonsMatch)
+                    .length === 0 && (
+                    <p className="text-[11px] italic text-stm-warm-500">
+                      No linked persons match the current filter.
+                    </p>
+                  )}
                 <div className="max-h-40 overflow-auto border border-stm-warm-200 bg-white">
-                  {organizationContext.linkedPersons!.map((person) => (
+                  {organizationContext
+                    .linkedPersons!.filter(linkedPersonsMatch)
+                    .map((person) => (
                     <div
                       key={person.id}
                       className="grid grid-cols-[minmax(0,1fr)_auto] gap-2 border-b border-stm-warm-100 px-2 py-1 last:border-b-0"
@@ -3347,12 +3472,20 @@ export default function PlaceEditor({
                 <p className="text-[10px] text-stm-sepia-600 tracking-wider">
                   Ward register residents (read-only) ·{' '}
                   {wardResidents.length} observations
+                  {normalizedPersonFilter &&
+                    ` · ${wardResidents.filter(wardRecordMatch).length} matching filter`}
                 </p>
                 <p className="text-[10px] text-stm-sepia-600 tracking-wider">
                   Colonial bias: The Ward registers list skin color as a racial
                   marker
                 </p>
-                {wardResidentsByYear.map((group) => (
+                {wardResidentsByYear
+                  .map((group) => ({
+                    ...group,
+                    records: group.records.filter(wardRecordMatch),
+                  }))
+                  .filter((group) => group.records.length > 0)
+                  .map((group) => (
                   <details
                     key={`ward-year-${group.year}`}
                     className="border border-stm-sepia-200 bg-stm-sepia-50"

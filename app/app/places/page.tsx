@@ -911,6 +911,7 @@ function PlacesPageInner() {
   const [loading, setLoading] = useState(true);
   const { canEdit } = useAuth();
   const [search, setSearch] = useState('');
+  const [personQuery, setPersonQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
   // Selected place IDs — supports up to 2 for future compare/merge
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -1869,6 +1870,47 @@ function PlacesPageInner() {
                   )}
                 </div>
 
+                {/* Person quick-filter (linked persons, ward residents, owners) */}
+                <div className="relative flex-1 min-w-48">
+                  <input
+                    type="text"
+                    value={personQuery}
+                    onChange={(e) => setPersonQuery(e.target.value)}
+                    placeholder="Filter persons & owners in detail pane..."
+                    aria-label="Filter linked persons, ward residents and owners in the detail pane"
+                    className="w-full border border-ink/15 bg-cream/95 py-1.5 pl-8 pr-8 text-sm text-ink/80 outline-none transition focus:border-teal-strong focus:ring-1 focus:ring-teal-bright/20"
+                  />
+                  <svg
+                    className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-ink/35 pointer-events-none"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle cx="11" cy="11" r="8" strokeWidth="2" />
+                    <path d="m21 21-4.35-4.35" strokeWidth="2" />
+                  </svg>
+                  {personQuery && (
+                    <button
+                      onClick={() => setPersonQuery('')}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-ink/35 hover:text-teal-strong"
+                      aria-label="Clear person filter"
+                    >
+                      <svg
+                        className="w-3.5 h-3.5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          d="M18 6 6 18M6 6l12 12"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                    </button>
+                  )}
+                </div>
+
                 {/* Browsing and merge filters */}
                 {workspaceMode !== 'review' && (
                   <>
@@ -2209,6 +2251,7 @@ function PlacesPageInner() {
                       historicalAddressesByPlace.get(selectedPlace.id)
                         ?.wardResidents ?? []
                     }
+                    personFilter={personQuery}
                     canEdit={canEdit}
                     onSave={handleSave}
                     onCancel={handleCancel}
@@ -2243,6 +2286,7 @@ function PlacesPageInner() {
                       historicalAddressesByPlace.get(selectedPlace.id)
                         ?.wardResidents ?? []
                     }
+                    personFilter={personQuery}
                     canEdit={canEdit}
                     onSave={handleSave}
                     onCancel={handleCancel}

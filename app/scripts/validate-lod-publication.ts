@@ -180,6 +180,47 @@ async function main() {
       'organization-composition-periods.json',
     ).toString('utf-8'),
   ) as Record<string, Array<Record<string, unknown>>>;
+  const personSearchShards = [
+    { file: 'person-search-index.json', spotChecks: ['adjuba', 'adolph vorm', 'homeyer'] },
+    { file: 'ward-name-index.json', spotChecks: ['eduard joseph sacoto stuger'] },
+  ];
+  for (const shard of personSearchShards) {
+    const shardBytes = readArtifact(PUBLIC_DATA_DIR, shard.file);
+    const shardIndex = JSON.parse(shardBytes.toString('utf-8')) as {
+      version?: number;
+      recordCount?: number;
+      orgs?: unknown;
+      records?: Array<{
+        k?: string;
+        d?: string;
+        b?: number;
+        r?: unknown[];
+        p?: string[];
+      }>;
+    };
+    assert(
+      shardIndex.version === 2,
+      `${shard.file} has an unexpected version`,
+    );
+    assert(
+      Array.isArray(shardIndex.records) && shardIndex.records.length > 0,
+      `${shard.file} has no person records`,
+    );
+    assert(
+      shardBytes.length <= 8 * 1024 * 1024,
+      `${shard.file} exceeds the 8 MB cap (${(shardBytes.length / 1024 / 1024).toFixed(2)} MB)`,
+    );
+    for (const spotCheck of shard.spotChecks) {
+      assert(
+        shardIndex.records.some(
+          (record) =>
+            record.k === spotCheck ||
+            (typeof record.k === 'string' && record.k.includes(spotCheck)),
+        ),
+        `${shard.file} is missing spot-check name "${spotCheck}"`,
+      );
+    }
+  }
   const organizationOverrides = JSON.parse(
     readArtifact(DATA_DIR, 'organization-authority-overrides.jsonld').toString(
       'utf-8',

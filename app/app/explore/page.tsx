@@ -33,6 +33,7 @@ function ExplorePageInner() {
     null,
   );
   const [highlightedName, setHighlightedName] = useState<string | null>(null);
+  const [highlightedPlaceIds, setHighlightedPlaceIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const lastAppliedPlace = useRef<string | null>(null);
 
@@ -112,12 +113,18 @@ function ExplorePageInner() {
 
   const handleHighlightName = useCallback((name: string) => {
     setHighlightedName(name);
-    setSelectedFeature(null);
+    setHighlightedPlaceIds([]);
+  }, []);
+
+  const handleHighlightPlaces = useCallback((placeIds: string[]) => {
+    setHighlightedPlaceIds(placeIds);
+    setHighlightedName(null);
   }, []);
 
   const handleClose = useCallback(() => {
     setSelectedFeature(null);
     setHighlightedName(null);
+    setHighlightedPlaceIds([]);
     syncUrl(null);
   }, [syncUrl]);
 
@@ -180,9 +187,11 @@ function ExplorePageInner() {
             null
           }
           highlightedName={highlightedName}
+          highlightedPlaceIds={highlightedPlaceIds}
           panelOpen={!!selectedFeature}
           onSelectPlantation={handleSelectPlantation}
           onHighlightName={handleHighlightName}
+          onHighlightPlaces={handleHighlightPlaces}
           initialCenter={initialCenter}
           initialZoom={initialZoom}
           onViewportChange={handleViewportChange}

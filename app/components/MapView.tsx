@@ -3,8 +3,18 @@
 import 'leaflet/dist/leaflet.css';
 import { loadAllmapsAnnotation } from '@/lib/allmaps';
 import { HISTORIC_MAPS } from '@/lib/historic-maps';
+import {
+  loadPersonIndex,
+  loadWardNameIndex,
+  placeIdsForHits,
+  searchPersonShards,
+} from '@/lib/person-search';
 import { usePlaceTypes } from '@/lib/thesaurus';
-import type { GeoJSONCollection, GeoJSONFeature } from '@/lib/types';
+import type {
+  GeoJSONCollection,
+  GeoJSONFeature,
+  PersonSearchIndex,
+} from '@/lib/types';
 import L from 'leaflet';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -212,9 +222,11 @@ interface MapViewProps {
   geojson: GeoJSONCollection | null;
   selectedPlantationUri: string | null;
   highlightedName: string | null;
+  highlightedPlaceIds?: string[] | null;
   panelOpen: boolean;
   onSelectPlantation: (feature: GeoJSONFeature) => void;
   onHighlightName: (name: string) => void;
+  onHighlightPlaces?: (placeIds: string[]) => void;
   initialCenter?: [number, number];
   initialZoom?: number;
   onViewportChange?: (center: [number, number], zoom: number) => void;
@@ -224,9 +236,11 @@ export default function MapView({
   geojson,
   selectedPlantationUri,
   highlightedName,
+  highlightedPlaceIds = null,
   panelOpen,
   onSelectPlantation,
   onHighlightName,
+  onHighlightPlaces,
   initialCenter,
   initialZoom,
   onViewportChange,
@@ -237,6 +251,7 @@ export default function MapView({
   const containerRef = useRef<HTMLDivElement>(null);
   const selectedUriRef = useRef(selectedPlantationUri);
   const highlightedNameRef = useRef(highlightedName);
+  const highlightedPlaceIdsRef = useRef<string[] | null>(highlightedPlaceIds);
   const onSelectRef = useRef(onSelectPlantation);
   const {
     colors: PLACE_TYPE_COLORS,
@@ -500,12 +515,19 @@ export default function MapView({
         const featureIdentifier =
           props?.plantationUri ?? props?.featureUri ?? props?.placeUri;
         const isSelected = featureIdentifier === selectedUriRef.current;
+        const highlightedIds = highlightedPlaceIdsRef.current;
+        const propsStmId = props?.stmId;
+        const isPlaceHighlighted =
+          !!highlightedIds &&
+          !!propsStmId &&
+          highlightedIds.includes(propsStmId);
         const isHighlighted =
           !isSelected &&
-          !!highlightedNameRef.current &&
-          props?.name
-            ?.toLowerCase()
-            .includes(highlightedNameRef.current.toLowerCase());
+          (isPlaceHighlighted ||
+            (!!highlightedNameRef.current &&
+              props?.name
+                ?.toLowerCase()
+                .includes(highlightedNameRef.current.toLowerCase())));
 
         // Point features (settlements, military posts, stations, villages, towns)
         if (geomType === 'Point') {
@@ -653,12 +675,13 @@ export default function MapView({
   useEffect(() => {
     selectedUriRef.current = selectedPlantationUri;
     highlightedNameRef.current = highlightedName;
+    highlightedPlaceIdsRef.current = highlightedPlaceIds ?? null;
     if (layerRef.current) {
       layerRef.current.eachLayer((l) => {
         layerRef.current!.resetStyle(l as L.Path);
       });
     }
-  }, [selectedPlantationUri, highlightedName]);
+  }, [selectedPlantationUri, highlightedName, highlightedPlaceIds]);
 
   // Sync overlay opacity across all active layers
   useEffect(() => {
@@ -702,27 +725,40 @@ export default function MapView({
     });
   }, [selectedPlantationUri, panelOpen]);
 
-  // Fly to all highlighted features when name is highlighted without selection
+  // Fly to all highlighted features when a person search highlights places
+  // without selection (set-based; falls back to the legacy name highlight).
   useEffect(() => {
     if (
       !mapRef.current ||
       !layerRef.current ||
-      !highlightedName ||
       selectedPlantationUri
     )
       return;
+    const highlightedIds =
+      highlightedPlaceIds && highlightedPlaceIds.length > 0
+        ? new Set(highlightedPlaceIds)
+        : null;
+    if (!highlightedIds && !highlightedName) return;
 
     let combinedBounds: L.LatLngBounds | null = null;
     layerRef.current.eachLayer((layer) => {
       const feature = (layer as unknown as { feature?: GeoJSONFeature })
         .feature;
-      if (
-        feature?.properties?.name
-          ?.toLowerCase()
-          .includes(highlightedName.toLowerCase())
-      ) {
+      const matchesIds =
+        !!highlightedIds && !!feature?.properties?.stmId
+          ? highlightedIds.has(feature.properties.stmId)
+          : false;
+      const matchesName =
+        !matchesIds &&
+        !!highlightedName &&
+        !!feature?.properties?.name
+          ? feature.properties.name
+              .toLowerCase()
+              .includes(highlightedName.toLowerCase())
+          : false;
+      if (matchesIds || matchesName) {
         let bounds: L.LatLngBounds;
-        const geomType = feature.geometry?.type;
+        const geomType = feature?.geometry?.type;
         if (geomType === 'Point') {
           const latlng = (layer as L.CircleMarker).getLatLng();
           bounds = L.latLngBounds(latlng, latlng);
@@ -740,7 +776,7 @@ export default function MapView({
         maxZoom: 13,
       });
     }
-  }, [highlightedName, selectedPlantationUri]);
+  }, [highlightedName, highlightedPlaceIds, selectedPlantationUri]);
 
   function handleZoomIn() {
     mapRef.current?.zoomIn();
@@ -845,6 +881,9 @@ export default function MapView({
               geojson={geojson}
               onSelect={onSelectPlantation}
               onHighlightName={onHighlightName}
+              onHighlightPlaces={(placeIds) =>
+                onHighlightPlaces?.(placeIds)
+              }
             />
 
             {/* Divider */}
@@ -1123,32 +1162,64 @@ export default function MapView({
   );
 }
 
-/* Inline search input */
+/* Inline search input — unified places + persons search */
 function SearchInput({
   geojson,
   onSelect,
   onHighlightName,
+  onHighlightPlaces,
 }: {
   geojson: GeoJSONCollection | null;
   onSelect: (feature: GeoJSONFeature) => void;
   onHighlightName: (name: string) => void;
+  onHighlightPlaces: (placeIds: string[]) => void;
 }) {
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
+  const [category, setCategory] = useState<'all' | 'places' | 'persons'>('all');
+  const [personIndex, setPersonIndex] =
+    useState<PersonSearchIndex | null>(null);
+  const [wardIndex, setWardIndex] = useState<PersonSearchIndex | null>(null);
 
-  const results = (() => {
-    if (!geojson || query.length < 2) return [];
+  // Eager plantation-names shard alongside the map payload; the ward shard
+  // lazy-loads on first input focus so initial render stays untouched.
+  useEffect(() => {
+    let cancelled = false;
+    loadPersonIndex().then((index) => {
+      if (!cancelled) setPersonIndex(index);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const ensureWardIndex = useCallback(() => {
+    if (wardIndex) return;
+    loadWardNameIndex().then((index) => {
+      if (index) setWardIndex(index);
+    });
+  }, [wardIndex]);
+
+  const placeResults = (() => {
+    if (!geojson || query.length < 2 || category === 'persons') return [];
     const q = query.toLowerCase();
     return geojson.features
       .filter((f) => f.properties.name?.toLowerCase().includes(q))
       .slice(0, 20);
   })();
 
+  const personHits = (() => {
+    if (query.length < 2 || category === 'places') return [];
+    return searchPersonShards([personIndex, wardIndex], query, 25);
+  })();
+
+  const hasResults = placeResults.length > 0 || personHits.length > 0;
+
   return (
     <div className="relative">
       <input
         type="text"
-        placeholder="Search features..."
+        placeholder="Search places & people..."
         value={query}
         onChange={(e) => {
           setQuery(e.target.value);
@@ -1157,42 +1228,108 @@ function SearchInput({
         onKeyDown={(e) => {
           if (e.key === 'Enter' && query.length >= 2) {
             onHighlightName(query);
+            if (personHits.length > 0) {
+              onHighlightPlaces(placeIdsForHits(personHits));
+            }
             setOpen(false);
           }
         }}
-        onFocus={() => setOpen(true)}
+        onFocus={() => {
+          setOpen(true);
+          ensureWardIndex();
+        }}
         onBlur={() => setTimeout(() => setOpen(false), 200)}
-        aria-label="Search features by name"
+        aria-label="Search places and people by name"
         aria-autocomplete="list"
         role="combobox"
-        aria-expanded={open && results.length > 0}
+        aria-expanded={open && hasResults}
         className="w-48 px-2.5 py-1 border border-ink/15 bg-cream/95 text-sm text-ink placeholder:text-ink/35 focus:outline-none focus:ring-2 focus:ring-teal-bright/40"
       />
-      {open && results.length > 0 && (
-        <ul
-          className="site-panel absolute top-full left-0 mt-1 w-64 max-h-64 overflow-y-auto z-10"
+      {open && hasResults && (
+        <div
+          className="site-panel absolute top-full left-0 mt-1 w-72 max-h-72 overflow-y-auto z-10"
           role="listbox"
         >
-          {results.map((f) => (
-            <li key={f.id} role="option">
+          <div className="sticky top-0 flex gap-1 bg-cream px-2 py-1.5 border-b border-ink/10">
+            {(
+              [
+                ['all', 'All'],
+                ['places', 'Places'],
+                ['persons', 'Persons'],
+              ] as const
+            ).map(([value, label]) => (
               <button
-                className="w-full text-left px-3 py-2 text-sm text-ink/80 hover:bg-teal-soft/20 transition-colors"
-                onMouseDown={() => {
-                  onSelect(f);
-                  setQuery(f.properties.name);
-                  setOpen(false);
-                }}
+                key={value}
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => setCategory(value)}
+                aria-pressed={category === value}
+                className={`px-2 py-0.5 text-xs font-medium transition-colors ${
+                  category === value
+                    ? 'bg-teal-strong text-cream'
+                    : 'text-ink/65 hover:bg-teal-soft/25 hover:text-teal-strong'
+                }`}
               >
-                <span className="font-medium">{f.properties.name}</span>
-                {f.properties.wikidataQid && (
-                  <span className="ml-2 text-xs text-stm-warm-400">
-                    {f.properties.wikidataQid}
-                  </span>
-                )}
+                {label}
               </button>
-            </li>
-          ))}
-        </ul>
+            ))}
+          </div>
+          {placeResults.length > 0 && (
+            <div>
+              <p className="px-3 pt-2 pb-1 text-[10px] font-medium uppercase tracking-[0.14em] text-ink/45">
+                Places &amp; Plantations
+              </p>
+              <ul>
+                {placeResults.map((f) => (
+                  <li key={f.id} role="option">
+                    <button
+                      className="w-full text-left px-3 py-2 text-sm text-ink/80 hover:bg-teal-soft/20 transition-colors"
+                      onMouseDown={() => {
+                        onSelect(f);
+                        setQuery(f.properties.name);
+                        setOpen(false);
+                      }}
+                    >
+                      <span className="font-medium">{f.properties.name}</span>
+                      {f.properties.wikidataQid && (
+                        <span className="ml-2 text-xs text-stm-warm-400">
+                          {f.properties.wikidataQid}
+                        </span>
+                      )}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {personHits.length > 0 && (
+            <div>
+              <p className="px-3 pt-2 pb-1 text-[10px] font-medium uppercase tracking-[0.14em] text-ink/45">
+                Persons &amp; Actors
+              </p>
+              <ul>
+                {personHits.map((hit) => (
+                  <li key={hit.display} role="option">
+                    <button
+                      className="w-full text-left px-3 py-2 text-sm text-ink/80 hover:bg-teal-soft/20 transition-colors"
+                      onMouseDown={() => {
+                        onHighlightPlaces(hit.placeIds);
+                        setOpen(false);
+                      }}
+                    >
+                      <span className="font-medium">{hit.display}</span>
+                      <span className="ml-2 text-[10px] text-ink/45">
+                        {hit.kinds.join(' · ')}
+                        {hit.years.length > 0 &&
+                          ` · ${hit.years[0]}${hit.years.length > 1 ? `–${hit.years[hit.years.length - 1]}` : ''}`}
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
       )}
     </div>
   );
