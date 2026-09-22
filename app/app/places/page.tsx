@@ -986,6 +986,31 @@ function PlacesPageInner() {
     }
   }, [places, placeParam]);
 
+  // Keep linked enslaved-person attestations available for the selected
+  // plantation's organization: the person links live on the organization
+  // entity (persons-by-org.json), not on the place record itself.
+  const [linkedPersonsByOrg, setLinkedPersonsByOrg] = useState<
+    Record<string, Array<{ id: string; label: string; observations: Array<Record<string, unknown>> }>>
+  >({});
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/data/persons-by-org.json')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (cancelled || !data || typeof data !== 'object') return;
+        setLinkedPersonsByOrg(
+          data as Record<
+            string,
+            Array<{ id: string; label: string; observations: Array<Record<string, unknown>> }>
+          >,
+        );
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   // Keep derived Concordans links available for whichever record is
   // selected: fetch that record's projection on selection change. The gazetteer
   // payload itself never carries derived data, so the editor would otherwise
@@ -1568,8 +1593,11 @@ function PlacesPageInner() {
         ? (allData.observations[organizationUri] ?? [])
         : [],
       qid: organizationQid,
+      linkedPersons: organizationUri
+        ? (linkedPersonsByOrg[organizationUri] ?? [])
+        : [],
     };
-  }, [allData, selectedPlace, isCreating]);
+  }, [allData, selectedPlace, isCreating, linkedPersonsByOrg]);
 
   const typeCounts = useMemo(() => {
     const countable = places.filter(
