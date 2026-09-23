@@ -170,6 +170,36 @@ export function loadWardNameIndex(): Promise<PersonSearchIndex | null> {
 }
 
 /**
+ * Merge two records sharing a normalized key (one per shard): union kind
+ * bits, place IDs, expanded years, and refs. Years always expand through
+ * personYears() first — plantation `y` holds plain years while ward `y`
+ * holds run-length [start, length] pairs flagged by `yr`; the merge stores
+ * plain years.
+ */
+function mergeSearchRecords(
+  a: PersonSearchRecord,
+  b: PersonSearchRecord,
+): PersonSearchRecord {
+  const placeIds = [...new Set([...a.p, ...b.p])].sort();
+  const years = [...new Set([...personYears(a), ...personYears(b)])].sort(
+    (x, y) => x - y,
+  );
+  const displayA = a.d ?? a.k;
+  const displayB = b.d ?? b.k;
+  return {
+    k: a.k,
+    ...(displayA.toLowerCase() === a.k && displayB.toLowerCase() === b.k
+      ? {}
+      : { d: displayA.length >= displayB.length ? displayA : displayB }),
+    b: a.b | b.b,
+    p: placeIds.length > 200 ? placeIds.slice(0, 200) : placeIds,
+    y: years,
+    r: [...a.r, ...b.r],
+    ...(placeIds.length > 200 ? { t: true as const } : {}),
+  };
+}
+
+/**
  * Ranked search over one or more loaded shards. Pass the eagerly loaded
  * plantation shard always, plus the ward shard once focused.
  */
@@ -180,24 +210,29 @@ export function searchPersonShards(
 ): RankedPersonHit[] {
   const normalizedQuery = normalizeName(query);
   if (normalizedQuery.length < 2) return [];
-  const hits: RankedPersonHit[] = [];
-  const seen = new Set<string>();
+  const merged = new Map<string, PersonSearchRecord>();
   for (const shard of shards) {
     if (!shard) continue;
     for (const record of shard.records) {
-      if (seen.has(record.k)) continue;
-      const rank = rankRecord(record.k, normalizedQuery);
-      if (rank == null) continue;
-      seen.add(record.k);
-      hits.push({
-        record,
-        display: personDisplay(record),
-        kinds: personKinds(record),
-        placeIds: record.p,
-        years: personYears(record),
-        rank,
-      });
+      const existing = merged.get(record.k);
+      merged.set(
+        record.k,
+        existing ? mergeSearchRecords(existing, record) : record,
+      );
     }
+  }
+  const hits: RankedPersonHit[] = [];
+  for (const record of merged.values()) {
+    const rank = rankRecord(record.k, normalizedQuery);
+    if (rank == null) continue;
+    hits.push({
+      record,
+      display: personDisplay(record),
+      kinds: personKinds(record),
+      placeIds: record.p,
+      years: personYears(record),
+      rank,
+    });
   }
   hits.sort(
     (a, b) => a.rank - b.rank || a.display.localeCompare(b.display),

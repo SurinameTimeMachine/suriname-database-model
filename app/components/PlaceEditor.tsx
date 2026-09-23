@@ -1164,14 +1164,43 @@ export default function PlaceEditor({
     [normalizedPersonFilter],
   );
 
+  // Filtered ward groups: recalculate preview/personCount/certainty from
+  // the filter-matched records so summaries never describe hidden rows.
+  const filteredWardGroups = useMemo(() => {
+    if (!normalizedPersonFilter) return wardResidentsByYear;
+    const groups: WardResidentYearGroup[] = [];
+    for (const group of wardResidentsByYear) {
+      const records = group.records.filter(wardRecordMatch);
+      if (records.length === 0) continue;
+      groups.push({
+        year: group.year,
+        previewAddress:
+          records[0]?.sourceAddress.addressFull ??
+          records[0]?.householdHead ??
+          `${records.length} observations`,
+        personCount: records.reduce(
+          (total, record) => total + record.observedPersons.length,
+          0,
+        ),
+        certainty: records.some((record) => record.certainty !== 'certain')
+          ? 'probable'
+          : 'certain',
+        records,
+      });
+    }
+    return groups;
+  }, [wardResidentsByYear, wardRecordMatch, normalizedPersonFilter]);
+
   const actorObservationMatch = useCallback(
     (observation: OrganizationObservation) => {
       if (!normalizedPersonFilter) return true;
+      // Match exactly the fields rendered in reportedOwners rows
+      // (owner/administrator/director); observedName-only hits would pass
+      // the filter yet render zero rows.
       return [
         observation.hasOwner,
         observation.hasAdministrator,
         observation.hasDirector,
-        observation.observedName,
       ].some(
         (text) =>
           typeof text === 'string' &&
@@ -3479,13 +3508,7 @@ export default function PlaceEditor({
                   Colonial bias: The Ward registers list skin color as a racial
                   marker
                 </p>
-                {wardResidentsByYear
-                  .map((group) => ({
-                    ...group,
-                    records: group.records.filter(wardRecordMatch),
-                  }))
-                  .filter((group) => group.records.length > 0)
-                  .map((group) => (
+                {filteredWardGroups.map((group) => (
                   <details
                     key={`ward-year-${group.year}`}
                     className="border border-stm-sepia-200 bg-stm-sepia-50"

@@ -98,6 +98,7 @@ function ExplorePageInner() {
     (feature: GeoJSONFeature) => {
       setSelectedFeature(feature);
       setHighlightedName(feature.properties.name);
+      setHighlightedPlaceIds([]);
       const placeId =
         feature.properties.stmId ??
         extractPlaceId(

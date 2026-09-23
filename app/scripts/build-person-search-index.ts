@@ -260,21 +260,22 @@ function buildRecords(
   for (const [key, entry] of [...sink.entries()].sort((a, b) =>
     a[0].localeCompare(b[0]),
   )) {
+    // Record-level place/year unions resolve through the org table from ALL
+    // refs, before the single-token ref cap below — so the `p` union keeps
+    // every place ID even when `r` is capped (e.g. "Johanna" x 219 orgs).
+    const placeSet = new Set<string>();
+    for (const ref of entry.refs) {
+      if (ref.o != null) {
+        for (const placeId of orgPlaces(ref.o)) placeSet.add(placeId);
+      }
+    }
     // Cap single-token ref fan-out: "Johanna" x 219 orgs collapses to the
-    // top refs by attestation count; the record union still routes the map.
+    // top refs by attestation count; the record union above still routes the map.
     let refs = entry.refs;
     if (!key.includes(' ') && refs.length > SINGLE_TOKEN_REF_CAP) {
       refs = [...refs]
         .sort((a, b) => b.c - a.c || (a.o ?? 0) - (b.o ?? 0))
         .slice(0, SINGLE_TOKEN_REF_CAP);
-    }
-    // Record-level place/year unions resolve through the org table, so
-    // refs stay minimal (org int + kind + count + role/status/variant).
-    const placeSet = new Set<string>();
-    for (const ref of refs) {
-      if (ref.o != null) {
-        for (const placeId of orgPlaces(ref.o)) placeSet.add(placeId);
-      }
     }
     const placeIds = [...placeSet].sort();
     const matchYears = [...entry.years].sort((a, b) => a - b);
