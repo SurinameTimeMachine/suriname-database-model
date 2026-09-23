@@ -1123,6 +1123,62 @@ export default function PlaceEditor({
 
   // Person-name quick-filter from the /places toolbar: normalized substring
   // match over linked persons, ward resident names, and almanac actor names.
+  // Person deep-link (?highlightPerson=): same normalized substring match
+  // as the toolbar filter, but used to auto-open accordions, badge the
+  // matching row, and scroll it into view on arrival.
+  const normalizedHighlightPerson = useMemo(
+    () =>
+      (typeof window === 'undefined'
+        ? ''
+        : new URLSearchParams(window.location.search).get('highlightPerson') ??
+          ''
+      )
+        .normalize('NFKD')
+        .replace(/[̀-ͯ]/g, '')
+        .toLowerCase()
+        .trim(),
+    // Key on place + filter so arrival via deep-link re-runs the scroll.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [place.id, personFilter],
+  );
+
+  const highlightRowClass = useCallback(
+    (texts: Array<string | null | undefined>) => {
+      if (!normalizedHighlightPerson) return '';
+      const hit = texts.some(
+        (text) =>
+          typeof text === 'string' &&
+          text
+            .normalize('NFKD')
+            .replace(/[̀-ͯ]/g, '')
+            .toLowerCase()
+            .includes(normalizedHighlightPerson),
+      );
+      return hit ? ' ring-2 ring-teal-bright/70 bg-teal-soft/25 rounded-sm' : '';
+    },
+    [normalizedHighlightPerson],
+  );
+
+  const highlightScrollRef = useRef<HTMLDivElement | null>(null);
+
+  // Scroll the first highlighted row into view once derived data arrives
+  // (ward projections load async after selection).
+  useEffect(() => {
+    if (!normalizedHighlightPerson) return;
+    const frame = requestAnimationFrame(() => {
+      highlightScrollRef.current
+        ?.querySelector('[data-person-highlight="true"]')
+        ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [
+    normalizedHighlightPerson,
+    place.id,
+    wardResidents.length,
+    organizationContext?.linkedPersons?.length,
+    organizationContext?.observations?.length,
+  ]);
+
   const normalizedPersonFilter = useMemo(
     () =>
       personFilter
@@ -1746,7 +1802,10 @@ export default function PlaceEditor({
   );
 
   return (
-    <div className="flex h-auto min-h-0 w-full min-w-0 max-w-full flex-col overflow-visible border border-stm-warm-200 bg-white shadow-sm">
+    <div
+      ref={highlightScrollRef}
+      className="flex h-auto min-h-0 w-full min-w-0 max-w-full flex-col overflow-visible border border-stm-warm-200 bg-white shadow-sm"
+    >
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-3 border-b border-stm-warm-100">
         <div className="min-w-0">
@@ -1997,7 +2056,21 @@ export default function PlaceEditor({
                     .map((owner) => (
                     <div
                       key={`${owner.year}-${owner.value}`}
-                      className="grid grid-cols-[3.5rem_minmax(0,1fr)] gap-2 border-b border-stm-warm-100 px-2 py-1 last:border-b-0"
+                      data-person-highlight={
+                        normalizedHighlightPerson &&
+                        [owner.value].some(
+                          (text) =>
+                            typeof text === 'string' &&
+                            text
+                              .normalize('NFKD')
+                              .replace(/[̀-ͯ]/g, '')
+                              .toLowerCase()
+                              .includes(normalizedHighlightPerson),
+                        )
+                          ? 'true'
+                          : undefined
+                      }
+                      className={`grid grid-cols-[3.5rem_minmax(0,1fr)] gap-2 border-b border-stm-warm-100 px-2 py-1 last:border-b-0${highlightRowClass([owner.value])}`}
                     >
                       <span className="font-mono text-stm-warm-500">
                         {owner.year}
@@ -2051,7 +2124,42 @@ export default function PlaceEditor({
                     .map((person) => (
                     <div
                       key={person.id}
-                      className="grid grid-cols-[minmax(0,1fr)_auto] gap-2 border-b border-stm-warm-100 px-2 py-1 last:border-b-0"
+                      data-person-highlight={
+                        normalizedHighlightPerson &&
+                        [
+                          person.label,
+                          ...((person.observations ?? []).flatMap(
+                            (observation) => [
+                              observation.nameEnslaved,
+                              observation.emancipationFirstName,
+                              observation.emancipationFamilyName,
+                            ],
+                          )),
+                        ].some(
+                          (text) =>
+                            typeof text === 'string' &&
+                            text
+                              .normalize('NFKD')
+                              .replace(/[̀-ͯ]/g, '')
+                              .toLowerCase()
+                              .includes(normalizedHighlightPerson),
+                        )
+                          ? 'true'
+                          : undefined
+                      }
+                      className={`grid grid-cols-[minmax(0,1fr)_auto] gap-2 border-b border-stm-warm-100 px-2 py-1 last:border-b-0${highlightRowClass([
+                        person.label,
+                        ...((person.observations ?? []).flatMap(
+                          (observation) => [
+                            observation.nameEnslaved,
+                            observation.emancipationFirstName,
+                            observation.emancipationFamilyName,
+                          ].filter(
+                            (value): value is string =>
+                              typeof value === 'string',
+                          ),
+                        )),
+                      ])}`}
                     >
                       <span className="min-w-0 break-words">
                         {person.label}
@@ -3526,6 +3634,11 @@ export default function PlaceEditor({
                   <details
                     key={`ward-year-${group.year}`}
                     className="border border-stm-sepia-200 bg-stm-sepia-50"
+                    open={
+                      !normalizedPersonFilter
+                        ? undefined
+                        : group.records.some(wardRecordMatch) || undefined
+                    }
                   >
                     <summary className="flex cursor-pointer items-center gap-2 p-2 text-xs marker:text-stm-sepia-500">
                       <span className="font-mono font-semibold text-stm-sepia-800 shrink-0">
@@ -3561,7 +3674,37 @@ export default function PlaceEditor({
                       {group.records.map((record) => (
                         <div
                           key={record.id}
-                          className="space-y-1 border-t border-stm-sepia-200/70 pt-1.5 first:border-t-0 first:pt-0"
+                          data-person-highlight={
+                            normalizedHighlightPerson &&
+                            [
+                              record.householdHead,
+                              record.sourceAddress.addressFull,
+                              ...record.observedPersons.flatMap((person) => [
+                                person.name,
+                                person.occupation,
+                                person.origin,
+                              ]),
+                            ].some(
+                              (text) =>
+                                typeof text === 'string' &&
+                                text
+                                  .normalize('NFKD')
+                                  .replace(/[̀-ͯ]/g, '')
+                                  .toLowerCase()
+                                  .includes(normalizedHighlightPerson),
+                            )
+                              ? 'true'
+                              : undefined
+                          }
+                          className={`space-y-1 border-t border-stm-sepia-200/70 pt-1.5 first:border-t-0 first:pt-0${highlightRowClass([
+                            record.householdHead,
+                            record.sourceAddress.addressFull,
+                            ...record.observedPersons.flatMap((person) => [
+                              person.name,
+                              person.occupation,
+                              person.origin,
+                            ]),
+                          ])}`}
                         >
                           <p className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[10px] text-stm-warm-500">
                             <span className="font-mono font-semibold text-stm-sepia-800">
@@ -3579,7 +3722,21 @@ export default function PlaceEditor({
                               {record.observedPersons.map((person) => (
                                 <li
                                   key={person.id}
-                                  className="flex flex-wrap items-baseline gap-x-1.5 text-[10px] text-stm-warm-700"
+                                  data-person-highlight={
+                                    normalizedHighlightPerson &&
+                                    [person.name].some(
+                                      (text) =>
+                                        typeof text === 'string' &&
+                                        text
+                                          .normalize('NFKD')
+                                          .replace(/[̀-ͯ]/g, '')
+                                          .toLowerCase()
+                                          .includes(normalizedHighlightPerson),
+                                    )
+                                      ? 'true'
+                                      : undefined
+                                  }
+                                  className={`flex flex-wrap items-baseline gap-x-1.5 text-[10px] text-stm-warm-700${highlightRowClass([person.name])}`}
                                 >
                                   <span className="font-medium">
                                     {person.name ?? (
