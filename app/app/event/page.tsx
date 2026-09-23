@@ -134,7 +134,7 @@ export default function EventPage() {
     }
   }
 
-  async function claimNextTask() {
+  async function claimNextTask(excludeTaskId?: string) {
     if (!participantId) {
       setStatus('Start eerst een sessie met nickname.');
       return;
@@ -146,7 +146,7 @@ export default function EventPage() {
       const res = await fetch('/api/event/claim', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ participantId }),
+        body: JSON.stringify({ participantId, excludeTaskId: excludeTaskId ?? null }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Kon taak niet ophalen.');
@@ -225,6 +225,7 @@ export default function EventPage() {
       setStatus('Geen actieve taak om in te dienen.');
       return;
     }
+    const skippedTaskId = decision === 'skip' ? task.taskId : undefined;
 
     setBusy(true);
     setStatus('Taak indienen...');
@@ -259,7 +260,7 @@ export default function EventPage() {
       }
       setTask(null);
       resetFormForTask(null);
-      await claimNextTask();
+      await claimNextTask(skippedTaskId);
     } catch (error) {
       setStatus(error instanceof Error ? error.message : 'Onbekende fout bij submit.');
     } finally {
@@ -303,7 +304,7 @@ export default function EventPage() {
 
           {participantId && !task && !done ? (
             <section className="m-3 border border-stm-warm-200 bg-white p-3">
-              <button onClick={claimNextTask} disabled={busy} className="w-full bg-stm-warm-900 py-3 text-sm font-semibold text-white disabled:opacity-50">
+              <button onClick={() => claimNextTask()} disabled={busy} className="w-full bg-stm-warm-900 py-3 text-sm font-semibold text-white disabled:opacity-50">
                 Volgende foto
               </button>
             </section>
