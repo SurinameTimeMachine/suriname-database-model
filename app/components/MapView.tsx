@@ -16,6 +16,7 @@ import type {
   PersonSearchIndex,
 } from '@/lib/types';
 import L from 'leaflet';
+import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 const TRANSFORMATION_LABELS: Record<string, string> = {
@@ -160,6 +161,14 @@ const DEFAULT_ENABLED = new Set(
   OVERLAY_CONFIGS.filter((c) => c.defaultEnabled).map((c) => c.id),
 );
 const ENABLE_WARPED_OVERLAYS = true;
+
+/** Feature types active by default; all others stay toggleable but off. */
+const DEFAULT_FEATURE_TYPES = new Set([
+  'plantation',
+  'river',
+  'creek',
+  'historical-address',
+]);
 const MAP_DESIGN = {
   cream: '#fdf8f2',
   tealStrong: '#006d5b',
@@ -275,7 +284,12 @@ export default function MapView({
   const [toolbarOpen, setToolbarOpen] = useState(true);
   const layersDropdownRef = useRef<HTMLDivElement>(null);
   const [enabledFeatures, setEnabledFeatures] = useState<Set<string>>(
-    () => new Set(allTypes),
+    () =>
+      new Set(
+        [...DEFAULT_FEATURE_TYPES].filter(
+          (type) => allTypes.length === 0 || allTypes.includes(type),
+        ),
+      ),
   );
   const enabledFeaturesRef = useRef(enabledFeatures);
   enabledFeaturesRef.current = enabledFeatures;
@@ -283,14 +297,23 @@ export default function MapView({
   const [featuresOpen, setFeaturesOpen] = useState(false);
   const featuresDropdownRef = useRef<HTMLDivElement>(null);
 
-  // The thesaurus loads after the map mounts. Enable newly published place
-  // types by default without re-enabling types a visitor has turned off.
+  // The thesaurus loads after the map mounts. Only enable newly published
+  // place types by default when they belong to the default-on set
+  // (plantation/river/creek/historical-address); other types stay available
+  // in the layer control for manual toggling without re-enabling types a
+  // visitor has turned off.
   useEffect(() => {
     const known = knownFeatureTypesRef.current;
     const newTypes = allTypes.filter((type) => !known.has(type));
     if (newTypes.length === 0) return;
     knownFeatureTypesRef.current = new Set([...known, ...newTypes]);
-    setEnabledFeatures((previous) => new Set([...previous, ...newTypes]));
+    setEnabledFeatures((previous) => {
+      const next = new Set(previous);
+      for (const type of newTypes) {
+        if (DEFAULT_FEATURE_TYPES.has(type)) next.add(type);
+      }
+      return next;
+    });
   }, [allTypes]);
 
   // Keep callback ref in sync
@@ -1180,6 +1203,23 @@ function SearchInput({
   const [personIndex, setPersonIndex] =
     useState<PersonSearchIndex | null>(null);
   const [wardIndex, setWardIndex] = useState<PersonSearchIndex | null>(null);
+  const router = useRouter();
+
+  // Deep-link a person hit into /places: open the first routed place with
+  // ?highlightPerson= so PlaceEditor auto-expands and highlights the row.
+  const openPersonHit = useCallback(
+    (hit: { display: string; placeIds: string[] }) => {
+      onHighlightPlaces(hit.placeIds);
+      setOpen(false);
+      const placeId = hit.placeIds[0];
+      if (placeId) {
+        router.push(
+          `/places?place=${encodeURIComponent(placeId)}&highlightPerson=${encodeURIComponent(hit.display)}`,
+        );
+      }
+    },
+    [onHighlightPlaces, router],
+  );
 
   // Eager plantation-names shard alongside the map payload; the ward shard
   // lazy-loads on first input focus so initial render stays untouched.
@@ -1312,10 +1352,7 @@ function SearchInput({
                   <li key={hit.display} role="option">
                     <button
                       className="w-full text-left px-3 py-2 text-sm text-ink/80 hover:bg-teal-soft/20 transition-colors"
-                      onMouseDown={() => {
-                        onHighlightPlaces(hit.placeIds);
-                        setOpen(false);
-                      }}
+                      onMouseDown={() => openPersonHit(hit)}
                     >
                       <span className="font-medium">{hit.display}</span>
                       <span className="ml-2 text-[10px] text-ink/45">

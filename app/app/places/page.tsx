@@ -1043,6 +1043,13 @@ function PlacesPageInner() {
   }, [selectedIdForConcordans]);
 
   const modeParam = searchParams.get('mode');
+  const highlightPersonParam = searchParams.get('highlightPerson') ?? '';
+
+  // Seed the detail-pane person filter from a person-search deep link
+  // (?highlightPerson=) so PlaceEditor matching rows highlight on arrival.
+  useEffect(() => {
+    if (highlightPersonParam) setPersonQuery(highlightPersonParam);
+  }, [highlightPersonParam]);
 
   useEffect(() => {
     const requestedMode = modeParam;
