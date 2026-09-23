@@ -1285,34 +1285,52 @@ function SearchInput({
         aria-expanded={open && hasResults}
         className="w-48 px-2.5 py-1 border border-ink/15 bg-cream/95 text-sm text-ink placeholder:text-ink/35 focus:outline-none focus:ring-2 focus:ring-teal-bright/40"
       />
-      {open && hasResults && (
+      {open && query.length >= 2 && (
         <div
           className="site-panel absolute top-full left-0 mt-1 w-72 max-h-72 overflow-y-auto z-10"
           role="listbox"
         >
-          <div className="sticky top-0 flex gap-1 bg-cream px-2 py-1.5 border-b border-ink/10">
+          <div
+            className="sticky top-0 flex gap-1 bg-cream px-2 py-1.5 border-b border-ink/10"
+            role="group"
+            aria-label="Result category filter"
+          >
             {(
               [
                 ['all', 'All'],
                 ['places', 'Places'],
                 ['persons', 'Persons'],
               ] as const
-            ).map(([value, label]) => (
-              <button
-                key={value}
-                type="button"
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => setCategory(value)}
-                aria-pressed={category === value}
-                className={`px-2 py-0.5 text-xs font-medium transition-colors ${
-                  category === value
-                    ? 'bg-teal-strong text-cream'
-                    : 'text-ink/65 hover:bg-teal-soft/25 hover:text-teal-strong'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
+            ).map(([value, label]) => {
+              const count =
+                value === 'places'
+                  ? placeResults.length
+                  : value === 'persons'
+                    ? personHits.length
+                    : placeResults.length + personHits.length;
+              const active = category === value;
+              return (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => setCategory(value)}
+                  aria-pressed={active}
+                  aria-label={`${label} results (${count})`}
+                  className={`px-2 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-teal-bright/50 ${
+                    active
+                      ? 'bg-teal-strong text-cream shadow-sm'
+                      : 'bg-ink/5 text-ink/65 hover:bg-teal-soft/25 hover:text-teal-strong'
+                  }`}
+                >
+                  {label}
+                  <span
+                    className={`ml-1 text-[10px] ${active ? 'text-cream/80' : 'text-ink/40'}`}
+                  >
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
           </div>
           {placeResults.length > 0 && (
             <div>
@@ -1321,10 +1339,11 @@ function SearchInput({
               </p>
               <ul>
                 {placeResults.map((f) => (
-                  <li key={f.id} role="option">
+                  <li key={f.id} role="option" aria-selected="false">
                     <button
-                      className="w-full text-left px-3 py-2 text-sm text-ink/80 hover:bg-teal-soft/20 transition-colors"
-                      onMouseDown={() => {
+                      type="button"
+                      className="w-full text-left px-3 py-2 text-sm text-ink/80 hover:bg-teal-soft/20 focus:bg-teal-soft/20 focus:outline-none transition-colors"
+                      onClick={() => {
                         onSelect(f);
                         setQuery(f.properties.name);
                         setOpen(false);
@@ -1349,10 +1368,11 @@ function SearchInput({
               </p>
               <ul>
                 {personHits.map((hit) => (
-                  <li key={hit.display} role="option">
+                  <li key={hit.display} role="option" aria-selected="false">
                     <button
-                      className="w-full text-left px-3 py-2 text-sm text-ink/80 hover:bg-teal-soft/20 transition-colors"
-                      onMouseDown={() => openPersonHit(hit)}
+                      type="button"
+                      className="w-full text-left px-3 py-2 text-sm text-ink/80 hover:bg-teal-soft/20 focus:bg-teal-soft/20 focus:outline-none transition-colors"
+                      onClick={() => openPersonHit(hit)}
                     >
                       <span className="font-medium">{hit.display}</span>
                       <span className="ml-2 text-[10px] text-ink/45">
@@ -1365,6 +1385,15 @@ function SearchInput({
                 ))}
               </ul>
             </div>
+          )}
+          {!hasResults && (
+            <p className="px-3 py-3 text-sm text-ink/55" role="status">
+              {category === 'places'
+                ? `Geen locaties gevonden voor '${query}'`
+                : category === 'persons'
+                  ? `Geen personen gevonden voor '${query}'`
+                  : `Geen resultaten gevonden voor '${query}'`}
+            </p>
           )}
         </div>
       )}

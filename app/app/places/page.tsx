@@ -10,6 +10,11 @@ import SourceFilter, {
 } from '@/components/SourceFilter';
 import { useAuth } from '@/lib/auth';
 import { type AllData, loadAllData } from '@/lib/data';
+import {
+  loadPersonIndex,
+  loadWardNameIndex,
+  searchPersonShards,
+} from '@/lib/person-search';
 import { getActiveSources, useSourceRegistry } from '@/lib/sources';
 import { readableTypeTextColor, usePlaceTypes } from '@/lib/thesaurus';
 import type {
@@ -912,6 +917,9 @@ function PlacesPageInner() {
   const { canEdit } = useAuth();
   const [search, setSearch] = useState('');
   const [personQuery, setPersonQuery] = useState('');
+  const [searchCategory, setSearchCategory] = useState<'all' | 'places' | 'persons'>('all');
+  const [personPlaceIds, setPersonPlaceIds] = useState<Set<string> | null>(null);
+  const [personSearchPending, setPersonSearchPending] = useState(false);
   const [typeFilter, setTypeFilter] = useState('all');
   // Selected place IDs — supports up to 2 for future compare/merge
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -1050,6 +1058,40 @@ function PlacesPageInner() {
   useEffect(() => {
     if (highlightPersonParam) setPersonQuery(highlightPersonParam);
   }, [highlightPersonParam]);
+
+  // Universal person search: resolve the main search term against both
+  // person-search shards and keep the matching place IDs so the left-hand
+  // list filters to places where that person appears in the archives.
+  // The ward shard lazy-loads on first use; the plantation shard is eager.
+  useEffect(() => {
+    const term = search.trim();
+    if (searchCategory === 'places' || term.length < 2) {
+      setPersonPlaceIds(null);
+      setPersonSearchPending(false);
+      return;
+    }
+    let cancelled = false;
+    setPersonSearchPending(true);
+    Promise.all([loadPersonIndex(), loadWardNameIndex()])
+      .then(([plantation, ward]) => {
+        if (cancelled) return;
+        const hits = searchPersonShards([plantation, ward], term, 50);
+        const ids = new Set<string>();
+        for (const hit of hits) {
+          for (const placeId of hit.placeIds) ids.add(placeId);
+        }
+        setPersonPlaceIds(ids);
+      })
+      .catch(() => {
+        if (!cancelled) setPersonPlaceIds(new Set());
+      })
+      .finally(() => {
+        if (!cancelled) setPersonSearchPending(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [search, searchCategory]);
 
   useEffect(() => {
     const requestedMode = modeParam;
@@ -1350,20 +1392,26 @@ function PlacesPageInner() {
     }
     if (search.trim()) {
       const q = search.toLowerCase();
+      const personIds = personPlaceIds;
+      const includePersons =
+        searchCategory !== 'places' && personIds !== null;
+      const matchPerson = (id: string) => personIds?.has(id) ?? false;
       list = list.filter(
         (p) =>
-          p.names.some((n) => n.text.toLowerCase().includes(q)) ||
-          p.id.toLowerCase().includes(q) ||
-          (p.externalLinks || []).some(
-            (l) =>
-              l.identifier.toLowerCase().includes(q) ||
-              l.authority.toLowerCase().includes(q),
-          ) ||
-          (getCurrentDistrictLabel(p) &&
-            getCurrentDistrictLabel(p)?.toLowerCase().includes(q)) ||
-          p.psurIds.some((id) => id.toLowerCase().includes(q)) ||
-          (p.locationDescription &&
-            p.locationDescription.toLowerCase().includes(q)),
+          (searchCategory !== 'persons' &&
+            (p.names.some((n) => n.text.toLowerCase().includes(q)) ||
+              p.id.toLowerCase().includes(q) ||
+              (p.externalLinks || []).some(
+                (l) =>
+                  l.identifier.toLowerCase().includes(q) ||
+                  l.authority.toLowerCase().includes(q),
+              ) ||
+              (getCurrentDistrictLabel(p) &&
+                getCurrentDistrictLabel(p)?.toLowerCase().includes(q)) ||
+              p.psurIds.some((id) => id.toLowerCase().includes(q)) ||
+              (p.locationDescription &&
+                p.locationDescription.toLowerCase().includes(q)))) ||
+          (includePersons && matchPerson(p.id)),
       );
     }
     // Sort
@@ -1441,6 +1489,8 @@ function PlacesPageInner() {
     places,
     typeFilter,
     search,
+    searchCategory,
+    personPlaceIds,
     sortKey,
     sortDir,
     sourceFilter,
@@ -1843,7 +1893,8 @@ function PlacesPageInner() {
                     type="text"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Search by name, district, PSUR ID..."
+                    placeholder="Search places & people by name, district, PSUR ID..."
+                    aria-label="Search places and people"
                     className="w-full border border-ink/15 bg-cream/95 py-1.5 pl-8 pr-8 text-sm text-ink/80 outline-none transition focus:border-teal-strong focus:ring-1 focus:ring-teal-bright/20"
                   />
                   <svg
@@ -1876,6 +1927,43 @@ function PlacesPageInner() {
                     </button>
                   )}
                 </div>
+
+                {/* Search category filter (All / Places / Persons) */}
+                <div
+                  className="flex shrink-0 items-center gap-1"
+                  role="group"
+                  aria-label="Search category filter"
+                >
+                  {(
+                    [
+                      ['all', 'All'],
+                      ['places', 'Places'],
+                      ['persons', 'Persons'],
+                    ] as const
+                  ).map(([value, label]) => {
+                    const active = searchCategory === value;
+                    return (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => setSearchCategory(value)}
+                        aria-pressed={active}
+                        className={`px-2 py-1 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-teal-bright/50 ${
+                          active
+                            ? 'bg-teal-strong text-cream shadow-sm'
+                            : 'bg-ink/5 text-ink/65 hover:bg-teal-soft/25 hover:text-teal-strong'
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
+                </div>
+                {personSearchPending && search.trim().length >= 2 && searchCategory !== 'places' && (
+                  <span className="text-xs text-ink/45" role="status">
+                    Searching persons…
+                  </span>
+                )}
 
                 {/* Person quick-filter (linked persons, ward residents, owners) */}
                 <div className="relative flex-1 min-w-48">
@@ -2259,6 +2347,7 @@ function PlacesPageInner() {
                         ?.wardResidents ?? []
                     }
                     personFilter={personQuery}
+                    highlightPerson={highlightPersonParam || undefined}
                     canEdit={canEdit}
                     onSave={handleSave}
                     onCancel={handleCancel}
@@ -2294,6 +2383,7 @@ function PlacesPageInner() {
                         ?.wardResidents ?? []
                     }
                     personFilter={personQuery}
+                    highlightPerson={highlightPersonParam || undefined}
                     canEdit={canEdit}
                     onSave={handleSave}
                     onCancel={handleCancel}
