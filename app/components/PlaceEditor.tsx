@@ -46,6 +46,8 @@ interface PlaceEditorProps {
   wardResidents?: WardRegisterResidentLink[];
   /** Person-name quick-filter from the /places toolbar (substring match). */
   personFilter?: string;
+  /** Explicit deep-link highlight (e.g. ?highlightPerson=); falls back to personFilter. */
+  highlightPerson?: string;
   canEdit: boolean;
   onSave: (place: GazetteerPlace) => Promise<void>;
   onCancel: () => void;
@@ -684,6 +686,7 @@ export default function PlaceEditor({
   concordansSourceAttribution = null,
   wardResidents = [],
   personFilter = '',
+  highlightPerson,
   canEdit,
   onSave,
   onCancel,
@@ -1123,15 +1126,20 @@ export default function PlaceEditor({
 
   // Person-name quick-filter from the /places toolbar: normalized substring
   // match over linked persons, ward resident names, and almanac actor names.
-  // Person deep-link (?highlightPerson=): same normalized substring match
-  // as the toolbar filter, but used to auto-open accordions, badge the
-  // matching row, and scroll it into view on arrival.
+  // Person deep-link (?highlightPerson= prop, falling back to the raw URL
+  // param for direct navigation): same normalized substring match as the
+  // toolbar filter, but used to auto-open accordions, badge the matching
+  // row, and scroll it into view on arrival.
   const normalizedHighlightPerson = useMemo(
     () =>
-      (typeof window === 'undefined'
-        ? ''
-        : new URLSearchParams(window.location.search).get('highlightPerson') ??
-          ''
+      (
+        highlightPerson ??
+        (typeof window === 'undefined'
+          ? ''
+          : (new URLSearchParams(window.location.search).get(
+              'highlightPerson',
+            ) ??
+            ''))
       )
         .normalize('NFKD')
         .replace(/[̀-ͯ]/g, '')
@@ -1139,7 +1147,7 @@ export default function PlaceEditor({
         .trim(),
     // Key on place + filter so arrival via deep-link re-runs the scroll.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [place.id, personFilter],
+    [place.id, personFilter, highlightPerson],
   );
 
   const highlightRowClass = useCallback(
@@ -1154,7 +1162,7 @@ export default function PlaceEditor({
             .toLowerCase()
             .includes(normalizedHighlightPerson),
       );
-      return hit ? ' ring-2 ring-teal-bright/70 bg-teal-soft/25 rounded-sm' : '';
+      return hit ? ' ring-2 ring-teal-bright/70 bg-teal-soft/25' : '';
     },
     [normalizedHighlightPerson],
   );
