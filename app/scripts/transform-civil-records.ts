@@ -128,6 +128,10 @@ export interface UnmappedLocation {
   count: number;
   fieldOrigin: string;
   exampleRecordIds: string[];
+  /** cert_date years observed for this raw string (for year-aware tuples). */
+  years: number[];
+  /** Per-year occurrence counts (parallel to years). */
+  yearCounts: number[];
 }
 
 export interface CivilTransformResult {
@@ -149,6 +153,14 @@ export interface CivilTransformResult {
 
 function clean(value: string | undefined): string {
   return (value ?? '').trim();
+}
+
+/** Extract the certificate year from dd-mm-yyyy (null when unparseable). */
+function certYearOf(certDate: string): number | null {
+  const match = clean(certDate).match(/(\d{1,2})-(\d{1,2})-(\d{4})/);
+  if (!match) return null;
+  const year = Number(match[3]);
+  return Number.isInteger(year) ? year : null;
 }
 
 function joinName(fname: string, prefix: string, sname: string): string {
@@ -262,6 +274,7 @@ function resolveLocation(
   fieldOrigin: string,
   unmapped: Map<string, UnmappedLocation>,
   recordId: string,
+  certYear: number | null,
 ): ResolvedLocation | null {
   const text = clean(raw);
   if (!text || text === '#') return null;
@@ -361,14 +374,23 @@ function resolveLocation(
     };
   }
 
-  // Unresolvable: todo-list entry.
+  // Unresolvable: todo-list entry (year-aware for Track B tuples).
   const key = `${fieldOrigin}||${text}`;
   let entry = unmapped.get(key);
   if (!entry) {
-    entry = { raw: text, count: 0, fieldOrigin, exampleRecordIds: [] };
+    entry = { raw: text, count: 0, fieldOrigin, exampleRecordIds: [], years: [], yearCounts: [] };
     unmapped.set(key, entry);
   }
   entry.count += 1;
+  if (certYear != null) {
+    const yearIndex = entry.years.indexOf(certYear);
+    if (yearIndex < 0) {
+      entry.years.push(certYear);
+      entry.yearCounts.push(1);
+    } else {
+      entry.yearCounts[yearIndex] += 1;
+    }
+  }
   if (entry.exampleRecordIds.length < 5) entry.exampleRecordIds.push(recordId);
   return {
     raw: text,
@@ -500,6 +522,7 @@ function transformDeathRow(
   const recordId = clean(row.id);
   const certDate = clean(row.cert_date);
   const eventDate = clean(row.death_date);
+  const certYear = certYearOf(certDate);
   const observations: CivilObservation[] = [];
   const edges: KinshipEdge[] = [];
   const uri = (role: string) => `${STM}civil-observation/${recordId}-${role}`;
@@ -510,6 +533,7 @@ function transformDeathRow(
     'death:dec_place/death_place',
     unmapped,
     recordId,
+    certYear,
   );
   observations.push(
     observe(
@@ -546,6 +570,7 @@ function transformDeathRow(
       `death:parent_place_${n}`,
       unmapped,
       recordId,
+      certYear,
     );
     observations.push(
       observe(
@@ -621,6 +646,7 @@ function transformDeathRow(
         'death:inf_place',
         unmapped,
         recordId,
+        certYear,
       );
       observations.push(
         observe(
@@ -670,6 +696,7 @@ function transformDeathRow(
       `death:witn_place_${n}`,
       unmapped,
       recordId,
+      certYear,
     );
     observations.push(
       observe(
@@ -706,6 +733,7 @@ function transformBirthRow(
   const recordId = clean(row.id);
   const certDate = clean(row.cert_date);
   const eventDate = clean(row.birth_date);
+  const certYear = certYearOf(certDate);
   const observations: CivilObservation[] = [];
   const edges: KinshipEdge[] = [];
   const uri = (role: string) => `${STM}civil-observation/${recordId}-${role}`;
@@ -716,6 +744,7 @@ function transformBirthRow(
     'birth:moth_place/birth_place',
     unmapped,
     recordId,
+    certYear,
   );
   const mothFname = clean(row.moth_fname);
   const mothSname = clean(row.moth_sname);
@@ -749,6 +778,7 @@ function transformBirthRow(
       'birth:birth_place',
       unmapped,
       recordId,
+      certYear,
     );
     observations.push(
       observe(
@@ -824,6 +854,7 @@ function transformBirthRow(
         'birth:inf_place',
         unmapped,
         recordId,
+        certYear,
       );
       observations.push(
         observe(
@@ -866,6 +897,7 @@ function transformBirthRow(
       `birth:witn_place_${n}`,
       unmapped,
       recordId,
+      certYear,
     );
     observations.push(
       observe(
