@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { LinkedImage } from '@/lib/types';
 
 const INITIAL_IMAGE_COUNT = 10;
@@ -9,6 +9,12 @@ export default function LinkedImagesSection({
   images: LinkedImage[];
 }) {
   const [expanded, setExpanded] = useState(false);
+  // Reset to truncated view whenever a different organization's images load.
+  // Without this, expanding once keeps every subsequently selected org
+  // expanded (same mounted component, new props) — appearing as "no truncation".
+  useEffect(() => {
+    setExpanded(false);
+  }, [images]);
   const truncated = images.length > INITIAL_IMAGE_COUNT;
   const visible = expanded || !truncated ? images : images.slice(0, INITIAL_IMAGE_COUNT);
   return (
