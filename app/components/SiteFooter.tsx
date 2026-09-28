@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 export default function SiteFooter() {
@@ -18,16 +17,29 @@ export default function SiteFooter() {
           <span className="text-ink/25">•</span>
           <span>2026</span>
           <span className="text-ink/25">•</span>
+          <span>Development &amp; Design: Jona Schlegel</span>
+          <span className="text-ink/25">•</span>
           <span>Project lead: Thunnis van Oort</span>
           <span className="text-ink/25">•</span>
           <span>Funder: Stichting Pica</span>
+          <span className="text-ink/25">•</span>
+          <span>Huygens Institute</span>
+          <span className="text-ink/25">•</span>
+          <a
+            href="https://surinametijdmachine.org/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="transition hover:text-teal-strong"
+          >
+            About
+          </a>
         </div>
 
-        <div className="mt-1.5 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[11px] text-ink/55">
-          <Link href="/#partners" className="transition hover:text-teal-strong">
-            Partners
-          </Link>
-        </div>
+        <p className="mt-1.5 text-center text-[11px] text-ink/45">
+          Development Preview: This platform is actively under development for
+          research and testing. Historical record linkages are continuously
+          being refined and may contain errors or incomplete data.
+        </p>
       </div>
     </footer>
   );
