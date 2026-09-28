@@ -342,14 +342,21 @@ function proposeCandidates(
 }
 
 // Track A gate: deterministic exact rules only (see workflow doc §4).
-function isTrackA(candidate: LocationCandidate, raw: string): boolean {
+// hasParenthetical covers ALL raw variants in the normalized bucket —
+// any qualified variant blocks promotion regardless of which variant won
+// the representative-raw slot, so input ordering can never bypass the gate.
+function isTrackA(
+  candidate: LocationCandidate,
+  raw: string,
+  hasParenthetical = false,
+): boolean {
   if (
     candidate.match_reason === 'street_alias_exact' ||
     candidate.match_reason === 'concordance_exact' ||
     candidate.match_reason === 'relative_phrase'
   ) {
     // Parenthetical qualifiers stripped → not deterministic.
-    if (/\([^)]*\)/.test(raw)) return false;
+    if (hasParenthetical || /\([^)]*\)/.test(raw)) return false;
     return candidate.match_score >= 0.95;
   }
   return false;
@@ -422,6 +429,8 @@ export function generateCivilLocationManifest(): ManifestResult {
     string,
     {
       raw: string;
+      rawCount: number;
+      hasParenthetical: boolean;
       origins: Set<string>;
       examples: string[];
       yearCounts: Map<number, number>;
@@ -435,6 +444,8 @@ export function generateCivilLocationManifest(): ManifestResult {
     if (!bucket) {
       bucket = {
         raw: entry.raw,
+        rawCount: 0,
+        hasParenthetical: false,
         origins: new Set(),
         examples: [],
         yearCounts: new Map(),
@@ -442,15 +453,26 @@ export function generateCivilLocationManifest(): ManifestResult {
       };
       byNormalized.set(normalized, bucket);
     }
+    // Representative raw = highest-count variant: deterministic output
+    // independent of input ordering.
+    if (entry.count > bucket.rawCount) {
+      bucket.raw = entry.raw;
+      bucket.rawCount = entry.count;
+    }
+    // Variant-aware qualifier gate: ANY parenthetical variant in the bucket
+    // blocks Track A promotion (checked per-variant, not just on the
+    // representative raw).
+    if (/\([^)]*\)/.test(entry.raw)) bucket.hasParenthetical = true;
     bucket.origins.add(entry.fieldOrigin);
     for (const id of entry.exampleRecordIds) {
       if (bucket.examples.length < 5) bucket.examples.push(id);
     }
     const years = entry.years ?? [];
     const counts = entry.yearCounts ?? [];
-    if (years.length === 0) {
-      bucket.nullCount += entry.count;
-    }
+    const dated = counts.reduce((sum, c) => sum + (c ?? 0), 0);
+    // Undated occurrences: an entry can mix dated and undated records, so
+    // derive the residual from the count — never just the empty-years case.
+    bucket.nullCount += Math.max(0, entry.count - dated);
     years.forEach((year, index) => {
       bucket!.yearCounts.set(
         year,
@@ -480,9 +502,17 @@ export function generateCivilLocationManifest(): ManifestResult {
         streetAliases,
         concordansStreets,
       );
-      const track = isTrackA(top, bucket.raw) ? 'A' : 'B';
       const prior = priorReviews.get(id);
       if (prior) preservedReviews++;
+      // Approved human decisions promote to Track A regardless of the
+      // machine gate — and the reviewed tuple stays in the manifest with
+      // its manual_review payload intact, never dropped or detached.
+      const humanApproved =
+        prior?.status === 'approved' || prior?.status === 'custom_override';
+      const track =
+        humanApproved || isTrackA(top, bucket.raw, bucket.hasParenthetical)
+          ? 'A'
+          : 'B';
       tuples.push({
         tuple_id: id,
         raw_location_string: bucket.raw,
