@@ -84,12 +84,12 @@ export default function EventPage() {
     }
   }, []);
 
-  function resetFormForTask(nextTask: EventTask | null) {
+  function resetForm() {
     setAddedPlaces([]);
     setAddedDates([]);
     setAddedPersons([]);
     setLocationUnknown(true);
-    setDateInput(nextTask?.yearRaw || '');
+    setDateInput('');
     setPlaceInput('');
     setPersonInput('');
     setNotes('');
@@ -155,14 +155,14 @@ export default function EventPage() {
       if (data.done || !data.task) {
         setDone(true);
         setTask(null);
-        resetFormForTask(null);
-        setStatus('Geen taak beschikbaar. Alles aangeboden of afgerond.');
+        resetForm();
+        setStatus('Er is op dit moment geen foto beschikbaar. Probeer het later opnieuw.');
         return;
       }
 
       setDone(false);
       setTask(data.task);
-      resetFormForTask(data.task);
+      resetForm();
       setStatus('');
     } catch (error) {
       if (error instanceof Error && error.message.toLowerCase().includes('unknown participant')) {
@@ -184,7 +184,7 @@ export default function EventPage() {
     setTask(null);
     setDone(false);
     setStats(null);
-    resetFormForTask(null);
+    resetForm();
     setStatus('Kies een nickname om te beginnen.');
   }
 
@@ -225,6 +225,10 @@ export default function EventPage() {
       setStatus('Geen actieve taak om in te dienen.');
       return;
     }
+    if (decision === 'confirm' && (placeInput.trim() || dateInput.trim() || personInput.trim())) {
+      setStatus('Er staat nog tekst in een invoerveld. Klik op Toevoegen of maak het veld leeg voordat je bevestigt.');
+      return;
+    }
     const skippedTaskId = decision === 'skip' ? task.taskId : undefined;
 
     setBusy(true);
@@ -259,7 +263,7 @@ export default function EventPage() {
         setStatus('Taak opgeslagen. Volgende taak laden...');
       }
       setTask(null);
-      resetFormForTask(null);
+      resetForm();
       await claimNextTask(skippedTaskId);
     } catch (error) {
       setStatus(error instanceof Error ? error.message : 'Onbekende fout bij submit.');
@@ -269,7 +273,7 @@ export default function EventPage() {
   }
 
   return (
-    <main className="h-full min-h-0 overflow-hidden bg-stm-warm-50 text-stm-warm-900">
+    <div lang="nl" className="annotation-app h-full min-h-0 overflow-hidden bg-stm-warm-50 text-stm-warm-900">
       <div className="mx-auto flex h-full w-full max-w-xl flex-col">
         {!task ? (
           <header className="shrink-0 border-b border-stm-warm-200 bg-white px-4 py-3">
@@ -287,9 +291,10 @@ export default function EventPage() {
         <div className="flex min-h-0 flex-1 flex-col">
           {!participantId ? (
             <section className="m-3 border border-stm-warm-200 bg-white p-4">
-              <p className="mb-3 text-sm text-stm-warm-700">Kies een nickname om te beginnen.</p>
+              <label htmlFor="event-nickname" className="mb-3 block text-sm text-stm-warm-700">Kies een nickname om te beginnen.</label>
               <div className="flex gap-2">
                 <input
+                  id="event-nickname"
                   value={nickname}
                   onChange={(e) => setNickname(e.target.value)}
                   placeholder="Bijv. Team-12"
@@ -302,15 +307,13 @@ export default function EventPage() {
             </section>
           ) : null}
 
-          {participantId && !task && !done ? (
+          {participantId && !task ? (
             <section className="m-3 border border-stm-warm-200 bg-white p-3">
               <button onClick={() => claimNextTask()} disabled={busy} className="w-full bg-stm-warm-900 py-3 text-sm font-semibold text-white disabled:opacity-50">
-                Volgende foto
+                {done ? 'Opnieuw proberen' : 'Volgende foto'}
               </button>
             </section>
           ) : null}
-
-          {done ? <p className="m-3 border border-stm-warm-200 bg-white p-4 text-sm text-stm-warm-700">Geen foto&apos;s meer beschikbaar.</p> : null}
 
           {task ? (
             <section className="flex min-h-0 flex-1 flex-col bg-white">
@@ -321,11 +324,12 @@ export default function EventPage() {
                   </div>
                 ) : <div className="flex min-h-[30vh] items-center justify-center bg-stm-warm-100 text-sm text-stm-warm-500">Geen preview beschikbaar</div>}
 
-                <div className="space-y-3 p-3">
+                <fieldset disabled={busy} className="min-w-0 space-y-3 p-3">
                   <div>
                     <h1 className="text-base font-semibold leading-tight">{task.title || '(zonder titel)'}</h1>
                     <p
                       ref={descriptionRef}
+                      id="event-description"
                       className={`mt-1 text-sm leading-snug text-stm-warm-700 ${descriptionExpanded ? '' : 'line-clamp-5'}`}
                     >
                       {task.description || '(geen beschrijving)'}
@@ -334,6 +338,8 @@ export default function EventPage() {
                       <button
                         type="button"
                         onClick={() => setDescriptionExpanded((expanded) => !expanded)}
+                        aria-expanded={descriptionExpanded}
+                        aria-controls="event-description"
                         className="min-h-11 text-sm font-semibold text-stm-sepia-700 underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stm-sepia-700"
                       >
                         {descriptionExpanded ? 'Minder' : 'Meer'}
@@ -353,7 +359,7 @@ export default function EventPage() {
                   ) : null}
 
                   <div className="border-t border-stm-warm-200 pt-3">
-                    <label className="mb-1 block text-sm font-semibold text-stm-warm-700">Datum</label>
+                    <p className="mb-1 block text-sm font-semibold text-stm-warm-700">Datum</p>
                     <p className="min-h-11 flex items-center border border-stm-warm-300 bg-stm-warm-100 px-3 py-2 text-base text-stm-warm-600">
                       {task.yearRaw.trim() || 'Onbekend'}
                     </p>
@@ -413,7 +419,7 @@ export default function EventPage() {
                     <summary className="flex min-h-11 cursor-pointer items-center text-sm font-semibold text-stm-warm-700">Notitie toevoegen</summary>
                     <textarea aria-label="Notitie" value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} className="mt-2 w-full border border-stm-warm-300 px-3 py-2 text-base focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stm-sepia-700" placeholder="Optioneel" />
                   </details>
-                </div>
+                </fieldset>
               </div>
 
               <div className="grid shrink-0 grid-cols-2 gap-2 border-t border-stm-warm-200 bg-white p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
@@ -424,8 +430,8 @@ export default function EventPage() {
           ) : null}
         </div>
 
-        {status ? <p className="shrink-0 border-t border-stm-warm-200 bg-white px-3 py-2 text-xs text-stm-warm-700">{status}</p> : null}
+        <p role="status" aria-live="polite" aria-atomic="true" className={status ? 'shrink-0 border-t border-stm-warm-200 bg-white px-3 py-2 text-sm text-stm-warm-700' : 'sr-only'}>{status}</p>
       </div>
-    </main>
+    </div>
   );
 }

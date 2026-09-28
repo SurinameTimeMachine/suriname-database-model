@@ -1,9 +1,10 @@
 'use client';
 
 import { clearAuthCache, useAuth } from '@/lib/auth';
+import { FooterContent } from './SiteFooter';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 const NAV_ITEMS = [
   { href: '/annotate', label: 'Image review' },
@@ -27,9 +28,10 @@ const DOMAIN_LINKS: DomainLink[] = [
 
 export default function Navigation() {
   const pathname = usePathname();
-  const isAnnotationApp = pathname.startsWith('/annotate');
+  const isAnnotationApp = pathname.startsWith('/annotate') || pathname === '/event';
   const searchParams = useSearchParams();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const annotationMenuButton = useRef<HTMLButtonElement>(null);
   const { user, canEdit, loading: authLoading } = useAuth();
   const [authError, setAuthError] = useState<string | null>(null);
 
@@ -54,14 +56,49 @@ export default function Navigation() {
     window.location.href = '/api/auth/logout';
   }, []);
 
+  const closeMobileMenu = useCallback(() => {
+    setMobileOpen(false);
+    annotationMenuButton.current?.focus();
+  }, []);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+    function onEscape(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        closeMobileMenu();
+      }
+    }
+    document.addEventListener('keydown', onEscape);
+    return () => document.removeEventListener('keydown', onEscape);
+  }, [mobileOpen, closeMobileMenu]);
+
   return (
-    <div className={isAnnotationApp ? 'hidden md:block' : undefined}>
+    <div className={isAnnotationApp ? 'sticky top-0 z-50 shrink-0' : undefined}>
       <header
         id="site-header"
         className="sticky top-0 z-50 border-b border-ink/10 bg-cream/95 font-sans shadow-[0_10px_28px_rgba(0,30,24,0.05)] backdrop-blur-sm"
         role="banner"
+        onBlur={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget)) setMobileOpen(false);
+        }}
       >
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-10">
+        {isAnnotationApp ? (
+          <div lang="nl" className="flex h-12 items-center px-3 md:hidden">
+            <button
+              ref={annotationMenuButton}
+              type="button"
+              className="annotation-menu-toggle inline-flex min-h-11 items-center gap-2 px-2 text-sm font-semibold text-ink"
+              aria-expanded={mobileOpen}
+              aria-controls="mobile-nav"
+              onClick={() => setMobileOpen((open) => !open)}
+            >
+              <span aria-hidden="true">{mobileOpen ? '←' : '☰'}</span>
+              {mobileOpen ? 'Terug naar foto' : 'Menu'}
+            </button>
+          </div>
+        ) : null}
+        <div className={`${isAnnotationApp ? 'hidden md:block ' : ''}mx-auto max-w-6xl px-4 sm:px-6 lg:px-10`}>
           <div className="flex items-center justify-between gap-3 py-3">
             <div className="flex min-w-0 items-center gap-3 sm:gap-4">
               <Link
@@ -172,7 +209,7 @@ export default function Navigation() {
               </div>
 
               <button
-                className="inline-flex h-8 w-8 items-center justify-center border-none bg-transparent text-ink/60 transition-colors hover:text-ink sm:hidden"
+                className="inline-flex h-11 w-11 items-center justify-center border-none bg-transparent text-ink/60 transition-colors hover:text-ink md:hidden"
                 onClick={() => setMobileOpen(!mobileOpen)}
                 aria-expanded={mobileOpen}
                 aria-controls="mobile-nav"
@@ -211,96 +248,108 @@ export default function Navigation() {
           </div>
         </div>
 
-        {mobileOpen && (
-          <div
-            id="mobile-nav"
-            className="border-t border-ink/10 bg-cream px-4 pb-4 pt-3 sm:hidden"
-          >
-            <div className="mb-3 flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-[0.25em] text-ink/60">
-              {DOMAIN_LINKS.map(({ label, href, isCurrent }, index) => (
-                <div key={label} className="flex items-center gap-2">
-                  {index > 0 && <span className="text-ink/20">•</span>}
-                  <a
-                    href={href}
-                    aria-current={isCurrent ? 'page' : undefined}
-                    className={
-                      isCurrent
-                        ? 'font-semibold text-ink'
-                        : 'transition-colors hover:text-ink'
-                    }
-                  >
-                    {label}
-                  </a>
-                </div>
-              ))}
-            </div>
-
-            <nav aria-label="Mobile navigation" className="space-y-1">
-              {NAV_ITEMS.map(({ href, label }) => {
-                const active = pathname.startsWith(href);
-                return (
-                  <Link
-                    key={href}
-                    href={href}
-                    className={`block px-2 py-2 text-xs uppercase tracking-[0.2em] transition-colors ${
-                      active
-                        ? 'font-semibold text-teal-strong'
-                        : 'text-ink/70 hover:text-teal-strong'
-                    }`}
-                    onClick={() => setMobileOpen(false)}
-                    aria-current={active ? 'page' : undefined}
-                  >
-                    {label}
-                  </Link>
-                );
-              })}
-            </nav>
-
-            <div className="mt-4 border-t border-ink/10 pt-3">
-              <div className="flex items-center justify-between gap-3">
-                <button
-                  type="button"
-                  aria-label="Language selector"
-                  className="border-none bg-transparent text-xs font-medium uppercase tracking-[0.25em] text-ink/40 transition-colors hover:text-ink"
+        <div
+          id="mobile-nav"
+          hidden={!mobileOpen}
+          className={`${isAnnotationApp ? 'absolute inset-x-0 top-full max-h-[calc(100dvh-3rem)] overflow-y-auto shadow-lg ' : ''}border-t border-ink/10 bg-cream px-4 pb-4 pt-3 md:hidden`}
+        >
+          <div className="mb-3 flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-[0.25em] text-ink/60">
+            {DOMAIN_LINKS.map(({ label, href, isCurrent }, index) => (
+              <div key={label} className="flex items-center gap-2">
+                {index > 0 && <span className="text-ink/20">•</span>}
+                <a
+                  href={href}
+                  aria-current={isCurrent ? 'page' : undefined}
+                  className={
+                    isCurrent
+                      ? 'inline-flex min-h-11 items-center font-semibold text-ink'
+                      : 'inline-flex min-h-11 items-center transition-colors hover:text-ink'
+                  }
                 >
-                  EN
-                </button>
-                {authLoading ? (
-                  <span className="text-xs text-ink/40">…</span>
-                ) : user ? (
-                  <div className="flex items-center gap-2">
-                    <img
-                      src={user.avatar_url}
-                      alt={user.login}
-                      className="h-5 w-5 rounded-full"
-                    />
-                    <span className="text-xs text-ink/60">
-                      {user.name || user.login}
-                    </span>
-                    {canEdit && (
-                      <span className="bg-teal-soft px-1.5 py-0.5 text-[10px] uppercase tracking-[0.2em] text-teal-strong">
-                        Editor
-                      </span>
-                    )}
-                    <button
-                      onClick={signOut}
-                      className="border-none bg-transparent text-xs uppercase tracking-[0.2em] text-ink/40 transition-colors hover:text-teal-strong"
-                    >
-                      Sign out
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    onClick={signIn}
-                    className="border-none bg-transparent text-xs uppercase tracking-[0.2em] text-ink/70 transition-colors hover:text-teal-strong"
-                  >
-                    Sign in with GitHub
-                  </button>
-                )}
+                  {label}
+                </a>
               </div>
+            ))}
+          </div>
+
+          <nav aria-label="Mobile navigation" className="space-y-1">
+            {NAV_ITEMS.map(({ href, label }) => {
+              const active = pathname.startsWith(href);
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  className={`flex min-h-11 items-center px-2 py-2 text-xs uppercase tracking-[0.2em] transition-colors ${
+                    active
+                      ? 'font-semibold text-teal-strong'
+                      : 'text-ink/70 hover:text-teal-strong'
+                  }`}
+                  onClick={() => setMobileOpen(false)}
+                  aria-current={active ? 'page' : undefined}
+                >
+                  {label}
+                </Link>
+              );
+            })}
+          </nav>
+
+          <div className="mt-4 border-t border-ink/10 pt-3">
+            <div className="flex items-center justify-between gap-3">
+              <button
+                type="button"
+                aria-label="Language selector"
+                className="border-none bg-transparent text-xs font-medium uppercase tracking-[0.25em] text-ink/40 transition-colors hover:text-ink"
+              >
+                EN
+              </button>
+              {authLoading ? (
+                <span className="text-xs text-ink/40">…</span>
+              ) : user ? (
+                <div className="flex items-center gap-2">
+                  <img
+                    src={user.avatar_url}
+                    alt={user.login}
+                    className="h-5 w-5 rounded-full"
+                  />
+                  <span className="text-xs text-ink/60">
+                    {user.name || user.login}
+                  </span>
+                  {canEdit && (
+                    <span className="bg-teal-soft px-1.5 py-0.5 text-[10px] uppercase tracking-[0.2em] text-teal-strong">
+                      Editor
+                    </span>
+                  )}
+                  <button
+                    onClick={signOut}
+                    className="border-none bg-transparent text-xs uppercase tracking-[0.2em] text-ink/40 transition-colors hover:text-teal-strong"
+                  >
+                    Sign out
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={signIn}
+                  className="border-none bg-transparent text-xs uppercase tracking-[0.2em] text-ink/70 transition-colors hover:text-teal-strong"
+                >
+                  Sign in with GitHub
+                </button>
+              )}
             </div>
           </div>
-        )}
+          {isAnnotationApp ? (
+            <div className="mt-4 border-t border-ink/10">
+              <FooterContent />
+              <button
+                type="button"
+                lang="nl"
+                onClick={closeMobileMenu}
+                className="annotation-menu-toggle min-h-11 w-full border border-ink/30 px-3 text-sm font-semibold text-ink"
+              >
+                Terug naar foto
+              </button>
+            </div>
+          ) : null}
+        </div>
       </header>
 
       {authError && (

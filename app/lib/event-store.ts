@@ -351,10 +351,9 @@ export async function claimTask(participantId: string, excludeTaskId?: string): 
       }
     }
 
-    // Round 1: hand out every task once before any task is offered a second time.
-    // The just-skipped task is excluded so a single skip can never hand back
-    // the same image (it returns to 'unoffered' and would otherwise be
-    // re-selected by the task_id ordering below).
+    // Prefer the least-offered first-round tasks so repeated skips do not
+    // alternate between the same images while unseen tasks are available.
+    // Also exclude the just-skipped image from this request.
     let round: 1 | 2 = 1;
     let candidates = exclude
       ? await db<TaskIdRow[]>`
@@ -364,7 +363,7 @@ export async function claimTask(participantId: string, excludeTaskId?: string): 
         where t.task_id <> ${exclude}
           and (t.status = 'unoffered'
             or (t.status = 'assigned' and c.round = 1 and c.lease_until <= now()))
-        order by t.task_id asc
+        order by t.assignment_count asc, t.last_assigned_at asc nulls first, t.task_id asc
         limit 1
         for update of t skip locked`
       : await db<TaskIdRow[]>`
@@ -373,7 +372,7 @@ export async function claimTask(participantId: string, excludeTaskId?: string): 
         left join claims c on c.claim_id = t.current_claim_id
         where t.status = 'unoffered'
            or (t.status = 'assigned' and c.round = 1 and c.lease_until <= now())
-        order by t.task_id asc
+        order by t.assignment_count asc, t.last_assigned_at asc nulls first, t.task_id asc
         limit 1
         for update of t skip locked`;
 
