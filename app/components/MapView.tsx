@@ -277,7 +277,9 @@ export default function MapView({
   const [enabledOverlays, setEnabledOverlays] = useState<Set<string>>(
     () => new Set(DEFAULT_ENABLED),
   );
-  const [overlayErrors, setOverlayErrors] = useState<Record<string, string>>({});
+  const [overlayErrors, setOverlayErrors] = useState<Record<string, string>>(
+    {},
+  );
   const enabledOverlaysRef = useRef(enabledOverlays);
   enabledOverlaysRef.current = enabledOverlays;
   const [layersOpen, setLayersOpen] = useState(false);
@@ -338,6 +340,24 @@ export default function MapView({
       maxZoom: 18,
     }).addTo(map);
 
+    // Display-only national outline from SBB's current GONINI service.
+    // Keep it below historical overlays and the application's place features.
+    L.tileLayer
+      .wms('https://gonini.sbb.sr/geoserver/wms', {
+        layers: 'gonini:grenzen',
+        format: 'image/png',
+        transparent: true,
+        version: '1.1.1',
+        maxZoom: 18,
+        bounds: [
+          [1.43727, -58.45304],
+          [6.07443, -53.92694],
+        ],
+        attribution:
+          'Outline: <a href="https://gonini.sbb.sr/">GONINI / SBB</a>',
+      })
+      .addTo(map);
+
     mapRef.current = map;
 
     // Leaflet and Allmaps both need one frame after mount to observe the
@@ -389,9 +409,11 @@ export default function MapView({
     Promise.all(urls.map(loadAllmapsAnnotation))
       .then(async (annotations) => {
         const { WarpedMapLayer } = await import('@allmaps/leaflet');
-        if (mapRef.current !== map || !enabledOverlaysRef.current.has(id)) return;
+        if (mapRef.current !== map || !enabledOverlaysRef.current.has(id))
+          return;
         await nextFrame();
-        if (mapRef.current !== map || !enabledOverlaysRef.current.has(id)) return;
+        if (mapRef.current !== map || !enabledOverlaysRef.current.has(id))
+          return;
 
         const warpedMapLayer = new WarpedMapLayer(annotations[0]);
         warpedMapLayer.addTo(map);
@@ -430,30 +452,33 @@ export default function MapView({
   }, []);
 
   // Toggle overlay callback — creates/destroys WarpedMapLayer lazily
-  const toggleOverlay = useCallback((id: string, config: OverlayConfig) => {
-    if (!ENABLE_WARPED_OVERLAYS) return;
-    const next = new Set(enabledOverlaysRef.current);
-    if (next.has(id)) {
-      const layers = warpedLayersRef.current.get(id);
-      if (layers) {
-        layers.forEach(safelyRemove);
-        warpedLayersRef.current.delete(id);
+  const toggleOverlay = useCallback(
+    (id: string, config: OverlayConfig) => {
+      if (!ENABLE_WARPED_OVERLAYS) return;
+      const next = new Set(enabledOverlaysRef.current);
+      if (next.has(id)) {
+        const layers = warpedLayersRef.current.get(id);
+        if (layers) {
+          layers.forEach(safelyRemove);
+          warpedLayersRef.current.delete(id);
+        }
+        next.delete(id);
+        enabledOverlaysRef.current = next;
+        setEnabledOverlays(next);
+        return;
       }
-      next.delete(id);
+
+      next.add(id);
       enabledOverlaysRef.current = next;
       setEnabledOverlays(next);
-      return;
-    }
-
-    next.add(id);
-    enabledOverlaysRef.current = next;
-    setEnabledOverlays(next);
-    setOverlayErrors((previous) => {
-      const { [id]: _removed, ...remaining } = previous;
-      return remaining;
-    });
-    loadOverlay(id, config);
-  }, [loadOverlay]);
+      setOverlayErrors((previous) => {
+        const { [id]: _removed, ...remaining } = previous;
+        return remaining;
+      });
+      loadOverlay(id, config);
+    },
+    [loadOverlay],
+  );
 
   // Initialize default-enabled overlays once map is ready
   useEffect(() => {
@@ -751,12 +776,7 @@ export default function MapView({
   // Fly to all highlighted features when a person search highlights places
   // without selection (set-based; falls back to the legacy name highlight).
   useEffect(() => {
-    if (
-      !mapRef.current ||
-      !layerRef.current ||
-      selectedPlantationUri
-    )
-      return;
+    if (!mapRef.current || !layerRef.current || selectedPlantationUri) return;
     const highlightedIds =
       highlightedPlaceIds && highlightedPlaceIds.length > 0
         ? new Set(highlightedPlaceIds)
@@ -772,9 +792,7 @@ export default function MapView({
           ? highlightedIds.has(feature.properties.stmId)
           : false;
       const matchesName =
-        !matchesIds &&
-        !!highlightedName &&
-        !!feature?.properties?.name
+        !matchesIds && !!highlightedName && !!feature?.properties?.name
           ? feature.properties.name
               .toLowerCase()
               .includes(highlightedName.toLowerCase())
@@ -904,9 +922,7 @@ export default function MapView({
               geojson={geojson}
               onSelect={onSelectPlantation}
               onHighlightName={onHighlightName}
-              onHighlightPlaces={(placeIds) =>
-                onHighlightPlaces?.(placeIds)
-              }
+              onHighlightPlaces={(placeIds) => onHighlightPlaces?.(placeIds)}
             />
 
             {/* Divider */}
@@ -1032,9 +1048,7 @@ export default function MapView({
                                 }}
                               />
                             )}
-                            <span className="text-ink/80 flex-1">
-                              {label}
-                            </span>
+                            <span className="text-ink/80 flex-1">{label}</span>
                           </label>
                         </li>
                       );
@@ -1095,7 +1109,9 @@ export default function MapView({
                           max={1}
                           step={0.05}
                           value={opacity}
-                          onChange={(e) => setOpacity(parseFloat(e.target.value))}
+                          onChange={(e) =>
+                            setOpacity(parseFloat(e.target.value))
+                          }
                           className="flex-1 accent-stm-sepia-600"
                           aria-label="Map overlay opacity"
                         />
@@ -1115,7 +1131,9 @@ export default function MapView({
                                 <input
                                   type="checkbox"
                                   checked={isEnabled}
-                                  onChange={() => toggleOverlay(config.id, config)}
+                                  onChange={() =>
+                                    toggleOverlay(config.id, config)
+                                  }
                                   className="accent-stm-sepia-600"
                                 />
                                 <span className="text-stm-warm-800 truncate flex-1">
@@ -1142,8 +1160,9 @@ export default function MapView({
                               {isEnabled && (
                                 <div className="flex items-center gap-2 px-3 pb-1 pl-8 text-[10px] text-stm-warm-400">
                                   <span title="Transformation type">
-                                    {TRANSFORMATION_LABELS[config.transformation] ??
-                                      config.transformation}
+                                    {TRANSFORMATION_LABELS[
+                                      config.transformation
+                                    ] ?? config.transformation}
                                   </span>
                                   <span>·</span>
                                   <span title="Ground control points">
@@ -1200,8 +1219,9 @@ function SearchInput({
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
   const [category, setCategory] = useState<'all' | 'places' | 'persons'>('all');
-  const [personIndex, setPersonIndex] =
-    useState<PersonSearchIndex | null>(null);
+  const [personIndex, setPersonIndex] = useState<PersonSearchIndex | null>(
+    null,
+  );
   const [wardIndex, setWardIndex] = useState<PersonSearchIndex | null>(null);
   const router = useRouter();
 

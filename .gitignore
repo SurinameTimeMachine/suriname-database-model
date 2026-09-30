@@ -11,6 +11,7 @@ app/lod/database.jsonld
 app/lod/persons.jsonld
 app/lod/map-features.geojson
 app/public/data/
+data/paramaribo-ward-register-address-links.json
 
 # concordans paramaribo local inputs
 data/concordans-paramaribo/raw/
