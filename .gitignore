@@ -17,6 +17,10 @@ data/paramaribo-ward-register-address-links.json
 data/concordans-paramaribo/raw/
 data/concordans-paramaribo/tmp/
 
+# restricted raw datasets (documentation only is tracked)
+data/12-migratie-datasets/*
+!data/12-migratie-datasets/README.md
+
 # misc
 .DS_Store
 .codex/
