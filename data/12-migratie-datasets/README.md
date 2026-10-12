@@ -2,13 +2,13 @@
 
 ## Data Governance, Licensing & Access Notice
 
-> ⚠️ **RESTRICTED DATASET — DO NOT COMMIT RAW DATA TO GIT** (Until license resolved)
-> 
+> **RESTRICTED DATASET — DO NOT COMMIT RAW DATA TO GIT** (Until license resolved)
+>
 > Formal licensing and public reuse agreements for these raw migration registers are currently being finalized with the rightsholders (including Prof. dr. Maurits Hassankhan / collaborating institutions).
-> 
+>
 > - **Repository Policy:** All raw data files in this folder are strictly excluded from public Git tracking via `.gitignore`.
 > - **Permitted Scope:** Internal database modeling, record pairing, entity resolution, and local search-index pipeline processing only. Public redistribution of raw registers is strictly prohibited.
-> - **Licensing Model (Pending):** Re-use is conducted under an assumed Non-Commercial, Share-Alike, with Attribution framework (CC BY-NC-SA style).
+> - **Licensing Status:** No public reuse or redistribution is permitted until formal written terms are agreed with the rightsholders. Do not assume any broader license in the meantime.
 
 ---
 
@@ -58,21 +58,21 @@ Both CSVs are **headerless** (row 0 contains data). Columns map directly to the 
   - `Col 31–38`: Renewal / Return date cycles
   - `Col 40`: **Memo** (73% filled; contains multi-generation births, agenda-linked deaths, CVO notes)
   - `Col 42`: **Kinship references** (34% filled, e.g. `dochter van JJ/615;JJ/616`, `vrouw van F/77`)
-  - `Col 44`: UUID v4 string (stable primary key)
+  - `Col 44`: UUID string (stable source-record key)
 
 * **Chinezen (Strict 44 columns, 0 ragged rows):**
   - Same registry shape with Chinese-specific fields: `monsternummer` (col 2), religion (`leer van confucius`, col 16), origin (`Wijtjoe`, `Hongkong`, `Macao`, cols 17–18), register code (`864D`, col 40), memo (79.6%), and UUID (col 43).
 
 ### 2. Entity Architecture & Key Findings
-- **One Row per Immigrant:** Single-row entity model (no card front/back pairs).
-- **Entities:** `ContractLabourer` $\rightarrow$ `Voyage` $\rightarrow$ `Placement` $\rightarrow$ `Kinship` / `LifeEvents`.
+- **One Row per Immigrant:** Single-row source model (no card front/back pairs). Each raw row maps to one source-bound PICO `PersonObservation`, not to a standalone merged person entity.
+- **Observation Relations:** `Voyage` (ship + dates), `Placement` (planter/plantation/district + contract cycles), and `Kinship` / `LifeEvents` are modeled as observations and edges linked to the source row, following the PICO observation pattern.
 - **Zero Cross-File Overlap:** Contract-number overlap between Hindostani and Chinese files is **0** (disjoint contract-letter ranges). Ingest as separate batches, **never join**.
 
 ---
 
 ## Technical Data Quality & Ingestion Rules
 
-1. **Regex UUID Extraction:** 226 Hindostani rows exceed 45 columns due to embedded newlines in the `memo` field. Parsers must locate the UUID via regex (`[0-9a-f-]{36}`) rather than relying on strict column index positioning.
+1. **Regex UUID Extraction:** 226 Hindostani rows exceed 45 columns due to embedded newlines in the `memo` field. Parsers must locate the UUID via strict UUID v4 regex (`\b[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\b`) rather than relying on strict column index positioning.
 2. **Date Duality Handling:** Ingest the ISO date (`yyyy-mm-dd`) as primary and keep the Dutch format (`d-m-yyyy`) as raw text. Partial dates (e.g. `??-??-1900`, `1866-00-00`) must be tagged with a precision flag instead of cast to full timestamps.
 3. **Contract Number Normalization:** Contract numbers appear both as `AA/137` and `137/AA`. Normalize both directions before resolving kinship edges.
 4. **Attribution Display:** All search results and UI cards rendering records from these migration datasets must display explicit attribution to **Nationaal Archief Suriname (NAS)** and **Nationaal Archief Nederland (NAN)**, alongside researcher credit to Prof. dr. Maurits Hassankhan e.a.

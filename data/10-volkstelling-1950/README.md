@@ -22,10 +22,10 @@ This directory contains transcribed records from the **1950 Suriname Population 
 
 ### 2. Paired Record Model (Cards: Front & Back)
 The source records represent physical census cards where **one person spans two consecutive rows** (`Volgnummer` pairs):
-- **Even Row (`Volgnummer` N):** Card Front — Main person attributes (`Voornamen`, `Achternaam_1921`, `Achternaam_1950`, `Woonplaats`, `Woondistrict`, `Geboortedatum`).
-- **Odd Row (`Volgnummer` N+1):** Card Back — Kinship and relationships (`Achternaam_Vader`, `Voornamen_Vader`, `Achternaam_Moeder`, `Voornamen_Moeder`, `Achternaam_Partner`, `Huwelijksdatum`).
+- **Odd Row (`Volgnummer` N):** Card Front — Main person attributes (`Voornamen`, `Achternaam_1921`, `Achternaam_1950`, `Woonplaats`, `Woondistrict`, `Geboortedatum`).
+- **Even Row (`Volgnummer` N+1):** Card Back — Kinship and relationships (`Achternaam_Vader`, `Voornamen_Vader`, `Achternaam_Moeder`, `Voornamen_Moeder`, `Achternaam_Partner`, `Huwelijksdatum`).
 
-> **Transformation Rule:** Ingestion scripts **must pair consecutive rows** during transformation. Processing rows independently would split individuals and orphan kinship data.
+> **Transformation Rule:** Ingestion scripts **must pair consecutive rows scoped within the same `Toegang` and `Inventarisnummer`** during transformation. Pairing across inventory boundaries would corrupt records. Processing rows independently would split individuals and orphan kinship data.
 
 ---
 

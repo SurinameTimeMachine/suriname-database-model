@@ -4,7 +4,7 @@
 
 - **Source Provider:** Generously provided by **Stichting Madeisu** ([https://www.madeisu.org/](https://www.madeisu.org/)).
 - **Attribution Requirement:** All usage, ingestion, and presentation of this dataset on the Suriname Time Machine platform must explicitly attribute **Stichting Madeisu** as the original record provider, including direct links to their official website ([https://www.madeisu.org/](https://www.madeisu.org/)).
-- **Licensing Assumptions:** In the absence of an explicit formal software/data license, this dataset is incorporated under a **Non-Commercial, Attribution, Share-Alike (CC BY-NC-SA 4.0 style)** model. 
+- **Licensing & Usage:** Usage and ingestion of this dataset is restricted to explicitly confirmed terms granted by **Stichting Madeisu**. Do not assume any broader license; confirm terms with the provider before any public reuse or redistribution.
 
 ---
 
@@ -12,8 +12,8 @@
 
 | File Name | File Size | Record Count | Description |
 | :--- | :--- | :--- | :--- |
-| `Contractarbeiders.xlsx` | 46 KB | **505 records** | Person-level contract records (16 columns) |
-| `Plantages.xlsx` | 10.5 KB | **25 records** | Plantation aggregate placements & Geo coordinates (7 columns) |
+| `Brondocument historisch register- DetailsContractarbeiders.xlsx` | 46 KB | **505 records** | Person-level contract records (16 columns) |
+| `Brondocument historisch register - Plantages.xlsx` | 10.5 KB | **25 records** | Plantation aggregate placements & Geo coordinates (7 columns) |
 | `Plantagekaart contractarbeiders 1853-1864.png` | 1.9 MB | Image (1267×863) | Historical placement map of contract laborers |
 | `*:Zone.Identifier` | 25 B | — | *Windows ADS junk files (excluded from ingestion)* |
 
@@ -23,7 +23,7 @@
 
 ## Data Schema & Record Architecture
 
-### 1. Person Contract Records (`Contractarbeiders.xlsx`) — 505 Records
+### 1. Person Contract Records (`Brondocument historisch register- DetailsContractarbeiders.xlsx`) — 505 Records
 
 | Column | Example | Description |
 | :--- | :--- | :--- |
@@ -43,9 +43,9 @@
 | `Index` | `101` | Record index number |
 | `Bijzonderheden` | `Kind van Maria` | Free text remarks (contains implicit kinship relations) |
 
-### 2. Plantation Placements (`Plantages.xlsx`) — 25 Aggregates
+### 2. Plantation Placements (`Brondocument historisch register - Plantages.xlsx`) — 25 Aggregates
 - **Aggregate Counts:** Contains `Locatie`, `Geo(lat, lon)`, `Eigenaar`, `Vrouw`, `Man`, `Type`, and `Boot`.
-- Sum of `Vrouw` + `Man` = 506 persons vs. 505 transcribed individuals in the person sheet (1 row delta). The `Plantages.xlsx` sheet is a derived roll-up summary, not an independent person source.
+- Sum of `Vrouw` + `Man` = 506 persons vs. 505 transcribed individuals in the person sheet (1 row delta). The `Brondocument historisch register - Plantages.xlsx` sheet is a derived roll-up summary, not an independent person source.
 
 ### 3. Ships / Voyages (Implicit Entity)
 - 5 distinct ships: *Libania & Adelaida*, *Tres Amigos*, *Maravilha*, *Mathilda*, and *Rothsay*.
@@ -63,7 +63,7 @@
 
 ## Recommended Ingestion Strategy
 
-1. **Mint Person Entities:** Generate individual contract laborer entities keyed on `stm-madeisu/<ID>`.
+1. **Mint Source Observations (PICO PersonObservation):** Generate individual source-bound PICO PersonObservation records for contract laborers keyed on `stm-madeisu/<ID>`.
 2. **Link Ships & Voyages:** Create arrival voyage event entities linking group members arriving on the same vessel and date.
 3. **Link Plantations:** Link laborer placement observations to resolved plantation entities in `person-search-index.json`.
 4. **Display Attribution:** Ensure all UI detail cards rendering Madeisu records explicitly feature the **Stichting Madeisu** credit line and link ([https://www.madeisu.org/](https://www.madeisu.org/)).

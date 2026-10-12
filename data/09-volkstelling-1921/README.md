@@ -29,13 +29,14 @@ This directory contains the transcribed population census records from the **192
 | `scan_klapper` | URL | ~100% | Direct link to index card scan |
 | `scan_registratielijst` | URL | ~97.3% | Direct link to full registration sheet scan |
 | `opmerking_registratielijst`| String | ~2.7% | Miscellaneous remarks / archival notes |
-| *(Unlabeled 12th column)* | UUID v4 string | 100% | **Global primary key** (`stm-census1921/<uuid>`) |
+| *(Unlabeled 12th column)* | UUID string | 100% | **Global source-record key** (`stm-census1921/<uuid>`) |
 
 ### 2. Record Model Architecture
-- **Single Row per Person:** Unlike the 1950 census (which uses front/back card row pairs), **each row in 1921 represents one person entity**.
-- **Household Grouping:** Households are structurally implied by the tuple: `(naam district, kringnummer, lijstnummer)`.
-  - Yields **22,474 distinct registration lists / households** (median size: 3 persons; max: 1,132 persons in institutional/barracks lists).
-- **No Direct Kinship Attributes:** Parent/spouse relationships are not explicitly declared in columns, but can be inferred through shared household tuples and surnames.
+- **Single Row per Person:** Unlike the 1950 census (which uses front/back card row pairs), **each row in 1921 represents one source-bound PICO PersonObservation**.
+- **Registration-List Grouping:** Records are structurally grouped by the tuple: `(naam district, kringnummer, lijstnummer)`.
+  - Yields **22,474 distinct registration-list groups** (median size: 3 persons; max: 1,132 persons in institutional/barracks lists).
+  - These tuples represent registration-list groups only. They should only be classified as households if supported by source context (e.g. shared address or explicit household markers), not by list co-membership alone.
+- **No Direct Kinship Attributes:** Parent/spouse relationships are not explicitly declared in columns, but can be inferred through shared registration-list groups and surnames.
 
 ---
 
@@ -60,7 +61,7 @@ This directory contains the transcribed population census records from the **192
 ## Recommended Ingestion Pipeline Strategy
 
 1. **Decoder:** Implement two-pass CSV decoding in `app/scripts/transform-volkstelling-1921.ts` to cleanly unescape double-quoted lines.
-2. **Entity Generation:** Mint individual person entities keyed on the 12th UUID column (`stm-census1921/<uuid>`).
-3. **Household Aggregation:** Create group/household entities linked by `(naam district, kringnummer, lijstnummer)`.
+2. **Entity Generation:** Mint individual source-bound PICO PersonObservations keyed on the 12th UUID column (`stm-census1921/<uuid>`).
+3. **Registration-List Aggregation:** Create group entities linked by `(naam district, kringnummer, lijstnummer)`; classify as households only where source context supports it.
 4. **Contract Extract:** Parse Asian labor contract numbers into explicit record metadata.
 5. **Search Indexing:** Register person observations under search category `census-1921-resident`.
