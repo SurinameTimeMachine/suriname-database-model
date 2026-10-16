@@ -80,13 +80,18 @@ databases:
           LIMIT 500
       contract_search:
         title: 'Contract number search'
-        description: Find migrants / labourers / census residents by contract number.
+        description: Find migrants / labourers / census residents by contract number (substring).
         sql: |
+          WITH hits AS (
+            SELECT contract_number FROM contract_numbers
+             WHERE contract_number LIKE '%' || :contract || '%'
+             LIMIT 500
+          )
           SELECT p.full_name, p.role, p.source_dataset, p.contract_number,
                  p.plantation_name, c.item_id
           FROM persons p
+          JOIN hits ON hits.contract_number = p.contract_number
           LEFT JOIN certificates c ON c.certificate_id = p.certificate_id
-          WHERE p.contract_number LIKE '%' || :contract || '%'
           ORDER BY p.source_dataset, p.full_name
           LIMIT 200
       owner_plantation_search:

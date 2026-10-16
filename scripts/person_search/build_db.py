@@ -329,6 +329,7 @@ CREATE INDEX idx_pers_norm ON persons(name_norm);
 CREATE INDEX idx_pers_sdx ON persons(name_soundex);
 CREATE INDEX idx_pers_role ON persons(role, source_dataset);
 CREATE INDEX idx_pers_item ON persons(certificate_id, role);
+CREATE INDEX idx_pers_contract ON persons(contract_number);
 CREATE INDEX idx_names_person ON person_names(person_id);
 CREATE INDEX idx_names_norm ON person_names(value_norm);
 CREATE INDEX idx_rel_cert ON relations(certificate_id);
@@ -360,6 +361,17 @@ CREATE TABLE cross_dataset_names AS
   HAVING datasets > 1;
 CREATE INDEX idx_cross_name ON cross_dataset_names(person_name);
 CREATE INDEX idx_cross_datasets ON cross_dataset_names(datasets DESC);
+
+-- Distinct contract numbers (with counts) so substring contract search scans
+-- a few thousand rows instead of the 1.9M-row persons table.
+DROP TABLE IF EXISTS contract_numbers;
+CREATE TABLE contract_numbers AS
+  SELECT contract_number, COUNT(*) AS person_count,
+         GROUP_CONCAT(DISTINCT source_dataset) AS datasets
+    FROM persons
+   WHERE contract_number IS NOT NULL AND contract_number <> ''
+   GROUP BY contract_number;
+CREATE INDEX idx_contract_numbers ON contract_numbers(contract_number);
 """
 
 SOURCES = [
