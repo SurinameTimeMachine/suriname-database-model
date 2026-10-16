@@ -140,3 +140,4 @@ a.person { color: var(--accent); font-weight: 600; text-decoration: underline; t
 .card .pairwith a { position: relative; z-index: 1; }
 .pair[hidden], .help[hidden] { display: none; }
 .kv dd a, .crumb a, .place-card .name a { color: var(--accent); }
+.facets .small { color: var(--muted); font-size: .8rem; margin: 4px 6px; }

@@ -24,6 +24,7 @@ const T = {
     page: (a, b) => `${a}–${b}`, prev: '← Vorige', next: 'Volgende →',
     facetDataset: 'Bron', facetRole: 'Rol', facetDecade: 'Periode', facetLocation: 'Locatie',
     showAll: n => `Toon alle ${n.toLocaleString('nl-NL')}`, showLess: 'Toon minder',
+    locCapped: n => `Alleen de ${n.toLocaleString('nl-NL')} meest voorkomende locaties worden getoond.`,
     person: 'Persoon', record: 'Bron / akte', onRecord: 'Op dezelfde akte / hetzelfde record',
     relations: 'Relaties', otherNames: 'Andere namen en herkomst', notes: 'Opmerkingen en aantekeningen',
     sameName: 'Zelfde naam elders – mogelijk dezelfde persoon (niet automatisch gekoppeld)',
@@ -36,7 +37,7 @@ const T = {
     restricted: 'Beperkte bron: alleen voor intern gebruik door het projectteam. Niet delen of publiceren.',
     pairAdd: '+ Samen met een tweede persoon (op hetzelfde record)', pairLabel: 'Samen met (op hetzelfde record)',
     pairPh: 'Naam van de tweede persoon', role2: 'Rol tweede persoon', pairClear: 'Verwijderen', with: 'samen met',
-    facetRole2: 'Rol tweede persoon', pairResults: n => `${n.toLocaleString('nl-NL')} records met beide personen`,
+    facetRole2: 'Rol tweede persoon', pairResults: n => `${n.toLocaleString('nl-NL')} combinaties gevonden (persoon + tweede persoon op hetzelfde record)`,
     modeLabel: 'Zoekwijze', modePrefix: 'Woordbegin', modeExact: 'Exact (hele woorden)', modeFuzzy: 'Fuzzy (spellingvarianten)',
     viewPersons: 'Personen', viewPlaces: 'Plaatsen', help: 'Hoe zoek ik?',
     placesPh: 'Zoek een plaats, plantage, straat of district…',
@@ -77,6 +78,7 @@ const T = {
     page: (a, b) => `${a}–${b}`, prev: '← Previous', next: 'Next →',
     facetDataset: 'Source', facetRole: 'Role', facetDecade: 'Period', facetLocation: 'Location',
     showAll: n => `Show all ${n.toLocaleString('en-GB')}`, showLess: 'Show less',
+    locCapped: n => `Only the ${n.toLocaleString('en-GB')} most frequent locations are shown.`,
     person: 'Person', record: 'Source / record', onRecord: 'On the same record',
     relations: 'Relations', otherNames: 'Other names and origin', notes: 'Remarks and notes',
     sameName: 'Same name elsewhere – possibly the same person (not linked automatically)',
@@ -89,7 +91,7 @@ const T = {
     restricted: 'Restricted source: internal use by the project team only. Do not share or publish.',
     pairAdd: '+ Together with a second person (on the same record)', pairLabel: 'Together with (on the same record)',
     pairPh: 'Name of the second person', role2: 'Role of second person', pairClear: 'Remove', with: 'with',
-    facetRole2: 'Role of second person', pairResults: n => `${n.toLocaleString('en-GB')} records with both persons`,
+    facetRole2: 'Role of second person', pairResults: n => `${n.toLocaleString('en-GB')} matching pairs (person + second person on the same record)`,
     modeLabel: 'Search mode', modePrefix: 'Word start', modeExact: 'Exact (whole words)', modeFuzzy: 'Fuzzy (spelling variants)',
     viewPersons: 'Persons', viewPlaces: 'Places', help: 'How to search?',
     placesPh: 'Search a place, plantation, street or district…',
@@ -414,6 +416,7 @@ async function renderSearch(s) {
     renderFacets(facets, s);
   } catch (err) {
     if (key !== lastSearchKey) return;
+    lastSearchKey = null;   // allow the same search to be retried
     status.className = 'status error';
     status.textContent = t('error') + err.message;
     $('#list').innerHTML = ''; $('#pager').innerHTML = '';
@@ -421,11 +424,14 @@ async function renderSearch(s) {
 }
 
 async function renderPlaceList(s, status, key) {
-  const words = plain(s.q).replace(/[^\p{L}\p{N}]+/gu, ' ').trim().split(' ').filter(Boolean);
+  // the canned query takes up to six words; longer input keeps the first six
+  const words = plain(s.q).replace(/[^\p{L}\p{N}]+/gu, ' ').trim().split(' ').filter(Boolean).slice(0, 6);
   if (!words.length) { status.textContent = ''; return; }
   status.textContent = t('loading');
   try {
-    const rows = await api('ui_places', { w1: words[0], w2: words[1] || '', w3: words[2] || '' });
+    const params = {};
+    for (let i = 0; i < 6; i++) params[`w${i + 1}`] = words[i] || '';
+    const rows = await api('ui_places', params);
     if (key !== lastSearchKey) return;
     status.textContent = rows.length ? t('placesFound')(rows.length) + (rows.length >= 200 ? ' ' + t('placesMore') : '')
                                      : t('noResults');
@@ -438,6 +444,7 @@ async function renderPlaceList(s, status, key) {
       </li>`).join('');
   } catch (err) {
     if (key !== lastSearchKey) return;
+    lastSearchKey = null;
     status.className = 'status error';
     status.textContent = t('error') + err.message;
   }
@@ -491,7 +498,7 @@ function renderFacets(facets, s) {
   html += list('role', t('facetRole'), 'role', roleLabel);
   html += list('role2', t('facetRole2'), 'role2', roleLabel);
   const dec = by('decade').sort((a, b) => a.value - b.value);
-  if (dec.length > 1) {
+  if (dec.length > 1 || (dec.length === 1 && s.from && s.to)) {
     const max = Math.max(...dec.map(d => d.n));
     html += `<h2>${t('facetDecade')}</h2><div class="decades">` + dec.map(d =>
       `<button type="button" title="${d.value}–${d.value + 9}: ${d.n.toLocaleString()}" data-decade="${d.value}"
@@ -514,6 +521,7 @@ function renderFacets(facets, s) {
     if (locs.length > 15) {
       html += `<button type="button" class="link-btn" data-toggle-locs>${showAllLocations ? t('showLess') : t('showAll')(locs.length)}</button>`;
     }
+    if (showAllLocations && locs.length >= Number(LOC_LIMIT)) html += `<p class="small">${t('locCapped')(locs.length)}</p>`;
   } else if (s.loc) {
     html += `<h2>${t('facetLocation')}</h2><button type="button" class="facet on" data-facet="loc" data-value="" data-label="">
       <span>${esc(s.locl || s.loc)}</span><span class="n">×</span></button>`;
@@ -567,15 +575,26 @@ function relationLabel(r) {
   return base;
 }
 
+let personRequest = 0;      // increases on every open/close; older responses are dropped
+let focusBeforeDrawer = null;
+
 async function renderPerson(ref) {
+  const request = ++personRequest;
   const drawer = $('#drawer');
-  drawer.hidden = false;
+  if (drawer.hidden) {
+    focusBeforeDrawer = document.activeElement;
+    drawer.hidden = false;
+    // keep keyboard focus inside the drawer while it is open
+    document.querySelectorAll('header.top, main.layout').forEach(el => { el.inert = true; });
+    $('.drawer-panel .close').focus();
+  }
   document.body.style.overflow = 'hidden';
   $('#back').hidden = personStack.length < 2;
   const box = $('#detail');
   box.innerHTML = `<p class="status">${t('loading')}</p>`;
   try {
     const [p] = await api('ui_person', ref.key ? { key: ref.key } : { id: ref.id });
+    if (request !== personRequest) return;
     if (!p) { box.innerHTML = `<p class="empty">${t('none')}</p>`; return; }
     const id = p.person_id;
     const [onRecord, rels, names, notes, same, places] = await Promise.all([
@@ -586,6 +605,7 @@ async function renderPerson(ref) {
       api('ui_same_name', { id }),
       p.certificate_id ? api('ui_record_places', { cert: p.certificate_id }) : [],
     ]);
+    if (request !== personRequest) return;
     const links = archiveLinks(p);
     const photos = notes.filter(n => n.status === 'photo_url' && /^https:\/\//.test(n.text || ''));
     notes.filter(n => SCAN_NOTES[n.status] && /^https?:\/\//.test(n.text || ''))
@@ -668,14 +688,21 @@ async function renderPerson(ref) {
     `;
     $('.drawer-panel').scrollTop = 0;
   } catch (err) {
+    if (request !== personRequest) return;
     box.innerHTML = `<p class="status error">${esc(t('error') + err.message)}</p>`;
   }
 }
 
 function closePerson() {
   personStack = [];
-  $('#drawer').hidden = true;
+  personRequest++;
+  const drawer = $('#drawer');
+  if (drawer.hidden) return;
+  drawer.hidden = true;
   document.body.style.overflow = '';
+  document.querySelectorAll('header.top, main.layout').forEach(el => { el.inert = false; });
+  if (focusBeforeDrawer && document.contains(focusBeforeDrawer)) focusBeforeDrawer.focus();
+  focusBeforeDrawer = null;
 }
 
 // ---------------------------------------------------------------------------
@@ -691,7 +718,10 @@ function applyLang() {
 
 function syncForm(s) {
   document.body.classList.toggle('view-places', s.view === 'places');
-  document.querySelectorAll('.view-btn').forEach(b => b.classList.toggle('on', b.dataset.view === s.view));
+  document.querySelectorAll('.view-btn').forEach(b => {
+    b.classList.toggle('on', b.dataset.view === s.view);
+    b.setAttribute('aria-selected', String(b.dataset.view === s.view));
+  });
   $('#q').placeholder = t(s.view === 'places' ? 'placesPh' : 'placeholder');
   $('#q').value = s.q;
   $('#f-mode').value = s.mode;
@@ -733,7 +763,7 @@ function formState() {
   return {
     view: s.view, q, q2: $('#q2').value.trim(), role2: $('#f-role2').value, mode: $('#f-mode').value, dataset: $('#f-dataset').value, role: $('#f-role').value,
     from: $('#f-from').value, to: $('#f-to').value, place: $('#f-place').value.trim(),
-    sort: $('#f-sort').value, page: '', obs: '', person: '',
+    sort: $('#f-sort').value, page: '', obs: '', person: '', loc: s.loc, locl: s.locl,
     // a new place search leaves the chosen place
     pk: s.view === 'places' && q !== s.q ? '' : s.pk, pl: s.view === 'places' && q !== s.q ? '' : s.pl,
   };

@@ -2,7 +2,7 @@
 # Start the local person search page.
 #
 #   scripts/person_search/serve.sh                 # uses suriname_person_search.db
-#   scripts/person_search/serve.sh other.db
+#   scripts/person_search/serve.sh /other/folder/suriname_person_search.db
 #   scripts/person_search/serve.sh --team [db]     # for sharing with the team (see below)
 #   scripts/person_search/serve.sh --port 8002     # a second, own instance next to the team one
 #
@@ -28,6 +28,12 @@ while [ $# -gt 0 ]; do
   esac
 done
 DB="${1:-suriname_person_search.db}"
+# The page and metadata.yaml address the database as 'suriname_person_search',
+# which Datasette derives from the file name.
+if [ "$(basename "$DB")" != "suriname_person_search.db" ]; then
+  echo "The database file must be named suriname_person_search.db (it may be in another folder)." >&2
+  exit 1
+fi
 if [ ! -f "$DB" ]; then
   echo "Database $DB not found; build it first: python3 scripts/person_search/build_db.py" >&2
   exit 1

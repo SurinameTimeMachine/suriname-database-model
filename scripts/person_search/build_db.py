@@ -178,6 +178,9 @@ def parse_date(value):
         d, mo, y = int(m.group(1)), int(m.group(2)), int(m.group(3))
     if not (1600 <= y <= 2000):
         return text, None, 'invalid'
+    if not (1 <= mo <= 12 and 1 <= d <= 31):
+        # e.g. '1866-00-00': only the year is known
+        return None, y, 'partial'
     return f'{y:04d}-{mo:02d}-{d:02d}', y, 'day'
 
 
@@ -394,6 +397,7 @@ CREATE INDEX idx_loc_norm ON locations(location_norm);
 FTS = """
 CREATE VIRTUAL TABLE persons_fts USING fts5(
   full_name, given_name, surname, alias, former_name, location, occupation,
+  plantation_name, district, address_text,
   content='persons', content_rowid='person_id',
   tokenize="unicode61 remove_diacritics 2");
 CREATE VIRTUAL TABLE persons_phonetic_fts USING fts5(
@@ -416,10 +420,18 @@ CREATE INDEX IF NOT EXISTS idx_rel_from ON relations(from_person);
 CREATE INDEX IF NOT EXISTS idx_rel_to ON relations(to_person);
 CREATE INDEX IF NOT EXISTS idx_pers_year ON persons(event_year);
 CREATE INDEX IF NOT EXISTS idx_loc_cert ON locations(certificate_id);
+-- Annotations from row-based loaders carry their certificate already; the rest
+-- (e.g. curator comment exports) get one only where the item id is unambiguous.
+DROP TABLE IF EXISTS temp.unique_items;
+CREATE TEMP TABLE unique_items AS
+  SELECT source_dataset, item_id, MIN(certificate_id) AS certificate_id FROM certificates
+   WHERE item_id IS NOT NULL GROUP BY source_dataset, item_id HAVING COUNT(*) = 1;
+CREATE INDEX temp.idx_unique_items ON unique_items(source_dataset, item_id);
 UPDATE annotations SET certificate_id = (
-    SELECT MIN(c.certificate_id) FROM certificates c
-     WHERE c.source_dataset = annotations.source_dataset AND c.item_id = annotations.item_id)
+    SELECT u.certificate_id FROM temp.unique_items u
+     WHERE u.source_dataset = annotations.source_dataset AND u.item_id = annotations.item_id)
  WHERE certificate_id IS NULL AND item_id IS NOT NULL;
+DROP TABLE temp.unique_items;
 CREATE INDEX IF NOT EXISTS idx_ann_ds_item ON annotations(source_dataset, item_id);
 CREATE INDEX IF NOT EXISTS idx_ann_cert ON annotations(certificate_id);
 
@@ -749,7 +761,7 @@ def load_civil_flat(builder, path, source_dataset, record_type):
             if column in row:
                 builder.add_location(cert, row.get(column), column, source_dataset)
         builder.add_annotation(clean(row.get('original_scanid')) or clean(row.get('id')),
-                               row.get('notes_all'), source_file)
+                               row.get('notes_all'), source_file, certificate_id=cert)
     builder.log(f'  {source_dataset}: {len(rows)} certificates')
 
 
@@ -1058,12 +1070,15 @@ def load_ward_registers(builder):
                                           district=clean(row.get('Buurt')))
             builder.add_relation(cert, 'owner-property', owner_id, person, confidence,
                                  'Eigenaar field', source_file)
-        builder.add_annotation(item, row.get('Eigenaar'), source_file, status='owner_prose')
+        builder.add_annotation(item, row.get('Eigenaar'), source_file, status='owner_prose',
+                               certificate_id=cert)
         for column in ('Enslaved_Remarks', 'Freeperson_Remarks', 'Annotaties', 'Diversen',
                        'Adress_Remarks', 'Remarks_Orig', 'Invoer_Remarks'):
-            builder.add_annotation(item, row.get(column), source_file, status=column)
+            builder.add_annotation(item, row.get(column), source_file, status=column, certificate_id=cert)
         for column in ('Straatnaam', 'Address_Full'):
             builder.add_location(cert, row.get(column), column, '04-ward-registers')
+        builder.add_location(cert, 'Paramaribo', 'cert_place', '04-ward-registers')
+        builder.add_location(cert, row.get('Buurt'), 'Buurt', '04-ward-registers')
     builder.log(f'  04-ward-registers: {len(rows)} entries')
 
 
@@ -1113,8 +1128,10 @@ def load_slave_emancipation(builder):
                                            given_name=mother_raw)
             builder.add_relation(cert, 'parent-child', mother_id, person_id, 'certain',
                                  'Name_mother field', source_file)
-        builder.add_annotation(item, row.get('Family_relations'), source_file, status='family_relations')
-        builder.add_annotation(item, row.get('Remarks_ER'), source_file, status='remarks_ER')
+        builder.add_annotation(item, row.get('Family_relations'), source_file, status='family_relations',
+                               certificate_id=cert)
+        builder.add_annotation(item, row.get('Remarks_ER'), source_file, status='remarks_ER',
+                               certificate_id=cert)
         builder.add_location(cert, row.get('Plantation'), 'Plantation', '05-slave-emancipation',
                              precision='plantation')
     builder.log(f'  05-slave-emancipation: {len(rows)} entries')
@@ -1147,7 +1164,8 @@ def load_almanakken(builder):
                                          district=clean(row.get('district_of_divisie')))
                 builder.add_relation(cert, 'employer-plantation', pid, None, 'probable',
                                      f'{role} on {row.get("plantation_std")}', source_file)
-                builder.add_annotation(clean(row.get('recordid')), raw, source_file, status=column)
+                builder.add_annotation(clean(row.get('recordid')), raw, source_file, status=column,
+                                       certificate_id=cert)
         for column in ('slaven', 'generaal_totaal_slaven', 'plantage_mannelijke_niet_vrije_bewoners',
                        'plantage_vrouwelijke_niet_vrije_bewoners', 'totaal_generaal_bewoners',
                        'vrije_bewoners'):
@@ -1155,8 +1173,9 @@ def load_almanakken(builder):
             if count:
                 builder.add_group(cert, column, count, 'almanak head-count', '06-almanakken', source_file)
         builder.add_annotation(clean(row.get('recordid')), row.get('additional_info'), source_file,
-                               status='additional_info')
+                               status='additional_info', certificate_id=cert)
         builder.add_location(cert, row.get('plantation_std'), 'plantation_std', '06-almanakken')
+        builder.add_location(cert, row.get('district_of_divisie'), 'district_of_divisie', '06-almanakken')
     builder.log(f'  06-almanakken (csv): {len(rows)} entries')
 
     if os.path.exists(ALMANAK_XLSX):
@@ -1169,6 +1188,8 @@ def load_almanakken(builder):
                 item_id=clean(row.get('recordid')), folio=clean(row.get('page')),
                 event_year=to_int(row.get('year')), plantation_name=clean(row.get('plantation_std')),
                 district=clean(row.get('district_of_divisie')), source_file=xfile)
+            builder.add_location(cert, row.get('plantation_std'), 'plantation_std', '06-almanakken')
+            builder.add_location(cert, row.get('district_of_divisie'), 'district_of_divisie', '06-almanakken')
             for prefix, role in (('adm', 'administrator'), ('dir', 'director'), ('eig', 'owner'),
                                  ('ade', 'administrator_europe'), ('ads', 'administrator_suriname'),
                                  ('bl', 'blank_officier')):
@@ -1180,7 +1201,8 @@ def load_almanakken(builder):
                     builder.add_person(cert, '06-almanakken', role, xfile,
                                        given_name=given, name_prefix=nprefix, surname=surname,
                                        role_index=index, plantation_name=clean(row.get('plantation_std')))
-            builder.add_annotation(clean(row.get('recordid')), row.get('OVERIG'), xfile, status='overig')
+            builder.add_annotation(clean(row.get('recordid')), row.get('OVERIG'), xfile, status='overig',
+                                   certificate_id=cert)
         builder.log(f'  06-almanakken (xlsx): {len(xrows)} entries')
 
 
@@ -1207,11 +1229,11 @@ def load_census_1921(builder):
             contract_number=contract, registration_number=clean(row.get('lijstnummer')),
             status='free')
         builder.add_annotation(item, row.get('opmerking_registratielijst'), source_file,
-                               status='opmerking')
+                               status='opmerking', certificate_id=builder_cert)
         for column in ('scan_registratielijst', 'scan_klapper'):
             url = clean(row.get(column))
             if url and url.startswith('http'):
-                builder.add_annotation(item, url, source_file, status=column)
+                builder.add_annotation(item, url, source_file, status=column, certificate_id=builder_cert)
         builder.add_location(builder_cert, row.get('adres'), 'adres', '09-volkstelling-1921')
     builder.log(f'  09-volkstelling-1921: {len(rows)} entries')
 
@@ -1269,7 +1291,7 @@ def load_census_1950(builder):
                             builder.add_relation(cert, rtype, rel_id, subject, 'certain',
                                                  f'card back {role}', source_file)
                     builder.add_annotation(item, back.get('Huwelijksdatum'), source_file,
-                                           status='huwelijksdatum')
+                                           status='huwelijksdatum', certificate_id=cert)
                 builder.add_location(cert, front.get('Woonplaats'), 'Woonplaats', '10-volkstelling-1950')
             i += 1
     builder.log(f'  10-volkstelling-1950: {sum(len(r) for _, r in all_rows)} rows -> paired')
@@ -1297,7 +1319,8 @@ def load_madeisu(builder):
         builder.add_name(pid, 'display_name', row.get('Naam'), source_file)
         remarks = clean(row.get('Bijzonderheden'))
         if remarks:
-            builder.add_annotation(clean(row.get('ID')), remarks, source_file, status='bijzonderheden')
+            builder.add_annotation(clean(row.get('ID')), remarks, source_file, status='bijzonderheden',
+                                   certificate_id=cert)
             kind_map = {'kind van': 'parent-child', 'zuster van': 'sibling', 'dochter van': 'parent-child',
                         'zoon van': 'parent-child', 'broer van': 'sibling'}
             for phrase, rtype in kind_map.items():
@@ -1318,6 +1341,7 @@ def load_madeisu(builder):
                 collection='madeisu', item_id=clean(row.get('Locatie')),
                 plantation_name=clean(row.get('Locatie')), address_text=clean(row.get('Geo')),
                 source_file=pfile)
+            builder.add_location(cert, row.get('Locatie'), 'Locatie', '11-madeisu')
             for name_col, role in (('Eigenaar', 'owner'),):
                 for name in split_names(row.get(name_col)):
                     given, prefix, surname = split_simple_name(name)
@@ -1421,8 +1445,8 @@ KINSHIP_KINDS = {
 }
 _KIN_WORD = re.compile(r'\s*([A-Za-z]+(?:/[A-Za-z]+)?)\.?\s*')
 _KIN_SPLIT = re.compile(r'\s*(?:;|,|\+|&|\ben(?=[\s\d]))\s*', re.I)
-_CODE_LN = re.compile(r'([A-Za-z]+)/?(\d+[a-z]?)')            # AA/117, AA117, AB1054
-_CODE_NL = re.compile(r'(\d+[a-z]?)/?([A-Za-z]{2,}|[A-Z])')    # 117/AA, 237VI, 19a/KG
+_CODE_LN = re.compile(r'([A-Za-z]+)/(\d+[A-Za-z]?)|([A-Za-z]+)(\d+[a-z]?)')   # AA/117, KG/382A, AB1054
+_CODE_NL = re.compile(r'(\d+[A-Za-z]?)/([A-Za-z]+)|(\d+[a-z]?)([A-Za-z]{2,}|[A-Z])')  # 117/AA, 382A/KG, 237VI
 _CODE_N = re.compile(r'(\d+[a-z]?)')                           # 180, 34a: series left out
 
 
@@ -1445,16 +1469,19 @@ def parse_kinship(refs, own_contract=None):
         m = _KIN_WORD.match(phrase)
         word = (m.group(1) if m else '').lower()
         rest = phrase[m.end():] if m else phrase
-        rest = re.sub(r'^[?.\s]*(van|v)\.?\s*', '', rest, flags=re.I)
+        # drop the preposition 'van' / 'v.' but never the start of a series ('VI/237', 'VV/117')
+        rest = re.sub(r'^[?.\s]*(?:van(?=[\s.]|\d|[A-Za-z]{1,3}\d)|v(?=[\s.]|\d))\.?\s*', '', rest, flags=re.I)
         rtype, direction, detail = KINSHIP_KINDS.get(word, ('related', 'out', word))
         confidence = 'probable' if '?' in phrase else 'certain'
         parsed = []   # [letters or None, number]
         for token in _KIN_SPLIT.split(rest):
             token = re.sub(r'\s+', '', token).strip('.:/()?')
             if (m := _CODE_LN.fullmatch(token)):
-                parsed.append([m.group(1).upper(), m.group(2).upper()])
+                letters_, number_ = (m.group(1), m.group(2)) if m.group(1) else (m.group(3), m.group(4))
+                parsed.append([letters_.upper(), number_.upper()])
             elif (m := _CODE_NL.fullmatch(token)):
-                parsed.append([m.group(2).upper(), m.group(1).upper()])
+                number_, letters_ = (m.group(1), m.group(2)) if m.group(1) else (m.group(3), m.group(4))
+                parsed.append([letters_.upper(), number_.upper()])
             elif (m := _CODE_N.fullmatch(token)):
                 parsed.append([None, m.group(1).upper()])
         letters = next((p[0] for p in parsed if p[0]), None)
@@ -1480,6 +1507,10 @@ def load_migration(builder):
         for raw in records:
             values = {field: clean(raw[i]) if i < len(raw) else None
                       for i, field in layout['fields'].items()}
+            # clean() joins lines; kinship references are split on line breaks, so keep them
+            if 'kinship_refs' in values:
+                index = next(i for i, f in layout['fields'].items() if f == 'kinship_refs')
+                values['kinship_refs'] = (raw[index].strip() or None) if index < len(raw) else None
             uuid = values.get('uuid')
             event_raw = (values.get('arrival_date') or values.get('contract_start')
                          or values.get('arrival_year'))
@@ -1509,12 +1540,12 @@ def load_migration(builder):
             if values.get('kinship_refs'):
                 kinship.append((pid, cert, values['kinship_refs'], values.get('contract_number')))
             for field in MIGRATION_NOTE_FIELDS:
-                builder.add_annotation(uuid, values.get(field), source_file, status=field)
+                builder.add_annotation(uuid, values.get(field), source_file, status=field, certificate_id=cert)
             photo = values.get('photo_url') or ''
             if photo.startswith('http'):
                 # the old gahetna.nl host is gone; the same path is served by nationaalarchief.nl
                 photo = re.sub(r'^https?://www\.gahetna\.nl/', 'https://www.nationaalarchief.nl/', photo)
-                builder.add_annotation(uuid, photo, source_file, status='photo_url')
+                builder.add_annotation(uuid, photo, source_file, status='photo_url', certificate_id=cert)
             for index, field in layout['origin'].items():
                 value = raw[index] if index < len(raw) else None
                 builder.add_name(pid, field, value, source_file)

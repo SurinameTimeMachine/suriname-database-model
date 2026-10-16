@@ -240,7 +240,13 @@ databases:
             FROM h1
             JOIN persons p1 ON p1.person_id = h1.person_id
             JOIN persons p2 ON p2.certificate_id = p1.certificate_id AND p2.person_id <> p1.person_id
+            LEFT JOIN certificates c1 ON c1.certificate_id = p1.certificate_id
             WHERE p2.person_id IN (SELECT person_id FROM h2)
+            AND (:place = '' OR (COALESCE(p1.location, '') || ' ' || COALESCE(p1.plantation_name, '') || ' ' ||
+                 COALESCE(c1.plantation_name, '') || ' ' || COALESCE(c1.cert_place, '') || ' ' ||
+                 COALESCE(c1.address_text, '') || ' ' || COALESCE(p1.district, '') || ' ' ||
+                 COALESCE(c1.district, '')) LIKE '%' || :place || '%')
+            AND (:loc = '' OR p1.certificate_id IN (SELECT certificate_id FROM locations WHERE location_norm = :loc))
             AND (:dataset = '' OR p1.source_dataset = :dataset)
             AND (:role = '' OR p1.role = :role)
             AND (:role2 = '' OR p2.role = :role2)
@@ -277,7 +283,13 @@ databases:
             FROM h1
             JOIN persons p1 ON p1.person_id = h1.person_id
             JOIN persons p2 ON p2.certificate_id = p1.certificate_id AND p2.person_id <> p1.person_id
+            LEFT JOIN certificates c1 ON c1.certificate_id = p1.certificate_id
             WHERE p2.person_id IN (SELECT person_id FROM h2)
+            AND (:place = '' OR (COALESCE(p1.location, '') || ' ' || COALESCE(p1.plantation_name, '') || ' ' ||
+                 COALESCE(c1.plantation_name, '') || ' ' || COALESCE(c1.cert_place, '') || ' ' ||
+                 COALESCE(c1.address_text, '') || ' ' || COALESCE(p1.district, '') || ' ' ||
+                 COALESCE(c1.district, '')) LIKE '%' || :place || '%')
+            AND (:loc = '' OR p1.certificate_id IN (SELECT certificate_id FROM locations WHERE location_norm = :loc))
             AND (:dataset = '' OR p1.source_dataset = :dataset)
             AND (:role = '' OR p1.role = :role)
             AND (:role2 = '' OR p2.role = :role2)
@@ -343,9 +355,12 @@ databases:
         title: 'Search page: notes and memo fields of a record'
         hide_sql: true
         sql: |
+          -- notes of this record; notes without a record (shared scan ids) via dataset + item id
           SELECT a.status, a.text, a.user_id, a.timestamp
           FROM certificates c
-          JOIN annotations a ON a.source_dataset = c.source_dataset AND a.item_id = c.item_id
+          JOIN annotations a
+            ON a.certificate_id = c.certificate_id
+            OR (a.certificate_id IS NULL AND a.source_dataset = c.source_dataset AND a.item_id = c.item_id)
           WHERE c.certificate_id = CAST(:cert AS INTEGER)
           ORDER BY a.annotation_id
           LIMIT 100
@@ -390,11 +405,14 @@ databases:
         title: 'Search page: place names'
         hide_sql: true
         sql: |
-          -- :q is lower-cased without accents by the page; every word must occur
+          -- words are lower-cased without accents by the page (up to six); every word must occur
           SELECT place_norm, label, records, datasets FROM places
           WHERE place_norm LIKE '%' || :w1 || '%'
             AND (:w2 = '' OR place_norm LIKE '%' || :w2 || '%')
             AND (:w3 = '' OR place_norm LIKE '%' || :w3 || '%')
+            AND (:w4 = '' OR place_norm LIKE '%' || :w4 || '%')
+            AND (:w5 = '' OR place_norm LIKE '%' || :w5 || '%')
+            AND (:w6 = '' OR place_norm LIKE '%' || :w6 || '%')
           ORDER BY records DESC
           LIMIT 200
       ui_place_search:
