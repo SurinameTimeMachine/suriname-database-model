@@ -419,11 +419,27 @@ def main():
               AND full_name NOT IN (SELECT full_name FROM main.persons
                                     WHERE source_dataset NOT IN ({ph}) AND full_name IS NOT NULL)
             ORDER BY random() LIMIT 300""", hidden + hidden)]
+    leaked = []
+    if sample:
+        with open(args.out, "rb") as fh, mmap.mmap(fh.fileno(), 0, access=mmap.ACCESS_READ) as mm:
+            hits = [s for s in sample if mm.find(s.encode("utf-8")) != -1]
+        # A hidden name that is only a given name (e.g. "Adriaan Salomon") also occurs
+        # inside longer public names ("Adriaan Salomon Parke"). Such a hit is explained
+        # by visible data and is not a leak; the same holds for alternative names of
+        # visible persons (e.g. an emancipation name in person_names). Only
+        # unexplained hits count.
+        explain_sql = ["SELECT 1 FROM pub.persons WHERE full_name LIKE ?1"]
+        if "person_names" in plain and "person_names" not in skipped \
+                and "value" in cols_of(conn, "pub", "person_names"):
+            explain_sql.append("SELECT 1 FROM pub.person_names WHERE value LIKE ?1")
+        explain_sql = " UNION ALL ".join(explain_sql) + " LIMIT 1"
+        leaked = [s for s in hits if not conn.execute(explain_sql, (f"%{s}%",)).fetchone()]
+        if hits:
+            print(f"Sampled hidden names also found in the file: {len(hits)}, "
+                  f"of which explained by visible names: {len(hits) - len(leaked)}")
     conn.execute("DETACH DATABASE pub")
     conn.close()
     if sample:
-        with open(args.out, "rb") as fh, mmap.mmap(fh.fileno(), 0, access=mmap.ACCESS_READ) as mm:
-            leaked = [s for s in sample if mm.find(s.encode("utf-8")) != -1]
         if leaked:
             problems.append(f"{len(leaked)} of {len(sample)} sampled names from hidden records found, e.g. {leaked[:3]}")
 
