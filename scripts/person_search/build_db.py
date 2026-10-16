@@ -62,6 +62,7 @@ MADEISU_XLSX = P('data/11-madeisu', 'Brondocument historisch register- DetailsCo
 MADEISU_PLANT_XLSX = P('data/11-madeisu', 'Brondocument historisch register - Plantages.xlsx')
 MIG_HIND = P('data/12-migratie-datasets', 'NT00345_hindostanen.csv')
 MIG_CHIN = P('data/12-migratie-datasets', 'NT00347_chinezen.csv')
+MIG_JAVA = P('data/12-migratie-datasets', 'NT00346_javanen.csv')
 C13 = P('data/13-Civil_records_under_embargo_raw_data')
 
 NULL_MARKERS = {'', '#', '?', '??', 'onbekend', '-', 'n.v.t.', 'niet vermeld', 'geen',
@@ -394,7 +395,7 @@ SOURCES = [
     ('09-volkstelling-1921', 'Volkstelling 1921 (NT00445)', 'Open data', 0, 'data/09-volkstelling-1921', ''),
     ('10-volkstelling-1950', 'Volkstelling 1950 (2.10.19.02)', 'Open data', 0, 'data/10-volkstelling-1950', ''),
     ('11-madeisu', 'Madeisu contract labourers 1853-1864', 'Stichting Madeisu terms', 1, 'data/11-madeisu', 'Restricted to confirmed Madeisu terms'),
-    ('12-migratie-datasets', 'Migration registers (Hindostani/Chinese)', 'Restricted - no reuse pending', 1, 'data/12-migratie-datasets', 'No public reuse until written terms'),
+    ('12-migratie-datasets', 'Migration registers (Hindostani/Chinese/Javanese)', 'Restricted - no reuse pending', 1, 'data/12-migratie-datasets', 'No public reuse until written terms'),
     ('13-civil', 'Civil records (births/deaths/recognitions/marriages)', 'Embargoed raw data', 1, 'data/13-Civil_records_under_embargo_raw_data', 'Local use only'),
 ]
 
@@ -1165,65 +1166,181 @@ def load_madeisu(builder):
         builder.log(f'  11-madeisu (plantations): {len(prows)} entries')
 
 
-MIG_HIND_MAP = {1: 'contract_number', 2: 'surname', 3: 'given_name', 4: 'ship', 5: 'age',
-                6: 'nationality', 7: 'height', 8: 'ethnicity', 9: 'sex', 11: 'occupation',
-                12: 'literacy', 13: 'religion', 20: 'recruiter', 23: 'arrival_place',
-                24: 'planter', 25: 'plantation', 40: 'memo', 42: 'kinship_refs', 44: 'uuid'}
-MIG_CHIN_MAP = {1: 'contract_number', 3: 'given_name', 4: 'surname', 7: 'family_ref',
-                 10: 'height', 13: 'sex', 14: 'age', 16: 'religion', 25: 'ship',
-                 40: 'register_code', 41: 'district', 42: 'memo', 43: 'uuid'}
-MIG_HIND_ORIGIN = {14: 'district', 15: 'police_post', 16: 'village'}
-MIG_CHIN_ORIGIN = {17: 'origin_1', 18: 'origin_2'}
+# Column layouts of the headerless HDS exports (NT00345 / NT00347 / NT00346).
+# Field names follow the labels on the Nationaal Archief index pages
+# (https://www.nationaalarchief.nl/onderzoeken/index/<nt>/<uuid>), checked
+# record by record against the CSV columns.
+MIGRATION_LAYOUTS = {
+    'hindostani': {
+        'path': MIG_HIND,
+        'fields': {1: 'contract_number', 2: 'surname', 3: 'given_name', 4: 'ship',
+                   5: 'muster_number', 6: 'birth_country', 7: 'height', 8: 'skin_colour',
+                   9: 'sex', 10: 'age', 11: 'occupation', 12: 'identifying_mark',
+                   13: 'religion', 17: 'departure_place', 19: 'departure_date',
+                   20: 'recruiter', 22: 'arrival_date', 23: 'arrival_place', 24: 'planter',
+                   25: 'plantation', 30: 'exit_status', 39: 'court_ruling', 40: 'memo',
+                   41: 'children', 42: 'kinship_refs', 44: 'uuid'},
+        'origin': {14: 'district', 15: 'police_post', 16: 'village'},
+    },
+    'chinese': {
+        'path': MIG_CHIN,
+        'fields': {1: 'contract_number', 2: 'muster_number', 3: 'surname', 4: 'father_name',
+                   6: 'arrival_year', 9: 'birth_country', 11: 'skin_colour', 13: 'sex',
+                   14: 'age', 16: 'religion', 18: 'departure_place', 19: 'departure_date',
+                   21: 'recruiter', 22: 'arrival_date', 24: 'arrival_place', 25: 'ship',
+                   26: 'planter', 31: 'recontracts', 32: 'plantation', 38: 'death_date',
+                   40: 'free_labourer_code', 41: 'district', 42: 'memo', 43: 'uuid'},
+        'origin': {17: 'place_of_origin'},
+    },
+    'javanese': {
+        'path': MIG_JAVA,
+        'fields': {1: 'given_name', 2: 'father_name', 3: 'birth_country', 4: 'height',
+                   5: 'identifying_mark', 6: 'sex', 7: 'age', 9: 'religion',
+                   10: 'departure_place', 11: 'departure_date', 13: 'ship',
+                   15: 'muster_number', 16: 'arrival_place', 19: 'planter', 20: 'recruiter',
+                   21: 'contract_number', 22: 'contract_start', 36: 'death_date',
+                   38: 'return_date', 40: 'return_ship', 41: 'civil_status_notes',
+                   42: 'kinship_refs', 43: 'family_notes', 44: 'recontracts',
+                   45: 'land_situation', 35: 'plantation', 46: 'memo', 47: 'photo_url',
+                   48: 'uuid'},
+        'origin': {31: 'residency', 32: 'division', 33: 'district', 34: 'village'},
+    },
+}
+
+# Free-text columns kept as annotations on the record (status = field name).
+MIGRATION_NOTE_FIELDS = ('memo', 'kinship_refs', 'court_ruling', 'recontracts',
+                         'civil_status_notes', 'family_notes', 'land_situation')
+
+# HDS exports escape with backslashes: \" is a quote, \\ a backslash, \n a line break.
+_HDS_ESCAPES = {'\\': '\x00B', '"': '""', 'n': '\x00N'}
 
 
 def _read_headerless(path):
-    delimiter = sniff_delimiter(path)
+    """Read an HDS export: no header row, backslash escapes inside quoted fields."""
     with open(path, encoding='utf-8-sig', newline='') as handle:
-        return list(csv.reader(handle.read().splitlines(), delimiter=delimiter))
+        text = handle.read()
+    text = re.sub(r'\\(.)', lambda m: _HDS_ESCAPES.get(m.group(1), m.group(0)), text)
+    return [[v.replace('\x00B', '\\').replace('\x00N', '\n') for v in row]
+            for row in csv.reader(text.splitlines(), delimiter=sniff_delimiter(path))]
+
+
+def contract_key(code):
+    """Normalise 'AA/117', '117/AA' and 'AA117' (also '382a/KG') to 'AA/117'."""
+    if not code:
+        return None
+    s = re.sub(r'\s+', '', str(code)).upper()
+    m = (re.fullmatch(r'([A-Z]+)/?(\d+[A-Z]?)', s) or
+         re.fullmatch(r'(\d+[A-Z]?)/([A-Z]+)', s))
+    if not m:
+        return None
+    letters, number = m.groups() if m.group(1).isalpha() else m.groups()[::-1]
+    return f'{letters}/{number}'
+
+
+# Kinship phrase -> (relation_type, direction, detail); direction 'out' means
+# "this person is <kind> of the referenced person".
+KINSHIP_KINDS = {
+    'moeder': ('parent-child', 'out', 'mother'), 'm/v': ('parent-child', 'out', 'mother'),
+    'vader': ('parent-child', 'out', 'father'), 'v/v': ('parent-child', 'out', 'father'),
+    'zoon': ('parent-child', 'in', 'son'), 'z/v': ('parent-child', 'in', 'son'),
+    'dochter': ('parent-child', 'in', 'daughter'), 'd/v': ('parent-child', 'in', 'daughter'),
+    'kind': ('parent-child', 'in', 'child'),
+    'vrouw': ('spouse', 'out', 'wife'), 'vr': ('spouse', 'out', 'wife'),
+    'echtgenote': ('spouse', 'out', 'wife'), 'man': ('spouse', 'out', 'husband'),
+    'gehuwd': ('spouse', 'out', 'married'),
+    'broer': ('sibling', 'out', 'brother'), 'zuster': ('sibling', 'out', 'sister'),
+    'zus': ('sibling', 'out', 'sister'),
+    'pleegmoeder': ('foster', 'out', 'foster mother'), 'pleegvader': ('foster', 'out', 'foster father'),
+    'pleegzoon': ('foster', 'in', 'foster son'), 'pleegdochter': ('foster', 'in', 'foster daughter'),
+}
+_CODE_RE = re.compile(r'([A-Za-z]+/\d+[A-Za-z]?|\d+[A-Za-z]?/[A-Za-z]+|[A-Za-z]{1,3}\d+[A-Za-z]?)')
+
+
+def parse_kinship(refs):
+    """Yield (relation_type, direction, detail, confidence, contract_key, phrase)."""
+    for phrase in re.split(r'[|\n]', refs or ''):
+        phrase = phrase.strip()
+        if not phrase:
+            continue
+        word = phrase.split()[0].lower().rstrip('.:?')
+        rtype, direction, detail = KINSHIP_KINDS.get(word, ('related', 'out', word))
+        confidence = 'probable' if '?' in phrase else 'certain'
+        # "382+382a/KG" lists two contracts sharing the letters.
+        expanded = re.sub(r'(\d+[A-Za-z]?)\+(\d+[A-Za-z]?)/([A-Za-z]+)', r'\1/\3;\2/\3', phrase)
+        for code in _CODE_RE.findall(expanded):
+            key = contract_key(code)
+            if key:
+                yield rtype, direction, detail, confidence, key, phrase
 
 
 def load_migration(builder):
-    for path, mapping, origin_map, label in (
-            (MIG_HIND, MIG_HIND_MAP, MIG_HIND_ORIGIN, 'hindostani'),
-            (MIG_CHIN, MIG_CHIN_MAP, MIG_CHIN_ORIGIN, 'chinese')):
+    for label, layout in MIGRATION_LAYOUTS.items():
+        path = layout['path']
         if not os.path.exists(path):
+            builder.log(f'  12-migratie/{label}: file not found, skipped')
             continue
-        table = _read_headerless(path)
         source_file = os.path.relpath(path, REPO_ROOT)
-        records = table[1:] if table else []
+        records = _read_headerless(path)
+        by_contract, kinship = {}, []
         for raw in records:
-            def cell(i):
-                return raw[i].strip() if i < len(raw) else ''
-            values = {field: clean(cell(i)) for i, field in mapping.items()}
+            values = {field: clean(raw[i]) if i < len(raw) else None
+                      for i, field in layout['fields'].items()}
             uuid = values.get('uuid')
+            event_raw = (values.get('arrival_date') or values.get('contract_start')
+                         or values.get('arrival_year'))
+            event_date, event_year, precision = parse_date(event_raw)
             cert = builder.add_certificate(
                 source_dataset='12-migratie-datasets', record_type='contract_record',
                 collection=f'migration-{label}', item_id=uuid,
                 contract_number=values.get('contract_number'),
-                registration_number=values.get('contract_number'),
-                plantation_name=values.get('plantation'),
-                district=values.get('district'),
+                registration_number=values.get('muster_number'),
+                event_date=event_date if precision == 'day' else None, event_year=event_year,
+                date_precision=precision,
+                plantation_name=values.get('plantation'), district=values.get('district'),
                 address_text=values.get('ship'), source_file=source_file)
             pid = builder.add_person(
                 cert, '12-migratie-datasets', 'migrant', source_file,
                 given_name=values.get('given_name'), surname=values.get('surname'),
                 sex=values.get('sex'), age=values.get('age'),
                 occupation=values.get('occupation'), religion=values.get('religion'),
-                ethnicity=values.get('ethnicity'), nationality=values.get('nationality'),
-                literacy=values.get('literacy'),
-                contract_number=values.get('contract_number'),
-                plantation_name=values.get('plantation'))
-            for index, kind in origin_map.items():
-                builder.add_name(pid, kind, cell(index), source_file)
+                origin=values.get('birth_country'), death_date=values.get('death_date'),
+                event_date=event_raw, contract_number=values.get('contract_number'),
+                registration_number=values.get('muster_number'),
+                plantation_name=values.get('plantation'), district=values.get('district'))
+            builder.add_name(pid, 'father_name', values.get('father_name'), source_file)
+            key = contract_key(values.get('contract_number'))
+            if key:
+                by_contract[key] = (pid, cert)
             if values.get('kinship_refs'):
-                builder.add_annotation(uuid, values['kinship_refs'], source_file, status='kinship_refs')
-            if values.get('family_ref'):
-                builder.add_annotation(uuid, values['family_ref'], source_file, status='family_ref')
-            builder.add_annotation(uuid, values.get('memo'), source_file, status='memo')
-            for index, field in origin_map.items():
-                builder.add_location(cert, cell(index), field, '12-migratie-datasets')
+                kinship.append((pid, cert, values['kinship_refs']))
+            for field in MIGRATION_NOTE_FIELDS:
+                builder.add_annotation(uuid, values.get(field), source_file, status=field)
+            for index, field in layout['origin'].items():
+                value = raw[index] if index < len(raw) else None
+                builder.add_name(pid, field, value, source_file)
+                builder.add_location(cert, value, field, '12-migratie-datasets')
             builder.add_location(cert, values.get('plantation'), 'plantation', '12-migratie-datasets')
-        builder.log(f'  12-migratie/{label}: {len(records)} records')
+
+        # Kinship references point to other records of the same register by contract number.
+        seen, linked, unresolved = set(), 0, 0
+        for pid, cert, refs in kinship:
+            for rtype, direction, detail, confidence, key, phrase in parse_kinship(refs):
+                other = by_contract.get(key)
+                if not other or other[0] == pid:
+                    unresolved += 1
+                    continue
+                a, b = (pid, other[0]) if direction == 'out' else (other[0], pid)
+                if rtype in ('spouse', 'sibling', 'related'):
+                    pair = (rtype, min(a, b), max(a, b))
+                else:
+                    pair = (rtype, a, b)
+                if pair in seen:
+                    continue
+                seen.add(pair)
+                builder.add_relation(cert, rtype, a, b, confidence, phrase, source_file)
+                linked += 1
+        builder.log(f'  12-migratie/{label}: {len(records)} records, '
+                    f'{linked} kinship links, {unresolved} references not resolved')
 
 
 # ---------------------------------------------------------------------------
