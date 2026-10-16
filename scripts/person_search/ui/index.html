@@ -13,11 +13,33 @@
     <button type="button" id="lang" class="link-btn" aria-label="Language">EN</button>
   </div>
   <form id="search" autocomplete="off">
+    <div class="viewrow" role="tablist">
+      <button type="button" class="view-btn" data-view="" data-t="viewPersons" role="tab">Personen</button>
+      <button type="button" class="view-btn" data-view="places" data-t="viewPlaces" role="tab">Plaatsen</button>
+      <button type="button" id="help-btn" class="link-btn" data-t="help" aria-expanded="false">Hoe zoek ik?</button>
+    </div>
+    <div id="help" class="help" hidden></div>
     <div class="searchrow">
       <input id="q" type="search" data-tp="placeholder" placeholder="Zoek op naam, plaats of beroep…" aria-label="Zoeken">
       <button type="submit" data-t="search">Zoeken</button>
     </div>
+    <div class="pairrow persons-only">
+      <button type="button" id="pair-btn" class="link-btn" data-t="pairAdd">+ Samen met een tweede persoon (op hetzelfde record)</button>
+      <div id="pair" class="pair" hidden>
+        <label class="grow"><span data-t="pairLabel">Samen met (op hetzelfde record)</span>
+          <input id="q2" type="search" data-tp="pairPh" placeholder="Naam van de tweede persoon"></label>
+        <label><span data-t="role2">Rol tweede persoon</span>
+          <select id="f-role2"><option value="" data-t="all">Alle</option></select></label>
+        <button type="button" id="pair-clear" class="link-btn" data-t="pairClear">Verwijderen</button>
+      </div>
+    </div>
     <div class="filters">
+      <label class="persons-only"><span data-t="modeLabel">Zoekwijze</span>
+        <select id="f-mode">
+          <option value="" data-t="modePrefix">Woordbegin</option>
+          <option value="exact" data-t="modeExact">Exact (hele woorden)</option>
+          <option value="fuzzy" data-t="modeFuzzy">Fuzzy (spellingvarianten)</option>
+        </select></label>
       <label><span data-t="dataset">Bron</span>
         <select id="f-dataset"><option value="" data-t="all">Alle</option></select></label>
       <label><span data-t="role">Rol</span>
@@ -26,9 +48,9 @@
         <input id="f-from" type="number" inputmode="numeric" min="1600" max="2000" placeholder="1700"></label>
       <label><span data-t="to">Tot jaar</span>
         <input id="f-to" type="number" inputmode="numeric" min="1600" max="2000" placeholder="1960"></label>
-      <label class="wide"><span data-t="place">Plaats / plantage</span>
+      <label class="wide persons-only"><span data-t="place">Plaats / plantage</span>
         <input id="f-place" type="text" data-tp="placePh" placeholder="bijv. Commewijne"></label>
-      <label><span data-t="sort">Sorteren</span>
+      <label class="persons-only"><span data-t="sort">Sorteren</span>
         <select id="f-sort">
           <option value="" data-t="sortRel">Beste match</option>
           <option value="year" data-t="sortYear">Jaar</option>

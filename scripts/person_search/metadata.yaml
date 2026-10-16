@@ -155,10 +155,15 @@ databases:
         title: 'Search page: person results'
         hide_sql: true
         sql: |
+          -- :mode 'fuzzy' searches the phonetic keys; other modes the names/places index
           WITH hits AS (
-            SELECT rowid AS person_id, rank FROM persons_fts WHERE persons_fts MATCH :match
+            SELECT rowid AS person_id, rank FROM persons_fts
+             WHERE :mode <> 'fuzzy' AND persons_fts MATCH :match
+            UNION ALL
+            SELECT rowid AS person_id, rank FROM persons_phonetic_fts
+             WHERE :mode = 'fuzzy' AND persons_phonetic_fts MATCH :match
           )
-          SELECT p.person_id, p.full_name, p.role, p.source_dataset, p.sex, p.age,
+          SELECT p.person_id, p.obs_key, p.full_name, p.role, p.source_dataset, p.sex, p.age,
                  p.event_year AS year, p.status, p.occupation,
                  COALESCE(p.plantation_name, c.plantation_name) AS plantation,
                  COALESCE(p.location, c.cert_place, c.address_text, p.district, c.district) AS place,
@@ -174,6 +179,7 @@ databases:
                  COALESCE(c.plantation_name, '') || ' ' || COALESCE(c.cert_place, '') || ' ' ||
                  COALESCE(c.address_text, '') || ' ' || COALESCE(p.district, '') || ' ' ||
                  COALESCE(c.district, '')) LIKE '%' || :place || '%')
+            AND (:loc = '' OR p.certificate_id IN (SELECT certificate_id FROM locations WHERE location_norm = :loc))
           ORDER BY CASE WHEN :sort = 'year' THEN COALESCE(p.event_year, 9999) END, h.rank
           LIMIT 51 OFFSET CAST(:offset AS INTEGER)
       ui_facets:
@@ -181,11 +187,15 @@ databases:
         hide_sql: true
         sql: |
           WITH hits AS (
-            SELECT rowid AS person_id FROM persons_fts WHERE persons_fts MATCH :match
+            SELECT rowid AS person_id FROM persons_fts
+             WHERE :mode <> 'fuzzy' AND persons_fts MATCH :match
+            UNION ALL
+            SELECT rowid AS person_id FROM persons_phonetic_fts
+             WHERE :mode = 'fuzzy' AND persons_phonetic_fts MATCH :match
           ),
           f AS MATERIALIZED (
-            SELECT p.source_dataset AS ds, p.role AS role, (p.event_year / 10) * 10 AS decade,
-                   COALESCE(p.plantation_name, c.plantation_name) AS plantation
+            SELECT p.person_id, p.certificate_id, p.source_dataset AS ds, p.role AS role,
+                   (p.event_year / 10) * 10 AS decade
             FROM hits h
             JOIN persons p ON p.person_id = h.person_id
             LEFT JOIN certificates c ON c.certificate_id = p.certificate_id
@@ -197,13 +207,104 @@ databases:
                    COALESCE(c.plantation_name, '') || ' ' || COALESCE(c.cert_place, '') || ' ' ||
                    COALESCE(c.address_text, '') || ' ' || COALESCE(p.district, '') || ' ' ||
                    COALESCE(c.district, '')) LIKE '%' || :place || '%')
+              AND (:loc = '' OR p.certificate_id IN (SELECT certificate_id FROM locations WHERE location_norm = :loc))
           )
-          SELECT 'dataset' AS facet, ds AS value, COUNT(*) AS n FROM f GROUP BY ds
-          UNION ALL SELECT 'role', role, COUNT(*) FROM f GROUP BY role
-          UNION ALL SELECT 'decade', decade, COUNT(*) FROM f WHERE decade IS NOT NULL GROUP BY decade
+          SELECT 'dataset' AS facet, ds AS value, COUNT(*) AS n, NULL AS label FROM f GROUP BY ds
+          UNION ALL SELECT 'role', role, COUNT(*), NULL FROM f GROUP BY role
+          UNION ALL SELECT 'decade', decade, COUNT(*), NULL FROM f WHERE decade IS NOT NULL GROUP BY decade
+          -- every place string on the matched records (plantation, record place, address,
+          -- origin, ...), counted as persons; :loc_limit 15 for the top list, larger for "show all"
           UNION ALL SELECT * FROM (
-            SELECT 'plantation', plantation, COUNT(*) AS n FROM f
-             WHERE plantation IS NOT NULL GROUP BY plantation ORDER BY n DESC LIMIT 15)
+            SELECT 'location', l.location_norm, COUNT(DISTINCT f.person_id) AS n, MIN(l.raw_text)
+              FROM f JOIN locations l ON l.certificate_id = f.certificate_id
+             WHERE l.location_norm IS NOT NULL
+             GROUP BY l.location_norm ORDER BY n DESC
+             LIMIT CAST(:loc_limit AS INTEGER))
+      ui_pair_search:
+        title: 'Search page: two persons on the same record'
+        hide_sql: true
+        sql: |
+          -- :match and :match2 are FTS5 expressions for the first and the second person
+          WITH h1 AS MATERIALIZED (
+            SELECT rowid AS person_id FROM persons_fts WHERE :mode <> 'fuzzy' AND persons_fts MATCH :match
+            UNION ALL
+            SELECT rowid FROM persons_phonetic_fts WHERE :mode = 'fuzzy' AND persons_phonetic_fts MATCH :match
+          ),
+          h2 AS MATERIALIZED (
+            SELECT rowid AS person_id FROM persons_fts WHERE :mode <> 'fuzzy' AND persons_fts MATCH :match2
+            UNION ALL
+            SELECT rowid FROM persons_phonetic_fts WHERE :mode = 'fuzzy' AND persons_phonetic_fts MATCH :match2
+          ),
+          pairs AS MATERIALIZED (
+            SELECT p1.person_id AS id1, p2.person_id AS id2
+            FROM h1
+            JOIN persons p1 ON p1.person_id = h1.person_id
+            JOIN persons p2 ON p2.certificate_id = p1.certificate_id AND p2.person_id <> p1.person_id
+            LEFT JOIN certificates c1 ON c1.certificate_id = p1.certificate_id
+            WHERE p2.person_id IN (SELECT person_id FROM h2)
+            AND (:place = '' OR (COALESCE(p1.location, '') || ' ' || COALESCE(p1.plantation_name, '') || ' ' ||
+                 COALESCE(c1.plantation_name, '') || ' ' || COALESCE(c1.cert_place, '') || ' ' ||
+                 COALESCE(c1.address_text, '') || ' ' || COALESCE(p1.district, '') || ' ' ||
+                 COALESCE(c1.district, '')) LIKE '%' || :place || '%')
+            AND (:loc = '' OR p1.certificate_id IN (SELECT certificate_id FROM locations WHERE location_norm = :loc))
+            AND (:dataset = '' OR p1.source_dataset = :dataset)
+            AND (:role = '' OR p1.role = :role)
+            AND (:role2 = '' OR p2.role = :role2)
+            AND (:year_from = '' OR p1.event_year >= CAST(:year_from AS INTEGER))
+            AND (:year_to = '' OR p1.event_year <= CAST(:year_to AS INTEGER))
+          )
+          SELECT p.person_id, p.obs_key, p.full_name, p.role, p.source_dataset, p.event_year AS year,
+                 COALESCE(p.plantation_name, c.plantation_name) AS plantation,
+                 COALESCE(p.location, c.cert_place, c.address_text, p.district, c.district) AS place,
+                 p.occupation, c.record_type, c.collection, p.certificate_id,
+                 o.person_id AS other_id, o.obs_key AS other_key, o.full_name AS other_name, o.role AS other_role
+          FROM pairs
+          JOIN persons p ON p.person_id = pairs.id1
+          JOIN persons o ON o.person_id = pairs.id2
+          LEFT JOIN certificates c ON c.certificate_id = p.certificate_id
+          ORDER BY COALESCE(p.event_year, 9999), p.certificate_id
+          LIMIT 51 OFFSET CAST(:offset AS INTEGER)
+      ui_pair_facets:
+        title: 'Search page: filter counts for two persons on the same record'
+        hide_sql: true
+        sql: |
+          WITH h1 AS MATERIALIZED (
+            SELECT rowid AS person_id FROM persons_fts WHERE :mode <> 'fuzzy' AND persons_fts MATCH :match
+            UNION ALL
+            SELECT rowid FROM persons_phonetic_fts WHERE :mode = 'fuzzy' AND persons_phonetic_fts MATCH :match
+          ),
+          h2 AS MATERIALIZED (
+            SELECT rowid AS person_id FROM persons_fts WHERE :mode <> 'fuzzy' AND persons_fts MATCH :match2
+            UNION ALL
+            SELECT rowid FROM persons_phonetic_fts WHERE :mode = 'fuzzy' AND persons_phonetic_fts MATCH :match2
+          ),
+          pairs AS MATERIALIZED (
+            SELECT p1.person_id AS id1, p2.person_id AS id2
+            FROM h1
+            JOIN persons p1 ON p1.person_id = h1.person_id
+            JOIN persons p2 ON p2.certificate_id = p1.certificate_id AND p2.person_id <> p1.person_id
+            LEFT JOIN certificates c1 ON c1.certificate_id = p1.certificate_id
+            WHERE p2.person_id IN (SELECT person_id FROM h2)
+            AND (:place = '' OR (COALESCE(p1.location, '') || ' ' || COALESCE(p1.plantation_name, '') || ' ' ||
+                 COALESCE(c1.plantation_name, '') || ' ' || COALESCE(c1.cert_place, '') || ' ' ||
+                 COALESCE(c1.address_text, '') || ' ' || COALESCE(p1.district, '') || ' ' ||
+                 COALESCE(c1.district, '')) LIKE '%' || :place || '%')
+            AND (:loc = '' OR p1.certificate_id IN (SELECT certificate_id FROM locations WHERE location_norm = :loc))
+            AND (:dataset = '' OR p1.source_dataset = :dataset)
+            AND (:role = '' OR p1.role = :role)
+            AND (:role2 = '' OR p2.role = :role2)
+            AND (:year_from = '' OR p1.event_year >= CAST(:year_from AS INTEGER))
+            AND (:year_to = '' OR p1.event_year <= CAST(:year_to AS INTEGER))
+          )
+          SELECT 'dataset' AS facet, p.source_dataset AS value, COUNT(*) AS n, NULL AS label
+            FROM pairs JOIN persons p ON p.person_id = pairs.id1 GROUP BY p.source_dataset
+          UNION ALL SELECT 'role', p.role, COUNT(*), NULL
+            FROM pairs JOIN persons p ON p.person_id = pairs.id1 GROUP BY p.role
+          UNION ALL SELECT 'role2', p.role, COUNT(*), NULL
+            FROM pairs JOIN persons p ON p.person_id = pairs.id2 GROUP BY p.role
+          UNION ALL SELECT 'decade', (p.event_year / 10) * 10, COUNT(*), NULL
+            FROM pairs JOIN persons p ON p.person_id = pairs.id1
+           WHERE p.event_year IS NOT NULL GROUP BY (p.event_year / 10) * 10
       ui_person:
         title: 'Search page: one person with their record'
         hide_sql: true
@@ -219,12 +320,15 @@ databases:
           FROM persons p
           LEFT JOIN certificates c ON c.certificate_id = p.certificate_id
           LEFT JOIN sources s ON s.source_dataset = p.source_dataset
-          WHERE p.person_id = CAST(:id AS INTEGER)
+          -- by stable observation key (:key) or, for old links, by row id (:id)
+          WHERE p.person_id = (SELECT person_id FROM persons WHERE obs_key = :key
+                               UNION ALL SELECT CAST(:id AS INTEGER) WHERE :key = ''
+                               LIMIT 1)
       ui_record_persons:
         title: 'Search page: everyone on the same record'
         hide_sql: true
         sql: |
-          SELECT person_id, full_name, role, role_index, sex, age, occupation, status
+          SELECT person_id, obs_key, full_name, role, role_index, sex, age, occupation, status
           FROM persons
           WHERE certificate_id = CAST(:cert AS INTEGER)
           ORDER BY role, role_index, person_id
@@ -235,7 +339,7 @@ databases:
         sql: |
           SELECT r.relation_type, r.confidence, r.detail, r.certificate_id,
                  CASE WHEN r.from_person = CAST(:id AS INTEGER) THEN 'out' ELSE 'in' END AS direction,
-                 o.person_id AS other_id, o.full_name AS other_name, o.role AS other_role,
+                 o.person_id AS other_id, o.obs_key AS other_key, o.full_name AS other_name, o.role AS other_role,
                  o.source_dataset AS other_dataset, o.event_year AS other_year
           FROM relations r
           JOIN persons o ON o.person_id = CASE WHEN r.from_person = CAST(:id AS INTEGER)
@@ -251,12 +355,23 @@ databases:
         title: 'Search page: notes and memo fields of a record'
         hide_sql: true
         sql: |
+          -- notes of this record; notes without a record (shared scan ids) via dataset + item id
           SELECT a.status, a.text, a.user_id, a.timestamp
           FROM certificates c
-          JOIN annotations a ON a.source_dataset = c.source_dataset AND a.item_id = c.item_id
+          JOIN annotations a
+            ON a.certificate_id = c.certificate_id
+            OR (a.certificate_id IS NULL AND a.source_dataset = c.source_dataset AND a.item_id = c.item_id)
           WHERE c.certificate_id = CAST(:cert AS INTEGER)
           ORDER BY a.annotation_id
           LIMIT 100
+      ui_record_places:
+        title: 'Search page: places named on a record'
+        hide_sql: true
+        sql: |
+          SELECT raw_text, location_norm, field_origin, precision
+          FROM locations
+          WHERE certificate_id = CAST(:cert AS INTEGER)
+          ORDER BY location_id
       ui_same_name:
         title: 'Search page: same name elsewhere (candidates, never merged)'
         hide_sql: true
@@ -279,13 +394,73 @@ databases:
             UNION
             SELECT n.person_id, n.kind FROM own_names n WHERE n.value_norm IN (SELECT k FROM keys)
           )
-          SELECT p.person_id, p.full_name, p.role, p.source_dataset, p.event_year AS year,
+          SELECT p.person_id, p.obs_key, p.full_name, p.role, p.source_dataset, p.event_year AS year,
                  COALESCE(p.plantation_name, p.location, p.district) AS place, MIN(cand.via) AS via
           FROM cand JOIN persons p ON p.person_id = cand.person_id
           WHERE p.person_id <> CAST(:id AS INTEGER)
           GROUP BY p.person_id
           ORDER BY p.event_year
           LIMIT 150
+      ui_places:
+        title: 'Search page: place names'
+        hide_sql: true
+        sql: |
+          -- words are lower-cased without accents by the page (up to six); every word must occur
+          SELECT place_norm, label, records, datasets FROM places
+          WHERE place_norm LIKE '%' || :w1 || '%'
+            AND (:w2 = '' OR place_norm LIKE '%' || :w2 || '%')
+            AND (:w3 = '' OR place_norm LIKE '%' || :w3 || '%')
+            AND (:w4 = '' OR place_norm LIKE '%' || :w4 || '%')
+            AND (:w5 = '' OR place_norm LIKE '%' || :w5 || '%')
+            AND (:w6 = '' OR place_norm LIKE '%' || :w6 || '%')
+          ORDER BY records DESC
+          LIMIT 200
+      ui_place_search:
+        title: 'Search page: persons on records at one place'
+        hide_sql: true
+        sql: |
+          WITH recs AS (SELECT DISTINCT certificate_id FROM locations WHERE location_norm = :place_norm)
+          SELECT p.person_id, p.obs_key, p.full_name, p.role, p.source_dataset, p.sex, p.age,
+                 p.event_year AS year, p.status, p.occupation,
+                 COALESCE(p.plantation_name, c.plantation_name) AS plantation,
+                 COALESCE(p.location, c.cert_place, c.address_text, p.district, c.district) AS place,
+                 c.record_type, c.collection, p.certificate_id
+          FROM recs
+          JOIN persons p ON p.certificate_id = recs.certificate_id
+          JOIN certificates c ON c.certificate_id = p.certificate_id
+          WHERE 1 = 1
+            AND (:dataset = '' OR p.source_dataset = :dataset)
+            AND (:role = '' OR p.role = :role)
+            AND (:year_from = '' OR p.event_year >= CAST(:year_from AS INTEGER))
+            AND (:year_to = '' OR p.event_year <= CAST(:year_to AS INTEGER))
+            AND (:loc = '' OR p.certificate_id IN (SELECT certificate_id FROM locations WHERE location_norm = :loc))
+          ORDER BY COALESCE(p.event_year, 9999), p.certificate_id, p.person_id
+          LIMIT 51 OFFSET CAST(:offset AS INTEGER)
+      ui_place_facets:
+        title: 'Search page: filter counts for one place'
+        hide_sql: true
+        sql: |
+          WITH recs AS (SELECT DISTINCT certificate_id FROM locations WHERE location_norm = :place_norm),
+          f AS MATERIALIZED (
+            SELECT p.person_id, p.certificate_id, p.source_dataset AS ds, p.role AS role,
+                   (p.event_year / 10) * 10 AS decade
+            FROM recs JOIN persons p ON p.certificate_id = recs.certificate_id
+            WHERE 1 = 1
+            AND (:dataset = '' OR p.source_dataset = :dataset)
+            AND (:role = '' OR p.role = :role)
+            AND (:year_from = '' OR p.event_year >= CAST(:year_from AS INTEGER))
+            AND (:year_to = '' OR p.event_year <= CAST(:year_to AS INTEGER))
+            AND (:loc = '' OR p.certificate_id IN (SELECT certificate_id FROM locations WHERE location_norm = :loc))
+          )
+          SELECT 'dataset' AS facet, ds AS value, COUNT(*) AS n, NULL AS label FROM f GROUP BY ds
+          UNION ALL SELECT 'role', role, COUNT(*), NULL FROM f GROUP BY role
+          UNION ALL SELECT 'decade', decade, COUNT(*), NULL FROM f WHERE decade IS NOT NULL GROUP BY decade
+          UNION ALL SELECT * FROM (
+            SELECT 'location', l.location_norm, COUNT(DISTINCT f.person_id) AS n, MIN(l.raw_text)
+              FROM f JOIN locations l ON l.certificate_id = f.certificate_id
+             WHERE l.location_norm IS NOT NULL AND l.location_norm <> :place_norm
+             GROUP BY l.location_norm ORDER BY n DESC
+             LIMIT CAST(:loc_limit AS INTEGER))
       ui_datasets:
         title: 'Search page: dataset list'
         hide_sql: true

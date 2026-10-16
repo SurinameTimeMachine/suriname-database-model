@@ -22,15 +22,45 @@ const T = {
     loading: 'Zoeken…', results: n => `${n.toLocaleString('nl-NL')} vermeldingen gevonden`,
     noResults: 'Niets gevonden. Probeer een deel van de naam, of minder filters.',
     page: (a, b) => `${a}–${b}`, prev: '← Vorige', next: 'Volgende →',
-    facetDataset: 'Bron', facetRole: 'Rol', facetDecade: 'Periode', facetPlantation: 'Plantage (top 15)',
+    facetDataset: 'Bron', facetRole: 'Rol', facetDecade: 'Periode', facetLocation: 'Locatie',
+    showAll: n => `Toon alle ${n.toLocaleString('nl-NL')}`, showLess: 'Toon minder',
+    locCapped: n => `Alleen de ${n.toLocaleString('nl-NL')} meest voorkomende locaties worden getoond.`,
     person: 'Persoon', record: 'Bron / akte', onRecord: 'Op dezelfde akte / hetzelfde record',
     relations: 'Relaties', otherNames: 'Andere namen en herkomst', notes: 'Opmerkingen en aantekeningen',
     sameName: 'Zelfde naam elders – mogelijk dezelfde persoon (niet automatisch gekoppeld)',
-    links: 'Bekijken bij het archief', none: 'Geen.', you: '(deze persoon)', probable: 'waarschijnlijk',
+    links: 'Bekijken bij het archief', none: 'Geen.', you: '(deze persoon)', probable: 'waarschijnlijk', possible: 'mogelijk',
+    samePerson: 'Dezelfde persoon in een andere bron (kandidaat, niet samengevoegd)',
+    recordPlaces: 'Plaatsen in dit record', resolved: 'afgeleid uit eerdere vermelding in de akte',
     via: { name: 'zelfde naam', emancipation_name: 'via emancipatienaam', former_name: 'via eerdere naam',
            orig_spelling: 'via oorspronkelijke spelling', maiden_name: 'via meisjesnaam',
            widow_name: 'via weduwenaam', baptized_name: 'via doopnaam', display_name: 'via weergavenaam' },
     restricted: 'Beperkte bron: alleen voor intern gebruik door het projectteam. Niet delen of publiceren.',
+    pairAdd: '+ Samen met een tweede persoon (op hetzelfde record)', pairLabel: 'Samen met (op hetzelfde record)',
+    pairPh: 'Naam van de tweede persoon', role2: 'Rol tweede persoon', pairClear: 'Verwijderen', with: 'samen met',
+    facetRole2: 'Rol tweede persoon', pairResults: n => `${n.toLocaleString('nl-NL')} combinaties gevonden (persoon + tweede persoon op hetzelfde record)`,
+    modeLabel: 'Zoekwijze', modePrefix: 'Woordbegin', modeExact: 'Exact (hele woorden)', modeFuzzy: 'Fuzzy (spellingvarianten)',
+    viewPersons: 'Personen', viewPlaces: 'Plaatsen', help: 'Hoe zoek ik?',
+    placesPh: 'Zoek een plaats, plantage, straat of district…',
+    placesFound: n => `${n.toLocaleString('nl-NL')} plaatsnamen gevonden (meest voorkomend eerst)`,
+    placesMore: 'Alleen de eerste 200 worden getoond; maak de zoekterm specifieker.',
+    records: n => `${n.toLocaleString('nl-NL')} records`, allPlaces: '← Alle plaatsnamen',
+    personsAt: 'Personen op records met plaats', permalink: 'Vaste link', copy: 'Kopieer', copied: 'Gekopieerd',
+    fuzzyEmpty: 'Fuzzy zoeken werkt alleen op namen; vul een naam in (lidwoorden als "van" en "de" tellen niet mee).',
+    helpHtml: `<p><b>Personen</b> – alle woorden die je typt moeten voorkomen, in elke volgorde, in naam, alias,
+      eerdere naam, plaats of beroep. Hoofdletters en accenten tellen niet.</p>
+      <ul><li><b>Woordbegin</b> (standaard): elk woord mag het begin van een woord zijn – <i>jan</i> vindt Jan, Janna, Jansen
+        (maar niet Bijan; midden in een woord zoeken kan niet).</li>
+      <li><b>Exact</b>: alleen hele woorden – <i>jan</i> vindt alleen Jan.</li>
+      <li><b>Fuzzy</b>: vindt bekende spellingvarianten – ij/ei/y, oe/ou, dj/j, tj/ch, c/k, ph/f, sch/s, dt/d/t,
+        dubbele letters: <i>Meijer</i> vindt ook Meyer en Meier, <i>Smit</i> ook Schmidt, <i>Ponidja</i> ook Ponidjah.
+        Alleen voor namen, hele woorden.</li></ul>
+      <p><b>Samen met een tweede persoon</b> – vind records waarop twee personen samen voorkomen, eventueel met een
+      rol per persoon: bijv. vader <i>Jan</i> + moeder <i>Maria</i> vindt de geboorteakten van hun kinderen.</p>
+      <p><b>Plaatsen</b> – zoek een plaats-, plantage-, straat- of districtsnaam (ook midden in een woord) en klik op een
+      plaatsnaam om alle personen te zien op records met die plaats. Elke spelling is nog een aparte plaatsnaam.</p>
+      <p>Elk resultaat is één <b>vermelding</b> van een persoon in één bron. Klik om de persoonskaart te openen;
+      met Ctrl+klik (Cmd+klik op een Mac) of de middelste muisknop opent hij in een nieuw tabblad.
+      De link van een persoonskaart is vast en kan bewaard worden.</p>`,
     error: 'Er ging iets mis bij het ophalen: ',
     introHtml: `<p>Zoek in één keer door alle persoonsbronnen van de Suriname Time Machine.
       Typ een naam (of een deel ervan), een plaats of een beroep. Meerdere woorden worden allemaal gezocht,
@@ -46,15 +76,44 @@ const T = {
     loading: 'Searching…', results: n => `${n.toLocaleString('en-GB')} mentions found`,
     noResults: 'Nothing found. Try part of the name, or fewer filters.',
     page: (a, b) => `${a}–${b}`, prev: '← Previous', next: 'Next →',
-    facetDataset: 'Source', facetRole: 'Role', facetDecade: 'Period', facetPlantation: 'Plantation (top 15)',
+    facetDataset: 'Source', facetRole: 'Role', facetDecade: 'Period', facetLocation: 'Location',
+    showAll: n => `Show all ${n.toLocaleString('en-GB')}`, showLess: 'Show less',
+    locCapped: n => `Only the ${n.toLocaleString('en-GB')} most frequent locations are shown.`,
     person: 'Person', record: 'Source / record', onRecord: 'On the same record',
     relations: 'Relations', otherNames: 'Other names and origin', notes: 'Remarks and notes',
     sameName: 'Same name elsewhere – possibly the same person (not linked automatically)',
-    links: 'View at the archive', none: 'None.', you: '(this person)', probable: 'probable',
+    links: 'View at the archive', none: 'None.', you: '(this person)', probable: 'probable', possible: 'possible',
+    samePerson: 'Same person in another source (candidate, not merged)',
+    recordPlaces: 'Places on this record', resolved: 'resolved from an earlier mention in the certificate',
     via: { name: 'same name', emancipation_name: 'via emancipation name', former_name: 'via former name',
            orig_spelling: 'via original spelling', maiden_name: 'via maiden name',
            widow_name: 'via widow name', baptized_name: 'via baptismal name', display_name: 'via display name' },
     restricted: 'Restricted source: internal use by the project team only. Do not share or publish.',
+    pairAdd: '+ Together with a second person (on the same record)', pairLabel: 'Together with (on the same record)',
+    pairPh: 'Name of the second person', role2: 'Role of second person', pairClear: 'Remove', with: 'with',
+    facetRole2: 'Role of second person', pairResults: n => `${n.toLocaleString('en-GB')} matching pairs (person + second person on the same record)`,
+    modeLabel: 'Search mode', modePrefix: 'Word start', modeExact: 'Exact (whole words)', modeFuzzy: 'Fuzzy (spelling variants)',
+    viewPersons: 'Persons', viewPlaces: 'Places', help: 'How to search?',
+    placesPh: 'Search a place, plantation, street or district…',
+    placesFound: n => `${n.toLocaleString('en-GB')} place names found (most frequent first)`,
+    placesMore: 'Only the first 200 are shown; make the search more specific.',
+    records: n => `${n.toLocaleString('en-GB')} records`, allPlaces: '← All place names',
+    personsAt: 'Persons on records with place', permalink: 'Permanent link', copy: 'Copy', copied: 'Copied',
+    fuzzyEmpty: 'Fuzzy search works on names only; enter a name (particles such as "van" and "de" are ignored).',
+    helpHtml: `<p><b>Persons</b> – every word you type must occur, in any order, in a name, alias, former name,
+      place or occupation. Case and accents are ignored.</p>
+      <ul><li><b>Word start</b> (default): each word may be the start of a word – <i>jan</i> finds Jan, Janna, Jansen
+        (not Bijan; searching inside a word is not possible).</li>
+      <li><b>Exact</b>: whole words only – <i>jan</i> finds only Jan.</li>
+      <li><b>Fuzzy</b>: finds common spelling variants – ij/ei/y, oe/ou, dj/j, tj/ch, c/k, ph/f, sch/s, dt/d/t,
+        double letters: <i>Meijer</i> also finds Meyer and Meier, <i>Smit</i> also Schmidt, <i>Ponidja</i> also Ponidjah.
+        Names only, whole words.</li></ul>
+      <p><b>Together with a second person</b> – find records on which two persons occur together, optionally with
+      a role for each: e.g. father <i>Jan</i> + mother <i>Maria</i> finds the birth certificates of their children.</p>
+      <p><b>Places</b> – search a place, plantation, street or district name (also inside words) and click a place
+      name to see all persons on records with that place. Each spelling is still a separate place name.</p>
+      <p>Each result is one <b>mention</b> of a person in one source. Click to open the person card; Ctrl+click
+      (Cmd+click on a Mac) or the middle mouse button opens it in a new tab. The link of a person card is permanent.</p>`,
     error: 'Something went wrong while loading: ',
     introHtml: `<p>Search all person sources of the Suriname Time Machine at once.
       Type a name (or part of it), a place or an occupation. All words are searched, in any order.
@@ -115,7 +174,7 @@ const REL = {
     informant: { out: 'aangifte gedaan van', in: 'aangever' },
     'enslaver-enslaved': { out: 'tot slaaf gemaakt', in: 'eigenaar' },
     'employer-plantation': { out: 'plantage', in: 'werkgever' }, 'owner-property': { out: 'eigendom', in: 'eigenaar' },
-    related: { out: 'verwant', in: 'verwant' },
+    related: { out: 'verwant', in: 'verwant' }, 'same-person': { out: 'zelfde persoon', in: 'zelfde persoon' },
   },
   en: {
     'parent-child': { out: 'child', in: 'parent' }, spouse: { out: 'spouse', in: 'spouse' },
@@ -124,7 +183,7 @@ const REL = {
     informant: { out: 'reported the event of', in: 'informant' },
     'enslaver-enslaved': { out: 'enslaved', in: 'owner' },
     'employer-plantation': { out: 'plantation', in: 'employer' }, 'owner-property': { out: 'property', in: 'owner' },
-    related: { out: 'relative', in: 'relative' },
+    related: { out: 'relative', in: 'relative' }, 'same-person': { out: 'same person', in: 'same person' },
   },
 };
 const PARENT_DETAIL = { nl: { mother: 'moeder', father: 'vader' }, en: { mother: 'mother', father: 'father' } };
@@ -183,6 +242,26 @@ const RECORD_TYPES = {
 };
 const recordLabel = rt => (RECORD_TYPES[lang] || {})[rt] || rt;
 
+const PLACE_FIELDS = {
+  nl: { cert_place: 'Plaats akte', cert_location: 'Locatie akte', birth_place: 'Geboorteplaats', inf_place: 'Woonplaats aangever',
+        moth_place: 'Woonplaats moeder', groom_place: 'Woonplaats bruidegom', bride_place: 'Woonplaats bruid',
+        death_place: 'Plaats van overlijden', dec_place: 'Woonplaats overledene', dec_birthplace: 'Geboorteplaats overledene',
+        plantation: 'Plantage', Plantage: 'Plantage', Woonplaats: 'Woonplaats', adres: 'Adres',
+        district: 'Herkomst: district', village: 'Herkomst: dorp', residency: 'Herkomst: residentie', division: 'Herkomst: afdeling',
+        police_post: 'Herkomst: politiepost', place_of_origin: 'Plaats van herkomst' },
+  en: { cert_place: 'Record place', cert_location: 'Record location', birth_place: 'Birth place', inf_place: "Informant's residence",
+        moth_place: "Mother's residence", groom_place: "Groom's residence", bride_place: "Bride's residence",
+        death_place: 'Place of death', dec_place: "Deceased's residence", dec_birthplace: "Deceased's birth place",
+        plantation: 'Plantation', Plantage: 'Plantation', Woonplaats: 'Residence', adres: 'Address',
+        district: 'Origin: district', village: 'Origin: village', residency: 'Origin: residency', division: 'Origin: division',
+        police_post: 'Origin: police post', place_of_origin: 'Place of origin' },
+};
+const placeFieldLabel = f => {
+  const base = (f || '').replace(/ \(resolved\)$/, '');
+  return (PLACE_FIELDS[lang][base] || base.replace(/_/g, ' ')) + (base !== f ? ` (${t('resolved')})` : '');
+};
+const SCAN_NOTES = { scan_registratielijst: 'Scan registratielijst (Nationaal Archief)', scan_klapper: 'Scan klapper (Nationaal Archief)' };
+
 const NOTE_KINDS = {
   nl: { memo: 'Memo', photo_url: 'Foto', kinship_refs: 'Familieverwijzingen', recontracts: 'Hercontracten', court_ruling: 'Vonnis',
         civil_status_notes: 'Burgerlijke stand', family_notes: 'Familiegegevens', land_situation: 'Grondsituatie' },
@@ -235,16 +314,38 @@ async function api(query, params = {}) {
   return data;
 }
 
-// "maria elis" -> "maria"* "elis"*  (all words, any order, each as a prefix)
-function ftsMatch(q) {
-  return q.trim().split(/\s+/).filter(Boolean)
-    .map(w => '"' + w.replace(/"/g, '""') + '"*').join(' ');
+// Same steps as phonetic_key() in build_db.py; keep both in sync.
+const PHONETIC_STOPWORDS = new Set(['van', 'de', 'der', 'den', 'het', 'ten', 'ter', 'te', 'la', 'le', 'du', 'des']);
+const PHONETIC_RULES = [['sch', 's'], ['ck', 'k'], ['ph', 'f'], ['th', 't'], ['dj', 'j'], ['tj', 'ch'],
+  ['ij', 'i'], ['ei', 'i'], ['ey', 'i'], ['ie', 'i'], ['y', 'i'], ['oe', 'u'], ['ou', 'u'], ['ae', 'a']];
+const plain = w => w.normalize('NFKD').replace(/\p{M}/gu, '').toLowerCase();
+function phoneticKey(word) {
+  let t = plain(word).replace(/[^a-z]/g, '');
+  if (!t || PHONETIC_STOPWORDS.has(t)) return '';
+  t = t.replace(/c(?=[eiy])/g, 's').replace(/c(?!h)/g, 'k');
+  for (const [a, b] of PHONETIC_RULES) t = t.split(a).join(b);
+  return t.replace(/dt$|d$/, 't').replace(/([aeiou])h$/, '$1').replace(/(.)\1+/g, '$1');
+}
+
+// FTS5 expression: all words, any order.
+//   ''      "maria"* "elis"*   (each word as a prefix)
+//   exact   "maria" "elis"
+//   fuzzy   "mir" "elisabet"   (spelling keys, searched in persons_phonetic_fts)
+function ftsMatch(q, mode) {
+  const words = q.trim().split(/\s+/).filter(Boolean);
+  if (mode === 'fuzzy') {
+    return [...new Set(words.flatMap(w => w.split(/[^\p{L}]+/u)).map(phoneticKey).filter(Boolean))]
+      .map(k => `"${k}"`).join(' ');
+  }
+  return words.map(w => '"' + w.replace(/"/g, '""') + '"' + (mode === 'exact' ? '' : '*')).join(' ');
 }
 
 // ---------------------------------------------------------------------------
 // State in the URL hash
 // ---------------------------------------------------------------------------
-const KEYS = ['q', 'dataset', 'role', 'from', 'to', 'place', 'sort', 'page', 'person'];
+const KEYS = ['view', 'q', 'q2', 'role2', 'mode', 'dataset', 'role', 'from', 'to', 'place', 'loc', 'locl', 'sort', 'pk', 'pl', 'page', 'obs', 'person'];
+const LOC_LIMIT = '2000';   // locations fetched for the facet; 15 shown until expanded
+let showAllLocations = false;
 function readState() {
   const h = new URLSearchParams(location.hash.slice(1));
   const s = {};
@@ -259,6 +360,14 @@ function writeState(s, replace) {
   render();
 }
 function setState(patch, replace) { writeState({ ...readState(), ...patch }, replace); }
+function hrefFor(patch) {
+  const s = { ...readState(), ...patch };
+  const h = new URLSearchParams();
+  KEYS.forEach(k => { if (s[k]) h.set(k, s[k]); });
+  return '#' + h.toString();
+}
+// person links carry the stable observation key; the row id is only a fallback
+const personHref = (key, id) => hrefFor(key ? { obs: key, person: '' } : { person: String(id), obs: '' });
 
 // ---------------------------------------------------------------------------
 // Rendering: search results and facets
@@ -266,39 +375,78 @@ function setState(patch, replace) { writeState({ ...readState(), ...patch }, rep
 let lastSearchKey = null;
 
 function filterParams(s) {
-  return { match: ftsMatch(s.q), dataset: s.dataset, role: s.role, year_from: s.from, year_to: s.to, place: s.place };
+  return { match: ftsMatch(s.q, s.mode), mode: s.mode, dataset: s.dataset, role: s.role,
+           year_from: s.from, year_to: s.to, place: s.place, loc: s.loc };
 }
+const commonFilters = s => ({ dataset: s.dataset, role: s.role, year_from: s.from, year_to: s.to, loc: s.loc });
 
 async function renderSearch(s) {
-  const key = JSON.stringify([s.q, s.dataset, s.role, s.from, s.to, s.place, s.sort, s.page, lang]);
+  const key = JSON.stringify([s.view, s.q, s.q2, s.role2, s.mode, s.dataset, s.role, s.from, s.to, s.place, s.loc, s.sort, s.pk, s.page, lang]);
   if (key === lastSearchKey) return;
   lastSearchKey = key;
   const status = $('#status');
   status.className = 'status';
-  $('#intro').innerHTML = s.q ? '' : t('introHtml');
-  if (!s.q.trim()) {
-    status.textContent = ''; $('#list').innerHTML = ''; $('#pager').innerHTML = ''; $('#facets').innerHTML = '';
-    return;
-  }
+  $('#intro').innerHTML = (s.q || s.pk) ? '' : t('introHtml');
+  const clear = () => { $('#list').innerHTML = ''; $('#pager').innerHTML = ''; $('#facets').innerHTML = ''; };
+  if (s.view === 'places' && !s.pk) { clear(); return renderPlaceList(s, status, key); }
+  if (!s.pk && !s.q.trim()) { status.textContent = ''; clear(); return; }
+  const pair = !s.pk && s.view !== 'places' && s.q2.trim();
+  const params = s.pk ? { place_norm: s.pk, ...commonFilters(s) } : filterParams(s);
+  if (pair) Object.assign(params, { match2: ftsMatch(s.q2, s.mode), role2: s.role2 });
+  if (!s.pk && (!params.match || (pair && !params.match2))) { status.textContent = t('fuzzyEmpty'); clear(); return; }
   status.textContent = t('loading');
   const page = Math.max(0, parseInt(s.page || '0', 10) || 0);
   try {
-    const params = filterParams(s);
-    const [rows, facets] = await Promise.all([
+    const [rows, facets] = await Promise.all(pair ? [
+      api('ui_pair_search', { ...params, offset: String(page * PAGE) }),
+      api('ui_pair_facets', params),
+    ] : s.pk ? [
+      api('ui_place_search', { ...params, offset: String(page * PAGE) }),
+      api('ui_place_facets', { ...params, loc_limit: LOC_LIMIT }),
+    ] : [
       api('ui_search', { ...params, sort: s.sort, offset: String(page * PAGE) }),
-      api('ui_facets', params),
+      api('ui_facets', { ...params, loc_limit: LOC_LIMIT }),
     ]);
     if (key !== lastSearchKey) return;  // a newer search started meanwhile
     const total = facets.filter(f => f.facet === 'dataset').reduce((a, f) => a + f.n, 0);
-    status.textContent = total ? t('results')(total) : t('noResults');
+    status.innerHTML = (s.pk ? `<p class="crumb"><a href="${esc(hrefFor({ pk: '', pl: '', page: '' }))}">${t('allPlaces')}</a>
+      · ${t('personsAt')} <b>${esc(s.pl || s.pk)}</b></p>` : '') + esc(total ? (pair ? t('pairResults') : t('results'))(total) : t('noResults'));
     renderList(rows.slice(0, PAGE));
     renderPager(page, rows.length > PAGE, total);
     renderFacets(facets, s);
   } catch (err) {
     if (key !== lastSearchKey) return;
+    lastSearchKey = null;   // allow the same search to be retried
     status.className = 'status error';
     status.textContent = t('error') + err.message;
     $('#list').innerHTML = ''; $('#pager').innerHTML = '';
+  }
+}
+
+async function renderPlaceList(s, status, key) {
+  // the canned query takes up to six words; longer input keeps the first six
+  const words = plain(s.q).replace(/[^\p{L}\p{N}]+/gu, ' ').trim().split(' ').filter(Boolean).slice(0, 6);
+  if (!words.length) { status.textContent = ''; return; }
+  status.textContent = t('loading');
+  try {
+    const params = {};
+    for (let i = 0; i < 6; i++) params[`w${i + 1}`] = words[i] || '';
+    const rows = await api('ui_places', params);
+    if (key !== lastSearchKey) return;
+    status.textContent = rows.length ? t('placesFound')(rows.length) + (rows.length >= 200 ? ' ' + t('placesMore') : '')
+                                     : t('noResults');
+    $('#list').innerHTML = rows.map(r => `
+      <li class="card place-card">
+        <span class="name"><a href="${esc(hrefFor({ pk: r.place_norm, pl: r.label, page: '' }))}">${esc(r.label)}</a></span>
+        <span class="year">${esc(t('records')(r.records))}</span>
+        <span class="meta">${(r.datasets || '').split(',').map(ds =>
+          `<span class="badge${isRestricted(ds) ? ' restricted' : ''}">${esc(dsLabel(ds))}</span>`).join('')}</span>
+      </li>`).join('');
+  } catch (err) {
+    if (key !== lastSearchKey) return;
+    lastSearchKey = null;
+    status.className = 'status error';
+    status.textContent = t('error') + err.message;
   }
 }
 
@@ -309,8 +457,8 @@ function renderList(rows) {
     const place = r.place && r.place !== r.plantation
       ? (r.source_dataset === '12-migratie-datasets' ? `${t('ship')} ${r.place}` : r.place) : '';
     return `
-    <li class="card" tabindex="0" data-person="${r.person_id}">
-      <span class="name">${esc(r.full_name || '—')}</span>
+    <li class="card">
+      <span class="name"><a href="${esc(personHref(r.obs_key, r.person_id))}">${esc(r.full_name || '—')}</a></span>
       <span class="year">${esc(r.year || '')}</span>
       <span class="meta">
         <span class="badge role">${esc(roleLabel(r.role))}</span>
@@ -320,6 +468,8 @@ function renderList(rows) {
         ${place ? `<span>${esc(place)}</span>` : ''}
         ${r.occupation ? `<span>${esc(r.occupation)}</span>` : ''}
       </span>
+      ${r.other_id ? `<span class="pairwith">+ ${t('with')} <a href="${esc(personHref(r.other_key, r.other_id))}">${esc(r.other_name || '—')}</a>
+        <span class="badge role">${esc(roleLabel(r.other_role))}</span></span>` : ''}
     </li>`;
   }).join('');
 }
@@ -346,8 +496,9 @@ function renderFacets(facets, s) {
   };
   let html = list('dataset', t('facetDataset'), 'dataset', dsLabel);
   html += list('role', t('facetRole'), 'role', roleLabel);
+  html += list('role2', t('facetRole2'), 'role2', roleLabel);
   const dec = by('decade').sort((a, b) => a.value - b.value);
-  if (dec.length > 1) {
+  if (dec.length > 1 || (dec.length === 1 && s.from && s.to)) {
     const max = Math.max(...dec.map(d => d.n));
     html += `<h2>${t('facetDecade')}</h2><div class="decades">` + dec.map(d =>
       `<button type="button" title="${d.value}–${d.value + 9}: ${d.n.toLocaleString()}" data-decade="${d.value}"
@@ -355,12 +506,32 @@ function renderFacets(facets, s) {
         style="height:${Math.max(4, Math.round(d.n / max * 70))}px"></button>`).join('') +
       `</div><div class="decade-axis"><span>${dec[0].value}</span><span>${dec[dec.length - 1].value + 9}</span></div>`;
   }
-  html += list('plantation', t('facetPlantation'), 'place', v => v);
+  const locs = by('location').sort((a, b) => b.n - a.n);
+  if (locs.length) {
+    const shown = showAllLocations ? locs : locs.slice(0, 15);
+    if (s.loc && !shown.some(f => f.value === s.loc)) {
+      const cur = locs.find(f => f.value === s.loc);
+      if (cur) shown.unshift(cur);
+    }
+    html += `<h2>${t('facetLocation')}</h2>` + shown.map(f => {
+      const on = s.loc === f.value;
+      return `<button type="button" class="facet${on ? ' on' : ''}" data-facet="loc" data-value="${esc(on ? '' : f.value)}"
+        data-label="${esc(on ? '' : (f.label || f.value))}"><span>${esc(f.label || f.value)}</span><span class="n">${f.n.toLocaleString()}</span></button>`;
+    }).join('');
+    if (locs.length > 15) {
+      html += `<button type="button" class="link-btn" data-toggle-locs>${showAllLocations ? t('showLess') : t('showAll')(locs.length)}</button>`;
+    }
+    if (showAllLocations && locs.length >= Number(LOC_LIMIT)) html += `<p class="small">${t('locCapped')(locs.length)}</p>`;
+  } else if (s.loc) {
+    html += `<h2>${t('facetLocation')}</h2><button type="button" class="facet on" data-facet="loc" data-value="" data-label="">
+      <span>${esc(s.locl || s.loc)}</span><span class="n">×</span></button>`;
+  }
   $('#facets').innerHTML = html;
 
   // keep the dropdowns in step with what the current results contain
   fillSelect('#f-dataset', by('dataset').map(f => f.value), s.dataset, dsLabel);
   fillSelect('#f-role', by('role').map(f => f.value), s.role, roleLabel);
+  fillSelect('#f-role2', by('role2').length ? by('role2').map(f => f.value) : Object.keys(ROLES.nl), s.role2, roleLabel);
 }
 
 function fillSelect(sel, values, current, label) {
@@ -377,18 +548,23 @@ function fillSelect(sel, values, current, label) {
 // ---------------------------------------------------------------------------
 let personStack = [];
 
-function kv(fields, obj) {
-  const rows = fields.filter(([k]) => obj[k] !== null && obj[k] !== undefined && obj[k] !== '')
-    .map(([k, nl, en]) => {
+// placeKeys (optional): a normalised place per field; the value then links to the place search
+function kv(fields, obj, placeKeys) {
+  const rows = fields.map((f, i) => [...f, placeKeys ? placeKeys[i] : null])
+    .filter(([k]) => obj[k] !== null && obj[k] !== undefined && obj[k] !== '')
+    .map(([k, nl, en, pk]) => {
       let v = obj[k];
       if (k === 'license' && obj.embargo) v += ' (embargo)';
-      return `<dt>${esc(lang === 'nl' ? nl : en)}</dt><dd>${esc(v)}</dd>`;
+      if (k === 'religion' && obj.collection === 'migration-hindostani') nl = 'Godsdienst of kaste', en = 'Religion or caste';
+      const val = pk ? `<a href="${esc(hrefFor({ view: 'places', q: v, pk, pl: v, page: '', obs: '', person: '',
+                          dataset: '', role: '', from: '', to: '', loc: '', locl: '' }))}">${esc(v)}</a>` : esc(v);
+      return `<dt>${esc(lang === 'nl' ? nl : en)}</dt><dd>${val}</dd>`;
     });
   return rows.length ? `<dl class="kv">${rows.join('')}</dl>` : `<p class="empty">${t('none')}</p>`;
 }
 
-function personLink(id, name) {
-  return `<button type="button" class="person" data-person="${id}">${esc(name || '—')}</button>`;
+function personLink(id, name, key) {
+  return `<a class="person" href="${esc(personHref(key, id))}">${esc(name || '—')}</a>`;
 }
 
 function relationLabel(r) {
@@ -399,31 +575,49 @@ function relationLabel(r) {
   return base;
 }
 
-async function renderPerson(id) {
+let personRequest = 0;      // increases on every open/close; older responses are dropped
+let focusBeforeDrawer = null;
+
+async function renderPerson(ref) {
+  const request = ++personRequest;
   const drawer = $('#drawer');
-  drawer.hidden = false;
+  if (drawer.hidden) {
+    focusBeforeDrawer = document.activeElement;
+    drawer.hidden = false;
+    // keep keyboard focus inside the drawer while it is open
+    document.querySelectorAll('header.top, main.layout').forEach(el => { el.inert = true; });
+    $('.drawer-panel .close').focus();
+  }
   document.body.style.overflow = 'hidden';
   $('#back').hidden = personStack.length < 2;
   const box = $('#detail');
   box.innerHTML = `<p class="status">${t('loading')}</p>`;
   try {
-    const [p] = await api('ui_person', { id });
+    const [p] = await api('ui_person', ref.key ? { key: ref.key } : { id: ref.id });
+    if (request !== personRequest) return;
     if (!p) { box.innerHTML = `<p class="empty">${t('none')}</p>`; return; }
-    const [onRecord, rels, names, notes, same] = await Promise.all([
+    const id = p.person_id;
+    const [onRecord, rels, names, notes, same, places] = await Promise.all([
       p.certificate_id ? api('ui_record_persons', { cert: p.certificate_id }) : [],
       api('ui_relations', { id }),
       api('ui_names', { id }),
       p.certificate_id ? api('ui_notes', { cert: p.certificate_id }) : [],
       api('ui_same_name', { id }),
+      p.certificate_id ? api('ui_record_places', { cert: p.certificate_id }) : [],
     ]);
+    if (request !== personRequest) return;
     const links = archiveLinks(p);
     const photos = notes.filter(n => n.status === 'photo_url' && /^https:\/\//.test(n.text || ''));
-    const otherNotes = notes.filter(n => n.status !== 'photo_url');
+    notes.filter(n => SCAN_NOTES[n.status] && /^https?:\/\//.test(n.text || ''))
+      .forEach(n => links.push([SCAN_NOTES[n.status], n.text]));
+    const otherNotes = notes.filter(n => n.status !== 'photo_url' && !SCAN_NOTES[n.status]);
+    const sameRels = rels.filter(r => r.relation_type === 'same-person');
     const relsByOther = new Map();
     rels.forEach(r => { if (!relsByOther.has(r.other_id)) relsByOther.set(r.other_id, []); relsByOther.get(r.other_id).push(r); });
     // relations to people on the same record are shown in that list; the rest separately
     const recordIds = new Set(onRecord.map(o => o.person_id));
-    const otherRels = rels.filter(r => !recordIds.has(r.other_id));
+    const otherRels = rels.filter(r => !recordIds.has(r.other_id) && r.relation_type !== 'same-person');
+    const confLabel = c => c === 'possible' ? t('possible') : (c && c !== 'certain' ? t('probable') : '');
 
     box.innerHTML = `
       <h2 id="d-title">${esc(p.full_name || '—')}</h2>
@@ -432,6 +626,8 @@ async function renderPerson(id) {
         <span class="badge${isRestricted(p.source_dataset) ? ' restricted' : ''}">${esc(dsLabel(p.source_dataset))}</span>
         ${p.event_year ? `<span class="badge role">${esc(p.event_year)}</span>` : ''}
       </div>
+      ${p.obs_key ? `<div class="permalink">${t('permalink')}: <code>${esc(p.obs_key)}</code>
+        <button type="button" class="link-btn" data-copy="${esc(location.origin + location.pathname + '#obs=' + encodeURIComponent(p.obs_key))}">${t('copy')}</button></div>` : ''}
       ${isRestricted(p.source_dataset) ? `<div class="notice restricted">${t('restricted')}</div>` : ''}
       ${photos.length ? photos.map(n => `
         <a class="photo" href="${esc(n.text)}" target="_blank" rel="noopener"><img src="${esc(n.text)}" alt="${esc(p.full_name || '')}" loading="lazy"></a>`).join('') : ''}
@@ -451,16 +647,26 @@ async function renderPerson(id) {
         const how = (relsByOther.get(o.person_id) || []).map(relationLabel);
         return `<li class="${me ? 'me' : ''}">
           <span class="rel">${esc(roleLabel(o.role))}${o.role_index ? ' ' + esc(o.role_index) : ''}</span>
-          ${me ? `<b>${esc(o.full_name || '—')}</b> <span class="small">${t('you')}</span>` : personLink(o.person_id, o.full_name)}
+          ${me ? `<b>${esc(o.full_name || '—')}</b> <span class="small">${t('you')}</span>` : personLink(o.person_id, o.full_name, o.obs_key)}
           ${how.length ? `<span class="small">→ ${esc([...new Set(how)].join(', '))}</span>` : ''}
           ${o.age ? `<span class="small">${esc(o.age)}</span>` : ''}
           ${o.occupation ? `<span class="small">${esc(o.occupation)}</span>` : ''}
         </li>`;
       }).join('') + '</ul>' : ''}
 
+      ${sameRels.length ? `<h3>${t('samePerson')}</h3><ul class="people">` + sameRels.map(r => `
+        <li><span class="rel">${esc(confLabel(r.confidence) || '')}</span>
+          ${personLink(r.other_id, r.other_name, r.other_key)}
+          <span class="badge${isRestricted(r.other_dataset) ? ' restricted' : ''}">${esc(dsLabel(r.other_dataset))}</span>
+          <span class="small">${r.other_year ? esc(r.other_year) + ', ' : ''}${esc(r.detail || '')}</span>
+        </li>`).join('') + '</ul>' : ''}
+
+      ${places.length ? `<h3>${t('recordPlaces')}</h3>` + kv(places.map((pl, i) => [`pl${i}`, placeFieldLabel(pl.field_origin), placeFieldLabel(pl.field_origin)]),
+        Object.fromEntries(places.map((pl, i) => [`pl${i}`, pl.raw_text])), places.map(pl => pl.location_norm)) : ''}
+
       ${otherRels.length ? `<h3>${t('relations')}</h3><ul class="people">` + otherRels.map(r => `
-        <li><span class="rel">${esc(relationLabel(r))}${r.confidence && r.confidence !== 'certain' ? ` (${t('probable')})` : ''}</span>
-          ${personLink(r.other_id, r.other_name)}
+        <li><span class="rel">${esc(relationLabel(r))}${confLabel(r.confidence) ? ` (${confLabel(r.confidence)})` : ''}</span>
+          ${personLink(r.other_id, r.other_name, r.other_key)}
           <span class="small">${esc(dsLabel(r.other_dataset))}${r.other_year ? ', ' + esc(r.other_year) : ''}</span>
           ${r.detail && r.detail !== r.relation_type ? `<span class="small">“${esc(r.detail)}”</span>` : ''}
         </li>`).join('') + '</ul>' : ''}
@@ -474,7 +680,7 @@ async function renderPerson(id) {
       <h3>${t('sameName')}</h3>
       ${same.length ? '<ul class="people">' + same.map(o => `
         <li><span class="rel">${esc(roleLabel(o.role))}</span>
-          ${personLink(o.person_id, o.full_name)}
+          ${personLink(o.person_id, o.full_name, o.obs_key)}
           <span class="badge${isRestricted(o.source_dataset) ? ' restricted' : ''}">${esc(dsLabel(o.source_dataset))}</span>
           <span class="small">${[o.year, o.place].filter(Boolean).map(esc).join(', ')}</span>
           ${o.via && o.via !== 'name' ? `<span class="small">(${esc(T[lang].via[o.via] || o.via)})</span>` : ''}
@@ -482,14 +688,21 @@ async function renderPerson(id) {
     `;
     $('.drawer-panel').scrollTop = 0;
   } catch (err) {
+    if (request !== personRequest) return;
     box.innerHTML = `<p class="status error">${esc(t('error') + err.message)}</p>`;
   }
 }
 
 function closePerson() {
   personStack = [];
-  $('#drawer').hidden = true;
+  personRequest++;
+  const drawer = $('#drawer');
+  if (drawer.hidden) return;
+  drawer.hidden = true;
   document.body.style.overflow = '';
+  document.querySelectorAll('header.top, main.layout').forEach(el => { el.inert = false; });
+  if (focusBeforeDrawer && document.contains(focusBeforeDrawer)) focusBeforeDrawer.focus();
+  focusBeforeDrawer = null;
 }
 
 // ---------------------------------------------------------------------------
@@ -504,7 +717,19 @@ function applyLang() {
 }
 
 function syncForm(s) {
+  document.body.classList.toggle('view-places', s.view === 'places');
+  document.querySelectorAll('.view-btn').forEach(b => {
+    b.classList.toggle('on', b.dataset.view === s.view);
+    b.setAttribute('aria-selected', String(b.dataset.view === s.view));
+  });
+  $('#q').placeholder = t(s.view === 'places' ? 'placesPh' : 'placeholder');
   $('#q').value = s.q;
+  $('#f-mode').value = s.mode;
+  $('#q2').value = s.q2;
+  if (s.q2) $('#pair').hidden = false;
+  $('#pair-btn').hidden = !$('#pair').hidden;
+  if (!$('#f-role2').querySelector(`option[value="${CSS.escape(s.role2)}"]`)) fillSelect('#f-role2', Object.keys(ROLES.nl), s.role2, roleLabel);
+  $('#f-role2').value = s.role2;
   $('#f-from').value = s.from;
   $('#f-to').value = s.to;
   $('#f-place').value = s.place;
@@ -519,28 +744,42 @@ function render() {
   const s = readState();
   syncForm(s);
   renderSearch(s);
-  if (s.person) {
-    if (personStack[personStack.length - 1] !== s.person) {
-      const i = personStack.indexOf(s.person);
-      personStack = i >= 0 ? personStack.slice(0, i + 1) : [...personStack, s.person];
+  const ref = s.obs ? { key: s.obs } : (s.person ? { id: s.person } : null);
+  if (ref) {
+    const tag = s.obs || 'id:' + s.person;
+    if (personStack[personStack.length - 1] !== tag) {
+      const i = personStack.indexOf(tag);
+      personStack = i >= 0 ? personStack.slice(0, i + 1) : [...personStack, tag];
     }
-    renderPerson(s.person);
+    renderPerson(ref);
   } else {
     closePerson();
   }
 }
 
 function formState() {
+  const s = readState();
+  const q = $('#q').value.trim();
   return {
-    q: $('#q').value.trim(), dataset: $('#f-dataset').value, role: $('#f-role').value,
+    view: s.view, q, q2: $('#q2').value.trim(), role2: $('#f-role2').value, mode: $('#f-mode').value, dataset: $('#f-dataset').value, role: $('#f-role').value,
     from: $('#f-from').value, to: $('#f-to').value, place: $('#f-place').value.trim(),
-    sort: $('#f-sort').value, page: '', person: '',
+    sort: $('#f-sort').value, page: '', obs: '', person: '', loc: s.loc, locl: s.locl,
+    // a new place search leaves the chosen place
+    pk: s.view === 'places' && q !== s.q ? '' : s.pk, pl: s.view === 'places' && q !== s.q ? '' : s.pl,
   };
 }
 
 $('#search').addEventListener('submit', e => { e.preventDefault(); writeState(formState()); });
-['#f-dataset', '#f-role', '#f-sort'].forEach(sel => $(sel).addEventListener('change', () => writeState(formState())));
-$('#reset').addEventListener('click', () => writeState({ q: $('#q').value.trim() }));
+['#f-mode', '#f-dataset', '#f-role', '#f-role2', '#f-sort'].forEach(sel => $(sel).addEventListener('change', () => writeState(formState())));
+$('#reset').addEventListener('click', () => { const s = readState(); writeState({ view: s.view, q: s.q, mode: s.mode, pk: s.pk, pl: s.pl }); });
+$('#pair-btn').addEventListener('click', () => { $('#pair').hidden = false; $('#pair-btn').hidden = true; $('#q2').focus(); });
+$('#pair-clear').addEventListener('click', () => { $('#pair').hidden = true; $('#pair-btn').hidden = false; setState({ q2: '', role2: '', page: '' }); });
+$('#help-btn').addEventListener('click', () => {
+  const box = $('#help');
+  box.hidden = !box.hidden;
+  box.innerHTML = t('helpHtml');
+  $('#help-btn').setAttribute('aria-expanded', String(!box.hidden));
+});
 $('#lang').addEventListener('click', () => {
   lang = lang === 'nl' ? 'en' : 'nl';
   try { localStorage.setItem('stm-lang', lang); } catch (e) { /* storage unavailable */ }
@@ -548,26 +787,50 @@ $('#lang').addEventListener('click', () => {
 });
 
 document.addEventListener('click', e => {
-  const person = e.target.closest('[data-person]');
-  if (person) { setState({ person: person.dataset.person }); return; }
+  // In-page links: let the browser handle new-tab clicks; otherwise update state without a reload.
+  const link = e.target.closest('a[href^="#"]');
+  if (link) {
+    if (e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return;
+    e.preventDefault();
+    history.pushState(null, '', link.getAttribute('href'));
+    render();
+    return;
+  }
+  const view = e.target.closest('[data-view]');
+  if (view) { const s = readState(); writeState({ view: view.dataset.view, q: s.q, mode: s.mode }); return; }
+  const copy = e.target.closest('[data-copy]');
+  if (copy) {
+    navigator.clipboard?.writeText(copy.dataset.copy).then(() => { copy.textContent = t('copied'); }).catch(() => {});
+    return;
+  }
   const facet = e.target.closest('[data-facet]');
-  if (facet) { setState({ [facet.dataset.facet]: facet.dataset.value, page: '', person: '' }); return; }
+  if (facet) {
+    const patch = { [facet.dataset.facet]: facet.dataset.value, page: '', person: '', obs: '' };
+    if (facet.dataset.facet === 'loc') patch.locl = facet.dataset.label;
+    setState(patch);
+    return;
+  }
+  if (e.target.closest('[data-toggle-locs]')) {
+    showAllLocations = !showAllLocations;
+    lastSearchKey = null;
+    render();
+    return;
+  }
   const decade = e.target.closest('[data-decade]');
   if (decade) {
     const d = parseInt(decade.dataset.decade, 10);
     const s = readState();
     const on = s.from === String(d) && s.to === String(d + 9);
-    setState({ from: on ? '' : String(d), to: on ? '' : String(d + 9), page: '', person: '' });
+    setState({ from: on ? '' : String(d), to: on ? '' : String(d + 9), page: '', person: '', obs: '' });
     return;
   }
   const pageBtn = e.target.closest('[data-page]');
   if (pageBtn && !pageBtn.disabled) { setState({ page: pageBtn.dataset.page === '0' ? '' : pageBtn.dataset.page }); window.scrollTo(0, 0); return; }
-  if (e.target.closest('[data-close]')) { setState({ person: '' }); return; }
+  if (e.target.closest('[data-close]')) { setState({ person: '', obs: '' }); return; }
   if (e.target.closest('#back')) { history.back(); }
 });
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && !$('#drawer').hidden) setState({ person: '' });
-  if (e.key === 'Enter' && e.target.matches('.card')) setState({ person: e.target.dataset.person });
+  if (e.key === 'Escape' && !$('#drawer').hidden) setState({ person: '', obs: '' });
 });
 window.addEventListener('popstate', render);
 
