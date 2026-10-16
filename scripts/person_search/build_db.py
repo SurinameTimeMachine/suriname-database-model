@@ -415,6 +415,7 @@ UPDATE persons SET event_year = (SELECT c.event_year FROM certificates c
 CREATE INDEX IF NOT EXISTS idx_rel_from ON relations(from_person);
 CREATE INDEX IF NOT EXISTS idx_rel_to ON relations(to_person);
 CREATE INDEX IF NOT EXISTS idx_pers_year ON persons(event_year);
+CREATE INDEX IF NOT EXISTS idx_loc_cert ON locations(certificate_id);
 UPDATE annotations SET certificate_id = (
     SELECT MIN(c.certificate_id) FROM certificates c
      WHERE c.source_dataset = annotations.source_dataset AND c.item_id = annotations.item_id)
@@ -827,6 +828,16 @@ def link_side_persons(builder, cert, ids, side_people):
             builder.add_relation(cert, 'witness', pid, subject, 'certain', f'witness_row{row_no}', sfile)
 
 
+PLACE_REFERENCE = re.compile(
+    r'^(op |in |ter |te )?(den |de |het )?(gemelde|opgemelde|genoemde?n?|voornoemde?n?|die|deze|dezelfde|zelfde)'
+    r'( plantage| houtgrond| grond| plaats)?\s*$|^aldaar$|^idem$|^als boven$', re.I)
+
+
+def is_place_reference(value):
+    """True for a place field that only points back ('gemelde plantage', 'aldaar')."""
+    return bool(PLACE_REFERENCE.match(clean(value) or ''))
+
+
 def scan_inventory(item_id):
     """'NL-HaNA_2.10.61_2068H_0001' -> '2068H' (inventory number inside a scan id)."""
     m = re.match(r'^[A-Z]{2}-[A-Za-z]+_\d+(?:\.\d+)+_([^_]+)_', item_id or '')
@@ -903,6 +914,15 @@ def load_folder13(builder):
             for column in ('cert_place', 'cert_location', 'birth_place', 'inf_place',
                            'moth_place', 'groom_place', 'bride_place'):
                 builder.add_location(cert, row.get(column), column, '13-civil')
+            # "gemelde plantage", "aldaar", "genoemde houtgrond": the birth (or mother's)
+            # place refers back to the place named earlier in the certificate, normally
+            # the informant's residence. Add that place as a resolved location.
+            earlier = clean(row.get('inf_place'))
+            if earlier and not is_place_reference(earlier):
+                for column in ('birth_place', 'moth_place'):
+                    if is_place_reference(row.get(column)):
+                        builder.add_location(cert, earlier, f'{column} (resolved)', '13-civil',
+                                             precision='resolved reference')
         builder.stats['exact_duplicate_rows_dropped'] += dropped
         builder.log(f'  13-{collection}/{register or "-"}: {len(master_rows)} master rows ({dropped} dupes)')
 
@@ -1188,6 +1208,10 @@ def load_census_1921(builder):
             status='free')
         builder.add_annotation(item, row.get('opmerking_registratielijst'), source_file,
                                status='opmerking')
+        for column in ('scan_registratielijst', 'scan_klapper'):
+            url = clean(row.get(column))
+            if url and url.startswith('http'):
+                builder.add_annotation(item, url, source_file, status=column)
         builder.add_location(builder_cert, row.get('adres'), 'adres', '09-volkstelling-1921')
     builder.log(f'  09-volkstelling-1921: {len(rows)} entries')
 
@@ -1218,7 +1242,8 @@ def load_census_1950(builder):
                     source_dataset='10-volkstelling-1950', record_type='census_entry',
                     collection='volkstelling-1950', item_id=item,
                     inventory_number=clean(front.get('Inventarisnummer')),
-                    folio=clean(front.get('Volgnummer')), event_date=clean(front.get('Geboortedatum')),
+                    # the card's date is the person's birth date; the record itself is the 1950 census
+                    folio=clean(front.get('Volgnummer')), event_year=1950,
                     registration_number=clean(front.get('Toegang')),
                     district=clean(front.get('Woondistrict')),
                     address_text=clean(front.get('Woonplaats')), source_file=source_file)
@@ -1394,24 +1419,53 @@ KINSHIP_KINDS = {
     'pleegmoeder': ('foster', 'out', 'foster mother'), 'pleegvader': ('foster', 'out', 'foster father'),
     'pleegzoon': ('foster', 'in', 'foster son'), 'pleegdochter': ('foster', 'in', 'foster daughter'),
 }
-_CODE_RE = re.compile(r'([A-Za-z]+/\d+[A-Za-z]?|\d+[A-Za-z]?/[A-Za-z]+|[A-Za-z]{1,3}\d+[A-Za-z]?)')
+_KIN_WORD = re.compile(r'\s*([A-Za-z]+(?:/[A-Za-z]+)?)\.?\s*')
+_KIN_SPLIT = re.compile(r'\s*(?:;|,|\+|&|\ben(?=[\s\d]))\s*', re.I)
+_CODE_LN = re.compile(r'([A-Za-z]+)/?(\d+[a-z]?)')            # AA/117, AA117, AB1054
+_CODE_NL = re.compile(r'(\d+[a-z]?)/?([A-Za-z]{2,}|[A-Z])')    # 117/AA, 237VI, 19a/KG
+_CODE_N = re.compile(r'(\d+[a-z]?)')                           # 180, 34a: series left out
 
 
-def parse_kinship(refs):
-    """Yield (relation_type, direction, detail, confidence, contract_key, phrase)."""
+def parse_kinship(refs, own_contract=None):
+    """Yield (relation_type, direction, detail, confidence, contract_key, phrase).
+
+    Handles the ways the registers write references: 'dochter van AA/130;AA/131',
+    'Vrouw van 255/AA', 'dochter van 382+382a/KG', 'Man van 237VI', 'Z/v667 en 668',
+    'vrouw vanAB668'. A reference without series letters ('Vrouw van 180',
+    'dochter van 34 en 34a') takes the letters of another code in the same phrase,
+    or else of the person's own contract; in the latter case the link is only
+    'probable'.
+    """
+    own = contract_key(own_contract)
+    own_letters = own.split('/')[0] if own else None
     for phrase in re.split(r'[|\n]', refs or ''):
         phrase = phrase.strip()
         if not phrase:
             continue
-        word = phrase.split()[0].lower().rstrip('.:?')
+        m = _KIN_WORD.match(phrase)
+        word = (m.group(1) if m else '').lower()
+        rest = phrase[m.end():] if m else phrase
+        rest = re.sub(r'^[?.\s]*(van|v)\.?\s*', '', rest, flags=re.I)
         rtype, direction, detail = KINSHIP_KINDS.get(word, ('related', 'out', word))
         confidence = 'probable' if '?' in phrase else 'certain'
-        # "382+382a/KG" lists two contracts sharing the letters.
-        expanded = re.sub(r'(\d+[A-Za-z]?)\+(\d+[A-Za-z]?)/([A-Za-z]+)', r'\1/\3;\2/\3', phrase)
-        for code in _CODE_RE.findall(expanded):
-            key = contract_key(code)
-            if key:
-                yield rtype, direction, detail, confidence, key, phrase
+        parsed = []   # [letters or None, number]
+        for token in _KIN_SPLIT.split(rest):
+            token = re.sub(r'\s+', '', token).strip('.:/()?')
+            if (m := _CODE_LN.fullmatch(token)):
+                parsed.append([m.group(1).upper(), m.group(2).upper()])
+            elif (m := _CODE_NL.fullmatch(token)):
+                parsed.append([m.group(2).upper(), m.group(1).upper()])
+            elif (m := _CODE_N.fullmatch(token)):
+                parsed.append([None, m.group(1).upper()])
+        letters = next((p[0] for p in parsed if p[0]), None)
+        for code_letters, number in parsed:
+            conf = confidence
+            if not code_letters:
+                # letters shared within the phrase are explicit; the own series is a guess
+                conf = confidence if letters else 'probable'
+                code_letters = letters or own_letters
+            if code_letters:
+                yield rtype, direction, detail, conf, f'{code_letters}/{number}', phrase
 
 
 def load_migration(builder):
@@ -1453,7 +1507,7 @@ def load_migration(builder):
             if key:
                 by_contract[key] = (pid, cert)
             if values.get('kinship_refs'):
-                kinship.append((pid, cert, values['kinship_refs']))
+                kinship.append((pid, cert, values['kinship_refs'], values.get('contract_number')))
             for field in MIGRATION_NOTE_FIELDS:
                 builder.add_annotation(uuid, values.get(field), source_file, status=field)
             photo = values.get('photo_url') or ''
@@ -1469,9 +1523,15 @@ def load_migration(builder):
 
         # Kinship references point to other records of the same register by contract number.
         seen, linked, unresolved = set(), 0, 0
-        for pid, cert, refs in kinship:
-            for rtype, direction, detail, confidence, key, phrase in parse_kinship(refs):
+        for pid, cert, refs, own_contract in kinship:
+            for rtype, direction, detail, confidence, key, phrase in parse_kinship(refs, own_contract):
                 other = by_contract.get(key)
+                if not other:
+                    # 'A/286' written for contract 'AA/286' (single for double letters)
+                    letters, number = key.split('/')
+                    if len(letters) == 1:
+                        other = by_contract.get(f'{letters * 2}/{number}')
+                        confidence = 'probable'
                 if not other or other[0] == pid:
                     unresolved += 1
                     continue
@@ -1487,6 +1547,71 @@ def load_migration(builder):
                 linked += 1
         builder.log(f'  12-migratie/{label}: {len(records)} records, '
                     f'{linked} kinship links, {unresolved} references not resolved')
+
+
+def name_keys(name):
+    return {k for k in (phonetic_key(w) for w in re.split(r'[^\w]+', name or '')) if k}
+
+
+# 'd/v 375/OO' = dochter van (daughter of), 'z/v' = zoon van (son of) the migrant
+# with that contract; other prefixes are kept as a generic relation.
+CENSUS_KIN = {'d': ('parent-child', 'daughter of'), 'z': ('parent-child', 'son of')}
+
+
+def link_census_to_migration(builder):
+    """Link 1921 census residents to migration register records by contract number.
+
+    The 1921 census notes a contract number ('904/UU') for former contract labourers,
+    or 'd/v'/'z/v' + contract number for their children. These are candidate links,
+    stored as relations with a confidence, never merged:
+      * same contract and a shared name key  -> same-person, probable
+      * same contract, exactly one record, no shared name key -> same-person, possible
+      * 'd/v' / 'z/v' + contract             -> parent-child, probable
+    Hindostani and Javanese contract series overlap (AA/1 exists in both), so a
+    contract alone that matches records in two registers is not linked.
+    """
+    conn = builder.conn
+    migrants = defaultdict(list)
+    for pid, cert, contract, name in conn.execute(
+            """SELECT person_id, certificate_id, contract_number, full_name FROM persons
+               WHERE source_dataset = '12-migratie-datasets' AND contract_number IS NOT NULL"""):
+        key = contract_key(contract)
+        if key:
+            migrants[key].append((pid, name_keys(name)))
+    counts = Counter()
+    rows = conn.execute(
+        """SELECT person_id, certificate_id, contract_number, full_name, source_file FROM persons
+           WHERE source_dataset = '09-volkstelling-1921' AND contract_number IS NOT NULL""").fetchall()
+    for pid, cert, contract, name, source_file in rows:
+        kin = re.match(r'^\s*(\w)/v\s*', contract, re.I)
+        hits = migrants.get(contract_key(contract[kin.end():] if kin else contract), [])
+        if not hits:
+            counts['no migration record'] += 1
+            continue
+        if kin:
+            if len(hits) > 1:
+                # a child usually does not share the parent's name; only accept one register
+                counts['kin ambiguous'] += 1
+                continue
+            rtype, detail = CENSUS_KIN.get(kin.group(1).lower(), ('related', f'{kin.group(1)}/v'))
+            builder.add_relation(cert, rtype, hits[0][0], pid, 'probable',
+                                 f'1921 census: {contract} ({detail})', source_file)
+            counts[f'kin {rtype}'] += 1
+            continue
+        mine = name_keys(name)
+        named = [h for h in hits if mine & h[1]]
+        if len(named) == 1:
+            builder.add_relation(cert, 'same-person', named[0][0], pid, 'probable',
+                                 f'contract {contract} + name', source_file)
+            counts['same-person probable'] += 1
+        elif not named and len(hits) == 1:
+            builder.add_relation(cert, 'same-person', hits[0][0], pid, 'possible',
+                                 f'contract {contract}', source_file)
+            counts['same-person possible'] += 1
+        else:
+            counts['ambiguous'] += 1
+    builder.log('  1921 census <-> migration registers: ' +
+                ', '.join(f'{k} {v}' for k, v in sorted(counts.items())))
 
 
 # ---------------------------------------------------------------------------
@@ -1513,6 +1638,7 @@ def build(out_path, quiet=False, vacuum=False):
     load_madeisu(builder)
     load_migration(builder)
     load_folder13(builder)
+    link_census_to_migration(builder)
 
     builder.log('Finalizing…')
     step = time.time()

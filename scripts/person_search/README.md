@@ -25,6 +25,11 @@ scripts/person_search/serve.sh
 
 Then open <http://127.0.0.1:8001/ui/index.html>. Stop with Ctrl+C.
 
+- `serve.sh --team`: free SQL off, for sharing with the team over a private
+  network such as Tailscale (`tailscale serve --bg 8001`; never `funnel`).
+- `serve.sh --port 8002`: a second, own instance (with free SQL) next to the
+  team one.
+
 The script starts [Datasette](https://datasette.io) 0.65.1 through `uvx`
 (install [uv](https://docs.astral.sh/uv/) once). It listens on 127.0.0.1 only
 and has downloads switched off.
@@ -43,6 +48,8 @@ only calls the canned queries named `ui_*` in `metadata.yaml`:
 | `ui_same_name` | same (normalised) name or alternative name elsewhere: candidates, never merged |
 | `ui_places` | place search: normalised place strings (table `places`) |
 | `ui_place_search`, `ui_place_facets` | persons on records with one place |
+| `ui_pair_search`, `ui_pair_facets` | two persons on the same record (each with an optional role) |
+| `ui_record_places` | all places named on a record (clickable to the place search) |
 
 ### Searching
 

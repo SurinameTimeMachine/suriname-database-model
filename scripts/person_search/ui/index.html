@@ -23,6 +23,16 @@
       <input id="q" type="search" data-tp="placeholder" placeholder="Zoek op naam, plaats of beroep…" aria-label="Zoeken">
       <button type="submit" data-t="search">Zoeken</button>
     </div>
+    <div class="pairrow persons-only">
+      <button type="button" id="pair-btn" class="link-btn" data-t="pairAdd">+ Samen met een tweede persoon (op hetzelfde record)</button>
+      <div id="pair" class="pair" hidden>
+        <label class="grow"><span data-t="pairLabel">Samen met (op hetzelfde record)</span>
+          <input id="q2" type="search" data-tp="pairPh" placeholder="Naam van de tweede persoon"></label>
+        <label><span data-t="role2">Rol tweede persoon</span>
+          <select id="f-role2"><option value="" data-t="all">Alle</option></select></label>
+        <button type="button" id="pair-clear" class="link-btn" data-t="pairClear">Verwijderen</button>
+      </div>
+    </div>
     <div class="filters">
       <label class="persons-only"><span data-t="modeLabel">Zoekwijze</span>
         <select id="f-mode">
