@@ -9,6 +9,9 @@ description: >-
 # Datasette 0.65 does not read server settings from metadata (-m). Pass them on the
 # command line instead (restricted data stays local, so downloads stay off):
 #
+#   scripts/person_search/serve.sh   (search page at http://127.0.0.1:8001/ui/index.html)
+#
+# or by hand:
 #   uvx datasette suriname_person_search.db -m scripts/person_search/metadata.yaml \
 #     --setting default_page_size 50 --setting sql_time_limit_ms 20000 \
 #     --setting allow_download off --setting allow_csv_stream off --port 8001
@@ -144,3 +147,149 @@ databases:
         title: 'Dataset licensing & embargo status'
         sql: |
           SELECT source_dataset, title, license, embargo, raw_path, notes FROM sources
+
+      # ---- Queries used by the search page (scripts/person_search/ui/) -----------
+      # Parameters that are not given arrive as '' and switch their filter off.
+      # :match is an FTS5 expression built by the page, e.g. "maria"* "elis"*.
+      ui_search:
+        title: 'Search page: person results'
+        hide_sql: true
+        sql: |
+          WITH hits AS (
+            SELECT rowid AS person_id, rank FROM persons_fts WHERE persons_fts MATCH :match
+          )
+          SELECT p.person_id, p.full_name, p.role, p.source_dataset, p.sex, p.age,
+                 p.event_year AS year, p.status, p.occupation,
+                 COALESCE(p.plantation_name, c.plantation_name) AS plantation,
+                 COALESCE(p.location, c.cert_place, c.address_text, p.district, c.district) AS place,
+                 c.record_type, c.collection, p.certificate_id
+          FROM hits h
+          JOIN persons p ON p.person_id = h.person_id
+          LEFT JOIN certificates c ON c.certificate_id = p.certificate_id
+          WHERE (:dataset = '' OR p.source_dataset = :dataset)
+            AND (:role = '' OR p.role = :role)
+            AND (:year_from = '' OR p.event_year >= CAST(:year_from AS INTEGER))
+            AND (:year_to = '' OR p.event_year <= CAST(:year_to AS INTEGER))
+            AND (:place = '' OR (COALESCE(p.location, '') || ' ' || COALESCE(p.plantation_name, '') || ' ' ||
+                 COALESCE(c.plantation_name, '') || ' ' || COALESCE(c.cert_place, '') || ' ' ||
+                 COALESCE(c.address_text, '') || ' ' || COALESCE(p.district, '') || ' ' ||
+                 COALESCE(c.district, '')) LIKE '%' || :place || '%')
+          ORDER BY CASE WHEN :sort = 'year' THEN COALESCE(p.event_year, 9999) END, h.rank
+          LIMIT 51 OFFSET CAST(:offset AS INTEGER)
+      ui_facets:
+        title: 'Search page: filter counts'
+        hide_sql: true
+        sql: |
+          WITH hits AS (
+            SELECT rowid AS person_id FROM persons_fts WHERE persons_fts MATCH :match
+          ),
+          f AS MATERIALIZED (
+            SELECT p.source_dataset AS ds, p.role AS role, (p.event_year / 10) * 10 AS decade,
+                   COALESCE(p.plantation_name, c.plantation_name) AS plantation
+            FROM hits h
+            JOIN persons p ON p.person_id = h.person_id
+            LEFT JOIN certificates c ON c.certificate_id = p.certificate_id
+            WHERE (:dataset = '' OR p.source_dataset = :dataset)
+              AND (:role = '' OR p.role = :role)
+              AND (:year_from = '' OR p.event_year >= CAST(:year_from AS INTEGER))
+              AND (:year_to = '' OR p.event_year <= CAST(:year_to AS INTEGER))
+              AND (:place = '' OR (COALESCE(p.location, '') || ' ' || COALESCE(p.plantation_name, '') || ' ' ||
+                   COALESCE(c.plantation_name, '') || ' ' || COALESCE(c.cert_place, '') || ' ' ||
+                   COALESCE(c.address_text, '') || ' ' || COALESCE(p.district, '') || ' ' ||
+                   COALESCE(c.district, '')) LIKE '%' || :place || '%')
+          )
+          SELECT 'dataset' AS facet, ds AS value, COUNT(*) AS n FROM f GROUP BY ds
+          UNION ALL SELECT 'role', role, COUNT(*) FROM f GROUP BY role
+          UNION ALL SELECT 'decade', decade, COUNT(*) FROM f WHERE decade IS NOT NULL GROUP BY decade
+          UNION ALL SELECT * FROM (
+            SELECT 'plantation', plantation, COUNT(*) AS n FROM f
+             WHERE plantation IS NOT NULL GROUP BY plantation ORDER BY n DESC LIMIT 15)
+      ui_person:
+        title: 'Search page: one person with their record'
+        hide_sql: true
+        sql: |
+          SELECT p.*, s.title AS dataset_title, s.license, s.embargo,
+                 c.record_type, c.collection, c.register, c.item_id, c.inventory_number,
+                 c.folio, c.page, c.certificate_number, c.series,
+                 c.event_date AS record_event_date, c.cert_date AS record_date,
+                 c.cert_place AS record_place, c.cert_location AS record_location,
+                 c.district AS record_district, c.plantation_name AS record_plantation,
+                 c.ward_code AS record_ward, c.address_text AS record_address,
+                 c.contract_number AS record_contract, c.registration_number AS record_registration
+          FROM persons p
+          LEFT JOIN certificates c ON c.certificate_id = p.certificate_id
+          LEFT JOIN sources s ON s.source_dataset = p.source_dataset
+          WHERE p.person_id = CAST(:id AS INTEGER)
+      ui_record_persons:
+        title: 'Search page: everyone on the same record'
+        hide_sql: true
+        sql: |
+          SELECT person_id, full_name, role, role_index, sex, age, occupation, status
+          FROM persons
+          WHERE certificate_id = CAST(:cert AS INTEGER)
+          ORDER BY role, role_index, person_id
+          LIMIT 200
+      ui_relations:
+        title: 'Search page: relations of a person'
+        hide_sql: true
+        sql: |
+          SELECT r.relation_type, r.confidence, r.detail, r.certificate_id,
+                 CASE WHEN r.from_person = CAST(:id AS INTEGER) THEN 'out' ELSE 'in' END AS direction,
+                 o.person_id AS other_id, o.full_name AS other_name, o.role AS other_role,
+                 o.source_dataset AS other_dataset, o.event_year AS other_year
+          FROM relations r
+          JOIN persons o ON o.person_id = CASE WHEN r.from_person = CAST(:id AS INTEGER)
+                                               THEN r.to_person ELSE r.from_person END
+          WHERE r.from_person = CAST(:id AS INTEGER) OR r.to_person = CAST(:id AS INTEGER)
+          LIMIT 300
+      ui_names:
+        title: 'Search page: other names of a person'
+        hide_sql: true
+        sql: |
+          SELECT kind, value FROM person_names WHERE person_id = CAST(:id AS INTEGER)
+      ui_notes:
+        title: 'Search page: notes and memo fields of a record'
+        hide_sql: true
+        sql: |
+          -- annotations carry no dataset column yet; match on item_id within the
+          -- same data folder (first 8 characters of the source path, e.g. 'data/12-')
+          SELECT a.status, a.text, a.user_id, a.timestamp
+          FROM certificates c
+          JOIN annotations a ON a.item_id = c.item_id
+          WHERE c.certificate_id = CAST(:cert AS INTEGER)
+            AND substr(a.source_file, 1, 8) = substr(c.source_file, 1, 8)
+          LIMIT 100
+      ui_same_name:
+        title: 'Search page: same name elsewhere (candidates, never merged)'
+        hide_sql: true
+        sql: |
+          -- only name kinds that name the person themself (not father_name, spouse_name
+          -- or places of origin, which person_names also holds)
+          WITH me AS (SELECT person_id, name_norm FROM persons WHERE person_id = CAST(:id AS INTEGER)),
+          own_names AS (
+            SELECT person_id, kind, value_norm FROM person_names
+             WHERE kind IN ('orig_spelling', 'former_name', 'emancipation_name', 'maiden_name',
+                            'widow_name', 'baptized_name', 'display_name')
+          ),
+          keys AS (
+            SELECT name_norm AS k FROM me WHERE name_norm IS NOT NULL
+            UNION SELECT value_norm FROM own_names
+             WHERE person_id = (SELECT person_id FROM me) AND value_norm IS NOT NULL
+          ),
+          cand AS (
+            SELECT p.person_id, 'name' AS via FROM persons p WHERE p.name_norm IN (SELECT k FROM keys)
+            UNION
+            SELECT n.person_id, n.kind FROM own_names n WHERE n.value_norm IN (SELECT k FROM keys)
+          )
+          SELECT p.person_id, p.full_name, p.role, p.source_dataset, p.event_year AS year,
+                 COALESCE(p.plantation_name, p.location, p.district) AS place, MIN(cand.via) AS via
+          FROM cand JOIN persons p ON p.person_id = cand.person_id
+          WHERE p.person_id <> CAST(:id AS INTEGER)
+          GROUP BY p.person_id
+          ORDER BY p.event_year
+          LIMIT 150
+      ui_datasets:
+        title: 'Search page: dataset list'
+        hide_sql: true
+        sql: |
+          SELECT source_dataset, title, license, embargo, notes FROM sources ORDER BY source_dataset

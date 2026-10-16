@@ -356,6 +356,23 @@ CREATE VIRTUAL TABLE persons_fts USING fts5(
   tokenize="unicode61 remove_diacritics 2");
 """
 
+# Year backfill and lookup indexes used by the search page.
+# Several datasets store the record date only as text (e.g. '17-09-1858'), and
+# persons other than the main subject (parents, witnesses) carry no date at all;
+# give them the year of their record so period filters include them.
+YEARS_AND_INDEXES = """
+UPDATE certificates SET event_year = CAST(substr(COALESCE(event_date, cert_date), -4) AS INTEGER)
+ WHERE event_year IS NULL AND COALESCE(event_date, cert_date) GLOB '*[12][0-9][0-9][0-9]';
+UPDATE certificates SET event_year = CAST(substr(COALESCE(event_date, cert_date), 1, 4) AS INTEGER)
+ WHERE event_year IS NULL AND COALESCE(event_date, cert_date) GLOB '[12][0-9][0-9][0-9]-*';
+UPDATE persons SET event_year = (SELECT c.event_year FROM certificates c
+                                  WHERE c.certificate_id = persons.certificate_id)
+ WHERE event_year IS NULL;
+CREATE INDEX IF NOT EXISTS idx_rel_from ON relations(from_person);
+CREATE INDEX IF NOT EXISTS idx_rel_to ON relations(to_person);
+CREATE INDEX IF NOT EXISTS idx_pers_year ON persons(event_year);
+"""
+
 # Precomputed so the Datasette "cross-dataset matches" canned query is instant
 # (grouping 1.9M persons live exceeds the SQL time limit).
 CROSS_DATASET = """
@@ -1380,6 +1397,11 @@ def build(out_path, quiet=False, vacuum=False):
                GROUP BY 1, 2 HAVING c > 1""").fetchall()])
     conn.commit()
     builder.log(f'  dup_count done ({time.time() - step:.1f}s)')
+
+    step = time.time()
+    conn.executescript(YEARS_AND_INDEXES)
+    conn.commit()
+    builder.log(f'  years backfilled, relation indexes built ({time.time() - step:.1f}s)')
 
     step = time.time()
     conn.executescript(FTS)

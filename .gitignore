@@ -45,3 +45,6 @@ next-env.d.ts
 npm-debug.log*
 .env
 .env*.local
+
+# python bytecode
+__pycache__/
