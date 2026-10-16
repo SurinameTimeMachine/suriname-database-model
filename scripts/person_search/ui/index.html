@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Suriname Time Machine – Personen zoeken</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <h1 data-t="title">Suriname Time Machine · Personen zoeken</h1>
+    <button type="button" id="lang" class="link-btn" aria-label="Language">EN</button>
+  </div>
+  <form id="search" autocomplete="off">
+    <div class="searchrow">
+      <input id="q" type="search" data-tp="placeholder" placeholder="Zoek op naam, plaats of beroep…" aria-label="Zoeken">
+      <button type="submit" data-t="search">Zoeken</button>
+    </div>
+    <div class="filters">
+      <label><span data-t="dataset">Bron</span>
+        <select id="f-dataset"><option value="" data-t="all">Alle</option></select></label>
+      <label><span data-t="role">Rol</span>
+        <select id="f-role"><option value="" data-t="all">Alle</option></select></label>
+      <label><span data-t="from">Van jaar</span>
+        <input id="f-from" type="number" inputmode="numeric" min="1600" max="2000" placeholder="1700"></label>
+      <label><span data-t="to">Tot jaar</span>
+        <input id="f-to" type="number" inputmode="numeric" min="1600" max="2000" placeholder="1960"></label>
+      <label class="wide"><span data-t="place">Plaats / plantage</span>
+        <input id="f-place" type="text" data-tp="placePh" placeholder="bijv. Commewijne"></label>
+      <label><span data-t="sort">Sorteren</span>
+        <select id="f-sort">
+          <option value="" data-t="sortRel">Beste match</option>
+          <option value="year" data-t="sortYear">Jaar</option>
+        </select></label>
+      <button type="button" id="reset" class="link-btn" data-t="reset">Filters wissen</button>
+    </div>
+  </form>
+</header>
+
+<main class="layout">
+  <aside id="facets" class="facets" aria-label="Filters"></aside>
+  <section class="results">
+    <div id="status" class="status" role="status"></div>
+    <ol id="list" class="list"></ol>
+    <div id="pager" class="pager"></div>
+    <div id="intro" class="intro"></div>
+  </section>
+</main>
+
+<div id="drawer" class="drawer" hidden>
+  <div class="drawer-backdrop" data-close></div>
+  <article class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="d-title">
+    <div class="drawer-head">
+      <button type="button" class="link-btn" id="back" data-t="back" hidden>← Terug</button>
+      <button type="button" class="close" data-close aria-label="Sluiten">×</button>
+    </div>
+    <div id="detail"></div>
+  </article>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
