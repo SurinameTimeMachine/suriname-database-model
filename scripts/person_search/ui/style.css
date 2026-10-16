@@ -109,3 +109,4 @@ a.person, button.person { color: var(--accent); background: none; border: 0; pad
   .kv dd { margin-bottom: 6px; }
   .drawer-panel { padding: 0 16px 40px; }
 }
+.photo img { display: block; max-width: 220px; max-height: 280px; margin: 14px 0 4px; border-radius: 6px; border: 1px solid var(--line); }
