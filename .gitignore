@@ -24,12 +24,18 @@ data/12-migratie-datasets/*
 # embargoed civil records — NEVER commit raw data or derived databases/exports
 data/13-Civil_records_under_embargo_raw_data/
 data/civil/
+data/civil-records-*.json
+data/civil-records-*.ndjson
+data/unmapped-civil-locations.json
+data/civil-locations-track-a.json
+data/evaluation/
 *.db
 *.sqlite
 *.sqlite3
 *.db-wal
 *.db-shm
 civil_records.db
+suriname_person_search.db
 
 # misc
 .DS_Store

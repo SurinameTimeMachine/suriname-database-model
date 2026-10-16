@@ -1,0 +1,140 @@
+title: Suriname Time Machine — Person Search
+description: >-
+  Unified, person-centric local search database across Surinamese historical
+  datasets (civil records, ward registers, slave & emancipation registers,
+  almanakken, censuses, contract labour). Built locally with
+  scripts/person_search/build_db.py. RESTRICTED/EMBARGOED datasets are local
+  use only and must never be published.
+
+# Datasette settings (used with `datasette suriname_person_search.db -m metadata.yaml`)
+settings:
+  default_page_size: 50
+  sql_time_limit_ms: 20000
+  allow_download: false          # restricted data stays local
+  suggest_facets: true
+  allow_facet: true
+
+databases:
+  suriname_person_search:
+    description: >-
+      Person attestations across all person-bearing datasets
+      (02, 03, 04, 05, 06, 09, 10, 11, 12, 13). One row per person-role cell,
+      searchable via FTS5. Licensing/embargo per dataset is recorded in `sources`.
+    tables:
+      sources:
+        description: Dataset registry with licensing / embargo status.
+        label_column: source_dataset
+        facets: [embargo, license]
+      certificates:
+        description: One row per source record (certificate, register entry, census record, almanak entry).
+        facets: [source_dataset, record_type, collection, register, event_year, district]
+      persons:
+        description: The unified search unit — one row per person-role attestation.
+        label_column: full_name
+        facets:
+          - source_dataset
+          - role
+          - status
+          - sex
+          - district
+          - plantation_name
+          - event_year
+      person_names:
+        description: Alternate / former names (alias, maiden, widow, emancipation, baptized, spelling variants).
+        facets: [kind]
+      relations:
+        description: Kinship and role edges (parent-child, spouse, enslaver-enslaved, witness, employer-plantation).
+        facets: [relation_type, confidence]
+      locations:
+        description: Location strings with normalization and (when resolved) gazetteer place IDs.
+        facets: [source_dataset, precision, field_origin]
+      group_observations:
+        description: Head-counts that cannot be individualised (enslaved matrices, almanak totals).
+        facets: [category, source_dataset]
+      annotations:
+        description: Curator comments, owner prose, family relations and memo fields kept verbatim.
+        facets: [status, source_file]
+    queries:
+      person_search:
+        title: 'Person search (prefix, all datasets)'
+        description: FTS5 prefix search across names, aliases, places and occupations.
+        sql: |
+          SELECT p.full_name, p.role, p.source_dataset, p.event_year, p.location,
+                 c.item_id, p.person_id
+          FROM persons_fts f
+          JOIN persons p ON p.person_id = f.rowid
+          LEFT JOIN certificates c ON c.certificate_id = p.certificate_id
+          WHERE persons_fts MATCH :q
+          ORDER BY rank
+          LIMIT 100
+      person_dossier:
+        title: 'Person dossier by name (exact normalised)'
+        description: All attestations for a normalised name, across every dataset and role.
+        sql: |
+          SELECT p.person_id, p.full_name, p.role, p.source_dataset, p.event_year,
+                 p.occupation, p.location, p.plantation_name, p.status, c.item_id
+          FROM persons p
+          LEFT JOIN certificates c ON c.certificate_id = p.certificate_id
+          WHERE p.name_norm = :name
+          ORDER BY p.event_year, p.source_dataset
+          LIMIT 500
+      contract_search:
+        title: 'Contract number search'
+        description: Find migrants / labourers / census residents by contract number.
+        sql: |
+          SELECT p.full_name, p.role, p.source_dataset, p.contract_number,
+                 p.plantation_name, c.item_id
+          FROM persons p
+          LEFT JOIN certificates c ON c.certificate_id = p.certificate_id
+          WHERE p.contract_number LIKE '%' || :contract || '%'
+          ORDER BY p.source_dataset, p.full_name
+          LIMIT 200
+      owner_plantation_search:
+        title: 'Owner / manager search by plantation'
+        description: Plantation owners, administrators, directors and heirs (almanakken, ward registers).
+        sql: |
+          SELECT p.full_name, p.role, p.source_dataset, p.event_year,
+                 p.plantation_name, p.district, c.item_id
+          FROM persons p
+          LEFT JOIN certificates c ON c.certificate_id = p.certificate_id
+          WHERE p.role IN ('owner','heirs','administrator','director',
+                           'administrator_europe','administrator_suriname','blank_officier')
+            AND (:plantation IS NULL OR p.plantation_name LIKE '%' || :plantation || '%')
+            AND (:name IS NULL OR p.name_norm LIKE '%' || :name || '%')
+          ORDER BY p.plantation_name, p.event_year
+          LIMIT 200
+      enslaver_enslaved:
+        title: 'Enslaved persons by owner'
+        description: Slave & emancipation register entries with their owner/enslaver.
+        sql: |
+          SELECT p.full_name AS enslaved_person, p.status, p.plantation_name,
+                 p.birth_year, c.series, c.item_id,
+                 (SELECT o.full_name FROM relations r
+                    JOIN persons o ON o.person_id = r.from_person
+                   WHERE r.certificate_id = c.certificate_id
+                     AND r.relation_type = 'enslaver-enslaved' LIMIT 1) AS enslaver
+          FROM persons p
+          JOIN certificates c ON c.certificate_id = p.certificate_id
+          WHERE p.source_dataset = '05-slave-emancipation'
+            AND p.role IN ('enslaved','emancipated')
+            AND (:owner IS NULL OR p.person_id IN (
+                  SELECT r.to_person FROM relations r
+                    JOIN persons o ON o.person_id = r.from_person
+                   WHERE r.relation_type = 'enslaver-enslaved'
+                     AND o.name_norm LIKE '%' || :owner || '%'))
+          ORDER BY enslaver, enslaved_person
+          LIMIT 300
+      cross_dataset_matches:
+        title: 'Cross-dataset name matches'
+        description: Normalised names appearing in more than one dataset (candidate links, never merged).
+        sql: |
+          SELECT person_name, datasets, which_datasets, roles,
+                 first_year, last_year, attestations
+          FROM cross_dataset_names
+          WHERE (:name IS NULL OR person_name LIKE '%' || :name || '%')
+          ORDER BY datasets DESC, attestations DESC
+          LIMIT 200
+      dataset_licensing:
+        title: 'Dataset licensing & embargo status'
+        sql: |
+          SELECT source_dataset, title, license, embargo, raw_path, notes FROM sources
