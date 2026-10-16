@@ -54,8 +54,8 @@ databases:
         description: Head-counts that cannot be individualised (enslaved matrices, almanak totals).
         facets: [category, source_dataset]
       annotations:
-        description: Curator comments, owner prose, family relations and memo fields kept verbatim.
-        facets: [status, source_file]
+        description: Curator comments, owner prose, family relations, memo fields and marginal notes kept verbatim.
+        facets: [source_dataset, status]
     queries:
       person_search:
         title: 'Person search (prefix, all datasets)'
@@ -251,13 +251,11 @@ databases:
         title: 'Search page: notes and memo fields of a record'
         hide_sql: true
         sql: |
-          -- annotations carry no dataset column yet; match on item_id within the
-          -- same data folder (first 8 characters of the source path, e.g. 'data/12-')
           SELECT a.status, a.text, a.user_id, a.timestamp
           FROM certificates c
-          JOIN annotations a ON a.item_id = c.item_id
+          JOIN annotations a ON a.source_dataset = c.source_dataset AND a.item_id = c.item_id
           WHERE c.certificate_id = CAST(:cert AS INTEGER)
-            AND substr(a.source_file, 1, 8) = substr(c.source_file, 1, 8)
+          ORDER BY a.annotation_id
           LIMIT 100
       ui_same_name:
         title: 'Search page: same name elsewhere (candidates, never merged)'

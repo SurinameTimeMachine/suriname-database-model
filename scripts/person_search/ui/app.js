@@ -112,6 +112,7 @@ const REL = {
     'parent-child': { out: 'kind', in: 'ouder' }, spouse: { out: 'echtgeno(o)t(e)', in: 'echtgeno(o)t(e)' },
     sibling: { out: 'broer/zus', in: 'broer/zus' }, foster: { out: 'pleegkind', in: 'pleegouder' },
     witness: { out: 'getuige bij akte van', in: 'getuige' }, declarant: { out: 'comparant voor', in: 'comparant' },
+    informant: { out: 'aangifte gedaan van', in: 'aangever' },
     'enslaver-enslaved': { out: 'tot slaaf gemaakt', in: 'eigenaar' },
     'employer-plantation': { out: 'plantage', in: 'werkgever' }, 'owner-property': { out: 'eigendom', in: 'eigenaar' },
     related: { out: 'verwant', in: 'verwant' },
@@ -120,6 +121,7 @@ const REL = {
     'parent-child': { out: 'child', in: 'parent' }, spouse: { out: 'spouse', in: 'spouse' },
     sibling: { out: 'sibling', in: 'sibling' }, foster: { out: 'foster child', in: 'foster parent' },
     witness: { out: 'witness on record of', in: 'witness' }, declarant: { out: 'declarant for', in: 'declarant' },
+    informant: { out: 'reported the event of', in: 'informant' },
     'enslaver-enslaved': { out: 'enslaved', in: 'owner' },
     'employer-plantation': { out: 'plantation', in: 'employer' }, 'owner-property': { out: 'property', in: 'owner' },
     related: { out: 'relative', in: 'relative' },
@@ -165,10 +167,26 @@ const NAME_KINDS = {
         district: 'Origin: district', village: 'Origin: village / desa', residency: 'Origin: residency',
         division: 'Origin: division', police_post: 'Origin: police post', place_of_origin: 'Place of origin' },
 };
+const RECORD_TYPES = {
+  nl: { death_certificate: 'Overlijdensakte', birth_certificate: 'Geboorteakte', ward_register_entry: 'Wijkregister',
+        emancipation_record: 'Emancipatieregister', slave_register_entry: 'Slavenregister',
+        almanak_entry: 'Almanak', almanak_disambiguated: 'Almanak (gestandaardiseerde personen)',
+        census_entry: 'Volkstelling', contract_record: 'Contractregister', plantation_placement: 'Plaatsing op plantage',
+        erkenningen: 'Erkenningsakte', 'geboorten-districten': 'Geboorteakte (districten)', huwelijken: 'Huwelijksakte',
+        echtscheidingen: 'Echtscheidingsakte' },
+  en: { death_certificate: 'Death certificate', birth_certificate: 'Birth certificate', ward_register_entry: 'Ward register',
+        emancipation_record: 'Emancipation register', slave_register_entry: 'Slave register',
+        almanak_entry: 'Almanac', almanak_disambiguated: 'Almanac (standardised persons)',
+        census_entry: 'Census', contract_record: 'Contract register', plantation_placement: 'Plantation placement',
+        erkenningen: 'Recognition certificate', 'geboorten-districten': 'Birth certificate (districts)',
+        huwelijken: 'Marriage certificate', echtscheidingen: 'Divorce certificate' },
+};
+const recordLabel = rt => (RECORD_TYPES[lang] || {})[rt] || rt;
+
 const NOTE_KINDS = {
-  nl: { memo: 'Memo', kinship_refs: 'Familieverwijzingen', recontracts: 'Hercontracten', court_ruling: 'Vonnis',
+  nl: { memo: 'Memo', photo_url: 'Foto', kinship_refs: 'Familieverwijzingen', recontracts: 'Hercontracten', court_ruling: 'Vonnis',
         civil_status_notes: 'Burgerlijke stand', family_notes: 'Familiegegevens', land_situation: 'Grondsituatie' },
-  en: { memo: 'Memo', kinship_refs: 'Kinship references', recontracts: 'Recontracts', court_ruling: 'Court ruling',
+  en: { memo: 'Memo', photo_url: 'Photo', kinship_refs: 'Kinship references', recontracts: 'Recontracts', court_ruling: 'Court ruling',
         civil_status_notes: 'Civil status', family_notes: 'Family details', land_situation: 'Land situation' },
 };
 
@@ -297,6 +315,7 @@ function renderList(rows) {
       <span class="meta">
         <span class="badge role">${esc(roleLabel(r.role))}</span>
         <span class="badge${isRestricted(r.source_dataset) ? ' restricted' : ''}">${esc(dsLabel(r.source_dataset))}${group ? ' · ' + esc(group) : ''}</span>
+        ${r.record_type && !group && RECORD_TYPES[lang][r.record_type] && r.source_dataset === '13-civil' ? `<span>${esc(recordLabel(r.record_type))}</span>` : ''}
         ${r.plantation ? `<span>${esc(r.plantation)}</span>` : ''}
         ${place ? `<span>${esc(place)}</span>` : ''}
         ${r.occupation ? `<span>${esc(r.occupation)}</span>` : ''}
@@ -398,6 +417,8 @@ async function renderPerson(id) {
       api('ui_same_name', { id }),
     ]);
     const links = archiveLinks(p);
+    const photos = notes.filter(n => n.status === 'photo_url' && /^https:\/\//.test(n.text || ''));
+    const otherNotes = notes.filter(n => n.status !== 'photo_url');
     const relsByOther = new Map();
     rels.forEach(r => { if (!relsByOther.has(r.other_id)) relsByOther.set(r.other_id, []); relsByOther.get(r.other_id).push(r); });
     // relations to people on the same record are shown in that list; the rest separately
@@ -412,12 +433,16 @@ async function renderPerson(id) {
         ${p.event_year ? `<span class="badge role">${esc(p.event_year)}</span>` : ''}
       </div>
       ${isRestricted(p.source_dataset) ? `<div class="notice restricted">${t('restricted')}</div>` : ''}
+      ${photos.length ? photos.map(n => `
+        <a class="photo" href="${esc(n.text)}" target="_blank" rel="noopener"><img src="${esc(n.text)}" alt="${esc(p.full_name || '')}" loading="lazy"></a>`).join('') : ''}
+
 
       <h3>${t('person')}</h3>
       ${kv(PERSON_FIELDS, p)}
 
       <h3>${t('record')}</h3>
-      ${kv(RECORD_FIELDS, p)}
+      ${kv(RECORD_FIELDS, { ...p, record_type: recordLabel(p.record_type),
+                            collection: (COLLECTIONS[p.collection] || {})[lang] || p.collection })}
       ${links.length ? `<p class="links">${t('links')}: ` +
         links.map(([label, url]) => `<a href="${esc(url)}" target="_blank" rel="noopener">${esc(label)} ↗</a>`).join('') + '</p>' : ''}
 
@@ -443,7 +468,7 @@ async function renderPerson(id) {
       ${names.length ? `<h3>${t('otherNames')}</h3>` + kv(names.map((n, i) => [`n${i}`, NAME_KINDS.nl[n.kind] || n.kind, NAME_KINDS.en[n.kind] || n.kind]),
         Object.fromEntries(names.map((n, i) => [`n${i}`, n.value]))) : ''}
 
-      ${notes.length ? `<h3>${t('notes')}</h3>` + notes.map(n => `
+      ${otherNotes.length ? `<h3>${t('notes')}</h3>` + otherNotes.map(n => `
         <div class="note">${n.status ? `<b>${esc((NOTE_KINDS[lang] || {})[n.status] || n.status)}</b>` : ''}${esc(n.text)}</div>`).join('') : ''}
 
       <h3>${t('sameName')}</h3>

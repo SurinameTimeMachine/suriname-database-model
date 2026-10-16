@@ -330,7 +330,8 @@ CREATE TABLE group_observations (
 
 CREATE TABLE annotations (
   annotation_id INTEGER PRIMARY KEY,
-  item_id TEXT, user_id TEXT, timestamp TEXT, text TEXT, status TEXT, source_file TEXT
+  item_id TEXT, user_id TEXT, timestamp TEXT, text TEXT, status TEXT, source_file TEXT,
+  source_dataset TEXT, certificate_id INTEGER
 );
 
 CREATE INDEX idx_cert_item ON certificates(item_id);
@@ -371,6 +372,12 @@ UPDATE persons SET event_year = (SELECT c.event_year FROM certificates c
 CREATE INDEX IF NOT EXISTS idx_rel_from ON relations(from_person);
 CREATE INDEX IF NOT EXISTS idx_rel_to ON relations(to_person);
 CREATE INDEX IF NOT EXISTS idx_pers_year ON persons(event_year);
+UPDATE annotations SET certificate_id = (
+    SELECT MIN(c.certificate_id) FROM certificates c
+     WHERE c.source_dataset = annotations.source_dataset AND c.item_id = annotations.item_id)
+ WHERE certificate_id IS NULL AND item_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_ann_ds_item ON annotations(source_dataset, item_id);
+CREATE INDEX IF NOT EXISTS idx_ann_cert ON annotations(certificate_id);
 """
 
 # Precomputed so the Datasette "cross-dataset matches" canned query is instant
@@ -415,6 +422,9 @@ SOURCES = [
     ('12-migratie-datasets', 'Migration registers (Hindostani/Chinese/Javanese)', 'Restricted - no reuse pending', 1, 'data/12-migratie-datasets', 'No public reuse until written terms'),
     ('13-civil', 'Civil records (births/deaths/recognitions/marriages)', 'Embargoed raw data', 1, 'data/13-Civil_records_under_embargo_raw_data', 'Local use only'),
 ]
+
+# 'data/02-' -> '02-death', taken from the raw_path of each source.
+DATASET_BY_FOLDER = {raw_path[:8]: dataset for dataset, _, _, _, raw_path, _ in SOURCES}
 
 # ---------------------------------------------------------------------------
 # Builder
@@ -514,14 +524,19 @@ class Builder:
             (certificate_id, category, count, detail, source_dataset, source_file))
         self.stats['groups'] += 1
 
-    def add_annotation(self, item_id, text, source_file, user_id=None, timestamp=None, status=None):
+    def add_annotation(self, item_id, text, source_file, user_id=None, timestamp=None, status=None,
+                       source_dataset=None, certificate_id=None):
         text = clean(text)
         if not text:
             return
+        # Every data folder belongs to one dataset ('data/12-…' -> '12-migratie-datasets');
+        # certificate_id is filled in after loading where the caller does not know it.
+        source_dataset = source_dataset or DATASET_BY_FOLDER.get((source_file or '')[:8])
         self.conn.execute(
-            """INSERT INTO annotations (item_id, user_id, timestamp, text, status, source_file)
-               VALUES (?,?,?,?,?,?)""",
-            (item_id, user_id, timestamp, text, status, source_file))
+            """INSERT INTO annotations (item_id, user_id, timestamp, text, status, source_file,
+                                        source_dataset, certificate_id)
+               VALUES (?,?,?,?,?,?,?,?)""",
+            (item_id, user_id, timestamp, text, status, source_file, source_dataset, certificate_id))
         self.stats['annotations'] += 1
 
 
@@ -691,6 +706,11 @@ def link_within_certificate(builder, cert, ids, source_file, source_dataset):
     declarant = ref('declarant')
     if declarant and child:
         builder.add_relation(cert, 'declarant', declarant, child, 'certain', 'declarant', source_file)
+    # informant (aangever) reported the birth or death; recorded exactly as on the certificate
+    informant = ref('informant')
+    if informant and (deceased or child):
+        builder.add_relation(cert, 'informant', informant, deceased or child, 'certain', 'informant',
+                             source_file)
 
 
 def link_side_persons(builder, cert, ids, side_people):
@@ -732,6 +752,12 @@ def link_side_persons(builder, cert, ids, side_people):
             builder.add_relation(cert, 'witness', pid, subject, 'certain', f'witness_row{row_no}', sfile)
 
 
+def scan_inventory(item_id):
+    """'NL-HaNA_2.10.61_2068H_0001' -> '2068H' (inventory number inside a scan id)."""
+    m = re.match(r'^[A-Z]{2}-[A-Za-z]+_\d+(?:\.\d+)+_([^_]+)_', item_id or '')
+    return m.group(1) if m else None
+
+
 def load_folder13(builder):
     def load_collection(folder, collection, register, master_specs, side_tables):
         master_path = os.path.join(folder, 'nonrepeatable-fields-plat.csv')
@@ -739,6 +765,13 @@ def load_folder13(builder):
             return
         source_file = os.path.relpath(master_path, REPO_ROOT)
         _, master_rows = read_table(master_path)
+        # marginal notes (kantmeldingen), one or more per certificate
+        notes, notes_file = defaultdict(list), None
+        notes_path = os.path.join(folder, 'notes-plat.csv')
+        if os.path.exists(notes_path):
+            notes_file = os.path.relpath(notes_path, REPO_ROOT)
+            for nrow in read_table(notes_path)[1]:
+                notes[clean(nrow.get('itemID'))].append(nrow)
         side = {}
         for name, specs in side_tables:
             sp = os.path.join(folder, name)
@@ -757,12 +790,27 @@ def load_folder13(builder):
                 continue
             seen.add(key)
             item_id = clean(row.get('itemID'))
+            folio = clean(row.get('folio')) or clean(row.get('folio1'))
+            folio2 = clean(row.get('folio2'))
+            if folio and folio2 and folio2 != folio:
+                folio = f'{folio}-{folio2}'
+            # marriage registers also hold divorce certificates (cert_type)
+            record_type = collection
+            if 'echtscheiding' in (row.get('cert_type') or '').lower():
+                record_type = 'echtscheidingen'
             cert = builder.add_certificate(
-                source_dataset='13-civil', record_type=collection, collection=collection,
-                register=register, item_id=item_id,
-                folio=clean(row.get('folio')) or clean(row.get('folio1')),
-                cert_date=clean(row.get('cert_date')), cert_place=clean(row.get('cert_place')),
+                source_dataset='13-civil', record_type=record_type, collection=collection,
+                register=register, item_id=item_id, inventory_number=scan_inventory(item_id),
+                folio=folio, cert_date=clean(row.get('cert_date')),
+                cert_place=clean(row.get('cert_place')),
                 cert_location=clean(row.get('cert_location')), source_file=source_file)
+            for note in notes.get(item_id, ()):
+                note_type = clean(note.get('note_type_other')) or clean(note.get('note_type'))
+                text = clean(note.get('note_txt'))
+                if text or (note_type and not note_type.lower().startswith('geen kantmelding')):
+                    builder.add_annotation(item_id, text or note_type, notes_file,
+                                           status=f'kantmelding: {note_type}' if note_type else 'kantmelding',
+                                           source_dataset='13-civil', certificate_id=cert)
             ids = {}
             for person in extract_role_persons(row, master_specs):
                 pid = builder.add_person(cert, '13-civil', person['role'], source_file,
@@ -1332,6 +1380,11 @@ def load_migration(builder):
                 kinship.append((pid, cert, values['kinship_refs']))
             for field in MIGRATION_NOTE_FIELDS:
                 builder.add_annotation(uuid, values.get(field), source_file, status=field)
+            photo = values.get('photo_url') or ''
+            if photo.startswith('http'):
+                # the old gahetna.nl host is gone; the same path is served by nationaalarchief.nl
+                photo = re.sub(r'^https?://www\.gahetna\.nl/', 'https://www.nationaalarchief.nl/', photo)
+                builder.add_annotation(uuid, photo, source_file, status='photo_url')
             for index, field in layout['origin'].items():
                 value = raw[index] if index < len(raw) else None
                 builder.add_name(pid, field, value, source_file)
