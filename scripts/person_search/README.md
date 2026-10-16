@@ -41,9 +41,37 @@ only calls the canned queries named `ui_*` in `metadata.yaml`:
 | `ui_names` | alternative names, father's name, places of origin |
 | `ui_notes` | memo and note fields of the record |
 | `ui_same_name` | same (normalised) name or alternative name elsewhere: candidates, never merged |
+| `ui_places` | place search: normalised place strings (table `places`) |
+| `ui_place_search`, `ui_place_facets` | persons on records with one place |
 
-Searches and person cards are kept in the URL (`#q=…&person=…`), so they can
-be bookmarked. The page is in Dutch with an English toggle.
+### Searching
+
+- **Persons**: all words must occur, in any order, in name, alias, former name,
+  place or occupation (FTS5 `persons_fts`). Three modes:
+  - *word start* (default): each word is a prefix (`jan` finds Jan, Janna, Jansen);
+  - *exact*: whole words only;
+  - *fuzzy*: spelling keys that fold common Dutch/Surinamese variants (ij/ei/y,
+    oe/ou, dj/j, tj/ch, c/k, ph/f, sch/s, dt/d/t, double letters) but keep the
+    vowels (`persons.name_phonetic`, FTS5 `persons_phonetic_fts`).
+    `phonetic_key()` in `build_db.py` and `phoneticKey()` in `ui/app.js` must stay identical.
+- **Places**: substring search over every normalised place string; a chosen
+  place lists all persons on records with that place. Spelling variants are not
+  merged yet (that needs the gazetteer).
+
+### Permanent links
+
+Every person observation has a stable key, `persons.obs_key`:
+`<dataset>/<record id>/<role>`, e.g. `03-birth/12345/mother`. The record id is
+the dataset's own id where it has one (02, 03, 04 rows; UUIDs of 09 and 12;
+scan ids of 13) and otherwise the scan/item id; a counter (`-2`, `-3`) is added
+only where that is not unique (in source order). Because the key comes from the
+source and not from the row number, `…/ui/index.html#obs=<key>` keeps pointing
+to the same observation after a rebuild, as long as the source files do not
+change. Where a counter is needed, reordering the source can shift it.
+
+Searches and person cards are kept in the URL, so they can be bookmarked; person
+links open in a new tab with Ctrl/Cmd+click. The page is in Dutch with an
+English toggle.
 
 The regular Datasette interface (tables, facets, the other canned queries)
 stays available at <http://127.0.0.1:8001/>.

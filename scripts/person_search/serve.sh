@@ -1,19 +1,39 @@
 #!/usr/bin/env bash
-# Start the local person search page on this computer only.
+# Start the local person search page.
 #
-#   scripts/person_search/serve.sh            # uses suriname_person_search.db
+#   scripts/person_search/serve.sh                 # uses suriname_person_search.db
 #   scripts/person_search/serve.sh other.db
+#   scripts/person_search/serve.sh --team [db]     # for sharing with the team (see below)
 #
 # Then open http://127.0.0.1:8001/ui/index.html in a browser.
-# The full database contains restricted data: it is served on 127.0.0.1 only,
-# with downloads switched off. Do not expose this server to a network.
+#
+# The full database contains restricted and embargoed data. The server listens on
+# 127.0.0.1 only, with downloads switched off. Never expose it to the internet.
+#
+# --team: for sharing with team members over a private network such as
+# Tailscale (`tailscale serve --bg 8001`; never `tailscale funnel`). It also
+# switches off free SQL, so visitors can use the search page and browse tables
+# but cannot run their own queries to pull out large parts of the data.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
+
+TEAM=0
+if [ "${1:-}" = "--team" ]; then
+  TEAM=1
+  shift
+fi
 DB="${1:-suriname_person_search.db}"
 if [ ! -f "$DB" ]; then
   echo "Database $DB not found; build it first: python3 scripts/person_search/build_db.py" >&2
   exit 1
 fi
+
+EXTRA=()
+if [ "$TEAM" = 1 ]; then
+  EXTRA+=(--setting default_allow_sql off)
+  echo "Team mode: free SQL is off."
+fi
+
 echo "Search page: http://127.0.0.1:8001/ui/index.html   (stop with Ctrl+C)"
 # Datasette 0.65 needs pkg_resources (setuptools < 81) and does not run on Python 3.14.
 exec uvx --python 3.12 --from 'datasette==0.65.1' --with 'setuptools<81' datasette serve --immutable "$DB" \
@@ -21,4 +41,5 @@ exec uvx --python 3.12 --from 'datasette==0.65.1' --with 'setuptools<81' dataset
   --static ui:scripts/person_search/ui \
   --host 127.0.0.1 --port 8001 \
   --setting default_page_size 50 --setting sql_time_limit_ms 20000 \
-  --setting allow_download off --setting allow_csv_stream off
+  --setting allow_download off --setting allow_csv_stream off \
+  "${EXTRA[@]}"

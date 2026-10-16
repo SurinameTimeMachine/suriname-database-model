@@ -118,6 +118,45 @@ def soundex(name: str) -> str:
     return (out + '000')[:4].upper()
 
 
+# Spelling key for fuzzy name search. Unlike Soundex it keeps the vowels (Soundex
+# makes Meijer = Maria = Meer), but folds common Dutch/Surinamese spelling
+# variants together: ij/ei/ey/y/ie -> i, oe/ou -> u, dj -> j, tj -> ch, ph -> f,
+# sch -> s, c -> k/s, ck -> k, th -> t, final dt/d -> t, final vowel+h -> vowel,
+# double letters -> single. E.g. Meijer/Meyer/Meier -> mier, Ponidjah/Ponidja ->
+# ponija, Djosodikromo/Josodikromo, Karel/Carel, Schmidt/Smit, Tjon/Chon.
+# The search page (ui/app.js, phoneticKey) implements the same steps; keep both in sync.
+PHONETIC_STOPWORDS = {'van', 'de', 'der', 'den', 'het', 'ten', 'ter', 'te', 'la', 'le', 'du', 'des'}
+_PHONETIC_RULES = (
+    ('sch', 's'), ('ck', 'k'), ('ph', 'f'), ('th', 't'), ('dj', 'j'), ('tj', 'ch'),
+    ('ij', 'i'), ('ei', 'i'), ('ey', 'i'), ('ie', 'i'), ('y', 'i'),
+    ('oe', 'u'), ('ou', 'u'), ('ae', 'a'),
+)
+
+
+def phonetic_key(token: str) -> str:
+    t = re.sub(r'[^a-z]', '', strip_diacritics(token or '').lower())
+    if not t or t in PHONETIC_STOPWORDS:
+        return ''
+    t = re.sub(r'c(?=[eiy])', 's', t)
+    t = re.sub(r'c(?!h)', 'k', t)
+    for a, b in _PHONETIC_RULES:
+        t = t.replace(a, b)
+    t = re.sub(r'dt$|d$', 't', t)
+    t = re.sub(r'([aeiou])h$', r'\1', t)
+    t = re.sub(r'(.)\1+', r'\1', t)
+    return t
+
+
+def phonetic_keys(*texts) -> str | None:
+    keys = []
+    for text in texts:
+        for token in re.split(r'[^\w]+', text or ''):
+            key = phonetic_key(token)
+            if key and key not in keys:
+                keys.append(key)
+    return ' '.join(keys) or None
+
+
 DATE_DMY = re.compile(r'^(\d{1,2})-(\d{1,2})-(\d{4})$')
 DATE_ISO = re.compile(r'^(\d{4})-(\d{1,2})-(\d{1,2})$')
 
@@ -282,7 +321,8 @@ CREATE TABLE certificates (
   event_date TEXT, event_year INTEGER, date_precision TEXT,
   cert_date TEXT, cert_place TEXT, cert_location TEXT,
   district TEXT, plantation_name TEXT, ward_code TEXT, address_text TEXT,
-  source_file TEXT, dup_count INTEGER DEFAULT 0
+  source_file TEXT, dup_count INTEGER DEFAULT 0,
+  record_id TEXT
 );
 
 CREATE TABLE persons (
@@ -299,7 +339,8 @@ CREATE TABLE persons (
   location TEXT, address_text TEXT, ward_code TEXT, district TEXT, plantation_name TEXT,
   registration_number TEXT, contract_number TEXT, slavenregister_id TEXT,
   role TEXT NOT NULL, role_index INTEGER, status TEXT,
-  confidence TEXT, raw_prefix TEXT, source_file TEXT
+  confidence TEXT, raw_prefix TEXT, source_file TEXT,
+  name_phonetic TEXT, obs_key TEXT
 );
 
 CREATE TABLE person_names (
@@ -355,6 +396,8 @@ CREATE VIRTUAL TABLE persons_fts USING fts5(
   full_name, given_name, surname, alias, former_name, location, occupation,
   content='persons', content_rowid='person_id',
   tokenize="unicode61 remove_diacritics 2");
+CREATE VIRTUAL TABLE persons_phonetic_fts USING fts5(
+  name_phonetic, content='persons', content_rowid='person_id');
 """
 
 # Year backfill and lookup indexes used by the search page.
@@ -378,6 +421,23 @@ UPDATE annotations SET certificate_id = (
  WHERE certificate_id IS NULL AND item_id IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_ann_ds_item ON annotations(source_dataset, item_id);
 CREATE INDEX IF NOT EXISTS idx_ann_cert ON annotations(certificate_id);
+
+-- Stable key per person observation, derived from the source rather than from
+-- insertion order: dataset / the record's own id (or scan id) / role, with a
+-- counter only where that is not unique (several records per scan, or several
+-- persons with the same role). Used for bookmarkable links on the search page.
+DROP TABLE IF EXISTS temp.obs;
+CREATE TEMP TABLE obs AS
+  SELECT p.person_id,
+         p.source_dataset || '/' || COALESCE(c.record_id, c.item_id, 'c' || c.certificate_id) || '/' || p.role AS base,
+         ROW_NUMBER() OVER (PARTITION BY p.source_dataset, COALESCE(c.record_id, c.item_id, 'c' || c.certificate_id), p.role
+                            ORDER BY p.person_id) AS n
+    FROM persons p JOIN certificates c ON c.certificate_id = p.certificate_id;
+CREATE UNIQUE INDEX temp.idx_obs ON obs(person_id);
+UPDATE persons SET obs_key = (SELECT base || CASE WHEN n > 1 THEN '-' || n ELSE '' END
+                                FROM temp.obs WHERE obs.person_id = persons.person_id);
+DROP TABLE temp.obs;
+CREATE UNIQUE INDEX IF NOT EXISTS idx_pers_obs ON persons(obs_key);
 """
 
 # Precomputed so the Datasette "cross-dataset matches" canned query is instant
@@ -408,6 +468,18 @@ CREATE TABLE contract_numbers AS
    WHERE contract_number IS NOT NULL AND contract_number <> ''
    GROUP BY contract_number;
 CREATE INDEX idx_contract_numbers ON contract_numbers(contract_number);
+
+-- One row per normalised place string, for the place search on the search page.
+DROP TABLE IF EXISTS places;
+CREATE TABLE places AS
+  SELECT location_norm AS place_norm, MIN(raw_text) AS label,
+         COUNT(DISTINCT certificate_id) AS records,
+         GROUP_CONCAT(DISTINCT source_dataset) AS datasets
+    FROM locations
+   WHERE location_norm IS NOT NULL AND location_norm <> ''
+   GROUP BY location_norm;
+CREATE INDEX idx_places_norm ON places(place_norm);
+CREATE INDEX idx_places_records ON places(records DESC);
 """
 
 SOURCES = [
@@ -447,7 +519,7 @@ class Builder:
                 'inventory_number', 'folio', 'page', 'certificate_number', 'contract_number',
                 'slavenregister_id', 'registration_number', 'series', 'event_date', 'event_year',
                 'date_precision', 'cert_date', 'cert_place', 'cert_location', 'district',
-                'plantation_name', 'ward_code', 'address_text', 'source_file')
+                'plantation_name', 'ward_code', 'address_text', 'source_file', 'record_id')
         values = [kw.get(c) for c in cols]
         cur = self.conn.execute(
             f'INSERT INTO certificates ({",".join(cols)}) VALUES ({",".join("?" * len(cols))})',
@@ -472,8 +544,9 @@ class Builder:
                 death_date, death_year, event_date, event_year, date_precision, religion, ethnicity,
                 origin, nationality, occupation, literacy, literate, location, address_text,
                 ward_code, district, plantation_name, registration_number, contract_number,
-                slavenregister_id, role, role_index, status, confidence, raw_prefix, source_file)
-               VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+                slavenregister_id, role, role_index, status, confidence, raw_prefix, source_file,
+                name_phonetic)
+               VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
             (certificate_id, source_dataset, given, prefix, surname, alias, former,
              full, normalize(norm), soundex(surname or given),
              clean(kw.get('sex')), clean(kw.get('age')), to_int(re.sub(r'\D', '', str(kw.get('age') or ''))[:2] or None),
@@ -485,7 +558,8 @@ class Builder:
              clean(kw.get('ward_code')), clean(kw.get('district')), clean(kw.get('plantation_name')),
              clean(kw.get('registration_number')), clean(kw.get('contract_number')),
              clean(kw.get('slavenregister_id')), role, kw.get('role_index'),
-             clean(kw.get('status')), kw.get('confidence') or 'certain', clean(kw.get('raw_prefix')), source_file))
+             clean(kw.get('status')), kw.get('confidence') or 'certain', clean(kw.get('raw_prefix')), source_file,
+             phonetic_keys(full, alias, former)))
         self.stats['persons'] += 1
         self.per_dataset[source_dataset] += 1
         return cur.lastrowid
@@ -657,6 +731,7 @@ def load_civil_flat(builder, path, source_dataset, record_type):
         cert = builder.add_certificate(
             source_dataset=source_dataset, record_type=record_type,
             item_id=clean(row.get('original_scanid')) or clean(row.get('id')),
+            record_id=clean(row.get('id')),
             inventory_number=clean(row.get('inventory_number')), folio=clean(row.get('folio')),
             cert_date=clean(row.get('cert_date')), cert_place=clean(row.get('cert_place')),
             event_date=clean(row.get('death_date') or row.get('birth_date')),
@@ -924,6 +999,7 @@ def load_ward_registers(builder):
         cert = builder.add_certificate(
             source_dataset='04-ward-registers', record_type='ward_register_entry',
             collection='ward-registers', register=clean(row.get('Register')), item_id=item,
+            record_id=clean(row.get('Id')),
             folio=clean(row.get('Id')), event_year=to_int(row.get('Jaar')),
             cert_place='Paramaribo',
             district=clean(row.get('Buurt')),
@@ -1461,6 +1537,7 @@ def build(out_path, quiet=False, vacuum=False):
     builder.log(f'  FTS table created ({time.time() - step:.1f}s)')
     step = time.time()
     conn.execute("INSERT INTO persons_fts(persons_fts) VALUES('rebuild')")
+    conn.execute("INSERT INTO persons_phonetic_fts(persons_phonetic_fts) VALUES('rebuild')")
     conn.commit()
     builder.log(f'  FTS rebuilt ({time.time() - step:.1f}s)')
 
