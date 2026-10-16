@@ -149,7 +149,13 @@ def read_table(path: str):
     table = list(csv.reader(body.splitlines(), delimiter=delimiter))
     # Quirk: single quoted field hiding a delimited row (``"a";"b"``).
     if table and len(table[0]) == 1 and delimiter in table[0][0]:
-        table = list(csv.reader(body.splitlines(), delimiter=delimiter, quotechar='"'))
+        # Re-parsing with the same quoting returns the same single field, so strip
+        # the outer quotes (and un-double inner ones) before splitting.
+        unwrapped = []
+        for ln in body.splitlines():
+            s = ln.strip()
+            unwrapped.append(s[1:-1].replace('""', '"') if len(s) >= 2 and s[0] == s[-1] == '"' else ln)
+        table = list(csv.reader(unwrapped, delimiter=delimiter))
     headers = [h.strip().strip('"').strip() for h in table[0]]
     rows = []
     for raw in table[1:]:
@@ -518,11 +524,12 @@ class Builder:
                 other = ref(role)
                 if other:
                     pairs.append(('parent-child', other, child, role))
-            for role in ('parent_groom', 'parent_bride'):
-                other = ref(role)
-                if other:
-                    pairs.append(('parent-child', other, child, role))
         groom, bride = ref('groom'), ref('bride')
+        # parents of the groom/bride are parents of the spouses, not of a child
+        for role, spouse in (('parent_groom', groom), ('parent_bride', bride)):
+            other = ref(role)
+            if other and spouse:
+                pairs.append(('parent-child', other, spouse, role))
         if groom and bride:
             pairs.append(('spouse', groom, bride, 'groom-bride'))
         deceased = ref('deceased')

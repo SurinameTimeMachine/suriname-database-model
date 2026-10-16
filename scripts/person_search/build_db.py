@@ -156,6 +156,14 @@ def sniff_delimiter(path: str) -> str:
     return ';' if first.count(';') >= first.count(',') else ','
 
 
+def unwrap_quoted_line(line: str) -> str:
+    """Strip one pair of outer quotes from a line, un-doubling escaped inner quotes."""
+    s = line.strip()
+    if len(s) >= 2 and s[0] == '"' and s[-1] == '"':
+        return s[1:-1].replace('""', '"')
+    return line
+
+
 def read_table(path: str):
     delimiter = sniff_delimiter(path)
     with open(path, encoding='utf-8-sig', newline='') as handle:
@@ -164,7 +172,10 @@ def read_table(path: str):
         return [], []
     table = list(csv.reader(lines, delimiter=delimiter))
     if table and len(table[0]) == 1 and delimiter in table[0][0]:
-        table = list(csv.reader(lines, delimiter=delimiter, quotechar='"'))
+        # Quirk: every row is wrapped in one pair of quotes ("a;b;c"). Re-parsing
+        # with the same quoting returns the same single field, so strip the outer
+        # quotes (and un-double inner ones) before splitting.
+        table = list(csv.reader([unwrap_quoted_line(ln) for ln in lines], delimiter=delimiter))
     header = [h.strip().strip('"') for h in table[0]]
     rows = []
     for raw in table[1:]:
@@ -664,6 +675,45 @@ def link_within_certificate(builder, cert, ids, source_file, source_dataset):
         builder.add_relation(cert, 'declarant', declarant, child, 'certain', 'declarant', source_file)
 
 
+def link_side_persons(builder, cert, ids, side_people):
+    """Create relations for persons loaded from folder-13 side tables.
+
+    Master-row persons are linked by link_within_certificate. Side-table persons
+    (witnesses-plat, parents_groom/bride-plat, children-plat, comparanten-plat)
+    used to be inserted without any relation. Rules:
+      * mother -> child within the same side row (erkenningen children-plat)
+      * declarant -> every child of the certificate (erkenningen comparanten)
+      * parent_groom -> groom, parent_bride -> bride (marriages)
+      * witness -> the certificate subject (master deceased/child/groom,
+        otherwise the first side-table child)
+    Custodians and children listed on marriage certificates are left unlinked:
+    their relation to groom/bride is not explicit in the source.
+    """
+    def master(role):
+        return ids.get((role, None))
+
+    side_children = [(pid, f, n) for role, pid, f, n in side_people if role == 'child']
+    all_children = ([master('child')] if master('child') else []) + [pid for pid, _, _ in side_children]
+    subject = master('deceased') or master('child') or master('groom') or \
+        (side_children[0][0] if side_children else None)
+    groom, bride = master('groom'), master('bride')
+
+    for role, pid, sfile, row_no in side_people:
+        if role == 'mother':
+            for child, cfile, cno in side_children:
+                if cfile == sfile and cno == row_no:
+                    builder.add_relation(cert, 'parent-child', pid, child, 'certain', 'mother', sfile)
+        elif role == 'declarant':
+            for child in all_children:
+                builder.add_relation(cert, 'declarant', pid, child, 'certain', 'declarant', sfile)
+        elif role == 'parent_groom' and groom:
+            builder.add_relation(cert, 'parent-child', pid, groom, 'certain', 'parent_groom', sfile)
+        elif role == 'parent_bride' and bride:
+            builder.add_relation(cert, 'parent-child', pid, bride, 'certain', 'parent_bride', sfile)
+        elif role == 'witness' and subject:
+            builder.add_relation(cert, 'witness', pid, subject, 'certain', f'witness_row{row_no}', sfile)
+
+
 def load_folder13(builder):
     def load_collection(folder, collection, register, master_specs, side_tables):
         master_path = os.path.join(folder, 'nonrepeatable-fields-plat.csv')
@@ -700,12 +750,15 @@ def load_folder13(builder):
                 pid = builder.add_person(cert, '13-civil', person['role'], source_file,
                                          **{k: v for k, v in person.items() if k != 'role'})
                 ids[(person['role'], person.get('role_index'))] = pid
-            for name, (sfile, specs, by_item) in side.items():
-                for srow in by_item.get(item_id, ()):
+            side_people = []   # (role, person_id, side_file, row_number)
+            for _name, (sfile, specs, by_item) in side.items():
+                for row_no, srow in enumerate(by_item.get(item_id, ()), start=1):
                     for person in extract_role_persons(srow, specs):
-                        builder.add_person(cert, '13-civil', person['role'], sfile,
-                                           **{k: v for k, v in person.items() if k != 'role'})
+                        pid = builder.add_person(cert, '13-civil', person['role'], sfile,
+                                                 **{k: v for k, v in person.items() if k != 'role'})
+                        side_people.append((person['role'], pid, sfile, row_no))
             link_within_certificate(builder, cert, ids, source_file, '13-civil')
+            link_side_persons(builder, cert, ids, side_people)
             for column in ('cert_place', 'cert_location', 'birth_place', 'inf_place',
                            'moth_place', 'groom_place', 'bride_place'):
                 builder.add_location(cert, row.get(column), column, '13-civil')
@@ -1082,7 +1135,7 @@ def load_madeisu(builder):
                         'zoon van': 'parent-child', 'broer van': 'sibling'}
             for phrase, rtype in kind_map.items():
                 if phrase in remarks.lower():
-                    other = re.sub(rf'^.*?{phrase}\s+', '', remarks, flags=re.I).strip(' .')
+                    other = re.sub(rf'^.*?{re.escape(phrase)}\s+', '', remarks, flags=re.I).strip(' .')
                     if other:
                         builder.add_relation(cert, rtype, None, pid, 'probable', f'{phrase} {other}', source_file)
                     break

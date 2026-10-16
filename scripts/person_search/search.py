@@ -182,10 +182,21 @@ def main(argv=None):
         return 0
 
     if args.contract:
-        rows = conn.execute(f"""{SELECT} WHERE p.contract_number LIKE ?
-                                ORDER BY p.source_dataset LIMIT ?""",
-                            (f'%{args.contract}%', args.limit)).fetchall()
-        print_rows(rows, args.limit)
+        # match against the small table of distinct contract numbers first, then
+        # join to persons (avoids a substring scan over ~1.9M persons)
+        has_lookup = conn.execute("SELECT 1 FROM sqlite_master WHERE name='contract_numbers'").fetchone()
+        if has_lookup:
+            rows = conn.execute(f"""
+                WITH hits AS (SELECT contract_number FROM contract_numbers
+                              WHERE contract_number LIKE ?)
+                {SELECT} JOIN hits ON hits.contract_number = p.contract_number
+                ORDER BY p.source_dataset LIMIT ?""",
+                (f'%{args.contract}%', args.limit)).fetchall()
+        else:
+            rows = conn.execute(f"""{SELECT} WHERE p.contract_number LIKE ?
+                                    ORDER BY p.source_dataset LIMIT ?""",
+                                (f'%{args.contract}%', args.limit)).fetchall()
+        output(rows, args)
         return 0
 
     if args.cross_dataset:
@@ -194,6 +205,10 @@ def main(argv=None):
             SELECT source_dataset, COUNT(*) c, GROUP_CONCAT(DISTINCT role) roles
             FROM persons WHERE name_norm LIKE ? GROUP BY 1 ORDER BY 2 DESC""",
             (f'%{name}%',)).fetchall()
+        if args.json:
+            print(json.dumps([{'source_dataset': d, 'count': c, 'roles': r} for d, c, r in rows],
+                             ensure_ascii=False, indent=1))
+            return 0
         for dataset, count, roles in rows:
             print(f'  {dataset:<28} {count:>8,}  {roles}')
         if not rows:
@@ -208,7 +223,7 @@ def main(argv=None):
                 SELECT r.to_person FROM relations r JOIN persons o ON o.person_id = r.from_person
                  WHERE r.relation_type = 'enslaver-enslaved' AND o.name_norm LIKE ?)
             ORDER BY p.name_norm LIMIT ?""", (f'%{normalize(args.owner)}%', args.limit)).fetchall()
-        print_rows(rows, args.limit)
+        output(rows, args)
         return 0
 
     if not args.terms:
@@ -225,15 +240,23 @@ def main(argv=None):
         mode = 'soundex(fallback)'
     elapsed = (time.perf_counter() - started) * 1000
 
-    if args.json:
-        keys = ['person_id', 'full_name', 'role', 'source_dataset', 'sex', 'age', 'birth_year',
-                'event_year', 'occupation', 'location', 'plantation_name', 'district', 'status',
-                'contract_number', 'item_id', 'record_type', 'register']
-        print(json.dumps([dict(zip(keys, r)) for r in rows], ensure_ascii=False, indent=1))
-    else:
-        print_rows(rows, args.limit)
+    output(rows, args)
+    if not args.json:
         print(f'\nmode={mode}  hits={len(rows)}  {elapsed:.0f} ms')
     return 0
+
+
+JSON_KEYS = ['person_id', 'full_name', 'role', 'source_dataset', 'sex', 'age', 'birth_year',
+             'event_year', 'occupation', 'location', 'plantation_name', 'district', 'status',
+             'contract_number', 'item_id', 'record_type', 'register']
+
+
+def output(rows, args):
+    """Print rows of the shared SELECT as JSON (--json) or as a table."""
+    if args.json:
+        print(json.dumps([dict(zip(JSON_KEYS, r)) for r in rows], ensure_ascii=False, indent=1))
+    else:
+        print_rows(rows, args.limit)
 
 
 if __name__ == '__main__':

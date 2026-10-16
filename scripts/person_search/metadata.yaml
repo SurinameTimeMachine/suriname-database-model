@@ -6,13 +6,12 @@ description: >-
   scripts/person_search/build_db.py. RESTRICTED/EMBARGOED datasets are local
   use only and must never be published.
 
-# Datasette settings (used with `datasette suriname_person_search.db -m metadata.yaml`)
-settings:
-  default_page_size: 50
-  sql_time_limit_ms: 20000
-  allow_download: false          # restricted data stays local
-  suggest_facets: true
-  allow_facet: true
+# Datasette 0.65 does not read server settings from metadata (-m). Pass them on the
+# command line instead (restricted data stays local, so downloads stay off):
+#
+#   uvx datasette suriname_person_search.db -m scripts/person_search/metadata.yaml \
+#     --setting default_page_size 50 --setting sql_time_limit_ms 20000 \
+#     --setting allow_download off --setting allow_csv_stream off --port 8001
 
 databases:
   suriname_person_search:
@@ -64,7 +63,9 @@ databases:
           FROM persons_fts f
           JOIN persons p ON p.person_id = f.rowid
           LEFT JOIN certificates c ON c.certificate_id = p.certificate_id
-          WHERE persons_fts MATCH :q
+          -- quote the input as one FTS5 phrase and make its last token a prefix:
+          -- "badl" finds Badloe, and punctuation such as "J.W." stays valid
+          WHERE persons_fts MATCH '"' || replace(trim(:q), '"', '""') || '"*'
           ORDER BY rank
           LIMIT 100
       person_dossier:
