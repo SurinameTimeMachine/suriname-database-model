@@ -45,7 +45,7 @@ databases:
         description: Alternate / former names (alias, maiden, widow, emancipation, baptized, spelling variants).
         facets: [kind]
       relations:
-        description: Kinship and role edges (parent-child, spouse, enslaver-enslaved, witness, employer-plantation).
+        description: Kinship and role edges (parent-child, spouse, partner, enslaver-enslaved, witness, employer-plantation).
         facets: [relation_type, confidence]
       locations:
         description: Location strings with normalization and (when resolved) gazetteer place IDs.
