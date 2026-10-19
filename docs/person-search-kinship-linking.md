@@ -266,8 +266,13 @@ After this change, the following are still not linked:
 
 Suggested next steps, for the team to decide:
 
-1. **A list for checking by hand**: export the notes above (with a link to the
-   record) as a spreadsheet, so that someone can fill in the right person.
+1. **A list for checking by hand** (done): `scripts/person_search/export_kinship_review.py`
+   writes these notes to a spreadsheet, with links to the search page and the
+   Nationaal Archief, and columns to fill in the right person and a decision.
+   Run it with `uv run --with openpyxl python scripts/person_search/export_kinship_review.py`.
+   The file contains restricted data and is written next to the repository,
+   not inside it. In October 2026 it listed 780 notes; notes that only say
+   "geen vrouw" are left out.
 2. **MR numbers ↔ 1921 census**: the census has MR numbers for Marienburg;
    linking them could connect several hundred people to the census.
 3. **Names instead of numbers** (`man van DUKHANI`, `d/v Bok Krijem`): these
