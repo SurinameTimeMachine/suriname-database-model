@@ -169,6 +169,7 @@ const ROLES = {
 const REL = {
   nl: {
     'parent-child': { out: 'kind', in: 'ouder' }, spouse: { out: 'echtgeno(o)t(e)', in: 'echtgeno(o)t(e)' },
+    partner: { out: 'leeft samen met', in: 'leeft samen met' },
     sibling: { out: 'broer/zus', in: 'broer/zus' }, foster: { out: 'pleegkind', in: 'pleegouder' },
     witness: { out: 'getuige bij akte van', in: 'getuige' }, declarant: { out: 'comparant voor', in: 'comparant' },
     informant: { out: 'aangifte gedaan van', in: 'aangever' },
@@ -178,6 +179,7 @@ const REL = {
   },
   en: {
     'parent-child': { out: 'child', in: 'parent' }, spouse: { out: 'spouse', in: 'spouse' },
+    partner: { out: 'lives with', in: 'lives with' },
     sibling: { out: 'sibling', in: 'sibling' }, foster: { out: 'foster child', in: 'foster parent' },
     witness: { out: 'witness on record of', in: 'witness' }, declarant: { out: 'declarant for', in: 'declarant' },
     informant: { out: 'reported the event of', in: 'informant' },
