@@ -1858,6 +1858,12 @@ def build(out_path, quiet=False, vacuum=False):
     conn.commit()
     builder.log(f'  cross-dataset summary table built ({time.time() - step:.1f}s)')
 
+    # Place linking: gazetteer + place_geo + locations.place_id (link_places.py).
+    step = time.time()
+    import link_places
+    link_places.run(conn, log=builder.log)
+    builder.log(f'  places linked ({time.time() - step:.1f}s)')
+
     counts = {t: conn.execute(f'SELECT COUNT(*) FROM {t}').fetchone()[0]
               for t in ('sources', 'certificates', 'persons', 'person_names', 'relations',
                         'locations', 'group_observations', 'annotations')}

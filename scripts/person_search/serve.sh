@@ -11,6 +11,11 @@
 # The full database contains restricted and embargoed data. The server listens on
 # 127.0.0.1 only, with downloads switched off. Never expose it to the internet.
 #
+# contributions.db (next to the database) is the only writable file: visitors' additions,
+# written by a server script with a cookie-less POST to /contributions/add_contribution
+# (see scripts/person_search/README.md). The archive is cached for an hour
+# (default_cache_ttl 3600); read contributions with ?_ttl=0.
+#
 # --team: for sharing with team members over a private network such as
 # Tailscale (`tailscale serve --bg 8001`; never `tailscale funnel`). It also
 # switches off free SQL, so visitors can use the search page and browse tables
@@ -39,6 +44,10 @@ if [ ! -f "$DB" ]; then
   exit 1
 fi
 
+# Visitor contributions live in a separate, writable file next to the archive.
+CONTRIB="$(dirname "$DB")/contributions.db"
+python3 scripts/person_search/contributions.py "$CONTRIB"
+
 EXTRA=()
 if [ "$TEAM" = 1 ]; then
   EXTRA+=(--setting default_allow_sql off)
@@ -47,10 +56,11 @@ fi
 
 echo "Search page: http://127.0.0.1:$PORT/ui/index.html   (stop with Ctrl+C)"
 # Datasette 0.65 needs pkg_resources (setuptools < 81) and does not run on Python 3.14.
-exec uvx --python 3.12 --from 'datasette==0.65.1' --with 'setuptools<81' datasette serve --immutable "$DB" \
+exec uvx --python 3.12 --from 'datasette==0.65.1' --with 'setuptools<81' datasette serve --immutable "$DB" "$CONTRIB" \
   -m scripts/person_search/metadata.yaml \
   --static ui:scripts/person_search/ui \
   --host 127.0.0.1 --port "$PORT" \
   --setting default_page_size 50 --setting sql_time_limit_ms 20000 \
+  --setting default_cache_ttl 3600 \
   --setting allow_download off --setting allow_csv_stream off \
   "${EXTRA[@]}"
