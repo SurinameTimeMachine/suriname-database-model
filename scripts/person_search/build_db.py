@@ -1853,6 +1853,10 @@ def build(out_path, quiet=False, vacuum=False):
     conn.commit()
     builder.log(f'  FTS rebuilt ({time.time() - step:.1f}s)')
 
+    # Repair impossible years (typos) before anything summarises years (fix_dates.py).
+    import fix_dates
+    fix_dates.run(conn, log=builder.log)
+
     step = time.time()
     conn.executescript(CROSS_DATASET)
     conn.commit()
