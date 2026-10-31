@@ -60,7 +60,7 @@ exec uvx --python 3.12 --from 'datasette==0.65.1' --with 'setuptools<81' dataset
   -m scripts/person_search/metadata.yaml \
   --static ui:scripts/person_search/ui \
   --host 127.0.0.1 --port "$PORT" \
-  --setting default_page_size 50 --setting sql_time_limit_ms 20000 \
+  --setting default_page_size 50 --setting sql_time_limit_ms 60000 \
   --setting default_cache_ttl 3600 \
   --setting allow_download off --setting allow_csv_stream off \
   "${EXTRA[@]}"

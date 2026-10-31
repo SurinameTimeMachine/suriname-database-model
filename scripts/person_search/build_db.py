@@ -1866,6 +1866,8 @@ def build(out_path, quiet=False, vacuum=False):
     step = time.time()
     import link_places
     link_places.run(conn, log=builder.log)
+    import map_counts
+    map_counts.run(conn, log=builder.log)
     builder.log(f'  places linked ({time.time() - step:.1f}s)')
 
     counts = {t: conn.execute(f'SELECT COUNT(*) FROM {t}').fetchone()[0]
