@@ -629,23 +629,111 @@ databases:
   contributions:
     description: >-
       Knowledge added by visitors about deceased people (relations, same-person suggestions,
-      stories, corrections). Separate, writable file; the archive stays read-only.
+      stories, corrections), and spoken stories from the "I was here" app with the entities
+      recognised in them. Separate, writable file; the archive stays read-only.
       Contributions can contain personal data: reviewed = 0 until a team member has checked them.
+      Reads are cached for an hour server-wide: add ?_ttl=0 to see new rows at once.
     tables:
       contributions:
-        facets: [kind, reviewed, consent]
+        facets: [kind, reviewed, consent, relation_type, field]
+      stories:
+        facets: [reviewed, consent, narrator_relation]
+      story_entities:
+        facets: [type, category, confirmed]
     queries:
+      # ---- Writes (POST, no login: writes are open for the hackathon demo) -------------
+      # Parameters that are not sent, or sent as '', are stored as NULL.
       add_contribution:
         title: 'Add a contribution (POST)'
         write: true
         on_success_message: Contribution saved
         sql: |
           INSERT INTO contributions (person_id, obs_key, patient_id, kind, value, related_person_id,
-                                     contributor, consent, reviewed, created_at)
+                                     contributor, consent, reviewed, created_at,
+                                     uid, story_id, person_key, relation_type, related_key,
+                                     related_obs_key, related_patient_id, name_raw, field, place_raw,
+                                     place_norm, year, quote, confirmed, contributor_key)
           VALUES (NULLIF(:person_id, ''), NULLIF(:obs_key, ''), NULLIF(:patient_id, ''), :kind, :value,
                   NULLIF(:related_person_id, ''), NULLIF(:contributor, ''),
-                  CASE WHEN :consent IN ('1', 'true', 'yes', 'ja') THEN 1 ELSE 0 END,
-                  0, datetime('now'))
+                  CASE WHEN lower(CAST(:consent AS TEXT)) IN ('1', 'true', 'yes', 'ja') THEN 1 ELSE 0 END,
+                  0, datetime('now'),
+                  NULLIF(:uid, ''), NULLIF(:story_id, ''), NULLIF(:person_key, ''),
+                  NULLIF(:relation_type, ''), NULLIF(:related_key, ''), NULLIF(:related_obs_key, ''),
+                  NULLIF(:related_patient_id, ''), NULLIF(:name_raw, ''), NULLIF(:field, ''),
+                  NULLIF(:place_raw, ''), NULLIF(:place_norm, ''), NULLIF(:year, ''), NULLIF(:quote, ''),
+                  CASE WHEN lower(CAST(:confirmed AS TEXT)) IN ('1', 'true', 'yes', 'ja') THEN 1 ELSE 0 END,
+                  NULLIF(:contributor_key, ''))
+      add_story:
+        title: 'Add a story (POST)'
+        write: true
+        on_success_message: Story saved
+        sql: |
+          INSERT INTO stories (id, person_key, person_id, obs_key, patient_id, person_name, transcript,
+                               summary, narrator_key, narrator_name, narrator_relation,
+                               narrator_relation_label, narrator_about, consent, created_at, reviewed)
+          VALUES (:id, NULLIF(:person_key, ''), NULLIF(:person_id, ''), NULLIF(:obs_key, ''),
+                  NULLIF(:patient_id, ''), NULLIF(:person_name, ''), NULLIF(:transcript, ''),
+                  NULLIF(:summary, ''), NULLIF(:narrator_key, ''), NULLIF(:narrator_name, ''),
+                  NULLIF(:narrator_relation, ''), NULLIF(:narrator_relation_label, ''),
+                  NULLIF(:narrator_about, ''),
+                  CASE WHEN lower(CAST(:consent AS TEXT)) IN ('1', 'true', 'yes', 'ja') THEN 1 ELSE 0 END,
+                  COALESCE(NULLIF(:created_at, ''), datetime('now')), 0)
+      add_story_entities:
+        title: 'Add the entities of a story (POST, many rows at once)'
+        description: >-
+          rows = a JSON array (sent as one string) of objects with the story_entities columns:
+          id, story_id, start, end, mention, type, category, about, is_subject, confirmed, quote,
+          link, link_label, link_person_id, link_obs_key, link_patient_id, link_place_norm,
+          contribution_uid. story_id may be left out of the objects and given once as story_id.
+        write: true
+        on_success_message: Entities saved
+        sql: |
+          INSERT INTO story_entities (id, story_id, start, "end", mention, type, category, about,
+                                      is_subject, confirmed, quote, link, link_label, link_person_id,
+                                      link_obs_key, link_patient_id, link_place_norm, contribution_uid)
+          SELECT json_extract(value, '$.id'),
+                 COALESCE(json_extract(value, '$.story_id'), NULLIF(:story_id, '')),
+                 json_extract(value, '$.start'), json_extract(value, '$.end'),
+                 json_extract(value, '$.mention'), json_extract(value, '$.type'),
+                 json_extract(value, '$.category'), json_extract(value, '$.about'),
+                 json_extract(value, '$.is_subject'), json_extract(value, '$.confirmed'),
+                 json_extract(value, '$.quote'), json_extract(value, '$.link'),
+                 json_extract(value, '$.link_label'), json_extract(value, '$.link_person_id'),
+                 json_extract(value, '$.link_obs_key'), json_extract(value, '$.link_patient_id'),
+                 json_extract(value, '$.link_place_norm'), json_extract(value, '$.contribution_uid')
+          FROM json_each(:rows)
+      add_story_contributions:
+        title: 'Add the dataset rows of a story (POST, many rows at once)'
+        description: >-
+          rows = a JSON array (sent as one string) of objects with contributions columns (all
+          optional): uid, story_id, person_key, person_id, obs_key, patient_id, kind, value,
+          relation_type, related_key, related_person_id, related_obs_key, related_patient_id,
+          name_raw, field, place_raw, place_norm, year, quote, confirmed, contributor,
+          contributor_key, consent. story_id may be given once as story_id.
+          id, reviewed (0) and created_at are set by the database.
+        write: true
+        on_success_message: Contributions saved
+        sql: |
+          INSERT INTO contributions (uid, story_id, person_key, person_id, obs_key, patient_id, kind, value,
+                                     relation_type, related_key, related_person_id, related_obs_key,
+                                     related_patient_id, name_raw, field, place_raw, place_norm, year,
+                                     quote, confirmed, contributor, contributor_key, consent,
+                                     reviewed, created_at)
+          SELECT json_extract(value, '$.uid'),
+                 COALESCE(json_extract(value, '$.story_id'), NULLIF(:story_id, '')),
+                 json_extract(value, '$.person_key'), json_extract(value, '$.person_id'),
+                 json_extract(value, '$.obs_key'), json_extract(value, '$.patient_id'),
+                 json_extract(value, '$.kind'), json_extract(value, '$.value'),
+                 json_extract(value, '$.relation_type'), json_extract(value, '$.related_key'),
+                 json_extract(value, '$.related_person_id'), json_extract(value, '$.related_obs_key'),
+                 json_extract(value, '$.related_patient_id'), json_extract(value, '$.name_raw'),
+                 json_extract(value, '$.field'), json_extract(value, '$.place_raw'),
+                 json_extract(value, '$.place_norm'), json_extract(value, '$.year'),
+                 json_extract(value, '$.quote'), json_extract(value, '$.confirmed'),
+                 json_extract(value, '$.contributor'), json_extract(value, '$.contributor_key'),
+                 json_extract(value, '$.consent'), 0, datetime('now')
+          FROM json_each(:rows)
+      # ---- Reads -------------------------------------------------------------------------
       contributions_since:
         title: 'Contributions after a given id (for syncing; call with ?_ttl=0)'
         hide_sql: true
@@ -658,5 +746,31 @@ databases:
           SELECT id, person_id, obs_key, patient_id, kind, value, related_person_id, reviewed, created_at
           FROM contributions
           WHERE person_id = CAST(:person_id AS INTEGER)
-            AND (reviewed = 1 OR :include_unreviewed = '1')
+            AND (reviewed = 1 OR CAST(:include_unreviewed AS TEXT) = '1')
           ORDER BY id
+      stories_for_person:
+        title: 'Stories about one person (key = patient:/person:/name:..., reviewed only unless include_unreviewed=1)'
+        hide_sql: true
+        sql: |
+          SELECT s.*
+          FROM stories s
+          WHERE (s.person_key = :key
+                 OR s.id IN (SELECT story_id FROM story_entities WHERE link = :key))
+            AND (s.reviewed = 1 OR CAST(:include_unreviewed AS TEXT) = '1')
+          ORDER BY s.created_at DESC
+          LIMIT 200
+      story:
+        title: 'One story'
+        hide_sql: true
+        sql: |
+          SELECT * FROM stories WHERE id = :id
+      story_entities_for:
+        title: 'Entities of one story, in transcript order'
+        hide_sql: true
+        sql: |
+          SELECT * FROM story_entities WHERE story_id = :story_id ORDER BY start, "end"
+      contributions_for_story:
+        title: 'Dataset rows of one story'
+        hide_sql: true
+        sql: |
+          SELECT * FROM contributions WHERE story_id = :story_id ORDER BY id
