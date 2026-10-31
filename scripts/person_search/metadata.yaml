@@ -645,46 +645,47 @@ databases:
       # Parameters that are not sent, or sent as '', are stored as NULL.
       add_contribution:
         title: 'Add a contribution (POST)'
+        description: >-
+          The original single-row form; every parameter must be sent (use '' for unknown).
+          For the newer columns (uid, story_id, person_key, relation_type, ...) use add_story_contributions.
         write: true
         on_success_message: Contribution saved
         sql: |
           INSERT INTO contributions (person_id, obs_key, patient_id, kind, value, related_person_id,
-                                     contributor, consent, reviewed, created_at,
-                                     uid, story_id, person_key, relation_type, related_key,
-                                     related_obs_key, related_patient_id, name_raw, field, place_raw,
-                                     place_norm, year, quote, confirmed, contributor_key)
+                                     contributor, consent, reviewed, created_at)
           VALUES (NULLIF(:person_id, ''), NULLIF(:obs_key, ''), NULLIF(:patient_id, ''), :kind, :value,
                   NULLIF(:related_person_id, ''), NULLIF(:contributor, ''),
                   CASE WHEN lower(CAST(:consent AS TEXT)) IN ('1', 'true', 'yes', 'ja') THEN 1 ELSE 0 END,
-                  0, datetime('now'),
-                  NULLIF(:uid, ''), NULLIF(:story_id, ''), NULLIF(:person_key, ''),
-                  NULLIF(:relation_type, ''), NULLIF(:related_key, ''), NULLIF(:related_obs_key, ''),
-                  NULLIF(:related_patient_id, ''), NULLIF(:name_raw, ''), NULLIF(:field, ''),
-                  NULLIF(:place_raw, ''), NULLIF(:place_norm, ''), NULLIF(:year, ''), NULLIF(:quote, ''),
-                  CASE WHEN lower(CAST(:confirmed AS TEXT)) IN ('1', 'true', 'yes', 'ja') THEN 1 ELSE 0 END,
-                  NULLIF(:contributor_key, ''))
+                  0, datetime('now'))
       add_story:
         title: 'Add a story (POST)'
+        description: >-
+          story = one JSON object (sent as a string) with the stories columns: id (required), person_key,
+          person_id, obs_key, patient_id, person_name, transcript, summary, narrator_key, narrator_name,
+          narrator_relation, narrator_relation_label, narrator_about, consent, created_at. Missing keys
+          are stored as NULL; created_at defaults to now, reviewed is always 0.
         write: true
         on_success_message: Story saved
         sql: |
           INSERT INTO stories (id, person_key, person_id, obs_key, patient_id, person_name, transcript,
                                summary, narrator_key, narrator_name, narrator_relation,
                                narrator_relation_label, narrator_about, consent, created_at, reviewed)
-          VALUES (:id, NULLIF(:person_key, ''), NULLIF(:person_id, ''), NULLIF(:obs_key, ''),
-                  NULLIF(:patient_id, ''), NULLIF(:person_name, ''), NULLIF(:transcript, ''),
-                  NULLIF(:summary, ''), NULLIF(:narrator_key, ''), NULLIF(:narrator_name, ''),
-                  NULLIF(:narrator_relation, ''), NULLIF(:narrator_relation_label, ''),
-                  NULLIF(:narrator_about, ''),
-                  CASE WHEN lower(CAST(:consent AS TEXT)) IN ('1', 'true', 'yes', 'ja') THEN 1 ELSE 0 END,
-                  COALESCE(NULLIF(:created_at, ''), datetime('now')), 0)
+          SELECT json_extract(:story, '$.id'), json_extract(:story, '$.person_key'),
+                 json_extract(:story, '$.person_id'), json_extract(:story, '$.obs_key'),
+                 json_extract(:story, '$.patient_id'), json_extract(:story, '$.person_name'),
+                 json_extract(:story, '$.transcript'), json_extract(:story, '$.summary'),
+                 json_extract(:story, '$.narrator_key'), json_extract(:story, '$.narrator_name'),
+                 json_extract(:story, '$.narrator_relation'), json_extract(:story, '$.narrator_relation_label'),
+                 json_extract(:story, '$.narrator_about'),
+                 CASE WHEN lower(CAST(json_extract(:story, '$.consent') AS TEXT)) IN ('1', 'true', 'yes', 'ja') THEN 1 ELSE 0 END,
+                 COALESCE(json_extract(:story, '$.created_at'), datetime('now')), 0
       add_story_entities:
         title: 'Add the entities of a story (POST, many rows at once)'
         description: >-
           rows = a JSON array (sent as one string) of objects with the story_entities columns:
           id, story_id, start, end, mention, type, category, about, is_subject, confirmed, quote,
           link, link_label, link_person_id, link_obs_key, link_patient_id, link_place_norm,
-          contribution_uid. story_id may be left out of the objects and given once as story_id.
+          contribution_uid. Put story_id in every object.
         write: true
         on_success_message: Entities saved
         sql: |
@@ -692,7 +693,7 @@ databases:
                                       is_subject, confirmed, quote, link, link_label, link_person_id,
                                       link_obs_key, link_patient_id, link_place_norm, contribution_uid)
           SELECT json_extract(value, '$.id'),
-                 COALESCE(json_extract(value, '$.story_id'), NULLIF(:story_id, '')),
+                 json_extract(value, '$.story_id'),
                  json_extract(value, '$.start'), json_extract(value, '$.end'),
                  json_extract(value, '$.mention'), json_extract(value, '$.type'),
                  json_extract(value, '$.category'), json_extract(value, '$.about'),
@@ -709,7 +710,7 @@ databases:
           optional): uid, story_id, person_key, person_id, obs_key, patient_id, kind, value,
           relation_type, related_key, related_person_id, related_obs_key, related_patient_id,
           name_raw, field, place_raw, place_norm, year, quote, confirmed, contributor,
-          contributor_key, consent. story_id may be given once as story_id.
+          contributor_key, consent. Put story_id in every object.
           id, reviewed (0) and created_at are set by the database.
         write: true
         on_success_message: Contributions saved
@@ -720,7 +721,7 @@ databases:
                                      quote, confirmed, contributor, contributor_key, consent,
                                      reviewed, created_at)
           SELECT json_extract(value, '$.uid'),
-                 COALESCE(json_extract(value, '$.story_id'), NULLIF(:story_id, '')),
+                 json_extract(value, '$.story_id'),
                  json_extract(value, '$.person_key'), json_extract(value, '$.person_id'),
                  json_extract(value, '$.obs_key'), json_extract(value, '$.patient_id'),
                  json_extract(value, '$.kind'), json_extract(value, '$.value'),
