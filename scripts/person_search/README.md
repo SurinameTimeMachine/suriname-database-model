@@ -17,6 +17,15 @@ python3 scripts/person_search/build_db.py          # writes suriname_person_sear
 Standard library only. Needs the raw data folders under `data/` (several are
 not in git; see each folder's README).
 
+Family notes in the migration registers (`Vrouw van 387`, `Man van 530 en vader
+van 531/VI`) are turned into links by `parse_kinship()`; every rule and the
+reason for it is described in
+[docs/person-search-kinship-linking.md](../../docs/person-search-kinship-linking.md).
+`python3 scripts/person_search/test_kinship.py` checks one real example per rule.
+Notes that could not be linked can be exported for checking by hand with
+`uv run --with openpyxl python scripts/person_search/export_kinship_review.py`
+(restricted data: the spreadsheet is written outside the repository).
+
 ## 2. Open the search page
 
 ```bash

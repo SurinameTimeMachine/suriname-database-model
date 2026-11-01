@@ -36,6 +36,7 @@ data/evaluation/
 *.db-shm
 civil_records.db
 suriname_person_search.db
+contributions.db
 
 # misc
 .DS_Store

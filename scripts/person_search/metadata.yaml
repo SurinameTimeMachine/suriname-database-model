@@ -45,7 +45,7 @@ databases:
         description: Alternate / former names (alias, maiden, widow, emancipation, baptized, spelling variants).
         facets: [kind]
       relations:
-        description: Kinship and role edges (parent-child, spouse, enslaver-enslaved, witness, employer-plantation).
+        description: Kinship and role edges (parent-child, spouse, partner, enslaver-enslaved, witness, employer-plantation).
         facets: [relation_type, confidence]
       locations:
         description: Location strings with normalization and (when resolved) gazetteer place IDs.
@@ -56,6 +56,26 @@ databases:
       annotations:
         description: Curator comments, owner prose, family relations, memo fields and marginal notes kept verbatim.
         facets: [source_dataset, status]
+      gazetteer:
+        description: >-
+          Places of data/places-gazetteer.jsonld (stm-xxxxx ids with lat/lng), plus Paramaribo streets
+          derived from the street layers 1758-1916 and the Concordans Paramaribo (type 'street',
+          id stm-street-...). Built by scripts/person_search/link_places.py.
+          For historical addresses in Paramaribo we are grateful for the Concordans by Dr. Muntjewerff,
+          see https://www.concordansparamaribo.info/. This is a pilot version and can contain mistakes
+          that are not attributable to Dr. Muntjewerff.
+        label_column: prefLabel
+        facets: [type, source]
+      place_geo:
+        description: >-
+          One row per distinct place string (locations.location_norm): the best guess of where it is.
+          match_type: address1885 (1885 address point, via the Concordans Paramaribo), gazetteer
+          (plantation, settlement, river, district...), street-centroid (Paramaribo street), unplaced.
+          confidence 0-1; with several possible places the confidence is divided by their number and
+          the note says so. Automatic, not reviewed. Address links use the Concordans Paramaribo by
+          Dr. Muntjewerff (https://www.concordansparamaribo.info/), a pilot version that can contain
+          mistakes that are not attributable to Dr. Muntjewerff.
+        facets: [match_type]
     queries:
       person_search:
         title: 'Person search (prefix, all datasets)'
@@ -466,3 +486,291 @@ databases:
         hide_sql: true
         sql: |
           SELECT source_dataset, title, license, embargo, notes FROM sources ORDER BY source_dataset
+      person_places:
+        title: 'Map: places on the records of a person and of their same-name candidates'
+        description: >-
+          For a person's trail on the map. relation = 'own' (records of this person_id) or
+          'candidate' (same name elsewhere, as in ui_same_name; never merged). Every place named
+          on those records, with coordinates where place_geo has them.
+        hide_sql: true
+        sql: |
+          WITH me AS (SELECT person_id, name_norm FROM persons WHERE person_id = CAST(:id AS INTEGER)),
+          own_names AS (
+            SELECT person_id, kind, value_norm FROM person_names
+             WHERE kind IN ('orig_spelling', 'former_name', 'emancipation_name', 'maiden_name',
+                            'widow_name', 'baptized_name', 'display_name')
+          ),
+          keys AS (
+            SELECT name_norm AS k FROM me WHERE name_norm IS NOT NULL
+            UNION SELECT value_norm FROM own_names
+             WHERE person_id = (SELECT person_id FROM me) AND value_norm IS NOT NULL
+          ),
+          cand AS (
+            SELECT p.person_id FROM persons p WHERE p.name_norm IN (SELECT k FROM keys)
+            UNION
+            SELECT n.person_id FROM own_names n WHERE n.value_norm IN (SELECT k FROM keys)
+          ),
+          people AS (
+            SELECT person_id, 'own' AS relation FROM me
+            UNION ALL
+            SELECT * FROM (SELECT person_id, 'candidate' FROM cand
+                            WHERE person_id <> CAST(:id AS INTEGER) LIMIT 150)
+          )
+          SELECT pe.relation, p.person_id, p.obs_key, p.full_name, p.role,
+                 l.certificate_id, c.source_dataset, c.event_year, l.field_origin,
+                 l.raw_text, l.location_norm, g.gazetteer_id, g.label AS place_label,
+                 g.lat, g.lng, g.match_type, g.confidence
+          FROM people pe
+          JOIN persons p ON p.person_id = pe.person_id
+          JOIN certificates c ON c.certificate_id = p.certificate_id
+          JOIN locations l ON l.certificate_id = p.certificate_id
+          LEFT JOIN place_geo g ON g.location_norm = l.location_norm
+          ORDER BY pe.relation DESC, c.event_year, l.certificate_id, l.location_id
+          LIMIT 1000
+      record_places_geo:
+        title: 'Map: places named on one record, with coordinates'
+        hide_sql: true
+        sql: |
+          SELECT l.raw_text, l.location_norm, l.field_origin, l.precision,
+                 g.gazetteer_id, g.gazetteer_uri, g.label AS place_label,
+                 g.lat, g.lng, g.match_type, g.confidence, g.note
+          FROM locations l
+          LEFT JOIN place_geo g ON g.location_norm = l.location_norm
+          WHERE l.certificate_id = CAST(:cert AS INTEGER)
+          ORDER BY l.location_id
+      map_places:
+        title: 'Map: overview, place strings with coordinates by number of records'
+        description: >-
+          One row per place string (several spellings can share one point; group on gazetteer_id
+          to draw one marker per point, or use map_points).
+        hide_sql: true
+        sql: |
+          SELECT g.location_norm, p.label, p.records, p.datasets, g.gazetteer_id, g.gazetteer_uri,
+                 g.lat, g.lng, g.match_type, g.confidence
+          FROM place_geo g
+          JOIN places p ON p.place_norm = g.location_norm
+          WHERE g.lat IS NOT NULL
+          ORDER BY p.records DESC
+          LIMIT 2000
+      map_points:
+        title: 'Map: overview, one row per point (all spellings together)'
+        hide_sql: true
+        sql: |
+          SELECT g.gazetteer_id, z.prefLabel AS place_label, z.type, g.lat, g.lng,
+                 SUM(p.records) AS records, COUNT(*) AS spellings,
+                 MAX(g.confidence) AS best_confidence, MIN(g.match_type) AS match_type
+          FROM place_geo g
+          JOIN places p ON p.place_norm = g.location_norm
+          LEFT JOIN gazetteer z ON z.id = g.gazetteer_id
+          WHERE g.lat IS NOT NULL
+          GROUP BY g.gazetteer_id
+          ORDER BY records DESC
+          LIMIT 2000
+      place_wall:
+        title: 'Map: names at one place (wall of names)'
+        hide_sql: true
+        sql: |
+          WITH recs AS (SELECT DISTINCT certificate_id FROM locations WHERE location_norm = :place_norm)
+          SELECT p.person_id, p.obs_key, p.full_name, p.role, p.source_dataset, p.sex, p.age,
+                 p.event_year AS year, p.status, p.occupation,
+                 COALESCE(p.plantation_name, c.plantation_name) AS plantation,
+                 COALESCE(p.location, c.cert_place, c.address_text, p.district, c.district) AS place,
+                 c.record_type, c.collection, p.certificate_id
+          FROM recs
+          JOIN persons p ON p.certificate_id = recs.certificate_id
+          JOIN certificates c ON c.certificate_id = p.certificate_id
+          WHERE 1 = 1
+            AND (:dataset = '' OR p.source_dataset = :dataset)
+            AND (:role = '' OR p.role = :role)
+            AND (:year_from = '' OR p.event_year >= CAST(:year_from AS INTEGER))
+            AND (:year_to = '' OR p.event_year <= CAST(:year_to AS INTEGER))
+          ORDER BY COALESCE(p.event_year, 9999), p.certificate_id, p.person_id
+          LIMIT 1000
+      place_wall_point:
+        title: 'Map: names at one point (all spellings of a gazetteer place)'
+        hide_sql: true
+        sql: |
+          WITH recs AS (SELECT DISTINCT certificate_id FROM locations WHERE place_id = :gazetteer_id)
+          SELECT p.person_id, p.obs_key, p.full_name, p.role, p.source_dataset, p.sex, p.age,
+                 p.event_year AS year, p.status, p.occupation, p.certificate_id
+          FROM recs
+          JOIN persons p ON p.certificate_id = recs.certificate_id
+          WHERE (:year_from = '' OR p.event_year >= CAST(:year_from AS INTEGER))
+            AND (:year_to = '' OR p.event_year <= CAST(:year_to AS INTEGER))
+          ORDER BY COALESCE(p.event_year, 9999), p.certificate_id, p.person_id
+          LIMIT 1000
+      patient_start:
+        title: 'Militair Hospitaal 1921: one patient with census entries and links into the full data'
+        description: >-
+          soort = 'patient' (the patient), 'vermelding' (a census 1921 row of this patient) or
+          'koppeling' (a link to a record in another dataset, with resultaat / rol / methode /
+          toelichting). person_id and certificate_id lead into ui_person, ui_relations,
+          record_places_geo and person_places.
+        hide_sql: true
+        sql: |
+          SELECT 'patient' AS soort, pt.patient_id AS id, NULL AS person_id, NULL AS certificate_id,
+                 NULL AS obs_key, pt.achternaam || ' ' || COALESCE(pt.initialen_of_contractnr, '') AS naam,
+                 '09-volkstelling-1921' AS dataset, pt.geboortejaar AS jaar,
+                 pt.beste_resultaat AS resultaat, pt.groep AS rol, pt.gevonden_in AS methode,
+                 pt.aantal_vermeldingen AS toelichting
+          FROM mh1921_patienten pt WHERE pt.patient_id = CAST(:patient_id AS INTEGER)
+          UNION ALL
+          SELECT 'vermelding', v.vermelding_id, v.person_id, v.certificate_id, p.obs_key,
+                 COALESCE(p.full_name, v.achternaam || ' ' || COALESCE(v.initialen_of_contractnr, '')),
+                 '09-volkstelling-1921', COALESCE(p.event_year, 1921), NULL, p.role, NULL, v.geboortejaar
+          FROM mh1921_vermeldingen v LEFT JOIN persons p ON p.person_id = v.person_id
+          WHERE v.patient_id = CAST(:patient_id AS INTEGER)
+          UNION ALL
+          SELECT 'koppeling', k.koppeling_id, k.doel_person_id, k.doel_certificate_id, p.obs_key,
+                 p.full_name, k.doel_dataset, p.event_year, k.resultaat, k.rol_in_doelrecord,
+                 k.methode, k.toelichting
+          FROM mh1921_koppelingen k LEFT JOIN persons p ON p.person_id = k.doel_person_id
+          WHERE k.patient_id = CAST(:patient_id AS INTEGER)
+  contributions:
+    description: >-
+      Knowledge added by visitors about deceased people (relations, same-person suggestions,
+      stories, corrections), and spoken stories from the "I was here" app with the entities
+      recognised in them. Separate, writable file; the archive stays read-only.
+      Contributions can contain personal data: reviewed = 0 until a team member has checked them.
+      Reads are cached for an hour server-wide: add ?_ttl=0 to see new rows at once.
+    tables:
+      contributions:
+        facets: [kind, reviewed, consent, relation_type, field]
+      stories:
+        facets: [reviewed, consent, narrator_relation]
+      story_entities:
+        facets: [type, category, confirmed]
+    queries:
+      # ---- Writes (POST, no login: writes are open for the hackathon demo) -------------
+      # Parameters that are not sent, or sent as '', are stored as NULL.
+      add_contribution:
+        title: 'Add a contribution (POST)'
+        write: true
+        on_success_message: Contribution saved
+        sql: |
+          INSERT INTO contributions (person_id, obs_key, patient_id, kind, value, related_person_id,
+                                     contributor, consent, reviewed, created_at,
+                                     uid, story_id, person_key, relation_type, related_key,
+                                     related_obs_key, related_patient_id, name_raw, field, place_raw,
+                                     place_norm, year, quote, confirmed, contributor_key)
+          VALUES (NULLIF(:person_id, ''), NULLIF(:obs_key, ''), NULLIF(:patient_id, ''), :kind, :value,
+                  NULLIF(:related_person_id, ''), NULLIF(:contributor, ''),
+                  CASE WHEN lower(CAST(:consent AS TEXT)) IN ('1', 'true', 'yes', 'ja') THEN 1 ELSE 0 END,
+                  0, datetime('now'),
+                  NULLIF(:uid, ''), NULLIF(:story_id, ''), NULLIF(:person_key, ''),
+                  NULLIF(:relation_type, ''), NULLIF(:related_key, ''), NULLIF(:related_obs_key, ''),
+                  NULLIF(:related_patient_id, ''), NULLIF(:name_raw, ''), NULLIF(:field, ''),
+                  NULLIF(:place_raw, ''), NULLIF(:place_norm, ''), NULLIF(:year, ''), NULLIF(:quote, ''),
+                  CASE WHEN lower(CAST(:confirmed AS TEXT)) IN ('1', 'true', 'yes', 'ja') THEN 1 ELSE 0 END,
+                  NULLIF(:contributor_key, ''))
+      add_story:
+        title: 'Add a story (POST)'
+        write: true
+        on_success_message: Story saved
+        sql: |
+          INSERT INTO stories (id, person_key, person_id, obs_key, patient_id, person_name, transcript,
+                               summary, narrator_key, narrator_name, narrator_relation,
+                               narrator_relation_label, narrator_about, consent, created_at, reviewed)
+          VALUES (:id, NULLIF(:person_key, ''), NULLIF(:person_id, ''), NULLIF(:obs_key, ''),
+                  NULLIF(:patient_id, ''), NULLIF(:person_name, ''), NULLIF(:transcript, ''),
+                  NULLIF(:summary, ''), NULLIF(:narrator_key, ''), NULLIF(:narrator_name, ''),
+                  NULLIF(:narrator_relation, ''), NULLIF(:narrator_relation_label, ''),
+                  NULLIF(:narrator_about, ''),
+                  CASE WHEN lower(CAST(:consent AS TEXT)) IN ('1', 'true', 'yes', 'ja') THEN 1 ELSE 0 END,
+                  COALESCE(NULLIF(:created_at, ''), datetime('now')), 0)
+      add_story_entities:
+        title: 'Add the entities of a story (POST, many rows at once)'
+        description: >-
+          rows = a JSON array (sent as one string) of objects with the story_entities columns:
+          id, story_id, start, end, mention, type, category, about, is_subject, confirmed, quote,
+          link, link_label, link_person_id, link_obs_key, link_patient_id, link_place_norm,
+          contribution_uid. story_id may be left out of the objects and given once as story_id.
+        write: true
+        on_success_message: Entities saved
+        sql: |
+          INSERT INTO story_entities (id, story_id, start, "end", mention, type, category, about,
+                                      is_subject, confirmed, quote, link, link_label, link_person_id,
+                                      link_obs_key, link_patient_id, link_place_norm, contribution_uid)
+          SELECT json_extract(value, '$.id'),
+                 COALESCE(json_extract(value, '$.story_id'), NULLIF(:story_id, '')),
+                 json_extract(value, '$.start'), json_extract(value, '$.end'),
+                 json_extract(value, '$.mention'), json_extract(value, '$.type'),
+                 json_extract(value, '$.category'), json_extract(value, '$.about'),
+                 json_extract(value, '$.is_subject'), json_extract(value, '$.confirmed'),
+                 json_extract(value, '$.quote'), json_extract(value, '$.link'),
+                 json_extract(value, '$.link_label'), json_extract(value, '$.link_person_id'),
+                 json_extract(value, '$.link_obs_key'), json_extract(value, '$.link_patient_id'),
+                 json_extract(value, '$.link_place_norm'), json_extract(value, '$.contribution_uid')
+          FROM json_each(:rows)
+      add_story_contributions:
+        title: 'Add the dataset rows of a story (POST, many rows at once)'
+        description: >-
+          rows = a JSON array (sent as one string) of objects with contributions columns (all
+          optional): uid, story_id, person_key, person_id, obs_key, patient_id, kind, value,
+          relation_type, related_key, related_person_id, related_obs_key, related_patient_id,
+          name_raw, field, place_raw, place_norm, year, quote, confirmed, contributor,
+          contributor_key, consent. story_id may be given once as story_id.
+          id, reviewed (0) and created_at are set by the database.
+        write: true
+        on_success_message: Contributions saved
+        sql: |
+          INSERT INTO contributions (uid, story_id, person_key, person_id, obs_key, patient_id, kind, value,
+                                     relation_type, related_key, related_person_id, related_obs_key,
+                                     related_patient_id, name_raw, field, place_raw, place_norm, year,
+                                     quote, confirmed, contributor, contributor_key, consent,
+                                     reviewed, created_at)
+          SELECT json_extract(value, '$.uid'),
+                 COALESCE(json_extract(value, '$.story_id'), NULLIF(:story_id, '')),
+                 json_extract(value, '$.person_key'), json_extract(value, '$.person_id'),
+                 json_extract(value, '$.obs_key'), json_extract(value, '$.patient_id'),
+                 json_extract(value, '$.kind'), json_extract(value, '$.value'),
+                 json_extract(value, '$.relation_type'), json_extract(value, '$.related_key'),
+                 json_extract(value, '$.related_person_id'), json_extract(value, '$.related_obs_key'),
+                 json_extract(value, '$.related_patient_id'), json_extract(value, '$.name_raw'),
+                 json_extract(value, '$.field'), json_extract(value, '$.place_raw'),
+                 json_extract(value, '$.place_norm'), json_extract(value, '$.year'),
+                 json_extract(value, '$.quote'), json_extract(value, '$.confirmed'),
+                 json_extract(value, '$.contributor'), json_extract(value, '$.contributor_key'),
+                 json_extract(value, '$.consent'), 0, datetime('now')
+          FROM json_each(:rows)
+      # ---- Reads -------------------------------------------------------------------------
+      contributions_since:
+        title: 'Contributions after a given id (for syncing; call with ?_ttl=0)'
+        hide_sql: true
+        sql: |
+          SELECT * FROM contributions WHERE id > CAST(:since AS INTEGER) ORDER BY id LIMIT 1000
+      contributions_for_person:
+        title: 'Contributions about one person (reviewed only, unless include_unreviewed=1)'
+        hide_sql: true
+        sql: |
+          SELECT id, person_id, obs_key, patient_id, kind, value, related_person_id, reviewed, created_at
+          FROM contributions
+          WHERE person_id = CAST(:person_id AS INTEGER)
+            AND (reviewed = 1 OR CAST(:include_unreviewed AS TEXT) = '1')
+          ORDER BY id
+      stories_for_person:
+        title: 'Stories about one person (key = patient:/person:/name:..., reviewed only unless include_unreviewed=1)'
+        hide_sql: true
+        sql: |
+          SELECT s.*
+          FROM stories s
+          WHERE (s.person_key = :key
+                 OR s.id IN (SELECT story_id FROM story_entities WHERE link = :key))
+            AND (s.reviewed = 1 OR CAST(:include_unreviewed AS TEXT) = '1')
+          ORDER BY s.created_at DESC
+          LIMIT 200
+      story:
+        title: 'One story'
+        hide_sql: true
+        sql: |
+          SELECT * FROM stories WHERE id = :id
+      story_entities_for:
+        title: 'Entities of one story, in transcript order'
+        hide_sql: true
+        sql: |
+          SELECT * FROM story_entities WHERE story_id = :story_id ORDER BY start, "end"
+      contributions_for_story:
+        title: 'Dataset rows of one story'
+        hide_sql: true
+        sql: |
+          SELECT * FROM contributions WHERE story_id = :story_id ORDER BY id

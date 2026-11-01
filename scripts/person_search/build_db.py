@@ -1435,64 +1435,217 @@ KINSHIP_KINDS = {
     'zoon': ('parent-child', 'in', 'son'), 'z/v': ('parent-child', 'in', 'son'),
     'dochter': ('parent-child', 'in', 'daughter'), 'd/v': ('parent-child', 'in', 'daughter'),
     'kind': ('parent-child', 'in', 'child'),
-    'vrouw': ('spouse', 'out', 'wife'), 'vr': ('spouse', 'out', 'wife'),
+    'vrouw': ('spouse', 'out', 'wife'), 'vr': ('spouse', 'out', 'wife'), 'vr/v': ('spouse', 'out', 'wife'),
     'echtgenote': ('spouse', 'out', 'wife'), 'man': ('spouse', 'out', 'husband'),
-    'gehuwd': ('spouse', 'out', 'married'),
-    'broer': ('sibling', 'out', 'brother'), 'zuster': ('sibling', 'out', 'sister'),
-    'zus': ('sibling', 'out', 'sister'),
+    'echtgenoot': ('spouse', 'out', 'husband'), 'gehuwd': ('spouse', 'out', 'married'),
+    'leeft': ('partner', 'out', 'lives with'),
+    'broer': ('sibling', 'out', 'brother'), 'broeder': ('sibling', 'out', 'brother'),
+    'zuster': ('sibling', 'out', 'sister'), 'zus': ('sibling', 'out', 'sister'),
+    'tweelingbroer': ('sibling', 'out', 'twin brother'), 'tweelingzus': ('sibling', 'out', 'twin sister'),
     'pleegmoeder': ('foster', 'out', 'foster mother'), 'pleegvader': ('foster', 'out', 'foster father'),
     'pleegzoon': ('foster', 'in', 'foster son'), 'pleegdochter': ('foster', 'in', 'foster daughter'),
 }
+# Short misspellings that edit distance cannot catch safely ('zon van 227/KG', 'mn van 781 AB').
+KINSHIP_TYPOS = {'zon': 'zoon', 'mn': 'man', 'br': 'broer'}
+# Series written in the Javanese register that has no records of its own there: the
+# Marienburg estate numbering, which also turns up in the 1921 census.
+OTHER_SERIES = {'MR'}
+# Words that start a remark rather than a kinship phrase ('Correctie 513/UU'): the
+# numbers after them are not relatives.
+REMARK_WORDS = {'correctie', 'zie', 'opm', 'geen'}
+# A clause that says it was written wrongly ('foutief geboekt Moet zijn van 962/VV') or
+# crossed out is not linked; such phrases go to the list for checking by hand.
+_STRUCK = re.compile(r'\b(?:foutief|doorgestre?ept|moet zijn)\b', re.I)
+# Short words that look like a series before a number ('en 1484', 'of 642').
+_NOT_A_SERIES = {'EN', 'OF', 'NO', 'NR'}
+
 _KIN_WORD = re.compile(r'\s*([A-Za-z]+(?:/[A-Za-z]+)?)\.?\s*')
-_KIN_SPLIT = re.compile(r'\s*(?:;|,|\+|&|\ben(?=[\s\d]))\s*', re.I)
-_CODE_LN = re.compile(r'([A-Za-z]+)/(\d+[A-Za-z]?)|([A-Za-z]+)(\d+[a-z]?)')   # AA/117, KG/382A, AB1054
-_CODE_NL = re.compile(r'(\d+[A-Za-z]?)/([A-Za-z]+)|(\d+[a-z]?)([A-Za-z]{2,}|[A-Z])')  # 117/AA, 382A/KG, 237VI
-_CODE_N = re.compile(r'(\d+[a-z]?)')                           # 180, 34a: series left out
+_WORD = re.compile(r'(?<![A-Za-z/])([A-Za-z]+(?:/[A-Za-z]+)?)(?![A-Za-z])')
+_PREPOSITION = re.compile(r'^[?.:\s]*(?:[Vv](?:an?|na)(?![a-z])|[Vv](?![A-Za-z])|[Mm]et(?![a-z]))\.?\s*')
+_DATE = re.compile(r'\b\d{1,2}[-/]\d{1,2}[-/]\d{2,4}\b')
+# 'monsterrol nummer 306': the muster-roll number on the same ship. A plain 'no. N' is left
+# out: it is the muster number in 'no. 9 (MM366)' (all 14 such phrases), but elsewhere a
+# contract number ('no 58 FF') or a deed number ('ag no 1017'), so it is not linked.
+_MUSTER_REF = re.compile(r'\bmonsterrol\s*(?:nummer|no|nr)\b\.?\s*(\d+)(?![\dA-Za-z])', re.I)
+_NO_BEFORE_CODE = re.compile(r'\bno(?![a-z])\.?\s*(?=\d+[a-z]?\s*/?\s*[A-Z]{1,2}\b)', re.I)   # 'no 58 FF'
+_NUMBER_REF = re.compile(r'\b(?:no|nr)(?![a-z])\.?\s*\d+[a-z]?|\b\d+[a-z]?\s*/?\s*(?:no|nr)\b\.?', re.I)
+_RANGE = re.compile(r'(\d+)\s*t/m\s*(?:[A-Za-z]{1,2}\s*/?\s*)?(\d+)(?![\d])', re.I)              # 792 t/m VI 794
+_RANGE_SUFFIX = re.compile(r'(\d+)([a-h])\s*t/m\s*(?:[A-Za-z]{1,2}\s*/?\s*)?\1([a-h])\b', re.I)  # 219b t/m 219e
+_CODE = re.compile(r'''
+    (?<![A-Za-z])(?P<l1>[A-Za-z]{1,2})\s*/?\s*(?P<n1>\d+)(?P<s1>[a-hA-H](?![A-Za-z]))?   # AA/117, VI 792, KG219e
+        (?!\d|[a-hA-H]?\s*/\s*[A-Za-z])                                                # not 'EN 1721/YY'
+  | (?P<n2>\d+)(?P<s2>[a-hA-H](?=[\s/]))?\s*                                            # 117/AA, 1802 WW,
+        (?:/\s*(?P<l2a>[A-Za-z]{1,2})|(?P<l2b>[A-Za-z]{2}|[A-Z]))(?![A-Za-z])           # 41a MR, 181/a
+  | (?P<n3>\d+)(?P<s3>[a-h])?(?![\dA-Za-z])                                             # 180, 34a
+''', re.X)
+_NOT_A_NAME = {'van', 'met', 'resp', 'alias'}
 
 
-def parse_kinship(refs, own_contract=None):
+def _edit_distance(a, b):
+    """Letters to add, drop or change, or neighbours to swap ('vadre' -> 'vader' is 1)."""
+    d = [[i + j if not i * j else 0 for j in range(len(b) + 1)] for i in range(len(a) + 1)]
+    for i in range(1, len(a) + 1):
+        for j in range(1, len(b) + 1):
+            d[i][j] = min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] != b[j - 1]))
+            if i > 1 and j > 1 and a[i - 1] == b[j - 2] and a[i - 2] == b[j - 1]:
+                d[i][j] = min(d[i][j], d[i - 2][j - 2] + 1)
+    return d[-1][-1]
+
+
+def kinship_word(word):
+    """Map a written kinship word to a KINSHIP_KINDS key, or None.
+
+    Accepts the word glued to its preposition ('Vrouwvan', 'dochter/v', 'manv') and
+    clerical misspellings ('Dochetr', 'Vropuw'): one wrong letter in a word of four
+    or five letters, two in longer words, as long as only one kinship word is that close.
+    """
+    word = word.lower()
+    for candidate in (word, re.sub(r'/(?:van|v)$', '', word), re.sub(r'(?:van|v)$', '', word)):
+        if candidate in KINSHIP_KINDS:
+            return candidate
+        if candidate in KINSHIP_TYPOS:
+            return KINSHIP_TYPOS[candidate]
+    if len(word) < 4 or '/' in word:
+        return None
+    limit = 1 if len(word) <= 5 else 2
+    close = {k for k in KINSHIP_KINDS if len(k) >= 4 and _edit_distance(word, k) <= limit}
+    return close.pop() if len(close) == 1 else None
+
+
+def _kinship_clauses(phrase):
+    """Split a phrase at every kinship word: 'man van 791 vader van 792' -> two clauses.
+
+    A misspelled or glued word ('vadre van') only counts when a preposition follows, so
+    a name that happens to look like a kinship word does not split the phrase. Remark
+    words ('Correctie 513/UU') also start a clause, which the caller then ignores.
+    """
+    starts = []
+    for m in _WORD.finditer(phrase):
+        word = m.group(1).lower()
+        if m.start() == 0 or not (word in KINSHIP_KINDS or word in REMARK_WORDS or (
+                kinship_word(word) and (re.search(r'(?:van|v)$', word)
+                                        or _PREPOSITION.match(phrase[m.end():].lstrip('.'))))):
+            continue
+        starts.append(m.start())
+    bounds = [0] + starts + [len(phrase)]
+    return [phrase[a:b] for a, b in zip(bounds, bounds[1:]) if phrase[a:b].strip()]
+
+
+def parse_kinship(refs, own_contract=None, series=None):
     """Yield (relation_type, direction, detail, confidence, contract_key, phrase).
 
     Handles the ways the registers write references: 'dochter van AA/130;AA/131',
     'Vrouw van 255/AA', 'dochter van 382+382a/KG', 'Man van 237VI', 'Z/v667 en 668',
-    'vrouw vanAB668'. A reference without series letters ('Vrouw van 180',
-    'dochter van 34 en 34a') takes the letters of another code in the same phrase,
-    or else of the person's own contract; in the latter case the link is only
-    'probable'.
+    'vrouw vanAB668', 'Gehuwd met 2133/WW', 'man van 791 vader van VI 792 t/m 794',
+    'Vrouw van 167Mr. (PP3)'. See docs/person-search-kinship-linking.md for the rules.
+
+    A reference without series letters ('Vrouw van 180', 'dochter van 34 en 34a')
+    takes the letters of another code in the same clause, or else of the person's own
+    contract; in the latter case the link is only 'probable'. `series` is the set of
+    series letters that occur in the register; letters outside it (and outside
+    OTHER_SERIES) are not read as a series ('en 1484' is the number 1484).
     """
     own = contract_key(own_contract)
     own_letters = own.split('/')[0] if own else None
+    known = None if series is None else set(series) | OTHER_SERIES
     for phrase in re.split(r'[|\n]', refs or ''):
         phrase = phrase.strip()
         if not phrase:
             continue
-        m = _KIN_WORD.match(phrase)
-        word = (m.group(1) if m else '').lower()
-        rest = phrase[m.end():] if m else phrase
-        # drop the preposition 'van' / 'v.' but never the start of a series ('VI/237', 'VV/117')
-        rest = re.sub(r'^[?.\s]*(?:van(?=[\s.]|\d|[A-Za-z]{1,3}\d)|v(?=[\s.]|\d))\.?\s*', '', rest, flags=re.I)
-        rtype, direction, detail = KINSHIP_KINDS.get(word, ('related', 'out', word))
-        confidence = 'probable' if '?' in phrase else 'certain'
-        parsed = []   # [letters or None, number]
-        for token in _KIN_SPLIT.split(rest):
-            token = re.sub(r'\s+', '', token).strip('.:/()?')
-            if (m := _CODE_LN.fullmatch(token)):
-                letters_, number_ = (m.group(1), m.group(2)) if m.group(1) else (m.group(3), m.group(4))
-                parsed.append([letters_.upper(), number_.upper()])
-            elif (m := _CODE_NL.fullmatch(token)):
-                number_, letters_ = (m.group(1), m.group(2)) if m.group(1) else (m.group(3), m.group(4))
-                parsed.append([letters_.upper(), number_.upper()])
-            elif (m := _CODE_N.fullmatch(token)):
-                parsed.append([None, m.group(1).upper()])
-        letters = next((p[0] for p in parsed if p[0]), None)
-        for code_letters, number in parsed:
-            conf = confidence
+        text = re.sub(r'(?<![A-Za-z])([A-Z])(?:\.\s?|\s)([A-Z])(?:\.(?=\s|$))?(?![A-Za-z])',
+                      r'\1\2', phrase)                                                 # 'V V', 'K.G.'
+        text = re.sub(r'\b([Vv]an|v)(?=[A-Z]{1,2}\s*\d)', r'\1 ', text)              # 'vanAB 734', 'vAB 1091'
+        text = re.sub(r'\b((?:[Mm]an|[Vv]r|[Vv]rouw))v\b', r'\1 v', text)            # 'manv AB1100'
+        text = re.sub(r'(\d) ([a-d])\b', r'\1\2', text)                                # 'man van 207 a'
+        text = re.sub(r'([a-z])([dzmv]/v)\b', r'\1 \2', text, flags=re.I)               # 'Roekijahd/v'
+        dangling, previous, previous_key = False, '', None   # previous clause had no contract number
+        found, phrase_letters = [], set()   # yielded at the end: bare numbers may need other clauses
+        for clause in _kinship_clauses(text):
+            m = _KIN_WORD.match(clause)
+            written = m.group(1) if m else ''
+            key = kinship_word(written)
+            rtype, direction, detail = KINSHIP_KINDS[key] if key else ('related', 'out', written.lower())
+            remark = written.lower() in REMARK_WORDS
+            rest = clause[m.end():] if m else clause
+            rest = _PREPOSITION.sub('', rest, count=1)
+            rest = _DATE.sub(' ', rest)
+            muster = _MUSTER_REF.findall(rest)
+            rest = _NUMBER_REF.sub(' ', _NO_BEFORE_CODE.sub('', _MUSTER_REF.sub(' ', rest)))
+            rest = _RANGE_SUFFIX.sub(lambda r: ', '.join(r[1] + chr(c) for c in range(
+                ord(r[2].lower()), ord(r[3].lower()) + 1)), rest)
+            rest = _RANGE.sub(lambda r: ', '.join(map(str, range(int(r[1]), int(r[2]) + 1)))
+                              if 0 < int(r[2]) - int(r[1]) <= 20 else r[0], rest)
+            confidence = 'probable' if '?' in clause or re.search(r'\bof\b', rest) else 'certain'
+            parsed, leftover = [], rest
+            for cm in _CODE.finditer(rest):
+                letters = (cm['l1'] or cm['l2a'] or cm['l2b'] or '').upper()
+                number = cm['n1'] or cm['n2'] or cm['n3']
+                suffix = (cm['s1'] or cm['s2'] or cm['s3'] or '').upper()
+                written_letters = cm['l1'] or cm['l2a'] or cm['l2b'] or ''
+                if letters and known is not None and letters not in known and letters * 2 not in known \
+                        and (letters in _NOT_A_SERIES or not written_letters.isupper()):
+                    letters = ''   # 'en 1484': the letters were a word, the number stands alone
+                if not letters and re.match(r'\s*(?:mr\.?)?\s*[(\[]', rest[cm.end():], re.I):
+                    continue   # '324 (AC249)': the number in brackets is the contract, 324 another count
+                parsed.append([letters or None, number + suffix, cm.start()])
+                leftover = leftover.replace(cm[0], ' ', 1)
+            named = any(w.lower() not in _NOT_A_NAME for w in re.findall(r'[A-Za-z]{3,}', leftover))
+            # 'man van Pinmiten d/v 897/UU', 'leeft met d/v 2228/WW', 'Roegijem z/v 1184 JJ':
+            # a filiation ('d/v', 'z/v') after a clause without a number describes the person
+            # named or meant there, not the person of this record - unless a separator ends a
+            # kinship clause before it ('geen vrouw. d/v 12'). ('Bok Siti is moeder van CC72'
+            # is about the person of the record.)
+            skip = '/' in written and dangling and (
+                previous_key is None or not re.search(r'[.;,)]\s*$', previous))
+            # 'D/v Anta AC828 en Bok Sari AG364' in the record of AG364: about her child
+            # (without names, 'zoon van VI33 en VI34' in VI34 is a slip of the pen)
+            if direction == 'in' and own and named and any(f'{p_letters}/{p_number}' == own
+                                                 for p_letters, p_number, _ in parsed):
+                skip = True
+            dangling, previous, previous_key = not parsed and not muster, clause, key
+            # an unknown word with free text around it ('Sakijo 1499VV op 6 dec 1948') is no kinship phrase
+            if skip or remark or (key is None and named) or _STRUCK.search(clause):
+                continue
+            if not parsed:   # 'vrouw van monsterrol nummer 306': only the muster number to go on
+                found += [(rtype, direction, detail, 'probable', '#', number) for number in muster]
+            lettered = [(pos, p_letters) for p_letters, _, pos in parsed if p_letters]
+            phrase_letters |= {p_letters for _, p_letters in lettered}
+            for code_letters, number, pos in parsed:
+                if not code_letters:
+                    if named:   # bare numbers next to names or remarks are not contract numbers
+                        continue
+                    # '1 en 2/MR 734 en 733/AD': a bare number takes the letters of the next code,
+                    # else of the one before
+                    after = [l for p, l in lettered if p > pos]
+                    before = [l for p, l in lettered if p < pos]
+                    code_letters = (after[:1] or before[-1:] or [None])[0]
+                found.append((rtype, direction, detail, confidence, code_letters, number))
+        for rtype, direction, detail, confidence, code_letters, number in found:
+            if code_letters == '#':
+                yield rtype, direction, detail, confidence, f'#{number}', phrase
+                continue
             if not code_letters:
-                # letters shared within the phrase are explicit; the own series is a guess
-                conf = confidence if letters else 'probable'
-                code_letters = letters or own_letters
+                # the person's own series: a guess, unless the rest of the phrase writes that
+                # same series ('Man van 530 en vader van 531/VI' in the record of VI529)
+                code_letters = own_letters
+                if phrase_letters != {own_letters}:
+                    confidence = 'probable'
             if code_letters:
-                yield rtype, direction, detail, conf, f'{code_letters}/{number}', phrase
+                yield rtype, direction, detail, confidence, f'{code_letters}/{number}', phrase
+
+
+def resolve_kinship_ref(key, ship, by_contract, by_muster):
+    """Return ((person_id, certificate_id) or None, confidence override or None) for a
+    reference from parse_kinship: a contract key, or '#N' for muster number N on `ship`."""
+    if key.startswith('#'):
+        return by_muster.get((ship, key[1:])), None
+    other = by_contract.get(key)
+    if not other:
+        # 'A/286' written for contract 'AA/286' (single for double letters)
+        letters, number = key.split('/')
+        if len(letters) == 1:
+            return by_contract.get(f'{letters * 2}/{number}'), 'probable'
+    return other, None
 
 
 def load_migration(builder):
@@ -1503,7 +1656,7 @@ def load_migration(builder):
             continue
         source_file = os.path.relpath(path, REPO_ROOT)
         records = _read_headerless(path)
-        by_contract, kinship = {}, []
+        by_contract, by_muster, kinship = {}, {}, []
         for raw in records:
             values = {field: clean(raw[i]) if i < len(raw) else None
                       for i, field in layout['fields'].items()}
@@ -1537,8 +1690,13 @@ def load_migration(builder):
             key = contract_key(values.get('contract_number'))
             if key:
                 by_contract[key] = (pid, cert)
+            if values.get('ship') and values.get('muster_number'):
+                # a muster number shared by two records on one ship identifies neither
+                muster = (values['ship'], values['muster_number'])
+                by_muster[muster] = None if muster in by_muster else (pid, cert)
             if values.get('kinship_refs'):
-                kinship.append((pid, cert, values['kinship_refs'], values.get('contract_number')))
+                kinship.append((pid, cert, values['kinship_refs'], values.get('contract_number'),
+                                values.get('ship')))
             for field in MIGRATION_NOTE_FIELDS:
                 builder.add_annotation(uuid, values.get(field), source_file, status=field, certificate_id=cert)
             photo = values.get('photo_url') or ''
@@ -1552,22 +1710,19 @@ def load_migration(builder):
                 builder.add_location(cert, value, field, '12-migratie-datasets')
             builder.add_location(cert, values.get('plantation'), 'plantation', '12-migratie-datasets')
 
-        # Kinship references point to other records of the same register by contract number.
+        # Kinship references point to other records of the same register by contract number
+        # (or muster number on the same ship); see docs/person-search-kinship-linking.md.
         seen, linked, unresolved = set(), 0, 0
-        for pid, cert, refs, own_contract in kinship:
-            for rtype, direction, detail, confidence, key, phrase in parse_kinship(refs, own_contract):
-                other = by_contract.get(key)
-                if not other:
-                    # 'A/286' written for contract 'AA/286' (single for double letters)
-                    letters, number = key.split('/')
-                    if len(letters) == 1:
-                        other = by_contract.get(f'{letters * 2}/{number}')
-                        confidence = 'probable'
+        series = {key.split('/')[0] for key in by_contract}
+        for pid, cert, refs, own_contract, ship in kinship:
+            for rtype, direction, detail, confidence, key, phrase in parse_kinship(refs, own_contract, series):
+                other, override = resolve_kinship_ref(key, ship, by_contract, by_muster)
+                confidence = override or confidence
                 if not other or other[0] == pid:
                     unresolved += 1
                     continue
                 a, b = (pid, other[0]) if direction == 'out' else (other[0], pid)
-                if rtype in ('spouse', 'sibling', 'related'):
+                if rtype in ('spouse', 'partner', 'sibling', 'related'):
                     pair = (rtype, min(a, b), max(a, b))
                 else:
                     pair = (rtype, a, b)
@@ -1698,10 +1853,20 @@ def build(out_path, quiet=False, vacuum=False):
     conn.commit()
     builder.log(f'  FTS rebuilt ({time.time() - step:.1f}s)')
 
+    # Repair impossible years (typos) before anything summarises years (fix_dates.py).
+    import fix_dates
+    fix_dates.run(conn, log=builder.log)
+
     step = time.time()
     conn.executescript(CROSS_DATASET)
     conn.commit()
     builder.log(f'  cross-dataset summary table built ({time.time() - step:.1f}s)')
+
+    # Place linking: gazetteer + place_geo + locations.place_id (link_places.py).
+    step = time.time()
+    import link_places
+    link_places.run(conn, log=builder.log)
+    builder.log(f'  places linked ({time.time() - step:.1f}s)')
 
     counts = {t: conn.execute(f'SELECT COUNT(*) FROM {t}').fetchone()[0]
               for t in ('sources', 'certificates', 'persons', 'person_names', 'relations',
