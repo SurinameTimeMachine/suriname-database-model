@@ -2,20 +2,27 @@
 
 **Version 1.0 (draft, 9 November 2026). The DOI will follow after publication in DataverseNL.**
 
-## What is this?
+## Introduction
 
-A point dataset of 3,105 location points of *erven* (urban plots) in Paramaribo, Suriname, in 1885.
+This documentation describes a dataset of historical address information in Paramaribo. The core
+dataset contains 3,105 location points of *erven* (urban plots) in Paramaribo, Suriname, in 1885.
 3,005 of them are addresses (`punttype` = `adres`): they carry the 1885 address (district letter +
-house number + optional suffix) and usually the 1885 street name. The remaining 100 are district labels
-(`punttype` = `wijklabel`): points with only a district letter, without a house number and sometimes
-without a street name, usually marking a large building or site. Where known, the use or function of the
-plot in 1885 and 1916 is included.
+house number + optional suffix) and almost always the 1885 street name. The remaining 100 are district
+labels (`punttype` = `wijklabel`): points with only a district letter, without a house number and often
+without a street name, usually marking a large building or site described on one of the two historical
+maps used (see below). Where known, the use or function of the plot in 1885 and 1916 is included.
 
 The points are based on the *Figuratieve plattegrond der stad Paramaribo* ("Figurative plan of the town
 of Paramaribo") by A.J. Meyer (Paramaribo, 1885; Allard Pierson, University of Amsterdam,
 HB-KZL 108.03.21, <https://hdl.handle.net/11245/3.39624>). Meyer, a tax official, drew on nine sheets
 all plots in the town and the 604 plots in the two outer districts, sometimes with their use. As far as
 we know, this is the oldest source that shows exact addresses on a plan of Paramaribo.
+
+Three auxiliary datasets are included to help interpret the points: the 1885 street network as shown on
+Meyer's map (171 line segments, `straten_paramaribo_1885.geojson`), the street network of the 1916–17
+*Opnemingsdienst* map (165 segments, `straten_paramaribo_1916.geojson`), and the boundaries of the
+eight 1885 districts (A–F, EBW and TBW; `wijkgrenzen_paramaribo_1885.geojson`). The district boundaries
+are accurate except for TBW, which is an estimate (see below).
 
 With these points you can approximately map historical addresses from Surinamese sources (district
 registers, civil registers, almanacs, censuses), and visualise city-wide data at address level. The

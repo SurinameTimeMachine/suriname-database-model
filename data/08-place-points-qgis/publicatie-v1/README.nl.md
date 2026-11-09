@@ -2,19 +2,27 @@
 
 **Versie 1.0 (concept, 9 november 2026). De DOI volgt na publicatie in DataverseNL.**
 
-## Wat is dit?
+## Inleiding
 
-Een puntenbestand van 3.105 locatiepunten van erven in Paramaribo in 1885. 3.005 daarvan zijn adressen
+Deze documentatie beschrijft een dataset met historische adresgegevens van Paramaribo. De kern is een
+puntenbestand van 3.105 locatiepunten van erven in Paramaribo in 1885. 3.005 daarvan zijn adressen
 (`punttype` = `adres`): ze hebben het adres van 1885 (wijkletter + huisnummer + eventuele toevoeging) en
-meestal de straatnaam van 1885. De overige 100 zijn wijklabels: punten met alleen een wijkletter, zonder
-huisnummer en soms zonder straatnaam, meestal bij een groot gebouw of terrein. Waar bekend staat het gebruik
-of de functie van het erf in 1885 en 1916 erbij.
+bijna altijd de straatnaam van 1885. De overige 100 zijn wijklabels: punten met alleen een wijkletter,
+zonder huisnummer en vaak zonder straatnaam, meestal bij een groot gebouw of terrein dat op een van de
+twee gebruikte historische kaarten staat beschreven (zie hieronder). Waar bekend staat het gebruik of de
+functie van het erf in 1885 en 1916 erbij.
 
 De punten zijn gebaseerd op de *Figuratieve plattegrond der stad Paramaribo* door A.J. Meyer
 (Paramaribo, 1885; Allard Pierson, Universiteit van Amsterdam, HB-KZL 108.03.21,
 <https://hdl.handle.net/11245/3.39624>). Belastingambtenaar Meyer tekende in negen bladen alle erven
 in de stad en de 604 erven in de twee buitenwijken, soms met hun gebruik. Voor zover bekend is dit de
 oudste bron die exacte adressen op de plattegrond van Paramaribo weergeeft.
+
+Er zijn drie hulpbestanden bijgevoegd om de punten te helpen interpreteren: het stratennet van 1885
+volgens de kaart van Meyer (171 lijnsegmenten, `straten_paramaribo_1885.geojson`), het stratennet van
+de kaart van de Opnemingsdienst van 1916–17 (165 segmenten, `straten_paramaribo_1916.geojson`) en de
+grenzen van de acht wijken van 1885 (A–F, EBW en TBW; `wijkgrenzen_paramaribo_1885.geojson`). De
+wijkgrenzen zijn nauwkeurig, behalve die van de TBW; die is een inschatting (zie hieronder).
 
 Met de punten kun je historische adressen uit Surinaamse bronnen (wijkregisters, burgerlijke stand,
 almanakken, volkstellingen) bij benadering op de kaart zetten. Je kunt er ook gegevens over de hele
