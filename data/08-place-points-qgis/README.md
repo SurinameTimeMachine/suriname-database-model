@@ -19,4 +19,4 @@ or duplicate the existing district and road records.
 CSV + GeoJSON points, street lines 1885/1916, district boundaries 1885, README (English) and CITATION.cff.
 The package is built with `scripts/locatiepunten1885/build_publicatie.py` from the unchanged exports in
 `export20260619/` and `export20261109/`; the corrections (omitted points, a/b suffixes, omitted street
-lines) are in that script and in the README.
+lines) are in that script and in `CORRECTIES-publicatie-v1.md` (internal).

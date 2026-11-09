@@ -159,20 +159,6 @@ dataset.
 - The accuracy is sufficient for approximately locating addresses and for city-level visualisations. The
   dataset is not suitable for analyses at plot or metre level.
 
-## Corrections compared to the QGIS export
-
-The script `scripts/locatiepunten1885/build_publicatie.py` in the repository builds these files from the
-unchanged QGIS export. The following corrections were made:
-
-- 2 points without geometry were omitted (fid 2627 and 2630).
-- 36 points without a district letter were omitted: 33 annotations from the 1916 map, such as
-  plantations and institutions on the edge of town, and 3 empty points.
-- For B230, B258 and E42 there were two points with the same address. Both points are correct, but the
-  suffix was missing. The point closest to the previous house number now has `a`, the other `b`.
-- The export fields description 1854, suffix 1837 and cinema name were not included.
-- For the streets, whitespace in names was cleaned and empty names left empty; in the 1885 layer one
-  line without coordinates and two duplicate lines were omitted. The geometry is otherwise unchanged.
-
 ## Known limitations
 
 - The position of a number of points is estimated ("Ligging gegokt" in `redactioneel_commentaar`).
@@ -190,7 +176,7 @@ DataverseNL (HDSC). https://doi.org/10.34894/... [TODO DOI after publication]
 ## Use of AI
 
 AI (Claude, Anthropic) was used in compiling this publication package: converting the QGIS file to
-CSV/GeoJSON with Dutch field names, applying the corrections listed above, searching the Government
+CSV/GeoJSON with Dutch field names, applying a few data corrections, searching the Government
 Gazettes for the district boundaries, and drafting this README. The location points themselves, the
 addresses and the descriptions were made by people. All AI-assisted steps were checked by Thunnis van
 Oort.
