@@ -88,6 +88,15 @@ heeft getekend, is niet bekend. De resolutie van 18 december 1869 (*Surinaamsche
 Gouvernementsadvertentieblad; Delpher [ddd:011194077](https://resolver.kb.nl/resolve?urn=ddd:011194077:mpeg21))
 bevestigt dat deze indeling toen nog gold ("met behoud van de bestaande indeeling").
 
+Bij notificatie van 10 januari 1860 (G.B. 1860 no. 1) zijn de grenzen van wijk F (ten zuiden nu de
+Dominékreek) en van de Tweede Buitenwijk aangepast: die omvat sindsdien "alle bebouwde en onbebouwde
+erven ten westen der Wanicastraat, tot het Stads District behoorende". De buitengrens van de Tweede
+Buitenwijk is dus de grens van het stadsdistrict, en die is nergens als lijn vastgelegd: het Koninklijk
+Besluit over de districtsindeling (21 december 1862, afgekondigd 7 februari 1863) noemt alleen "de Stad
+Paramaribo met hare buitenwijken, de grond Hermitage aan het kanaal van Saramacca en de gronden aan den
+weg van Kwatta tot en met Oldenburg". **De noord- en westgrens van de TBW-polygoon zijn daarom een
+benadering**; punten langs de Weg naar Zee en de weg naar Kwatta vallen er ten onrechte buiten.
+
 De oorspronkelijke laag staat in Zanderij / Suriname TM (EPSG:31171). Het build-script zet hem om naar
 WGS84. Ter controle: van de locatiepunten valt 99,9% binnen de grens van hun eigen wijk, met
 uitzondering van de Tweede Buitenwijk. **In de Tweede Buitenwijk (TBW) liggen 45 van de 441 punten
