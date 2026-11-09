@@ -76,14 +76,17 @@ van de 1885-laag zegt dus niets over de exacte ligging van straten in 1885.
 ## Wijkgrenzen 1885
 
 `wijkgrenzen_paramaribo_1885.geojson` bevat de grenzen van de zes binnenwijken (A–F) en de twee
-buitenwijken (EBW, TBW), met het veld `wijk_1885`. Waar de grenzen precies op zijn gebaseerd is niet
-vastgelegd. Mogelijk volgen ze de indeling van de bladen van Meyer (1885): elk blad beslaat één
-wijk, en de catalogus beschrijft de grenzen (bijv. wijk A: Waterkant, Heiligeweg, Klipstenenstraat, Laan van
-Tourtonne, Sommelsdijckse kreek, Grote en Kleine Combéweg). De wijkindeling zelf is ouder: een
-gouvernementsresolutie van 18 december 1869 (*Surinaamsche Courant*, Gouvernementsadvertentieblad; Delpher
-[ddd:011194077](https://resolver.kb.nl/resolve?urn=ddd:011194077:mpeg21)) noemt dezelfde acht wijken
-"met behoud van de bestaande indeeling" en verwijst naar publicaties uit 1834, 1837 en 1850. Die resolutie
-beschrijft zelf geen grenzen.
+buitenwijken (EBW, TBW), met het veld `wijk_1885`. De grenzen volgen de wijkindeling
+die is vastgelegd in de *Wet van den 24sten April 1837, houdende voorbereidende bepalingen tot invoering
+eener nieuwe Wijkverdeeling voor de Stad Paramaribo en haren omtrek* (Gouvernementsblad Suriname 1837
+no. 3, art. 3 en 4). Daarin worden de zes binnenwijken en twee buitenwijken met straten en waterlopen
+omschreven, bijvoorbeeld wijk A: ten oosten de rivier Suriname, ten noorden de Sommelsdijkse kreek tot de
+Laan van Tourtonne, ten westen de Heiligeweg (met de Knuffelsgracht) en ten zuiden de Klipstenenstraat.
+Een controle tegen het stratenplan van 1916 bevestigt dit voor de grenzen die we konden toetsen
+(Keizerstraat, Klipstenenstraat, Heiligeweg, Zwartenhovenbrugstraat en Wanicastraat). Wie de polygonen
+heeft getekend, is niet bekend. De resolutie van 18 december 1869 (*Surinaamsche Courant*,
+Gouvernementsadvertentieblad; Delpher [ddd:011194077](https://resolver.kb.nl/resolve?urn=ddd:011194077:mpeg21))
+bevestigt dat deze indeling toen nog gold ("met behoud van de bestaande indeeling").
 
 De oorspronkelijke laag staat in Zanderij / Suriname TM (EPSG:31171). Het build-script zet hem om naar
 WGS84. Ter controle: van de locatiepunten valt 99,9% binnen de grens van hun eigen wijk, met
