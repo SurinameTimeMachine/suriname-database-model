@@ -114,8 +114,8 @@ omschreven aan de hand van gronden en plantages:
 
 Een getekende stadsgrens is er wel op de kaart van 1916–17: het inzetkaartje *Stadsgrens en verdeeling
 in Wijken* (schaal 1:40.000, rechtsonder op de kaart van de Opnemingsdienst,
-<https://hdl.handle.net/11245/3.38611>) geeft de grens van de 2e Buitenwijk met het district Beneden
-Suriname aan. Die grens heeft meegespeeld bij het tekenen van de TBW-polygoon, maar geeft de situatie
+<https://hdl.handle.net/11245/3.38611>) geeft de grens van de 2e Buitenwijk met de omliggende districten
+aan. Die grens heeft meegespeeld bij het tekenen van de TBW-polygoon, maar geeft de situatie
 van rond 1916 weer en niet per se die van 1885.
 
 **De noord- en westgrens van de TBW-polygoon zijn daarom een inschatting** op basis van de
