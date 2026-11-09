@@ -94,8 +94,9 @@ erven ten westen der Wanicastraat, tot het Stads District behoorende". De buiten
 Buitenwijk is dus de grens van het stadsdistrict, en die is nergens als lijn vastgelegd: het Koninklijk
 Besluit over de districtsindeling (21 december 1862, afgekondigd 7 februari 1863) noemt alleen "de Stad
 Paramaribo met hare buitenwijken, de grond Hermitage aan het kanaal van Saramacca en de gronden aan den
-weg van Kwatta tot en met Oldenburg". **De noord- en westgrens van de TBW-polygoon zijn daarom een
-benadering**; punten langs de Weg naar Zee en de weg naar Kwatta vallen er ten onrechte buiten.
+weg van Kwatta tot en met Oldenburg". De grens tussen stad en plantagedistricten werd dus
+bepaald door welke gronden en plantages bij de stad werden gerekend, niet door een straat. **De noord- en
+westgrens van de TBW-polygoon zijn daarom een benadering**; punten langs de Weg naar Zee en de weg naar Kwatta vallen er ten onrechte buiten.
 
 De oorspronkelijke laag staat in Zanderij / Suriname TM (EPSG:31171). Het build-script zet hem om naar
 WGS84. Ter controle: van de locatiepunten valt 99,9% binnen de grens van hun eigen wijk, met
