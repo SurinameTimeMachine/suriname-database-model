@@ -78,32 +78,49 @@ van de 1885-laag zegt dus niets over de exacte ligging van straten in 1885.
 ## Wijkgrenzen 1885
 
 `wijkgrenzen_paramaribo_1885.geojson` bevat de grenzen van de zes binnenwijken (A–F) en de twee
-buitenwijken (EBW, TBW), met het veld `wijk_1885`. De grenzen volgen de wijkindeling
-die is vastgelegd in de *Wet van den 24sten April 1837, houdende voorbereidende bepalingen tot invoering
-eener nieuwe Wijkverdeeling voor de Stad Paramaribo en haren omtrek* (Gouvernementsblad Suriname 1837
-no. 3, art. 3 en 4). Daarin worden de zes binnenwijken en twee buitenwijken met straten en waterlopen
-omschreven, bijvoorbeeld wijk A: ten oosten de rivier Suriname, ten noorden de Sommelsdijkse kreek tot de
-Laan van Tourtonne, ten westen de Heiligeweg (met de Knuffelsgracht) en ten zuiden de Klipstenenstraat.
-Een controle tegen het stratenplan van 1916 bevestigt dit voor de grenzen die we konden toetsen
-(Keizerstraat, Klipstenenstraat, Heiligeweg, Zwartenhovenbrugstraat en Wanicastraat). Wie de polygonen
-heeft getekend, is niet bekend. De resolutie van 18 december 1869 (*Surinaamsche Courant*,
-Gouvernementsadvertentieblad; Delpher [ddd:011194077](https://resolver.kb.nl/resolve?urn=ddd:011194077:mpeg21))
-bevestigt dat deze indeling toen nog gold ("met behoud van de bestaande indeeling").
+buitenwijken (EBW, TBW), met het veld `wijk_1885`. Wie de polygonen heeft getekend, is niet bekend.
 
-Bij notificatie van 10 januari 1860 (G.B. 1860 no. 1) zijn de grenzen van wijk F (ten zuiden nu de
-Dominékreek) en van de Tweede Buitenwijk aangepast: die omvat sindsdien "alle bebouwde en onbebouwde
-erven ten westen der Wanicastraat, tot het Stads District behoorende". De buitengrens van de Tweede
-Buitenwijk is dus de grens van het stadsdistrict, en die is nergens als lijn vastgelegd: het Koninklijk
-Besluit over de districtsindeling (21 december 1862, afgekondigd 7 februari 1863) noemt alleen "de Stad
-Paramaribo met hare buitenwijken, de grond Hermitage aan het kanaal van Saramacca en de gronden aan den
-weg van Kwatta tot en met Oldenburg". De grens tussen stad en plantagedistricten werd dus
-bepaald door welke gronden en plantages bij de stad werden gerekend, niet door een straat. **De noord- en
-westgrens van de TBW-polygoon zijn daarom een benadering**; punten langs de Weg naar Zee en de weg naar Kwatta vallen er ten onrechte buiten.
+**Binnenwijken A–F en Eerste Buitenwijk: grenzen volgens de bron.** Deze grenzen volgen de
+*Wet van den 24sten April 1837, houdende voorbereidende bepalingen tot invoering eener nieuwe
+Wijkverdeeling voor de Stad Paramaribo en haren omtrek* (Gouvernementsblad Suriname 1837 no. 3, art. 3
+en 4). Daarin worden de wijken met straten en waterlopen omschreven, bijvoorbeeld wijk A: ten oosten de
+rivier Suriname, ten noorden de Sommelsdijkse kreek tot de Laan van Tourtonne, ten westen de Heiligeweg
+(met de Knuffelsgracht) en ten zuiden de Klipstenenstraat. De Eerste Buitenwijk (Combé) wordt ten
+oosten en noorden begrensd door de rivier Suriname en de Divisie Para. Bij notificatie van 10 januari
+1860 (G.B. 1860 no. 1) is de zuidgrens van wijk F verlegd naar de Dominékreek. Een controle tegen het
+stratenplan van 1916 bevestigt de grenzen die we konden toetsen (Keizerstraat, Klipstenenstraat,
+Heiligeweg, Zwartenhovenbrugstraat en Wanicastraat). De resolutie van 18 december 1869 (*Surinaamsche
+Courant*, Gouvernementsadvertentieblad; Delpher
+[ddd:011194077](https://resolver.kb.nl/resolve?urn=ddd:011194077:mpeg21)) bevestigt dat deze indeling
+toen nog gold ("met behoud van de bestaande indeeling").
+
+**Tweede Buitenwijk (TBW): een inschatting op basis van de bronnen.** Volgens de notificatie van 1860
+omvat de TBW "alle bebouwde en onbebouwde erven ten westen der Wanicastraat, tot het Stads District
+behoorende" (in 1837 nog: ten westen van de Wanicastraat en ten zuiden van de Gemeene Landsweg). De
+oostgrens is dus de Wanicastraat; de noord- en westgrens vallen samen met de grens van het
+stadsdistrict. Die grens is in de Gouvernementsbladen nergens als lijn vastgelegd, maar alleen
+omschreven aan de hand van gronden en plantages:
+
+- G.B. 1837 no. 3, art. 4: de stad grenst aan de Divisie Para; de TBW omvat de erven "tot het Stads
+  District zijn behoorende".
+- Publicatie van 1 maart 1842 (G.B. 1842 no. 3), *Reglement op de verdeeling der Kolonie Suriname in
+  Divisiën*, art. 4: de Divisie Para loopt "met uitsluiting der Stad Paramaribo en haren omtrek" tot
+  aan de Redoute Purmerend, zonder dat die omtrek wordt omschreven.
+- Koninklijk Besluit van 21 december 1862 no. 26, afgekondigd bij resolutie van 7 februari 1863
+  (G.B. 1863 no. 3), art. 12 en 16: het stadsdistrict bestaat uit "de Stad Paramaribo met hare
+  buitenwijken, de grond Hermitage aan het kanaal van Saramacca en de gronden aan den weg van Kwatta
+  tot en met Oldenburg"; de noordzijde van de weg naar Kwatta vanaf de grond Toevlugt hoort bij het
+  district Beneden Para.
+
+**De noord- en westgrens van de TBW-polygoon zijn daarom een inschatting.** In de praktijk lijkt de
+2e of Oude Rijweg de westgrens te vormen; de noordgrens is het minst zeker. Punten langs de Weg naar Zee
+en de weg naar Kwatta vallen buiten de getekende polygoon, terwijl ze waarschijnlijk wel tot de TBW
+behoorden.
 
 De oorspronkelijke laag staat in Zanderij / Suriname TM (EPSG:31171). Het build-script zet hem om naar
 WGS84. Ter controle: van de locatiepunten valt 99,9% binnen de grens van hun eigen wijk, met
 uitzondering van de Tweede Buitenwijk. **In de Tweede Buitenwijk (TBW) liggen 45 van de 441 punten
-buiten de formele wijkgrens**, omdat de punten daar ruimer zijn geplaatst.
+buiten de getekende wijkgrens**, omdat de punten daar ruimer zijn geplaatst en de grens een inschatting is.
 
 ## Hoe is de dataset gemaakt?
 
@@ -154,7 +171,7 @@ de ongewijzigde QGIS-export. Daarbij zijn de volgende correcties gedaan:
   toevoeging ontbrak. Het punt dat het dichtst bij het vorige huisnummer ligt heeft nu `a`, het
   andere `b`.
 - De velden beschrijving 1854, toevoeging 1837 en bioscoopnaam uit de export zijn niet opgenomen.
-- Bij de straten zijn alleen witruimte in namen opgeschoond en lege namen leeg gelaten; de geometrie is ongewijzigd.
+- Bij de straten zijn witruimte in namen opgeschoond en lege namen leeg gelaten; in de laag van 1885 zijn één lijn zonder coördinaten en twee dubbele lijnen weggelaten. De geometrie is verder ongewijzigd.
 
 ## Bekende beperkingen
 
