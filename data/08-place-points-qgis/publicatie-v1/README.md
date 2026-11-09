@@ -112,8 +112,15 @@ omschreven aan de hand van gronden en plantages:
   tot en met Oldenburg"; de noordzijde van de weg naar Kwatta vanaf de grond Toevlugt hoort bij het
   district Beneden Para.
 
-**De noord- en westgrens van de TBW-polygoon zijn daarom een inschatting.** In de praktijk lijkt de
-2e of Oude Rijweg de westgrens te vormen; de noordgrens is het minst zeker. Punten langs de Weg naar Zee
+Een getekende stadsgrens is er wel op de kaart van 1916–17: het inzetkaartje *Stadsgrens en verdeeling
+in Wijken* (schaal 1:40.000, rechtsonder op de kaart van de Opnemingsdienst,
+<https://hdl.handle.net/11245/3.38611>) geeft de grens van de 2e Buitenwijk met het district Beneden
+Suriname aan. Die grens heeft meegespeeld bij het tekenen van de TBW-polygoon, maar geeft de situatie
+van rond 1916 weer en niet per se die van 1885.
+
+**De noord- en westgrens van de TBW-polygoon zijn daarom een inschatting** op basis van de
+Gouvernementsbladen en de kaart van 1916–17. In de praktijk lijkt de 2e of Oude Rijweg de westgrens te
+vormen; de noordgrens is het minst zeker. Punten langs de Weg naar Zee
 en de weg naar Kwatta vallen buiten de getekende polygoon, terwijl ze waarschijnlijk wel tot de TBW
 behoorden.
 
