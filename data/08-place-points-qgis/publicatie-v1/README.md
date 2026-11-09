@@ -29,6 +29,7 @@ stad op adresniveau mee visualiseren. De dataset hoort bij de Suriname Time Mach
 | `data/locatiepunten_paramaribo_1885.geojson` | Dezelfde gegevens als GeoJSON (RFC 7946, CRS84) |
 | `data/straten_paramaribo_1885.geojson` | Straatlijnen volgens de kaart van 1885 (174 segmenten) |
 | `data/straten_paramaribo_1916.geojson` | Straatlijnen volgens de kaart van 1916–17 (165 segmenten) |
+| `data/wijkgrenzen_paramaribo_1885.geojson` | Grenzen van de 8 wijken van 1885 (A–F, EBW, TBW) |
 | `README.md` | Deze beschrijving |
 | `CITATION.cff` | Citeerinformatie |
 | `docs/voorbeeld_blad74_wijkA_HB-KZL-108-03-21.jpg` | Voorbeeld: blad 74 (wijk A) van de kaart van 1885, Allard Pierson UvA |
@@ -66,8 +67,24 @@ locatiepunten. Velden:
 | `bron_fid` | Volgnummer in het oorspronkelijke QGIS-bestand |
 
 Een straat kan uit meerdere segmenten bestaan. In de laag van 1885 hebben 45 van de 174 segmenten
-geen naam ingevoerd. [TODO methode: zijn de straten van 1885 op de kaart van 1916 overgetrokken, net
-als de punten?]
+geen naam ingevoerd.
+
+**Let op:** de lijnen van 1885 volgen het stratenplan van 1916–17. Omdat de kaart van 1885 schematisch
+is, zijn alleen de straatnamen van die kaart overgenomen en op de straten van 1916 gezet. De geometrie
+van de 1885-laag zegt dus niets over de exacte ligging van straten in 1885.
+
+## Wijkgrenzen 1885
+
+`wijkgrenzen_paramaribo_1885.geojson` bevat de grenzen van de zes binnenwijken (A–F) en de twee
+buitenwijken (EBW, TBW), met het veld `wijk_1885`. De grenzen zijn mogelijk gebaseerd op de
+wijkverdeling die het gouvernement in december 1869 publiceerde (*Surinaamsche Courant*,
+Gouvernementsadvertentieblad, publicatie van 18 december 1869 no. 5; Delpher
+[ddd:011194077](https://resolver.kb.nl/resolve?urn=ddd:011194077:mpeg21)). Die herkomst is niet zeker.
+
+De oorspronkelijke laag staat in Zanderij / Suriname TM (EPSG:31171). Het build-script zet hem om naar
+WGS84. Ter controle: van de locatiepunten valt 99,9% binnen de grens van hun eigen wijk, met
+uitzondering van de Tweede Buitenwijk. **In de Tweede Buitenwijk (TBW) liggen 45 van de 441 punten
+buiten de formele wijkgrens**, omdat de punten daar ruimer zijn geplaatst.
 
 ## Hoe is de dataset gemaakt?
 

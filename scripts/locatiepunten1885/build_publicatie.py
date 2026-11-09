@@ -17,13 +17,45 @@ laten een gat, ids worden nooit hernummerd.
 
 Gebruik: python3 scripts/locatiepunten1885/build_publicatie.py
 """
-import csv, json, sys
+import csv, json, math, sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / "data/08-place-points-qgis/export20260619/locatiepunten1885.geojson"
 OUT = ROOT / "data/08-place-points-qgis/publicatie-v1/data"
 BASE = "https://data.surinametijdmachine.org/place/"
+WIJKEN_1885 = ROOT / "data/08-place-points-qgis/export20260619/districts_paramaribo_NW_1885.geojson"
+
+# --- Zanderij / Suriname TM (EPSG:31171) -> WGS84, zonder pyproj --------------------
+# Parameters uit de .qmd: tmerc lon_0=-55.68333 k=0.9999 x_0=500000, ellps=intl,
+# towgs84=-265,120,-358. Inverse transversale Mercator (Snyder) + 3-parameter verschuiving.
+A=6378388.0; F=1/297.0; E2=2*F-F*F
+K0=0.9999; LON0=math.radians(-55.6833333333333); FE=500000.0
+def inv_tm(x,y):
+    e2=E2; ep2=e2/(1-e2); M=y/K0
+    mu=M/(A*(1-e2/4-3*e2**2/64-5*e2**3/256))
+    e1=(1-math.sqrt(1-e2))/(1+math.sqrt(1-e2))
+    p1=mu+(3*e1/2-27*e1**3/32)*math.sin(2*mu)+(21*e1**2/16-55*e1**4/32)*math.sin(4*mu)+(151*e1**3/96)*math.sin(6*mu)+(1097*e1**4/512)*math.sin(8*mu)
+    C1=ep2*math.cos(p1)**2; T1=math.tan(p1)**2; N1=A/math.sqrt(1-e2*math.sin(p1)**2)
+    R1=A*(1-e2)/(1-e2*math.sin(p1)**2)**1.5; D=(x-FE)/(N1*K0)
+    lat=p1-(N1*math.tan(p1)/R1)*(D*D/2-(5+3*T1+10*C1-4*C1*C1-9*ep2)*D**4/24+(61+90*T1+298*C1+45*T1*T1-252*ep2-3*C1*C1)*D**6/720)
+    lon=LON0+(D-(1+2*T1+C1)*D**3/6+(5-2*C1+28*T1-3*C1*C1+8*ep2+24*T1*T1)*D**5/120)/math.cos(p1)
+    return lat,lon
+def geo2ecef(lat,lon,a,e2,h=0):
+    N=a/math.sqrt(1-e2*math.sin(lat)**2)
+    return ((N+h)*math.cos(lat)*math.cos(lon),(N+h)*math.cos(lat)*math.sin(lon),(N*(1-e2)+h)*math.sin(lat))
+def ecef2geo(X,Y,Z,a,e2):
+    lon=math.atan2(Y,X); p=math.hypot(X,Y); lat=math.atan2(Z,p*(1-e2))
+    for _ in range(10):
+        N=a/math.sqrt(1-e2*math.sin(lat)**2); lat=math.atan2(Z+e2*N*math.sin(lat),p)
+    return lat,lon
+WA=6378137.0; WF=1/298.257223563; WE2=2*WF-WF*WF
+def to_wgs84(x,y):
+    lat,lon=inv_tm(x,y); X,Y,Z=geo2ecef(lat,lon,A,E2)
+    lat2,lon2=ecef2geo(X-265,Y+120,Z-358,WA,WE2)
+    return math.degrees(lon2),math.degrees(lat2)
+# -----------------------------------------------------------------------------------
+
 STREETS = {
     1885: ROOT / "data/08-place-points-qgis/export20261109/streetsParamaribo1885map.geojson",
     1916: ROOT / "data/08-place-points-qgis/export20260619/streetsParamaribo1916map.geojson",
@@ -110,6 +142,26 @@ def build_streets():
         print(year, len(out), "straatsegmenten;", sum(1 for x in out if not x["properties"]["naam"]), "zonder naam")
 
 
+def build_wijken():
+    """Wijkgrenzen 1885 omzetten van EPSG:31171 naar WGS84 (CRS84)."""
+    d = json.loads(WIJKEN_1885.read_text(encoding="utf-8"))
+
+    def conv(c):
+        return [conv(x) for x in c] if isinstance(c[0], list) else [round(v, 8) for v in to_wgs84(*c[:2])]
+
+    out = []
+    for f in d["features"]:
+        wijk = t(f["properties"].get("wijk"))
+        out.append({"type": "Feature", "id": f"wijk-1885-{wijk}",
+                    "properties": {"wijk_1885": wijk}, "geometry": {
+                        "type": f["geometry"]["type"], "coordinates": conv(f["geometry"]["coordinates"])}})
+    (OUT / "wijkgrenzen_paramaribo_1885.geojson").write_text(json.dumps(
+        {"type": "FeatureCollection", "name": "wijkgrenzen_paramaribo_1885", "features": out},
+        ensure_ascii=False), encoding="utf-8")
+    print(len(out), "wijken 1885")
+
+
 if __name__ == "__main__":
     main()
     build_streets()
+    build_wijken()
