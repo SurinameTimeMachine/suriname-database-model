@@ -63,7 +63,7 @@ STREETS = {
 
 # fid -> toevoeging (handmatig gecontroleerd op afstand tot huisnummer n-1 / n+1)
 TOEVOEGING_FIX = {2778: "a", 556: "b", 579: "a", 2757: "b", 1068: "a", 2936: "b"}
-ADRES_OPEN = {287}  # wijklabel 'Politiewacht': adres1885 EBW vs wijk A, nog niet besloten
+ADRES_OPEN = set()
 # Adresconflicten (adres1885 <> wijk+huisnummer+toevoeging), besluit Thunnis van Oort 9-11-2026.
 ADRES_FIX = {
     433: {"huisnummer_1885": "100"},                      # B100: losse velden volgen adres
@@ -74,6 +74,7 @@ ADRES_FIX = {
     3064: {"adres_1885": "TBW349b"},                      # TMW -> TBW
     3132: {"toevoeging_1885": "fb"},                      # TBW6fb
     3133: {"toevoeging_1885": "fa"},                      # TBW6fa
+    287: {"wijk_1885": "EBW"},                            # wijklabel Politiewacht: EBW (grensgeval)
     # huisnummer ontbrak in losse velden; aangevuld uit adres1885
     2629: {"huisnummer_1885": "206"},                     # F206
     3043: {"huisnummer_1885": "54"},                      # F54b

@@ -19,5 +19,5 @@ de ongewijzigde QGIS-export. Daarbij zijn de volgende correcties gedaan:
   B100 (huisnummer 93 → 100), D51 (toevoeging b vervalt), F92 (adres aangevuld), F28a (toevoeging a;
   volgt na F28), F150b (wijk TBW → F), TBW349b (was TMW349b), TBW6fa/TBW6fb (toevoeging fa/fb).
 - Huisnummer aangevuld uit adres1885 bij F206, F54b en F457a (waren daardoor als wijklabel geteld).
-- Open: wijklabel "Politiewacht" (adres1885 EBW, wijk A).
+- Wijklabel "Politiewacht": wijk A → EBW (grensgeval).
 - Het build-script controleert nu dat adres1885 gelijk is aan wijk + huisnummer + toevoeging.
