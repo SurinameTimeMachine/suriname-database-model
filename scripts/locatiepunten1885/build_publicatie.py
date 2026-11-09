@@ -1,6 +1,8 @@
 """Bouw het publicatiepakket 'Locatiepunten Paramaribo 1885' uit de QGIS-export.
 
 Bron (ongewijzigd): data/08-place-points-qgis/export20260619/locatiepunten1885.geojson
+      + straten:    data/08-place-points-qgis/export20261109/streetsParamaribo1885map.geojson
+                    data/08-place-points-qgis/export20260619/streetsParamaribo1916map.geojson
 Uitvoer:            data/08-place-points-qgis/publicatie-v1/data/
 
 Correcties (besloten door Thunnis van Oort, 9 nov 2026):
@@ -22,6 +24,10 @@ ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / "data/08-place-points-qgis/export20260619/locatiepunten1885.geojson"
 OUT = ROOT / "data/08-place-points-qgis/publicatie-v1/data"
 BASE = "https://data.surinametijdmachine.org/place/"
+STREETS = {
+    1885: ROOT / "data/08-place-points-qgis/export20261109/streetsParamaribo1885map.geojson",
+    1916: ROOT / "data/08-place-points-qgis/export20260619/streetsParamaribo1916map.geojson",
+}
 
 # fid -> toevoeging (handmatig gecontroleerd op afstand tot huisnummer n-1 / n+1)
 TOEVOEGING_FIX = {2778: "a", 556: "b", 579: "a", 2757: "b", 1068: "a", 2936: "b"}
@@ -84,5 +90,24 @@ def main():
           "; weggelaten:", {k: len(v) for k, v in dropped.items()})
 
 
+def build_streets():
+    """Straatlijnen 1885 en 1916: id per jaar op volgorde van de bron, lege naam -> null.
+    '[naamloos]' betekent: op de kaart zonder naam; null: naam (nog) niet ingevoerd."""
+    for year, src in STREETS.items():
+        feats = json.loads(src.read_text(encoding="utf-8"))["features"]
+        out = []
+        for i, f in enumerate(feats, 1):
+            naam = t(f["properties"].get("Name")) or None
+            sid = f"stm-{year}-street-{i:03d}"
+            out.append({"type": "Feature", "id": sid, "geometry": f["geometry"],
+                        "properties": {"straat_id": sid, "naam": naam, "kaartjaar": year,
+                                       "bron_fid": i}})
+        (OUT / f"straten_paramaribo_{year}.geojson").write_text(json.dumps(
+            {"type": "FeatureCollection", "name": f"straten_paramaribo_{year}", "features": out},
+            ensure_ascii=False), encoding="utf-8")
+        print(year, len(out), "straatsegmenten;", sum(1 for x in out if not x["properties"]["naam"]), "zonder naam")
+
+
 if __name__ == "__main__":
     main()
+    build_streets()

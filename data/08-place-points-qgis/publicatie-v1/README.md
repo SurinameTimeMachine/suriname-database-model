@@ -25,6 +25,8 @@ stad op adresniveau mee visualiseren. De dataset hoort bij de Suriname Time Mach
 |---|---|
 | `data/locatiepunten_paramaribo_1885.csv` | Eén rij per punt, coördinaten in WGS84 (lon/lat), UTF-8 |
 | `data/locatiepunten_paramaribo_1885.geojson` | Dezelfde gegevens als GeoJSON (RFC 7946, CRS84) |
+| `data/straten_paramaribo_1885.geojson` | Straatlijnen volgens de kaart van 1885 (174 segmenten) |
+| `data/straten_paramaribo_1916.geojson` | Straatlijnen volgens de kaart van 1916–17 (165 segmenten) |
 | `README.md` | Deze beschrijving |
 | `CITATION.cff` | Citeerinformatie |
 | `docs/voorbeeld_blad74_wijkA_HB-KZL-108-03-21.jpg` | Voorbeeld: blad 74 (wijk A) van de kaart van 1885, Allard Pierson UvA |
@@ -48,6 +50,22 @@ stad op adresniveau mee visualiseren. De dataset hoort bij de Suriname Time Mach
 | `redactioneel_commentaar` | Opmerking van de maker(s), bijv. "Ligging gegokt" |
 | `punttype` | `adres` (3.002) of `wijklabel` (103: punt met alleen een wijkletter, zonder huisnummer; meestal een groot gebouw of terrein) |
 | `lon`, `lat` | Coördinaten WGS84 (EPSG:4326), 7 decimalen |
+
+## Straten 1885 en 1916
+
+Twee lijnenbestanden geven het stratenplan volgens de kaarten van 1885 en 1916–17, als context bij de
+locatiepunten. Velden:
+
+| Veld | Beschrijving |
+|---|---|
+| `straat_id` | Identifier per segment, `stm-1885-street-NNN` of `stm-1916-street-NNN` (NNN = volgorde in de bron) |
+| `naam` | Straatnaam zoals op de kaart. `[naamloos]` = op de kaart zonder naam; leeg = naam niet ingevoerd |
+| `kaartjaar` | 1885 of 1916 |
+| `bron_fid` | Volgnummer in het oorspronkelijke QGIS-bestand |
+
+Een straat kan uit meerdere segmenten bestaan. In de laag van 1885 hebben 45 van de 174 segmenten
+geen naam ingevoerd. [TODO methode: zijn de straten van 1885 op de kaart van 1916 overgetrokken, net
+als de punten?]
 
 ## Hoe is de dataset gemaakt?
 
@@ -95,6 +113,7 @@ de ongewijzigde QGIS-export. Daarbij zijn de volgende correcties gedaan:
   toevoeging ontbrak. Het punt dat het dichtst bij het vorige huisnummer ligt heeft nu `a`, het
   andere `b`.
 - De velden beschrijving 1854, toevoeging 1837 en bioscoopnaam uit de export zijn niet opgenomen.
+- Bij de straten zijn alleen witruimte in namen opgeschoond en lege namen leeg gelaten; de geometrie is ongewijzigd.
 
 ## Bekende beperkingen
 
