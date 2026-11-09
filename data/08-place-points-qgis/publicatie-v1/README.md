@@ -33,7 +33,8 @@ see also the glossary at the end.
 | `data/straten_paramaribo_1885.geojson` | Street lines according to the 1885 map (171 segments) |
 | `data/straten_paramaribo_1916.geojson` | Street lines according to the 1916–17 map (165 segments) |
 | `data/wijkgrenzen_paramaribo_1885.geojson` | Boundaries of the 8 districts (*wijken*) of 1885 (A–F, EBW, TBW) |
-| `README.md` | This description |
+| `README.md` | This description (English) |
+| `README.nl.md` | Description in Dutch |
 | `CITATION.cff` | Citation information |
 | `docs/voorbeeld_blad74_wijkA_HB-KZL-108-03-21.jpg` | Example: sheet 74 (district A) of the 1885 map, Allard Pierson UvA |
 
