@@ -178,13 +178,13 @@ def build_wijken():
         out.append({"type": "Feature", "id": f"wijk-1885-{wijk}",
                     "properties": {"wijk_1885": wijk}, "geometry": {
                         "type": f["geometry"]["type"], "coordinates": conv(f["geometry"]["coordinates"])}})
+    ids = [f["id"] for f in out]
+    if len(set(ids)) != len(ids) or any(i.endswith("-") for i in ids):
+        sys.exit(f"Onverwachte wijkgrenzen: {ids}")
     (OUT / "wijkgrenzen_paramaribo_1885.geojson").write_text(json.dumps(
         {"type": "FeatureCollection", "name": "wijkgrenzen_paramaribo_1885", "features": out},
         ensure_ascii=False), encoding="utf-8")
     print(len(out), "wijken 1885")
-    ids = [f["id"] for f in out]
-    if len(set(ids)) != len(ids) or any(i.endswith("-") for i in ids):
-        sys.exit(f"Onverwachte wijkgrenzen: {ids}")
 
 
 if __name__ == "__main__":

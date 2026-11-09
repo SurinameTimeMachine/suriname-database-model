@@ -15,7 +15,7 @@ or duplicate the existing district and road records.
 
 ## Publicatieversie (v1) / Publication version (v1)
 
-`publicatie-v1/` contains the dataset *Locatiepunten Paramaribo 1885* as published in DataverseNL (HDSC):
+`publicatie-v1/` contains the dataset *Locatiepunten Paramaribo 1885* as prepared for publication in DataverseNL (HDSC):
 CSV + GeoJSON points, street lines 1885/1916, district boundaries 1885, README (English) and CITATION.cff.
 The package is built with `scripts/locatiepunten1885/build_publicatie.py` from the unchanged exports in
 `export20260619/` and `export20261109/`; the corrections (omitted points, a/b suffixes, omitted street
