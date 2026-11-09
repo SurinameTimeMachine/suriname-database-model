@@ -112,9 +112,8 @@ omschrijving als lijn, o.a. "langs de westelijke zijde van den eersten rijweg" t
 Gemeenelandsweg); en het inzetkaartje *Stadsgrens en verdeeling in Wijken* (1:40.000) op de kaart van
 1916–17 (<https://hdl.handle.net/11245/3.38611>). Voor 1862–1894 is geen omschrijving gevonden.
 
-Ter controle: van de locatiepunten valt 99,9% binnen de grens van hun eigen wijk, met
-uitzondering van de Tweede Buitenwijk. **In de Tweede Buitenwijk (TBW) liggen 45 van de 441 punten
-buiten de getekende wijkgrens**, omdat de punten daar ruimer zijn geplaatst en de grens een inschatting is.
+Van de locatiepunten valt 99,9% binnen de grens van hun eigen wijk, met uitzondering van de Tweede
+Buitenwijk. In de Tweede Buitenwijk (TBW) liggen 45 van de 441 punten buiten de getekende wijkgrens.
 
 ## Hoe is de dataset gemaakt?
 

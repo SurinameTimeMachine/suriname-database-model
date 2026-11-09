@@ -117,9 +117,8 @@ road up to and including Oldenburg); Gouvernementsblad 1894, art. 2 (first descr
 inset map *Stadsgrens en verdeeling in Wijken* (1:40,000) on the 1916–17 map
 (<https://hdl.handle.net/11245/3.38611>). No description was found for 1862–1894.
 
-As a check: 99.9% of the location points fall within the boundary of their own district, except in the
-Second Outer District. **In the TBW, 45 of the 441 points lie outside the drawn district boundary**,
-because the points there were placed more widely and the boundary is an estimate.
+99.9% of the location points fall within the boundary of their own district, except in the Second
+Outer District. In the TBW, 45 of the 441 points lie outside the drawn district boundary.
 
 ## How was the dataset made?
 
