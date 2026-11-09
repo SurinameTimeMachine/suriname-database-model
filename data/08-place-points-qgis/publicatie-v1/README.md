@@ -112,17 +112,21 @@ omschreven aan de hand van gronden en plantages:
   tot en met Oldenburg"; de noordzijde van de weg naar Kwatta vanaf de grond Toevlugt hoort bij het
   district Beneden Para.
 
-Een getekende stadsgrens is er wel op de kaart van 1916–17: het inzetkaartje *Stadsgrens en verdeeling
-in Wijken* (schaal 1:40.000, rechtsonder op de kaart van de Opnemingsdienst,
-<https://hdl.handle.net/11245/3.38611>) geeft de grens van de 2e Buitenwijk met de omliggende districten
-aan. Die grens heeft meegespeeld bij het tekenen van de TBW-polygoon, maar geeft de situatie
-van rond 1916 weer en niet per se die van 1885.
+Tussen 1862 en 1894 is in de Gouvernementsbladen geen nadere omschrijving gevonden. De eerste
+omschrijving als lijn dateert van 1894 (Gouvernementsblad 1894, art. 2): de grens van Paramaribo loopt
+langs de noordzijde van de Vierde Dwarsstraat of Mahonylaan, de zuidgrens van de plantages Ma Retraite en
+Tourtonne, de Sommelsdijkse kreek tot de grens tussen Oldenburg en Mon Divertissement, dan naar en langs
+de Kwattaweg "tot aan den eersten rijweg; langs de westelijke zijde van den eersten rijweg tot aan den
+Gemeenen landsweg", vandaar zuidwaarts tot de noordgrens van de plantage Hermitage, langs die grens naar
+de Wanicastraat en via de Wanicastraat en de Dominékreek naar de rivier. Ook het inzetkaartje
+*Stadsgrens en verdeeling in Wijken* (schaal 1:40.000) rechtsonder op de kaart van 1916–17
+(<https://hdl.handle.net/11245/3.38611>) tekent de stadsgrens rond de 2e Buitenwijk.
 
 **De noord- en westgrens van de TBW-polygoon zijn daarom een inschatting** op basis van de
-Gouvernementsbladen en de kaart van 1916–17. In de praktijk lijkt de 2e of Oude Rijweg de westgrens te
-vormen; de noordgrens is het minst zeker. Punten langs de Weg naar Zee
-en de weg naar Kwatta vallen buiten de getekende polygoon, terwijl ze waarschijnlijk wel tot de TBW
-behoorden.
+Gouvernementsbladen (1837, 1842, 1863, 1894) en de kaart van 1916–17. Ze geven de latere, wel
+omschreven stadsgrens (1894/1916) weer en niet per se die van 1885. Punten langs de Weg naar Zee, de
+Charlesburgweg en de weg naar Kwatta vallen buiten de getekende polygoon, terwijl ze in 1885 mogelijk wel
+tot de TBW werden gerekend.
 
 De oorspronkelijke laag staat in Zanderij / Suriname TM (EPSG:31171). Het build-script zet hem om naar
 WGS84. Ter controle: van de locatiepunten valt 99,9% binnen de grens van hun eigen wijk, met
