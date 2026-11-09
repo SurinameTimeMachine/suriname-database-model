@@ -63,6 +63,22 @@ STREETS = {
 
 # fid -> toevoeging (handmatig gecontroleerd op afstand tot huisnummer n-1 / n+1)
 TOEVOEGING_FIX = {2778: "a", 556: "b", 579: "a", 2757: "b", 1068: "a", 2936: "b"}
+ADRES_OPEN = {287}  # wijklabel 'Politiewacht': adres1885 EBW vs wijk A, nog niet besloten
+# Adresconflicten (adres1885 <> wijk+huisnummer+toevoeging), besluit Thunnis van Oort 9-11-2026.
+ADRES_FIX = {
+    433: {"huisnummer_1885": "100"},                      # B100: losse velden volgen adres
+    873: {"toevoeging_1885": ""},                         # D51: toevoeging b vervalt
+    1522: {"adres_1885": "F92"},                          # F92: adres aangevuld
+    3039: {"toevoeging_1885": "a"},                       # F28a (volgt na F28, fid 1456)
+    3060: {"wijk_1885": "F"},                             # F150b: wijk is F, niet TBW
+    3064: {"adres_1885": "TBW349b"},                      # TMW -> TBW
+    3132: {"toevoeging_1885": "fb"},                      # TBW6fb
+    3133: {"toevoeging_1885": "fa"},                      # TBW6fa
+    # huisnummer ontbrak in losse velden; aangevuld uit adres1885
+    2629: {"huisnummer_1885": "206"},                     # F206
+    3043: {"huisnummer_1885": "54"},                      # F54b
+    3044: {"huisnummer_1885": "457"},                     # F457a
+}
 
 FIELDS = [
     ("wijk_1885", "wijk1885"), ("huisnummer_1885", "huisnummer1885"),
@@ -93,6 +109,10 @@ def main():
         if fid in TOEVOEGING_FIX:
             r["toevoeging_1885"] = TOEVOEGING_FIX[fid]
             r["adres_1885"] = f"{r['wijk_1885']}{r['huisnummer_1885']}{r['toevoeging_1885']}"
+        r.update(ADRES_FIX.get(fid, {}))
+        if (r["huisnummer_1885"] or r["adres_1885"]) and fid not in ADRES_OPEN and \
+                r["adres_1885"] != f"{r['wijk_1885']}{r['huisnummer_1885']}{r['toevoeging_1885']}":
+            sys.exit(f"Adres klopt niet met losse velden (fid {fid}): {r}")
         if not r["huisnummer_1885"]:
             punttype = "wijklabel"
         else:

@@ -15,3 +15,9 @@ de ongewijzigde QGIS-export. Daarbij zijn de volgende correcties gedaan:
   andere `b`.
 - De velden beschrijving 1854, toevoeging 1837 en bioscoopnaam uit de export zijn niet opgenomen.
 - Bij de straten zijn witruimte in namen opgeschoond en lege namen leeg gelaten; in de laag van 1885 zijn één lijn zonder coördinaten en twee dubbele lijnen weggelaten. De geometrie is verder ongewijzigd.
+- Adresconflicten (adres1885 ≠ wijk + huisnummer + toevoeging), besluit Thunnis van Oort 9-11-2026:
+  B100 (huisnummer 93 → 100), D51 (toevoeging b vervalt), F92 (adres aangevuld), F28a (toevoeging a;
+  volgt na F28), F150b (wijk TBW → F), TBW349b (was TMW349b), TBW6fa/TBW6fb (toevoeging fa/fb).
+- Huisnummer aangevuld uit adres1885 bij F206, F54b en F457a (waren daardoor als wijklabel geteld).
+- Open: wijklabel "Politiewacht" (adres1885 EBW, wijk A).
+- Het build-script controleert nu dat adres1885 gelijk is aan wijk + huisnummer + toevoeging.

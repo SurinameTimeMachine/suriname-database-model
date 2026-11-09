@@ -409,7 +409,7 @@ stm-1885-address-0429,https://data.surinametijdmachine.org/place/stm-1885-addres
 stm-1885-address-0430,https://data.surinametijdmachine.org/place/stm-1885-address-0430,430,B,106,,B106,Wagenwegstraat,,,,,,adres,-55.1594301,5.8299308
 stm-1885-address-0431,https://data.surinametijdmachine.org/place/stm-1885-address-0431,431,B,107,,B107,Wagenwegstraat,,,,,,adres,-55.1595147,5.8299795
 stm-1885-address-0432,https://data.surinametijdmachine.org/place/stm-1885-address-0432,432,B,108,,B108,Wagenwegstraat,,,,,,adres,-55.1595645,5.8300015
-stm-1885-address-0433,https://data.surinametijdmachine.org/place/stm-1885-address-0433,433,B,93,,B100,Wagenwegstraat,,,,,,adres,-55.1588753,5.8296042
+stm-1885-address-0433,https://data.surinametijdmachine.org/place/stm-1885-address-0433,433,B,100,,B100,Wagenwegstraat,,,,,,adres,-55.1588753,5.8296042
 stm-1885-address-0434,https://data.surinametijdmachine.org/place/stm-1885-address-0434,434,B,99,,B99,Wagenwegstraat,,,,,,adres,-55.1588301,5.8295822
 stm-1885-address-0435,https://data.surinametijdmachine.org/place/stm-1885-address-0435,435,B,98,,B98,Wagenwegstraat,,,,,,adres,-55.1587861,5.8295602
 stm-1885-address-0436,https://data.surinametijdmachine.org/place/stm-1885-address-0436,436,B,97,,B97,Wagenwegstraat,,,,,,adres,-55.1587247,5.8295185
@@ -841,7 +841,7 @@ stm-1885-address-0869,https://data.surinametijdmachine.org/place/stm-1885-addres
 stm-1885-address-0870,https://data.surinametijdmachine.org/place/stm-1885-address-0870,870,D,47,a,D47a,Weidestraat,,,,,,adres,-55.1664096,5.8301487
 stm-1885-address-0871,https://data.surinametijdmachine.org/place/stm-1885-address-0871,871,D,49,a,D49a,Weidestraat,,,,,,adres,-55.1660769,5.8299681
 stm-1885-address-0872,https://data.surinametijdmachine.org/place/stm-1885-address-0872,872,D,50,,D50,Weidestraat,,,,,,adres,-55.1659213,5.8298781
-stm-1885-address-0873,https://data.surinametijdmachine.org/place/stm-1885-address-0873,873,D,51,b,D51,Weidestraat,,,,,,adres,-55.1655894,5.8296950
+stm-1885-address-0873,https://data.surinametijdmachine.org/place/stm-1885-address-0873,873,D,51,,D51,Weidestraat,,,,,,adres,-55.1655894,5.8296950
 stm-1885-address-0874,https://data.surinametijdmachine.org/place/stm-1885-address-0874,874,D,53,,D53,Weidestraat,,,,,,adres,-55.1649378,5.8293058
 stm-1885-address-0875,https://data.surinametijdmachine.org/place/stm-1885-address-0875,875,D,78,,D78,Weidestraat,,,,,,adres,-55.1616023,5.8274691
 stm-1885-address-0876,https://data.surinametijdmachine.org/place/stm-1885-address-0876,876,D,65,,D65,Weidestraat,,,,,,adres,-55.1634964,5.8285126
@@ -1490,7 +1490,7 @@ stm-1885-address-1518,https://data.surinametijdmachine.org/place/stm-1885-addres
 stm-1885-address-1519,https://data.surinametijdmachine.org/place/stm-1885-address-1519,1519,F,89,,F89,Drambrandersgracht,,,,,,adres,-55.1662711,5.8219928
 stm-1885-address-1520,https://data.surinametijdmachine.org/place/stm-1885-address-1520,1520,F,90,,F90,Drambrandersgracht,,,,,,adres,-55.1663625,5.8220741
 stm-1885-address-1521,https://data.surinametijdmachine.org/place/stm-1885-address-1521,1521,F,91,,F91,Drambrandersgracht,,,,,,adres,-55.1664695,5.8221672
-stm-1885-address-1522,https://data.surinametijdmachine.org/place/stm-1885-address-1522,1522,F,92,,F,Drambrandersgracht,,,,,,adres,-55.1665523,5.8222247
+stm-1885-address-1522,https://data.surinametijdmachine.org/place/stm-1885-address-1522,1522,F,92,,F92,Drambrandersgracht,,,,,,adres,-55.1665523,5.8222247
 stm-1885-address-1523,https://data.surinametijdmachine.org/place/stm-1885-address-1523,1523,F,93,,F93,Drambrandersgracht,,,,,,adres,-55.1666500,5.8222995
 stm-1885-address-1524,https://data.surinametijdmachine.org/place/stm-1885-address-1524,1524,F,94,,F94,Drambrandersgracht,,,,,,adres,-55.1666983,5.8223467
 stm-1885-address-1525,https://data.surinametijdmachine.org/place/stm-1885-address-1525,1525,F,95,,F95,Drambrandersgracht,,,,,,adres,-55.1667696,5.8223973
@@ -2593,7 +2593,7 @@ stm-1885-address-2623,https://data.surinametijdmachine.org/place/stm-1885-addres
 stm-1885-address-2624,https://data.surinametijdmachine.org/place/stm-1885-address-2624,2624,B,73,b,B73b,Gravenstraat,,,,,,adres,-55.1566083,5.8295144
 stm-1885-address-2625,https://data.surinametijdmachine.org/place/stm-1885-address-2625,2625,E,291,b,E291b,Princestraat,,,,,,adres,-55.1658392,5.8236404
 stm-1885-address-2626,https://data.surinametijdmachine.org/place/stm-1885-address-2626,2626,E,166,b,E166b,Hofstraat,,,,,,adres,-55.1656694,5.8251519
-stm-1885-address-2629,https://data.surinametijdmachine.org/place/stm-1885-address-2629,2629,F,,,F206,Groote Dwarsstraat,,,,,,wijklabel,-55.1670437,5.8198258
+stm-1885-address-2629,https://data.surinametijdmachine.org/place/stm-1885-address-2629,2629,F,206,,F206,Groote Dwarsstraat,,,,,,adres,-55.1670437,5.8198258
 stm-1885-address-2631,https://data.surinametijdmachine.org/place/stm-1885-address-2631,2631,A,90,b,A90b,Heerenstraat,,,,,,adres,-55.1538855,5.8268214
 stm-1885-address-2632,https://data.surinametijdmachine.org/place/stm-1885-address-2632,2632,F,,,,Gemenelandsweg,,,,,in 1885 ook F349,wijklabel,-55.1698323,5.8204817
 stm-1885-address-2633,https://data.surinametijdmachine.org/place/stm-1885-address-2633,2633,EBW,,,,Tweede Dwarsstraat,,,,,ook EBW214 in 1885,wijklabel,-55.1444927,5.8313274
@@ -2999,12 +2999,12 @@ stm-1885-address-3035,https://data.surinametijdmachine.org/place/stm-1885-addres
 stm-1885-address-3036,https://data.surinametijdmachine.org/place/stm-1885-address-3036,3036,D,169,,D169,Steenbakkersgracht,,,,,,adres,-55.1632970,5.8255540
 stm-1885-address-3037,https://data.surinametijdmachine.org/place/stm-1885-address-3037,3037,F,18,b,F18b,Saramaccastraat,,,,,,adres,-55.1653397,5.8192306
 stm-1885-address-3038,https://data.surinametijdmachine.org/place/stm-1885-address-3038,3038,F,21,a,F21a,,,,,,,adres,-55.1656928,5.8185328
-stm-1885-address-3039,https://data.surinametijdmachine.org/place/stm-1885-address-3039,3039,F,28,,F28a,Zwartenhovenbrugstraat,,,,,,adres,-55.1659765,5.8190405
+stm-1885-address-3039,https://data.surinametijdmachine.org/place/stm-1885-address-3039,3039,F,28,a,F28a,Zwartenhovenbrugstraat,,,,,,adres,-55.1659765,5.8190405
 stm-1885-address-3040,https://data.surinametijdmachine.org/place/stm-1885-address-3040,3040,F,33,b,F33b,Zwartenhovenbrugstraat,,,,,,adres,-55.1665152,5.8180655
 stm-1885-address-3041,https://data.surinametijdmachine.org/place/stm-1885-address-3041,3041,F,71,b,F71b,Drambrandersgracht,,,,,,adres,-55.1651792,5.8209957
 stm-1885-address-3042,https://data.surinametijdmachine.org/place/stm-1885-address-3042,3042,F,206,b,F206b,Groote Dwarsstraat,,,,,,adres,-55.1670285,5.8199075
-stm-1885-address-3043,https://data.surinametijdmachine.org/place/stm-1885-address-3043,3043,F,,b,F54b,Commissarisstraat,,,,,,wijklabel,-55.1670462,5.8179602
-stm-1885-address-3044,https://data.surinametijdmachine.org/place/stm-1885-address-3044,3044,F,,a,F457a,Molenpad,,,,,,wijklabel,-55.1684705,5.8168669
+stm-1885-address-3043,https://data.surinametijdmachine.org/place/stm-1885-address-3043,3043,F,54,b,F54b,Commissarisstraat,,,,,,adres,-55.1670462,5.8179602
+stm-1885-address-3044,https://data.surinametijdmachine.org/place/stm-1885-address-3044,3044,F,457,a,F457a,Molenpad,,,,,,adres,-55.1684705,5.8168669
 stm-1885-address-3045,https://data.surinametijdmachine.org/place/stm-1885-address-3045,3045,F,454,aa,F454aa,Limesgracht,,,,,,adres,-55.1695219,5.8184023
 stm-1885-address-3046,https://data.surinametijdmachine.org/place/stm-1885-address-3046,3046,F,454,b,F454b,Molenpad,,,,,,adres,-55.1698854,5.8176397
 stm-1885-address-3047,https://data.surinametijdmachine.org/place/stm-1885-address-3047,3047,F,454,c,F454c,Molenpad,,,,,,adres,-55.1699352,5.8176667
@@ -3020,11 +3020,11 @@ stm-1885-address-3056,https://data.surinametijdmachine.org/place/stm-1885-addres
 stm-1885-address-3057,https://data.surinametijdmachine.org/place/stm-1885-address-3057,3057,F,177,b,F177b,Pontenwerfstraat,,,,,,adres,-55.1675910,5.8213435
 stm-1885-address-3058,https://data.surinametijdmachine.org/place/stm-1885-address-3058,3058,F,169,b,F169b,Pontenwerfstraat,,,,,,adres,-55.1687369,5.8219993
 stm-1885-address-3059,https://data.surinametijdmachine.org/place/stm-1885-address-3059,3059,F,128,b,F128b,Nieuwe Dominéstraat,,,,,,adres,-55.1696545,5.8244811
-stm-1885-address-3060,https://data.surinametijdmachine.org/place/stm-1885-address-3060,3060,TBW,150,b,F150b,Nepveustraat,,,,,,adres,-55.1697713,5.8240673
+stm-1885-address-3060,https://data.surinametijdmachine.org/place/stm-1885-address-3060,3060,F,150,b,F150b,Nepveustraat,,,,,,adres,-55.1697713,5.8240673
 stm-1885-address-3061,https://data.surinametijdmachine.org/place/stm-1885-address-3061,3061,F,150,c,F150c,,,,,,,adres,-55.1697015,5.8241582
 stm-1885-address-3062,https://data.surinametijdmachine.org/place/stm-1885-address-3062,3062,F,147,b,F147b,Nepveustraat,,,,,,adres,-55.1701258,5.8234183
 stm-1885-address-3063,https://data.surinametijdmachine.org/place/stm-1885-address-3063,3063,F,256,a,F256a,Pontenwerfstraat,,,,,,adres,-55.1712097,5.8229989
-stm-1885-address-3064,https://data.surinametijdmachine.org/place/stm-1885-address-3064,3064,TBW,349,b,TMW349b,Wanicastraat,,,,,,adres,-55.1764003,5.8163936
+stm-1885-address-3064,https://data.surinametijdmachine.org/place/stm-1885-address-3064,3064,TBW,349,b,TBW349b,Wanicastraat,,,,,,adres,-55.1764003,5.8163936
 stm-1885-address-3065,https://data.surinametijdmachine.org/place/stm-1885-address-3065,3065,TBW,346,a,TBW346a,Molenpad,,,,,,adres,-55.1744737,5.8199066
 stm-1885-address-3066,https://data.surinametijdmachine.org/place/stm-1885-address-3066,3066,TBW,327,b,TBW327b,Verlengde Gemenelandsweg,,,,,,adres,-55.1737454,5.8227719
 stm-1885-address-3067,https://data.surinametijdmachine.org/place/stm-1885-address-3067,3067,TBW,335,b,TBW335b,Wanicastraat,,,,,,adres,-55.1739673,5.8203653
@@ -3092,8 +3092,8 @@ stm-1885-address-3128,https://data.surinametijdmachine.org/place/stm-1885-addres
 stm-1885-address-3129,https://data.surinametijdmachine.org/place/stm-1885-address-3129,3129,TBW,90,b,TBW90b,Koningsstraat,,,,,,adres,-55.1704157,5.8343860
 stm-1885-address-3130,https://data.surinametijdmachine.org/place/stm-1885-address-3130,3130,TBW,97,b,TBW97b,Koningsstraat,,,,,,adres,-55.1714582,5.8349564
 stm-1885-address-3131,https://data.surinametijdmachine.org/place/stm-1885-address-3131,3131,TBW,11,b,TBW11b,Oude laan van Charlesburg,,,,,,adres,-55.1644761,5.8384750
-stm-1885-address-3132,https://data.surinametijdmachine.org/place/stm-1885-address-3132,3132,TBW,6,b,TBW6fb,Weg naar Zee,,,,,,adres,-55.1663162,5.8442506
-stm-1885-address-3133,https://data.surinametijdmachine.org/place/stm-1885-address-3133,3133,TBW,6,a,TBW6fa,Weg naar Zee,,,,,,adres,-55.1663259,5.8439002
+stm-1885-address-3132,https://data.surinametijdmachine.org/place/stm-1885-address-3132,3132,TBW,6,fb,TBW6fb,Weg naar Zee,,,,,,adres,-55.1663162,5.8442506
+stm-1885-address-3133,https://data.surinametijdmachine.org/place/stm-1885-address-3133,3133,TBW,6,fa,TBW6fa,Weg naar Zee,,,,,,adres,-55.1663259,5.8439002
 stm-1885-address-3134,https://data.surinametijdmachine.org/place/stm-1885-address-3134,3134,TBW,6,e,TBW6e,Weg naar Zee,,,,,,adres,-55.1663210,5.8434475
 stm-1885-address-3135,https://data.surinametijdmachine.org/place/stm-1885-address-3135,3135,TBW,6,da,TBW6da,Weg naar Zee,,,,,,adres,-55.1663064,5.8428292
 stm-1885-address-3136,https://data.surinametijdmachine.org/place/stm-1885-address-3136,3136,TBW,6,a,TBW6a,Weg naar Zee,,,,,,adres,-55.1662967,5.8420747

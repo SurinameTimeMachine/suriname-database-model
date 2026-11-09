@@ -5,8 +5,8 @@
 ## What is this?
 
 A point dataset of 3,105 location points of *erven* (urban plots) in Paramaribo, Suriname, in 1885.
-3,002 of them are addresses (`punttype` = `adres`): they carry the 1885 address (district letter +
-house number + optional suffix) and usually the 1885 street name. The remaining 103 are district labels
+3,005 of them are addresses (`punttype` = `adres`): they carry the 1885 address (district letter +
+house number + optional suffix) and usually the 1885 street name. The remaining 100 are district labels
 (`punttype` = `wijklabel`): points with only a district letter, without a house number and sometimes
 without a street name, usually marking a large building or site. Where known, the use or function of the
 plot in 1885 and 1916 is included.
@@ -55,7 +55,7 @@ see also the glossary at the end.
 | `legenda_1885` | legend 1885 | Legend number/letter on the 1885 map |
 | `legenda_1916` | legend 1916 | Legend code on the 1916 map |
 | `redactioneel_commentaar` | editorial comment | Note by the maker, in Dutch, e.g. "Ligging gegokt" (location guessed) |
-| `punttype` | point type | `adres` (address, 3,002) or `wijklabel` (district label, 103: point with only a district letter, without house number; usually a large building or site) |
+| `punttype` | point type | `adres` (address, 3,005) or `wijklabel` (district label, 100: point with only a district letter, without house number; usually a large building or site) |
 | `lon`, `lat` | | Coordinates WGS84 (EPSG:4326), 7 decimals |
 
 ## Streets 1885 and 1916
@@ -134,6 +134,8 @@ relative to each other within a block. The points were placed as follows:
 3. In case of doubt, the Concordans Paramaribo by Dr. Muntjewerff
    (<https://www.concordansparamaribo.info/>) and the *wijkregisters* (district registers) were used to
    determine the position. No data from the concordance itself is included in this dataset.
+   Where possible, present-day plot boundaries as documented in GLIS (the Surinamese land registry)
+   were also taken into account. [TODO: more information on the use of GLIS]
 4. The fields `beschrijving_1885` and `legenda_1885` come from the legend of the 1885 map, and
    `beschrijving_1916` and `legenda_1916` from the 1916–17 map.
 5. The points were made in QGIS between 2021 and 2026 by Thunnis van Oort (ORCID

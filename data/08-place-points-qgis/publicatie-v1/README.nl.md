@@ -4,9 +4,9 @@
 
 ## Wat is dit?
 
-Een puntenbestand van 3.105 locatiepunten van erven in Paramaribo in 1885. 3.002 daarvan zijn adressen
+Een puntenbestand van 3.105 locatiepunten van erven in Paramaribo in 1885. 3.005 daarvan zijn adressen
 (`punttype` = `adres`): ze hebben het adres van 1885 (wijkletter + huisnummer + eventuele toevoeging) en
-meestal de straatnaam van 1885. De overige 103 zijn wijklabels: punten met alleen een wijkletter, zonder
+meestal de straatnaam van 1885. De overige 100 zijn wijklabels: punten met alleen een wijkletter, zonder
 huisnummer en soms zonder straatnaam, meestal bij een groot gebouw of terrein. Waar bekend staat het gebruik
 of de functie van het erf in 1885 en 1916 erbij.
 
@@ -52,7 +52,7 @@ stad op adresniveau mee visualiseren. De dataset hoort bij de Suriname Time Mach
 | `legenda_1885` | Legendanummer/-letter op de kaart van 1885 |
 | `legenda_1916` | Legendacode op de kaart van 1916 |
 | `redactioneel_commentaar` | Opmerking van de maker(s), bijv. "Ligging gegokt" |
-| `punttype` | `adres` (3.002) of `wijklabel` (103: punt met alleen een wijkletter, zonder huisnummer; meestal een groot gebouw of terrein) |
+| `punttype` | `adres` (3.005) of `wijklabel` (100: punt met alleen een wijkletter, zonder huisnummer; meestal een groot gebouw of terrein) |
 | `lon`, `lat` | Coördinaten WGS84 (EPSG:4326), 7 decimalen |
 
 ## Straten 1885 en 1916
@@ -128,7 +128,9 @@ waar de adressen ten opzichte van elkaar in een bouwblok lagen. Zo zijn de punte
    straatlijn, aan de kant van het erf.
 3. Bij twijfel zijn de Concordans Paramaribo van Dr. Muntjewerff
    (<https://www.concordansparamaribo.info/>) en de wijkregisters gebruikt om de positie te bepalen.
-   Gegevens uit de concordans zelf zitten niet in deze dataset.
+   Gegevens uit de concordans zelf zitten niet in deze dataset. Waar mogelijk is ook rekening gehouden
+   met de hedendaagse percelen zoals gedocumenteerd in GLIS (het Surinaamse kadaster).
+   [TODO: nadere informatie over het gebruik van GLIS]
 4. De velden `beschrijving_1885` en `legenda_1885` komen van de legenda van de kaart van 1885, en
    `beschrijving_1916` en `legenda_1916` van de kaart van 1916–17.
 5. De punten zijn tussen 2021 en 2026 door Thunnis van Oort (ORCID [0000-0001-8912-0508](https://orcid.org/0000-0001-8912-0508)) gemaakt in QGIS. De export van 19 juni 2026
