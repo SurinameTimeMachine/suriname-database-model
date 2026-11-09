@@ -99,44 +99,22 @@ Klipstenenstraat, Heiligeweg, Zwartenhovenbrugstraat and Wanicastraat). The reso
 [ddd:011194077](https://resolver.kb.nl/resolve?urn=ddd:011194077:mpeg21)) confirms that this division
 was still in force then ("met behoud van de bestaande indeeling", retaining the existing division).
 
-**Second Outer District (TBW): an estimate based on the sources.** According to the 1860 notification,
-the TBW comprises "alle bebouwde en onbebouwde erven ten westen der Wanicastraat, tot het Stads District
-behoorende" (all built and unbuilt plots west of the Wanicastraat belonging to the town district); in 1837
-it was the plots west of the Wanicastraat and south of the Gemeene Landsweg. Its eastern boundary is
-therefore the Wanicastraat; its northern and western boundaries coincide with the boundary of the
-*stadsdistrict* (town district). Until 1894 that boundary is not defined as a line in the Government
-Gazettes, but only described by the plantations and grounds belonging to it:
+**Second Outer District (TBW): an estimate.** From 1860 the TBW comprised all plots west of the
+Wanicastraat belonging to the *stadsdistrict* (town district). Its outer (northern and western) boundary
+is that of the town district, which was not defined as a line until 1894.[^tbw] The TBW polygon follows
+this later boundary (1894/1916) and is therefore an estimate for 1885: points along the Weg naar Zee, the
+Charlesburg road and the Kwatta road fall outside it, although they may have belonged to the TBW in 1885.
 
-- G.B. 1837 no. 3, art. 4: the town borders on the Divisie Para; the TBW comprises the plots "tot het
-  Stads District zijn behoorende" (belonging to the town district).
-- Publication of 1 March 1842 (G.B. 1842 no. 3), *Reglement op de verdeeling der Kolonie Suriname in
-  Divisiën* (regulation on the division of the colony into divisions), art. 4: the Divisie Para extends
-  "met uitsluiting der Stad Paramaribo en haren omtrek" (excluding the town of Paramaribo and its
-  surroundings) up to the Redoute Purmerend, without defining those surroundings.
-- Royal Decree of 21 December 1862 no. 26, promulgated by resolution of 7 February 1863 (G.B. 1863 no. 3),
-  art. 12 and 16: the town district consists of "de Stad Paramaribo met hare buitenwijken, de grond
-  Hermitage aan het kanaal van Saramacca en de gronden aan den weg van Kwatta tot en met Oldenburg" (the
-  town with its outer districts, the Hermitage estate on the Saramacca canal and the grounds along the
-  road to Kwatta up to and including Oldenburg); the north side of the Kwatta road from the Toevlugt
-  estate onwards belongs to the district Beneden Para.
-
-No further description was found in the Government Gazettes between 1862 and 1894. The first
-description as a line dates from 1894 (Gouvernementsblad 1894, art. 2): the boundary of Paramaribo runs
-along the north side of the Vierde Dwarsstraat or Mahonylaan, the southern boundary of the plantations
-Ma Retraite and Tourtonne, the Sommelsdijkse kreek up to the boundary between Oldenburg and Mon
-Divertissement, then to and along the Kwattaweg "tot aan den eersten rijweg; langs de westelijke zijde
-van den eersten rijweg tot aan den Gemeenen landsweg" (up to the Eerste Rijweg; along the west side of the
-Eerste Rijweg up to the Gemeenelandsweg), from there south to the northern boundary of the Hermitage
-plantation, along that boundary to the Wanicastraat, and via the Wanicastraat and the Dominékreek to the
-river. The inset map *Stadsgrens en verdeeling in Wijken* (town boundary and district division, scale
-1:40,000) in the lower right corner of the 1916–17 map (<https://hdl.handle.net/11245/3.38611>) also
-draws the town boundary around the Second Outer District.
-
-**The northern and western boundaries of the TBW polygon are therefore an estimate**, based on the
-Government Gazettes (1837, 1842, 1863, 1894) and the 1916–17 map. They reflect the later, explicitly
-defined town boundary (1894/1916) and not necessarily that of 1885. Points along the Weg naar Zee, the
-Charlesburg road and the Kwatta road fall outside the drawn polygon, although in 1885 they may well have
-been counted as part of the TBW.
+[^tbw]: Sources: Law of 24 April 1837 (G.B. 1837 no. 3, art. 4: TBW = plots west of the Wanicastraat
+and south of the Gemeene Landsweg); notification of 10 January 1860 (G.B. 1860 no. 1: "alle bebouwde en
+onbebouwde erven ten westen der Wanicastraat, tot het Stads District behoorende"); regulation on the
+divisions of 1 March 1842 (G.B. 1842 no. 3, art. 4: the Divisie Para excludes "de Stad Paramaribo en
+haren omtrek", undefined); Royal Decree of 21 December 1862 no. 26 (G.B. 1863 no. 3, art. 12 and 16: the
+town district is the town with its outer districts, the Hermitage estate and the grounds along the Kwatta
+road up to and including Oldenburg); Gouvernementsblad 1894, art. 2 (first description as a line, a.o.
+"langs de westelijke zijde van den eersten rijweg" between the Kwattaweg and the Gemeenelandsweg); and the
+inset map *Stadsgrens en verdeeling in Wijken* (1:40,000) on the 1916–17 map
+(<https://hdl.handle.net/11245/3.38611>). No description was found for 1862–1894.
 
 The original layer is in Zanderij / Suriname TM (EPSG:31171); the build script converts it to WGS84. As
 a check: 99.9% of the location points fall within the boundary of their own district, except in the
