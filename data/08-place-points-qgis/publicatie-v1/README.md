@@ -134,8 +134,11 @@ relative to each other within a block. The points were placed as follows:
 3. In case of doubt, the Concordans Paramaribo by Dr. Muntjewerff
    (<https://www.concordansparamaribo.info/>) and the *wijkregisters* (district registers) were used to
    determine the position. No data from the concordance itself is included in this dataset.
-   Where possible, present-day plot boundaries as documented in GLIS (the Surinamese land registry)
-   were also taken into account. [TODO: more information on the use of GLIS]
+   Where possible, present-day plot boundaries from the parcel data of the Management Instituut GLIS
+   (MI-GLIS, the Surinamese land registry) were used as a reference for placing points within blocks.
+   This parcel dataset is not publicly available and is not included here; the parcels can be viewed in
+   MI-GLIS Percelen Online
+   (<https://www.arcgis.com/apps/webappviewer/index.html?id=03fcf6e8dc7548c8954a0c918c137214>).
 4. The fields `beschrijving_1885` and `legenda_1885` come from the legend of the 1885 map, and
    `beschrijving_1916` and `legenda_1916` from the 1916–17 map.
 5. The points were made in QGIS between 2021 and 2026 by Thunnis van Oort (ORCID

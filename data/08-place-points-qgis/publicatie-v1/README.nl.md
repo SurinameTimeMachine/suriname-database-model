@@ -128,9 +128,11 @@ waar de adressen ten opzichte van elkaar in een bouwblok lagen. Zo zijn de punte
    straatlijn, aan de kant van het erf.
 3. Bij twijfel zijn de Concordans Paramaribo van Dr. Muntjewerff
    (<https://www.concordansparamaribo.info/>) en de wijkregisters gebruikt om de positie te bepalen.
-   Gegevens uit de concordans zelf zitten niet in deze dataset. Waar mogelijk is ook rekening gehouden
-   met de hedendaagse percelen zoals gedocumenteerd in GLIS (het Surinaamse kadaster).
-   [TODO: nadere informatie over het gebruik van GLIS]
+   Gegevens uit de concordans zelf zitten niet in deze dataset. Waar mogelijk zijn ook de hedendaagse
+   percelen uit de perceeldata van het Management Instituut GLIS (MI-GLIS, het Surinaamse kadaster)
+   gebruikt als referentie voor de plaatsing binnen blokken. Deze perceeldataset is niet openbaar en
+   zit niet in deze dataset; de percelen zijn te bekijken in MI-GLIS Percelen Online
+   (<https://www.arcgis.com/apps/webappviewer/index.html?id=03fcf6e8dc7548c8954a0c918c137214>).
 4. De velden `beschrijving_1885` en `legenda_1885` komen van de legenda van de kaart van 1885, en
    `beschrijving_1916` en `legenda_1916` van de kaart van 1916–17.
 5. De punten zijn tussen 2021 en 2026 door Thunnis van Oort (ORCID [0000-0001-8912-0508](https://orcid.org/0000-0001-8912-0508)) gemaakt in QGIS. De export van 19 juni 2026
