@@ -76,10 +76,14 @@ van de 1885-laag zegt dus niets over de exacte ligging van straten in 1885.
 ## Wijkgrenzen 1885
 
 `wijkgrenzen_paramaribo_1885.geojson` bevat de grenzen van de zes binnenwijken (A–F) en de twee
-buitenwijken (EBW, TBW), met het veld `wijk_1885`. De grenzen zijn mogelijk gebaseerd op de
-wijkverdeling die het gouvernement in december 1869 publiceerde (*Surinaamsche Courant*,
-Gouvernementsadvertentieblad, publicatie van 18 december 1869 no. 5; Delpher
-[ddd:011194077](https://resolver.kb.nl/resolve?urn=ddd:011194077:mpeg21)). Die herkomst is niet zeker.
+buitenwijken (EBW, TBW), met het veld `wijk_1885`. Waar de grenzen precies op zijn gebaseerd is niet
+vastgelegd. Mogelijk volgen ze de indeling van de bladen van Meyer (1885): elk blad beslaat één
+wijk, en de catalogus beschrijft de grenzen (bijv. wijk A: Waterkant, Heiligeweg, Klipstenenstraat, Laan van
+Tourtonne, Sommelsdijckse kreek, Grote en Kleine Combéweg). De wijkindeling zelf is ouder: een
+gouvernementsresolutie van 18 december 1869 (*Surinaamsche Courant*, Gouvernementsadvertentieblad; Delpher
+[ddd:011194077](https://resolver.kb.nl/resolve?urn=ddd:011194077:mpeg21)) noemt dezelfde acht wijken
+"met behoud van de bestaande indeeling" en verwijst naar publicaties uit 1834, 1837 en 1850. Die resolutie
+beschrijft zelf geen grenzen.
 
 De oorspronkelijke laag staat in Zanderij / Suriname TM (EPSG:31171). Het build-script zet hem om naar
 WGS84. Ter controle: van de locatiepunten valt 99,9% binnen de grens van hun eigen wijk, met
