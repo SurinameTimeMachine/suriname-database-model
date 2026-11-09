@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+message: "Gebruik je deze dataset? Citeer hem dan zo."
+title: "Locatiepunten Paramaribo 1885"
+type: dataset
+version: "1.0-concept"
+date-released: "2026-12-15"   # TODO
+authors:
+  - family-names: "van Oort"
+    given-names: "Thunnis"
+    email: "thunnis.van.oort@huygens.knaw.nl"
+    affiliation: "KNAW Humanities Cluster, Huygens Instituut"
+    orcid: "https://orcid.org/0000-0001-8912-0508"
+license: CC-BY-4.0
+repository-code: "https://github.com/SurinameTimeMachine/suriname-database-model"
+url: "https://dataverse.nl/dataverse/HDSC"   # TODO vervangen door DOI-landingspagina
+keywords: [Paramaribo, Suriname, 1885, adressen, historische geografie, gazetteer]
+references:
+  - type: map
+    title: "Figuratieve plattegrond der stad Paramaribo"
+    authors:
+      - name: "A.J. Meyer"
+    year: 1885
+    url: "https://hdl.handle.net/11245/3.39624"
+  - type: map
+    title: "Paramaribo"
+    authors:
+      - name: "Opnemingsdienst van Suriname"
+    year: 1917
+    url: "https://hdl.handle.net/11245/3.38611"
