@@ -13,7 +13,7 @@ authors:
 license: CC-BY-4.0
 repository-code: "https://github.com/SurinameTimeMachine/suriname-database-model"
 url: "https://dataverse.nl/dataverse/HDSC"   # TODO vervangen door DOI-landingspagina
-keywords: [Paramaribo, Suriname, 1885, adressen, historische geografie, gazetteer]
+keywords: [Paramaribo, Suriname, "1885", adressen, historische geografie, gazetteer]
 references:
   - type: map
     title: "Figuratieve plattegrond der stad Paramaribo"

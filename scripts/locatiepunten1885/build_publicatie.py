@@ -42,10 +42,12 @@ FIELDS = [
 
 
 def t(v):
+    """Maak een veldwaarde tekst: None wordt leeg, witruimte wordt genormaliseerd."""
     return "" if v is None else " ".join(str(v).split())
 
 
 def main():
+    """Bouw de CSV en GeoJSON van de locatiepunten, met de correcties uit de moduledocstring."""
     feats = json.loads(SRC.read_text(encoding="utf-8"))["features"]
     rows, out_feats, dropped = [], [], {"geen_geometrie": [], "geen_wijk": []}
     for fid, f in enumerate(feats, 1):

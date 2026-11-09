@@ -4,9 +4,11 @@
 
 ## Wat is dit?
 
-Een puntenbestand van 3.105 locatiepunten van erven (adressen) in Paramaribo in 1885. Elk punt
-heeft het adres van 1885 (wijkletter + huisnummer + eventuele toevoeging), de straatnaam van 1885
-en, waar bekend, het gebruik of de functie van het erf in 1885 en 1916.
+Een puntenbestand van 3.105 locatiepunten van erven in Paramaribo in 1885. 3.002 daarvan zijn adressen
+(`punttype` = `adres`): ze hebben het adres van 1885 (wijkletter + huisnummer + eventuele toevoeging) en
+meestal de straatnaam van 1885. De overige 103 zijn wijklabels: punten met alleen een wijkletter, zonder
+huisnummer en soms zonder straatnaam, meestal bij een groot gebouw of terrein. Waar bekend staat het gebruik
+of de functie van het erf in 1885 en 1916 erbij.
 
 De punten zijn gebaseerd op de *Figuratieve plattegrond der stad Paramaribo* door A.J. Meyer
 (Paramaribo, 1885; Allard Pierson, Universiteit van Amsterdam, HB-KZL 108.03.21,
@@ -87,7 +89,10 @@ waar de adressen ten opzichte van elkaar in een bouwblok lagen. Zo zijn de punte
    ongewijzigd bewaard.
 
 Het veld `punttype` is afgeleid uit de eigen adresvelden van de punten. De `lp_id`'s komen overeen met
-de records van het type `historical-address` in de STM-gazetteer.
+de records van het type `historical-address` in de STM-gazetteer. Let op: de gazetteer bevat (nog) de
+oorspronkelijke adressen uit de QGIS-export en ook de punten die hier zijn weggelaten. Voor de zes punten
+met een a/b-correctie (B230, B258, E42) geeft een koppeling op `lp_id` daarom een ander adres dan in
+deze dataset.
 
 ## Nauwkeurigheid: lees dit voor gebruik
 
