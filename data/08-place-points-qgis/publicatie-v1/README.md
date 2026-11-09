@@ -1,209 +1,240 @@
-# Locatiepunten Paramaribo 1885
+# Locatiepunten Paramaribo 1885 (Paramaribo address locations, 1885)
 
-**Versie 1.0 (concept, 9 november 2026). De DOI volgt na publicatie in DataverseNL.**
+**Version 1.0 (draft, 9 November 2026). The DOI will follow after publication in DataverseNL.**
 
-## Wat is dit?
+## What is this?
 
-Een puntenbestand van 3.105 locatiepunten van erven in Paramaribo in 1885. 3.002 daarvan zijn adressen
-(`punttype` = `adres`): ze hebben het adres van 1885 (wijkletter + huisnummer + eventuele toevoeging) en
-meestal de straatnaam van 1885. De overige 103 zijn wijklabels: punten met alleen een wijkletter, zonder
-huisnummer en soms zonder straatnaam, meestal bij een groot gebouw of terrein. Waar bekend staat het gebruik
-of de functie van het erf in 1885 en 1916 erbij.
+A point dataset of 3,105 location points of *erven* (urban plots) in Paramaribo, Suriname, in 1885.
+3,002 of them are addresses (`punttype` = `adres`): they carry the 1885 address (district letter +
+house number + optional suffix) and usually the 1885 street name. The remaining 103 are district labels
+(`punttype` = `wijklabel`): points with only a district letter, without a house number and sometimes
+without a street name, usually marking a large building or site. Where known, the use or function of the
+plot in 1885 and 1916 is included.
 
-De punten zijn gebaseerd op de *Figuratieve plattegrond der stad Paramaribo* door A.J. Meyer
-(Paramaribo, 1885; Allard Pierson, Universiteit van Amsterdam, HB-KZL 108.03.21,
-<https://hdl.handle.net/11245/3.39624>). Belastingambtenaar Meyer tekende in negen bladen alle erven
-in de stad en de 604 erven in de twee buitenwijken, soms met hun gebruik. Voor zover bekend is dit de
-oudste bron die exacte adressen op de plattegrond van Paramaribo weergeeft.
+The points are based on the *Figuratieve plattegrond der stad Paramaribo* ("Figurative plan of the town
+of Paramaribo") by A.J. Meyer (Paramaribo, 1885; Allard Pierson, University of Amsterdam,
+HB-KZL 108.03.21, <https://hdl.handle.net/11245/3.39624>). Meyer, a tax official, drew on nine sheets
+all plots in the town and the 604 plots in the two outer districts, sometimes with their use. As far as
+we know, this is the oldest source that shows exact addresses on a plan of Paramaribo.
 
-Met de punten kun je historische adressen uit Surinaamse bronnen (wijkregisters, burgerlijke stand,
-almanakken, volkstellingen) bij benadering op de kaart zetten. Je kunt er ook gegevens over de hele
-stad op adresniveau mee visualiseren. De dataset hoort bij de Suriname Time Machine
-(<https://www.surinametijdmachine.org>).
+With these points you can approximately map historical addresses from Surinamese sources (district
+registers, civil registers, almanacs, censuses), and visualise city-wide data at address level. The
+dataset is part of the Suriname Time Machine (<https://www.surinametijdmachine.org>).
 
-## Bestanden
+The data files keep their original Dutch field names and values. This README explains them in English;
+see also the glossary at the end.
 
-| Bestand | Inhoud |
+## Files
+
+| File | Contents |
 |---|---|
-| `data/locatiepunten_paramaribo_1885.csv` | Eén rij per punt, coördinaten in WGS84 (lon/lat), UTF-8 |
-| `data/locatiepunten_paramaribo_1885.geojson` | Dezelfde gegevens als GeoJSON (RFC 7946, CRS84) |
-| `data/straten_paramaribo_1885.geojson` | Straatlijnen volgens de kaart van 1885 (171 segmenten) |
-| `data/straten_paramaribo_1916.geojson` | Straatlijnen volgens de kaart van 1916–17 (165 segmenten) |
-| `data/wijkgrenzen_paramaribo_1885.geojson` | Grenzen van de 8 wijken van 1885 (A–F, EBW, TBW) |
-| `README.md` | Deze beschrijving |
-| `CITATION.cff` | Citeerinformatie |
-| `docs/voorbeeld_blad74_wijkA_HB-KZL-108-03-21.jpg` | Voorbeeld: blad 74 (wijk A) van de kaart van 1885, Allard Pierson UvA |
+| `data/locatiepunten_paramaribo_1885.csv` | One row per point, WGS84 coordinates (lon/lat), UTF-8 |
+| `data/locatiepunten_paramaribo_1885.geojson` | The same data as GeoJSON (RFC 7946, CRS84) |
+| `data/straten_paramaribo_1885.geojson` | Street lines according to the 1885 map (171 segments) |
+| `data/straten_paramaribo_1916.geojson` | Street lines according to the 1916–17 map (165 segments) |
+| `data/wijkgrenzen_paramaribo_1885.geojson` | Boundaries of the 8 districts (*wijken*) of 1885 (A–F, EBW, TBW) |
+| `README.md` | This description |
+| `CITATION.cff` | Citation information |
+| `docs/voorbeeld_blad74_wijkA_HB-KZL-108-03-21.jpg` | Example: sheet 74 (district A) of the 1885 map, Allard Pierson UvA |
 
-## Velden
+## Fields (location points)
 
-| Veld | Beschrijving |
-|---|---|
-| `lp_id` | Vaste identifier, `stm-1885-address-NNNN` (NNNN = volgorde in het bronbestand) |
-| `uri` | URI in de STM-gazetteer: `https://data.surinametijdmachine.org/place/{lp_id}` |
-| `bron_fid` | Volgnummer van het punt in het oorspronkelijke QGIS-bestand (export 19-06-2026). Weggelaten punten laten een gat in de nummering |
-| `wijk_1885` | Wijkletter 1885 (A–F) of buitenwijk (EBW = Eerste Buitenwijk, TBW = Tweede Buitenwijk) |
-| `huisnummer_1885` | Huisnummer 1885 |
-| `toevoeging_1885` | Toevoeging (a, b, c ...) |
-| `adres_1885` | Samengesteld adres 1885, bijv. `A44` |
-| `straatnaam_1885` | Straatnaam volgens de kaart van 1885 |
-| `beschrijving_1885` | Functie/gebouw volgens de legenda van de kaart van 1885 |
-| `beschrijving_1916` | Functie/gebouw volgens de kaart Paramaribo 1916–17 (Opnemingsdienst van Suriname) |
-| `legenda_1885` | Legendanummer/-letter op de kaart van 1885 |
-| `legenda_1916` | Legendacode op de kaart van 1916 |
-| `redactioneel_commentaar` | Opmerking van de maker(s), bijv. "Ligging gegokt" |
-| `punttype` | `adres` (3.002) of `wijklabel` (103: punt met alleen een wijkletter, zonder huisnummer; meestal een groot gebouw of terrein) |
-| `lon`, `lat` | Coördinaten WGS84 (EPSG:4326), 7 decimalen |
+| Field | English | Description |
+|---|---|---|
+| `lp_id` | location point id | Persistent identifier, `stm-1885-address-NNNN` (NNNN = order in the source file) |
+| `uri` | URI | URI in the STM gazetteer: `https://data.surinametijdmachine.org/place/{lp_id}` |
+| `bron_fid` | source fid | Sequence number of the point in the original QGIS file (export 19-06-2026). Omitted points leave a gap in the numbering |
+| `wijk_1885` | district 1885 | District letter 1885 (A–F) or outer district (EBW = *Eerste Buitenwijk*, First Outer District; TBW = *Tweede Buitenwijk*, Second Outer District) |
+| `huisnummer_1885` | house number 1885 | House number 1885 |
+| `toevoeging_1885` | suffix 1885 | Suffix (a, b, c ...) |
+| `adres_1885` | address 1885 | Combined 1885 address, e.g. `A44` |
+| `straatnaam_1885` | street name 1885 | Street name according to the 1885 map |
+| `beschrijving_1885` | description 1885 | Function/building according to the legend of the 1885 map (in Dutch) |
+| `beschrijving_1916` | description 1916 | Function/building according to the map *Paramaribo* 1916–17 (Opnemingsdienst van Suriname, Survey Department of Suriname) (in Dutch) |
+| `legenda_1885` | legend 1885 | Legend number/letter on the 1885 map |
+| `legenda_1916` | legend 1916 | Legend code on the 1916 map |
+| `redactioneel_commentaar` | editorial comment | Note by the maker, in Dutch, e.g. "Ligging gegokt" (location guessed) |
+| `punttype` | point type | `adres` (address, 3,002) or `wijklabel` (district label, 103: point with only a district letter, without house number; usually a large building or site) |
+| `lon`, `lat` | | Coordinates WGS84 (EPSG:4326), 7 decimals |
 
-## Straten 1885 en 1916
+## Streets 1885 and 1916
 
-Twee lijnenbestanden geven het stratenplan volgens de kaarten van 1885 en 1916–17, als context bij de
-locatiepunten. Velden:
+Two line files give the street plan according to the maps of 1885 and 1916–17, as context for the
+location points. Fields:
 
-| Veld | Beschrijving |
-|---|---|
-| `straat_id` | Identifier per segment, `stm-1885-street-NNN` of `stm-1916-street-NNN` (NNN = volgorde in de bron) |
-| `naam` | Straatnaam zoals op de kaart. `[naamloos]` = op de kaart zonder naam; leeg = naam niet ingevoerd |
-| `kaartjaar` | 1885 of 1916 |
-| `bron_fid` | Volgnummer in het oorspronkelijke QGIS-bestand |
+| Field | English | Description |
+|---|---|---|
+| `straat_id` | street id | Identifier per segment, `stm-1885-street-NNN` or `stm-1916-street-NNN` (NNN = order in the source) |
+| `naam` | name | Street name as on the map. `[naamloos]` (nameless) = street shown on the map without a name; empty = name not entered |
+| `kaartjaar` | map year | 1885 or 1916 |
+| `bron_fid` | source fid | Sequence number in the original QGIS file |
 
-Een straat kan uit meerdere segmenten bestaan. In de laag van 1885 hebben 45 van de 171 segmenten
-geen naam ingevoerd. Drie lijnen uit het bronbestand zijn weggelaten: één zonder coördinaten
-(bron_fid 3, Weg naar Zee) en twee exacte dubbelingen van de Noorderkerkstraat (bron_fid 171 en 172);
-de nummering van de overige id's is daardoor niet veranderd.
+A street can consist of several segments. In the 1885 layer, 45 of the 171 segments have no name
+entered. Three lines from the source file were omitted: one without coordinates (bron_fid 3, Weg naar
+Zee) and two exact duplicates of the Noorderkerkstraat (bron_fid 171 and 172); the numbering of the
+other ids is unchanged.
 
-**Let op:** de lijnen van 1885 volgen het stratenplan van 1916–17. Omdat de kaart van 1885 schematisch
-is, zijn alleen de straatnamen van die kaart overgenomen en op de straten van 1916 gezet. De geometrie
-van de 1885-laag zegt dus niets over de exacte ligging van straten in 1885.
+**Note:** the 1885 lines follow the 1916–17 street plan. Because the 1885 map is schematic, only its
+street names were taken over and placed on the 1916 streets. The geometry of the 1885 layer therefore
+says nothing about the exact position of streets in 1885.
 
-## Wijkgrenzen 1885
+## District boundaries 1885
 
-`wijkgrenzen_paramaribo_1885.geojson` bevat de grenzen van de zes binnenwijken (A–F) en de twee
-buitenwijken (EBW, TBW), met het veld `wijk_1885`. Wie de polygonen heeft getekend, is niet bekend.
+`wijkgrenzen_paramaribo_1885.geojson` contains the boundaries of the six inner districts (*binnenwijken*
+A–F) and the two outer districts (*buitenwijken* EBW and TBW), with the field `wijk_1885`. It is not known
+who drew the polygons.
 
-**Binnenwijken A–F en Eerste Buitenwijk: grenzen volgens de bron.** Deze grenzen volgen de
-*Wet van den 24sten April 1837, houdende voorbereidende bepalingen tot invoering eener nieuwe
-Wijkverdeeling voor de Stad Paramaribo en haren omtrek* (Gouvernementsblad Suriname 1837 no. 3, art. 3
-en 4). Daarin worden de wijken met straten en waterlopen omschreven, bijvoorbeeld wijk A: ten oosten de
-rivier Suriname, ten noorden de Sommelsdijkse kreek tot de Laan van Tourtonne, ten westen de Heiligeweg
-(met de Knuffelsgracht) en ten zuiden de Klipstenenstraat. De Eerste Buitenwijk (Combé) wordt ten
-oosten en noorden begrensd door de rivier Suriname en de Divisie Para. Bij notificatie van 10 januari
-1860 (G.B. 1860 no. 1) is de zuidgrens van wijk F verlegd naar de Dominékreek. Een controle tegen het
-stratenplan van 1916 bevestigt de grenzen die we konden toetsen (Keizerstraat, Klipstenenstraat,
-Heiligeweg, Zwartenhovenbrugstraat en Wanicastraat). De resolutie van 18 december 1869 (*Surinaamsche
-Courant*, Gouvernementsadvertentieblad; Delpher
-[ddd:011194077](https://resolver.kb.nl/resolve?urn=ddd:011194077:mpeg21)) bevestigt dat deze indeling
-toen nog gold ("met behoud van de bestaande indeeling").
+**Inner districts A–F and First Outer District: boundaries according to the source.** These boundaries
+follow the *Wet van den 24sten April 1837, houdende voorbereidende bepalingen tot invoering eener nieuwe
+Wijkverdeeling voor de Stad Paramaribo en haren omtrek* (Law of 24 April 1837 on a new district division
+of the town of Paramaribo and its surroundings; *Gouvernementsblad* (Government Gazette) Suriname 1837
+no. 3, art. 3 and 4). It describes the districts by streets and waterways; for example district A: to the
+east the Suriname river, to the north the Sommelsdijkse kreek up to the Laan van Tourtonne, to the west the
+Heiligeweg (including the Knuffelsgracht) and to the south the Klipstenenstraat. The First Outer District
+(Combé) is bounded to the east and north by the Suriname river and the *Divisie Para* (Para division). By
+notification of 10 January 1860 (G.B. 1860 no. 1) the southern boundary of district F was moved to the
+Dominékreek. A check against the 1916 street plan confirms the boundaries we could test (Keizerstraat,
+Klipstenenstraat, Heiligeweg, Zwartenhovenbrugstraat and Wanicastraat). The resolution of 18 December
+1869 (*Surinaamsche Courant*, Government advertisement section; Delpher
+[ddd:011194077](https://resolver.kb.nl/resolve?urn=ddd:011194077:mpeg21)) confirms that this division
+was still in force then ("met behoud van de bestaande indeeling", retaining the existing division).
 
-**Tweede Buitenwijk (TBW): een inschatting op basis van de bronnen.** Volgens de notificatie van 1860
-omvat de TBW "alle bebouwde en onbebouwde erven ten westen der Wanicastraat, tot het Stads District
-behoorende" (in 1837 nog: ten westen van de Wanicastraat en ten zuiden van de Gemeene Landsweg). De
-oostgrens is dus de Wanicastraat; de noord- en westgrens vallen samen met de grens van het
-stadsdistrict. Die grens is in de Gouvernementsbladen nergens als lijn vastgelegd, maar alleen
-omschreven aan de hand van gronden en plantages:
+**Second Outer District (TBW): an estimate based on the sources.** According to the 1860 notification,
+the TBW comprises "alle bebouwde en onbebouwde erven ten westen der Wanicastraat, tot het Stads District
+behoorende" (all built and unbuilt plots west of the Wanicastraat belonging to the town district); in 1837
+it was the plots west of the Wanicastraat and south of the Gemeene Landsweg. Its eastern boundary is
+therefore the Wanicastraat; its northern and western boundaries coincide with the boundary of the
+*stadsdistrict* (town district). Until 1894 that boundary is not defined as a line in the Government
+Gazettes, but only described by the plantations and grounds belonging to it:
 
-- G.B. 1837 no. 3, art. 4: de stad grenst aan de Divisie Para; de TBW omvat de erven "tot het Stads
-  District zijn behoorende".
-- Publicatie van 1 maart 1842 (G.B. 1842 no. 3), *Reglement op de verdeeling der Kolonie Suriname in
-  Divisiën*, art. 4: de Divisie Para loopt "met uitsluiting der Stad Paramaribo en haren omtrek" tot
-  aan de Redoute Purmerend, zonder dat die omtrek wordt omschreven.
-- Koninklijk Besluit van 21 december 1862 no. 26, afgekondigd bij resolutie van 7 februari 1863
-  (G.B. 1863 no. 3), art. 12 en 16: het stadsdistrict bestaat uit "de Stad Paramaribo met hare
-  buitenwijken, de grond Hermitage aan het kanaal van Saramacca en de gronden aan den weg van Kwatta
-  tot en met Oldenburg"; de noordzijde van de weg naar Kwatta vanaf de grond Toevlugt hoort bij het
-  district Beneden Para.
+- G.B. 1837 no. 3, art. 4: the town borders on the Divisie Para; the TBW comprises the plots "tot het
+  Stads District zijn behoorende" (belonging to the town district).
+- Publication of 1 March 1842 (G.B. 1842 no. 3), *Reglement op de verdeeling der Kolonie Suriname in
+  Divisiën* (regulation on the division of the colony into divisions), art. 4: the Divisie Para extends
+  "met uitsluiting der Stad Paramaribo en haren omtrek" (excluding the town of Paramaribo and its
+  surroundings) up to the Redoute Purmerend, without defining those surroundings.
+- Royal Decree of 21 December 1862 no. 26, promulgated by resolution of 7 February 1863 (G.B. 1863 no. 3),
+  art. 12 and 16: the town district consists of "de Stad Paramaribo met hare buitenwijken, de grond
+  Hermitage aan het kanaal van Saramacca en de gronden aan den weg van Kwatta tot en met Oldenburg" (the
+  town with its outer districts, the Hermitage estate on the Saramacca canal and the grounds along the
+  road to Kwatta up to and including Oldenburg); the north side of the Kwatta road from the Toevlugt
+  estate onwards belongs to the district Beneden Para.
 
-Tussen 1862 en 1894 is in de Gouvernementsbladen geen nadere omschrijving gevonden. De eerste
-omschrijving als lijn dateert van 1894 (Gouvernementsblad 1894, art. 2): de grens van Paramaribo loopt
-langs de noordzijde van de Vierde Dwarsstraat of Mahonylaan, de zuidgrens van de plantages Ma Retraite en
-Tourtonne, de Sommelsdijkse kreek tot de grens tussen Oldenburg en Mon Divertissement, dan naar en langs
-de Kwattaweg "tot aan den eersten rijweg; langs de westelijke zijde van den eersten rijweg tot aan den
-Gemeenen landsweg", vandaar zuidwaarts tot de noordgrens van de plantage Hermitage, langs die grens naar
-de Wanicastraat en via de Wanicastraat en de Dominékreek naar de rivier. Ook het inzetkaartje
-*Stadsgrens en verdeeling in Wijken* (schaal 1:40.000) rechtsonder op de kaart van 1916–17
-(<https://hdl.handle.net/11245/3.38611>) tekent de stadsgrens rond de 2e Buitenwijk.
+No further description was found in the Government Gazettes between 1862 and 1894. The first
+description as a line dates from 1894 (Gouvernementsblad 1894, art. 2): the boundary of Paramaribo runs
+along the north side of the Vierde Dwarsstraat or Mahonylaan, the southern boundary of the plantations
+Ma Retraite and Tourtonne, the Sommelsdijkse kreek up to the boundary between Oldenburg and Mon
+Divertissement, then to and along the Kwattaweg "tot aan den eersten rijweg; langs de westelijke zijde
+van den eersten rijweg tot aan den Gemeenen landsweg" (up to the Eerste Rijweg; along the west side of the
+Eerste Rijweg up to the Gemeenelandsweg), from there south to the northern boundary of the Hermitage
+plantation, along that boundary to the Wanicastraat, and via the Wanicastraat and the Dominékreek to the
+river. The inset map *Stadsgrens en verdeeling in Wijken* (town boundary and district division, scale
+1:40,000) in the lower right corner of the 1916–17 map (<https://hdl.handle.net/11245/3.38611>) also
+draws the town boundary around the Second Outer District.
 
-**De noord- en westgrens van de TBW-polygoon zijn daarom een inschatting** op basis van de
-Gouvernementsbladen (1837, 1842, 1863, 1894) en de kaart van 1916–17. Ze geven de latere, wel
-omschreven stadsgrens (1894/1916) weer en niet per se die van 1885. Punten langs de Weg naar Zee, de
-Charlesburgweg en de weg naar Kwatta vallen buiten de getekende polygoon, terwijl ze in 1885 mogelijk wel
-tot de TBW werden gerekend.
+**The northern and western boundaries of the TBW polygon are therefore an estimate**, based on the
+Government Gazettes (1837, 1842, 1863, 1894) and the 1916–17 map. They reflect the later, explicitly
+defined town boundary (1894/1916) and not necessarily that of 1885. Points along the Weg naar Zee, the
+Charlesburg road and the Kwatta road fall outside the drawn polygon, although in 1885 they may well have
+been counted as part of the TBW.
 
-De oorspronkelijke laag staat in Zanderij / Suriname TM (EPSG:31171). Het build-script zet hem om naar
-WGS84. Ter controle: van de locatiepunten valt 99,9% binnen de grens van hun eigen wijk, met
-uitzondering van de Tweede Buitenwijk. **In de Tweede Buitenwijk (TBW) liggen 45 van de 441 punten
-buiten de getekende wijkgrens**, omdat de punten daar ruimer zijn geplaatst en de grens een inschatting is.
+The original layer is in Zanderij / Suriname TM (EPSG:31171); the build script converts it to WGS84. As
+a check: 99.9% of the location points fall within the boundary of their own district, except in the
+Second Outer District. **In the TBW, 45 of the 441 points lie outside the drawn district boundary**,
+because the points there were placed more widely and the boundary is an estimate.
 
-## Hoe is de dataset gemaakt?
+## How was the dataset made?
 
-De kaart van Meyer is schematisch: de erven zijn niet op schaal getekend. De huisnummers laten wel zien
-waar de adressen ten opzichte van elkaar in een bouwblok lagen. Zo zijn de punten geplaatst:
+Meyer's map is schematic: the plots are not drawn to scale. The house numbers do show where addresses lay
+relative to each other within a block. The points were placed as follows:
 
-1. De schematische kaart van 1885 is gelegd over de veel nauwkeurigere kaart *Paramaribo* van
-   1916–17, vervaardigd door den Opnemingsdienst van Suriname (<https://hdl.handle.net/11245/3.38611>).
-2. Per bouwblok zijn de adressen op volgorde langs de straat gezet. Elk punt staat net achter de
-   straatlijn, aan de kant van het erf.
-3. Bij twijfel zijn de Concordans Paramaribo van Dr. Muntjewerff
-   (<https://www.concordansparamaribo.info/>) en de wijkregisters gebruikt om de positie te bepalen.
-   Gegevens uit de concordans zelf zitten niet in deze dataset.
-4. De velden `beschrijving_1885` en `legenda_1885` komen van de legenda van de kaart van 1885, en
-   `beschrijving_1916` en `legenda_1916` van de kaart van 1916–17.
-5. De punten zijn tussen 2021 en 2026 door Thunnis van Oort (ORCID [0000-0001-8912-0508](https://orcid.org/0000-0001-8912-0508)) gemaakt in QGIS. De export van 19 juni 2026
-   (`data/08-place-points-qgis/export20260619/locatiepunten1885.geojson` in de repository
-   `SurinameTimeMachine/suriname-database-model`) is de basis van deze versie en blijft daar
-   ongewijzigd bewaard.
+1. The schematic 1885 map was laid over the much more accurate map *Paramaribo* of 1916–17, made by the
+   Opnemingsdienst van Suriname (Survey Department of Suriname) (<https://hdl.handle.net/11245/3.38611>).
+2. Within each block, the addresses were placed in order along the street. Each point lies just behind
+   the street line, on the plot side.
+3. In case of doubt, the Concordans Paramaribo by Dr. Muntjewerff
+   (<https://www.concordansparamaribo.info/>) and the *wijkregisters* (district registers) were used to
+   determine the position. No data from the concordance itself is included in this dataset.
+4. The fields `beschrijving_1885` and `legenda_1885` come from the legend of the 1885 map, and
+   `beschrijving_1916` and `legenda_1916` from the 1916–17 map.
+5. The points were made in QGIS between 2021 and 2026 by Thunnis van Oort (ORCID
+   [0000-0001-8912-0508](https://orcid.org/0000-0001-8912-0508)). The export of 19 June 2026
+   (`data/08-place-points-qgis/export20260619/locatiepunten1885.geojson` in the repository
+   `SurinameTimeMachine/suriname-database-model`) is the basis of this version and is kept there unchanged.
 
-Het veld `punttype` is afgeleid uit de eigen adresvelden van de punten. De `lp_id`'s komen overeen met
-de records van het type `historical-address` in de STM-gazetteer. Let op: de gazetteer bevat (nog) de
-oorspronkelijke adressen uit de QGIS-export en ook de punten die hier zijn weggelaten. Voor de zes punten
-met een a/b-correctie (B230, B258, E42) geeft een koppeling op `lp_id` daarom een ander adres dan in
-deze dataset.
+The field `punttype` is derived from the points' own address fields. The `lp_id`s correspond to the
+records of type `historical-address` in the STM gazetteer. Note: the gazetteer (still) contains the
+original addresses from the QGIS export, including the points omitted here. For the six points with an
+a/b correction (B230, B258, E42), a join on `lp_id` therefore gives a different address than in this
+dataset.
 
-## Nauwkeurigheid: lees dit voor gebruik
+## Accuracy: read this before use
 
-- **De punten zijn benaderingen en geen gemeten posities.** Ze geven aan waar een adres ongeveer lag en
-  hoe adressen in een blok ten opzichte van elkaar lagen.
-- In het centrum zijn de punten nauwkeuriger dan in de buitenwijken (EBW, TBW). Daar is de precieze
-  ligging van een adres soms niet bekend. Zie ook `redactioneel_commentaar`, bijvoorbeeld "Ligging gegokt".
-- De dataset zegt niets over de grootte van een perceel of het aantal woningen per erf. Vooral in de
-  binnenstad stonden op één erf vaak meerdere woningen, onder andere voormalige slavenwoningen op de
-  achtererven.
-- Voor het ongeveer lokaliseren van adressen en voor visualisaties op stadsniveau is de nauwkeurigheid
-  voldoende. Voor analyses op perceel- of meterniveau is de dataset niet geschikt.
+- **The points are approximations, not surveyed positions.** They show roughly where an address lay and
+  how addresses within a block lay relative to each other.
+- The points are more accurate in the centre than in the outer districts (EBW, TBW), where the exact
+  position of an address is sometimes unknown. See also `redactioneel_commentaar`, e.g. "Ligging gegokt"
+  (location guessed).
+- The dataset says nothing about plot size or the number of dwellings per plot. Especially in the inner
+  town, one plot often held several dwellings, including former slave quarters on the back plots.
+- The accuracy is sufficient for approximately locating addresses and for city-level visualisations. The
+  dataset is not suitable for analyses at plot or metre level.
 
-## Correcties ten opzichte van de QGIS-export
+## Corrections compared to the QGIS export
 
-Het script `scripts/locatiepunten1885/build_publicatie.py` in de repository maakt deze bestanden uit
-de ongewijzigde QGIS-export. Daarbij zijn de volgende correcties gedaan:
+The script `scripts/locatiepunten1885/build_publicatie.py` in the repository builds these files from the
+unchanged QGIS export. The following corrections were made:
 
-- 2 punten zonder geometrie zijn weggelaten (fid 2627 en 2630).
-- 36 punten zonder wijkletter zijn weggelaten. Het gaat om 33 annotaties van de kaart van 1916, zoals
-  plantages en instellingen aan de rand van de stad, en 3 lege punten.
-- Voor B230, B258 en E42 stonden twee punten met hetzelfde adres. Die punten zijn terecht, maar de
-  toevoeging ontbrak. Het punt dat het dichtst bij het vorige huisnummer ligt heeft nu `a`, het
-  andere `b`.
-- De velden beschrijving 1854, toevoeging 1837 en bioscoopnaam uit de export zijn niet opgenomen.
-- Bij de straten zijn witruimte in namen opgeschoond en lege namen leeg gelaten; in de laag van 1885 zijn één lijn zonder coördinaten en twee dubbele lijnen weggelaten. De geometrie is verder ongewijzigd.
+- 2 points without geometry were omitted (fid 2627 and 2630).
+- 36 points without a district letter were omitted: 33 annotations from the 1916 map, such as
+  plantations and institutions on the edge of town, and 3 empty points.
+- For B230, B258 and E42 there were two points with the same address. Both points are correct, but the
+  suffix was missing. The point closest to the previous house number now has `a`, the other `b`.
+- The export fields description 1854, suffix 1837 and cinema name were not included.
+- For the streets, whitespace in names was cleaned and empty names left empty; in the 1885 layer one
+  line without coordinates and two duplicate lines were omitted. The geometry is otherwise unchanged.
 
-## Bekende beperkingen
+## Known limitations
 
-- De ligging van een aantal punten is geschat ("Ligging gegokt" in `redactioneel_commentaar`).
+- The position of a number of points is estimated ("Ligging gegokt" in `redactioneel_commentaar`).
+- The northern and western boundaries of the TBW polygon are an estimate (see above).
 
-## Licentie
+## Licence
 
-Deze dataset valt onder de licentie [Creative Commons Naamsvermelding 4.0 Internationaal (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/deed.nl). De kaarten van 1885 en 1916–17 zelf zijn publiek domein.
+This dataset is licensed under [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/). The 1885 and 1916–17 maps themselves are in the public domain.
 
-## Citeren
+## How to cite
 
-Van Oort, T. (2026). *Locatiepunten Paramaribo 1885* (versie 1.0). Suriname Time Machine.
-DataverseNL (HDSC). https://doi.org/10.34894/... [TODO DOI na publicatie]
+Van Oort, T. (2026). *Locatiepunten Paramaribo 1885* (version 1.0). Suriname Time Machine.
+DataverseNL (HDSC). https://doi.org/10.34894/... [TODO DOI after publication]
 
-## Gebruik van AI
+## Use of AI
 
-Bij het samenstellen van dit publicatiepakket is AI gebruikt (Claude, Anthropic): het omzetten van het
-QGIS-bestand naar CSV/GeoJSON met Nederlandse veldnamen, het doorvoeren van de hierboven genoemde correcties en het
-opstellen van deze README. De locatiepunten zelf, de adressen en de beschrijvingen zijn door mensen
-gemaakt. Alle door AI gemaakte stappen zijn door Thunnis van Oort gecontroleerd.
+AI (Claude, Anthropic) was used in compiling this publication package: converting the QGIS file to
+CSV/GeoJSON with Dutch field names, applying the corrections listed above, searching the Government
+Gazettes for the district boundaries, and drafting this README. The location points themselves, the
+addresses and the descriptions were made by people. All AI-assisted steps were checked by Thunnis van
+Oort.
 
 ## Contact
 
-Thunnis van Oort, KNAW Humanities Cluster / Huygens Instituut, thunnis.van.oort@huygens.knaw.nl
+Thunnis van Oort, KNAW Humanities Cluster / Huygens Institute, thunnis.van.oort@huygens.knaw.nl
+
+## Glossary of Dutch terms
+
+| Dutch | English |
+|---|---|
+| *erf* (pl. *erven*) | urban plot, yard |
+| *wijk* | (town) district / ward |
+| *binnenwijk* | inner district (A–F) |
+| *buitenwijk*; *Eerste/Tweede Buitenwijk* (EBW/TBW) | outer district; First/Second Outer District |
+| *wijkregister* | district register (population register per district) |
+| *stadsdistrict* | town district (administrative district of Paramaribo) |
+| *divisie* | division (rural administrative unit, before 1863) |
+| *Gouvernementsblad* (G.B.) | Government Gazette of Suriname |
+| *plantage*, *grond* | plantation, estate/ground |
+| *straat*, *weg*, *rijweg*, *laan* | street, road, carriage road, avenue/lane |
+| *gracht*, *kreek* | canal, creek |
+| *Opnemingsdienst van Suriname* | Survey Department of Suriname |
+| *naamloos* | nameless |
+| *ligging gegokt* | location guessed |
