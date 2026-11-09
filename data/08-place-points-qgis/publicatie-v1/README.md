@@ -27,7 +27,7 @@ stad op adresniveau mee visualiseren. De dataset hoort bij de Suriname Time Mach
 |---|---|
 | `data/locatiepunten_paramaribo_1885.csv` | Eén rij per punt, coördinaten in WGS84 (lon/lat), UTF-8 |
 | `data/locatiepunten_paramaribo_1885.geojson` | Dezelfde gegevens als GeoJSON (RFC 7946, CRS84) |
-| `data/straten_paramaribo_1885.geojson` | Straatlijnen volgens de kaart van 1885 (174 segmenten) |
+| `data/straten_paramaribo_1885.geojson` | Straatlijnen volgens de kaart van 1885 (171 segmenten) |
 | `data/straten_paramaribo_1916.geojson` | Straatlijnen volgens de kaart van 1916–17 (165 segmenten) |
 | `data/wijkgrenzen_paramaribo_1885.geojson` | Grenzen van de 8 wijken van 1885 (A–F, EBW, TBW) |
 | `README.md` | Deze beschrijving |
@@ -66,8 +66,10 @@ locatiepunten. Velden:
 | `kaartjaar` | 1885 of 1916 |
 | `bron_fid` | Volgnummer in het oorspronkelijke QGIS-bestand |
 
-Een straat kan uit meerdere segmenten bestaan. In de laag van 1885 hebben 45 van de 174 segmenten
-geen naam ingevoerd.
+Een straat kan uit meerdere segmenten bestaan. In de laag van 1885 hebben 45 van de 171 segmenten
+geen naam ingevoerd. Drie lijnen uit het bronbestand zijn weggelaten: één zonder coördinaten
+(bron_fid 3, Weg naar Zee) en twee exacte dubbelingen van de Noorderkerkstraat (bron_fid 171 en 172);
+de nummering van de overige id's is daardoor niet veranderd.
 
 **Let op:** de lijnen van 1885 volgen het stratenplan van 1916–17. Omdat de kaart van 1885 schematisch
 is, zijn alleen de straatnamen van die kaart overgenomen en op de straten van 1916 gezet. De geometrie

@@ -126,12 +126,34 @@ def main():
 
 def build_streets():
     """Straatlijnen 1885 en 1916: id per jaar op volgorde van de bron, lege naam -> null.
-    '[naamloos]' betekent: op de kaart zonder naam; null: naam (nog) niet ingevoerd."""
+    '[naamloos]' betekent: op de kaart zonder naam; null: naam (nog) niet ingevoerd.
+    Lijnen zonder coördinaten en exacte dubbelingen (ook omgekeerd) worden overgeslagen;
+    de id's van de overige lijnen blijven gelijk (gaten in de nummering)."""
+    def coords_key(geom):
+        c = (geom or {}).get("coordinates") or []
+        flat = json.dumps(c)
+        if geom and geom.get("type") == "MultiLineString":
+            rev = json.dumps([list(reversed(x)) for x in reversed(c)])
+        else:
+            rev = json.dumps(list(reversed(c)))
+        return min(flat, rev)
+
+    def is_empty(geom):
+        c = (geom or {}).get("coordinates")
+        return not c or all(not x for x in c)
+
     for year, src in STREETS.items():
         feats = json.loads(src.read_text(encoding="utf-8"))["features"]
-        out = []
+        out, seen, skipped = [], {}, []
         for i, f in enumerate(feats, 1):
-            naam = t(f["properties"].get("Name")) or None
+            props = f.get("properties") or {}
+            if is_empty(f.get("geometry")):
+                skipped.append((i, "geen geometrie")); continue
+            k = (t(props.get("Name")), coords_key(f["geometry"]))
+            if k in seen:
+                skipped.append((i, f"dubbel van {seen[k]}")); continue
+            seen[k] = i
+            naam = t(props.get("Name")) or None
             sid = f"stm-{year}-street-{i:03d}"
             out.append({"type": "Feature", "id": sid, "geometry": f["geometry"],
                         "properties": {"straat_id": sid, "naam": naam, "kaartjaar": year,
@@ -139,7 +161,8 @@ def build_streets():
         (OUT / f"straten_paramaribo_{year}.geojson").write_text(json.dumps(
             {"type": "FeatureCollection", "name": f"straten_paramaribo_{year}", "features": out},
             ensure_ascii=False), encoding="utf-8")
-        print(year, len(out), "straatsegmenten;", sum(1 for x in out if not x["properties"]["naam"]), "zonder naam")
+        print(year, len(out), "straatsegmenten;", sum(1 for x in out if not x["properties"]["naam"]),
+              "zonder naam; overgeslagen:", skipped)
 
 
 def build_wijken():
@@ -159,6 +182,9 @@ def build_wijken():
         {"type": "FeatureCollection", "name": "wijkgrenzen_paramaribo_1885", "features": out},
         ensure_ascii=False), encoding="utf-8")
     print(len(out), "wijken 1885")
+    ids = [f["id"] for f in out]
+    if len(set(ids)) != len(ids) or any(i.endswith("-") for i in ids):
+        sys.exit(f"Onverwachte wijkgrenzen: {ids}")
 
 
 if __name__ == "__main__":
