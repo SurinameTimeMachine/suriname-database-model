@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "If you use this dataset, please cite it as below."
-title: "Locatiepunten Paramaribo 1885 (Paramaribo address locations 1885, with streets 1885 and 1916 and district boundaries)"
+title: "Paramaribo historical address locations, 1885"
 type: dataset
 version: "1.0-concept"
 date-released: "2026-12-15"   # TODO

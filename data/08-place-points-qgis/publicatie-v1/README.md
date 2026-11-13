@@ -99,7 +99,7 @@ This dataset is licensed under [Creative Commons Attribution 4.0 International (
 
 ## How to cite
 
-Van Oort, T. (2026). *Locatiepunten Paramaribo 1885* (version 1.0). Suriname Time Machine. DataverseNL (HDSC). [DOI]
+Van Oort, T. (2026). *Paramaribo historical address locations, 1885* (version 1.0). Suriname Time Machine. DataverseNL (HDSC). [DOI]
 
 ## Use of AI
 
