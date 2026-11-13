@@ -21,3 +21,4 @@ de ongewijzigde QGIS-export. Daarbij zijn de volgende correcties gedaan:
 - Huisnummer aangevuld uit adres1885 bij F206, F54b en F457a (waren daardoor als wijklabel geteld).
 - Wijklabel "Politiewacht": wijk A → EBW (grensgeval).
 - Het build-script controleert nu dat adres1885 gelijk is aan wijk + huisnummer + toevoeging.
+- Wijkgrenzen: de oorspronkelijke laag staat in Zanderij / Suriname TM (EPSG:31171); build_publicatie.py zet hem om naar WGS84 (CRS84) met een eigen inverse transverse Mercator + Helmert-transformatie.
