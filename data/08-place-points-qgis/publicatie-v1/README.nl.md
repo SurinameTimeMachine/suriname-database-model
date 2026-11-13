@@ -1,6 +1,6 @@
 # Historische adreslocaties Paramaribo, 1885
 
-**Versie 1.0 (13 november 2026). [De DOI volgt na publicatie in DataverseNL.]**
+**Versie 1.0 (13 november 2026). DOI: <https://doi.org/10.34894/UNFLPK>**
 
 *Dit is de Nederlandse versie van README.md. Bij verschillen is de Engelse versie leidend.*
 
@@ -100,7 +100,7 @@ Deze dataset valt onder de licentie [Creative Commons Naamsvermelding 4.0 Intern
 
 ## Citeren
 
-Van Oort, T. (2026). *Paramaribo historical address locations, 1885* (versie 1.0). Suriname Time Machine. DataverseNL (HDSC). [DOI]
+Van Oort, T. (2026). *Paramaribo historical address locations, 1885* (versie 1.0). Suriname Time Machine. DataverseNL (HDSC). https://doi.org/10.34894/UNFLPK
 
 ## Gebruik van AI
 
