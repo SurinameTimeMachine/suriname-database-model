@@ -10,6 +10,7 @@ data/08-place-points-qgis/export20260619/locatiepunten1885.geojson.
 
 Idempotent. Usage: python3 scripts/locatiepunten1885/sync_gazetteer.py [--write]
 """
+import argparse
 import csv
 import json
 import sys
@@ -32,7 +33,9 @@ def label(r):
 
 
 def main():
-    write = "--write" in sys.argv
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument("--write", action="store_true", help="write the updated gazetteer")
+    write = parser.parse_args().write
     text = GAZ.read_text(encoding="utf-8")
     doc = json.loads(text)
     recs = {e["id"]: e for e in doc["@graph"]
@@ -46,6 +49,9 @@ def main():
     for rid in sorted(set(recs) - set(pub)):
         e = recs[rid]
         if e.get("deprecated") is True:
+            continue
+        if e.get("modifiedBy") not in (None, TAG):
+            print(f"SKIP {rid}: edited by {e['modifiedBy']}: not deprecated")
             continue
         e.update(deprecated=True, deprecatedAt=DATE, deprecatedBy=TAG, deprecationNote=NOTE)
         deprecated.append(rid)

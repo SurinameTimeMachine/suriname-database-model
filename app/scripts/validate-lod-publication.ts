@@ -1321,13 +1321,19 @@ async function main() {
       `Plantation ${String(entry.id)} is incorrectly backed by point geometry`,
     );
   }
-  const sourceAddressFeatures = (addressPointSource.features ?? []).filter(
-    (feature) =>
-      feature.geometry?.type === 'Point' &&
-      Array.isArray(feature.geometry.coordinates) &&
-      feature.geometry.coordinates.length >= 2 &&
-      Number.isFinite(Number(feature.geometry.coordinates[0])) &&
-      Number.isFinite(Number(feature.geometry.coordinates[1])),
+  const isValidAddressFeature = (
+    feature: NonNullable<typeof addressPointSource.features>[number],
+  ) =>
+    feature.geometry?.type === 'Point' &&
+    Array.isArray(feature.geometry.coordinates) &&
+    feature.geometry.coordinates.length >= 2 &&
+    Number.isFinite(Number(feature.geometry.coordinates[0])) &&
+    Number.isFinite(Number(feature.geometry.coordinates[1]));
+  // featureIndex is 1-based over the unfiltered source file.
+  const expectedFeatureIndexes = new Set(
+    (addressPointSource.features ?? []).flatMap((feature, offset) =>
+      isValidAddressFeature(feature) ? [offset + 1] : [],
+    ),
   );
   const historicalAddresses = activeGazetteer.filter(
     (entry) => entry.type === 'historical-address',
@@ -1345,8 +1351,11 @@ async function main() {
     ),
   );
   assert(
-    allHistoricalAddresses.length === sourceAddressFeatures.length &&
-      coveredFeatureIndexes.size === sourceAddressFeatures.length,
+    allHistoricalAddresses.length === expectedFeatureIndexes.size &&
+      coveredFeatureIndexes.size === expectedFeatureIndexes.size &&
+      [...coveredFeatureIndexes].every((index) =>
+        expectedFeatureIndexes.has(index as number),
+      ),
     'Historical-address Gazetteer records do not cover every valid 1885 source point',
   );
   for (const entry of historicalAddresses) {
