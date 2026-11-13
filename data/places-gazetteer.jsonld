@@ -730745,7 +730745,7 @@
       "type": "historical-address",
       "names": [
         {
-          "text": "Drambrandersgracht, F",
+          "text": "Drambrandersgracht, F92",
           "language": "nl",
           "type": "historical",
           "isPreferred": true,
@@ -730769,7 +730769,7 @@
       "psurIds": [],
       "district": "Wijk F",
       "locationDescription": "Wijk F",
-      "locationDescriptionOriginal": "F",
+      "locationDescriptionOriginal": "F92",
       "placeType": null,
       "productAssertions": [],
       "statusAssertions": [],
@@ -730778,8 +730778,8 @@
       "locationAssertions": [
         {
           "id": "address-observation-1885",
-          "standardized": "Drambrandersgracht, F",
-          "original": "F",
+          "standardized": "Drambrandersgracht, F92",
+          "original": "F92",
           "source": "historic-map-27",
           "startYear": 1885,
           "note": null,
@@ -730787,8 +730787,8 @@
         }
       ],
       "diklandRefs": [],
-      "modifiedBy": null,
-      "modifiedAt": null,
+      "modifiedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "modifiedAt": "2026-11-13",
       "sourceRecord": {
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
@@ -732933,8 +732933,8 @@
       "externalLinks": [],
       "fid": 287,
       "psurIds": [],
-      "district": "Wijk A",
-      "locationDescription": "Wijk A",
+      "district": "Wijk EBW",
+      "locationDescription": "Wijk EBW",
       "locationDescriptionOriginal": "EBW",
       "placeType": null,
       "productAssertions": [],
@@ -732953,8 +732953,8 @@
         }
       ],
       "diklandRefs": [],
-      "modifiedBy": null,
-      "modifiedAt": null,
+      "modifiedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "modifiedAt": "2026-11-13",
       "sourceRecord": {
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
@@ -733643,7 +733643,11 @@
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
         "featureIndex": 317
-      }
+      },
+      "deprecated": true,
+      "deprecatedAt": "2026-11-13",
+      "deprecatedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "deprecationNote": "Omitted from the data publication 'Locatiepunten Paramaribo 1885' (v1): point without an 1885 district letter (annotation from the 1916 map or empty point)."
     },
     {
       "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-2289",
@@ -778853,7 +778857,7 @@
       "type": "historical-address",
       "names": [
         {
-          "text": "Keizerstraat, B230",
+          "text": "Keizerstraat, B230b",
           "language": "nl",
           "type": "historical",
           "isPreferred": true,
@@ -778877,7 +778881,7 @@
       "psurIds": [],
       "district": "Wijk B",
       "locationDescription": "Wijk B",
-      "locationDescriptionOriginal": "B230",
+      "locationDescriptionOriginal": "B230b",
       "placeType": null,
       "productAssertions": [],
       "statusAssertions": [],
@@ -778886,8 +778890,8 @@
       "locationAssertions": [
         {
           "id": "address-observation-1885",
-          "standardized": "Keizerstraat, B230",
-          "original": "B230",
+          "standardized": "Keizerstraat, B230b",
+          "original": "B230b",
           "source": "historic-map-27",
           "startYear": 1885,
           "note": null,
@@ -778895,8 +778899,8 @@
         }
       ],
       "diklandRefs": [],
-      "modifiedBy": null,
-      "modifiedAt": null,
+      "modifiedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "modifiedAt": "2026-11-13",
       "sourceRecord": {
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
@@ -778910,7 +778914,7 @@
       "type": "historical-address",
       "names": [
         {
-          "text": "Keizerstraat, B230",
+          "text": "Keizerstraat, B230a",
           "language": "nl",
           "type": "historical",
           "isPreferred": true,
@@ -778934,7 +778938,7 @@
       "psurIds": [],
       "district": "Wijk B",
       "locationDescription": "Wijk B",
-      "locationDescriptionOriginal": "B230",
+      "locationDescriptionOriginal": "B230a",
       "placeType": null,
       "productAssertions": [],
       "statusAssertions": [],
@@ -778943,8 +778947,8 @@
       "locationAssertions": [
         {
           "id": "address-observation-1885",
-          "standardized": "Keizerstraat, B230",
-          "original": "B230",
+          "standardized": "Keizerstraat, B230a",
+          "original": "B230a",
           "source": "historic-map-27",
           "startYear": 1885,
           "note": null,
@@ -778952,8 +778956,8 @@
         }
       ],
       "diklandRefs": [],
-      "modifiedBy": null,
-      "modifiedAt": null,
+      "modifiedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "modifiedAt": "2026-11-13",
       "sourceRecord": {
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
@@ -781304,7 +781308,7 @@
       "type": "historical-address",
       "names": [
         {
-          "text": "Keizerstraat, B258",
+          "text": "Keizerstraat, B258a",
           "language": "nl",
           "type": "historical",
           "isPreferred": true,
@@ -781328,7 +781332,7 @@
       "psurIds": [],
       "district": "Wijk B",
       "locationDescription": "Wijk B",
-      "locationDescriptionOriginal": "B258",
+      "locationDescriptionOriginal": "B258a",
       "placeType": null,
       "productAssertions": [],
       "statusAssertions": [],
@@ -781337,8 +781341,8 @@
       "locationAssertions": [
         {
           "id": "address-observation-1885",
-          "standardized": "Keizerstraat, B258",
-          "original": "B258",
+          "standardized": "Keizerstraat, B258a",
+          "original": "B258a",
           "source": "historic-map-27",
           "startYear": 1885,
           "note": null,
@@ -781346,8 +781350,8 @@
         }
       ],
       "diklandRefs": [],
-      "modifiedBy": null,
-      "modifiedAt": null,
+      "modifiedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "modifiedAt": "2026-11-13",
       "sourceRecord": {
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
@@ -781361,7 +781365,7 @@
       "type": "historical-address",
       "names": [
         {
-          "text": "Keizerstraat, B258",
+          "text": "Keizerstraat, B258b",
           "language": "nl",
           "type": "historical",
           "isPreferred": true,
@@ -781385,7 +781389,7 @@
       "psurIds": [],
       "district": "Wijk B",
       "locationDescription": "Wijk B",
-      "locationDescriptionOriginal": "B258",
+      "locationDescriptionOriginal": "B258b",
       "placeType": null,
       "productAssertions": [],
       "statusAssertions": [],
@@ -781394,8 +781398,8 @@
       "locationAssertions": [
         {
           "id": "address-observation-1885",
-          "standardized": "Keizerstraat, B258",
-          "original": "B258",
+          "standardized": "Keizerstraat, B258b",
+          "original": "B258b",
           "source": "historic-map-27",
           "startYear": 1885,
           "note": null,
@@ -781403,8 +781407,8 @@
         }
       ],
       "diklandRefs": [],
-      "modifiedBy": null,
-      "modifiedAt": null,
+      "modifiedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "modifiedAt": "2026-11-13",
       "sourceRecord": {
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
@@ -809256,8 +809260,8 @@
       "externalLinks": [],
       "fid": 3060,
       "psurIds": [],
-      "district": "Wijk TBW",
-      "locationDescription": "Wijk TBW",
+      "district": "Wijk F",
+      "locationDescription": "Wijk F",
       "locationDescriptionOriginal": "F150b",
       "placeType": null,
       "productAssertions": [],
@@ -809276,8 +809280,8 @@
         }
       ],
       "diklandRefs": [],
-      "modifiedBy": null,
-      "modifiedAt": null,
+      "modifiedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "modifiedAt": "2026-11-13",
       "sourceRecord": {
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
@@ -832382,7 +832386,7 @@
       "type": "historical-address",
       "names": [
         {
-          "text": "Saramaccastraat, E42",
+          "text": "Saramaccastraat, E42a",
           "language": "nl",
           "type": "historical",
           "isPreferred": true,
@@ -832406,7 +832410,7 @@
       "psurIds": [],
       "district": "Wijk E",
       "locationDescription": "Wijk E",
-      "locationDescriptionOriginal": "E42",
+      "locationDescriptionOriginal": "E42a",
       "placeType": null,
       "productAssertions": [],
       "statusAssertions": [],
@@ -832415,8 +832419,8 @@
       "locationAssertions": [
         {
           "id": "address-observation-1885",
-          "standardized": "Saramaccastraat, E42",
-          "original": "E42",
+          "standardized": "Saramaccastraat, E42a",
+          "original": "E42a",
           "source": "historic-map-27",
           "startYear": 1885,
           "note": null,
@@ -832424,8 +832428,8 @@
         }
       ],
       "diklandRefs": [],
-      "modifiedBy": null,
-      "modifiedAt": null,
+      "modifiedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "modifiedAt": "2026-11-13",
       "sourceRecord": {
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
@@ -832439,7 +832443,7 @@
       "type": "historical-address",
       "names": [
         {
-          "text": "Saramaccastraat, E42",
+          "text": "Saramaccastraat, E42b",
           "language": "nl",
           "type": "historical",
           "isPreferred": true,
@@ -832463,7 +832467,7 @@
       "psurIds": [],
       "district": "Wijk E",
       "locationDescription": "Wijk E",
-      "locationDescriptionOriginal": "E42",
+      "locationDescriptionOriginal": "E42b",
       "placeType": null,
       "productAssertions": [],
       "statusAssertions": [],
@@ -832472,8 +832476,8 @@
       "locationAssertions": [
         {
           "id": "address-observation-1885",
-          "standardized": "Saramaccastraat, E42",
-          "original": "E42",
+          "standardized": "Saramaccastraat, E42b",
+          "original": "E42b",
           "source": "historic-map-27",
           "startYear": 1885,
           "note": null,
@@ -832481,8 +832485,8 @@
         }
       ],
       "diklandRefs": [],
-      "modifiedBy": null,
-      "modifiedAt": null,
+      "modifiedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "modifiedAt": "2026-11-13",
       "sourceRecord": {
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
@@ -853520,7 +853524,11 @@
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
         "featureIndex": 2246
-      }
+      },
+      "deprecated": true,
+      "deprecatedAt": "2026-11-13",
+      "deprecatedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "deprecationNote": "Omitted from the data publication 'Locatiepunten Paramaribo 1885' (v1): point without an 1885 district letter (annotation from the 1916 map or empty point)."
     },
     {
       "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-2595",
@@ -853919,7 +853927,11 @@
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
         "featureIndex": 2615
-      }
+      },
+      "deprecated": true,
+      "deprecatedAt": "2026-11-13",
+      "deprecatedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "deprecationNote": "Omitted from the data publication 'Locatiepunten Paramaribo 1885' (v1): point without an 1885 district letter (annotation from the 1916 map or empty point)."
     },
     {
       "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-2620",
@@ -854033,7 +854045,11 @@
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
         "featureIndex": 2628
-      }
+      },
+      "deprecated": true,
+      "deprecatedAt": "2026-11-13",
+      "deprecatedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "deprecationNote": "Omitted from the data publication 'Locatiepunten Paramaribo 1885' (v1): point without an 1885 district letter (annotation from the 1916 map or empty point)."
     },
     {
       "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-2637",
@@ -854090,7 +854106,11 @@
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
         "featureIndex": 2637
-      }
+      },
+      "deprecated": true,
+      "deprecatedAt": "2026-11-13",
+      "deprecatedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "deprecationNote": "Omitted from the data publication 'Locatiepunten Paramaribo 1885' (v1): point without an 1885 district letter (annotation from the 1916 map or empty point)."
     },
     {
       "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-2638",
@@ -854147,7 +854167,11 @@
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
         "featureIndex": 2638
-      }
+      },
+      "deprecated": true,
+      "deprecatedAt": "2026-11-13",
+      "deprecatedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "deprecationNote": "Omitted from the data publication 'Locatiepunten Paramaribo 1885' (v1): point without an 1885 district letter (annotation from the 1916 map or empty point)."
     },
     {
       "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-2639",
@@ -854204,7 +854228,11 @@
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
         "featureIndex": 2639
-      }
+      },
+      "deprecated": true,
+      "deprecatedAt": "2026-11-13",
+      "deprecatedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "deprecationNote": "Omitted from the data publication 'Locatiepunten Paramaribo 1885' (v1): point without an 1885 district letter (annotation from the 1916 map or empty point)."
     },
     {
       "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-0300",
@@ -854318,7 +854346,11 @@
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
         "featureIndex": 304
-      }
+      },
+      "deprecated": true,
+      "deprecatedAt": "2026-11-13",
+      "deprecatedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "deprecationNote": "Omitted from the data publication 'Locatiepunten Paramaribo 1885' (v1): point without an 1885 district letter (annotation from the 1916 map or empty point)."
     },
     {
       "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-0305",
@@ -854375,7 +854407,11 @@
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
         "featureIndex": 305
-      }
+      },
+      "deprecated": true,
+      "deprecatedAt": "2026-11-13",
+      "deprecatedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "deprecationNote": "Omitted from the data publication 'Locatiepunten Paramaribo 1885' (v1): point without an 1885 district letter (annotation from the 1916 map or empty point)."
     },
     {
       "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-0306",
@@ -854432,7 +854468,11 @@
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
         "featureIndex": 306
-      }
+      },
+      "deprecated": true,
+      "deprecatedAt": "2026-11-13",
+      "deprecatedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "deprecationNote": "Omitted from the data publication 'Locatiepunten Paramaribo 1885' (v1): point without an 1885 district letter (annotation from the 1916 map or empty point)."
     },
     {
       "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-0307",
@@ -854489,7 +854529,11 @@
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
         "featureIndex": 307
-      }
+      },
+      "deprecated": true,
+      "deprecatedAt": "2026-11-13",
+      "deprecatedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "deprecationNote": "Omitted from the data publication 'Locatiepunten Paramaribo 1885' (v1): point without an 1885 district letter (annotation from the 1916 map or empty point)."
     },
     {
       "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-0308",
@@ -854546,7 +854590,11 @@
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
         "featureIndex": 308
-      }
+      },
+      "deprecated": true,
+      "deprecatedAt": "2026-11-13",
+      "deprecatedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "deprecationNote": "Omitted from the data publication 'Locatiepunten Paramaribo 1885' (v1): point without an 1885 district letter (annotation from the 1916 map or empty point)."
     },
     {
       "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-0309",
@@ -854603,7 +854651,11 @@
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
         "featureIndex": 309
-      }
+      },
+      "deprecated": true,
+      "deprecatedAt": "2026-11-13",
+      "deprecatedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "deprecationNote": "Omitted from the data publication 'Locatiepunten Paramaribo 1885' (v1): point without an 1885 district letter (annotation from the 1916 map or empty point)."
     },
     {
       "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-0310",
@@ -854660,7 +854712,11 @@
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
         "featureIndex": 310
-      }
+      },
+      "deprecated": true,
+      "deprecatedAt": "2026-11-13",
+      "deprecatedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "deprecationNote": "Omitted from the data publication 'Locatiepunten Paramaribo 1885' (v1): point without an 1885 district letter (annotation from the 1916 map or empty point)."
     },
     {
       "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-0311",
@@ -854717,7 +854773,11 @@
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
         "featureIndex": 311
-      }
+      },
+      "deprecated": true,
+      "deprecatedAt": "2026-11-13",
+      "deprecatedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "deprecationNote": "Omitted from the data publication 'Locatiepunten Paramaribo 1885' (v1): point without an 1885 district letter (annotation from the 1916 map or empty point)."
     },
     {
       "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-0312",
@@ -854774,7 +854834,11 @@
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
         "featureIndex": 312
-      }
+      },
+      "deprecated": true,
+      "deprecatedAt": "2026-11-13",
+      "deprecatedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "deprecationNote": "Omitted from the data publication 'Locatiepunten Paramaribo 1885' (v1): point without an 1885 district letter (annotation from the 1916 map or empty point)."
     },
     {
       "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-0313",
@@ -854831,7 +854895,11 @@
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
         "featureIndex": 313
-      }
+      },
+      "deprecated": true,
+      "deprecatedAt": "2026-11-13",
+      "deprecatedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "deprecationNote": "Omitted from the data publication 'Locatiepunten Paramaribo 1885' (v1): point without an 1885 district letter (annotation from the 1916 map or empty point)."
     },
     {
       "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-0314",
@@ -854888,7 +854956,11 @@
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
         "featureIndex": 314
-      }
+      },
+      "deprecated": true,
+      "deprecatedAt": "2026-11-13",
+      "deprecatedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "deprecationNote": "Omitted from the data publication 'Locatiepunten Paramaribo 1885' (v1): point without an 1885 district letter (annotation from the 1916 map or empty point)."
     },
     {
       "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-0315",
@@ -854945,7 +855017,11 @@
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
         "featureIndex": 315
-      }
+      },
+      "deprecated": true,
+      "deprecatedAt": "2026-11-13",
+      "deprecatedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "deprecationNote": "Omitted from the data publication 'Locatiepunten Paramaribo 1885' (v1): point without an 1885 district letter (annotation from the 1916 map or empty point)."
     },
     {
       "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-0316",
@@ -855002,7 +855078,11 @@
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
         "featureIndex": 316
-      }
+      },
+      "deprecated": true,
+      "deprecatedAt": "2026-11-13",
+      "deprecatedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "deprecationNote": "Omitted from the data publication 'Locatiepunten Paramaribo 1885' (v1): point without an 1885 district letter (annotation from the 1916 map or empty point)."
     },
     {
       "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-0318",
@@ -855059,7 +855139,11 @@
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
         "featureIndex": 318
-      }
+      },
+      "deprecated": true,
+      "deprecatedAt": "2026-11-13",
+      "deprecatedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "deprecationNote": "Omitted from the data publication 'Locatiepunten Paramaribo 1885' (v1): point without an 1885 district letter (annotation from the 1916 map or empty point)."
     },
     {
       "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-0319",
@@ -855116,7 +855200,11 @@
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
         "featureIndex": 319
-      }
+      },
+      "deprecated": true,
+      "deprecatedAt": "2026-11-13",
+      "deprecatedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "deprecationNote": "Omitted from the data publication 'Locatiepunten Paramaribo 1885' (v1): point without an 1885 district letter (annotation from the 1916 map or empty point)."
     },
     {
       "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-0320",
@@ -855173,7 +855261,11 @@
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
         "featureIndex": 320
-      }
+      },
+      "deprecated": true,
+      "deprecatedAt": "2026-11-13",
+      "deprecatedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "deprecationNote": "Omitted from the data publication 'Locatiepunten Paramaribo 1885' (v1): point without an 1885 district letter (annotation from the 1916 map or empty point)."
     },
     {
       "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-0321",
@@ -855230,7 +855322,11 @@
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
         "featureIndex": 321
-      }
+      },
+      "deprecated": true,
+      "deprecatedAt": "2026-11-13",
+      "deprecatedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "deprecationNote": "Omitted from the data publication 'Locatiepunten Paramaribo 1885' (v1): point without an 1885 district letter (annotation from the 1916 map or empty point)."
     },
     {
       "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-0322",
@@ -855287,7 +855383,11 @@
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
         "featureIndex": 322
-      }
+      },
+      "deprecated": true,
+      "deprecatedAt": "2026-11-13",
+      "deprecatedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "deprecationNote": "Omitted from the data publication 'Locatiepunten Paramaribo 1885' (v1): point without an 1885 district letter (annotation from the 1916 map or empty point)."
     },
     {
       "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-0323",
@@ -855344,7 +855444,11 @@
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
         "featureIndex": 323
-      }
+      },
+      "deprecated": true,
+      "deprecatedAt": "2026-11-13",
+      "deprecatedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "deprecationNote": "Omitted from the data publication 'Locatiepunten Paramaribo 1885' (v1): point without an 1885 district letter (annotation from the 1916 map or empty point)."
     },
     {
       "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-0324",
@@ -855401,7 +855505,11 @@
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
         "featureIndex": 324
-      }
+      },
+      "deprecated": true,
+      "deprecatedAt": "2026-11-13",
+      "deprecatedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "deprecationNote": "Omitted from the data publication 'Locatiepunten Paramaribo 1885' (v1): point without an 1885 district letter (annotation from the 1916 map or empty point)."
     },
     {
       "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-0325",
@@ -855458,7 +855566,11 @@
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
         "featureIndex": 325
-      }
+      },
+      "deprecated": true,
+      "deprecatedAt": "2026-11-13",
+      "deprecatedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "deprecationNote": "Omitted from the data publication 'Locatiepunten Paramaribo 1885' (v1): point without an 1885 district letter (annotation from the 1916 map or empty point)."
     },
     {
       "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-0589",
@@ -855515,7 +855627,11 @@
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
         "featureIndex": 589
-      }
+      },
+      "deprecated": true,
+      "deprecatedAt": "2026-11-13",
+      "deprecatedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "deprecationNote": "Omitted from the data publication 'Locatiepunten Paramaribo 1885' (v1): point without an 1885 district letter (annotation from the 1916 map or empty point)."
     },
     {
       "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-0590",
@@ -855572,7 +855688,11 @@
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
         "featureIndex": 590
-      }
+      },
+      "deprecated": true,
+      "deprecatedAt": "2026-11-13",
+      "deprecatedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "deprecationNote": "Omitted from the data publication 'Locatiepunten Paramaribo 1885' (v1): point without an 1885 district letter (annotation from the 1916 map or empty point)."
     },
     {
       "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-0591",
@@ -855629,7 +855749,11 @@
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
         "featureIndex": 591
-      }
+      },
+      "deprecated": true,
+      "deprecatedAt": "2026-11-13",
+      "deprecatedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "deprecationNote": "Omitted from the data publication 'Locatiepunten Paramaribo 1885' (v1): point without an 1885 district letter (annotation from the 1916 map or empty point)."
     },
     {
       "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-0592",
@@ -855686,7 +855810,11 @@
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
         "featureIndex": 592
-      }
+      },
+      "deprecated": true,
+      "deprecatedAt": "2026-11-13",
+      "deprecatedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "deprecationNote": "Omitted from the data publication 'Locatiepunten Paramaribo 1885' (v1): point without an 1885 district letter (annotation from the 1916 map or empty point)."
     },
     {
       "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-0593",
@@ -855743,7 +855871,11 @@
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
         "featureIndex": 593
-      }
+      },
+      "deprecated": true,
+      "deprecatedAt": "2026-11-13",
+      "deprecatedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "deprecationNote": "Omitted from the data publication 'Locatiepunten Paramaribo 1885' (v1): point without an 1885 district letter (annotation from the 1916 map or empty point)."
     },
     {
       "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-0594",
@@ -855800,7 +855932,11 @@
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
         "featureIndex": 594
-      }
+      },
+      "deprecated": true,
+      "deprecatedAt": "2026-11-13",
+      "deprecatedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "deprecationNote": "Omitted from the data publication 'Locatiepunten Paramaribo 1885' (v1): point without an 1885 district letter (annotation from the 1916 map or empty point)."
     },
     {
       "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-0595",
@@ -855857,7 +855993,11 @@
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
         "featureIndex": 595
-      }
+      },
+      "deprecated": true,
+      "deprecatedAt": "2026-11-13",
+      "deprecatedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "deprecationNote": "Omitted from the data publication 'Locatiepunten Paramaribo 1885' (v1): point without an 1885 district letter (annotation from the 1916 map or empty point)."
     },
     {
       "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-0596",
@@ -855914,7 +856054,11 @@
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
         "featureIndex": 596
-      }
+      },
+      "deprecated": true,
+      "deprecatedAt": "2026-11-13",
+      "deprecatedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "deprecationNote": "Omitted from the data publication 'Locatiepunten Paramaribo 1885' (v1): point without an 1885 district letter (annotation from the 1916 map or empty point)."
     },
     {
       "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-0597",
@@ -875645,7 +875789,7 @@
       "type": "historical-address",
       "names": [
         {
-          "text": "Wanicastraat, TMW349b",
+          "text": "Wanicastraat, TBW349b",
           "language": "nl",
           "type": "historical",
           "isPreferred": true,
@@ -875669,7 +875813,7 @@
       "psurIds": [],
       "district": "Wijk TBW",
       "locationDescription": "Wijk TBW",
-      "locationDescriptionOriginal": "TMW349b",
+      "locationDescriptionOriginal": "TBW349b",
       "placeType": null,
       "productAssertions": [],
       "statusAssertions": [],
@@ -875678,8 +875822,8 @@
       "locationAssertions": [
         {
           "id": "address-observation-1885",
-          "standardized": "Wanicastraat, TMW349b",
-          "original": "TMW349b",
+          "standardized": "Wanicastraat, TBW349b",
+          "original": "TBW349b",
           "source": "historic-map-27",
           "startYear": 1885,
           "note": null,
@@ -875687,8 +875831,8 @@
         }
       ],
       "diklandRefs": [],
-      "modifiedBy": null,
-      "modifiedAt": null,
+      "modifiedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "modifiedAt": "2026-11-13",
       "sourceRecord": {
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
