@@ -5,7 +5,14 @@
  *
  * The records are E53 Places because they are source-specific address
  * locations, not claims about a persistent building or organisation.
+ *
+ * FROZEN IDS: stm-1885-address-NNNN is the feature order (1-based) in the
+ * export of 19 June 2026. These ids are published (gazetteer and the data
+ * publication 'Locatiepunten Paramaribo 1885', DataverseNL) and must never be
+ * renumbered. The script therefore refuses any other source file. New points
+ * get new numbers after 3143; omitted points are deprecated, never deleted.
  */
+import { createHash } from 'crypto';
 import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 
@@ -18,6 +25,8 @@ const SOURCE_PATH = join(
   'export20260619',
   'locatiepunten1885.geojson',
 );
+const SOURCE_SHA256 =
+  '23c590367136282fa87421861839bc60f0d804e6898742b27e4b74faf73aab03';
 const SOURCE_ID = 'historic-map-27';
 const LAYER = 'locatiepunten1885';
 
@@ -65,7 +74,15 @@ function sourceNote(properties: Properties): string | null {
 
 function main() {
   const write = process.argv.includes('--write');
-  const source = JSON.parse(readFileSync(SOURCE_PATH, 'utf-8')) as FeatureCollection;
+  const sourceText = readFileSync(SOURCE_PATH, 'utf-8');
+  const sourceHash = createHash('sha256').update(sourceText).digest('hex');
+  if (sourceHash !== SOURCE_SHA256) {
+    throw new Error(
+      `${SOURCE_PATH} differs from the export of 19 June 2026 (sha256 ${sourceHash}). ` +
+        'Ids stm-1885-address-NNNN are frozen to that file; do not re-import from a new export.',
+    );
+  }
+  const source = JSON.parse(sourceText) as FeatureCollection;
   const gazetteer = JSON.parse(
     readFileSync(GAZETTEER_PATH, 'utf-8'),
   ) as GazetteerDocument;
