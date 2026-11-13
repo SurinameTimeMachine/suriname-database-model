@@ -1332,8 +1332,21 @@ async function main() {
   const historicalAddresses = activeGazetteer.filter(
     (entry) => entry.type === 'historical-address',
   );
+  // Every valid 1885 source point keeps exactly one record. Points omitted
+  // from the data publication are deprecated (tombstones), never deleted, so
+  // active and deprecated records together cover the source.
+  const allHistoricalAddresses = gazetteer['@graph'].filter(
+    (entry) => entry.type === 'historical-address' && !entry.mergedInto,
+  );
+  const coveredFeatureIndexes = new Set(
+    allHistoricalAddresses.map(
+      (entry) =>
+        (entry.sourceRecord as Record<string, unknown> | undefined)?.featureIndex,
+    ),
+  );
   assert(
-    historicalAddresses.length === sourceAddressFeatures.length,
+    allHistoricalAddresses.length === sourceAddressFeatures.length &&
+      coveredFeatureIndexes.size === sourceAddressFeatures.length,
     'Historical-address Gazetteer records do not cover every valid 1885 source point',
   );
   for (const entry of historicalAddresses) {
