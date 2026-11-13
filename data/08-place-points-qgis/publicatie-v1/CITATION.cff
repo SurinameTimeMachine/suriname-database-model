@@ -2,8 +2,8 @@ cff-version: 1.2.0
 message: "If you use this dataset, please cite it as below."
 title: "Paramaribo historical address locations, 1885"
 type: dataset
-version: "1.0-concept"
-date-released: "2026-12-15"   # TODO
+version: "1.0"
+date-released: "2026-11-13"   # TODO: set to deposit date
 authors:
   - family-names: "van Oort"
     given-names: "Thunnis"
