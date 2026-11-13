@@ -103,7 +103,7 @@ Van Oort, T. (2026). *Locatiepunten Paramaribo 1885* (version 1.0). Suriname Tim
 
 ## Use of AI
 
-AI (Claude, Anthropic) was used in compiling this publication package: converting the QGIS file to CSV/GeoJSON with Dutch field names, applying a few minor data corrections, and drafting this README. The location points themselves, the addresses and the descriptions were made by people. All AI-assisted steps were checked by Thunnis van Oort.
+AI (Claude, Anthropic) was used in compiling this publication package: converting the QGIS file to CSV/GeoJSON with Dutch field names, applying a few minor data corrections, and drafting and translating this README. The location points themselves, the addresses and the descriptions were made by people. All AI-assisted steps were checked by Thunnis van Oort.
 
 ## Contact
 
