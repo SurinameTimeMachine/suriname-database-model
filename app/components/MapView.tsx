@@ -1,8 +1,10 @@
 'use client';
 
 import 'leaflet/dist/leaflet.css';
+import RecordedYearsFilter, { type YearRange } from './RecordedYearsFilter';
 import { loadAllmapsAnnotation } from '@/lib/allmaps';
 import { HISTORIC_MAPS } from '@/lib/historic-maps';
+import type { RankedPersonHit } from '@/lib/person-search';
 import {
   loadPersonIndex,
   loadWardNameIndex,
@@ -16,7 +18,6 @@ import type {
   PersonSearchIndex,
 } from '@/lib/types';
 import L from 'leaflet';
-import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 const TRANSFORMATION_LABELS: Record<string, string> = {
@@ -229,10 +230,16 @@ L.DomUtil.getPosition = function (el: HTMLElement): L.Point {
 
 interface MapViewProps {
   geojson: GeoJSONCollection | null;
+  yearBounds: YearRange | null;
+  yearRange: YearRange | null;
+  searchYearRange: YearRange | null;
+  onYearRangeChange: (range: YearRange | null) => void;
   selectedPlantationUri: string | null;
+  selectedFeatureType?: string;
   highlightedName: string | null;
   highlightedPlaceIds?: string[] | null;
   panelOpen: boolean;
+  onSelectPerson: (hit: RankedPersonHit) => void;
   onSelectPlantation: (feature: GeoJSONFeature) => void;
   onHighlightName: (name: string) => void;
   onHighlightPlaces?: (placeIds: string[]) => void;
@@ -243,10 +250,16 @@ interface MapViewProps {
 
 export default function MapView({
   geojson,
+  yearBounds,
+  yearRange,
+  searchYearRange,
+  onYearRangeChange,
   selectedPlantationUri,
+  selectedFeatureType,
   highlightedName,
   highlightedPlaceIds = null,
   panelOpen,
+  onSelectPerson,
   onSelectPlantation,
   onHighlightName,
   onHighlightPlaces,
@@ -283,7 +296,6 @@ export default function MapView({
   const enabledOverlaysRef = useRef(enabledOverlays);
   enabledOverlaysRef.current = enabledOverlays;
   const [layersOpen, setLayersOpen] = useState(false);
-  const [toolbarOpen, setToolbarOpen] = useState(true);
   const layersDropdownRef = useRef<HTMLDivElement>(null);
   const [enabledFeatures, setEnabledFeatures] = useState<Set<string>>(
     () =>
@@ -317,6 +329,25 @@ export default function MapView({
       return next;
     });
   }, [allTypes]);
+
+  // Reveal hidden types for both direct selections and person-linked places.
+  useEffect(() => {
+    const types = new Set<string>();
+    if (selectedPlantationUri && selectedFeatureType) types.add(selectedFeatureType);
+    if (highlightedPlaceIds?.length) {
+      const ids = new Set(highlightedPlaceIds);
+      for (const { properties } of geojson?.features ?? []) {
+        if (properties.stmId && ids.has(properties.stmId)) {
+          types.add(properties.featureType);
+        }
+      }
+    }
+    if (!types.size) return;
+    setEnabledFeatures((previous) => {
+      const next = new Set([...previous, ...types]);
+      return next.size === previous.size ? previous : next;
+    });
+  }, [geojson, highlightedPlaceIds, selectedPlantationUri, selectedFeatureType]);
 
   // Keep callback ref in sync
   useEffect(() => {
@@ -556,12 +587,12 @@ export default function MapView({
         });
       },
       style: (feature) => {
-        const props = feature?.properties;
+        const props = feature?.properties as GeoJSONFeature['properties'] | undefined;
         const geomType = feature?.geometry?.type;
         const ft = props?.featureType || 'plantation';
         const color = featureColor(ft, placeTypeColorsRef.current);
         const featureIdentifier =
-          props?.plantationUri ?? props?.featureUri ?? props?.placeUri;
+          props?.plantationUri ?? props?.featureUri ?? props?.placeUri ?? feature?.id;
         const isSelected = featureIdentifier === selectedUriRef.current;
         const highlightedIds = highlightedPlaceIdsRef.current;
         const propsStmId = props?.stmId;
@@ -569,13 +600,14 @@ export default function MapView({
           !!highlightedIds &&
           !!propsStmId &&
           highlightedIds.includes(propsStmId);
+        const highlight = highlightedNameRef.current?.toLowerCase();
         const isHighlighted =
           !isSelected &&
           (isPlaceHighlighted ||
-            (!!highlightedNameRef.current &&
-              props?.name
-                ?.toLowerCase()
-                .includes(highlightedNameRef.current.toLowerCase())));
+            (!!highlight &&
+              [props?.name, ...(props?.allNames ?? [])].some((label) =>
+                label?.toLowerCase().includes(highlight),
+              )));
 
         // Point features (settlements, military posts, stations, villages, towns)
         if (geomType === 'Point') {
@@ -677,7 +709,7 @@ export default function MapView({
         });
 
         const featureIdentifier =
-          props?.plantationUri ?? props?.featureUri ?? props?.placeUri;
+          props?.plantationUri ?? props?.featureUri ?? props?.placeUri ?? feature?.id;
         featureLayer.on('mouseover', (e) => {
           const target = e.target as L.Path;
           if (featureIdentifier !== selectedUriRef.current) {
@@ -745,79 +777,38 @@ export default function MapView({
     });
   }, [opacity, enabledOverlays]);
 
-  // Fly to selected feature — pad right side when panel is open
+  // Keep the selected or highlighted places clear of the search and summary.
   useEffect(() => {
-    if (!mapRef.current || !layerRef.current || !selectedPlantationUri) return;
+    const map = mapRef.current;
+    if (!map || !layerRef.current) return;
+    const ids = new Set(highlightedPlaceIds);
+    const name = highlightedName?.toLowerCase();
+    const bounds = L.latLngBounds([]);
 
     layerRef.current.eachLayer((layer) => {
-      const feature = (layer as unknown as { feature?: GeoJSONFeature })
-        .feature;
-      const featureIdentifier =
-        feature?.properties?.plantationUri ??
-        feature?.properties?.featureUri ??
-        feature?.properties?.placeUri;
-      if (featureIdentifier === selectedPlantationUri) {
-        const geomType = feature?.geometry?.type;
-        if (geomType === 'Point') {
-          const latlng = (layer as L.CircleMarker).getLatLng();
-          mapRef.current!.flyTo(latlng, 13);
-        } else {
-          const bounds = (layer as L.Polygon).getBounds();
-          mapRef.current!.flyToBounds(bounds, {
-            padding: [50, 50],
-            paddingBottomRight: panelOpen ? [420, 50] : [50, 50],
-            maxZoom: 13,
-          });
-        }
-      }
+      const feature = (layer as unknown as { feature?: GeoJSONFeature }).feature;
+      if (!feature) return;
+      const { plantationUri, featureUri, placeUri, stmId, allNames } = feature.properties;
+      const matches = selectedPlantationUri
+        ? (plantationUri ?? featureUri ?? placeUri ?? feature.id) === selectedPlantationUri
+        : ids.has(stmId ?? '') || (name && [feature.properties.name, ...(allNames ?? [])]
+          .some((label) => label?.toLowerCase().includes(name)));
+      if (!matches) return;
+      if (layer instanceof L.CircleMarker) bounds.extend(layer.getLatLng());
+      else if (layer instanceof L.Polyline) bounds.extend(layer.getBounds());
     });
-  }, [selectedPlantationUri, panelOpen]);
 
-  // Fly to all highlighted features when a person search highlights places
-  // without selection (set-based; falls back to the legacy name highlight).
-  useEffect(() => {
-    if (!mapRef.current || !layerRef.current || selectedPlantationUri) return;
-    const highlightedIds =
-      highlightedPlaceIds && highlightedPlaceIds.length > 0
-        ? new Set(highlightedPlaceIds)
-        : null;
-    if (!highlightedIds && !highlightedName) return;
-
-    let combinedBounds: L.LatLngBounds | null = null;
-    layerRef.current.eachLayer((layer) => {
-      const feature = (layer as unknown as { feature?: GeoJSONFeature })
-        .feature;
-      const matchesIds =
-        !!highlightedIds && !!feature?.properties?.stmId
-          ? highlightedIds.has(feature.properties.stmId)
-          : false;
-      const matchesName =
-        !matchesIds && !!highlightedName && !!feature?.properties?.name
-          ? feature.properties.name
-              .toLowerCase()
-              .includes(highlightedName.toLowerCase())
-          : false;
-      if (matchesIds || matchesName) {
-        let bounds: L.LatLngBounds;
-        const geomType = feature?.geometry?.type;
-        if (geomType === 'Point') {
-          const latlng = (layer as L.CircleMarker).getLatLng();
-          bounds = L.latLngBounds(latlng, latlng);
-        } else {
-          bounds = (layer as L.Polygon).getBounds();
-        }
-        combinedBounds = combinedBounds
-          ? combinedBounds.extend(bounds)
-          : bounds;
-      }
+    if (!bounds.isValid()) return;
+    const { x, y } = map.getSize();
+    const desktop = x >= 768;
+    map.flyToBounds(bounds, {
+      paddingTopLeft: [30, Math.min(280, y * 0.47)],
+      paddingBottomRight: panelOpen
+        ? desktop ? [Math.min(376, x * 0.4 + 24), 30] : [30, Math.min(220, y * 0.4 + 28)]
+        : [30, 30],
+      maxZoom: 13,
     });
-    if (combinedBounds) {
-      mapRef.current.flyToBounds(combinedBounds, {
-        padding: [50, 50],
-        maxZoom: 13,
-      });
-    }
-  }, [highlightedName, highlightedPlaceIds, selectedPlantationUri]);
+  }, [highlightedName, highlightedPlaceIds, selectedPlantationUri, panelOpen, geojson, enabledFeatures]);
 
   function handleZoomIn() {
     mapRef.current?.zoomIn();
@@ -853,352 +844,302 @@ export default function MapView({
     <div className="relative w-full h-full">
       <div ref={containerRef} className="w-full h-full" />
 
-      {/* Unified top toolbar */}
-      <div className="absolute top-3 left-3 right-3 z-1000 flex items-start gap-2">
-        {/* Toolbar toggle (collapsed state) */}
-        {!toolbarOpen && (
-          <button
-            onClick={() => setToolbarOpen(true)}
-            className="site-panel p-2 text-ink/75 hover:text-teal-strong transition-colors"
-            aria-label="Open map toolbar"
-          >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 20 20"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-            >
-              <path d="M4 6h12M4 10h12M4 14h12" strokeLinecap="round" />
-            </svg>
-          </button>
-        )}
-
-        {/* Toolbar panel */}
-        {toolbarOpen && (
-          <div className="site-panel flex items-center gap-3 px-3 py-2 flex-wrap backdrop-blur-sm">
-            {/* Zoom controls */}
-            <div className="flex items-center">
-              <button
-                onClick={handleZoomIn}
-                className="w-7 h-7 flex items-center justify-center text-ink/75 hover:bg-teal-soft/25 hover:text-teal-strong transition-colors border-r border-ink/10"
-                aria-label="Zoom in"
-              >
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 14 14"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path d="M7 2v10M2 7h10" strokeLinecap="round" />
-                </svg>
-              </button>
-              <button
-                onClick={handleZoomOut}
-                className="w-7 h-7 flex items-center justify-center text-ink/75 hover:bg-teal-soft/25 hover:text-teal-strong transition-colors"
-                aria-label="Zoom out"
-              >
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 14 14"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path d="M2 7h10" strokeLinecap="round" />
-                </svg>
-              </button>
-            </div>
-
-            {/* Divider */}
-            <div className="w-px h-6 bg-ink/10" />
-
-            {/* Search */}
-            <SearchInput
-              geojson={geojson}
-              onSelect={onSelectPlantation}
-              onHighlightName={onHighlightName}
-              onHighlightPlaces={(placeIds) => onHighlightPlaces?.(placeIds)}
-            />
-
-            {/* Divider */}
-            <div className="w-px h-6 bg-ink/10" />
-
-            {/* Legend (compact) */}
-            <div className="flex items-center gap-3 text-xs">
-              <div className="flex items-center gap-1.5">
-                <span className="w-3.5 h-2.5 border-2 border-teal-strong bg-teal-soft/80 inline-block" />
-                <span className="text-ink/65">Selected</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="w-3.5 h-2.5 border border-dashed border-teal-bright bg-teal-soft/60 inline-block" />
-                <span className="text-ink/65">Highlighted</span>
-              </div>
-            </div>
-
-            {/* Divider */}
-            <div className="w-px h-6 bg-ink/10" />
-
-            {/* Feature layers dropdown */}
-            <div className="relative" ref={featuresDropdownRef}>
-              <button
-                onClick={() => setFeaturesOpen((v) => !v)}
-                className={`flex items-center gap-1.5 text-xs font-medium px-2 py-1 transition-colors ${
-                  featuresOpen
-                    ? 'bg-teal-soft/35 text-ink'
-                    : 'text-ink/75 hover:bg-teal-soft/25 hover:text-teal-strong'
-                }`}
-                aria-label="Toggle feature layers"
-                aria-expanded={featuresOpen}
-              >
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 14 14"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                >
-                  <circle cx="7" cy="7" r="3" />
-                  <path
-                    d="M1 7h2.5M10.5 7H13M7 1v2.5M7 10.5V13"
-                    strokeLinecap="round"
-                  />
-                </svg>
-                Features
-                <span className="ml-0.5 bg-stm-sepia-600 text-white text-[10px] leading-none px-1 py-0.5 rounded-full">
-                  {enabledFeatures.size}
-                </span>
-              </button>
-
-              {featuresOpen && (
-                <div className="site-panel absolute top-full left-0 mt-1 w-56 z-10">
-                  <div className="px-3 py-1.5 border-b border-ink/10 flex items-center justify-between">
-                    <span className="text-[10px] font-medium text-ink/55 uppercase tracking-wide">
-                      Feature Layers
-                    </span>
-                    <button
-                      onClick={() => {
-                        setEnabledFeatures((prev) =>
-                          prev.size === allTypes.length
-                            ? new Set<string>()
-                            : new Set(allTypes),
-                        );
-                      }}
-                      className="text-[10px] text-stm-sepia-600 hover:text-stm-sepia-800"
-                    >
-                      {enabledFeatures.size === allTypes.length
-                        ? 'None'
-                        : 'All'}
-                    </button>
-                  </div>
-                  <ul className="max-h-72 overflow-y-auto py-1">
-                    {allTypes.map((ft) => {
-                      const isOn = enabledFeatures.has(ft);
-                      const color = PLACE_TYPE_COLORS[ft];
-                      const label = PLACE_TYPE_LABELS[ft] || ft;
-                      const isLine =
-                        ft === 'river' ||
-                        ft === 'creek' ||
-                        ft === 'road' ||
-                        ft === 'railroad';
-                      const isPoly = ft === 'plantation';
-                      return (
-                        <li key={ft}>
-                          <label className="flex items-center gap-2 px-3 py-1 hover:bg-teal-soft/20 cursor-pointer text-xs">
-                            <input
-                              type="checkbox"
-                              checked={isOn}
-                              onChange={() => {
-                                setEnabledFeatures((prev) => {
-                                  const next = new Set(prev);
-                                  if (next.has(ft)) next.delete(ft);
-                                  else next.add(ft);
-                                  return next;
-                                });
-                              }}
-                              className="accent-stm-sepia-600"
-                            />
-                            {isPoly ? (
-                              <span
-                                className="w-3.5 h-2.5 inline-block border opacity-70"
-                                style={{
-                                  backgroundColor: color,
-                                  borderColor: color,
-                                }}
-                              />
-                            ) : isLine ? (
-                              <span
-                                className="w-3.5 h-0.5 inline-block"
-                                style={{
-                                  backgroundColor: color,
-                                  opacity: 0.75,
-                                }}
-                              />
-                            ) : (
-                              <span
-                                className="w-2.5 h-2.5 rounded-full inline-block border border-cream"
-                                style={{
-                                  backgroundColor: color,
-                                  opacity: 0.8,
-                                }}
-                              />
-                            )}
-                            <span className="text-ink/80 flex-1">{label}</span>
-                          </label>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </div>
-              )}
-            </div>
-            {ENABLE_WARPED_OVERLAYS && (
-              <>
-                {/* Divider */}
-                <div className="w-px h-6 bg-ink/10" />
-
-                {/* Overlay layers dropdown */}
-                <div className="relative" ref={layersDropdownRef}>
-                  <button
-                    onClick={() => setLayersOpen((v) => !v)}
-                    className={`flex items-center gap-1.5 text-xs font-medium px-2 py-1 transition-colors ${
-                      layersOpen
-                        ? 'bg-teal-soft/35 text-ink'
-                        : 'text-ink/75 hover:bg-teal-soft/25 hover:text-teal-strong'
-                    }`}
-                    aria-label="Toggle map layers panel"
-                    aria-expanded={layersOpen}
-                  >
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 14 14"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                    >
-                      <path
-                        d="M7 2L1 5l6 3 6-3-6-3zM1 9l6 3 6-3M1 7l6 3 6-3"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                    Layers
-                    {enabledOverlays.size > 0 && (
-                      <span className="ml-0.5 bg-stm-sepia-600 text-white text-[10px] leading-none px-1 py-0.5 rounded-full">
-                        {enabledOverlays.size}
-                      </span>
-                    )}
-                  </button>
-
-                  {layersOpen && (
-                    <div className="site-panel absolute top-full left-0 mt-1 w-80 z-10">
-                      {/* Shared opacity slider */}
-                      <div className="px-3 py-2 border-b border-ink/10 flex items-center gap-2">
-                        <span className="text-xs text-ink/65 whitespace-nowrap">
-                          Opacity
-                        </span>
-                        <input
-                          type="range"
-                          min={0}
-                          max={1}
-                          step={0.05}
-                          value={opacity}
-                          onChange={(e) =>
-                            setOpacity(parseFloat(e.target.value))
-                          }
-                          className="flex-1 accent-stm-sepia-600"
-                          aria-label="Map overlay opacity"
-                        />
-                        <span className="text-[10px] text-stm-warm-400 w-7 text-right">
-                          {Math.round(opacity * 100)}%
-                        </span>
-                      </div>
-
-                      {/* Map checkboxes with info */}
-                      <ul className="max-h-80 overflow-y-auto py-1">
-                        {OVERLAY_CONFIGS.map((config) => {
-                          const isEnabled = enabledOverlays.has(config.id);
-                          const error = overlayErrors[config.id];
-                          return (
-                            <li key={config.id}>
-                              <label className="flex items-center gap-2 px-3 py-1.5 hover:bg-teal-soft/20 cursor-pointer text-xs">
-                                <input
-                                  type="checkbox"
-                                  checked={isEnabled}
-                                  onChange={() =>
-                                    toggleOverlay(config.id, config)
-                                  }
-                                  className="accent-stm-sepia-600"
-                                />
-                                <span className="text-stm-warm-800 truncate flex-1">
-                                  {config.label}
-                                </span>
-                              </label>
-                              {error && (
-                                <p className="px-3 pb-1 pl-8 text-[10px] text-stm-warm-500">
-                                  {error}
-                                </p>
-                              )}
-                              {config.annotationUrl && (
-                                <p className="px-3 pb-1 pl-8 text-[10px]">
-                                  <a
-                                    href={config.annotationUrl}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="text-stm-sepia-600 underline hover:text-stm-sepia-800"
-                                  >
-                                    Allmaps source
-                                  </a>
-                                </p>
-                              )}
-                              {isEnabled && (
-                                <div className="flex items-center gap-2 px-3 pb-1 pl-8 text-[10px] text-stm-warm-400">
-                                  <span title="Transformation type">
-                                    {TRANSFORMATION_LABELS[
-                                      config.transformation
-                                    ] ?? config.transformation}
-                                  </span>
-                                  <span>·</span>
-                                  <span title="Ground control points">
-                                    {config.gcpCount} GCPs
-                                  </span>
-                                </div>
-                              )}
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    </div>
-                  )}
-                </div>
-              </>
-            )}
-
-            {/* Collapse button */}
+      <div className="pointer-events-none absolute top-3 left-3 right-3 z-1000 flex max-w-sm flex-col items-start gap-2 sm:top-5 sm:left-5">
+        <div className="site-panel pointer-events-auto w-full rounded-xl p-4 shadow-lg">
+          <h1 className="text-xl font-semibold tracking-tight text-ink">Explore Suriname’s history</h1>
+          <p className="mt-1 mb-3 text-sm text-ink/75">Search for a place or person, or select a place on the map.</p>
+          <SearchInput
+            geojson={geojson}
+            yearRange={searchYearRange}
+            onSelect={onSelectPlantation}
+            onSelectPerson={onSelectPerson}
+            onHighlightName={onHighlightName}
+            onHighlightPlaces={(placeIds) => onHighlightPlaces?.(placeIds)}
+          />
+          {yearBounds && (
+            <RecordedYearsFilter bounds={yearBounds} range={yearRange} onChange={onYearRangeChange} />
+          )}
+          {searchYearRange && geojson?.features.length === 0 && (
+            <p className="mt-1 text-xs text-ink/75" role="status">No mapped places in this range.</p>
+          )}
+        </div>
+        <div className="site-panel pointer-events-auto flex flex-wrap items-center gap-2 rounded-lg px-2 py-1.5 shadow-md">
+          {/* Zoom controls */}
+          <div className="flex items-center">
             <button
-              onClick={() => setToolbarOpen(false)}
-              className="ml-auto text-stm-warm-400 hover:text-stm-warm-600 transition-colors p-0.5"
-              aria-label="Collapse toolbar"
+              onClick={handleZoomIn}
+              className="w-7 h-7 flex items-center justify-center text-ink/75 hover:bg-teal-soft/25 hover:text-teal-strong transition-colors border-r border-ink/10"
+              aria-label="Zoom in"
             >
               <svg
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
+                width="14"
+                height="14"
+                viewBox="0 0 14 14"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path d="M7 2v10M2 7h10" strokeLinecap="round" />
+              </svg>
+            </button>
+            <button
+              onClick={handleZoomOut}
+              className="w-7 h-7 flex items-center justify-center text-ink/75 hover:bg-teal-soft/25 hover:text-teal-strong transition-colors"
+              aria-label="Zoom out"
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 14 14"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path d="M2 7h10" strokeLinecap="round" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Divider */}
+          <div className="w-px h-6 bg-ink/10" />
+
+          <div className="relative" ref={featuresDropdownRef}>
+            <button
+              onClick={() => setFeaturesOpen((v) => !v)}
+              className={`flex items-center gap-1.5 text-xs font-medium px-2 py-1 transition-colors ${
+                featuresOpen
+                  ? 'bg-teal-soft/35 text-ink'
+                  : 'text-ink/75 hover:bg-teal-soft/25 hover:text-teal-strong'
+              }`}
+              aria-label="Toggle feature layers"
+              aria-expanded={featuresOpen}
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 14 14"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="1.5"
               >
-                <path d="M4 4l8 8M12 4l-8 8" strokeLinecap="round" />
+                <circle cx="7" cy="7" r="3" />
+                <path
+                  d="M1 7h2.5M10.5 7H13M7 1v2.5M7 10.5V13"
+                  strokeLinecap="round"
+                />
               </svg>
+              Places
+              <span className="ml-0.5 bg-stm-sepia-600 text-white text-[10px] leading-none px-1 py-0.5 rounded-full">
+                {enabledFeatures.size}
+              </span>
             </button>
+
+            {featuresOpen && (
+              <div className="site-panel absolute top-full left-0 mt-1 w-56 z-10">
+                <div className="px-3 py-1.5 border-b border-ink/10 flex items-center justify-between">
+                  <span className="text-[10px] font-medium text-ink/55 uppercase tracking-wide">
+                    Types of places
+                  </span>
+                  <button
+                    onClick={() => {
+                      setEnabledFeatures((prev) =>
+                        prev.size === allTypes.length
+                          ? new Set<string>()
+                          : new Set(allTypes),
+                      );
+                    }}
+                    className="text-[10px] text-stm-sepia-600 hover:text-stm-sepia-800"
+                  >
+                    {enabledFeatures.size === allTypes.length
+                      ? 'None'
+                      : 'All'}
+                  </button>
+                </div>
+                <ul className="max-h-72 overflow-y-auto py-1">
+                  {allTypes.map((ft) => {
+                    const isOn = enabledFeatures.has(ft);
+                    const color = PLACE_TYPE_COLORS[ft];
+                    const label = PLACE_TYPE_LABELS[ft] || ft;
+                    const isLine =
+                      ft === 'river' ||
+                      ft === 'creek' ||
+                      ft === 'road' ||
+                      ft === 'railroad';
+                    const isPoly = ft === 'plantation';
+                    return (
+                      <li key={ft}>
+                        <label className="flex items-center gap-2 px-3 py-1 hover:bg-teal-soft/20 cursor-pointer text-xs">
+                          <input
+                            type="checkbox"
+                            checked={isOn}
+                            onChange={() => {
+                              setEnabledFeatures((prev) => {
+                                const next = new Set(prev);
+                                if (next.has(ft)) next.delete(ft);
+                                else next.add(ft);
+                                return next;
+                              });
+                            }}
+                            className="accent-stm-sepia-600"
+                          />
+                          {isPoly ? (
+                            <span
+                              className="w-3.5 h-2.5 inline-block border opacity-70"
+                              style={{
+                                backgroundColor: color,
+                                borderColor: color,
+                              }}
+                            />
+                          ) : isLine ? (
+                            <span
+                              className="w-3.5 h-0.5 inline-block"
+                              style={{
+                                backgroundColor: color,
+                                opacity: 0.75,
+                              }}
+                            />
+                          ) : (
+                            <span
+                              className="w-2.5 h-2.5 rounded-full inline-block border border-cream"
+                              style={{
+                                backgroundColor: color,
+                                opacity: 0.8,
+                              }}
+                            />
+                          )}
+                          <span className="text-ink/80 flex-1">{label}</span>
+                        </label>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            )}
           </div>
-        )}
+          {ENABLE_WARPED_OVERLAYS && (
+            <>
+              {/* Divider */}
+              <div className="w-px h-6 bg-ink/10" />
+
+              {/* Overlay layers dropdown */}
+              <div className="relative" ref={layersDropdownRef}>
+                <button
+                  onClick={() => setLayersOpen((v) => !v)}
+                  className={`flex items-center gap-1.5 text-xs font-medium px-2 py-1 transition-colors ${
+                    layersOpen
+                      ? 'bg-teal-soft/35 text-ink'
+                      : 'text-ink/75 hover:bg-teal-soft/25 hover:text-teal-strong'
+                  }`}
+                  aria-label="Toggle map layers panel"
+                  aria-expanded={layersOpen}
+                >
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 14 14"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  >
+                    <path
+                      d="M7 2L1 5l6 3 6-3-6-3zM1 9l6 3 6-3M1 7l6 3 6-3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  Historical maps
+                  {enabledOverlays.size > 0 && (
+                    <span className="ml-0.5 bg-stm-sepia-600 text-white text-[10px] leading-none px-1 py-0.5 rounded-full">
+                      {enabledOverlays.size}
+                    </span>
+                  )}
+                </button>
+
+                {layersOpen && (
+                  <div className="site-panel absolute top-full left-auto right-0 mt-1 w-60 sm:w-80 z-10">
+                    {/* Shared opacity slider */}
+                    <div className="px-3 py-2 border-b border-ink/10 flex items-center gap-2">
+                      <span className="text-xs text-ink/65 whitespace-nowrap">
+                        Opacity
+                      </span>
+                      <input
+                        type="range"
+                        min={0}
+                        max={1}
+                        step={0.05}
+                        value={opacity}
+                        onChange={(e) =>
+                          setOpacity(parseFloat(e.target.value))
+                        }
+                        className="flex-1 accent-stm-sepia-600"
+                        aria-label="Map overlay opacity"
+                      />
+                      <span className="text-[10px] text-stm-warm-400 w-7 text-right">
+                        {Math.round(opacity * 100)}%
+                      </span>
+                    </div>
+
+                    {/* Map checkboxes with info */}
+                    <ul className="max-h-80 overflow-y-auto py-1">
+                      {OVERLAY_CONFIGS.map((config) => {
+                        const isEnabled = enabledOverlays.has(config.id);
+                        const error = overlayErrors[config.id];
+                        return (
+                          <li key={config.id}>
+                            <label className="flex items-center gap-2 px-3 py-1.5 hover:bg-teal-soft/20 cursor-pointer text-xs">
+                              <input
+                                type="checkbox"
+                                checked={isEnabled}
+                                onChange={() =>
+                                  toggleOverlay(config.id, config)
+                                }
+                                className="accent-stm-sepia-600"
+                              />
+                              <span className="text-stm-warm-800 truncate flex-1">
+                                {config.label}
+                              </span>
+                            </label>
+                            {error && (
+                              <p className="px-3 pb-1 pl-8 text-[10px] text-stm-warm-500">
+                                {error}
+                              </p>
+                            )}
+                            {config.annotationUrl && (
+                              <p className="px-3 pb-1 pl-8 text-[10px]">
+                                <a
+                                  href={config.annotationUrl}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="text-stm-sepia-600 underline hover:text-stm-sepia-800"
+                                >
+                                  Allmaps source
+                                </a>
+                              </p>
+                            )}
+                            {isEnabled && (
+                              <div className="flex items-center gap-2 px-3 pb-1 pl-8 text-[10px] text-stm-warm-400">
+                                <span title="Transformation type">
+                                  {TRANSFORMATION_LABELS[
+                                    config.transformation
+                                  ] ?? config.transformation}
+                                </span>
+                                <span>·</span>
+                                <span title="Ground control points">
+                                  {config.gcpCount} GCPs
+                                </span>
+                              </div>
+                            )}
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+
+        </div>
       </div>
     </div>
   );
@@ -1207,12 +1148,16 @@ export default function MapView({
 /* Inline search input — unified places + persons search */
 function SearchInput({
   geojson,
+  yearRange,
   onSelect,
+  onSelectPerson,
   onHighlightName,
   onHighlightPlaces,
 }: {
   geojson: GeoJSONCollection | null;
+  yearRange: YearRange | null;
   onSelect: (feature: GeoJSONFeature) => void;
+  onSelectPerson: (hit: RankedPersonHit) => void;
   onHighlightName: (name: string) => void;
   onHighlightPlaces: (placeIds: string[]) => void;
 }) {
@@ -1223,23 +1168,13 @@ function SearchInput({
     null,
   );
   const [wardIndex, setWardIndex] = useState<PersonSearchIndex | null>(null);
-  const router = useRouter();
+  const { labels } = usePlaceTypes();
 
-  // Deep-link a person hit into /places: open the first routed place with
-  // ?highlightPerson= so PlaceEditor auto-expands and highlights the row.
-  const openPersonHit = useCallback(
-    (hit: { display: string; placeIds: string[] }) => {
-      onHighlightPlaces(hit.placeIds);
-      setOpen(false);
-      const placeId = hit.placeIds[0];
-      if (placeId) {
-        router.push(
-          `/places?place=${encodeURIComponent(placeId)}&highlightPerson=${encodeURIComponent(hit.display)}`,
-        );
-      }
-    },
-    [onHighlightPlaces, router],
-  );
+  function openPersonHit(hit: RankedPersonHit) {
+    onSelectPerson(hit);
+    setQuery(hit.display);
+    setOpen(false);
+  }
 
   // Eager plantation-names shard alongside the map payload; the ward shard
   // lazy-loads on first input focus so initial render stays untouched.
@@ -1261,22 +1196,32 @@ function SearchInput({
   }, [wardIndex]);
 
   const placeResults = (() => {
-    if (!geojson || query.length < 2 || category === 'persons') return [];
-    const q = query.toLowerCase();
+    if (!geojson || query.trim().length < 2 || category === 'persons') return [];
+    const q = query.trim().toLowerCase();
     return geojson.features
-      .filter((f) => f.properties.name?.toLowerCase().includes(q))
+      .filter(({ properties }) =>
+        [properties.name, ...(properties.allNames ?? [])].some((name) =>
+          name?.toLowerCase().includes(q),
+        ),
+      )
       .slice(0, 20);
   })();
 
   const personHits = (() => {
-    if (query.length < 2 || category === 'places') return [];
-    return searchPersonShards([personIndex, wardIndex], query, 25);
+    if (query.trim().length < 2 || category === 'places') return [];
+    return searchPersonShards([personIndex, wardIndex], query, 25, yearRange ?? undefined);
   })();
 
   const hasResults = placeResults.length > 0 || personHits.length > 0;
 
   return (
-    <div className="relative">
+    <div
+      className="relative"
+      role="search"
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false);
+      }}
+    >
       <input
         type="text"
         placeholder="Search places & people..."
@@ -1286,29 +1231,34 @@ function SearchInput({
           setOpen(true);
         }}
         onKeyDown={(e) => {
-          if (e.key === 'Enter' && query.length >= 2) {
-            onHighlightName(query);
-            if (personHits.length > 0) {
-              onHighlightPlaces(placeIdsForHits(personHits));
-            }
+          if (e.key === 'Escape' && open) {
+            e.preventDefault();
             setOpen(false);
+            return;
           }
+          if (e.key !== 'Enter' || !hasResults) return;
+          if (placeResults.length === 1 && personHits.length === 0) {
+            onSelect(placeResults[0]);
+            setQuery(placeResults[0].properties.name);
+          } else if (personHits.length === 1 && placeResults.length === 0) {
+            openPersonHit(personHits[0]);
+          } else if (personHits.length > 0) {
+            onHighlightPlaces(placeIdsForHits(personHits));
+          } else {
+            onHighlightName(query.trim());
+          }
+          setOpen(false);
         }}
         onFocus={() => {
           setOpen(true);
           ensureWardIndex();
         }}
-        onBlur={() => setTimeout(() => setOpen(false), 200)}
         aria-label="Search places and people by name"
-        aria-autocomplete="list"
-        role="combobox"
-        aria-expanded={open && hasResults}
-        className="w-48 px-2.5 py-1 border border-ink/15 bg-cream/95 text-sm text-ink placeholder:text-ink/35 focus:outline-none focus:ring-2 focus:ring-teal-bright/40"
+        className="w-full rounded-md px-3 py-2.5 border border-ink/15 bg-cream/95 text-sm text-ink placeholder:text-ink/35 focus:outline-none focus:ring-2 focus:ring-teal-bright/40"
       />
-      {open && query.length >= 2 && (
+      {open && query.trim().length >= 2 && (
         <div
-          className="site-panel absolute top-full left-0 mt-1 w-72 max-h-72 overflow-y-auto z-10"
-          role="listbox"
+          className="site-panel absolute top-full left-0 mt-1 w-full max-h-[min(18rem,42dvh)] overflow-y-auto z-10"
         >
           <div
             className="sticky top-0 flex gap-1 bg-cream px-2 py-1.5 border-b border-ink/10"
@@ -1319,7 +1269,7 @@ function SearchInput({
               [
                 ['all', 'All'],
                 ['places', 'Places'],
-                ['persons', 'Persons'],
+                ['persons', 'People'],
               ] as const
             ).map(([value, label]) => {
               const count =
@@ -1355,11 +1305,11 @@ function SearchInput({
           {placeResults.length > 0 && (
             <div>
               <p className="px-3 pt-2 pb-1 text-[10px] font-medium uppercase tracking-[0.14em] text-ink/45">
-                Places &amp; Plantations
+                Places
               </p>
               <ul>
                 {placeResults.map((f) => (
-                  <li key={f.id} role="option" aria-selected="false">
+                  <li key={`place-${f.id}`}>
                     <button
                       type="button"
                       className="w-full text-left px-3 py-2 text-sm text-ink/80 hover:bg-teal-soft/20 focus:bg-teal-soft/20 focus:outline-none transition-colors"
@@ -1370,9 +1320,9 @@ function SearchInput({
                       }}
                     >
                       <span className="font-medium">{f.properties.name}</span>
-                      {f.properties.wikidataQid && (
+                      {f.properties.featureType && (
                         <span className="ml-2 text-xs text-stm-warm-400">
-                          {f.properties.wikidataQid}
+                          {labels[f.properties.featureType] ?? f.properties.featureType}
                         </span>
                       )}
                     </button>
@@ -1384,11 +1334,11 @@ function SearchInput({
           {personHits.length > 0 && (
             <div>
               <p className="px-3 pt-2 pb-1 text-[10px] font-medium uppercase tracking-[0.14em] text-ink/45">
-                Persons &amp; Actors
+                People
               </p>
               <ul>
                 {personHits.map((hit) => (
-                  <li key={hit.display} role="option" aria-selected="false">
+                  <li key={`person-${hit.display}`}>
                     <button
                       type="button"
                       className="w-full text-left px-3 py-2 text-sm text-ink/80 hover:bg-teal-soft/20 focus:bg-teal-soft/20 focus:outline-none transition-colors"
@@ -1396,7 +1346,7 @@ function SearchInput({
                     >
                       <span className="font-medium">{hit.display}</span>
                       <span className="ml-2 text-[10px] text-ink/45">
-                        {hit.kinds.join(' · ')}
+                        {hit.years.length > 0 ? 'Recorded' : 'Historical record'}
                         {hit.years.length > 0 &&
                           ` · ${hit.years[0]}${hit.years.length > 1 ? `–${hit.years[hit.years.length - 1]}` : ''}`}
                       </span>
@@ -1409,10 +1359,10 @@ function SearchInput({
           {!hasResults && (
             <p className="px-3 py-3 text-sm text-ink/55" role="status">
               {category === 'places'
-                ? `Geen locaties gevonden voor '${query}'`
+                ? `No places found for '${query}'`
                 : category === 'persons'
-                  ? `Geen personen gevonden voor '${query}'`
-                  : `Geen resultaten gevonden voor '${query}'`}
+                  ? `No people found for '${query}'`
+                  : `No results for '${query}'`}
             </p>
           )}
         </div>

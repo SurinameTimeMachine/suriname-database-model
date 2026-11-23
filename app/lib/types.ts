@@ -259,6 +259,7 @@ export interface GeoJSONFeatureProperties {
   status: string;
   featureType: string; // PlaceType — granular place type
   mapYear: string; // Derivable from E22 source production date
+  recordedYears?: number[]; // Years supported by dated sources
   stmId?: string; // Gazetteer ID (e.g. "stm-00522") — canonical short ID for cross-linking
   plantationUri?: string;
   featureUri?: string;
