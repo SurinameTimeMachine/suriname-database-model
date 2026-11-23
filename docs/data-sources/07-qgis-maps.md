@@ -243,6 +243,22 @@ flowchart LR
 - Coastlines and rivers may have changed
 - Different projection assumptions
 
+### Aligning the 1930 web overlay with the QGIS vectors
+
+The web app loads the [1930 Allmaps annotation page](https://annotations.allmaps.org/manifests/5178b46e14dc211e), which contains nine sheets with separate thin-plate spline georeferences. The 1930 plantation, river and road importers convert vector coordinates from Zanderij / Suriname Old TM (EPSG:31170) to WGS 84 (EPSG:4326). The conversion places the vectors on the web map. The Allmaps control points and spline independently place the scanned image.
+
+The sheet covering Accaribo and Pararac is [Leiden item 2014682](https://annotations.allmaps.org/maps/edaf1bbc8b86f0bf). The current annotation has 197 control points for this sheet. The [earlier Mapathon annotation](https://surinametijdmachine.org/iiif/mapathon/kaart-van-suriname-1930.json) uses the same IIIF image with four control points. Evaluating both splines with the app's installed Allmaps transformer gave these approximate differences for the same image pixels:
+
+| Image pixel (x, y) | Distance between the two web placements |
+| --- | ---: |
+| 6224, 6294 | 843 m |
+| 6291, 6421 | 906 m |
+| 6417, 6168 | 777 m |
+
+These are differences between the two web georeferences. To measure the discrepancy against QGIS, use the georeferenced raster that was visible when the vectors were traced, or the original scan plus the QGIS Georeferencer control points, target CRS, and transformation method. The repository contains the vector exports.
+
+For a matched web overlay, use tiles made from that QGIS raster in EPSG:3857, or recreate its georeference in Allmaps and compare the resulting positions against QGIS. Check the Para–Suriname River connection, plantation corners near Accaribo and Gelderland, and reference features on other sheets, including a sheet join. Compare at a settled Leaflet zoom. The Paramaribo streets imported from the 1916 map have their own source and need a separate comparison.
+
 ---
 
 ## Part 2: Digital Annotations (Vector Layers)
