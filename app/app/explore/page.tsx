@@ -1,6 +1,7 @@
 'use client';
 
 import ExplorationSummary from '@/components/ExplorationSummary';
+import type { YearRange } from '@/components/RecordedYearsFilter';
 import { getGeoJSON } from '@/lib/data';
 import type { RankedPersonHit } from '@/lib/person-search';
 import type { GeoJSONCollection, GeoJSONFeature } from '@/lib/types';
@@ -12,9 +13,13 @@ import {
 } from '@/lib/url';
 import dynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
-import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import { Suspense, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 
 const MapView = dynamic(() => import('@/components/MapView'), { ssr: false });
+
+function matchesYears(years: number[], [from, to]: YearRange): boolean {
+  return years.some((year) => year >= from && year <= to);
+}
 
 export default function ExplorePage() {
   return (
@@ -37,6 +42,22 @@ function ExplorePageInner() {
   const [highlightedPlaceIds, setHighlightedPlaceIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const lastAppliedPlace = useRef<string | null>(null);
+
+  const [yearRange, setYearRange] = useState<YearRange | null>(null);
+  const deferredRange = useDeferredValue(yearRange);
+  const yearBounds = useMemo<YearRange | null>(() => {
+    const years = new Set(geojson?.features.flatMap(({ properties }) => properties.recordedYears ?? []));
+    return years.size ? [Math.min(...years), Math.max(...years)] : null;
+  }, [geojson]);
+  const visibleGeojson = useMemo(() => {
+    if (!geojson || !deferredRange) return geojson;
+    return {
+      ...geojson,
+      features: geojson.features.filter(({ properties }) =>
+        matchesYears(properties.recordedYears ?? [], deferredRange),
+      ),
+    };
+  }, [geojson, deferredRange]);
 
   // Compute initial viewport from URL params
   const initialCenter: [number, number] =
@@ -147,6 +168,16 @@ function ExplorePageInner() {
     syncUrl(null);
   }, [syncUrl]);
 
+  function handleYearRangeChange(range: YearRange | null) {
+    setYearRange(range);
+    if (range && (
+      (selectedFeature && !matchesYears(selectedFeature.properties.recordedYears ?? [], range)) ||
+      (person && !matchesYears(person.years, range))
+    )) {
+      handleClose();
+    }
+  }
+
   const handleViewportChange = useCallback(
     (center: [number, number], zoom: number) => {
       const currentPlaceId = (() => {
@@ -210,7 +241,11 @@ function ExplorePageInner() {
       {/* Map fills all available space — never resizes */}
       <div className="absolute inset-0">
         <MapView
-          geojson={geojson}
+          geojson={visibleGeojson}
+          yearBounds={yearBounds}
+          yearRange={yearRange}
+          searchYearRange={deferredRange}
+          onYearRangeChange={handleYearRangeChange}
           selectedPlantationUri={
             selectedFeature?.properties.plantationUri ??
             selectedFeature?.properties.featureUri ??
@@ -238,7 +273,8 @@ function ExplorePageInner() {
           key={selectedFeature ? `place-${selectedFeature.id}` : `person-${person?.display ?? ''}`}
           feature={selectedFeature}
           person={person}
-          features={geojson.features}
+          features={visibleGeojson?.features ?? geojson.features}
+          yearRange={deferredRange}
           onSelectPlace={handleSelectPlantation}
           onClose={handleClose}
         />

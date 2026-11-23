@@ -18,6 +18,7 @@ import {
   type PlaceFunctionSource,
 } from '../lib/place-functions';
 import { resolveConfirmedPhysicalLinkReview } from '../lib/physical-organization-links';
+import type { GeoJSONFeature } from '../lib/types';
 import {
   almanakkenField,
   isVerlaten,
@@ -1865,6 +1866,33 @@ if (existsSync(geojsonSrc)) {
     console.log(
       `  Merged ${added} gazetteer features into map-features.geojson`,
     );
+  }
+
+  // Publish dated source evidence alongside the geometry for exploration.
+  for (const { properties } of geojson.features as GeoJSONFeature[]) {
+    const entry = properties.stmId
+      ? activeGazetteerById.get(properties.stmId)
+      : undefined;
+    const canonicalUri = entry ? canonicalPlaceUri(entry) : null;
+    const years = new Set<number>();
+    function addYear(value: unknown) {
+      if ((typeof value === 'string' || typeof value === 'number') && /^\d{4}$/.test(String(value))) {
+        years.add(Number(value));
+      }
+    }
+    for (const source of Array.isArray(entry?.sources) ? entry.sources : []) {
+      addYear(sourceRegistryById.get(source)?.mapYear);
+    }
+    for (const uri of new Set([properties.featureUri, properties.plantationUri, properties.placeUri, canonicalUri])) {
+      if (!uri) continue;
+      for (const name of appellationsByEntity[uri] ?? []) {
+        addYear((name as { mapYear?: string }).mapYear);
+      }
+      for (const event of lifecycleEventsByEntity[uri] ?? []) {
+        if (event.hadPrimarySource) addYear(event.startYear);
+      }
+    }
+    properties.recordedYears = [...years].sort((a, b) => a - b);
   }
 
   writeFileSync(join(OUT_DIR, 'map-features.geojson'), JSON.stringify(geojson));

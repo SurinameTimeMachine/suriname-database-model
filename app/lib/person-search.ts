@@ -207,6 +207,7 @@ export function searchPersonShards(
   shards: Array<PersonSearchIndex | null | undefined>,
   query: string,
   limit = 25,
+  yearRange?: readonly [number, number],
 ): RankedPersonHit[] {
   const normalizedQuery = normalizeName(query);
   if (normalizedQuery.length < 2) return [];
@@ -225,12 +226,14 @@ export function searchPersonShards(
   for (const record of merged.values()) {
     const rank = rankRecord(record.k, normalizedQuery);
     if (rank == null) continue;
+    const years = personYears(record);
+    if (yearRange && !years.some((year) => year >= yearRange[0] && year <= yearRange[1])) continue;
     hits.push({
       record,
       display: personDisplay(record),
       kinds: personKinds(record),
       placeIds: record.p,
-      years: personYears(record),
+      years,
       rank,
     });
   }

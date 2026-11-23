@@ -5,12 +5,14 @@ import type { RankedPersonHit } from '@/lib/person-search';
 import { usePlaceTypes } from '@/lib/thesaurus';
 import type { GeoJSONFeature } from '@/lib/types';
 import Link from 'next/link';
+import type { YearRange } from './RecordedYearsFilter';
 import { useEffect, useId, useState } from 'react';
 
 interface ExplorationSummaryProps {
   feature: GeoJSONFeature | null;
   person: RankedPersonHit | null;
   features: GeoJSONFeature[];
+  yearRange?: YearRange | null;
   onSelectPlace: (feature: GeoJSONFeature) => void;
   onClose: () => void;
 }
@@ -19,6 +21,7 @@ export default function ExplorationSummary({
   feature,
   person,
   features,
+  yearRange,
   onSelectPlace,
   onClose,
 }: ExplorationSummaryProps) {
@@ -55,6 +58,9 @@ export default function ExplorationSummary({
           .filter(({ properties }) => properties.stmId && placeIds.has(properties.stmId))
           .map((related) => [related.properties.stmId, related]),
       ).values()).sort((a, b) => a.properties.name.localeCompare(b.properties.name))
+    : [];
+  const matchingYears = yearRange
+    ? place?.recordedYears?.filter((year) => year >= yearRange[0] && year <= yearRange[1]) ?? []
     : [];
   const tablePlaceId = place?.stmId ?? person?.placeIds[0];
   const tableParams = new URLSearchParams();
@@ -97,7 +103,9 @@ export default function ExplorationSummary({
         <div className="mt-3 space-y-2 text-sm leading-relaxed text-ink/85">
           {description && <p>{description}</p>}
           {place.mainBodyWater && <p><strong>Connected waterway</strong> · {place.mainBodyWater}</p>}
-          {place.mapYear && <p><strong>Map year</strong> · {place.mapYear}</p>}
+          {matchingYears.length > 0
+            ? <p><strong>Recorded in this range</strong> · {matchingYears.join(', ')}</p>
+            : place.mapYear && <p><strong>Map year</strong> · {place.mapYear}</p>}
           {otherNames.length > 0 && <p><strong>Also recorded as</strong> · {otherNames.join(', ')}</p>}
         </div>
       )}

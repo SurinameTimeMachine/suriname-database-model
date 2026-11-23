@@ -1,6 +1,7 @@
 'use client';
 
 import 'leaflet/dist/leaflet.css';
+import RecordedYearsFilter, { type YearRange } from './RecordedYearsFilter';
 import { loadAllmapsAnnotation } from '@/lib/allmaps';
 import { HISTORIC_MAPS } from '@/lib/historic-maps';
 import type { RankedPersonHit } from '@/lib/person-search';
@@ -229,6 +230,10 @@ L.DomUtil.getPosition = function (el: HTMLElement): L.Point {
 
 interface MapViewProps {
   geojson: GeoJSONCollection | null;
+  yearBounds: YearRange | null;
+  yearRange: YearRange | null;
+  searchYearRange: YearRange | null;
+  onYearRangeChange: (range: YearRange | null) => void;
   selectedPlantationUri: string | null;
   selectedFeatureType?: string;
   highlightedName: string | null;
@@ -245,6 +250,10 @@ interface MapViewProps {
 
 export default function MapView({
   geojson,
+  yearBounds,
+  yearRange,
+  searchYearRange,
+  onYearRangeChange,
   selectedPlantationUri,
   selectedFeatureType,
   highlightedName,
@@ -784,7 +793,7 @@ export default function MapView({
     const { x, y } = map.getSize();
     const desktop = x >= 768;
     map.flyToBounds(bounds, {
-      paddingTopLeft: [30, Math.min(200, y * 0.38)],
+      paddingTopLeft: [30, Math.min(280, y * 0.47)],
       paddingBottomRight: panelOpen
         ? desktop ? [Math.min(376, x * 0.4 + 24), 30] : [30, Math.min(220, y * 0.4 + 28)]
         : [30, 30],
@@ -832,11 +841,18 @@ export default function MapView({
           <p className="mt-1 mb-3 text-sm text-ink/75">Search for a place or person, or select a place on the map.</p>
           <SearchInput
             geojson={geojson}
+            yearRange={searchYearRange}
             onSelect={onSelectPlantation}
             onSelectPerson={onSelectPerson}
             onHighlightName={onHighlightName}
             onHighlightPlaces={(placeIds) => onHighlightPlaces?.(placeIds)}
           />
+          {yearBounds && (
+            <RecordedYearsFilter bounds={yearBounds} range={yearRange} onChange={onYearRangeChange} />
+          )}
+          {searchYearRange && geojson?.features.length === 0 && (
+            <p className="mt-1 text-xs text-ink/75" role="status">No mapped places in this range.</p>
+          )}
         </div>
         <div className="site-panel pointer-events-auto flex flex-wrap items-center gap-2 rounded-lg px-2 py-1.5 shadow-md">
           {/* Zoom controls */}
@@ -1123,12 +1139,14 @@ export default function MapView({
 /* Inline search input — unified places + persons search */
 function SearchInput({
   geojson,
+  yearRange,
   onSelect,
   onSelectPerson,
   onHighlightName,
   onHighlightPlaces,
 }: {
   geojson: GeoJSONCollection | null;
+  yearRange: YearRange | null;
   onSelect: (feature: GeoJSONFeature) => void;
   onSelectPerson: (hit: RankedPersonHit) => void;
   onHighlightName: (name: string) => void;
@@ -1182,7 +1200,7 @@ function SearchInput({
 
   const personHits = (() => {
     if (query.trim().length < 2 || category === 'places') return [];
-    return searchPersonShards([personIndex, wardIndex], query, 25);
+    return searchPersonShards([personIndex, wardIndex], query, 25, yearRange ?? undefined);
   })();
 
   const hasResults = placeResults.length > 0 || personHits.length > 0;
