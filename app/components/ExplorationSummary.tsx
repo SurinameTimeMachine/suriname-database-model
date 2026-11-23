@@ -4,6 +4,7 @@ import { getPhysicalFeatures } from '@/lib/data';
 import type { RankedPersonHit } from '@/lib/person-search';
 import { usePlaceTypes } from '@/lib/thesaurus';
 import type { GeoJSONFeature } from '@/lib/types';
+import Link from 'next/link';
 import { useEffect, useId, useState } from 'react';
 
 interface ExplorationSummaryProps {
@@ -55,6 +56,10 @@ export default function ExplorationSummary({
           .map((related) => [related.properties.stmId, related]),
       ).values()).sort((a, b) => a.properties.name.localeCompare(b.properties.name))
     : [];
+  const tablePlaceId = place?.stmId ?? person?.placeIds[0];
+  const tableParams = new URLSearchParams();
+  if (tablePlaceId) tableParams.set('place', tablePlaceId);
+  if (person) tableParams.set('highlightPerson', person.display);
 
   return (
     <aside
@@ -77,6 +82,16 @@ export default function ExplorationSummary({
           </svg>
         </button>
       </div>
+
+      {tablePlaceId && (
+        <Link
+          href={`/places?${tableParams.toString()}`}
+          className="mt-2 inline-flex min-h-9 items-center gap-2 rounded-md border border-ink/15 px-3 text-sm font-medium text-teal-strong hover:bg-teal-soft/25 focus-visible:outline-2"
+        >
+          {person ? 'View linked record in table' : 'Open in places table'}
+          <span aria-hidden="true">→</span>
+        </Link>
+      )}
 
       {place && (
         <div className="mt-3 space-y-2 text-sm leading-relaxed text-ink/85">
