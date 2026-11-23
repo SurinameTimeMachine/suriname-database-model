@@ -330,15 +330,24 @@ export default function MapView({
     });
   }, [allTypes]);
 
-  // Search can select places whose type is hidden by the initial filters.
+  // Reveal hidden types for both direct selections and person-linked places.
   useEffect(() => {
-    if (!selectedPlantationUri || !selectedFeatureType) return;
-    setEnabledFeatures((previous) =>
-      previous.has(selectedFeatureType)
-        ? previous
-        : new Set([...previous, selectedFeatureType]),
-    );
-  }, [selectedPlantationUri, selectedFeatureType]);
+    const types = new Set<string>();
+    if (selectedPlantationUri && selectedFeatureType) types.add(selectedFeatureType);
+    if (highlightedPlaceIds?.length) {
+      const ids = new Set(highlightedPlaceIds);
+      for (const { properties } of geojson?.features ?? []) {
+        if (properties.stmId && ids.has(properties.stmId)) {
+          types.add(properties.featureType);
+        }
+      }
+    }
+    if (!types.size) return;
+    setEnabledFeatures((previous) => {
+      const next = new Set([...previous, ...types]);
+      return next.size === previous.size ? previous : next;
+    });
+  }, [geojson, highlightedPlaceIds, selectedPlantationUri, selectedFeatureType]);
 
   // Keep callback ref in sync
   useEffect(() => {
