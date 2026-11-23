@@ -10,6 +10,7 @@ import {
   writeFileSync,
 } from 'fs';
 import { join } from 'path';
+import proj4 from 'proj4';
 import {
   derivePlaceFunctionAssertions,
   placeFunctionLabels,
@@ -31,6 +32,21 @@ const DATA_DIR = join(__dirname, '../../data');
 const DATA_BASE = 'https://data.surinametijdmachine.org/';
 const ONTOLOGY_BASE = 'https://data.surinametijdmachine.org/';
 const PIPELINE_TYPES = new Set(['plantation', 'river', 'creek']);
+const zanderijTm = '+proj=tmerc +lat_0=0 +lon_0=-55.68333333333 +x_0=500000 +y_0=0 +ellps=intl +towgs84=-265,120,-358,0,0,0,0 +units=m +no_defs';
+const oldTmToWgs84 = proj4(`${zanderijTm} +k=0.9996`, 'EPSG:4326');
+const qgisTmToWgs84 = proj4(`${zanderijTm} +k=0.9999`, 'EPSG:4326');
+
+type MapCoordinates = GeoJSONFeature['geometry']['coordinates'];
+
+function align1930Coordinates(coordinates: MapCoordinates): MapCoordinates {
+  if (typeof coordinates[0] === 'number') {
+    // Recover the original grid coordinates, then use the tracing raster's CRS.
+    return qgisTmToWgs84.forward(oldTmToWgs84.inverse(coordinates as number[]));
+  }
+  return (coordinates as (number[] | number[][])[]).map(
+    align1930Coordinates,
+  ) as MapCoordinates;
+}
 
 mkdirSync(OUT_DIR, { recursive: true });
 
@@ -1630,6 +1646,7 @@ writeJSON('provenance.json', provenanceIndex);
 const geojsonSrc = join(LOD_DIR, 'map-features.geojson');
 if (existsSync(geojsonSrc)) {
   const geojson = JSON.parse(readFileSync(geojsonSrc, 'utf-8'));
+  const tracedFeatures = new Set<GeoJSONFeature>(geojson.features);
 
   // Merge additional features from gazetteer (places.csv, military posts, roads, railroad)
   if (gazetteerEntries.length > 0) {
@@ -1869,10 +1886,22 @@ if (existsSync(geojsonSrc)) {
   }
 
   // Publish dated source evidence alongside the geometry for exploration.
-  for (const { properties } of geojson.features as GeoJSONFeature[]) {
+  for (const feature of geojson.features as GeoJSONFeature[]) {
+    const { properties } = feature;
     const entry = properties.stmId
       ? activeGazetteerById.get(properties.stmId)
       : undefined;
+    const seededRoad = entry?.type === 'road'
+      && entry.description === 'Road segment from 1930 plantation map'
+      && entry.modifiedAt === null
+      && entry.sources?.length === 1
+      && entry.sources[0] === 'map-1930';
+    if (
+      (tracedFeatures.has(feature) && PIPELINE_TYPES.has(properties.featureType))
+      || seededRoad
+    ) {
+      feature.geometry.coordinates = align1930Coordinates(feature.geometry.coordinates);
+    }
     const canonicalUri = entry ? canonicalPlaceUri(entry) : null;
     const years = new Set<number>();
     function addYear(value: unknown) {

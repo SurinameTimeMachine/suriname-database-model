@@ -3,7 +3,7 @@
 import 'leaflet/dist/leaflet.css';
 import RecordedYearsFilter, { type YearRange } from './RecordedYearsFilter';
 import { loadAllmapsAnnotation } from '@/lib/allmaps';
-import { HISTORIC_MAPS } from '@/lib/historic-maps';
+import { DEFAULT_HISTORIC_MAP, HISTORIC_MAPS } from '@/lib/historic-maps';
 import type { RankedPersonHit } from '@/lib/person-search';
 import {
   loadPersonIndex,
@@ -33,16 +33,23 @@ interface OverlayConfig {
   id: string;
   label: string;
   annotationUrl?: string;
-  annotationUrls?: string[];
+  rasterUrl?: string;
   defaultEnabled: boolean;
-  transformation: string;
-  gcpCount: number | string;
+  transformation?: string;
+  gcpCount?: number | string;
 }
 
 const OVERLAY_CONFIGS: OverlayConfig[] = [
+  {
+    id: 'map-1930-qgis',
+    label: 'Kaart van Suriname (1930) · QGIS',
+    rasterUrl: '/maps/suriname-1930-qgis.pmtiles',
+    defaultEnabled: true,
+  },
   ...HISTORIC_MAPS.map((map) => ({
     ...map,
-    defaultEnabled: map.defaultEnabled ?? false,
+    label: map.id === DEFAULT_HISTORIC_MAP.id ? `${map.label} · Allmaps` : map.label,
+    defaultEnabled: false,
   })),
   {
     id: 'moseberg-sheet2-1801',
@@ -161,7 +168,7 @@ const OVERLAY_CONFIGS: OverlayConfig[] = [
 const DEFAULT_ENABLED = new Set(
   OVERLAY_CONFIGS.filter((c) => c.defaultEnabled).map((c) => c.id),
 );
-const ENABLE_WARPED_OVERLAYS = true;
+const ENABLE_HISTORICAL_OVERLAYS = true;
 
 /** Feature types active by default; all others stay toggleable but off. */
 const DEFAULT_FEATURE_TYPES = new Set([
@@ -269,7 +276,8 @@ export default function MapView({
 }: MapViewProps) {
   const mapRef = useRef<L.Map | null>(null);
   const layerRef = useRef<L.GeoJSON | null>(null);
-  const warpedLayersRef = useRef<Map<string, L.Layer[]>>(new Map());
+  const overlayLayersRef = useRef(new Map<string, L.Layer & { setOpacity: (opacity: number) => unknown }>());
+  const loadingOverlaysRef = useRef(new Map<string, L.Map>());
   const containerRef = useRef<HTMLDivElement>(null);
   const selectedUriRef = useRef(selectedPlantationUri);
   const highlightedNameRef = useRef(highlightedName);
@@ -398,11 +406,9 @@ export default function MapView({
     });
 
     return () => {
-      // Remove all warped layers
-      warpedLayersRef.current.forEach((layers) => {
-        layers.forEach(safelyRemove);
-      });
-      warpedLayersRef.current.clear();
+      overlayLayersRef.current.forEach(safelyRemove);
+      overlayLayersRef.current.clear();
+      loadingOverlaysRef.current.clear();
       safelyRemove(map);
       mapRef.current = null;
     };
@@ -429,142 +435,92 @@ export default function MapView({
     };
   }, []);
 
-  const loadOverlay = useCallback((id: string, config: OverlayConfig) => {
+  const loadOverlay = useCallback(async (config: OverlayConfig) => {
     const map = mapRef.current;
-    if (!map || warpedLayersRef.current.has(id)) return;
-    const urls =
-      config.annotationUrls ??
-      (config.annotationUrl ? [config.annotationUrl] : []);
-    if (urls.length === 0) return;
+    const { id } = config;
+    if (!map || overlayLayersRef.current.has(id) || loadingOverlaysRef.current.has(id)) return;
 
-    Promise.all(urls.map(loadAllmapsAnnotation))
-      .then(async (annotations) => {
-        const { WarpedMapLayer } = await import('@allmaps/leaflet');
-        if (mapRef.current !== map || !enabledOverlaysRef.current.has(id))
-          return;
+    const loadingOverlays = loadingOverlaysRef.current;
+    loadingOverlays.set(id, map);
+    const isActive = () => mapRef.current === map && enabledOverlaysRef.current.has(id);
+
+    try {
+      let layer: L.Layer & { setOpacity: (opacity: number) => unknown };
+      if (config.rasterUrl) {
+        const { PMTiles, leafletRasterLayer } = await import('pmtiles');
+        const archive = new PMTiles(config.rasterUrl);
+        const header = await archive.getHeader();
+        if (!isActive()) return;
+        layer = leafletRasterLayer(archive, {
+          attribution: '1930 map: <a href="/sources/map-1930">Leiden University Libraries / STM</a>',
+          bounds: [[header.minLat, header.minLon], [header.maxLat, header.maxLon]],
+          minZoom: header.minZoom,
+          maxNativeZoom: header.maxZoom,
+          maxZoom: 18,
+          noWrap: true,
+          zIndex: 3,
+        }) as L.GridLayer;
+      } else if (config.annotationUrl) {
+        const [annotation, { WarpedMapLayer }] = await Promise.all([
+          loadAllmapsAnnotation(config.annotationUrl),
+          import('@allmaps/leaflet'),
+        ]);
         await nextFrame();
-        if (mapRef.current !== map || !enabledOverlaysRef.current.has(id))
-          return;
-
-        const warpedMapLayer = new WarpedMapLayer(annotations[0]);
-        warpedMapLayer.addTo(map);
-        warpedLayersRef.current.set(id, [warpedMapLayer]);
-        for (const annotation of annotations.slice(1)) {
-          if (mapRef.current !== map || !enabledOverlaysRef.current.has(id)) {
-            safelyRemove(warpedMapLayer);
-            warpedLayersRef.current.delete(id);
-            return;
-          }
-          (
-            warpedMapLayer as unknown as {
-              addGeoreferenceAnnotation: (value: unknown) => unknown;
-            }
-          ).addGeoreferenceAnnotation(annotation);
-        }
-        if ('setOpacity' in warpedMapLayer) {
-          (
-            warpedMapLayer as unknown as {
-              setOpacity: (o: number) => void;
-            }
-          ).setOpacity(opacityRef.current);
-        }
-      })
-      .catch(() => {
-        if (mapRef.current !== map) return;
-        setOverlayErrors((previous) => ({
-          ...previous,
-          [id]: 'Image service unavailable',
-        }));
-        const disabled = new Set(enabledOverlaysRef.current);
-        disabled.delete(id);
-        enabledOverlaysRef.current = disabled;
-        setEnabledOverlays(disabled);
-      });
-  }, []);
-
-  // Toggle overlay callback — creates/destroys WarpedMapLayer lazily
-  const toggleOverlay = useCallback(
-    (id: string, config: OverlayConfig) => {
-      if (!ENABLE_WARPED_OVERLAYS) return;
-      const next = new Set(enabledOverlaysRef.current);
-      if (next.has(id)) {
-        const layers = warpedLayersRef.current.get(id);
-        if (layers) {
-          layers.forEach(safelyRemove);
-          warpedLayersRef.current.delete(id);
-        }
-        next.delete(id);
-        enabledOverlaysRef.current = next;
-        setEnabledOverlays(next);
+        if (!isActive()) return;
+        layer = new WarpedMapLayer(annotation);
+      } else {
         return;
       }
 
-      next.add(id);
+      layer.setOpacity(opacityRef.current);
+      layer.addTo(map);
+      overlayLayersRef.current.set(id, layer);
+    } catch {
+      if (!isActive()) return;
+      setOverlayErrors((previous) => ({
+        ...previous,
+        [id]: config.rasterUrl ? 'Map tiles unavailable' : 'Image service unavailable',
+      }));
+      const next = new Set(enabledOverlaysRef.current);
+      next.delete(id);
       enabledOverlaysRef.current = next;
       setEnabledOverlays(next);
+    } finally {
+      if (loadingOverlays.get(id) === map) loadingOverlays.delete(id);
+    }
+  }, []);
+
+  const toggleOverlay = useCallback(
+    (config: OverlayConfig) => {
+      if (!ENABLE_HISTORICAL_OVERLAYS) return;
+      const { id } = config;
+      const next = new Set(enabledOverlaysRef.current);
+      if (next.has(id)) {
+        safelyRemove(overlayLayersRef.current.get(id) ?? null);
+        overlayLayersRef.current.delete(id);
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      enabledOverlaysRef.current = next;
+      setEnabledOverlays(next);
+      if (!next.has(id)) return;
+
       setOverlayErrors((previous) => {
         const { [id]: _removed, ...remaining } = previous;
         return remaining;
       });
-      loadOverlay(id, config);
+      void loadOverlay(config);
     },
     [loadOverlay],
   );
 
-  // Initialize default-enabled overlays once map is ready
   useEffect(() => {
-    if (!ENABLE_WARPED_OVERLAYS) return;
-    const map = mapRef.current;
-    if (!map) return;
-
-    let cancelled = false;
-    map.whenReady(() => {
-      OVERLAY_CONFIGS.forEach((config) => {
-        if (config.defaultEnabled && !warpedLayersRef.current.has(config.id)) {
-          const urls =
-            config.annotationUrls ??
-            (config.annotationUrl ? [config.annotationUrl] : []);
-          Promise.all(urls.map(loadAllmapsAnnotation))
-            .then(async (annotations) => {
-              const { WarpedMapLayer } = await import('@allmaps/leaflet');
-              if (cancelled || mapRef.current !== map) return;
-              await nextFrame();
-              if (cancelled || mapRef.current !== map) return;
-              if (urls.length === 0) return;
-              const warpedMapLayer = new WarpedMapLayer(annotations[0]);
-              warpedMapLayer.addTo(map);
-              warpedLayersRef.current.set(config.id, [warpedMapLayer]);
-              for (const annotation of annotations.slice(1)) {
-                if (cancelled || mapRef.current !== map) {
-                  safelyRemove(warpedMapLayer);
-                  warpedLayersRef.current.delete(config.id);
-                  return;
-                }
-                (
-                  warpedMapLayer as unknown as {
-                    addGeoreferenceAnnotation: (value: unknown) => unknown;
-                  }
-                ).addGeoreferenceAnnotation(annotation);
-              }
-              if ('setOpacity' in warpedMapLayer) {
-                (
-                  warpedMapLayer as unknown as {
-                    setOpacity: (o: number) => void;
-                  }
-                ).setOpacity(opacityRef.current);
-              }
-            })
-            .catch(() => {
-              // Allmaps module failed to load — map still usable
-            });
-        }
-      });
-    });
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+    if (!ENABLE_HISTORICAL_OVERLAYS) return;
+    for (const config of OVERLAY_CONFIGS) {
+      if (config.defaultEnabled) void loadOverlay(config);
+    }
+  }, [loadOverlay]);
 
   // Add/update GeoJSON layer — recreate only when data changes
   useEffect(() => {
@@ -763,19 +719,10 @@ export default function MapView({
     }
   }, [selectedPlantationUri, highlightedName, highlightedPlaceIds]);
 
-  // Sync overlay opacity across all active layers
+  // Sync opacity across all active historical overlays.
   useEffect(() => {
-    warpedLayersRef.current.forEach((layers, id) => {
-      const visible = enabledOverlays.has(id);
-      for (const layer of layers) {
-        if ('setOpacity' in layer) {
-          (layer as unknown as { setOpacity: (o: number) => void }).setOpacity(
-            visible ? opacity : 0,
-          );
-        }
-      }
-    });
-  }, [opacity, enabledOverlays]);
+    overlayLayersRef.current.forEach((layer) => layer.setOpacity(opacity));
+  }, [opacity]);
 
   // Keep the selected or highlighted places clear of the search and summary.
   useEffect(() => {
@@ -1016,7 +963,7 @@ export default function MapView({
               </div>
             )}
           </div>
-          {ENABLE_WARPED_OVERLAYS && (
+          {ENABLE_HISTORICAL_OVERLAYS && (
             <>
               {/* Divider */}
               <div className="w-px h-6 bg-ink/10" />
@@ -1091,7 +1038,7 @@ export default function MapView({
                                 type="checkbox"
                                 checked={isEnabled}
                                 onChange={() =>
-                                  toggleOverlay(config.id, config)
+                                  toggleOverlay(config)
                                 }
                                 className="accent-stm-sepia-600"
                               />
@@ -1116,7 +1063,7 @@ export default function MapView({
                                 </a>
                               </p>
                             )}
-                            {isEnabled && (
+                            {isEnabled && config.transformation && (
                               <div className="flex items-center gap-2 px-3 pb-1 pl-8 text-[10px] text-stm-warm-400">
                                 <span title="Transformation type">
                                   {TRANSFORMATION_LABELS[
