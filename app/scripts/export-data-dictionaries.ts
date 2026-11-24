@@ -184,6 +184,7 @@ const DESCRIPTIONS: Record<string, string> = {
   collectionUrl: 'Landing page or folder URL for the source collection.',
   holdingArchive: 'Archive or institution holding the source.',
   handleUrl: 'Persistent or archival landing-page URL for the source.',
+  searchUrl: 'Public search interface for the source at its holding or publishing institution.',
   iiifManifest: 'IIIF Presentation manifest describing the source.',
   iiifInfoUrl: 'IIIF Image API information URL for the source image.',
   linkedToGazetteer: 'Whether this source currently participates in Gazetteer derivation.',

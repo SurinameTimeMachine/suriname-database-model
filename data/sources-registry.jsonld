@@ -28,6 +28,7 @@
     "publicationPlace": "stm:publicationPlace",
     "holdingArchive": "stm:holdingArchive",
     "handleUrl": "stm:handleUrl",
+    "searchUrl": "stm:searchUrl",
     "iiifManifest": "stm:iiifManifest",
     "iiifInfoUrl": "stm:iiifInfoUrl",
     "linkedToGazetteer": "stm:linkedToGazetteer",
@@ -197,6 +198,7 @@
       "prefLabel": "Suriname Slave and Emancipation Registers (1830-1863)",
       "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/register",
       "timeSpan": "1830-1863",
+      "searchUrl": "https://nationaalarchief.sr/onderzoeken/alle-genealogie/genealogie-slavenregister/persons",
       "linkedToGazetteer": true,
       "description": "Individual-level records of enslaved persons in Suriname including birth, transfer, death, and emancipation events. 95,388 records with PSUR plantation IDs."
     },
@@ -209,6 +211,7 @@
       "prefLabel": "Paramaribo Ward Registers (1828-1847)",
       "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/register",
       "timeSpan": "1828-1847",
+      "searchUrl": "https://nationaalarchief.sr/onderzoeken/alle-genealogie/wijkregister/persons",
       "linkedToGazetteer": true,
       "description": "Census-like registration of free persons in Paramaribo. 102,260 source records (100,260 ingested rows, 100,109 with address keys) including demographics, individualized enslaved person attestations, and addresses linked to 1885 location points via the Concordans Paramaribo."
     },

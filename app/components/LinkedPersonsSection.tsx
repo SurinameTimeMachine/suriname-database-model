@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { useSourceRegistry } from '@/lib/sources';
 
 interface LinkedPersonObservation {
   id: string;
@@ -195,6 +196,10 @@ export default function LinkedPersonsSection({
   persons: LinkedPerson[];
 }) {
   const [query, setQuery] = useState('');
+  const { sources: registrySources } = useSourceRegistry();
+  const slaveRegisterSearchUrl =
+    registrySources.find((source) => source.sourceId === 'slave-registers')
+      ?.searchUrl ?? null;
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -219,17 +224,19 @@ export default function LinkedPersonsSection({
         {' '}
         {persons.length} {persons.length === 1 ? 'person' : 'persons'} found.
       </p>
-      <p className="mt-1 text-sm text-ink/65">
-        Search the full register at the source:{' '}
-        <a
-          href="https://nationaalarchief.sr/onderzoeken/alle-genealogie/genealogie-slavenregister/persons"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-stm-teal-700 underline hover:text-stm-teal-800"
-        >
-          Slavenregister Suriname (Nationaal Archief Suriname) ↗
-        </a>
-      </p>
+      {slaveRegisterSearchUrl && (
+        <p className="mt-1 text-sm text-ink/65">
+          Search the full register at the source:{' '}
+          <a
+            href={slaveRegisterSearchUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-stm-teal-700 underline hover:text-stm-teal-800"
+          >
+            Slavenregister Suriname (Nationaal Archief Suriname) ↗
+          </a>
+        </p>
+      )}
       {persons.length > 5 && (
         <input
           type="search"
