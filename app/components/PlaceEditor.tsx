@@ -3638,6 +3638,17 @@ export default function PlaceEditor({
                   Colonial bias: The Ward registers list skin color as a racial
                   marker
                 </p>
+                <p className="text-[10px] text-stm-sepia-600 tracking-wider">
+                  Search the full register at the source:{' '}
+                  <a
+                    href="https://nationaalarchief.sr/onderzoeken/alle-genealogie/wijkregister/persons"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-stm-teal-700 underline hover:text-stm-teal-800"
+                  >
+                    Wijkregister (Nationaal Archief Suriname) ↗
+                  </a>
+                </p>
                 {filteredWardGroups.map((group) => (
                   <details
                     key={`ward-year-${group.year}`}

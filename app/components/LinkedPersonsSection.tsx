@@ -219,6 +219,17 @@ export default function LinkedPersonsSection({
         {' '}
         {persons.length} {persons.length === 1 ? 'person' : 'persons'} found.
       </p>
+      <p className="mt-1 text-sm text-ink/65">
+        Search the full register at the source:{' '}
+        <a
+          href="https://nationaalarchief.sr/onderzoeken/alle-genealogie/genealogie-slavenregister/persons"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-stm-teal-700 underline hover:text-stm-teal-800"
+        >
+          Slavenregister Suriname (Nationaal Archief Suriname) ↗
+        </a>
+      </p>
       {persons.length > 5 && (
         <input
           type="search"
