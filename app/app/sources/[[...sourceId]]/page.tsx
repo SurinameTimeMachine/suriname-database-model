@@ -516,6 +516,16 @@ function SourceCard({
                     Archive Link
                   </a>
                 )}
+                {source.searchUrl && (
+                  <a
+                    href={source.searchUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-blue-600 hover:text-blue-800 hover:underline"
+                  >
+                    Search Register
+                  </a>
+                )}
                 {source.iiifManifest && (
                   <a
                     href={source.iiifManifest}

@@ -23,6 +23,7 @@ export interface Source {
   publicationPlace: string | null;
   holdingArchive: string | null;
   handleUrl: string | null;
+  searchUrl: string | null;
   iiifManifest: string | null;
   iiifInfoUrl: string | null;
   sameAs: string | null;
@@ -82,6 +83,7 @@ export function parseSourceRegistry(data: any): SourceRegistryData {
         publicationPlace: entry.publicationPlace ?? null,
         holdingArchive: entry.holdingArchive ?? null,
         handleUrl: entry.handleUrl ?? null,
+        searchUrl: entry.searchUrl ?? null,
         iiifManifest: entry.iiifManifest ?? null,
         iiifInfoUrl: entry.iiifInfoUrl ?? null,
         sameAs: entry.sameAs ?? null,
