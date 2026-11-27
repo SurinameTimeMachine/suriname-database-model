@@ -81,8 +81,6 @@ export default function ParamariboAddressHistory({
     return [...unique.values()];
   }, [historicalAddresses]);
 
-  if (rows.length === 0) return null;
-
   const sourceAttributionText = useMemo(() => {
     const registrySources = [
       ...new Set(
@@ -92,6 +90,8 @@ export default function ParamariboAddressHistory({
     if (registrySources.length === 0) return null;
     return `Registry source: ${registrySources.join(', ')}`;
   }, [rows]);
+
+  if (rows.length === 0) return null;
 
   const attributionUrl =
     sourceAttribution?.url ??
