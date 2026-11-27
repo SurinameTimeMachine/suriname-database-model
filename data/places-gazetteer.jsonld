@@ -730739,63 +730739,6 @@
       }
     },
     {
-      "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-1522",
-      "@type": "E53_Place",
-      "id": "stm-1885-address-1522",
-      "type": "historical-address",
-      "names": [
-        {
-          "text": "Drambrandersgracht, F92",
-          "language": "nl",
-          "type": "historical",
-          "isPreferred": true,
-          "source": "historic-map-27",
-          "sourceYear": 1885
-        }
-      ],
-      "broader": null,
-      "description": "",
-      "location": {
-        "lat": 5.822224749244567,
-        "lng": -55.16655227147134,
-        "wkt": "POINT (-55.16655227147134 5.822224749244567)",
-        "crs": "OGC:CRS84"
-      },
-      "sources": [
-        "historic-map-27"
-      ],
-      "externalLinks": [],
-      "fid": 1522,
-      "psurIds": [],
-      "district": "Wijk F",
-      "locationDescription": "Wijk F",
-      "locationDescriptionOriginal": "F92",
-      "placeType": null,
-      "productAssertions": [],
-      "statusAssertions": [],
-      "locationPoint": true,
-      "districtAssertions": [],
-      "locationAssertions": [
-        {
-          "id": "address-observation-1885",
-          "standardized": "Drambrandersgracht, F92",
-          "original": "F92",
-          "source": "historic-map-27",
-          "startYear": 1885,
-          "note": null,
-          "sourceRow": "locatiepunten1885#1522"
-        }
-      ],
-      "diklandRefs": [],
-      "modifiedBy": "data-migration/locatiepunten1885-publicatie-v1",
-      "modifiedAt": "2026-11-13",
-      "sourceRecord": {
-        "dataset": "08-place-points-qgis",
-        "layer": "locatiepunten1885",
-        "featureIndex": 1522
-      }
-    },
-    {
       "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-1541",
       "@type": "E53_Place",
       "id": "stm-1885-address-1541",
@@ -732503,6 +732446,63 @@
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
         "featureIndex": 1521
+      }
+    },
+    {
+      "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-1522",
+      "@type": "E53_Place",
+      "id": "stm-1885-address-1522",
+      "type": "historical-address",
+      "names": [
+        {
+          "text": "Drambrandersgracht, F92",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": true,
+          "source": "historic-map-27",
+          "sourceYear": 1885
+        }
+      ],
+      "broader": null,
+      "description": "",
+      "location": {
+        "lat": 5.822224749244567,
+        "lng": -55.16655227147134,
+        "wkt": "POINT (-55.16655227147134 5.822224749244567)",
+        "crs": "OGC:CRS84"
+      },
+      "sources": [
+        "historic-map-27"
+      ],
+      "externalLinks": [],
+      "fid": 1522,
+      "psurIds": [],
+      "district": "Wijk F",
+      "locationDescription": "Wijk F",
+      "locationDescriptionOriginal": "F92",
+      "placeType": null,
+      "productAssertions": [],
+      "statusAssertions": [],
+      "locationPoint": true,
+      "districtAssertions": [],
+      "locationAssertions": [
+        {
+          "id": "address-observation-1885",
+          "standardized": "Drambrandersgracht, F92",
+          "original": "F92",
+          "source": "historic-map-27",
+          "startYear": 1885,
+          "note": null,
+          "sourceRow": "locatiepunten1885#1522"
+        }
+      ],
+      "diklandRefs": [],
+      "modifiedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "modifiedAt": "2026-11-13",
+      "sourceRecord": {
+        "dataset": "08-place-points-qgis",
+        "layer": "locatiepunten1885",
+        "featureIndex": 1522
       }
     },
     {
@@ -778851,63 +778851,6 @@
       }
     },
     {
-      "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-0556",
-      "@type": "E53_Place",
-      "id": "stm-1885-address-0556",
-      "type": "historical-address",
-      "names": [
-        {
-          "text": "Keizerstraat, B230b",
-          "language": "nl",
-          "type": "historical",
-          "isPreferred": true,
-          "source": "historic-map-27",
-          "sourceYear": 1885
-        }
-      ],
-      "broader": null,
-      "description": "",
-      "location": {
-        "lat": 5.829390117894468,
-        "lng": -55.161376586375944,
-        "wkt": "POINT (-55.161376586375944 5.829390117894468)",
-        "crs": "OGC:CRS84"
-      },
-      "sources": [
-        "historic-map-27"
-      ],
-      "externalLinks": [],
-      "fid": 556,
-      "psurIds": [],
-      "district": "Wijk B",
-      "locationDescription": "Wijk B",
-      "locationDescriptionOriginal": "B230b",
-      "placeType": null,
-      "productAssertions": [],
-      "statusAssertions": [],
-      "locationPoint": true,
-      "districtAssertions": [],
-      "locationAssertions": [
-        {
-          "id": "address-observation-1885",
-          "standardized": "Keizerstraat, B230b",
-          "original": "B230b",
-          "source": "historic-map-27",
-          "startYear": 1885,
-          "note": null,
-          "sourceRow": "locatiepunten1885#556"
-        }
-      ],
-      "diklandRefs": [],
-      "modifiedBy": "data-migration/locatiepunten1885-publicatie-v1",
-      "modifiedAt": "2026-11-13",
-      "sourceRecord": {
-        "dataset": "08-place-points-qgis",
-        "layer": "locatiepunten1885",
-        "featureIndex": 556
-      }
-    },
-    {
       "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-2778",
       "@type": "E53_Place",
       "id": "stm-1885-address-2778",
@@ -778962,6 +778905,63 @@
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
         "featureIndex": 2778
+      }
+    },
+    {
+      "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-0556",
+      "@type": "E53_Place",
+      "id": "stm-1885-address-0556",
+      "type": "historical-address",
+      "names": [
+        {
+          "text": "Keizerstraat, B230b",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": true,
+          "source": "historic-map-27",
+          "sourceYear": 1885
+        }
+      ],
+      "broader": null,
+      "description": "",
+      "location": {
+        "lat": 5.829390117894468,
+        "lng": -55.161376586375944,
+        "wkt": "POINT (-55.161376586375944 5.829390117894468)",
+        "crs": "OGC:CRS84"
+      },
+      "sources": [
+        "historic-map-27"
+      ],
+      "externalLinks": [],
+      "fid": 556,
+      "psurIds": [],
+      "district": "Wijk B",
+      "locationDescription": "Wijk B",
+      "locationDescriptionOriginal": "B230b",
+      "placeType": null,
+      "productAssertions": [],
+      "statusAssertions": [],
+      "locationPoint": true,
+      "districtAssertions": [],
+      "locationAssertions": [
+        {
+          "id": "address-observation-1885",
+          "standardized": "Keizerstraat, B230b",
+          "original": "B230b",
+          "source": "historic-map-27",
+          "startYear": 1885,
+          "note": null,
+          "sourceRow": "locatiepunten1885#556"
+        }
+      ],
+      "diklandRefs": [],
+      "modifiedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "modifiedAt": "2026-11-13",
+      "sourceRecord": {
+        "dataset": "08-place-points-qgis",
+        "layer": "locatiepunten1885",
+        "featureIndex": 556
       }
     },
     {
@@ -816467,9 +816467,17 @@
           "sourceRow": "locatiepunten1885#1606"
         }
       ],
-      "diklandRefs": [],
+      "diklandRefs": [
+        {
+          "folderPath": "\\erfgoed - geschiedenis\\Paramaribo\\Antondekomstraat",
+          "driveUrl": "https://drive.google.com/drive/folders/14DzGjTJtYXLl1vHPpYaH29B9Wj1SyEJl?tid=0B88mZFitv8emcjVfcG5hWFJOdWs",
+          "author": "Philip Dikland",
+          "year": null,
+          "notes": "Anton de Komstraat R048 – het geboortehuis van Anton de Kom."
+        }
+      ],
       "modifiedBy": "Thunnisvanoort",
-      "modifiedAt": "2026-07-31",
+      "modifiedAt": "2026-11-27",
       "sourceRecord": {
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
@@ -875384,6 +875392,63 @@
       }
     },
     {
+      "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-3064",
+      "@type": "E53_Place",
+      "id": "stm-1885-address-3064",
+      "type": "historical-address",
+      "names": [
+        {
+          "text": "Wanicastraat, TBW349b",
+          "language": "nl",
+          "type": "historical",
+          "isPreferred": true,
+          "source": "historic-map-27",
+          "sourceYear": 1885
+        }
+      ],
+      "broader": null,
+      "description": "",
+      "location": {
+        "lat": 5.816393638709631,
+        "lng": -55.176400301204524,
+        "wkt": "POINT (-55.176400301204524 5.816393638709631)",
+        "crs": "OGC:CRS84"
+      },
+      "sources": [
+        "historic-map-27"
+      ],
+      "externalLinks": [],
+      "fid": 3064,
+      "psurIds": [],
+      "district": "Wijk TBW",
+      "locationDescription": "Wijk TBW",
+      "locationDescriptionOriginal": "TBW349b",
+      "placeType": null,
+      "productAssertions": [],
+      "statusAssertions": [],
+      "locationPoint": true,
+      "districtAssertions": [],
+      "locationAssertions": [
+        {
+          "id": "address-observation-1885",
+          "standardized": "Wanicastraat, TBW349b",
+          "original": "TBW349b",
+          "source": "historic-map-27",
+          "startYear": 1885,
+          "note": null,
+          "sourceRow": "locatiepunten1885#3064"
+        }
+      ],
+      "diklandRefs": [],
+      "modifiedBy": "data-migration/locatiepunten1885-publicatie-v1",
+      "modifiedAt": "2026-11-13",
+      "sourceRecord": {
+        "dataset": "08-place-points-qgis",
+        "layer": "locatiepunten1885",
+        "featureIndex": 3064
+      }
+    },
+    {
       "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-2603",
       "@type": "E53_Place",
       "id": "stm-1885-address-2603",
@@ -875780,63 +875845,6 @@
         "dataset": "08-place-points-qgis",
         "layer": "locatiepunten1885",
         "featureIndex": 3123
-      }
-    },
-    {
-      "@id": "https://data.surinametijdmachine.org/place/stm-1885-address-3064",
-      "@type": "E53_Place",
-      "id": "stm-1885-address-3064",
-      "type": "historical-address",
-      "names": [
-        {
-          "text": "Wanicastraat, TBW349b",
-          "language": "nl",
-          "type": "historical",
-          "isPreferred": true,
-          "source": "historic-map-27",
-          "sourceYear": 1885
-        }
-      ],
-      "broader": null,
-      "description": "",
-      "location": {
-        "lat": 5.816393638709631,
-        "lng": -55.176400301204524,
-        "wkt": "POINT (-55.176400301204524 5.816393638709631)",
-        "crs": "OGC:CRS84"
-      },
-      "sources": [
-        "historic-map-27"
-      ],
-      "externalLinks": [],
-      "fid": 3064,
-      "psurIds": [],
-      "district": "Wijk TBW",
-      "locationDescription": "Wijk TBW",
-      "locationDescriptionOriginal": "TBW349b",
-      "placeType": null,
-      "productAssertions": [],
-      "statusAssertions": [],
-      "locationPoint": true,
-      "districtAssertions": [],
-      "locationAssertions": [
-        {
-          "id": "address-observation-1885",
-          "standardized": "Wanicastraat, TBW349b",
-          "original": "TBW349b",
-          "source": "historic-map-27",
-          "startYear": 1885,
-          "note": null,
-          "sourceRow": "locatiepunten1885#3064"
-        }
-      ],
-      "diklandRefs": [],
-      "modifiedBy": "data-migration/locatiepunten1885-publicatie-v1",
-      "modifiedAt": "2026-11-13",
-      "sourceRecord": {
-        "dataset": "08-place-points-qgis",
-        "layer": "locatiepunten1885",
-        "featureIndex": 3064
       }
     },
     {
