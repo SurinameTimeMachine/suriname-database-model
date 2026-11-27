@@ -8,6 +8,7 @@
     "prov": "http://www.w3.org/ns/prov#",
     "xsd": "http://www.w3.org/2001/XMLSchema#",
     "prefLabel": "skos:prefLabel",
+    "E36_Visual_Item": "crm:E36_Visual_Item",
     "P128i_is_carried_by": {
       "@id": "crm:P128i_is_carried_by",
       "@type": "@id"
@@ -65,7 +66,7 @@
   "sdo:name": "RCE Beeldbank images linked to STM places",
   "sdo:description": "Static snapshot of images from the Beeldbank of the Rijksdienst voor het Cultureel Erfgoed (RCE linked data, dataset rce/afbeeldingen) with a Surinamese address, each linked once to the most specific STM location (1885 address point > street 1885 > street 1916 > place). Links are proposals; building-level links assume RCE house numbers follow the 1921/2022 numbering (via Concordans Paramaribo) and must be checked. Re-run scripts/rce_beeldbank/build_rce_images.py to refresh.",
   "sdo:license": "Images: CC BY-SA (per item, see license); metadata: RCE",
-  "sdo:dateModified": "2026-11-27T15:37:32.104088+00:00",
+  "sdo:dateModified": "2026-11-27T15:47:13.720203+00:00",
   "@graph": [
     {
       "@id": "https://data.surinametijdmachine.org/rce-image/00056310-1a2c-38db-a190-1a0f18196fa0",

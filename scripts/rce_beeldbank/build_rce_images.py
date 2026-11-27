@@ -19,7 +19,7 @@ stored as street name + segment ids (stm-1885-street-NNN / stm-1916-street-NNN) 
 
 Usage: python3 scripts/rce_beeldbank/build_rce_images.py   (needs network; ~1-3 min)
 """
-import csv, json, re, urllib.parse, urllib.request, datetime, collections
+import csv, json, os, re, urllib.parse, urllib.request, datetime, collections
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -127,7 +127,15 @@ def main():
                 creators.append(person_cache[c])
         return place, photo, p, img, ids, creators
 
-    items = [(pl, ph) for pl, phs in photos.items() for ph in phs]
+    # A photograph can depict several RCE addresses: keep only its most specific link.
+    level_rank = {'address-1885': 0, 'street-1885': 1, 'street-1916': 2, 'place': 3}
+    best_place = {}
+    for pl, phs in photos.items():
+        for ph in phs:
+            cur = best_place.get(ph)
+            if cur is None or level_rank[choices[pl]['level']] < level_rank[choices[cur]['level']]:
+                best_place[ph] = pl
+    items = sorted((pl, ph) for ph, pl in best_place.items())
     with ThreadPoolExecutor(16) as ex:
         described = list(ex.map(describe, items))
 
@@ -174,6 +182,7 @@ def main():
             'skos': 'http://www.w3.org/2004/02/skos/core#', 'dct': 'http://purl.org/dc/terms/',
             'prov': 'http://www.w3.org/ns/prov#', 'xsd': 'http://www.w3.org/2001/XMLSchema#',
             'prefLabel': 'skos:prefLabel',
+            'E36_Visual_Item': 'crm:E36_Visual_Item',
             'P128i_is_carried_by': {'@id': 'crm:P128i_is_carried_by', '@type': '@id'},
             'P138_represents': {'@id': 'crm:P138_represents', '@type': '@id'},
             'hadPrimarySource': {'@id': 'prov:hadPrimarySource', '@type': '@id'},
@@ -206,7 +215,16 @@ def main():
         'sdo:dateModified': datetime.datetime.now(datetime.timezone.utc).isoformat(),
         '@graph': graph,
     }
-    OUT.write_text(json.dumps(doc, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    dupes = [k for k, n in collections.Counter(g['@id'] for g in graph).items() if n > 1]
+    if dupes:
+        raise SystemExit(f'Duplicate image ids: {dupes[:5]}')
+    tmp = OUT.with_name(OUT.name + '.tmp')
+    try:
+        tmp.write_text(json.dumps(doc, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+        os.replace(tmp, OUT)
+    finally:
+        if tmp.exists():
+            tmp.unlink()
     print(f'Wrote {OUT} ({len(graph)} images)')
     print(collections.Counter(g['linkLevel'] for g in graph))
 
