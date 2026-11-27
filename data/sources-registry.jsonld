@@ -131,6 +131,18 @@
       "description": "Online image collection of Rijksmuseum at https://www.rijksmuseum.nl/nl/collectie"
     },
     {
+      "@id": "https://data.surinametijdmachine.org/source/rce-beeldbank",
+      "@type": [
+        "crm:E22_Human-Made_Object"
+      ],
+      "sourceId": "rce-beeldbank",
+      "prefLabel": "Beeldbank Rijksdienst voor het Cultureel Erfgoed (RCE)",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/research-collection",
+      "sameAs": "https://beeldbank.cultureelerfgoed.nl/",
+      "linkedToGazetteer": true,
+      "description": "Image bank of the Cultural Heritage Agency of the Netherlands (RCE), used via its linked-data dataset https://data.cultureelerfgoed.nl/rce/afbeeldingen. Images with a Surinamese address (mostly monument survey photographs 1960-1999) are linked to STM places in data/rce-images.jsonld. Images CC BY-SA 3.0/4.0."
+    },
+    {
       "@id": "https://data.surinametijdmachine.org/source/map-1930",
       "@type": [
         "crm:E22_Human-Made_Object"
