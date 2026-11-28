@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { join } from 'path';
 import type { Metadata } from 'next';
+import LinkedImagesSection from '@/components/LinkedImagesSection';
+import type { LinkedImage } from '@/lib/types';
 import ParamariboAddressHistory, {
   type HistoricalAddress,
 } from '@/components/ParamariboAddressHistory';
@@ -88,6 +90,7 @@ type PlaceProjection = {
     author?: string | null;
     year?: string | null;
   }>;
+  linkedImages?: LinkedImage[];
 };
 
 type GazetteerDocument = {
@@ -165,6 +168,7 @@ export default async function PlaceRecordPage({
     historicalAddresses: place.historicalAddresses ?? [],
     concordansSourceAttribution: place.concordansSourceAttribution ?? null,
     diklandRefs: place.diklandRefs ?? [],
+    linkedImages: place.linkedImages ?? [],
   };
   const canonicalUri = `${CANONICAL_BASE}/place/${id}`;
 
@@ -374,6 +378,14 @@ export default async function PlaceRecordPage({
               ))}
             </ul>
           </section>
+        )}
+
+        {(place.linkedImages?.length ?? 0) > 0 && (
+          <LinkedImagesSection
+            images={place.linkedImages ?? []}
+            title="Images"
+            variant="record"
+          />
         )}
       </article>
     </main>

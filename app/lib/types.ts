@@ -415,6 +415,11 @@ export interface LinkedImage {
   sameAs?: string;
   isPublicDomain?: boolean;
   licenseLabel?: string;
+  /** Collection the image comes from, e.g. 'Rijksmuseum' or 'RCE Beeldbank'. */
+  source?: string;
+  /** Landing page of the image in the source collection. */
+  url?: string | null;
+  creator?: string[];
 }
 
 /** Reference to a plantation description PDF in the Dikland (Suriname Heritage Guide) collection */
