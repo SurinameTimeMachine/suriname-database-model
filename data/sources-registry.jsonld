@@ -143,6 +143,28 @@
       "description": "Image bank of the Cultural Heritage Agency of the Netherlands (RCE), used via its linked-data dataset https://data.cultureelerfgoed.nl/rce/afbeeldingen. Images with a Surinamese address (mostly monument survey photographs 1960-1999) are linked to STM places in data/rce-images.jsonld. Images CC BY-SA 3.0/4.0."
     },
     {
+      "@id": "https://data.surinametijdmachine.org/source/hdsc-streets-paramaribo",
+      "@type": [
+        "crm:E22_Human-Made_Object"
+      ],
+      "sourceId": "hdsc-streets-paramaribo",
+      "prefLabel": "HDSC street list Paramaribo (13 July 2026)",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/dataset",
+      "linkedToGazetteer": true,
+      "description": "List of streets in Paramaribo compiled by the Historical Database of Suriname and the Caribbean (HDSC): label, spelling variants and earlier names, begin and end years, Wikidata id and the source where the street is mentioned (mostly the street list of the Concordans Paramaribo). Used as the leading source for the street records in the gazetteer (data/paramaribo-streets/)."
+    },
+    {
+      "@id": "https://data.surinametijdmachine.org/source/stm-editorial",
+      "@type": [
+        "crm:E22_Human-Made_Object"
+      ],
+      "sourceId": "stm-editorial",
+      "prefLabel": "Suriname Time Machine editorial decision",
+      "P2_has_type": "https://data.surinametijdmachine.org/type/source-type/research-collection",
+      "linkedToGazetteer": true,
+      "description": "Decision by the Suriname Time Machine project team, not taken from a published source. Used where the team links records that the sources do not connect, for example a street and its later name."
+    },
+    {
       "@id": "https://data.surinametijdmachine.org/source/map-1930",
       "@type": [
         "crm:E22_Human-Made_Object"
