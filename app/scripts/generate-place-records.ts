@@ -132,6 +132,7 @@ type GazetteerEntry = JsonObject & {
   almanakkenObservations?: AlmanakkenPlantationObservation[];
   locationPoint?: boolean;
   diklandRefs?: DiklandRef[];
+  streetSegments?: string[];
   deprecated?: boolean;
   mergedInto?: string;
 };
@@ -227,8 +228,12 @@ function readImagesByPlace(gazetteer: GazetteerEntry[]): Map<string, PlaceImage[
     const target = (entry as JsonObject).mergedInto;
     placeIds.set(entry.id, typeof target === 'string' ? target : entry.id);
   }
+  const streetBySegment = new Map<string, string>();
   for (const entry of gazetteer) {
     if (!entry.id || entry.deprecated) continue;
+    for (const segment of entry.streetSegments ?? []) {
+      streetBySegment.set(segment, entry.id);
+    }
     if (entry.type === 'plantation' && entry.fid !== null && entry.fid !== undefined) {
       plantationByFid.set(String(entry.fid), placeIds.get(entry.id) ?? entry.id);
     }
@@ -246,8 +251,21 @@ function readImagesByPlace(gazetteer: GazetteerEntry[]): Map<string, PlaceImage[
 
   for (const image of readGraphIfExists(RCE_IMAGES_PATH)) {
     const depicts = image.P138_represents;
-    if (typeof depicts !== 'string') continue;
-    push(placeIdFromUri(depicts), {
+    let placeId: string | undefined;
+    if (typeof depicts === 'string') {
+      placeId = placeIdFromUri(depicts);
+    } else {
+      // Street-level RCE links carry 1885/1916 street segment ids; the
+      // gazetteer street records list the segments they consist of.
+      const streets = new Set(
+        asArray(image.depictedStreetSegments as string | string[] | undefined)
+          .map((segment) => streetBySegment.get(segment))
+          .filter((id): id is string => Boolean(id)),
+      );
+      if (streets.size === 1) placeId = [...streets][0];
+    }
+    if (!placeId) continue;
+    push(placeId, {
       id: String(image['@id']),
       label: image.prefLabel as string | undefined,
       objectNumber: image.objectNumber as string | undefined,

@@ -1,0 +1,47 @@
+issue,name,detail
+editorial-merge,Dr. Sophie Redmondstraat,"hdsc-24 merged into hdsc-149 (Thunnis van Oort, 27 Nov 2026)"
+map-only,Gemeene Landsweg,stm-1885-street-060: no HDSC street found
+map-only,Gemeene Landsweg,stm-1916-street-055: no HDSC street found
+map-only,Laan van Tourtonne,stm-1885-street-005: no HDSC street found
+map-only,Laan van Tourtonne,stm-1916-street-155: no HDSC street found
+map-only,Nieuwe Weg van Charlesbrug,stm-1916-street-088: no HDSC street found
+map-only,Oude Weg van Charlesburg,stm-1916-street-089: no HDSC street found
+map-only,Van Idsingalaan,stm-1916-street-083: no HDSC street found
+map-only,Van Sijpesteijnlaan,stm-1885-street-087: no HDSC street found
+map-only,Van Sijpesteijnlaan,stm-1916-street-082: no HDSC street found
+map-only,Weg of oude laan naar Charlesburg,stm-1885-street-094: no HDSC street found
+map-only,Weg of oude laan naar Charlesburg,stm-1885-street-095: no HDSC street found
+match-alias,1e of Nieuwe Rijweg,stm-1885-street-059 -> hdsc-28 Eerste Rijweg (alias)
+match-alias,2e of Oude Rijweg,stm-1885-street-002 -> hdsc-157 Tweede Rijweg (alias)
+match-alias,Bamboelaan,stm-1916-street-135 -> hdsc-194 Bamboeslaan (alias)
+match-alias,Gonggrijpstraat,stm-1916-street-029 -> hdsc-36 Gongrijpstraat (alias)
+match-alias,Heiligeweg,stm-1885-street-040 -> hdsc-46 Heiligenweg (alias)
+match-alias,Heiligeweg,stm-1916-street-035 -> hdsc-46 Heiligenweg (alias)
+match-alias,Kalkbranderijstraat,stm-1916-street-165 -> hdsc-61 Kalkbranderstraat (alias)
+match-alias,Klipsteenstraat,stm-1885-street-029 -> hdsc-71 Klipstenenstraat (alias)
+match-alias,Klipsteenstraat,stm-1916-street-024 -> hdsc-71 Klipstenenstraat (alias)
+match-alias,Oude Oranjetuin,stm-1885-street-024 -> hdsc-118 Oranjetuin (alias)
+match-alias,Oude Oranjetuin,stm-1885-street-026 -> hdsc-118 Oranjetuin (alias)
+match-alias,Oude Oranjetuin,stm-1885-street-027 -> hdsc-118 Oranjetuin (alias)
+match-alias,Oude Oranjetuin,stm-1885-street-028 -> hdsc-118 Oranjetuin (alias)
+match-alias,Sommelsdijkschestraat (Palmenlaan),stm-1916-street-142 -> hdsc-144 Sommelsdijkstraat (alias)
+match-fuzzy,Jessurunstraat,stm-1916-street-028 -> hdsc-55 Jesserunstraat (fuzzy 0.93)
+match-fuzzy,Kalkbrandersstraat,stm-1885-street-173 -> hdsc-61 Kalkbranderstraat (fuzzy 0.97)
+match-fuzzy,Koningsstraat,stm-1885-street-067 -> hdsc-75 Koningstraat (fuzzy 0.96)
+match-fuzzy,Koningsstraat,stm-1916-street-062 -> hdsc-75 Koningstraat (fuzzy 0.96)
+match-fuzzy,Malabatrumstraat,stm-1885-street-031 -> hdsc-94 Malebatrumstraat (fuzzy 0.94)
+match-fuzzy,Malabatrumstraat,stm-1916-street-026 -> hdsc-94 Malebatrumstraat (fuzzy 0.94)
+match-fuzzy,Princessestraat,stm-1916-street-027 -> hdsc-130 Prinsessestraat (fuzzy 0.93)
+match-fuzzy,Timmermansstraat,stm-1885-street-126 -> hdsc-154 Timmermanstraat (fuzzy 0.97)
+match-fuzzy,Timmermansstraat,stm-1916-street-121 -> hdsc-154 Timmermanstraat (fuzzy 0.97)
+match-fuzzy,Vaillants Plein,stm-1916-street-034 -> hdsc-158 Vaillantplein (fuzzy 0.96)
+match-fuzzy,Vaillantsplein,stm-1885-street-169 -> hdsc-158 Vaillantplein (fuzzy 0.96)
+match-fuzzy,Van Esveldstraat,stm-1916-street-085 -> hdsc-159 Van Esveltstraat (fuzzy 0.93)
+match-fuzzy,Verlengde Gemeene Landsweg,stm-1885-street-061 -> hdsc-167 Verlengde Gemenelandsweg (fuzzy 0.98)
+match-fuzzy,Verlengde Gemeene Landsweg,stm-1916-street-056 -> hdsc-167 Verlengde Gemenelandsweg (fuzzy 0.98)
+match-fuzzy,Zwalmbergstraat,stm-1885-street-037 -> hdsc-152 Swalmbergstraat (fuzzy 0.93)
+skipped-bridge,Bocco brug,HDSC TempID 241: Brug op kruising S. Redmondstraat - Zhbrugstraat
+skipped-bridge,Engelse brug,HDSC TempID 240: Brug in Paramaribo op de kruising Heiligeweg - Waterkant
+skipped-bridge,Logebrug,HDSC TempID 244: Brug in Paramaribo op de kruising Saramaccastraat – Steenbakkersgracht
+skipped-bridge,Viottebrug,HDSC TempID 243: Brug in Paramaribo op de kruising Viottekreek - Wanicastraat
+skipped-bridge,Willemsbrug,HDSC TempID 242: Brug  in Paramaribo op de kruising Gr. Combeweg – Sommelsdijksekreek
