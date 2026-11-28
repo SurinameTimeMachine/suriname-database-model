@@ -187,6 +187,126 @@ type HistoricalAddressLink = {
  * different certainty per place, so each indexed entry is narrowed to the
  * certainty of that (link, place) relationship.
  */
+type PlaceImage = {
+  id: string;
+  label?: string;
+  objectNumber?: string;
+  year?: number | null;
+  thumbnailUrl?: string | null;
+  contentUrl?: string | null;
+  sameAs?: string;
+  url?: string | null;
+  isPublicDomain?: boolean;
+  licenseLabel?: string;
+  creator?: string[];
+  source: string;
+};
+
+const RCE_IMAGES_PATH = join(DATA_DIR, 'rce-images.jsonld');
+const RIJKSMUSEUM_IMAGES_PATH = join(DATA_DIR, 'rijksmuseum-images.jsonld');
+const DATABASE_PATH = join(__dirname, '../lod/database.jsonld');
+
+function readGraphIfExists(path: string): JsonObject[] {
+  return existsSync(path) ? readGraph(path) : [];
+}
+
+/**
+ * Images per gazetteer place id, from the RCE and Rijksmuseum snapshots.
+ * RCE images point at a gazetteer place (P138_represents place/stm-...).
+ * Rijksmuseum images point at an E25 plantation or an E74 organization; they
+ * are resolved to a gazetteer plantation via the plantation's 1930-map fid, or
+ * via the organization's associatedPhysicalPlantation. Ambiguous cases (more
+ * than one candidate place) are skipped rather than guessed.
+ */
+function readImagesByPlace(gazetteer: GazetteerEntry[]): Map<string, PlaceImage[]> {
+  const byPlace = new Map<string, PlaceImage[]>();
+  const placeIds = new Map<string, string>();
+  const plantationByFid = new Map<string, string>();
+  for (const entry of gazetteer) {
+    if (!entry.id) continue;
+    const target = (entry as JsonObject).mergedInto;
+    placeIds.set(entry.id, typeof target === 'string' ? target : entry.id);
+  }
+  for (const entry of gazetteer) {
+    if (!entry.id || entry.deprecated) continue;
+    if (entry.type === 'plantation' && entry.fid !== null && entry.fid !== undefined) {
+      plantationByFid.set(String(entry.fid), placeIds.get(entry.id) ?? entry.id);
+    }
+  }
+  const push = (placeId: string | undefined, image: PlaceImage) => {
+    if (!placeId) return;
+    const list = byPlace.get(placeId) ?? [];
+    if (!list.some((existing) => existing.id === image.id)) list.push(image);
+    byPlace.set(placeId, list);
+  };
+  const placeIdFromUri = (uri: string): string | undefined => {
+    const match = /\/place\/(stm-[a-z0-9-]+)/.exec(uri);
+    return match ? placeIds.get(match[1]) : undefined;
+  };
+
+  for (const image of readGraphIfExists(RCE_IMAGES_PATH)) {
+    const depicts = image.P138_represents;
+    if (typeof depicts !== 'string') continue;
+    push(placeIdFromUri(depicts), {
+      id: String(image['@id']),
+      label: image.prefLabel as string | undefined,
+      objectNumber: image.objectNumber as string | undefined,
+      year: (image.year as number | undefined) ?? null,
+      thumbnailUrl: image.thumbnailUrl as string | undefined,
+      contentUrl: image.contentUrl as string | undefined,
+      sameAs: image.sameAs as string | undefined,
+      url: image.url as string | undefined,
+      isPublicDomain: Boolean(image.isPublicDomain),
+      licenseLabel: image.licenseLabel as string | undefined,
+      creator: asArray(image.creator as string | string[] | undefined),
+      source: 'RCE Beeldbank',
+    });
+  }
+
+  const rijks = readGraphIfExists(RIJKSMUSEUM_IMAGES_PATH);
+  if (rijks.length > 0) {
+    const entities = new Map(
+      readGraphIfExists(DATABASE_PATH).map((entity) => [String(entity['@id']), entity]),
+    );
+    const resolvePlantation = (uri: string): string | undefined => {
+      const direct = placeIdFromUri(uri);
+      if (direct) return direct;
+      const location = entities.get(uri)?.P53_has_location;
+      const fid = typeof location === 'string' ? /fid-(\d+)$/.exec(location)?.[1] : undefined;
+      return fid ? plantationByFid.get(fid) : undefined;
+    };
+    for (const image of rijks) {
+      const depicts = image.P138_represents;
+      if (typeof depicts !== 'string') continue;
+      let candidates: string[] = [];
+      if (depicts.includes('/organization/')) {
+        const physical = asArray(
+          entities.get(depicts)?.associatedPhysicalPlantation as string | string[] | undefined,
+        );
+        candidates = physical.map(resolvePlantation).filter((id): id is string => Boolean(id));
+      } else {
+        const resolved = resolvePlantation(depicts);
+        if (resolved) candidates = [resolved];
+      }
+      const unique = [...new Set(candidates)];
+      if (unique.length !== 1) continue;
+      push(unique[0], {
+        id: String(image['@id']),
+        label: image.prefLabel as string | undefined,
+        objectNumber: image.objectNumber as string | undefined,
+        year: (image.year as number | undefined) ?? null,
+        thumbnailUrl: image.thumbnailUrl as string | undefined,
+        contentUrl: image.contentUrl as string | undefined,
+        sameAs: image.sameAs as string | undefined,
+        isPublicDomain: Boolean(image.isPublicDomain),
+        licenseLabel: image.licenseLabel as string | undefined,
+        source: 'Rijksmuseum',
+      });
+    }
+  }
+  return byPlace;
+}
+
 function readHistoricalAddressLinks(): Map<string, HistoricalAddressLink[]> {
   if (!existsSync(PARAMARIBO_CONCORDANCE_PATH)) return new Map();
   const document = JSON.parse(
@@ -451,6 +571,10 @@ export function generatePlaceRecords() {
       .map((entry) => [entry.sourceId as string, entry['@id'] as string]),
   );
   const historicalAddressesByPlace = readHistoricalAddressLinks();
+  const imagesByPlace = readImagesByPlace(gazetteer);
+  console.log(
+    `Linked images: ${[...imagesByPlace.values()].reduce((n, list) => n + list.length, 0)} on ${imagesByPlace.size} places`,
+  );
   const wardResidentsByPlace = readWardResidentLinks();
   mkdirSync(OUT_DIR, { recursive: true });
   mkdirSync(PROJECTIONS_DIR, { recursive: true });
@@ -1198,6 +1322,7 @@ export function generatePlaceRecords() {
           : [],
       almanakkenObservations,
       diklandRefs: asArray(entry.diklandRefs),
+      linkedImages: imagesByPlace.get(entry.id) ?? [],
     };
     writeFileSync(join(OUT_DIR, `${entry.id}.jsonld`), `${JSON.stringify(document)}\n`);
     writeFileSync(join(PROJECTIONS_DIR, `${entry.id}.json`), `${JSON.stringify(projection)}\n`);
